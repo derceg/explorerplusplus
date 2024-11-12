@@ -33,33 +33,6 @@ const wchar_t MAIN_FONT_KEY_NAME[] = L"MainFont";
 
 }
 
-BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
-{
-	HKEY hSettingsKey;
-	BOOL bRes = FALSE;
-
-	auto settingsKeyPath =
-		Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s + Storage::REGISTRY_SETTINGS_KEY_NAME;
-	LONG lRes =
-		RegOpenKeyEx(HKEY_CURRENT_USER, settingsKeyPath.c_str(), 0, KEY_READ, &hSettingsKey);
-
-	if (lRes == ERROR_SUCCESS)
-	{
-		DWORD dwSize = sizeof(WINDOWPLACEMENT);
-
-		RegQueryValueEx(hSettingsKey, _T("Position"), nullptr, nullptr, (LPBYTE) pwndpl, &dwSize);
-
-		if (dwSize == sizeof(WINDOWPLACEMENT) && pwndpl->length == sizeof(WINDOWPLACEMENT))
-		{
-			bRes = TRUE;
-		}
-
-		RegCloseKey(hSettingsKey);
-	}
-
-	return bRes;
-}
-
 BOOL LoadAllowMultipleInstancesFromRegistry()
 {
 	BOOL bAllowMultipleInstances = TRUE;
@@ -92,14 +65,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 
 	if (returnValue == ERROR_SUCCESS)
 	{
-		WINDOWPLACEMENT wndpl;
-
-		wndpl.length = sizeof(WINDOWPLACEMENT);
-		GetWindowPlacement(m_hContainer, &wndpl);
-
-		/* Window position. */
-		RegSetValueEx(hSettingsKey, _T("Position"), 0, REG_BINARY, (LPBYTE) &wndpl, sizeof(wndpl));
-
 		/* User settings. */
 		RegistrySettings::SaveDword(hSettingsKey, _T("LastSelectedTab"), m_iLastSelectedTab);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowExtensions"),

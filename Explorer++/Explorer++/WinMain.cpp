@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Explorer++.h"
 #include "AcceleratorManager.h"
 #include "App.h"
+#include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "CrashHandlerHelper.h"
 #include "ExitCode.h"
@@ -19,16 +19,8 @@
 #include <cstdlib>
 #include <format>
 
-struct WindowState
-{
-	RECT bounds;
-	int showState;
-};
-
 [[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
-RECT GetDefaultMainWindowBounds();
-std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML);
 bool IsModelessDialogMessage(App *app, MSG *msg);
 bool MaybeTranslateAccelerator(App *app, MSG *msg);
 
@@ -37,6 +29,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UNREFERENCED_PARAMETER(hInstance);
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
 
 	// It's important that this is what's done first for two reasons:
 	//
@@ -135,16 +128,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	App app(&commandLineSettings);
 
-	WindowState windowState(GetDefaultMainWindowBounds(), nCmdShow);
-	auto loadedWindowState = LoadMainWindowState(bLoadSettingsFromXML);
-
-	if (loadedWindowState)
-	{
-		windowState = *loadedWindowState;
-	}
-
-	Explorerplusplus::Create(&app, &windowState.bounds, windowState.showState);
-
 	MSG msg;
 
 	while (GetMessage(&msg, nullptr, 0, 0) > 0)
@@ -232,61 +215,6 @@ void InitializeLocale()
 	// Use the system default locale.
 	boost::locale::generator gen;
 	std::locale::global(gen(""));
-}
-
-RECT GetDefaultMainWindowBounds()
-{
-	RECT workArea;
-	BOOL res = SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
-	CHECK(res);
-
-	// The strategy here is fairly simple - the window will be sized to a portion of the work area
-	// of the primary monitor and centered.
-	auto width = static_cast<int>(GetRectWidth(&workArea) * 0.60);
-	auto height = static_cast<int>(GetRectHeight(&workArea) * 0.60);
-	int x = (GetRectWidth(&workArea) - width) / 2;
-	int y = (GetRectHeight(&workArea) - height) / 2;
-
-	return { x, y, x + width, y + height };
-}
-
-std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML)
-{
-	WINDOWPLACEMENT placement;
-	BOOL loaded;
-
-	if (loadSettingsFromXML)
-	{
-		loaded = LoadWindowPositionFromXML(&placement);
-	}
-	else
-	{
-		loaded = LoadWindowPositionFromRegistry(&placement);
-	}
-
-	if (!loaded)
-	{
-		return std::nullopt;
-	}
-
-	// When shown in its normal size, the window for the application should at least be on screen
-	// somewhere, even if it's not completely visible. Therefore, the position should be reset if
-	// the window won't be visible on any monitor.
-	// Checking this on startup makes sense, since the monitor setup can change in between
-	// executions.
-	HMONITOR monitor = MonitorFromRect(&placement.rcNormalPosition, MONITOR_DEFAULTTONULL);
-
-	if (!monitor)
-	{
-		return std::nullopt;
-	}
-
-	if (placement.showCmd != SW_SHOWNORMAL && placement.showCmd != SW_SHOWMAXIMIZED)
-	{
-		placement.showCmd = SW_SHOWNORMAL;
-	}
-
-	return WindowState(placement.rcNormalPosition, placement.showCmd);
 }
 
 bool IsModelessDialogMessage(App *app, MSG *msg)

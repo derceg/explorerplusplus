@@ -25,8 +25,9 @@ public:
 
 	/* Saving functions. */
 	void SaveGenericSettings() override;
-	void SaveBookmarks() override;
+	void SaveWindows(const std::vector<WindowStorageData> &windows) override;
 	void SaveTabs() override;
+	void SaveBookmarks() override;
 	void SaveDefaultColumns() override;
 	void SaveApplicationToolbar() override;
 	void SaveMainRebarInformation() override;

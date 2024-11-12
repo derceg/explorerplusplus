@@ -9,10 +9,17 @@
 #include "ColorRuleXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
+#include "WindowStorage.h"
+#include "WindowXmlStorage.h"
 
 XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument) :
 	m_xmlDocument(xmlDocument)
 {
+}
+
+std::vector<WindowStorageData> XmlAppStorage::LoadWindows()
+{
+	return WindowXmlStorage::Load(m_xmlDocument.get());
 }
 
 void XmlAppStorage::LoadBookmarks(BookmarkTree *bookmarkTree)

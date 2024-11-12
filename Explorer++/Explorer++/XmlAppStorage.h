@@ -15,6 +15,7 @@ class XmlAppStorage : public AppStorage
 public:
 	XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument);
 
+	[[nodiscard]] std::vector<WindowStorageData> LoadWindows() override;
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
 	void LoadColorRules(ColorRuleModel *model) override;
 	void LoadApplications(Applications::ApplicationModel *model) override;

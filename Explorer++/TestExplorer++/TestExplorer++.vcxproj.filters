@@ -271,6 +271,15 @@
     <ClCompile Include="DefaultColumnRegistryStorageTest.cpp">
       <Filter>Column Storage</Filter>
     </ClCompile>
+    <ClCompile Include="WindowRegistryStorageTest.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowXmlStorageTest.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowStorageTestHelper.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -369,6 +378,9 @@
     <Filter Include="Column Storage">
       <UniqueIdentifier>{99c509cf-2bb8-492a-8fdb-e3a588b04f69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{099d031f-db3c-4d82-87a6-265361e70edf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -449,6 +461,9 @@
     </ClInclude>
     <ClInclude Include="ColumnStorageTestHelper.h">
       <Filter>Column Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowStorageTestHelper.h">
+      <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -66,21 +66,6 @@ std::optional<std::wstring> MaybeLoadDirectory(IXMLDOMNode *tabNode)
 	return directory;
 }
 
-template <BetterEnum T>
-void LoadBetterEnumValue(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &valueName,
-	T &output)
-{
-	int value;
-	HRESULT hr = XMLSettings::GetIntFromMap(attributeMap, valueName, value);
-
-	if (FAILED(hr) || !T::_is_valid(value))
-	{
-		return;
-	}
-
-	output = T::_from_integral(value);
-}
-
 void LoadBooleanSortDirection(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &valueName,
 	SortDirection &output)
 {
@@ -107,14 +92,17 @@ FolderSettings LoadFolderSettings(IXMLDOMNode *tabNode)
 		return folderSettings;
 	}
 
-	LoadBetterEnumValue(attributeMap.get(), SETTING_VIEW_MODE, folderSettings.viewMode);
-	LoadBetterEnumValue(attributeMap.get(), SETTING_SORT_MODE, folderSettings.sortMode);
+	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_VIEW_MODE,
+		folderSettings.viewMode);
+	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_SORT_MODE,
+		folderSettings.sortMode);
 	folderSettings.groupMode = folderSettings.sortMode;
 	LoadBooleanSortDirection(attributeMap.get(), SETTING_SORT_ASCENDING,
 		folderSettings.sortDirection);
 	folderSettings.groupSortDirection = folderSettings.sortDirection;
-	LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_MODE, folderSettings.groupMode);
-	LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_SORT_DIRECTION,
+	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_MODE,
+		folderSettings.groupMode);
+	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_SORT_DIRECTION,
 		folderSettings.groupSortDirection);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);

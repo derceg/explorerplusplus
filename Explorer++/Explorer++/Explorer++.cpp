@@ -26,16 +26,24 @@
 #include "TaskbarThumbnails.h"
 #include "ThemeWindowTracker.h"
 #include "UiTheming.h"
+#include "WindowStorage.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-Explorerplusplus *Explorerplusplus::Create(App *app, const RECT *initialBounds, int showState)
+Explorerplusplus *Explorerplusplus::Create(App *app)
+{
+	auto defaultBounds = GetDefaultWindowBounds();
+	return Explorerplusplus::Create(app, &defaultBounds, WindowShowState::Normal);
+}
+
+Explorerplusplus *Explorerplusplus::Create(App *app, const RECT *initialBounds,
+	WindowShowState showState)
 {
 	return new Explorerplusplus(app, initialBounds, showState);
 }
 
-Explorerplusplus::Explorerplusplus(App *app, const RECT *initialBounds, int showState) :
+Explorerplusplus::Explorerplusplus(App *app, const RECT *initialBounds, WindowShowState showState) :
 	m_app(app),
 	m_hContainer(CreateMainWindow(initialBounds)),
 	m_browserTracker(app->GetBrowserList(), this),
@@ -70,7 +78,12 @@ Explorerplusplus::Explorerplusplus(App *app, const RECT *initialBounds, int show
 
 	Initialize();
 
-	ShowWindow(m_hContainer, showState);
+	if (showState == +WindowShowState::Minimized)
+	{
+		showState = WindowShowState::Normal;
+	}
+
+	ShowWindow(m_hContainer, ShowStateToNativeShowState(showState));
 	UpdateWindow(m_hContainer);
 }
 
@@ -91,12 +104,45 @@ HWND Explorerplusplus::CreateMainWindow(const RECT *initialBounds)
 		mainWindowClassRegistered = true;
 	}
 
+	RECT validatedBounds = GetValidatedWindowBounds(initialBounds);
+
 	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
-		WS_OVERLAPPEDWINDOW, initialBounds->left, initialBounds->top, GetRectWidth(initialBounds),
-		GetRectHeight(initialBounds), nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+		WS_OVERLAPPEDWINDOW, validatedBounds.left, validatedBounds.top,
+		GetRectWidth(&validatedBounds), GetRectHeight(&validatedBounds), nullptr, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 	CHECK(hwnd);
 
 	return hwnd;
+}
+
+RECT Explorerplusplus::GetValidatedWindowBounds(const RECT *requestedBounds)
+{
+	// When shown in its normal size, the window should at least be on screen somewhere, even if
+	// it's not completely visible.
+	HMONITOR monitor = MonitorFromRect(requestedBounds, MONITOR_DEFAULTTONULL);
+
+	if (!monitor)
+	{
+		return GetDefaultWindowBounds();
+	}
+
+	return *requestedBounds;
+}
+
+RECT Explorerplusplus::GetDefaultWindowBounds()
+{
+	RECT workArea;
+	BOOL res = SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
+	CHECK(res);
+
+	// The strategy here is fairly simple - the window will be sized to a portion of the work area
+	// of the primary monitor and centered.
+	auto width = static_cast<int>(GetRectWidth(&workArea) * 0.60);
+	auto height = static_cast<int>(GetRectHeight(&workArea) * 0.60);
+	int x = (GetRectWidth(&workArea) - width) / 2;
+	int y = (GetRectHeight(&workArea) - height) / 2;
+
+	return { x, y, x + width, y + height };
 }
 
 ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
@@ -122,6 +168,17 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 HWND Explorerplusplus::GetHWND() const
 {
 	return m_hContainer;
+}
+
+WindowStorageData Explorerplusplus::GetStorageData() const
+{
+	WINDOWPLACEMENT placement = {};
+	placement.length = sizeof(placement);
+	BOOL res = GetWindowPlacement(m_hContainer, &placement);
+	CHECK(res);
+
+	return WindowStorageData(placement.rcNormalPosition,
+		NativeShowStateToShowState(placement.showCmd));
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

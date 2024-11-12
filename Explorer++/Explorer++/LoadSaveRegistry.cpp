@@ -14,6 +14,7 @@
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
 #include "Storage.h"
+#include "WindowRegistryStorage.h"
 #include <wil/registry.h>
 
 LoadSaveRegistry::LoadSaveRegistry(App *app, Explorerplusplus *pContainer, bool load) :
@@ -71,6 +72,23 @@ void LoadSaveRegistry::SaveGenericSettings()
 	}
 }
 
+void LoadSaveRegistry::SaveWindows(const std::vector<WindowStorageData> &windows)
+{
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		WindowRegistryStorage::Save(mainKey.get(), windows);
+	}
+}
+
+void LoadSaveRegistry::SaveTabs()
+{
+	m_pContainer->SaveTabSettingsToRegistry();
+}
+
 void LoadSaveRegistry::SaveBookmarks()
 {
 	wil::unique_hkey mainKey;
@@ -81,11 +99,6 @@ void LoadSaveRegistry::SaveBookmarks()
 	{
 		BookmarkRegistryStorage::Save(mainKey.get(), m_app->GetBookmarkTree());
 	}
-}
-
-void LoadSaveRegistry::SaveTabs()
-{
-	m_pContainer->SaveTabSettingsToRegistry();
 }
 
 void LoadSaveRegistry::SaveDefaultColumns()

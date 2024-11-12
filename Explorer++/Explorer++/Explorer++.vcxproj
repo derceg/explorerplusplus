@@ -1251,6 +1251,9 @@
     <ClCompile Include="Win32ResourceLoader.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
     <ClCompile Include="WindowOptionsPage.cpp" />
+    <ClCompile Include="WindowRegistryStorage.cpp" />
+    <ClCompile Include="WindowStorage.cpp" />
+    <ClCompile Include="WindowXmlStorage.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XmlAppStorage.cpp" />
     <ClCompile Include="XmlAppStorageFactory.cpp" />
@@ -1518,6 +1521,9 @@
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="Win32ResourceLoader.h" />
     <ClInclude Include="WindowOptionsPage.h" />
+    <ClInclude Include="WindowRegistryStorage.h" />
+    <ClInclude Include="WindowStorage.h" />
+    <ClInclude Include="WindowXmlStorage.h" />
     <ClInclude Include="XmlAppStorage.h" />
     <ClInclude Include="XmlAppStorageFactory.h" />
     <ClInclude Include="XMLSettings.h" />

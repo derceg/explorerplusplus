@@ -14,6 +14,7 @@
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
 #include "Storage.h"
+#include "WindowXmlStorage.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -147,14 +148,19 @@ void LoadSaveXML::SaveGenericSettings()
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom.get(), m_pRoot.get());
 }
 
-void LoadSaveXML::SaveBookmarks()
+void LoadSaveXML::SaveWindows(const std::vector<WindowStorageData> &windows)
 {
-	BookmarkXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), m_app->GetBookmarkTree(), 1);
+	WindowXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), windows);
 }
 
 void LoadSaveXML::SaveTabs()
 {
 	m_pContainer->SaveTabSettingsToXML(m_pXMLDom.get(), m_pRoot.get());
+}
+
+void LoadSaveXML::SaveBookmarks()
+{
+	BookmarkXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), m_app->GetBookmarkTree(), 1);
 }
 
 void LoadSaveXML::SaveDefaultColumns()

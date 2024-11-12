@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace Applications
 {
 
@@ -14,12 +16,14 @@ class ApplicationModel;
 class BookmarkTree;
 class ColorRuleModel;
 struct FolderColumns;
+struct WindowStorageData;
 
 class AppStorage
 {
 public:
 	virtual ~AppStorage() = default;
 
+	[[nodiscard]] virtual std::vector<WindowStorageData> LoadWindows() = 0;
 	virtual void LoadBookmarks(BookmarkTree *bookmarkTree) = 0;
 	virtual void LoadColorRules(ColorRuleModel *model) = 0;
 	virtual void LoadApplications(Applications::ApplicationModel *model) = 0;

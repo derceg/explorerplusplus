@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "App.h"
+#include "Explorer++.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
 #include "DefaultAccelerators.h"
@@ -11,9 +12,11 @@
 #include "Explorer++_internal.h"
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
+#include "WindowStorage.h"
 #include "XmlAppStorage.h"
 #include "XmlAppStorageFactory.h"
 #include "../Helper/Helper.h"
+#include <ranges>
 
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
@@ -44,7 +47,9 @@ void App::Initialize()
 
 	m_browserList.browserRemovedSignal.AddObserver(std::bind_front(&App::OnBrowserRemoved, this));
 
-	LoadSettings();
+	std::vector<WindowStorageData> windows;
+	LoadSettings(windows);
+	RestoreSession(windows);
 }
 
 void App::OnBrowserRemoved()
@@ -56,7 +61,7 @@ void App::OnBrowserRemoved()
 	}
 }
 
-void App::LoadSettings()
+void App::LoadSettings(std::vector<WindowStorageData> &windows)
 {
 	BOOL loadSettingsFromXML = TestConfigFileInternal();
 	std::unique_ptr<AppStorage> appStorage;
@@ -75,11 +80,27 @@ void App::LoadSettings()
 		return;
 	}
 
+	windows = appStorage->LoadWindows();
 	appStorage->LoadBookmarks(&m_bookmarkTree);
 	appStorage->LoadColorRules(m_colorRuleModel.get());
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
 	appStorage->LoadDefaultColumns(m_config.globalFolderSettings.folderColumns);
+}
+
+void App::RestoreSession(const std::vector<WindowStorageData> &windows)
+{
+	// At the moment, only a single window is supported.
+	for (const auto &window : windows | std::views::take(1))
+	{
+		Explorerplusplus::Create(this, &window.bounds, window.showState);
+	}
+
+	if (m_browserList.IsEmpty())
+	{
+		// No windows were loaded from the previous session, so create the default window.
+		Explorerplusplus::Create(this);
+	}
 }
 
 const CommandLine::Settings *App::GetCommandLineSettings() const

@@ -26,6 +26,7 @@
 #include "TabContainer.h"
 #include "TaskbarThumbnails.h"
 #include "ToolbarHelper.h"
+#include "WindowStorage.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -1020,10 +1021,18 @@ void Explorerplusplus::SaveAllSettings()
 		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this, false);
 	}
 
+	std::vector<WindowStorageData> windows;
+
+	for (const auto *browser : m_app->GetBrowserList()->GetList())
+	{
+		windows.push_back(browser->GetStorageData());
+	}
+
 	loadSave->SaveGenericSettings();
+	loadSave->SaveWindows(windows);
 	loadSave->SaveTabs();
-	loadSave->SaveDefaultColumns();
 	loadSave->SaveBookmarks();
+	loadSave->SaveDefaultColumns();
 	loadSave->SaveApplicationToolbar();
 	loadSave->SaveMainRebarInformation();
 	loadSave->SaveColorRules();

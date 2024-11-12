@@ -14,6 +14,7 @@ class RegistryAppStorage : public AppStorage
 public:
 	RegistryAppStorage(wil::unique_hkey applicationKey);
 
+	[[nodiscard]] std::vector<WindowStorageData> LoadWindows() override;
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
 	void LoadColorRules(ColorRuleModel *model) override;
 	void LoadApplications(Applications::ApplicationModel *model) override;

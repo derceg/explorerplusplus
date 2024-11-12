@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Windows>
+		<Window X="618" Y="598" Width="1207" Height="651" ShowState="0"/>
+		<Window X="212" Y="40" Width="188" Height="1033" ShowState="1"/>
+		<Window X="1165" Y="2" Width="906" Height="641" ShowState="2"/>
+	</Windows>
+</ExplorerPlusPlus>

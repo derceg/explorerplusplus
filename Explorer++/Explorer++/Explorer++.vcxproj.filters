@@ -742,6 +742,15 @@
     <ClCompile Include="ColumnXmlStorage.cpp">
       <Filter>Column Storage</Filter>
     </ClCompile>
+    <ClCompile Include="WindowRegistryStorage.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowXmlStorage.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowStorage.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1536,6 +1545,15 @@
     <ClInclude Include="Storage.h">
       <Filter>Storage</Filter>
     </ClInclude>
+    <ClInclude Include="WindowRegistryStorage.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowStorage.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowXmlStorage.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1709,6 +1727,9 @@
     </Filter>
     <Filter Include="Column Storage">
       <UniqueIdentifier>{0324c360-b481-474e-88d6-1c784d571dfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{621355b2-c29a-4b3c-b487-dc938a666f95}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BrowserWindow.h"
+#include "WindowStorage.h"
 #include <gmock/gmock.h>
 
 class BrowserWindowMock : public BrowserWindow
@@ -16,6 +17,7 @@ public:
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(HWND, GetHWND, (), (const, override));
+	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
 
 	// Navigator
 	MOCK_METHOD(void, OpenItem,

@@ -73,7 +73,6 @@ will need to be changed correspondingly. */
 #define HASH_TREEVIEWDELAYENABLED 2186637066
 #define HASH_TREEVIEWWIDTH 4257779536
 #define HASH_VIEWMODEGLOBAL 3743629718
-#define HASH_POSITION 3300187802
 #define HASH_LOCKTOOLBARS 3842965076
 #define HASH_NEWTABDIRECTORY 3570078203
 #define HASH_INFOTIPTYPE 3366492864
@@ -124,118 +123,6 @@ struct ColumnXMLSaveData
 };
 
 unsigned long hash_setting(unsigned char *str);
-
-BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
-{
-	auto pXMLDom = XMLSettings::CreateXmlDocument();
-
-	if (!pXMLDom)
-	{
-		return FALSE;
-	}
-
-	TCHAR szConfigFile[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
-	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
-
-	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
-	VARIANT_BOOL status;
-	pXMLDom->load(var, &status);
-
-	if (status != VARIANT_TRUE)
-	{
-		return FALSE;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr_nothrow(L"//WindowPosition/*");
-	pXMLDom->selectNodes(bstr.get(), &pNodes);
-
-	if (!pNodes)
-	{
-		return FALSE;
-	}
-
-	pwndpl->length = sizeof(WINDOWPLACEMENT);
-
-	long length;
-	pNodes->get_length(&length);
-
-	/* There should only be one node
-	under 'WindowPosition'. */
-	if (length != 1)
-	{
-		return FALSE;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
-	pNodes->get_item(0, &pNode);
-
-	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-	HRESULT hr = pNode->get_attributes(&am);
-
-	if (SUCCEEDED(hr))
-	{
-		long nChildNodes;
-		am->get_length(&nChildNodes);
-
-		for (long i = 1; i < nChildNodes; i++)
-		{
-			wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
-			am->get_item(i, &pChildNode);
-
-			wil::unique_bstr bstrName;
-			pChildNode->get_nodeName(&bstrName);
-
-			wil::unique_bstr bstrValue;
-			pChildNode->get_text(&bstrValue);
-
-			if (lstrcmp(bstrName.get(), _T("Flags")) == 0)
-			{
-				pwndpl->flags = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("ShowCmd")) == 0)
-			{
-				pwndpl->showCmd = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("MinPositionX")) == 0)
-			{
-				pwndpl->ptMinPosition.x = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("MinPositionY")) == 0)
-			{
-				pwndpl->ptMinPosition.y = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("MaxPositionX")) == 0)
-			{
-				pwndpl->ptMaxPosition.x = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("MaxPositionY")) == 0)
-			{
-				pwndpl->ptMaxPosition.y = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("NormalPositionLeft")) == 0)
-			{
-				pwndpl->rcNormalPosition.left = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("NormalPositionTop")) == 0)
-			{
-				pwndpl->rcNormalPosition.top = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("NormalPositionRight")) == 0)
-			{
-				pwndpl->rcNormalPosition.right = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), _T("NormalPositionBottom")) == 0)
-			{
-				pwndpl->rcNormalPosition.bottom = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-		}
-	}
-
-	return TRUE;
-}
 
 BOOL LoadAllowMultipleInstancesFromXML()
 {
@@ -690,8 +577,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
 
 	XMLSettings::AppendChildToParent(pe.get(), pRoot);
-
-	SaveWindowPositionToXML(pXMLDom, pRoot);
 }
 
 void Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
@@ -727,56 +612,6 @@ void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMEle
 	TabXmlStorage::Save(pXMLDom, tabsNode.get(), GetTabListStorageData());
 
 	XMLSettings::AppendChildToParent(tabsNode.get(), pRoot);
-}
-
-void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
-{
-	wil::com_ptr_nothrow<IXMLDOMElement> pWndPosNode;
-	auto bstr = wil::make_bstr_nothrow(L"WindowPosition");
-	pXMLDom->createElement(bstr.get(), &pWndPosNode);
-
-	SaveWindowPositionToXMLInternal(pXMLDom, pWndPosNode.get());
-
-	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pWndPosNode.get());
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
-
-	XMLSettings::AppendChildToParent(pWndPosNode.get(), pRoot);
-}
-
-void Explorerplusplus::SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,
-	IXMLDOMElement *pWndPosNode)
-{
-	WINDOWPLACEMENT wndpl;
-	wndpl.length = sizeof(WINDOWPLACEMENT);
-	GetWindowPlacement(m_hContainer, &wndpl);
-
-	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pWndPosNode);
-
-	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pWndPosNode, _T("Setting"),
-		_T("Position"));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Flags"),
-		XMLSettings::EncodeIntValue(wndpl.flags));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowCmd"),
-		XMLSettings::EncodeIntValue(wndpl.showCmd));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionX"),
-		XMLSettings::EncodeIntValue(wndpl.ptMinPosition.x));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionY"),
-		XMLSettings::EncodeIntValue(wndpl.ptMinPosition.y));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MaxPositionX"),
-		XMLSettings::EncodeIntValue(wndpl.ptMaxPosition.x));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MaxPositionY"),
-		XMLSettings::EncodeIntValue(wndpl.ptMaxPosition.y));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionLeft"),
-		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.left));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionTop"),
-		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.top));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionRight"),
-		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.right));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionBottom"),
-		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.bottom));
 }
 
 void Explorerplusplus::LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom)
@@ -1078,62 +913,6 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		m_config->defaultFolderSettings.viewMode =
 			ViewMode::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		break;
-
-	case HASH_POSITION:
-	{
-		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-		pNode->get_attributes(&am);
-
-		WINDOWPLACEMENT wndpl;
-		BOOL bMaximized = FALSE;
-
-		long lChildNodes;
-		am->get_length(&lChildNodes);
-
-		for (long j = 1; j < lChildNodes; j++)
-		{
-			wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
-			am->get_item(j, &pChildNode);
-
-			wil::unique_bstr bstrName;
-			pChildNode->get_nodeName(&bstrName);
-
-			wil::unique_bstr bstrValue;
-			pChildNode->get_text(&bstrValue);
-
-			if (lstrcmp(bstrName.get(), L"Left") == 0)
-			{
-				wndpl.rcNormalPosition.left = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), L"Top") == 0)
-			{
-				wndpl.rcNormalPosition.top = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), L"Right") == 0)
-			{
-				wndpl.rcNormalPosition.right = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), L"Bottom") == 0)
-			{
-				wndpl.rcNormalPosition.bottom = XMLSettings::DecodeIntValue(bstrValue.get());
-			}
-			else if (lstrcmp(bstrName.get(), L"Maximized") == 0)
-			{
-				bMaximized = XMLSettings::DecodeBoolValue(bstrValue.get());
-			}
-		}
-
-		wndpl.length = sizeof(WINDOWPLACEMENT);
-		wndpl.showCmd = SW_HIDE;
-
-		if (bMaximized)
-		{
-			wndpl.showCmd |= SW_MAXIMIZE;
-		}
-
-		SetWindowPlacement(m_hContainer, &wndpl);
-	}
-	break;
 
 	case HASH_NEWTABDIRECTORY:
 		m_config->defaultTabDirectory = wszValue;

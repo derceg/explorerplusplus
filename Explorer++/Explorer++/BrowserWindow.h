@@ -9,6 +9,7 @@
 class BrowserCommandController;
 class BrowserPane;
 class ShellBrowser;
+struct WindowStorageData;
 
 // Each browser window contains one or more browser panes, with each pane containing a set of tabs.
 class BrowserWindow : public Navigator
@@ -21,4 +22,5 @@ public:
 	virtual void FocusActiveTab() = 0;
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual HWND GetHWND() const = 0;
+	virtual WindowStorageData GetStorageData() const = 0;
 };

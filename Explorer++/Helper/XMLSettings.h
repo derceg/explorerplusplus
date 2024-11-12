@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BetterEnumsWrapper.h"
 #include <wil/com.h>
 #include <MsXml2.h>
 #include <gdiplus.h>
@@ -45,5 +46,20 @@ HRESULT GetBoolFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &na
 	bool &outputValue);
 HRESULT GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	std::wstring &outputValue);
+
+template <BetterEnum T>
+void LoadBetterEnumValue(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &valueName,
+	T &output)
+{
+	int value;
+	HRESULT hr = GetIntFromMap(attributeMap, valueName, value);
+
+	if (FAILED(hr) || !T::_is_valid(value))
+	{
+		return;
+	}
+
+	output = T::_from_integral(value);
+}
 
 }

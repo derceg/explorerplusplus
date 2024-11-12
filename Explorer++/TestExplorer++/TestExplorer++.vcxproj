@@ -299,6 +299,9 @@
     <ClCompile Include="VersionHelperTest.cpp" />
     <ClCompile Include="VersionTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
+    <ClCompile Include="WindowRegistryStorageTest.cpp" />
+    <ClCompile Include="WindowStorageTestHelper.cpp" />
+    <ClCompile Include="WindowXmlStorageTest.cpp" />
     <ClCompile Include="XmlStorageTestHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -337,6 +340,7 @@
     <ClInclude Include="ShellBrowserFake.h" />
     <ClInclude Include="TabNavigationMock.h" />
     <ClInclude Include="TabStorageTestHelper.h" />
+    <ClInclude Include="WindowStorageTestHelper.h" />
     <ClInclude Include="XmlStorageTestHelper.h" />
   </ItemGroup>
   <ItemGroup>

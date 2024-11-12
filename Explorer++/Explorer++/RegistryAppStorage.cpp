@@ -9,10 +9,17 @@
 #include "ColorRuleRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
+#include "WindowRegistryStorage.h"
+#include "WindowStorage.h"
 
 RegistryAppStorage::RegistryAppStorage(wil::unique_hkey applicationKey) :
 	m_applicationKey(std::move(applicationKey))
 {
+}
+
+std::vector<WindowStorageData> RegistryAppStorage::LoadWindows()
+{
+	return WindowRegistryStorage::Load(m_applicationKey.get());
 }
 
 void RegistryAppStorage::LoadBookmarks(BookmarkTree *bookmarkTree)

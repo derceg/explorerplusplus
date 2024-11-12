@@ -7,6 +7,7 @@
 #include "BrowserList.h"
 #include "BrowserWindow.h"
 #include "GeneratorTestHelper.h"
+#include "WindowStorage.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -41,6 +42,11 @@ public:
 	HWND GetHWND() const override
 	{
 		return nullptr;
+	}
+
+	WindowStorageData GetStorageData() const override
+	{
+		return { {}, WindowShowState::Normal };
 	}
 
 	void OpenItem(const std::wstring &itemPath,

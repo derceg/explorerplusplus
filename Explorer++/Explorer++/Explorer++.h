@@ -25,6 +25,7 @@
 #include "TabNavigationInterface.h"
 #include "Theme.h"
 #include "ValueWrapper.h"
+#include "WindowStorage.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
@@ -92,7 +93,8 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
-	static Explorerplusplus *Create(App *app, const RECT *initialBounds, int showState);
+	static Explorerplusplus *Create(App *app);
+	static Explorerplusplus *Create(App *app, const RECT *initialBounds, WindowShowState showState);
 
 	~Explorerplusplus();
 
@@ -112,6 +114,7 @@ public:
 	ShellBrowser *GetActiveShellBrowser() override;
 
 	HWND GetHWND() const override;
+	WindowStorageData GetStorageData() const override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -195,9 +198,11 @@ private:
 		Increase
 	};
 
-	Explorerplusplus(App *app, const RECT *initialBounds, int showState);
+	Explorerplusplus(App *app, const RECT *initialBounds, WindowShowState showState);
 
 	static HWND CreateMainWindow(const RECT *initialBounds);
+	static RECT GetValidatedWindowBounds(const RECT *requestedBounds);
+	static RECT GetDefaultWindowBounds();
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -391,8 +396,6 @@ private:
 	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
 	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);

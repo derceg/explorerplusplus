@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <vector>
+
+struct WindowStorageData;
+
 /* Save/load interface. This allows multiple
 methods of saving/loading data, as long as it
 conforms to this specification. */
@@ -19,8 +23,9 @@ public:
 
 	/* Saving functions. */
 	virtual void SaveGenericSettings() = 0;
-	virtual void SaveBookmarks() = 0;
+	virtual void SaveWindows(const std::vector<WindowStorageData> &windows) = 0;
 	virtual void SaveTabs() = 0;
+	virtual void SaveBookmarks() = 0;
 	virtual void SaveDefaultColumns() = 0;
 	virtual void SaveApplicationToolbar() = 0;
 	virtual void SaveMainRebarInformation() = 0;

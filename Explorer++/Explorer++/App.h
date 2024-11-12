@@ -16,8 +16,10 @@
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
+#include <vector>
 
 class ColorRuleModel;
+struct WindowStorageData;
 
 class App : private boost::noncopyable
 {
@@ -43,7 +45,8 @@ private:
 
 	void Initialize();
 	void OnBrowserRemoved();
-	void LoadSettings();
+	void LoadSettings(std::vector<WindowStorageData> &windows);
+	void RestoreSession(const std::vector<WindowStorageData> &windows);
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	FeatureList m_featureList;
