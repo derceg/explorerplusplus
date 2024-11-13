@@ -10,6 +10,7 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "TabStorage.h"
 #include <wil/resource.h>
 
 int Tab::idCounter = 1;
@@ -136,4 +137,30 @@ void Tab::SetLockState(LockState lockState)
 boost::signals2::connection Tab::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
 {
 	return m_tabUpdatedSignal.connect(observer);
+}
+
+TabStorageData Tab::GetStorageData() const
+{
+	// The ShellBrowser instance can be null in tests, in which case, this method shouldn't be
+	// called.
+	CHECK(m_shellBrowser);
+
+	TabStorageData storageData;
+	storageData.pidl = m_shellBrowser->GetDirectoryIdl().get();
+	storageData.directory = m_shellBrowser->GetDirectory();
+	storageData.folderSettings = m_shellBrowser->GetFolderSettings();
+	storageData.columns = m_shellBrowser->ExportAllColumns();
+
+	TabSettings tabSettings;
+
+	if (m_useCustomName)
+	{
+		tabSettings.name = m_customName;
+	}
+
+	tabSettings.lockState = m_lockState;
+
+	storageData.tabSettings = tabSettings;
+
+	return storageData;
 }

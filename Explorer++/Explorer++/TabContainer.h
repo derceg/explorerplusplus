@@ -120,6 +120,8 @@ public:
 	const std::unordered_map<int, std::unique_ptr<Tab>> &GetAllTabs() const;
 	std::vector<std::reference_wrapper<const Tab>> GetAllTabsInOrder() const;
 
+	std::vector<TabStorageData> GetStorageData() const;
+
 	// Signals
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>

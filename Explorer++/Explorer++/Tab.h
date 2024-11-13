@@ -15,6 +15,7 @@ struct FolderSettings;
 struct PreservedTab;
 class ShellBrowserImpl;
 class TabNavigationInterface;
+struct TabStorageData;
 
 class Tab : private boost::noncopyable
 {
@@ -58,6 +59,8 @@ public:
 	void SetLockState(LockState lockState);
 
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
+
+	TabStorageData GetStorageData() const;
 
 	/* Although each tab manages its
 	own columns, it does not know

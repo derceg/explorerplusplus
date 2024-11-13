@@ -21,6 +21,7 @@
 #include "TabBacking.h"
 #include "TabContainerBackgroundContextMenu.h"
 #include "TabRestorer.h"
+#include "TabStorage.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -1314,8 +1315,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 	// non-copyable, that can't be done directly. std::reference_wrapper allows
 	// it to be done relatively easily, though. Sorting a set of pointers would
 	// accomplish the same thing.
-	std::sort(sortedTabs.begin(), sortedTabs.end(),
-		[this](const auto &tab1, const auto &tab2)
+	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto &tab1, const auto &tab2)
 		{ return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get()); });
 
 	return sortedTabs;
@@ -1513,4 +1513,17 @@ void TabContainer::ScrollTabControl(ScrollDirection direction)
 void TabContainer::OnFontUpdated()
 {
 	sizeUpdatedSignal.m_signal();
+}
+
+std::vector<TabStorageData> TabContainer::GetStorageData() const
+{
+	std::vector<TabStorageData> tabListStorageData;
+
+	for (auto tabRef : GetAllTabsInOrder())
+	{
+		const auto &tab = tabRef.get();
+		tabListStorageData.push_back(tab.GetStorageData());
+	}
+
+	return tabListStorageData;
 }

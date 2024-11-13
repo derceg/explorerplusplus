@@ -358,31 +358,5 @@ void Explorerplusplus::SelectTabById(int tabId)
 
 std::vector<TabStorageData> Explorerplusplus::GetTabListStorageData()
 {
-	std::vector<TabStorageData> tabListStorageData;
-
-	for (auto tabRef : GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
-	{
-		const auto &tab = tabRef.get();
-
-		TabStorageData tabStorageData;
-		tabStorageData.pidl = tab.GetShellBrowser()->GetDirectoryIdl().get();
-		tabStorageData.directory = tab.GetShellBrowser()->GetDirectory();
-		tabStorageData.folderSettings = tab.GetShellBrowser()->GetFolderSettings();
-		tabStorageData.columns = tab.GetShellBrowser()->ExportAllColumns();
-
-		TabSettings tabSettings;
-
-		if (tab.GetUseCustomName())
-		{
-			tabSettings.name = tab.GetName();
-		}
-
-		tabSettings.lockState = tab.GetLockState();
-
-		tabStorageData.tabSettings = tabSettings;
-
-		tabListStorageData.push_back(tabStorageData);
-	}
-
-	return tabListStorageData;
+	return GetActivePane()->GetTabContainer()->GetStorageData();
 }
