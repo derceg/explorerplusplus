@@ -15,7 +15,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "ColumnXmlStorage.h"
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -23,10 +22,7 @@
 #include "MainRebarXmlStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
-#include "ShellBrowser/Columns.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
 #include "Storage.h"
-#include "TabContainer.h"
 #include "TabStorage.h"
 #include "TabXmlStorage.h"
 #include "../Helper/Macros.h"

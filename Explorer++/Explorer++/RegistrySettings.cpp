@@ -4,21 +4,16 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "ColumnRegistryStorage.h"
 #include "Config.h"
 #include "CustomFontStorage.h"
-#include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainRebarRegistryStorage.h"
 #include "MainRebarStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
 #include "Storage.h"
-#include "TabContainer.h"
 #include "TabRegistryStorage.h"
 #include "TabStorage.h"
-#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include <wil/registry.h>
 
