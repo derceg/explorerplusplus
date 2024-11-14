@@ -112,12 +112,6 @@ will need to be changed correspondingly. */
 #define HASH_GO_UP_ON_DOUBLE_CLICK 1809284638
 #define HASH_MAIN_FONT 3006124449
 
-struct ColumnXMLSaveData
-{
-	TCHAR szName[64];
-	ColumnType type;
-};
-
 unsigned long hash_setting(unsigned char *str);
 
 BOOL LoadAllowMultipleInstancesFromXML()
