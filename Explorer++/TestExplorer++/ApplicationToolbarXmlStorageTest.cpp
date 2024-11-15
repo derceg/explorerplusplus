@@ -41,7 +41,7 @@ TEST_F(ApplicationToolbarXmlStorageTest, Save)
 	auto xmlDocumentData = CreateXmlDocument();
 
 	ApplicationToolbarXmlStorage::Save(xmlDocumentData.xmlDocument.get(),
-		xmlDocumentData.root.get(), &referenceModel);
+		xmlDocumentData.rootNode.get(), &referenceModel);
 
 	ApplicationModel loadedModel;
 	ApplicationToolbarXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);

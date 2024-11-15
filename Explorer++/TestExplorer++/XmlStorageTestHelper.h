@@ -16,7 +16,7 @@ protected:
 	struct XmlDocumentData
 	{
 		wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-		wil::com_ptr_nothrow<IXMLDOMElement> root;
+		wil::com_ptr_nothrow<IXMLDOMNode> rootNode;
 	};
 
 	wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath);

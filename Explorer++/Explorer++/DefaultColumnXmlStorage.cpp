@@ -34,8 +34,7 @@ void Load(IXMLDOMDocument *xmlDocument, FolderColumns &defaultColumns)
 	ColumnXmlStorage::LoadAllColumnSets(defaultColumnsNode.get(), defaultColumns);
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode,
-	const FolderColumns &defaultColumns)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const FolderColumns &defaultColumns)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> defaultColumnsNode;
 	auto nodeName = wil::make_bstr_nothrow(DEFAULT_COLUMNS_NODE_NAME);

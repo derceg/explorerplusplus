@@ -12,7 +12,6 @@ namespace DefaultColumnXmlStorage
 {
 
 void Load(IXMLDOMDocument *xmlDocument, FolderColumns &defaultColumns);
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode,
-	const FolderColumns &defaultColumns);
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const FolderColumns &defaultColumns);
 
 }

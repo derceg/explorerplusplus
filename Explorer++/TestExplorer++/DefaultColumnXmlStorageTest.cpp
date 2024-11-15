@@ -33,7 +33,7 @@ TEST_F(DefaultColumnXmlStorageTest, Save)
 
 	auto xmlDocumentData = CreateXmlDocument();
 
-	DefaultColumnXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.root.get(),
+	DefaultColumnXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
 		referenceColumns);
 
 	FolderColumns loadedColumns;

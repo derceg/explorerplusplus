@@ -38,7 +38,7 @@ TEST_F(ColorRuleXmlStorageTest, Save)
 
 	auto xmlDocumentData = CreateXmlDocument();
 
-	ColorRuleXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.root.get(),
+	ColorRuleXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
 		&referenceModel);
 
 	ColorRuleModel loadedModel;

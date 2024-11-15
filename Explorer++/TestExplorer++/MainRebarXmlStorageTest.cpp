@@ -34,7 +34,7 @@ TEST_F(MainRebarXmlStorageTest, Save)
 
 	auto xmlDocumentData = CreateXmlDocument();
 
-	MainRebarXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.root.get(),
+	MainRebarXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
 		referenceRebarStorageInfo);
 	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(xmlDocumentData.xmlDocument.get());
 

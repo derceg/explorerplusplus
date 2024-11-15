@@ -128,7 +128,7 @@ void Load(IXMLDOMDocument *xmlDocument, ApplicationModel *model)
 	LoadFromNode(applicationToolbarNode.get(), model);
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode, const ApplicationModel *model)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const ApplicationModel *model)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> applicationToolbarNode;
 	auto nodeName = wil::make_bstr_nothrow(APPLICATION_TOOLBAR_NODE_NAME);

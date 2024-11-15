@@ -144,7 +144,7 @@ void Load(IXMLDOMDocument *xmlDocument, ColorRuleModel *model)
 	LoadFromNode(colorRulesNode.get(), model);
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode, const ColorRuleModel *model)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const ColorRuleModel *model)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> colorRulesNode;
 	auto nodeName = wil::make_bstr_nothrow(COLOR_RULES_NODE_NAME);

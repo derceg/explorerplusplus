@@ -130,7 +130,7 @@ std::vector<RebarBandStorageInfo> Load(IXMLDOMDocument *xmlDocument)
 	return LoadFromNode(mainRebarNode.get());
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode,
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode,
 	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> mainRebarNode;

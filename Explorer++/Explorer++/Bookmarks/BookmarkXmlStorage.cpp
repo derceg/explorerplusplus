@@ -78,12 +78,12 @@ void Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
 	}
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, BookmarkTree *bookmarkTree,
 	int indent)
 {
 	auto newline =
 		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), rootNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> bookmarksNode;
 	auto bookmarksKeyNodeName = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
@@ -94,7 +94,7 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree
 		V2::Save(xmlDocument, bookmarksNode.get(), bookmarkTree, indent + 1);
 
 		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), bookmarksNode.get());
-		XMLSettings::AppendChildToParent(bookmarksNode.get(), parentNode);
+		XMLSettings::AppendChildToParent(bookmarksNode.get(), rootNode);
 	}
 }
 

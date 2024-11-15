@@ -35,7 +35,7 @@ TEST_F(WindowXmlStorageTest, V2Save)
 
 	auto xmlDocumentData = CreateXmlDocument();
 
-	WindowXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.root.get(),
+	WindowXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
 		referenceWindows);
 
 	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.xmlDocument.get());
