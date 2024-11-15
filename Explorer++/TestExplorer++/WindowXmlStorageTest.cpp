@@ -22,9 +22,9 @@ TEST_F(WindowXmlStorageTest, V2Load)
 	auto referenceWindows = BuildV2ReferenceWindows();
 
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	auto loadedWindows = WindowXmlStorage::Load(xmlDocument.get());
+	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.xmlDocument.get());
 
 	EXPECT_EQ(loadedWindows, referenceWindows);
 }
@@ -48,9 +48,9 @@ TEST_F(WindowXmlStorageTest, V1Load)
 	auto referenceWindow = BuildV1ReferenceWindow();
 
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v1-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	auto loadedWindows = WindowXmlStorage::Load(xmlDocument.get());
+	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.xmlDocument.get());
 
 	EXPECT_THAT(loadedWindows, ElementsAre(referenceWindow));
 }

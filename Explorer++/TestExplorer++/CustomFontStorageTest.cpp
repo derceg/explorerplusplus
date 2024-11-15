@@ -10,6 +10,7 @@
 #include "XmlStorageTestHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <gtest/gtest.h>
+#include <format>
 
 using namespace testing;
 
@@ -59,13 +60,12 @@ TEST_F(CustomFontXmlStorageTest, Load)
 	CustomFont referenceFont = BuildLoadSaveReferenceFont();
 
 	std::wstring xmlFilePath = GetResourcePath(L"custom-font-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainFontNode;
 	auto queryString = wil::make_bstr_nothrow(
-		(std::wstring(L"/ExplorerPlusPlus/Settings/Setting[@name='") + MAIN_FONT_NODE_NAME + L"']")
-			.c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &mainFontNode);
+		std::format(L"Settings/Setting[@name='{}']", MAIN_FONT_NODE_NAME).c_str());
+	HRESULT hr = xmlDocumentData.rootNode->selectSingleNode(queryString.get(), &mainFontNode);
 	ASSERT_EQ(hr, S_OK);
 
 	auto loadedFont = LoadCustomFontFromXml(mainFontNode.get());

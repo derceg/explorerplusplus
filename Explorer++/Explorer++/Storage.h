@@ -13,5 +13,6 @@ inline const wchar_t REGISTRY_SETTINGS_KEY_NAME[] = L"Settings";
 
 // The name of the config file that settings are stored in.
 inline const wchar_t CONFIG_FILE_FILENAME[] = L"config.xml";
+inline const wchar_t CONFIG_FILE_ROOT_NODE_NAME[] = L"ExplorerPlusPlus";
 
 }

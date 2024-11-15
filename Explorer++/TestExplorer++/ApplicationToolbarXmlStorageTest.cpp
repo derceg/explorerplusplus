@@ -25,10 +25,10 @@ TEST_F(ApplicationToolbarXmlStorageTest, Load)
 	BuildLoadSaveReferenceModel(&referenceModel);
 
 	std::wstring xmlFilePath = GetResourcePath(L"application-toolbar-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	ApplicationModel loadedModel;
-	ApplicationToolbarXmlStorage::Load(xmlDocument.get(), &loadedModel);
+	ApplicationToolbarXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }

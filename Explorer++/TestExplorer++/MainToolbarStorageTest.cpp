@@ -10,6 +10,7 @@
 #include "XmlStorageTestHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <gtest/gtest.h>
+#include <format>
 
 using namespace testing;
 
@@ -130,12 +131,12 @@ TEST_F(MainToolbarXmlStorageTest, Load)
 	auto referenceButtons = BuildMainToolbarLoadSaveReference();
 
 	std::wstring xmlFilePath = GetResourcePath(L"main-toolbar-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainToolbarNode;
-	auto queryString = wil::make_bstr_nothrow(
-		(std::wstring(L"/ExplorerPlusPlus/Settings/Setting[@name='") + NODE_NAME + L"']").c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &mainToolbarNode);
+	auto queryString =
+		wil::make_bstr_nothrow(std::format(L"Settings/Setting[@name='{}']", NODE_NAME).c_str());
+	HRESULT hr = xmlDocumentData.rootNode->selectSingleNode(queryString.get(), &mainToolbarNode);
 	ASSERT_EQ(hr, S_OK);
 
 	auto loadedButtons = MainToolbarStorage::LoadFromXml(mainToolbarNode.get());

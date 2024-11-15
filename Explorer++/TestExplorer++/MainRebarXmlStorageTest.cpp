@@ -21,9 +21,9 @@ TEST_F(MainRebarXmlStorageTest, Load)
 	auto referenceRebarStorageInfo = BuildMainRebarLoadSaveReference();
 
 	std::wstring xmlFilePath = GetResourcePath(L"main-rebar-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(xmlDocument.get());
+	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(xmlDocumentData.xmlDocument.get());
 
 	EXPECT_EQ(loadedRebarStorageInfo, referenceRebarStorageInfo);
 }

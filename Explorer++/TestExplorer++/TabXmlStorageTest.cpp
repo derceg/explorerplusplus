@@ -24,12 +24,11 @@ TEST_F(TabXmlStorageTest, Load)
 	BuildTabStorageLoadSaveReference(referenceTabs);
 
 	std::wstring xmlFilePath = GetResourcePath(L"tabs-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> tabsNode;
-	auto queryString =
-		wil::make_bstr_nothrow((std::wstring(L"/ExplorerPlusPlus/") + TABS_NODE_NAME).c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &tabsNode);
+	auto queryString = wil::make_bstr_nothrow(TABS_NODE_NAME);
+	HRESULT hr = xmlDocumentData.rootNode->selectSingleNode(queryString.get(), &tabsNode);
 	ASSERT_EQ(hr, S_OK);
 
 	auto loadedTabs = TabXmlStorage::Load(tabsNode.get());

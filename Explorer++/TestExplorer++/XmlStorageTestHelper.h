@@ -19,11 +19,11 @@ protected:
 		wil::com_ptr_nothrow<IXMLDOMNode> rootNode;
 	};
 
-	wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath);
+	XmlDocumentData LoadXmlDocument(const std::wstring &filePath);
 	XmlDocumentData CreateXmlDocument();
 
 private:
 	void LoadXmlDocumentHelper(const std::wstring &filePath,
-		wil::com_ptr_nothrow<IXMLDOMDocument> &outputXmlDocument);
+		XmlDocumentData &outputXmlDocumentData);
 	void CreateXmlDocumentHelper(XmlDocumentData &outputXmlDocumentData);
 };

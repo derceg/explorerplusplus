@@ -4,27 +4,35 @@
 
 #include "pch.h"
 #include "XmlStorageTestHelper.h"
+#include "Storage.h"
 #include "../Helper/XMLSettings.h"
 
 using namespace testing;
 
-wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)
+XmlStorageTest::XmlDocumentData XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)
 {
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	LoadXmlDocumentHelper(filePath, xmlDocument);
-	return xmlDocument;
+	XmlDocumentData xmlDocumentData;
+	LoadXmlDocumentHelper(filePath, xmlDocumentData);
+	return xmlDocumentData;
 }
 
 void XmlStorageTest::LoadXmlDocumentHelper(const std::wstring &filePath,
-	wil::com_ptr_nothrow<IXMLDOMDocument> &outputXmlDocument)
+	XmlDocumentData &outputXmlDocumentData)
 {
-	outputXmlDocument = XMLSettings::CreateXmlDocument();
-	ASSERT_THAT(outputXmlDocument, NotNull());
+	auto xmlDocument = XMLSettings::CreateXmlDocument();
+	ASSERT_THAT(xmlDocument, NotNull());
 
 	VARIANT_BOOL status;
 	auto filePathVariant = wil::make_variant_bstr_failfast(filePath.c_str());
-	outputXmlDocument->load(filePathVariant, &status);
+	xmlDocument->load(filePathVariant, &status);
 	ASSERT_EQ(status, VARIANT_TRUE);
+
+	wil::com_ptr_nothrow<IXMLDOMNode> rootNode;
+	auto query = wil::make_bstr_nothrow(Storage::CONFIG_FILE_ROOT_NODE_NAME);
+	HRESULT hr = xmlDocument->selectSingleNode(query.get(), &rootNode);
+	ASSERT_EQ(hr, S_OK);
+
+	outputXmlDocumentData = { xmlDocument, rootNode };
 }
 
 XmlStorageTest::XmlDocumentData XmlStorageTest::CreateXmlDocument()
@@ -45,10 +53,10 @@ void XmlStorageTest::CreateXmlDocumentHelper(XmlDocumentData &outputXmlDocumentD
 	xmlDocument->createProcessingInstruction(tag.get(), attribute.get(), &processingInstruction);
 	XMLSettings::AppendChildToParent(processingInstruction.get(), xmlDocument.get());
 
-	auto rootTag = wil::make_bstr_nothrow(L"ExplorerPlusPlus");
-	wil::com_ptr_nothrow<IXMLDOMElement> root;
-	xmlDocument->createElement(rootTag.get(), &root);
-	XMLSettings::AppendChildToParent(root.get(), xmlDocument.get());
+	auto rootTag = wil::make_bstr_nothrow(Storage::CONFIG_FILE_ROOT_NODE_NAME);
+	wil::com_ptr_nothrow<IXMLDOMElement> rootNode;
+	xmlDocument->createElement(rootTag.get(), &rootNode);
+	XMLSettings::AppendChildToParent(rootNode.get(), xmlDocument.get());
 
-	outputXmlDocumentData = { std::move(xmlDocument), std::move(root) };
+	outputXmlDocumentData = { xmlDocument, rootNode };
 }

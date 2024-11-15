@@ -24,12 +24,11 @@ TEST_F(ColumnXmlStorageTest, Load)
 	auto referenceColumns = BuildFolderColumnsLoadSaveReference();
 
 	std::wstring xmlFilePath = GetResourcePath(L"columns-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> columnsNode;
-	auto queryString =
-		wil::make_bstr_nothrow((std::wstring(L"/ExplorerPlusPlus/") + COLUMNS_NODE_NAME).c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &columnsNode);
+	auto queryString = wil::make_bstr_nothrow(COLUMNS_NODE_NAME);
+	HRESULT hr = xmlDocumentData.rootNode->selectSingleNode(queryString.get(), &columnsNode);
 	ASSERT_EQ(hr, S_OK);
 
 	FolderColumns loadedColumns;

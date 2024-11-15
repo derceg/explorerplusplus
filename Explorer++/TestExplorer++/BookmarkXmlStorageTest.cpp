@@ -20,10 +20,10 @@ protected:
 		bool compareGuids)
 	{
 		std::wstring xmlFilePath = GetResourcePath(filename);
-		auto xmlDocument = LoadXmlDocument(xmlFilePath);
+		auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 		BookmarkTree loadedBookmarkTree;
-		BookmarkXmlStorage::Load(xmlDocument.get(), &loadedBookmarkTree);
+		BookmarkXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedBookmarkTree);
 
 		CompareBookmarkTrees(&loadedBookmarkTree, referenceBookmarkTree, compareGuids);
 	}

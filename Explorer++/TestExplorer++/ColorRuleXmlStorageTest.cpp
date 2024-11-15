@@ -23,10 +23,10 @@ TEST_F(ColorRuleXmlStorageTest, Load)
 	BuildLoadSaveReferenceModel(&referenceModel);
 
 	std::wstring xmlFilePath = GetResourcePath(L"color-rules-config.xml");
-	auto xmlDocument = LoadXmlDocument(xmlFilePath);
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	ColorRuleModel loadedModel;
-	ColorRuleXmlStorage::Load(xmlDocument.get(), &loadedModel);
+	ColorRuleXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }
