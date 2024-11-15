@@ -160,7 +160,11 @@ TabSettings LoadTabSettings(HKEY key)
 
 	std::wstring customName;
 	RegistrySettings::ReadString(key, SETTING_TAB_CUSTOM_NAME, customName);
-	tabSettings.name = customName;
+
+	if (!customName.empty())
+	{
+		tabSettings.name = customName;
+	}
 
 	return tabSettings;
 }

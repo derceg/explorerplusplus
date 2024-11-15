@@ -69,7 +69,6 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 	tab2.directory = L"C:\\Users";
 	tab2.pidl = CreateSimplePidlForTest(tab2.directory);
 
-	tab2.tabSettings.name = L"";
 	tab2.tabSettings.lockState = Tab::LockState::Locked;
 
 	tab2.folderSettings.sortMode = SortMode::DateModified;
@@ -91,7 +90,6 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 	tab3.directory = L"C:\\Users\\Default";
 	tab3.pidl = CreateSimplePidlForTest(tab3.directory);
 
-	tab3.tabSettings.name = L"";
 	tab3.tabSettings.lockState = Tab::LockState::AddressLocked;
 
 	tab3.folderSettings.sortMode = SortMode::Created;
