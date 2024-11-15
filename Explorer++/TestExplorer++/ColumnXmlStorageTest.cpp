@@ -30,7 +30,7 @@ TEST_F(ColumnXmlStorageTest, Load)
 	auto queryString =
 		wil::make_bstr_nothrow((std::wstring(L"/ExplorerPlusPlus/") + COLUMNS_NODE_NAME).c_str());
 	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &columnsNode);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	ASSERT_EQ(hr, S_OK);
 
 	FolderColumns loadedColumns;
 	ColumnXmlStorage::LoadAllColumnSets(columnsNode.get(), loadedColumns);

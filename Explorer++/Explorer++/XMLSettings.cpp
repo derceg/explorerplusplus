@@ -578,9 +578,9 @@ void Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 	wil::com_ptr_nothrow<IXMLDOMNode> tabsNode;
 	auto bstr = wil::make_bstr_nothrow(L"//Tabs");
-	pXMLDom->selectSingleNode(bstr.get(), &tabsNode);
+	HRESULT hr = pXMLDom->selectSingleNode(bstr.get(), &tabsNode);
 
-	if (!tabsNode)
+	if (hr != S_OK)
 	{
 		return;
 	}

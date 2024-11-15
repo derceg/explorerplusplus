@@ -122,7 +122,7 @@ std::vector<RebarBandStorageInfo> Load(IXMLDOMDocument *xmlDocument)
 		(std::wstring(L"/ExplorerPlusPlus/") + MAIN_REBAR_NODE_NAME).c_str());
 	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &mainRebarNode);
 
-	if (FAILED(hr))
+	if (hr != S_OK)
 	{
 		return {};
 	}

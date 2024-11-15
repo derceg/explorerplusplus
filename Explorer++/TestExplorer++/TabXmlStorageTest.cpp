@@ -30,7 +30,7 @@ TEST_F(TabXmlStorageTest, Load)
 	auto queryString =
 		wil::make_bstr_nothrow((std::wstring(L"/ExplorerPlusPlus/") + TABS_NODE_NAME).c_str());
 	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &tabsNode);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	ASSERT_EQ(hr, S_OK);
 
 	auto loadedTabs = TabXmlStorage::Load(tabsNode.get());
 

@@ -24,9 +24,9 @@ void Load(IXMLDOMDocument *xmlDocument, FolderColumns &defaultColumns)
 	wil::com_ptr_nothrow<IXMLDOMNode> defaultColumnsNode;
 	auto queryString =
 		wil::make_bstr_nothrow((L"/ExplorerPlusPlus/"s + DEFAULT_COLUMNS_NODE_NAME).c_str());
-	xmlDocument->selectSingleNode(queryString.get(), &defaultColumnsNode);
+	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &defaultColumnsNode);
 
-	if (!defaultColumnsNode)
+	if (hr != S_OK)
 	{
 		return;
 	}

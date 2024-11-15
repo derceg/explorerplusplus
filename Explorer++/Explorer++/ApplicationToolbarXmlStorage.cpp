@@ -120,7 +120,7 @@ void Load(IXMLDOMDocument *xmlDocument, ApplicationModel *model)
 			.c_str());
 	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &applicationToolbarNode);
 
-	if (FAILED(hr))
+	if (hr != S_OK)
 	{
 		return;
 	}

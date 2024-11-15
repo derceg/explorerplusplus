@@ -134,7 +134,7 @@ void Load(IXMLDOMDocument *xmlDocument, ColorRuleModel *model)
 		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(COLOR_RULES_NODE_NAME)).c_str());
 	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &colorRulesNode);
 
-	if (FAILED(hr))
+	if (hr != S_OK)
 	{
 		return;
 	}

@@ -126,7 +126,7 @@ FolderColumns LoadColumns(IXMLDOMNode *tabNode)
 	auto queryString = wil::make_bstr_nothrow((L"./"s + SETTING_COLUMNS).c_str());
 	HRESULT hr = tabNode->selectSingleNode(queryString.get(), &columnsNode);
 
-	if (SUCCEEDED(hr))
+	if (hr == S_OK)
 	{
 		ColumnXmlStorage::LoadAllColumnSets(columnsNode.get(), columns);
 	}
