@@ -31,21 +31,14 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-Explorerplusplus *Explorerplusplus::Create(App *app)
+Explorerplusplus *Explorerplusplus::Create(App *app, const WindowStorageData *storageData)
 {
-	auto defaultBounds = GetDefaultWindowBounds();
-	return Explorerplusplus::Create(app, &defaultBounds, WindowShowState::Normal);
+	return new Explorerplusplus(app, storageData);
 }
 
-Explorerplusplus *Explorerplusplus::Create(App *app, const RECT *initialBounds,
-	WindowShowState showState)
-{
-	return new Explorerplusplus(app, initialBounds, showState);
-}
-
-Explorerplusplus::Explorerplusplus(App *app, const RECT *initialBounds, WindowShowState showState) :
+Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageData) :
 	m_app(app),
-	m_hContainer(CreateMainWindow(initialBounds)),
+	m_hContainer(CreateMainWindow(storageData)),
 	m_browserTracker(app->GetBrowserList(), this),
 	m_commandController(this),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
@@ -78,6 +71,8 @@ Explorerplusplus::Explorerplusplus(App *app, const RECT *initialBounds, WindowSh
 
 	Initialize();
 
+	WindowShowState showState = storageData ? storageData->showState : +WindowShowState::Normal;
+
 	if (showState == +WindowShowState::Minimized)
 	{
 		showState = WindowShowState::Normal;
@@ -92,7 +87,7 @@ Explorerplusplus::~Explorerplusplus()
 	m_pDirMon->Release();
 }
 
-HWND Explorerplusplus::CreateMainWindow(const RECT *initialBounds)
+HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 {
 	static bool mainWindowClassRegistered = false;
 
@@ -104,45 +99,23 @@ HWND Explorerplusplus::CreateMainWindow(const RECT *initialBounds)
 		mainWindowClassRegistered = true;
 	}
 
-	RECT validatedBounds = GetValidatedWindowBounds(initialBounds);
+	RECT finalBounds;
+
+	if (storageData)
+	{
+		finalBounds = GetValidatedMainWindowBounds(&storageData->bounds);
+	}
+	else
+	{
+		finalBounds = GetDefaultMainWindowBounds();
+	}
 
 	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
-		WS_OVERLAPPEDWINDOW, validatedBounds.left, validatedBounds.top,
-		GetRectWidth(&validatedBounds), GetRectHeight(&validatedBounds), nullptr, nullptr,
-		GetModuleHandle(nullptr), nullptr);
+		WS_OVERLAPPEDWINDOW, finalBounds.left, finalBounds.top, GetRectWidth(&finalBounds),
+		GetRectHeight(&finalBounds), nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 	CHECK(hwnd);
 
 	return hwnd;
-}
-
-RECT Explorerplusplus::GetValidatedWindowBounds(const RECT *requestedBounds)
-{
-	// When shown in its normal size, the window should at least be on screen somewhere, even if
-	// it's not completely visible.
-	HMONITOR monitor = MonitorFromRect(requestedBounds, MONITOR_DEFAULTTONULL);
-
-	if (!monitor)
-	{
-		return GetDefaultWindowBounds();
-	}
-
-	return *requestedBounds;
-}
-
-RECT Explorerplusplus::GetDefaultWindowBounds()
-{
-	RECT workArea;
-	BOOL res = SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
-	CHECK(res);
-
-	// The strategy here is fairly simple - the window will be sized to a portion of the work area
-	// of the primary monitor and centered.
-	auto width = static_cast<int>(GetRectWidth(&workArea) * 0.60);
-	auto height = static_cast<int>(GetRectHeight(&workArea) * 0.60);
-	int x = (GetRectWidth(&workArea) - width) / 2;
-	int y = (GetRectHeight(&workArea) - height) / 2;
-
-	return { x, y, x + width, y + height };
 }
 
 ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
@@ -163,6 +136,36 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 	windowClass.lpszMenuName = nullptr;
 	windowClass.lpszClassName = NExplorerplusplus::CLASS_NAME;
 	return RegisterClassEx(&windowClass);
+}
+
+RECT Explorerplusplus::GetValidatedMainWindowBounds(const RECT *requestedBounds)
+{
+	// When shown in its normal size, the window should at least be on screen somewhere, even if
+	// it's not completely visible.
+	HMONITOR monitor = MonitorFromRect(requestedBounds, MONITOR_DEFAULTTONULL);
+
+	if (!monitor)
+	{
+		return GetDefaultMainWindowBounds();
+	}
+
+	return *requestedBounds;
+}
+
+RECT Explorerplusplus::GetDefaultMainWindowBounds()
+{
+	RECT workArea;
+	BOOL res = SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
+	CHECK(res);
+
+	// The strategy here is fairly simple - the window will be sized to a portion of the work area
+	// of the primary monitor and centered.
+	auto width = static_cast<int>(GetRectWidth(&workArea) * 0.60);
+	auto height = static_cast<int>(GetRectHeight(&workArea) * 0.60);
+	int x = (GetRectWidth(&workArea) - width) / 2;
+	int y = (GetRectHeight(&workArea) - height) / 2;
+
+	return { x, y, x + width, y + height };
 }
 
 HWND Explorerplusplus::GetHWND() const

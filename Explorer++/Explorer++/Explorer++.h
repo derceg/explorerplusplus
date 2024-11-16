@@ -93,8 +93,7 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
-	static Explorerplusplus *Create(App *app);
-	static Explorerplusplus *Create(App *app, const RECT *initialBounds, WindowShowState showState);
+	static Explorerplusplus *Create(App *app, const WindowStorageData *storageData = nullptr);
 
 	~Explorerplusplus();
 
@@ -198,12 +197,12 @@ private:
 		Increase
 	};
 
-	Explorerplusplus(App *app, const RECT *initialBounds, WindowShowState showState);
+	Explorerplusplus(App *app, const WindowStorageData *storageData);
 
-	static HWND CreateMainWindow(const RECT *initialBounds);
-	static RECT GetValidatedWindowBounds(const RECT *requestedBounds);
-	static RECT GetDefaultWindowBounds();
+	static HWND CreateMainWindow(const WindowStorageData *storageData);
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
+	static RECT GetValidatedMainWindowBounds(const RECT *requestedBounds);
+	static RECT GetDefaultMainWindowBounds();
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

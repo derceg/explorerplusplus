@@ -93,7 +93,7 @@ void App::RestoreSession(const std::vector<WindowStorageData> &windows)
 	// At the moment, only a single window is supported.
 	for (const auto &window : windows | std::views::take(1))
 	{
-		Explorerplusplus::Create(this, &window.bounds, window.showState);
+		Explorerplusplus::Create(this, &window);
 	}
 
 	if (m_browserList.IsEmpty())
