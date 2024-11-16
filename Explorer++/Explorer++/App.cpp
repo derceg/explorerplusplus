@@ -12,6 +12,7 @@
 #include "Explorer++_internal.h"
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
+#include "TabStorage.h"
 #include "WindowStorage.h"
 #include "XmlAppStorage.h"
 #include "XmlAppStorageFactory.h"

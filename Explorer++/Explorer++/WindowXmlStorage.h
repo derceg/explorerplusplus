@@ -12,7 +12,7 @@ struct WindowStorageData;
 namespace WindowXmlStorage
 {
 
-std::vector<WindowStorageData> Load(IXMLDOMDocument *xmlDocument);
+std::vector<WindowStorageData> Load(IXMLDOMNode *rootNode);
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode,
 	const std::vector<WindowStorageData> &windows);
 

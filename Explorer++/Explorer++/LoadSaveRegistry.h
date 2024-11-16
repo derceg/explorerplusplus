@@ -16,13 +16,11 @@ public:
 
 	/* Loading functions. */
 	void LoadGenericSettings() override;
-	void LoadPreviousTabs() override;
 	void LoadMainRebarInformation() override;
 
 	/* Saving functions. */
 	void SaveGenericSettings() override;
 	void SaveWindows(const std::vector<WindowStorageData> &windows) override;
-	void SaveTabs() override;
 	void SaveBookmarks() override;
 	void SaveDefaultColumns() override;
 	void SaveApplicationToolbar() override;

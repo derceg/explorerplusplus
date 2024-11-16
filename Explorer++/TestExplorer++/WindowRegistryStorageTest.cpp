@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "WindowRegistryStorage.h"
 #include "RegistryStorageTestHelper.h"
+#include "TabStorage.h"
 #include "WindowStorage.h"
 #include "WindowStorageTestHelper.h"
 #include <gtest/gtest.h>
@@ -25,6 +26,20 @@ TEST_F(WindowRegistryStorageTest, V2Load)
 	auto loadedWindows = WindowRegistryStorage::Load(m_applicationTestKey.get());
 
 	EXPECT_EQ(loadedWindows, referenceWindows);
+}
+
+TEST_F(WindowRegistryStorageTest, V2LoadFallback)
+{
+	auto referenceWindow = BuildV2FallbackReferenceWindow();
+
+	// In this case, some of the window data is stored in the original format.
+	// WindowRegistryStorage::Load() should detect that the data isn't present within the windows
+	// registry key and fallback.
+	ImportRegistryResource(L"windows-v2-fallback.reg");
+
+	auto loadedWindows = WindowRegistryStorage::Load(m_applicationTestKey.get());
+
+	EXPECT_THAT(loadedWindows, ElementsAre(referenceWindow));
 }
 
 TEST_F(WindowRegistryStorageTest, V2Save)

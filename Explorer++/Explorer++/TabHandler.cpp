@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "App.h"
+#include "ColumnStorage.h"
 #include "Config.h"
 #include "LoadSaveInterface.h"
 #include "MainMenuSubMenuView.h"
@@ -143,11 +144,11 @@ void Explorerplusplus::OnNewTab()
 		TabSettings(_selected = true));
 }
 
-HRESULT Explorerplusplus::CreateInitialTabs()
+void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
 {
-	if (m_config->startupMode == +StartupMode::PreviousTabs)
+	if (m_config->startupMode == +StartupMode::PreviousTabs && storageData)
 	{
-		RestorePreviousTabs();
+		RestorePreviousTabs(*storageData);
 	}
 
 	CreateCommandLineTabs();
@@ -161,37 +162,44 @@ HRESULT Explorerplusplus::CreateInitialTabs()
 	{
 		m_bShowTabBar = false;
 	}
-
-	return S_OK;
 }
 
-void Explorerplusplus::RestorePreviousTabs()
+void Explorerplusplus::RestorePreviousTabs(const WindowStorageData &storageData)
 {
 	int index = 0;
 
-	for (auto &loadedTab : m_loadedTabs)
+	for (const auto &loadedTab : storageData.tabs)
 	{
-		loadedTab.tabSettings.index = index;
+		// It's important that the index is set on the tab. That's because the
+		// openNewTabNextToCurrent setting will alter the index at which a tab is created. If that
+		// setting was enabled and the index wasn't explicitly set here, the first tab would be
+		// created and selected, and each additional tab would be created to the immediate right of
+		// the first tab.
+		auto tabSettings = loadedTab.tabSettings;
+		tabSettings.index = index;
+
+		auto validatedColumns = loadedTab.columns;
+		ValidateColumns(validatedColumns);
 
 		if (loadedTab.pidl.HasValue())
 		{
 			auto navigateParams = NavigateParams::Normal(loadedTab.pidl.Raw());
-			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, loadedTab.tabSettings,
-				&loadedTab.folderSettings, &loadedTab.columns);
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, tabSettings,
+				&loadedTab.folderSettings, &validatedColumns);
 		}
 		else
 		{
-			GetActivePane()->GetTabContainer()->CreateNewTab(loadedTab.directory,
-				loadedTab.tabSettings, &loadedTab.folderSettings, &loadedTab.columns);
+			GetActivePane()->GetTabContainer()->CreateNewTab(loadedTab.directory, tabSettings,
+				&loadedTab.folderSettings, &validatedColumns);
 		}
 
 		index++;
 	}
 
-	if (m_iLastSelectedTab >= 0
-		&& m_iLastSelectedTab < GetActivePane()->GetTabContainer()->GetNumTabs())
+	if (storageData.selectedTab >= 0
+		&& storageData.selectedTab < GetActivePane()->GetTabContainer()->GetNumTabs())
 	{
-		GetActivePane()->GetTabContainer()->SelectTabAtIndex(m_iLastSelectedTab);
+		GetActivePane()->GetTabContainer()->SelectTabAtIndex(storageData.selectedTab);
 	}
 }
 
@@ -354,9 +362,4 @@ void Explorerplusplus::SelectTabById(int tabId)
 {
 	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
 	GetActivePane()->GetTabContainer()->SelectTab(tab);
-}
-
-std::vector<TabStorageData> Explorerplusplus::GetTabListStorageData()
-{
-	return GetActivePane()->GetTabContainer()->GetStorageData();
 }

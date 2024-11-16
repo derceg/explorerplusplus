@@ -13,7 +13,8 @@ class BookmarkTree;
 class XmlAppStorage : public AppStorage
 {
 public:
-	XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument);
+	XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument,
+		wil::com_ptr_nothrow<IXMLDOMNode> rootNode);
 
 	[[nodiscard]] std::vector<WindowStorageData> LoadWindows() override;
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
@@ -24,4 +25,5 @@ public:
 
 private:
 	const wil::com_ptr_nothrow<IXMLDOMDocument> m_xmlDocument;
+	const wil::com_ptr_nothrow<IXMLDOMNode> m_rootNode;
 };

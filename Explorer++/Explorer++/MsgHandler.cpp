@@ -24,6 +24,7 @@
 #include "Storage.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
+#include "TabStorage.h"
 #include "TaskbarThumbnails.h"
 #include "ToolbarHelper.h"
 #include "WindowStorage.h"
@@ -104,7 +105,6 @@ void Explorerplusplus::LoadAllSettings()
 	}
 
 	loadSave->LoadGenericSettings();
-	loadSave->LoadPreviousTabs();
 	loadSave->LoadMainRebarInformation();
 
 	ValidateLoadedSettings();
@@ -1008,8 +1008,6 @@ void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 
 void Explorerplusplus::SaveAllSettings()
 {
-	m_iLastSelectedTab = GetActivePane()->GetTabContainer()->GetSelectedTabIndex();
-
 	std::unique_ptr<ILoadSave> loadSave;
 
 	if (m_bSavePreferencesToXMLFile)
@@ -1030,7 +1028,6 @@ void Explorerplusplus::SaveAllSettings()
 
 	loadSave->SaveGenericSettings();
 	loadSave->SaveWindows(windows);
-	loadSave->SaveTabs();
 	loadSave->SaveBookmarks();
 	loadSave->SaveDefaultColumns();
 	loadSave->SaveApplicationToolbar();

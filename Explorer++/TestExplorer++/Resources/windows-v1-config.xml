@@ -6,4 +6,11 @@
 			MaxPositionX="-1" MaxPositionY="-1" NormalPositionLeft="98" NormalPositionTop="87"
 			NormalPositionRight="1606" NormalPositionBottom="798" />
 	</WindowPosition>
+	<Tabs>
+		<Tab Directory="c:\fake1"/>
+		<Tab Directory="c:\fake2"/>
+	</Tabs>
+	<Settings>
+		<Setting name="LastSelectedTab">1</Setting>
+	</Settings>
 </ExplorerPlusPlus>

@@ -47,7 +47,6 @@ will need to be changed correspondingly. */
 #define HASH_DISPLAYWINDOWHEIGHT 2017415020
 #define HASH_DISPLAYWINDOWVERTICAL 2262072301
 #define HASH_LANGUAGE 3526403497
-#define HASH_LASTSELECTEDTAB 1712438393
 #define HASH_NEXTTOCURRENT 743165450
 #define HASH_SHOWADDRESSBAR 3302864385
 #define HASH_SHOWBOOKMARKSTOOLBAR 1216493954
@@ -381,11 +380,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::EncodeBoolValue(m_config->useLargeToolbarIcons.get()));
 
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	_itow_s(m_iLastSelectedTab, szValue, SIZEOF_ARRAY(szValue), 10);
-	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LastSelectedTab"),
-		szValue);
-
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LockToolbars"),
 		XMLSettings::EncodeBoolValue(m_config->lockToolbars.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
@@ -569,41 +563,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AppendChildToParent(pe.get(), pRoot);
 }
 
-void Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
-{
-	if (!pXMLDom)
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNode> tabsNode;
-	auto bstr = wil::make_bstr_nothrow(L"//Tabs");
-	HRESULT hr = pXMLDom->selectSingleNode(bstr.get(), &tabsNode);
-
-	if (hr != S_OK)
-	{
-		return;
-	}
-
-	m_loadedTabs = TabXmlStorage::Load(tabsNode.get());
-}
-
-void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
-{
-	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
-	auto bstr = wil::make_bstr_nothrow(L"Tabs");
-	HRESULT hr = pXMLDom->createElement(bstr.get(), &tabsNode);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	TabXmlStorage::Save(pXMLDom, tabsNode.get(), GetTabListStorageData());
-
-	XMLSettings::AppendChildToParent(tabsNode.get(), pRoot);
-}
-
 void Explorerplusplus::LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom)
 {
 	m_loadedRebarStorageInfo = MainRebarXmlStorage::Load(pXMLDom);
@@ -737,10 +696,6 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_LARGETOOLBARICONS:
 		m_config->useLargeToolbarIcons.set(XMLSettings::DecodeBoolValue(wszValue));
-		break;
-
-	case HASH_LASTSELECTEDTAB:
-		m_iLastSelectedTab = XMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_LOCKTOOLBARS:

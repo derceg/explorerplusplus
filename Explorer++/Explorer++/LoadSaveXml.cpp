@@ -133,11 +133,6 @@ void LoadSaveXML::LoadGenericSettings()
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom.get());
 }
 
-void LoadSaveXML::LoadPreviousTabs()
-{
-	m_pContainer->LoadTabSettingsFromXML(m_pXMLDom.get());
-}
-
 void LoadSaveXML::LoadMainRebarInformation()
 {
 	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());
@@ -151,11 +146,6 @@ void LoadSaveXML::SaveGenericSettings()
 void LoadSaveXML::SaveWindows(const std::vector<WindowStorageData> &windows)
 {
 	WindowXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), windows);
-}
-
-void LoadSaveXML::SaveTabs()
-{
-	m_pContainer->SaveTabSettingsToXML(m_pXMLDom.get(), m_pRoot.get());
 }
 
 void LoadSaveXML::SaveBookmarks()

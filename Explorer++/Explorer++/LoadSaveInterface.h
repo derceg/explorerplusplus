@@ -18,13 +18,11 @@ public:
 
 	/* Loading functions. */
 	virtual void LoadGenericSettings() = 0;
-	virtual void LoadPreviousTabs() = 0;
 	virtual void LoadMainRebarInformation() = 0;
 
 	/* Saving functions. */
 	virtual void SaveGenericSettings() = 0;
 	virtual void SaveWindows(const std::vector<WindowStorageData> &windows) = 0;
-	virtual void SaveTabs() = 0;
 	virtual void SaveBookmarks() = 0;
 	virtual void SaveDefaultColumns() = 0;
 	virtual void SaveApplicationToolbar() = 0;

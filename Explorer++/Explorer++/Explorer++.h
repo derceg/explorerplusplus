@@ -215,7 +215,7 @@ private:
 	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void Initialize();
+	void Initialize(const WindowStorageData *storageData);
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
@@ -310,8 +310,8 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void ShowTabBar() override;
 	void HideTabBar() override;
-	HRESULT CreateInitialTabs();
-	void RestorePreviousTabs();
+	void CreateInitialTabs(const WindowStorageData *storageData);
+	void RestorePreviousTabs(const WindowStorageData &storageData);
 	void CreateCommandLineTabs();
 	void OnTabListViewSelectionChanged(const Tab &tab);
 
@@ -384,17 +384,12 @@ private:
 	/* Registry settings. */
 	LONG LoadGenericSettingsFromRegistry(HKEY applicationKey);
 	LONG SaveGenericSettingsToRegistry(HKEY applicationKey);
-	void SaveTabSettingsToRegistry();
-	std::vector<TabStorageData> GetTabListStorageData();
-	void LoadTabSettingsFromRegistry();
 	void LoadMainRebarInformationFromRegistry(HKEY mainKey);
 	void SaveMainRebarInformationToRegistry(HKEY mainKey);
 
 	/* XML Settings. */
 	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
@@ -572,7 +567,6 @@ private:
 	HWND m_lastActiveWindow;
 	bool m_bLanguageLoaded;
 	bool m_bShowTabBar;
-	int m_iLastSelectedTab = 0;
 	ULONG m_SHChangeNotifyID;
 
 	/* Initialization. */
@@ -605,7 +599,6 @@ private:
 	std::unique_ptr<BrowserPane> m_browserPane;
 
 	/* Tabs. */
-	std::vector<TabStorageData> m_loadedTabs;
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;

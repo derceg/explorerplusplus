@@ -9,6 +9,7 @@
 #include "ColorRuleRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
+#include "TabStorage.h"
 #include "WindowRegistryStorage.h"
 #include "WindowStorage.h"
 

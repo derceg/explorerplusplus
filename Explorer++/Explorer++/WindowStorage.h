@@ -5,6 +5,9 @@
 #pragma once
 
 #include "../Helper/BetterEnumsWrapper.h"
+#include <vector>
+
+struct TabStorageData;
 
 // These values are used when loading and saving data and shouldn't be changed.
 // clang-format off
@@ -19,6 +22,8 @@ struct WindowStorageData
 {
 	RECT bounds;
 	WindowShowState showState;
+	std::vector<TabStorageData> tabs;
+	int selectedTab;
 };
 
 WindowShowState NativeShowStateToShowState(int nativeShowState);

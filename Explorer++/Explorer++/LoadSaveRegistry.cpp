@@ -43,11 +43,6 @@ void LoadSaveRegistry::LoadGenericSettings()
 	}
 }
 
-void LoadSaveRegistry::LoadPreviousTabs()
-{
-	m_pContainer->LoadTabSettingsFromRegistry();
-}
-
 void LoadSaveRegistry::LoadMainRebarInformation()
 {
 	wil::unique_hkey mainKey;
@@ -82,11 +77,6 @@ void LoadSaveRegistry::SaveWindows(const std::vector<WindowStorageData> &windows
 	{
 		WindowRegistryStorage::Save(mainKey.get(), windows);
 	}
-}
-
-void LoadSaveRegistry::SaveTabs()
-{
-	m_pContainer->SaveTabSettingsToRegistry();
 }
 
 void LoadSaveRegistry::SaveBookmarks()

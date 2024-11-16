@@ -12,8 +12,6 @@
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
 #include "Storage.h"
-#include "TabRegistryStorage.h"
-#include "TabStorage.h"
 #include "../Helper/RegistrySettings.h"
 #include <wil/registry.h>
 
@@ -23,7 +21,6 @@ namespace
 {
 
 const wchar_t MAIN_TOOLBAR_STATE_KEY_NAME[] = L"ToolbarState";
-const wchar_t TABS_KEY[] = L"Software\\Explorer++\\Tabs";
 const wchar_t MAIN_FONT_KEY_NAME[] = L"MainFont";
 
 }
@@ -61,7 +58,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 	if (returnValue == ERROR_SUCCESS)
 	{
 		/* User settings. */
-		RegistrySettings::SaveDword(hSettingsKey, _T("LastSelectedTab"), m_iLastSelectedTab);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowExtensions"),
 			m_config->globalFolderSettings.showExtensions);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowStatusBar"), m_config->showStatusBar);
@@ -251,8 +247,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 	if (returnValue == ERROR_SUCCESS)
 	{
 		/* User settings. */
-		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("LastSelectedTab"),
-			m_iLastSelectedTab);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowExtensions"),
 			m_config->globalFolderSettings.showExtensions);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowStatusBar"),
@@ -492,34 +486,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 	}
 
 	return returnValue;
-}
-
-void Explorerplusplus::SaveTabSettingsToRegistry()
-{
-	wil::unique_hkey tabsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, TABS_KEY, tabsKey,
-		wil::reg::key_access::readwrite);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	TabRegistryStorage::Save(tabsKey.get(), GetTabListStorageData());
-}
-
-void Explorerplusplus::LoadTabSettingsFromRegistry()
-{
-	wil::unique_hkey tabsKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, TABS_KEY, tabsKey,
-		wil::reg::key_access::read);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	m_loadedTabs = TabRegistryStorage::Load(tabsKey.get());
 }
 
 void Explorerplusplus::LoadMainRebarInformationFromRegistry(HKEY mainKey)

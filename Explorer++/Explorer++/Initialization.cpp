@@ -27,7 +27,7 @@
 #include "ViewModeHelper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-void Explorerplusplus::Initialize()
+void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
 	LoadAllSettings();
 
@@ -73,7 +73,7 @@ void Explorerplusplus::Initialize()
 	m_taskbarThumbnails = std::make_unique<TaskbarThumbnails>(this,
 		GetActivePane()->GetTabContainer(), m_resourceInstance, m_config);
 
-	CreateInitialTabs();
+	CreateInitialTabs(storageData);
 
 	// Register for any shell changes. This should be done after the tabs have
 	// been created.

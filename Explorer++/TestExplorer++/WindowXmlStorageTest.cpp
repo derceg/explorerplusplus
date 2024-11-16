@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "WindowXmlStorage.h"
 #include "ResourceTestHelper.h"
+#include "TabStorage.h"
 #include "WindowStorage.h"
 #include "WindowStorageTestHelper.h"
 #include "XmlStorageTestHelper.h"
@@ -24,9 +25,21 @@ TEST_F(WindowXmlStorageTest, V2Load)
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.xmlDocument.get());
+	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());
 
 	EXPECT_EQ(loadedWindows, referenceWindows);
+}
+
+TEST_F(WindowXmlStorageTest, V2LoadFallback)
+{
+	auto referenceWindow = BuildV2FallbackReferenceWindow();
+
+	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-fallback-config.xml");
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
+
+	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());
+
+	EXPECT_THAT(loadedWindows, ElementsAre(referenceWindow));
 }
 
 TEST_F(WindowXmlStorageTest, V2Save)
@@ -38,7 +51,7 @@ TEST_F(WindowXmlStorageTest, V2Save)
 	WindowXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
 		referenceWindows);
 
-	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.xmlDocument.get());
+	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());
 
 	EXPECT_EQ(loadedWindows, referenceWindows);
 }
@@ -50,7 +63,7 @@ TEST_F(WindowXmlStorageTest, V1Load)
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v1-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.xmlDocument.get());
+	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());
 
 	EXPECT_THAT(loadedWindows, ElementsAre(referenceWindow));
 }

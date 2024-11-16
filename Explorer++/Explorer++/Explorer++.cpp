@@ -69,7 +69,7 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hContainer,
 		std::bind_front(&Explorerplusplus::WindowProcedure, this)));
 
-	Initialize();
+	Initialize(storageData);
 
 	WindowShowState showState = storageData ? storageData->showState : +WindowShowState::Normal;
 
@@ -180,8 +180,11 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 	BOOL res = GetWindowPlacement(m_hContainer, &placement);
 	CHECK(res);
 
+	const auto *tabContainer = GetActivePane()->GetTabContainer();
+
 	return WindowStorageData(placement.rcNormalPosition,
-		NativeShowStateToShowState(placement.showCmd));
+		NativeShowStateToShowState(placement.showCmd), tabContainer->GetStorageData(),
+		tabContainer->GetSelectedTabIndex());
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

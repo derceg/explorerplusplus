@@ -14,6 +14,7 @@ namespace WindowStorageTestHelper
 {
 
 std::vector<WindowStorageData> BuildV2ReferenceWindows();
+WindowStorageData BuildV2FallbackReferenceWindow();
 WindowStorageData BuildV1ReferenceWindow();
 
 }

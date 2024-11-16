@@ -35,11 +35,6 @@ void Explorerplusplus::ValidateLoadedSettings()
 	}
 
 	ValidateColumns(m_config->globalFolderSettings.folderColumns);
-
-	for (auto &loadedTab : m_loadedTabs)
-	{
-		ValidateColumns(loadedTab.columns);
-	}
 }
 
 void Explorerplusplus::ApplyDisplayWindowPosition()

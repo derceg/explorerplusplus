@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Windows>
+		<Window X="683" Y="790" Width="390" Height="1490" ShowState="0"/>
+	</Windows>
+	<Tabs>
+		<Tab Directory="c:\fake1"/>
+		<Tab Directory="c:\fake2"/>
+		<Tab Directory="c:\fake3"/>
+	</Tabs>
+	<Settings>
+		<Setting name="LastSelectedTab">2</Setting>
+	</Settings>
+</ExplorerPlusPlus>

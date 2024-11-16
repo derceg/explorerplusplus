@@ -35,5 +35,14 @@ std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::MaybeCreate()
 		return nullptr;
 	}
 
-	return std::make_unique<XmlAppStorage>(xmlDocument);
+	wil::com_ptr_nothrow<IXMLDOMNode> rootNode;
+	auto query = wil::make_bstr_failfast(Storage::CONFIG_FILE_ROOT_NODE_NAME);
+	HRESULT hr = xmlDocument->selectSingleNode(query.get(), &rootNode);
+
+	if (hr != S_OK)
+	{
+		return nullptr;
+	}
+
+	return std::make_unique<XmlAppStorage>(xmlDocument, rootNode);
 }
