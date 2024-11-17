@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include "StorageTestHelper.h"
 #include <vector>
 
 struct TabStorageData;
 
-bool operator==(const TabStorageData &first, const TabStorageData &second);
-
-void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs);
+TabStorageData CreateTabStorageFromDirectory(const std::wstring &directory,
+	TestStorageType storageType);
+void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
+	TestStorageType storageType);

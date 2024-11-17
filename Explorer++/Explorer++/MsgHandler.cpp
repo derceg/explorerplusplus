@@ -13,6 +13,7 @@
 #include "HolderWindow.h"
 #include "LoadSaveRegistry.h"
 #include "LoadSaveXml.h"
+#include "MainRebarStorage.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "Plugins/PluginManager.h"
@@ -105,7 +106,6 @@ void Explorerplusplus::LoadAllSettings()
 	}
 
 	loadSave->LoadGenericSettings();
-	loadSave->LoadMainRebarInformation();
 
 	ValidateLoadedSettings();
 }
@@ -1031,7 +1031,6 @@ void Explorerplusplus::SaveAllSettings()
 	loadSave->SaveBookmarks();
 	loadSave->SaveDefaultColumns();
 	loadSave->SaveApplicationToolbar();
-	loadSave->SaveMainRebarInformation();
 	loadSave->SaveColorRules();
 	loadSave->SaveDialogStates();
 }

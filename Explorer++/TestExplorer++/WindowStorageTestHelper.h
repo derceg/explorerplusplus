@@ -4,17 +4,16 @@
 
 #pragma once
 
+#include "StorageTestHelper.h"
 #include <vector>
 
 struct WindowStorageData;
 
-bool operator==(const WindowStorageData &first, const WindowStorageData &second);
-
 namespace WindowStorageTestHelper
 {
 
-std::vector<WindowStorageData> BuildV2ReferenceWindows();
-WindowStorageData BuildV2FallbackReferenceWindow();
-WindowStorageData BuildV1ReferenceWindow();
+std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageType);
+WindowStorageData BuildV2FallbackReferenceWindow(TestStorageType storageType);
+WindowStorageData BuildV1ReferenceWindow(TestStorageType storageType);
 
 }

@@ -27,7 +27,8 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
-void Explorerplusplus::CreateMainRebarAndChildren()
+void Explorerplusplus::CreateMainRebarAndChildren(
+	const std::vector<RebarBandStorageInfo> *rebarStorageInfo)
 {
 	m_hMainRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, L"",
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | CCS_NODIVIDER
@@ -36,7 +37,7 @@ void Explorerplusplus::CreateMainRebarAndChildren()
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hMainRebar,
 		std::bind_front(&Explorerplusplus::RebarSubclass, this)));
 
-	auto bands = InitializeMainRebarBands();
+	auto bands = InitializeMainRebarBands(rebarStorageInfo);
 
 	for (const auto &band : bands)
 	{
@@ -47,7 +48,8 @@ void Explorerplusplus::CreateMainRebarAndChildren()
 		std::bind_front(&Explorerplusplus::OnLockToolbarsUpdated, this)));
 }
 
-std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::InitializeMainRebarBands()
+std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::InitializeMainRebarBands(
+	const std::vector<RebarBandStorageInfo> *rebarStorageInfo)
 {
 	std::vector<InternalRebarBandInfo> mainRebarBands;
 
@@ -91,7 +93,10 @@ std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::Initializ
 	m_rebarConnections.push_back(m_config->showApplicationToolbar.addObserver(std::bind_front(
 		&Explorerplusplus::ShowMainRebarBand, this, m_applicationToolbar->GetView()->GetHWND())));
 
-	UpdateMainRebarBandsFromLoadedInfo(mainRebarBands);
+	if (rebarStorageInfo)
+	{
+		UpdateMainRebarBandsFromLoadedInfo(mainRebarBands, *rebarStorageInfo);
+	}
 
 	return mainRebarBands;
 }
@@ -134,20 +139,21 @@ Explorerplusplus::InternalRebarBandInfo Explorerplusplus::InitializeNonToolbarBa
 }
 
 void Explorerplusplus::UpdateMainRebarBandsFromLoadedInfo(
-	std::vector<InternalRebarBandInfo> &mainRebarBands)
+	std::vector<InternalRebarBandInfo> &mainRebarBands,
+	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
-	auto getSortedBandIndex = [this, &mainRebarBands](UINT bandId) -> size_t
+	auto getSortedBandIndex = [this, &mainRebarBands, &rebarStorageInfo](UINT bandId) -> size_t
 	{
-		auto itr = std::find_if(m_loadedRebarStorageInfo.begin(), m_loadedRebarStorageInfo.end(),
+		auto itr = std::find_if(rebarStorageInfo.begin(), rebarStorageInfo.end(),
 			[bandId](const auto &loadedBandInfo) { return loadedBandInfo.id == bandId; });
 
-		if (itr == m_loadedRebarStorageInfo.end())
+		if (itr == rebarStorageInfo.end())
 		{
 			// Any band that doesn't appear in the loaded data will be placed at the end.
 			return mainRebarBands.size() - 1;
 		}
 
-		return itr - m_loadedRebarStorageInfo.begin();
+		return itr - rebarStorageInfo.begin();
 	};
 
 	std::stable_sort(mainRebarBands.begin(), mainRebarBands.end(),
@@ -156,17 +162,18 @@ void Explorerplusplus::UpdateMainRebarBandsFromLoadedInfo(
 
 	for (auto &band : mainRebarBands)
 	{
-		UpdateMainRebarBandFromLoadedInfo(band);
+		UpdateMainRebarBandFromLoadedInfo(band, rebarStorageInfo);
 	}
 }
 
-void Explorerplusplus::UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo)
+void Explorerplusplus::UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo,
+	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
-	auto itr = std::find_if(m_loadedRebarStorageInfo.begin(), m_loadedRebarStorageInfo.end(),
+	auto itr = std::find_if(rebarStorageInfo.begin(), rebarStorageInfo.end(),
 		[&internalBandInfo](const auto &loadedBandInfo)
 		{ return loadedBandInfo.id == internalBandInfo.id; });
 
-	if (itr == m_loadedRebarStorageInfo.end())
+	if (itr == rebarStorageInfo.end())
 	{
 		return;
 	}
@@ -557,7 +564,7 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	return hSubMenu;
 }
 
-std::vector<RebarBandStorageInfo> Explorerplusplus::GetMainRebarStorageInfo()
+std::vector<RebarBandStorageInfo> Explorerplusplus::GetMainRebarStorageInfo() const
 {
 	std::vector<RebarBandStorageInfo> rebarStorageInfo;
 	auto numBands = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0));

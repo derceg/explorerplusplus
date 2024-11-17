@@ -133,11 +133,6 @@ void LoadSaveXML::LoadGenericSettings()
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom.get());
 }
 
-void LoadSaveXML::LoadMainRebarInformation()
-{
-	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());
-}
-
 void LoadSaveXML::SaveGenericSettings()
 {
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom.get(), m_pRoot.get());
@@ -163,11 +158,6 @@ void LoadSaveXML::SaveApplicationToolbar()
 {
 	Applications::ApplicationToolbarXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
 		m_app->GetApplicationModel());
-}
-
-void LoadSaveXML::SaveMainRebarInformation()
-{
-	m_pContainer->SaveMainRebarInformationToXML(m_pXMLDom.get(), m_pRoot.get());
 }
 
 void LoadSaveXML::SaveColorRules()

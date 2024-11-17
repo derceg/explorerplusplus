@@ -4,7 +4,10 @@
 
 #include "stdafx.h"
 #include "WindowStorage.h"
+#include "MainRebarStorage.h"
+#include "TabStorage.h"
 #include "../Helper/Helper.h"
+#include "../Helper/WindowHelper.h"
 
 namespace
 {
@@ -14,6 +17,8 @@ const auto g_showStateMappings = MakeBimap<int, WindowShowState>(
 		{ SW_SHOWMAXIMIZED, WindowShowState::Maximized } });
 
 }
+
+bool WindowStorageData::operator==(const WindowStorageData &other) const = default;
 
 WindowShowState NativeShowStateToShowState(int nativeShowState)
 {

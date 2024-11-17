@@ -465,6 +465,9 @@
     <ClInclude Include="WindowStorageTestHelper.h">
       <Filter>Windows</Filter>
     </ClInclude>
+    <ClInclude Include="StorageTestHelper.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

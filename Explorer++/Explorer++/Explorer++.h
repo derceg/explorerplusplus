@@ -339,12 +339,15 @@ private:
 	void SetProgramMenuItemStates(HMENU hProgramMenu);
 
 	// Main rebar
-	void CreateMainRebarAndChildren();
-	std::vector<InternalRebarBandInfo> InitializeMainRebarBands();
+	void CreateMainRebarAndChildren(const std::vector<RebarBandStorageInfo> *rebarStorageInfo);
+	std::vector<InternalRebarBandInfo> InitializeMainRebarBands(
+		const std::vector<RebarBandStorageInfo> *rebarStorageInfo);
 	InternalRebarBandInfo InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
 	InternalRebarBandInfo InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
-	void UpdateMainRebarBandsFromLoadedInfo(std::vector<InternalRebarBandInfo> &mainRebarBands);
-	void UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo);
+	void UpdateMainRebarBandsFromLoadedInfo(std::vector<InternalRebarBandInfo> &mainRebarBands,
+		const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
+	void UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo,
+		const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
 	void InsertMainRebarBand(const InternalRebarBandInfo &internalBandInfo);
 	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void CreateFolderControls();
@@ -360,7 +363,7 @@ private:
 	boost::signals2::connection AddToolbarContextMenuSelectedObserver(
 		const ToolbarContextMenuSelectedSignal::slot_type &observer) override;
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
-	std::vector<RebarBandStorageInfo> GetMainRebarStorageInfo();
+	std::vector<RebarBandStorageInfo> GetMainRebarStorageInfo() const;
 	void ShowMainRebarBand(HWND toolbar, bool show);
 	void OnLockToolbarsUpdated(bool lock);
 
@@ -384,14 +387,10 @@ private:
 	/* Registry settings. */
 	LONG LoadGenericSettingsFromRegistry(HKEY applicationKey);
 	LONG SaveGenericSettingsToRegistry(HKEY applicationKey);
-	void LoadMainRebarInformationFromRegistry(HKEY mainKey);
-	void SaveMainRebarInformationToRegistry(HKEY mainKey);
 
 	/* XML Settings. */
 	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
 
 	/* Window state update. */
@@ -661,7 +660,6 @@ private:
 	FileActionHandler m_FileActionHandler;
 
 	// Main rebar
-	std::vector<RebarBandStorageInfo> m_loadedRebarStorageInfo;
 	std::vector<boost::signals2::scoped_connection> m_rebarConnections;
 
 	/* Toolbars. */

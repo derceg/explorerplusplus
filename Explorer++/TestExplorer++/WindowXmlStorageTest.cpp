@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "WindowXmlStorage.h"
+#include "MainRebarStorage.h"
 #include "ResourceTestHelper.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
@@ -20,7 +21,7 @@ class WindowXmlStorageTest : public XmlStorageTest
 
 TEST_F(WindowXmlStorageTest, V2Load)
 {
-	auto referenceWindows = BuildV2ReferenceWindows();
+	auto referenceWindows = BuildV2ReferenceWindows(TestStorageType::Xml);
 
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
@@ -32,7 +33,7 @@ TEST_F(WindowXmlStorageTest, V2Load)
 
 TEST_F(WindowXmlStorageTest, V2LoadFallback)
 {
-	auto referenceWindow = BuildV2FallbackReferenceWindow();
+	auto referenceWindow = BuildV2FallbackReferenceWindow(TestStorageType::Xml);
 
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-fallback-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
@@ -44,7 +45,7 @@ TEST_F(WindowXmlStorageTest, V2LoadFallback)
 
 TEST_F(WindowXmlStorageTest, V2Save)
 {
-	auto referenceWindows = BuildV2ReferenceWindows();
+	auto referenceWindows = BuildV2ReferenceWindows(TestStorageType::Xml);
 
 	auto xmlDocumentData = CreateXmlDocument();
 
@@ -58,7 +59,7 @@ TEST_F(WindowXmlStorageTest, V2Save)
 
 TEST_F(WindowXmlStorageTest, V1Load)
 {
-	auto referenceWindow = BuildV1ReferenceWindow();
+	auto referenceWindow = BuildV1ReferenceWindow(TestStorageType::Xml);
 
 	std::wstring xmlFilePath = GetResourcePath(L"windows-v1-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);

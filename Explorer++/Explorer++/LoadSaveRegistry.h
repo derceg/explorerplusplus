@@ -16,7 +16,6 @@ public:
 
 	/* Loading functions. */
 	void LoadGenericSettings() override;
-	void LoadMainRebarInformation() override;
 
 	/* Saving functions. */
 	void SaveGenericSettings() override;
@@ -24,7 +23,6 @@ public:
 	void SaveBookmarks() override;
 	void SaveDefaultColumns() override;
 	void SaveApplicationToolbar() override;
-	void SaveMainRebarInformation() override;
 	void SaveColorRules() override;
 	void SaveDialogStates() override;
 

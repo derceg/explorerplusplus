@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "WindowRegistryStorage.h"
+#include "MainRebarRegistryStorage.h"
+#include "MainRebarStorage.h"
 #include "Storage.h"
 #include "TabRegistryStorage.h"
 #include "TabStorage.h"
@@ -23,6 +25,7 @@ const wchar_t SETTING_POSITION[] = L"Position";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
+const wchar_t MAIN_REBAR_SUB_KEY_PATH[] = L"Toolbars";
 
 std::vector<TabStorageData> LoadTabs(HKEY applicationKey)
 {
@@ -36,6 +39,20 @@ std::vector<TabStorageData> LoadTabs(HKEY applicationKey)
 	}
 
 	return TabRegistryStorage::Load(tabsKey.get());
+}
+
+std::vector<RebarBandStorageInfo> LoadMainRebarInfo(HKEY applicationKey)
+{
+	wil::unique_hkey mainRebarKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(applicationKey, MAIN_REBAR_SUB_KEY_PATH,
+		mainRebarKey, wil::reg::key_access::read);
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	return MainRebarRegistryStorage::Load(mainRebarKey.get());
 }
 
 std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
@@ -54,8 +71,10 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 	int selectedTab = 0;
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_SELECTED_TAB, selectedTab);
 
+	auto mainRebarInfo = LoadMainRebarInfo(applicationKey);
+
 	return WindowStorageData(placement.rcNormalPosition,
-		NativeShowStateToShowState(placement.showCmd), tabs, selectedTab);
+		NativeShowStateToShowState(placement.showCmd), tabs, selectedTab, mainRebarInfo);
 }
 
 }
@@ -73,6 +92,7 @@ const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
+const wchar_t MAIN_REBAR_SUB_KEY_PATH[] = L"Toolbars";
 
 std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey, bool fallback)
 {
@@ -140,7 +160,20 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		}
 	}
 
-	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab);
+	std::vector<RebarBandStorageInfo> mainRebarInfo;
+
+	if (wil::unique_hkey mainRebarKey; SUCCEEDED(wil::reg::open_unique_key_nothrow(windowKey,
+			MAIN_REBAR_SUB_KEY_PATH, mainRebarKey, wil::reg::key_access::read)))
+	{
+		mainRebarInfo = MainRebarRegistryStorage::Load(mainRebarKey.get());
+	}
+	else if (fallback)
+	{
+		mainRebarInfo = V1::LoadMainRebarInfo(applicationKey);
+	}
+
+	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab,
+		mainRebarInfo);
 }
 
 std::vector<WindowStorageData> Load(HKEY applicationKey, HKEY windowsKey)
@@ -188,6 +221,15 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	if (SUCCEEDED(hr))
 	{
 		TabRegistryStorage::Save(tabsKey.get(), window.tabs);
+	}
+
+	wil::unique_hkey mainRebarKey;
+	hr = wil::reg::create_unique_key_nothrow(windowKey, MAIN_REBAR_SUB_KEY_PATH, mainRebarKey,
+		wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		MainRebarRegistryStorage::Save(mainRebarKey.get(), window.mainRebarInfo);
 	}
 }
 

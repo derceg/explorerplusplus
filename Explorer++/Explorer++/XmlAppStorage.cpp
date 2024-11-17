@@ -9,6 +9,7 @@
 #include "ColorRuleXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
+#include "MainRebarStorage.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include "WindowXmlStorage.h"

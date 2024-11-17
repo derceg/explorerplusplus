@@ -7,6 +7,7 @@
 #include "../Helper/BetterEnumsWrapper.h"
 #include <vector>
 
+struct RebarBandStorageInfo;
 struct TabStorageData;
 
 // These values are used when loading and saving data and shouldn't be changed.
@@ -24,6 +25,10 @@ struct WindowStorageData
 	WindowShowState showState;
 	std::vector<TabStorageData> tabs;
 	int selectedTab;
+	std::vector<RebarBandStorageInfo> mainRebarInfo;
+
+	// This is only used in tests.
+	bool operator==(const WindowStorageData &other) const;
 };
 
 WindowShowState NativeShowStateToShowState(int nativeShowState);

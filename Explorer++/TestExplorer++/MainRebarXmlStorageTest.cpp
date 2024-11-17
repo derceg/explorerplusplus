@@ -14,6 +14,8 @@ using namespace testing;
 
 class MainRebarXmlStorageTest : public XmlStorageTest
 {
+protected:
+	static inline const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
 };
 
 TEST_F(MainRebarXmlStorageTest, Load)
@@ -23,7 +25,12 @@ TEST_F(MainRebarXmlStorageTest, Load)
 	std::wstring xmlFilePath = GetResourcePath(L"main-rebar-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(xmlDocumentData.xmlDocument.get());
+	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
+	auto queryString = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
+	HRESULT hr = xmlDocumentData.rootNode->selectSingleNode(queryString.get(), &mainRebarNode);
+	ASSERT_EQ(hr, S_OK);
+
+	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(mainRebarNode.get());
 
 	EXPECT_EQ(loadedRebarStorageInfo, referenceRebarStorageInfo);
 }
@@ -34,9 +41,14 @@ TEST_F(MainRebarXmlStorageTest, Save)
 
 	auto xmlDocumentData = CreateXmlDocument();
 
-	MainRebarXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
+	wil::com_ptr_nothrow<IXMLDOMElement> mainRebarNode;
+	auto nodeName = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
+	HRESULT hr = xmlDocumentData.xmlDocument->createElement(nodeName.get(), &mainRebarNode);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	MainRebarXmlStorage::Save(xmlDocumentData.xmlDocument.get(), mainRebarNode.get(),
 		referenceRebarStorageInfo);
-	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(xmlDocumentData.xmlDocument.get());
+	auto loadedRebarStorageInfo = MainRebarXmlStorage::Load(mainRebarNode.get());
 
 	EXPECT_EQ(loadedRebarStorageInfo, referenceRebarStorageInfo);
 }

@@ -12,8 +12,8 @@ struct RebarBandStorageInfo;
 namespace MainRebarXmlStorage
 {
 
-std::vector<RebarBandStorageInfo> Load(IXMLDOMDocument *xmlDocument);
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode,
+std::vector<RebarBandStorageInfo> Load(IXMLDOMNode *mainRebarNode);
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *mainRebarNode,
 	const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
 
 }

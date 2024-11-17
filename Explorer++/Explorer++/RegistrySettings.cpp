@@ -7,8 +7,6 @@
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "MainRebarRegistryStorage.h"
-#include "MainRebarStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
 #include "Storage.h"
@@ -486,14 +484,4 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 	}
 
 	return returnValue;
-}
-
-void Explorerplusplus::LoadMainRebarInformationFromRegistry(HKEY mainKey)
-{
-	m_loadedRebarStorageInfo = MainRebarRegistryStorage::Load(mainKey);
-}
-
-void Explorerplusplus::SaveMainRebarInformationToRegistry(HKEY mainKey)
-{
-	MainRebarRegistryStorage::Save(mainKey, GetMainRebarStorageInfo());
 }

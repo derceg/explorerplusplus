@@ -184,7 +184,7 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 
 	return WindowStorageData(placement.rcNormalPosition,
 		NativeShowStateToShowState(placement.showCmd), tabContainer->GetStorageData(),
-		tabContainer->GetSelectedTabIndex());
+		tabContainer->GetSelectedTabIndex(), GetMainRebarStorageInfo());
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

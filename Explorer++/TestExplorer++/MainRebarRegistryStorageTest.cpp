@@ -8,11 +8,14 @@
 #include "MainRebarStorageTestHelper.h"
 #include "RegistryStorageTestHelper.h"
 #include <gtest/gtest.h>
+#include <wil/registry.h>
 
 using namespace testing;
 
 class MainRebarRegistryStorageTest : public RegistryStorageTest
 {
+protected:
+	static inline const wchar_t MAIN_REBAR_KEY_NAME[] = L"Toolbars";
 };
 
 TEST_F(MainRebarRegistryStorageTest, Load)
@@ -21,7 +24,12 @@ TEST_F(MainRebarRegistryStorageTest, Load)
 
 	ImportRegistryResource(L"main-rebar.reg");
 
-	auto loadedRebarStorageInfo = MainRebarRegistryStorage::Load(m_applicationTestKey.get());
+	wil::unique_hkey mainRebarKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(m_applicationTestKey.get(), MAIN_REBAR_KEY_NAME,
+		mainRebarKey, wil::reg::key_access::read);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	auto loadedRebarStorageInfo = MainRebarRegistryStorage::Load(mainRebarKey.get());
 
 	EXPECT_EQ(loadedRebarStorageInfo, referenceRebarStorageInfo);
 }
@@ -30,8 +38,13 @@ TEST_F(MainRebarRegistryStorageTest, Save)
 {
 	auto referenceRebarStorageInfo = BuildMainRebarLoadSaveReference();
 
-	MainRebarRegistryStorage::Save(m_applicationTestKey.get(), referenceRebarStorageInfo);
-	auto loadedRebarStorageInfo = MainRebarRegistryStorage::Load(m_applicationTestKey.get());
+	wil::unique_hkey mainRebarKey;
+	HRESULT hr = wil::reg::create_unique_key_nothrow(m_applicationTestKey.get(),
+		MAIN_REBAR_KEY_NAME, mainRebarKey, wil::reg::key_access::readwrite);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	MainRebarRegistryStorage::Save(mainRebarKey.get(), referenceRebarStorageInfo);
+	auto loadedRebarStorageInfo = MainRebarRegistryStorage::Load(mainRebarKey.get());
 
 	EXPECT_EQ(loadedRebarStorageInfo, referenceRebarStorageInfo);
 }

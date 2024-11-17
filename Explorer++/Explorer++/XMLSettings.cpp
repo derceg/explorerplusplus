@@ -18,8 +18,6 @@
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "MainRebarStorage.h"
-#include "MainRebarXmlStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
 #include "Storage.h"
@@ -561,17 +559,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
 
 	XMLSettings::AppendChildToParent(pe.get(), pRoot);
-}
-
-void Explorerplusplus::LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom)
-{
-	m_loadedRebarStorageInfo = MainRebarXmlStorage::Load(pXMLDom);
-}
-
-void Explorerplusplus::SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom,
-	IXMLDOMElement *pRoot)
-{
-	MainRebarXmlStorage::Save(pXMLDom, pRoot, GetMainRebarStorageInfo());
 }
 
 unsigned long hash_setting(unsigned char *str)

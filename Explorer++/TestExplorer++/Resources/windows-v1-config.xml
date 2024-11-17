@@ -13,4 +13,8 @@
 	<Settings>
 		<Setting name="LastSelectedTab">1</Setting>
 	</Settings>
+	<Toolbars>
+		<Toolbar id="0" Style="768" Length="652"/>
+		<Toolbar id="1" Style="769" Length="839"/>
+	</Toolbars>
 </ExplorerPlusPlus>

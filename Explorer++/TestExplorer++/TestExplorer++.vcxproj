@@ -335,6 +335,7 @@
     <ClInclude Include="RuntimeTestHelper.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />
+    <ClInclude Include="StorageTestHelper.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />

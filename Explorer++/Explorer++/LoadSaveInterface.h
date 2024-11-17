@@ -18,7 +18,6 @@ public:
 
 	/* Loading functions. */
 	virtual void LoadGenericSettings() = 0;
-	virtual void LoadMainRebarInformation() = 0;
 
 	/* Saving functions. */
 	virtual void SaveGenericSettings() = 0;
@@ -26,7 +25,6 @@ public:
 	virtual void SaveBookmarks() = 0;
 	virtual void SaveDefaultColumns() = 0;
 	virtual void SaveApplicationToolbar() = 0;
-	virtual void SaveMainRebarInformation() = 0;
 	virtual void SaveColorRules() = 0;
 	virtual void SaveDialogStates() = 0;
 };

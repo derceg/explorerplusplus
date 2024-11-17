@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "WindowRegistryStorage.h"
+#include "MainRebarStorage.h"
 #include "RegistryStorageTestHelper.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
@@ -19,7 +20,7 @@ class WindowRegistryStorageTest : public RegistryStorageTest
 
 TEST_F(WindowRegistryStorageTest, V2Load)
 {
-	auto referenceWindows = BuildV2ReferenceWindows();
+	auto referenceWindows = BuildV2ReferenceWindows(TestStorageType::Registry);
 
 	ImportRegistryResource(L"windows-v2.reg");
 
@@ -30,7 +31,7 @@ TEST_F(WindowRegistryStorageTest, V2Load)
 
 TEST_F(WindowRegistryStorageTest, V2LoadFallback)
 {
-	auto referenceWindow = BuildV2FallbackReferenceWindow();
+	auto referenceWindow = BuildV2FallbackReferenceWindow(TestStorageType::Registry);
 
 	// In this case, some of the window data is stored in the original format.
 	// WindowRegistryStorage::Load() should detect that the data isn't present within the windows
@@ -44,7 +45,7 @@ TEST_F(WindowRegistryStorageTest, V2LoadFallback)
 
 TEST_F(WindowRegistryStorageTest, V2Save)
 {
-	auto referenceWindows = BuildV2ReferenceWindows();
+	auto referenceWindows = BuildV2ReferenceWindows(TestStorageType::Registry);
 
 	WindowRegistryStorage::Save(m_applicationTestKey.get(), referenceWindows);
 
@@ -55,7 +56,7 @@ TEST_F(WindowRegistryStorageTest, V2Save)
 
 TEST_F(WindowRegistryStorageTest, V1Load)
 {
-	auto referenceWindow = BuildV1ReferenceWindow();
+	auto referenceWindow = BuildV1ReferenceWindow(TestStorageType::Registry);
 
 	ImportRegistryResource(L"windows-v1.reg");
 

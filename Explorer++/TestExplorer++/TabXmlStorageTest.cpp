@@ -21,7 +21,7 @@ protected:
 TEST_F(TabXmlStorageTest, Load)
 {
 	std::vector<TabStorageData> referenceTabs;
-	BuildTabStorageLoadSaveReference(referenceTabs);
+	BuildTabStorageLoadSaveReference(referenceTabs, TestStorageType::Xml);
 
 	std::wstring xmlFilePath = GetResourcePath(L"tabs-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
@@ -39,7 +39,7 @@ TEST_F(TabXmlStorageTest, Load)
 TEST_F(TabXmlStorageTest, Save)
 {
 	std::vector<TabStorageData> referenceTabs;
-	BuildTabStorageLoadSaveReference(referenceTabs);
+	BuildTabStorageLoadSaveReference(referenceTabs, TestStorageType::Xml);
 
 	auto xmlDocumentData = CreateXmlDocument();
 

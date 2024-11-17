@@ -11,7 +11,7 @@ struct RebarBandStorageInfo;
 namespace MainRebarRegistryStorage
 {
 
-std::vector<RebarBandStorageInfo> Load(HKEY mainKey);
-void Save(HKEY mainKey, const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
+std::vector<RebarBandStorageInfo> Load(HKEY mainRebarKey);
+void Save(HKEY mainRebarKey, const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
 
 }

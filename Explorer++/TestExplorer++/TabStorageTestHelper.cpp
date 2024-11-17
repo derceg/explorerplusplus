@@ -7,29 +7,33 @@
 #include "ShellTestHelper.h"
 #include "TabStorage.h"
 
-bool operator==(const TabStorageData &first, const TabStorageData &second)
+TabStorageData CreateTabStorageFromDirectory(const std::wstring &directory,
+	TestStorageType storageType)
 {
-	bool areDirectoriesEquivalent = false;
+	TabStorageData tab;
 
-	if (first.pidl.HasValue() && second.pidl.HasValue())
+	// When using the registry to persist data, only the pidl field is used. When using the config
+	// XML file, only the directory field is used. To ensure that comparing two TabStorageData
+	// instances works as expected, it's important that only the required field is set.
+	// For example, if the directory field was set when saving registry data, it would be ignored.
+	// It wouldn't be set when loading data, however, which would cause the comparison between the
+	// data being saved and the data being loaded to fail.
+	if (storageType == TestStorageType::Registry)
 	{
-		areDirectoriesEquivalent = (first.pidl == second.pidl);
+		tab.pidl = CreateSimplePidlForTest(directory);
 	}
 	else
 	{
-		areDirectoriesEquivalent = (first.directory == second.directory);
+		tab.directory = directory;
 	}
 
-	return areDirectoriesEquivalent && first.tabSettings == second.tabSettings
-		&& first.folderSettings == second.folderSettings && first.columns == second.columns;
+	return tab;
 }
 
-void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
+void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
+	TestStorageType storageType)
 {
-	TabStorageData tab1;
-
-	tab1.directory = L"C:\\";
-	tab1.pidl = CreateSimplePidlForTest(tab1.directory);
+	auto tab1 = CreateTabStorageFromDirectory(L"C:\\", storageType);
 
 	tab1.tabSettings.name = L"C drive";
 
@@ -64,10 +68,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 	// Note that since no columns appear in the saved data for this tab and the third tab, there's
 	// no need to set any columns here. If there are no columns in the saved data, the default
 	// columns will be used.
-	TabStorageData tab2;
-
-	tab2.directory = L"C:\\Users";
-	tab2.pidl = CreateSimplePidlForTest(tab2.directory);
+	auto tab2 = CreateTabStorageFromDirectory(L"C:\\Users", storageType);
 
 	tab2.tabSettings.lockState = Tab::LockState::Locked;
 
@@ -85,10 +86,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 
 	outputTabs.push_back(tab2);
 
-	TabStorageData tab3;
-
-	tab3.directory = L"C:\\Users\\Default";
-	tab3.pidl = CreateSimplePidlForTest(tab3.directory);
+	auto tab3 = CreateTabStorageFromDirectory(L"C:\\Users\\Default", storageType);
 
 	tab3.tabSettings.lockState = Tab::LockState::AddressLocked;
 

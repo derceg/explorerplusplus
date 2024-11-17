@@ -173,3 +173,8 @@ wil::unique_hwnd CreateMessageOnlyWindow()
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, nullptr,
 		GetModuleHandle(nullptr), nullptr));
 }
+
+bool operator==(const RECT &first, const RECT &second)
+{
+	return EqualRect(&first, &second);
+}

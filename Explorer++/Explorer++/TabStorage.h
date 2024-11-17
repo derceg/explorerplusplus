@@ -18,4 +18,7 @@ struct TabStorageData
 	TabSettings tabSettings;
 	FolderSettings folderSettings;
 	FolderColumns columns;
+
+	// This is only used in tests.
+	bool operator==(const TabStorageData &) const = default;
 };

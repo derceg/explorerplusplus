@@ -43,18 +43,6 @@ void LoadSaveRegistry::LoadGenericSettings()
 	}
 }
 
-void LoadSaveRegistry::LoadMainRebarInformation()
-{
-	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::read);
-
-	if (SUCCEEDED(hr))
-	{
-		m_pContainer->LoadMainRebarInformationFromRegistry(mainKey.get());
-	}
-}
-
 void LoadSaveRegistry::SaveGenericSettings()
 {
 	wil::unique_hkey mainKey;
@@ -114,18 +102,6 @@ void LoadSaveRegistry::SaveApplicationToolbar()
 	{
 		Applications::ApplicationToolbarRegistryStorage::Save(mainKey.get(),
 			m_app->GetApplicationModel());
-	}
-}
-
-void LoadSaveRegistry::SaveMainRebarInformation()
-{
-	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
-		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
-
-	if (SUCCEEDED(hr))
-	{
-		m_pContainer->SaveMainRebarInformationToRegistry(mainKey.get());
 	}
 }
 

@@ -10,6 +10,7 @@
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
+#include "MainRebarStorage.h"
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
 #include "TabStorage.h"

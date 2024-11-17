@@ -7,6 +7,7 @@
 #include "BrowserList.h"
 #include "BrowserWindow.h"
 #include "GeneratorTestHelper.h"
+#include "MainRebarStorage.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include <gtest/gtest.h>

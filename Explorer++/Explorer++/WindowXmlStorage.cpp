@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "WindowXmlStorage.h"
+#include "MainRebarStorage.h"
+#include "MainRebarXmlStorage.h"
 #include "Storage.h"
 #include "TabStorage.h"
 #include "TabXmlStorage.h"
@@ -54,6 +56,7 @@ const wchar_t SETTING_SHOW_STATE[] = L"ShowCmd";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
+const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
 
 std::vector<TabStorageData> LoadTabs(IXMLDOMNode *rootNode)
 {
@@ -67,6 +70,20 @@ std::vector<TabStorageData> LoadTabs(IXMLDOMNode *rootNode)
 	}
 
 	return TabXmlStorage::Load(tabsNode.get());
+}
+
+std::vector<RebarBandStorageInfo> LoadMainRebarInfo(IXMLDOMNode *rootNode)
+{
+	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
+	auto query = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
+	HRESULT hr = rootNode->selectSingleNode(query.get(), &mainRebarNode);
+
+	if (hr != S_OK)
+	{
+		return {};
+	}
+
+	return MainRebarXmlStorage::Load(mainRebarNode.get());
 }
 
 std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowPositionNode)
@@ -141,8 +158,10 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 		GetIntSetting(settingsNode.get(), SETTING_SELECTED_TAB, selectedTab);
 	}
 
+	auto mainRebarInfo = LoadMainRebarInfo(rootNode);
+
 	return WindowStorageData({ left, top, right, bottom }, NativeShowStateToShowState(showState),
-		tabs, selectedTab);
+		tabs, selectedTab, mainRebarInfo);
 }
 
 }
@@ -161,6 +180,7 @@ const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
+const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
 
 std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *windowNode,
 	bool fallback)
@@ -238,7 +258,23 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		}
 	}
 
-	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab);
+	std::vector<RebarBandStorageInfo> mainRebarInfo;
+
+	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
+	query = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
+	hr = windowNode->selectSingleNode(query.get(), &mainRebarNode);
+
+	if (hr == S_OK)
+	{
+		mainRebarInfo = MainRebarXmlStorage::Load(mainRebarNode.get());
+	}
+	else if (fallback)
+	{
+		mainRebarInfo = V1::LoadMainRebarInfo(rootNode);
+	}
+
+	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab,
+		mainRebarInfo);
 }
 
 std::vector<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowsNode)
@@ -307,6 +343,17 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 		TabXmlStorage::Save(xmlDocument, tabsNode.get(), window.tabs);
 
 		XMLSettings::AppendChildToParent(tabsNode.get(), windowNode.get());
+	}
+
+	wil::com_ptr_nothrow<IXMLDOMElement> mainRebarNode;
+	auto mainRebarNodeName = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
+	hr = xmlDocument->createElement(mainRebarNodeName.get(), &mainRebarNode);
+
+	if (hr == S_OK)
+	{
+		MainRebarXmlStorage::Save(xmlDocument, mainRebarNode.get(), window.mainRebarInfo);
+
+		XMLSettings::AppendChildToParent(mainRebarNode.get(), windowNode.get());
 	}
 
 	XMLSettings::AppendChildToParent(windowNode.get(), windowsNode);

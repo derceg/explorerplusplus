@@ -6,6 +6,10 @@
 			<Tabs>
 				<Tab Directory="c:\fake1"/>
 			</Tabs>
+			<Toolbars>
+				<Toolbar id="1" Style="769" Length="212"/>
+				<Toolbar id="0" Style="768" Length="391"/>
+			</Toolbars>
 		</Window>
 		<Window X="212" Y="40" Width="188" Height="1033" ShowState="1" SelectedTab="2">
 			<Tabs>
@@ -13,12 +17,18 @@
 				<Tab Directory="c:\fake2"/>
 				<Tab Directory="c:\fake3"/>
 			</Tabs>
+			<Toolbars>
+				<Toolbar id="0" Style="769" Length="110"/>
+			</Toolbars>
 		</Window>
 		<Window X="1165" Y="2" Width="906" Height="641" ShowState="2" SelectedTab="1">
 			<Tabs>
 				<Tab Directory="c:\fake1"/>
 				<Tab Directory="c:\fake2"/>
 			</Tabs>
+			<Toolbars>
+				<Toolbar id="0" Style="769" Length="1846"/>
+			</Toolbars>
 		</Window>
 	</Windows>
 </ExplorerPlusPlus>

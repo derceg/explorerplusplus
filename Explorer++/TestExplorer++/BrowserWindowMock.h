@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BrowserWindow.h"
+#include "MainRebarStorage.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include <gmock/gmock.h>

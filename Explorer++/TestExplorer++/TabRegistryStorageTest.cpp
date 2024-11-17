@@ -21,7 +21,7 @@ protected:
 TEST_F(TabRegistryStorageTest, Load)
 {
 	std::vector<TabStorageData> referenceTabs;
-	BuildTabStorageLoadSaveReference(referenceTabs);
+	BuildTabStorageLoadSaveReference(referenceTabs, TestStorageType::Registry);
 
 	ImportRegistryResource(L"tabs.reg");
 
@@ -38,7 +38,7 @@ TEST_F(TabRegistryStorageTest, Load)
 TEST_F(TabRegistryStorageTest, Save)
 {
 	std::vector<TabStorageData> referenceTabs;
-	BuildTabStorageLoadSaveReference(referenceTabs);
+	BuildTabStorageLoadSaveReference(referenceTabs, TestStorageType::Registry);
 
 	wil::unique_hkey tabsKey;
 	HRESULT hr = wil::reg::create_unique_key_nothrow(m_applicationTestKey.get(), TABS_KEY_NAME,
