@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include "MainToolbarStorage.h"
 #include "../Helper/BetterEnumsWrapper.h"
+#include <optional>
 #include <vector>
 
 struct RebarBandStorageInfo;
@@ -26,6 +28,7 @@ struct WindowStorageData
 	std::vector<TabStorageData> tabs;
 	int selectedTab;
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
+	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
 
 	// This is only used in tests.
 	bool operator==(const WindowStorageData &other) const;

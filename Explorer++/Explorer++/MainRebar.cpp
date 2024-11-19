@@ -27,8 +27,7 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
-void Explorerplusplus::CreateMainRebarAndChildren(
-	const std::vector<RebarBandStorageInfo> *rebarStorageInfo)
+void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData *storageData)
 {
 	m_hMainRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, L"",
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | CCS_NODIVIDER
@@ -37,7 +36,7 @@ void Explorerplusplus::CreateMainRebarAndChildren(
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hMainRebar,
 		std::bind_front(&Explorerplusplus::RebarSubclass, this)));
 
-	auto bands = InitializeMainRebarBands(rebarStorageInfo);
+	auto bands = InitializeMainRebarBands(storageData);
 
 	for (const auto &band : bands)
 	{
@@ -49,11 +48,11 @@ void Explorerplusplus::CreateMainRebarAndChildren(
 }
 
 std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::InitializeMainRebarBands(
-	const std::vector<RebarBandStorageInfo> *rebarStorageInfo)
+	const WindowStorageData *storageData)
 {
 	std::vector<InternalRebarBandInfo> mainRebarBands;
 
-	CreateMainToolbar();
+	CreateMainToolbar(storageData ? storageData->mainToolbarButtons : std::nullopt);
 	auto internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_MAIN_TOOLBAR,
 		m_mainToolbar->GetHWND(), m_config->showMainToolbar.get());
 	mainRebarBands.push_back(internalBandInfo);
@@ -93,9 +92,9 @@ std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::Initializ
 	m_rebarConnections.push_back(m_config->showApplicationToolbar.addObserver(std::bind_front(
 		&Explorerplusplus::ShowMainRebarBand, this, m_applicationToolbar->GetView()->GetHWND())));
 
-	if (rebarStorageInfo)
+	if (storageData)
 	{
-		UpdateMainRebarBandsFromLoadedInfo(mainRebarBands, *rebarStorageInfo);
+		UpdateMainRebarBandsFromLoadedInfo(mainRebarBands, storageData->mainRebarInfo);
 	}
 
 	return mainRebarBands;
@@ -466,10 +465,11 @@ void Explorerplusplus::OnAddressBarSizeUpdated()
 	UpdateRebarBandSize(m_hMainRebar, m_addressBar->GetHWND(), 0, GetRectHeight(&rect));
 }
 
-void Explorerplusplus::CreateMainToolbar()
+void Explorerplusplus::CreateMainToolbar(
+	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, this,
-		&m_shellIconLoader, m_config, m_loadedMainToolbarButtons);
+		&m_shellIconLoader, m_config, initialButtons);
 	m_mainToolbar->sizeUpdatedSignal.AddObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));
 }

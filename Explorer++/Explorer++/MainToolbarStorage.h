@@ -18,8 +18,14 @@ namespace MainToolbarStorage
 class MainToolbarButtons
 {
 public:
+	MainToolbarButtons() = default;
+	MainToolbarButtons(const std::vector<MainToolbarButton> &buttons);
+
 	void AddButton(MainToolbarButton button);
 	const std::vector<MainToolbarButton> &GetButtons() const;
+
+	// This is only used in tests.
+	bool operator==(const MainToolbarButtons &) const = default;
 
 private:
 	std::vector<MainToolbarButton> m_buttons;

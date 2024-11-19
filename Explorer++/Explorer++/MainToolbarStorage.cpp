@@ -62,6 +62,14 @@ constexpr WCHAR XM_BUTTON_ATTRIBUTE_TEMPLATE[] = L"Button{}";
 namespace MainToolbarStorage
 {
 
+MainToolbarButtons::MainToolbarButtons(const std::vector<MainToolbarButton> &buttons)
+{
+	for (auto button : buttons)
+	{
+		AddButton(button);
+	}
+}
+
 void MainToolbarButtons::AddButton(MainToolbarButton button)
 {
 	if ((button != +MainToolbarButton::Separator)

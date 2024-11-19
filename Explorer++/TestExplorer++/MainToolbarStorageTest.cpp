@@ -19,45 +19,17 @@ namespace
 
 MainToolbarStorage::MainToolbarButtons BuildMainToolbarLoadSaveReference()
 {
-	MainToolbarStorage::MainToolbarButtons buttons;
-	buttons.AddButton(MainToolbarButton::Folders);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::Up);
-	buttons.AddButton(MainToolbarButton::Back);
-	buttons.AddButton(MainToolbarButton::Forward);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::Search);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::Paste);
-	buttons.AddButton(MainToolbarButton::Delete);
-	buttons.AddButton(MainToolbarButton::Copy);
-	buttons.AddButton(MainToolbarButton::Cut);
-	buttons.AddButton(MainToolbarButton::DeletePermanently);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::NewFolder);
-	buttons.AddButton(MainToolbarButton::CopyTo);
-	buttons.AddButton(MainToolbarButton::MoveTo);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::OpenCommandPrompt);
-	buttons.AddButton(MainToolbarButton::Refresh);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::AddBookmark);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::NewTab);
-	buttons.AddButton(MainToolbarButton::MergeFiles);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::CloseTab);
-	return buttons;
-}
-
-}
-
-namespace MainToolbarStorage
-{
-
-bool operator==(const MainToolbarButtons &first, const MainToolbarButtons &second)
-{
-	return first.GetButtons() == second.GetButtons();
+	return MainToolbarStorage::MainToolbarButtons({ MainToolbarButton::Folders,
+		MainToolbarButton::Separator, MainToolbarButton::Up, MainToolbarButton::Back,
+		MainToolbarButton::Forward, MainToolbarButton::Separator, MainToolbarButton::Search,
+		MainToolbarButton::Separator, MainToolbarButton::Paste, MainToolbarButton::Delete,
+		MainToolbarButton::Copy, MainToolbarButton::Cut, MainToolbarButton::DeletePermanently,
+		MainToolbarButton::Separator, MainToolbarButton::NewFolder, MainToolbarButton::CopyTo,
+		MainToolbarButton::MoveTo, MainToolbarButton::Separator,
+		MainToolbarButton::OpenCommandPrompt, MainToolbarButton::Refresh,
+		MainToolbarButton::Separator, MainToolbarButton::AddBookmark, MainToolbarButton::Separator,
+		MainToolbarButton::NewTab, MainToolbarButton::MergeFiles, MainToolbarButton::Separator,
+		MainToolbarButton::CloseTab });
 }
 
 }

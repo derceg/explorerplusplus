@@ -27,7 +27,12 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 			{
 				{ 1, 769, 212 },
 				{ 0, 768, 391 }
-			}
+			},
+			MainToolbarStorage::MainToolbarButtons({
+				MainToolbarButton::Back,
+				MainToolbarButton::Forward,
+				MainToolbarButton::Delete
+			})
 		},
 		{
 			{ 212, 40, 400, 1073 },
@@ -40,7 +45,12 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 			2,
 			{
 				{ 0, 769, 110 }
-			}
+			},
+			MainToolbarStorage::MainToolbarButtons({
+				MainToolbarButton::Refresh,
+				MainToolbarButton::Separator,
+				MainToolbarButton::NewTab
+			})
 		},
 		{
 			{ 1165, 2, 2071, 643 },
@@ -52,7 +62,11 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 			1,
 			{
 				{ 0, 769, 1846 }
-			}
+			},
+			MainToolbarStorage::MainToolbarButtons({
+				MainToolbarButton::Search,
+				MainToolbarButton::CloseTab
+			})
 		}
 	};
 	// clang-format on
@@ -74,7 +88,11 @@ WindowStorageData BuildV2FallbackReferenceWindow(TestStorageType storageType)
 			{ 2, 769, 88 },
 			{ 0, 768, 712 },
 			{ 1, 768, 1834 }
-		}
+		},
+		MainToolbarStorage::MainToolbarButtons({
+			MainToolbarButton::MergeFiles,
+			MainToolbarButton::OpenCommandPrompt
+		})
 	};
 	// clang-format on
 }
@@ -93,7 +111,12 @@ WindowStorageData BuildV1ReferenceWindow(TestStorageType storageType)
 		{
 			{ 0, 768, 652 },
 			{ 1, 769, 839 }
-		}
+		},
+		MainToolbarStorage::MainToolbarButtons({
+			MainToolbarButton::CopyTo,
+			MainToolbarButton::MoveTo,
+			MainToolbarButton::Up
+		})
 	};
 	// clang-format on
 }

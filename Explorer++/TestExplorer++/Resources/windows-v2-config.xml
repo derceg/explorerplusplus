@@ -10,6 +10,7 @@
 				<Toolbar id="1" Style="769" Length="212"/>
 				<Toolbar id="0" Style="768" Length="391"/>
 			</Toolbars>
+			<MainToolbarButtons Button0="Back" Button1="Forward" Button2="Delete" />
 		</Window>
 		<Window X="212" Y="40" Width="188" Height="1033" ShowState="1" SelectedTab="2">
 			<Tabs>
@@ -20,6 +21,7 @@
 			<Toolbars>
 				<Toolbar id="0" Style="769" Length="110"/>
 			</Toolbars>
+			<MainToolbarButtons Button0="Refresh" Button1="Separator" Button2="Create a new tab" />
 		</Window>
 		<Window X="1165" Y="2" Width="906" Height="641" ShowState="2" SelectedTab="1">
 			<Tabs>
@@ -29,6 +31,7 @@
 			<Toolbars>
 				<Toolbar id="0" Style="769" Length="1846"/>
 			</Toolbars>
+			<MainToolbarButtons Button0="Search" Button1="Close Tab" />
 		</Window>
 	</Windows>
 </ExplorerPlusPlus>

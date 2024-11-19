@@ -23,6 +23,7 @@ namespace V1
 
 const wchar_t SETTING_POSITION[] = L"Position";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
+const wchar_t SETTING_MAIN_TOOLBAR_BUTTONS[] = L"ToolbarState";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
 const wchar_t MAIN_REBAR_SUB_KEY_PATH[] = L"Toolbars";
@@ -73,8 +74,12 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 
 	auto mainRebarInfo = LoadMainRebarInfo(applicationKey);
 
+	auto mainToolbarButtons =
+		MainToolbarStorage::LoadFromRegistry(settingsKey, SETTING_MAIN_TOOLBAR_BUTTONS);
+
 	return WindowStorageData(placement.rcNormalPosition,
-		NativeShowStateToShowState(placement.showCmd), tabs, selectedTab, mainRebarInfo);
+		NativeShowStateToShowState(placement.showCmd), tabs, selectedTab, mainRebarInfo,
+		mainToolbarButtons);
 }
 
 }
@@ -90,6 +95,7 @@ const wchar_t SETTING_WIDTH[] = L"Width";
 const wchar_t SETTING_HEIGHT[] = L"Height";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
+const wchar_t SETTING_MAIN_TOOLBAR_BUTTONS[] = L"MainToolbarButtons";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
 const wchar_t MAIN_REBAR_SUB_KEY_PATH[] = L"Toolbars";
@@ -143,21 +149,24 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		tabs = V1::LoadTabs(applicationKey);
 	}
 
+	wil::unique_hkey settingsKey;
+
+	if (fallback)
+	{
+		// Some window-specific settings were previously stored under the top-level settings key, so
+		// that key may be used as a fallback.
+		wil::reg::open_unique_key_nothrow(applicationKey, Storage::REGISTRY_SETTINGS_KEY_NAME,
+			settingsKey, wil::reg::key_access::read);
+	}
+
 	int selectedTab = 0;
 	res =
 		RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_SELECTED_TAB, selectedTab);
 
-	if (res != ERROR_SUCCESS && fallback)
+	if (res != ERROR_SUCCESS && settingsKey)
 	{
-		wil::unique_hkey settingsKey;
-		HRESULT hr = wil::reg::open_unique_key_nothrow(applicationKey,
-			Storage::REGISTRY_SETTINGS_KEY_NAME, settingsKey, wil::reg::key_access::read);
-
-		if (SUCCEEDED(hr))
-		{
-			RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(),
-				V1::SETTING_SELECTED_TAB, selectedTab);
-		}
+		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(), V1::SETTING_SELECTED_TAB,
+			selectedTab);
 	}
 
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
@@ -172,8 +181,17 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		mainRebarInfo = V1::LoadMainRebarInfo(applicationKey);
 	}
 
+	auto mainToolbarButtons =
+		MainToolbarStorage::LoadFromRegistry(windowKey, SETTING_MAIN_TOOLBAR_BUTTONS);
+
+	if (!mainToolbarButtons && settingsKey)
+	{
+		mainToolbarButtons = MainToolbarStorage::LoadFromRegistry(settingsKey.get(),
+			V1::SETTING_MAIN_TOOLBAR_BUTTONS);
+	}
+
 	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab,
-		mainRebarInfo);
+		mainRebarInfo, mainToolbarButtons);
 }
 
 std::vector<WindowStorageData> Load(HKEY applicationKey, HKEY windowsKey)
@@ -231,6 +249,12 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	{
 		MainRebarRegistryStorage::Save(mainRebarKey.get(), window.mainRebarInfo);
 	}
+
+	// When loading data, there might not be any buttons that are retrieved. However, when saving
+	// data, there should always be a list of buttons provided (even if the list is empty).
+	CHECK(window.mainToolbarButtons);
+	MainToolbarStorage::SaveToRegistry(windowKey, SETTING_MAIN_TOOLBAR_BUTTONS,
+		*window.mainToolbarButtons);
 }
 
 void Save(HKEY windowsKey, const std::vector<WindowStorageData> &windows)

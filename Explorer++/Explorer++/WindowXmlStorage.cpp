@@ -86,6 +86,21 @@ std::vector<RebarBandStorageInfo> LoadMainRebarInfo(IXMLDOMNode *rootNode)
 	return MainRebarXmlStorage::Load(mainRebarNode.get());
 }
 
+std::optional<MainToolbarStorage::MainToolbarButtons> LoadMainToolbarButtons(
+	IXMLDOMNode *settingsNode)
+{
+	wil::com_ptr_nothrow<IXMLDOMNode> mainToolbarNode;
+	auto query = wil::make_bstr_nothrow(L"Setting[@name='ToolbarState']");
+	HRESULT hr = settingsNode->selectSingleNode(query.get(), &mainToolbarNode);
+
+	if (hr != S_OK)
+	{
+		return {};
+	}
+
+	return MainToolbarStorage::LoadFromXml(mainToolbarNode.get());
+}
+
 std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowPositionNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> positionNode;
@@ -160,8 +175,15 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 
 	auto mainRebarInfo = LoadMainRebarInfo(rootNode);
 
+	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
+
+	if (settingsNode)
+	{
+		mainToolbarButtons = LoadMainToolbarButtons(settingsNode.get());
+	}
+
 	return WindowStorageData({ left, top, right, bottom }, NativeShowStateToShowState(showState),
-		tabs, selectedTab, mainRebarInfo);
+		tabs, selectedTab, mainRebarInfo, mainToolbarButtons);
 }
 
 }
@@ -181,6 +203,7 @@ const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
 const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
+const wchar_t MAIN_TOOLBAR_NODE_NAME[] = L"MainToolbarButtons";
 
 std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *windowNode,
 	bool fallback)
@@ -243,19 +266,20 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		tabs = V1::LoadTabs(rootNode);
 	}
 
+	wil::com_ptr_nothrow<IXMLDOMNode> settingsNode;
+
+	if (fallback)
+	{
+		query = wil::make_bstr_nothrow(Storage::CONFIG_FILE_SETTINGS_NODE_NAME);
+		rootNode->selectSingleNode(query.get(), &settingsNode);
+	}
+
 	int selectedTab = 0;
 	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_SELECTED_TAB, selectedTab);
 
-	if (hr != S_OK && fallback)
+	if (hr != S_OK && settingsNode)
 	{
-		wil::com_ptr_nothrow<IXMLDOMNode> settingsNode;
-		query = wil::make_bstr_nothrow(Storage::CONFIG_FILE_SETTINGS_NODE_NAME);
-		hr = rootNode->selectSingleNode(query.get(), &settingsNode);
-
-		if (hr == S_OK)
-		{
-			GetIntSetting(settingsNode.get(), V1::SETTING_SELECTED_TAB, selectedTab);
-		}
+		GetIntSetting(settingsNode.get(), V1::SETTING_SELECTED_TAB, selectedTab);
 	}
 
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
@@ -273,8 +297,23 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		mainRebarInfo = V1::LoadMainRebarInfo(rootNode);
 	}
 
+	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
+
+	wil::com_ptr_nothrow<IXMLDOMNode> mainToolbarNode;
+	query = wil::make_bstr_nothrow(MAIN_TOOLBAR_NODE_NAME);
+	hr = windowNode->selectSingleNode(query.get(), &mainToolbarNode);
+
+	if (hr == S_OK)
+	{
+		mainToolbarButtons = MainToolbarStorage::LoadFromXml(mainToolbarNode.get());
+	}
+	else if (settingsNode)
+	{
+		mainToolbarButtons = V1::LoadMainToolbarButtons(settingsNode.get());
+	}
+
 	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab,
-		mainRebarInfo);
+		mainRebarInfo, mainToolbarButtons);
 }
 
 std::vector<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowsNode)
@@ -354,6 +393,19 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 		MainRebarXmlStorage::Save(xmlDocument, mainRebarNode.get(), window.mainRebarInfo);
 
 		XMLSettings::AppendChildToParent(mainRebarNode.get(), windowNode.get());
+	}
+
+	wil::com_ptr_nothrow<IXMLDOMElement> mainToolbarNode;
+	auto mainToolbarNodeName = wil::make_bstr_nothrow(MAIN_TOOLBAR_NODE_NAME);
+	hr = xmlDocument->createElement(mainToolbarNodeName.get(), &mainToolbarNode);
+
+	if (hr == S_OK)
+	{
+		CHECK(window.mainToolbarButtons);
+		MainToolbarStorage::SaveToXml(xmlDocument, mainToolbarNode.get(),
+			*window.mainToolbarButtons);
+
+		XMLSettings::AppendChildToParent(mainToolbarNode.get(), windowNode.get());
 	}
 
 	XMLSettings::AppendChildToParent(windowNode.get(), windowsNode);

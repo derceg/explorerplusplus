@@ -18,8 +18,6 @@
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "MainToolbar.h"
-#include "MainToolbarStorage.h"
 #include "Storage.h"
 #include "TabStorage.h"
 #include "TabXmlStorage.h"
@@ -62,7 +60,6 @@ will need to be changed correspondingly. */
 #define HASH_SHOWTOOLBAR 1852868921
 #define HASH_SORTASCENDINGGLOBAL 2605638058
 #define HASH_STARTUPMODE 1344265373
-#define HASH_TOOLBARSTATE 3436473849
 #define HASH_TREEVIEWDELAYENABLED 2186637066
 #define HASH_TREEVIEWWIDTH 4257779536
 #define HASH_VIEWMODEGLOBAL 3743629718
@@ -491,12 +488,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::EncodeIntValue(m_config->iconSet));
 
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
-		_T("ToolbarState"));
-	MainToolbarStorage::SaveToXml(pXMLDom, pParentNode.get(),
-		m_mainToolbar->GetButtonsForStorage());
-
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewDelayEnabled"),
 		XMLSettings::EncodeBoolValue(m_config->treeViewDelayEnabled));
 
@@ -826,10 +817,6 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_USEFULLROWSELECT:
 		m_config->useFullRowSelect = XMLSettings::DecodeBoolValue(wszValue);
-		break;
-
-	case HASH_TOOLBARSTATE:
-		m_loadedMainToolbarButtons = MainToolbarStorage::LoadFromXml(pNode);
 		break;
 
 	case HASH_TREEVIEWDELAYENABLED:

@@ -7,18 +7,14 @@
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "MainToolbar.h"
-#include "MainToolbarStorage.h"
 #include "Storage.h"
 #include "../Helper/RegistrySettings.h"
-#include <wil/registry.h>
 
 using namespace std::string_literals;
 
 namespace
 {
 
-const wchar_t MAIN_TOOLBAR_STATE_KEY_NAME[] = L"ToolbarState";
 const wchar_t MAIN_FONT_KEY_NAME[] = L"MainFont";
 
 }
@@ -211,9 +207,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 
 		RegSetValueEx(hSettingsKey, _T("DisplayFont"), 0, REG_BINARY, (LPBYTE) &logFont,
 			sizeof(LOGFONT));
-
-		MainToolbarStorage::SaveToRegistry(hSettingsKey, MAIN_TOOLBAR_STATE_KEY_NAME,
-			m_mainToolbar->GetButtonsForStorage());
 
 		auto &mainFont = m_config->mainFont.get();
 
@@ -462,9 +455,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 
 			m_config->displayWindowFont = hFont;
 		}
-
-		m_loadedMainToolbarButtons =
-			MainToolbarStorage::LoadFromRegistry(hSettingsKey, MAIN_TOOLBAR_STATE_KEY_NAME);
 
 		auto mainFontKeyPath = Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s
 			+ Storage::REGISTRY_SETTINGS_KEY_NAME + L"\\"s + MAIN_FONT_KEY_NAME;

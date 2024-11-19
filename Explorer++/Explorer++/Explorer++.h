@@ -339,9 +339,9 @@ private:
 	void SetProgramMenuItemStates(HMENU hProgramMenu);
 
 	// Main rebar
-	void CreateMainRebarAndChildren(const std::vector<RebarBandStorageInfo> *rebarStorageInfo);
+	void CreateMainRebarAndChildren(const WindowStorageData *storageData);
 	std::vector<InternalRebarBandInfo> InitializeMainRebarBands(
-		const std::vector<RebarBandStorageInfo> *rebarStorageInfo);
+		const WindowStorageData *storageData);
 	InternalRebarBandInfo InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
 	InternalRebarBandInfo InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
 	void UpdateMainRebarBandsFromLoadedInfo(std::vector<InternalRebarBandInfo> &mainRebarBands,
@@ -352,7 +352,8 @@ private:
 	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void CreateFolderControls();
 	void CreateAddressBar();
-	void CreateMainToolbar();
+	void CreateMainToolbar(
+		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	void CreateBookmarksToolbar();
 	void CreateDrivesToolbar();
 	void CreateApplicationToolbar();
@@ -663,7 +664,6 @@ private:
 
 	/* Toolbars. */
 	MainToolbar *m_mainToolbar;
-	std::optional<MainToolbarStorage::MainToolbarButtons> m_loadedMainToolbarButtons;
 	DrivesToolbar *m_drivesToolbar = nullptr;
 	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
 

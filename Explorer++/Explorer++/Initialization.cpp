@@ -55,7 +55,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	CreateDirectoryMonitor(&m_pDirMon);
 
 	CreateStatusBar();
-	CreateMainRebarAndChildren(storageData ? &storageData->mainRebarInfo : nullptr);
+	CreateMainRebarAndChildren(storageData);
 	InitializeDisplayWindow();
 	InitializeTabs();
 	CreateFolderControls();

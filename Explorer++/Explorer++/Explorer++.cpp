@@ -16,6 +16,7 @@
 #include "MainMenuSubMenuView.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
+#include "MainToolbar.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -183,7 +184,8 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 
 	return WindowStorageData(placement.rcNormalPosition,
 		NativeShowStateToShowState(placement.showCmd), tabContainer->GetStorageData(),
-		tabContainer->GetSelectedTabIndex(), GetMainRebarStorageInfo());
+		tabContainer->GetSelectedTabIndex(), GetMainRebarStorageInfo(),
+		m_mainToolbar->GetButtonsForStorage());
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

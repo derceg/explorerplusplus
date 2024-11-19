@@ -12,6 +12,7 @@
 	</Tabs>
 	<Settings>
 		<Setting name="LastSelectedTab">1</Setting>
+		<Setting name="ToolbarState" Button0="Copy To" Button1="Move To" Button2="Up" />
 	</Settings>
 	<Toolbars>
 		<Toolbar id="0" Style="768" Length="652"/>
