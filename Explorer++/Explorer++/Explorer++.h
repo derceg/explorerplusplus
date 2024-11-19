@@ -564,7 +564,6 @@ private:
 
 	/** Internal state. **/
 	HWND m_lastActiveWindow;
-	bool m_bLanguageLoaded;
 	bool m_bShowTabBar;
 	ULONG m_SHChangeNotifyID;
 

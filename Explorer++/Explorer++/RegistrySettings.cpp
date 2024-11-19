@@ -362,12 +362,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 			m_config->defaultTabDirectory);
 		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("IconTheme"), m_config->iconSet);
 
-		RegistrySettings::ReadDword(hSettingsKey, _T("Language"),
-			[this](DWORD value)
-			{
-				m_config->language = value;
-				m_bLanguageLoaded = true;
-			});
+		RegistrySettings::ReadDword(hSettingsKey, _T("Language"), m_config->language);
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("OpenTabsInForeground"),
 			m_config->openTabsInForeground);

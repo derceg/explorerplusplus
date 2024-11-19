@@ -678,7 +678,6 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_LANGUAGE:
 		m_config->language = XMLSettings::DecodeIntValue(wszValue);
-		m_bLanguageLoaded = true;
 		break;
 
 	case HASH_LARGETOOLBARICONS:
