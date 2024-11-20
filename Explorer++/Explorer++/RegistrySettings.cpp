@@ -9,6 +9,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "Storage.h"
 #include "../Helper/RegistrySettings.h"
+#include <wil/registry.h>
 
 using namespace std::string_literals;
 
@@ -212,9 +213,14 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 
 		if (mainFont)
 		{
-			auto mainFontKeyPath = Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s
-				+ Storage::REGISTRY_SETTINGS_KEY_NAME + L"\\"s + MAIN_FONT_KEY_NAME;
-			SaveCustomFontToRegistry(mainFontKeyPath, *mainFont);
+			wil::unique_hkey mainFontKey;
+			HRESULT hr = wil::reg::create_unique_key_nothrow(hSettingsKey, MAIN_FONT_KEY_NAME,
+				mainFontKey, wil::reg::key_access::readwrite);
+
+			if (SUCCEEDED(hr))
+			{
+				CustomFontStorage::SaveToRegistry(mainFontKey.get(), *mainFont);
+			}
 		}
 
 		RegCloseKey(hSettingsKey);
@@ -456,13 +462,18 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 			m_config->displayWindowFont = hFont;
 		}
 
-		auto mainFontKeyPath = Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s
-			+ Storage::REGISTRY_SETTINGS_KEY_NAME + L"\\"s + MAIN_FONT_KEY_NAME;
-		auto mainFont = LoadCustomFontFromRegistry(mainFontKeyPath);
+		wil::unique_hkey mainFontKey;
+		HRESULT hr = wil::reg::open_unique_key_nothrow(hSettingsKey, MAIN_FONT_KEY_NAME,
+			mainFontKey, wil::reg::key_access::read);
 
-		if (mainFont)
+		if (SUCCEEDED(hr))
 		{
-			m_config->mainFont = *mainFont;
+			auto mainFont = CustomFontStorage::LoadFromRegistry(mainFontKey.get());
+
+			if (mainFont)
+			{
+				m_config->mainFont = *mainFont;
+			}
 		}
 
 		RegCloseKey(hSettingsKey);

@@ -543,7 +543,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 		XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 			_T("MainFont"));
-		SaveCustomFontToXml(pXMLDom, pParentNode.get(), *mainFont);
+		CustomFontStorage::SaveToXml(pXMLDom, pParentNode.get(), *mainFont);
 	}
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
@@ -890,7 +890,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_MAIN_FONT:
 	{
-		auto mainFont = LoadCustomFontFromXml(pNode);
+		auto mainFont = CustomFontStorage::LoadFromXml(pNode);
 
 		if (mainFont)
 		{

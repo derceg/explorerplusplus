@@ -9,29 +9,21 @@
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 
-constexpr TCHAR SETTING_NAME[] = _T("Name");
-constexpr TCHAR SETTING_SIZE[] = _T("Size");
-
-std::unique_ptr<CustomFont> LoadCustomFontFromKey(HKEY key);
-void SaveCustomFontToKey(HKEY key, const CustomFont &customFont);
-
-std::unique_ptr<CustomFont> LoadCustomFontFromRegistry(const std::wstring &keyPath)
+namespace
 {
-	wil::unique_hkey fontKey;
-	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, keyPath.c_str(), 0, KEY_READ, &fontKey);
 
-	if (res == ERROR_SUCCESS)
-	{
-		return LoadCustomFontFromKey(fontKey.get());
-	}
+constexpr wchar_t SETTING_NAME[] = L"Name";
+constexpr wchar_t SETTING_SIZE[] = L"Size";
 
-	return nullptr;
 }
 
-std::unique_ptr<CustomFont> LoadCustomFontFromKey(HKEY key)
+namespace CustomFontStorage
+{
+
+std::unique_ptr<CustomFont> LoadFromRegistry(HKEY fontKey)
 {
 	std::wstring name;
-	LSTATUS result = RegistrySettings::ReadString(key, SETTING_NAME, name);
+	LSTATUS result = RegistrySettings::ReadString(fontKey, SETTING_NAME, name);
 
 	if (result != ERROR_SUCCESS)
 	{
@@ -39,7 +31,7 @@ std::unique_ptr<CustomFont> LoadCustomFontFromKey(HKEY key)
 	}
 
 	int size;
-	result = RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SIZE, size);
+	result = RegistrySettings::Read32BitValueFromRegistry(fontKey, SETTING_SIZE, size);
 
 	if (result != ERROR_SUCCESS)
 	{
@@ -49,28 +41,16 @@ std::unique_ptr<CustomFont> LoadCustomFontFromKey(HKEY key)
 	return std::make_unique<CustomFont>(name, size);
 }
 
-void SaveCustomFontToRegistry(const std::wstring &keyPath, const CustomFont &customFont)
+void SaveToRegistry(HKEY fontKey, const CustomFont &customFont)
 {
-	wil::unique_hkey fontKey;
-	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, keyPath.c_str(), 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &fontKey, nullptr);
-
-	if (res == ERROR_SUCCESS)
-	{
-		SaveCustomFontToKey(fontKey.get(), customFont);
-	}
+	RegistrySettings::SaveString(fontKey, SETTING_NAME, customFont.GetName());
+	RegistrySettings::SaveDword(fontKey, SETTING_SIZE, customFont.GetSize());
 }
 
-void SaveCustomFontToKey(HKEY key, const CustomFont &customFont)
-{
-	RegistrySettings::SaveString(key, SETTING_NAME, customFont.GetName());
-	RegistrySettings::SaveDword(key, SETTING_SIZE, customFont.GetSize());
-}
-
-std::unique_ptr<CustomFont> LoadCustomFontFromXml(IXMLDOMNode *parentNode)
+std::unique_ptr<CustomFont> LoadFromXml(IXMLDOMNode *fontNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
-	HRESULT hr = parentNode->get_attributes(&attributeMap);
+	HRESULT hr = fontNode->get_attributes(&attributeMap);
 
 	if (hr != S_OK)
 	{
@@ -96,11 +76,12 @@ std::unique_ptr<CustomFont> LoadCustomFontFromXml(IXMLDOMNode *parentNode)
 	return std::make_unique<CustomFont>(name, size);
 }
 
-void SaveCustomFontToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-	const CustomFont &customFont)
+void SaveToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *fontNode, const CustomFont &customFont)
 {
-	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_NAME,
+	XMLSettings::AddAttributeToNode(xmlDocument, fontNode, SETTING_NAME,
 		customFont.GetName().c_str());
-	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_SIZE,
+	XMLSettings::AddAttributeToNode(xmlDocument, fontNode, SETTING_SIZE,
 		XMLSettings::EncodeIntValue(customFont.GetSize()));
+}
+
 }
