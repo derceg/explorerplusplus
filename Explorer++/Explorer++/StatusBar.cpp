@@ -27,17 +27,10 @@ void Explorerplusplus::CreateStatusBar()
 	m_hStatusBar = ::CreateStatusBar(m_hContainer, style);
 	m_pStatusBar = new StatusBar(m_hStatusBar);
 
-	int width = 0;
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hStatusBar,
+		std::bind_front(&Explorerplusplus::StatusBarSubclass, this)));
 
-	RECT rc;
-	BOOL res = GetWindowRect(m_hContainer, &rc);
-
-	if (res)
-	{
-		width = GetRectWidth(&rc);
-	}
-
-	SetStatusBarParts(width);
+	SetStatusBarParts();
 
 	m_statusBarFontSetter = std::make_unique<MainFontSetter>(m_hStatusBar, m_config);
 	m_statusBarFontSetter->fontUpdatedSignal.AddObserver([this]() { UpdateStatusBarMinHeight(); });
@@ -49,15 +42,30 @@ void Explorerplusplus::CreateStatusBar()
 	UpdateStatusBarMinHeight();
 }
 
-void Explorerplusplus::SetStatusBarParts(int width)
+LRESULT Explorerplusplus::StatusBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	int parts[3];
+	switch (msg)
+	{
+	case WM_SIZE:
+		SetStatusBarParts();
+		break;
+	}
 
-	parts[0] = (int) (0.50 * width);
-	parts[1] = (int) (0.75 * width);
-	parts[2] = width;
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
 
-	SendMessage(m_hStatusBar, SB_SETPARTS, 3, (LPARAM) parts);
+void Explorerplusplus::SetStatusBarParts()
+{
+	RECT clientRect;
+	BOOL res = GetClientRect(m_hStatusBar, &clientRect);
+	CHECK(res);
+
+	int width = GetRectWidth(&clientRect);
+
+	int parts[] = { static_cast<int>(0.50 * width), static_cast<int>(0.75 * width), -1 };
+	auto setPartsRes =
+		SendMessage(m_hStatusBar, SB_SETPARTS, std::size(parts), reinterpret_cast<LPARAM>(parts));
+	DCHECK(setPartsRes);
 }
 
 // This function should be called whenever the font is updated for the status bar control.

@@ -404,7 +404,8 @@ private:
 
 	// Status bar
 	void CreateStatusBar();
-	void SetStatusBarParts(int width);
+	LRESULT StatusBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void SetStatusBarParts();
 	void UpdateStatusBarMinHeight();
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
 	void OnNavigationStartedStatusBar(const Tab &tab, const NavigateParams &navigateParams);

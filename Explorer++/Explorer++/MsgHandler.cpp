@@ -509,7 +509,6 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	/* <---- Status bar ----> */
 
 	PinStatusBar(m_hStatusBar, mainWindowWidth, mainWindowHeight);
-	SetStatusBarParts(mainWindowWidth);
 }
 
 void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
