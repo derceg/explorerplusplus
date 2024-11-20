@@ -45,6 +45,7 @@ class BookmarksMainMenu;
 class BookmarksToolbar;
 class CachedIcons;
 struct Config;
+class DisplayWindow;
 class DrivesToolbar;
 class GlobalHistoryMenu;
 class HolderWindow;
@@ -554,7 +555,6 @@ private:
 
 	HWND m_hStatusBar;
 	HWND m_hMainRebar;
-	HWND m_hDisplayWindow;
 	HWND m_hTabBacking;
 
 	HWND m_hTabWindowToolbar;
@@ -574,8 +574,9 @@ private:
 	bool m_applicationInitialized = false;
 	ApplicationInitializedSignal m_applicationInitializedSignal;
 
-	MainWindow *m_mainWindow;
-	AddressBar *m_addressBar;
+	MainWindow *m_mainWindow = nullptr;
+	AddressBar *m_addressBar = nullptr;
+	DisplayWindow *m_displayWindow = nullptr;
 
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 

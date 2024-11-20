@@ -190,10 +190,11 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 		LOGFONT logFont;
 		HFONT hFont;
 
-		centreColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETCENTRECOLOR, 0, 0);
-		surroundColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETSURROUNDCOLOR, 0, 0);
-		textColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETTEXTCOLOR, 0, 0);
-		SendMessage(m_hDisplayWindow, DWM_GETFONT, (WPARAM) &hFont, 0);
+		centreColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETCENTRECOLOR, 0, 0);
+		surroundColor =
+			(COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETSURROUNDCOLOR, 0, 0);
+		textColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETTEXTCOLOR, 0, 0);
+		SendMessage(m_displayWindow->GetHWND(), DWM_GETFONT, (WPARAM) &hFont, 0);
 
 		RegSetValueEx(hSettingsKey, _T("DisplayCentreColor"), 0, REG_BINARY, (LPBYTE) &centreColor,
 			sizeof(centreColor));

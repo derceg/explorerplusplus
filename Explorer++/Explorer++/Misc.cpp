@@ -29,8 +29,8 @@ void Explorerplusplus::ValidateLoadedSettings()
 
 void Explorerplusplus::ApplyDisplayWindowPosition()
 {
-	SendMessage(m_hDisplayWindow, WM_USER_DISPLAYWINDOWMOVED, m_config->displayWindowVertical,
-		NULL);
+	SendMessage(m_displayWindow->GetHWND(), WM_USER_DISPLAYWINDOWMOVED,
+		m_config->displayWindowVertical, NULL);
 }
 
 void Explorerplusplus::CopyToFolder(bool move)

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <gdiplus.h>
+#include <memory>
 #include <vector>
 
 #define DWM_BASE (WM_APP + 100)
@@ -55,6 +56,8 @@
 #define WM_NDW_ICONRCLICK (WM_APP + 101)
 #define WM_NDW_RCLICK (WM_APP + 102)
 
+class WindowSubclassWrapper;
+
 typedef struct
 {
 	Gdiplus::Color CentreColor;
@@ -78,16 +81,23 @@ typedef struct
 class DisplayWindow
 {
 public:
-	DisplayWindow(HWND hDisplayWindow, DWInitialSettings_t *pInitialSettings);
-	~DisplayWindow();
+	static DisplayWindow *Create(HWND parent, DWInitialSettings_t *initialSettings);
 
-	static LRESULT CALLBACK DisplayWindowProcStub(HWND hwnd, UINT msg, WPARAM wParam,
-		LPARAM lParam);
+	HWND GetHWND() const;
 
 	void ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 
 private:
-#define BORDER_COLOUR Gdiplus::Color(128, 128, 128)
+	static inline const Gdiplus::Color BORDER_COLOUR{ 128, 128, 128 };
+
+	static inline const wchar_t CLASS_NAME[] = L"DisplayWindow";
+	static inline const wchar_t WINDOW_NAME[] = L"DisplayWindow";
+
+	DisplayWindow(HWND parent, DWInitialSettings_t *initialSettings);
+	~DisplayWindow();
+
+	static HWND CreateDisplayWindow(HWND parent);
+	static ATOM RegisterDisplayWindowClass();
 
 	LRESULT CALLBACK DisplayWindowProc(HWND displayWindow, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -109,7 +119,8 @@ private:
 	void ExtractThumbnailImage();
 	void CancelThumbnailExtraction();
 
-	HWND m_hDisplayWindow;
+	const HWND m_hwnd;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 
 	/* Text drawing attributes. */
 	COLORREF m_TextColor;
@@ -141,5 +152,3 @@ private:
 	HICON m_hMainIcon;
 	HFONT m_hDisplayFont;
 };
-
-HWND CreateDisplayWindow(HWND parent, DWInitialSettings_t *pSettings);

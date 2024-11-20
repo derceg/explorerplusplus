@@ -270,7 +270,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayCentreColor"));
-	centreColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETCENTRECOLOR, 0, 0);
+	centreColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETCENTRECOLOR, 0, 0);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
 		XMLSettings::EncodeIntValue(GetRValue(centreColor)));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
@@ -284,7 +284,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayFont"));
-	SendMessage(m_hDisplayWindow, DWM_GETFONT, (WPARAM) &hFont, 0);
+	SendMessage(m_displayWindow->GetHWND(), DWM_GETFONT, (WPARAM) &hFont, 0);
 	GetObject(hFont, sizeof(LOGFONT), &fontInfo);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Height"),
 		XMLSettings::EncodeIntValue(fontInfo.lfHeight));
@@ -305,7 +305,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplaySurroundColor"));
-	surroundColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETSURROUNDCOLOR, 0, 0);
+	surroundColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETSURROUNDCOLOR, 0, 0);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
 		XMLSettings::EncodeIntValue(GetRValue(surroundColor)));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
@@ -318,7 +318,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayTextColor"));
-	textColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETTEXTCOLOR, 0, 0);
+	textColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETTEXTCOLOR, 0, 0);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
 		XMLSettings::EncodeIntValue(GetRValue(textColor)));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),

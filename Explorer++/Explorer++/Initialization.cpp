@@ -107,7 +107,7 @@ void Explorerplusplus::InitializeDisplayWindow()
 	initialSettings.hIcon = (HICON) LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION);
 
-	m_hDisplayWindow = CreateDisplayWindow(m_hContainer, &initialSettings);
+	m_displayWindow = DisplayWindow::Create(m_hContainer, &initialSettings);
 
 	ApplyDisplayWindowPosition();
 }

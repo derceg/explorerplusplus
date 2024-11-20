@@ -8,6 +8,7 @@
 #include "../Helper/DialogSettings.h"
 
 class DisplayColoursDialog;
+class DisplayWindow;
 
 class DisplayColoursDialogPersistentSettings : public DialogSettings
 {
@@ -75,7 +76,7 @@ private:
 	COLORREF GetColorFromSliderGroup(ColorGroup colorGroup[NUM_COLORS]);
 
 	HWND m_hDisplayWindow;
-	HWND m_hPreviewDisplayWindow;
+	DisplayWindow *m_previewDisplayWindow = nullptr;
 	HICON m_hDisplayWindowIcon;
 
 	ColorGroup m_CenterGroup[NUM_COLORS];

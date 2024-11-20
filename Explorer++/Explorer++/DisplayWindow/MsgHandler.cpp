@@ -116,7 +116,7 @@ void DisplayWindow::DrawThumbnail(HDC hdcMem)
 		if (!m_bThumbnailExtractionFailed)
 		{
 			RECT rc;
-			GetClientRect(m_hDisplayWindow, &rc);
+			GetClientRect(m_hwnd, &rc);
 
 			HDC hdcSrc = CreateCompatibleDC(hdcMem);
 			auto hBitmapOld = (HBITMAP) SelectObject(hdcSrc, m_hbmThumbnail);
@@ -199,7 +199,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 			if (SUCCEEDED(hr))
 			{
-				GetClientRect(m_hDisplayWindow, &rc);
+				GetClientRect(m_hwnd, &rc);
 
 				/* First, query the thumbnail so that its actual aspect
 				ratio can be calculated. */
@@ -246,7 +246,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 							if (!pte->bCancelled)
 							{
 								m_bThumbnailExtractionFailed = FALSE;
-								InvalidateRect(m_hDisplayWindow, nullptr, FALSE);
+								InvalidateRect(m_hwnd, nullptr, FALSE);
 							}
 
 							LeaveCriticalSection(&m_csDWThumbnails);
@@ -287,7 +287,7 @@ void DisplayWindow::PaintText(HDC hdc, unsigned int x)
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, m_TextColor);
 
-	GetClientRect(m_hDisplayWindow, &rcClient);
+	GetClientRect(m_hwnd, &rcClient);
 	xCurrent = x;
 
 	/* TODO: Fix. */
@@ -340,9 +340,9 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 	cursorPos.x = GET_X_LPARAM(lParam);
 	cursorPos.y = GET_Y_LPARAM(lParam);
 
-	GetClientRect(m_hDisplayWindow, &rc);
+	GetClientRect(m_hwnd, &rc);
 
-	GetClientRect(GetParent(m_hDisplayWindow), &rc2);
+	GetClientRect(GetParent(m_hwnd), &rc2);
 
 	if (m_bSizing)
 	{
@@ -356,7 +356,7 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 
 		/* Notify the main window, so that it can redraw/reposition
 		its other windows. */
-		SendMessage(GetParent(m_hDisplayWindow), WM_USER_DISPLAYWINDOWRESIZED,
+		SendMessage(GetParent(m_hwnd), WM_USER_DISPLAYWINDOWRESIZED,
 			MAKEWPARAM(std::max(rc.right - cursorPos.x, 0L), std::max(rc.bottom - cursorPos.y, 0L)),
 			0);
 	}
@@ -394,14 +394,14 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 	cursorPos.x = GET_X_LPARAM(lParam);
 	cursorPos.y = GET_Y_LPARAM(lParam);
 
-	GetClientRect(m_hDisplayWindow, &rc);
+	GetClientRect(m_hwnd, &rc);
 
 	if (m_bVertical && cursorPos.x <= (rc.left + 5) || !m_bVertical && cursorPos.y <= (rc.top + 5))
 	{
 		SetCursor(LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS));
 		m_bSizing = TRUE;
-		SetFocus(m_hDisplayWindow);
-		SetCapture(m_hDisplayWindow);
+		SetFocus(m_hwnd);
+		SetCapture(m_hwnd);
 	}
 
 	/* If an image thumbnail was clicked, open
@@ -418,8 +418,7 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 		{
 			/* TODO: Parent should be notified. */
 			SetCursor(LoadCursor(nullptr, IDC_HAND));
-			ShellExecute(m_hDisplayWindow, _T("open"), m_ImageFile, nullptr, nullptr,
-				SW_SHOWNORMAL);
+			ShellExecute(m_hwnd, _T("open"), m_ImageFile, nullptr, nullptr, SW_SHOWNORMAL);
 		}
 	}
 }
@@ -439,11 +438,11 @@ void DisplayWindow::OnRButtonUp(WPARAM wParam, LPARAM lParam)
 
 	if (PtInRect(&rc, pt))
 	{
-		SendMessage(GetParent(m_hDisplayWindow), WM_NDW_ICONRCLICK, wParam, lParam);
+		SendMessage(GetParent(m_hwnd), WM_NDW_ICONRCLICK, wParam, lParam);
 	}
 	else
 	{
-		SendMessage(GetParent(m_hDisplayWindow), WM_NDW_RCLICK, wParam, lParam);
+		SendMessage(GetParent(m_hwnd), WM_NDW_RCLICK, wParam, lParam);
 	}
 }
 
@@ -487,26 +486,26 @@ void DisplayWindow::OnSize(int width, int height)
 	HDC hdc;
 	RECT rc;
 
-	hdc = GetDC(m_hDisplayWindow);
+	hdc = GetDC(m_hwnd);
 
 	SetRect(&rc, 0, 0, width, height);
 	DrawGradientFill(hdc, &rc);
 
-	ReleaseDC(m_hDisplayWindow, hdc);
+	ReleaseDC(m_hwnd, hdc);
 
-	RedrawWindow(m_hDisplayWindow, nullptr, nullptr, RDW_INVALIDATE);
+	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }
 
 void DisplayWindow::OnSetFont(HFONT hFont)
 {
 	m_hDisplayFont = hFont;
 
-	RedrawWindow(m_hDisplayWindow, nullptr, nullptr, RDW_INVALIDATE);
+	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }
 
 void DisplayWindow::OnSetTextColor(COLORREF hColor)
 {
 	m_TextColor = hColor;
 
-	RedrawWindow(m_hDisplayWindow, nullptr, nullptr, RDW_INVALIDATE);
+	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }

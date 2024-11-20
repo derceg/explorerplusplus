@@ -175,7 +175,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 				folderSizeText.c_str());
 
 			/* TODO: The line index should be stored in some other (variable) way. */
-			DisplayWindow_SetLine(m_hDisplayWindow, FOLDER_SIZE_LINE_INDEX, szSizeString);
+			DisplayWindow_SetLine(m_displayWindow->GetHWND(), FOLDER_SIZE_LINE_INDEX, szSizeString);
 		}
 
 		free(pDWFolderSizeCompletion);
@@ -489,7 +489,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case IDM_VIEW_DISPLAYWINDOW:
 		m_config->showDisplayWindow = !m_config->showDisplayWindow;
-		lShowWindow(m_hDisplayWindow, m_config->showDisplayWindow);
+		lShowWindow(m_displayWindow->GetHWND(), m_config->showDisplayWindow);
 		UpdateLayout();
 		break;
 
@@ -1396,7 +1396,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		/* Display window menus. */
 	case IDM_DW_HIDEDISPLAYWINDOW:
 		m_config->showDisplayWindow = FALSE;
-		lShowWindow(m_hDisplayWindow, m_config->showDisplayWindow);
+		lShowWindow(m_displayWindow->GetHWND(), m_config->showDisplayWindow);
 		UpdateLayout();
 		break;
 

@@ -9,6 +9,7 @@
 #include "ColorRule.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
+#include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "LoadSaveRegistry.h"
@@ -350,9 +351,9 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
 	m_config->displayWindowWidth = std::max(m_config->displayWindowWidth,
-		dpiCompatibility.ScaleValue(m_hDisplayWindow, DISPLAY_WINDOW_MINIMUM_WIDTH));
+		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_WIDTH));
 	m_config->displayWindowHeight = std::max(m_config->displayWindowHeight,
-		dpiCompatibility.ScaleValue(m_hDisplayWindow, DISPLAY_WINDOW_MINIMUM_HEIGHT));
+		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
 	RECT rebarRect;
 	GetClientRect(m_hMainRebar, &rebarRect);
@@ -428,8 +429,8 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
-	SetWindowPos(m_hTabBacking, m_hDisplayWindow, iTabBackingLeft, iTabTop, iTabBackingWidth,
-		tabWindowHeight, uFlags);
+	SetWindowPos(m_hTabBacking, m_displayWindow->GetHWND(), iTabBackingLeft, iTabTop,
+		iTabBackingWidth, tabWindowHeight, uFlags);
 
 	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0,
 		iTabBackingWidth - 25, tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
@@ -473,14 +474,14 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	if (m_config->displayWindowVertical)
 	{
-		SetWindowPos(m_hDisplayWindow, NULL, mainWindowWidth - indentRight, iIndentRebar,
+		SetWindowPos(m_displayWindow->GetHWND(), NULL, mainWindowWidth - indentRight, iIndentRebar,
 			m_config->displayWindowWidth, mainWindowHeight - iIndentRebar - indentBottom,
 			SWP_SHOWWINDOW | SWP_NOZORDER);
 	}
 	else
 	{
-		SetWindowPos(m_hDisplayWindow, nullptr, 0, mainWindowHeight - indentBottom, mainWindowWidth,
-			m_config->displayWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
+		SetWindowPos(m_displayWindow->GetHWND(), nullptr, 0, mainWindowHeight - indentBottom,
+			mainWindowWidth, m_config->displayWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 	}
 
 	/* <---- ALL listview windows ----> */
@@ -943,7 +944,7 @@ void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 	MenuHelper::CheckItem(menu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
 
 	POINT ptScreen = *ptClient;
-	BOOL res = ClientToScreen(m_hDisplayWindow, &ptScreen);
+	BOOL res = ClientToScreen(m_displayWindow->GetHWND(), &ptScreen);
 
 	if (!res)
 	{

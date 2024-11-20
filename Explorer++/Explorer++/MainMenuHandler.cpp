@@ -10,6 +10,7 @@
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
 #include "DisplayColoursDialog.h"
+#include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "FileProgressSink.h"
 #include "FilterDialog.h"
@@ -36,8 +37,8 @@
 
 void Explorerplusplus::OnChangeDisplayColors()
 {
-	DisplayColoursDialog displayColoursDialog(m_resourceInstance, m_hContainer, m_hDisplayWindow,
-		m_config->displayWindowCentreColor.ToCOLORREF(),
+	DisplayColoursDialog displayColoursDialog(m_resourceInstance, m_hContainer,
+		m_displayWindow->GetHWND(), m_config->displayWindowCentreColor.ToCOLORREF(),
 		m_config->displayWindowSurroundColor.ToCOLORREF());
 	displayColoursDialog.ShowModalDialog();
 }

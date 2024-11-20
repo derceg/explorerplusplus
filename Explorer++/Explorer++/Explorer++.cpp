@@ -60,7 +60,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	m_hStatusBar = nullptr;
 	m_hTabBacking = nullptr;
 	m_hTabWindowToolbar = nullptr;
-	m_hDisplayWindow = nullptr;
 	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
 
@@ -93,7 +92,7 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 
 	if (!mainWindowClassRegistered)
 	{
-		LONG res = RegisterMainWindowClass(GetModuleHandle(nullptr));
+		auto res = RegisterMainWindowClass(GetModuleHandle(nullptr));
 		CHECK(res);
 
 		mainWindowClassRegistered = true;
