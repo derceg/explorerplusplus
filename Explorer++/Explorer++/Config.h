@@ -66,8 +66,8 @@ struct Config
 	BOOL closeMainWindowOnTabClose = TRUE;
 	BOOL confirmCloseTabs = FALSE;
 	ValueWrapper<BOOL> synchronizeTreeview = TRUE;
-	LONG displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
-	LONG displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
+	int displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
+	int displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 	BOOL displayWindowVertical = FALSE;
 	int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;

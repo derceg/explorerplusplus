@@ -349,6 +349,10 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	m_config->treeViewWidth = std::clamp(m_config->treeViewWidth,
 		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
+	m_config->displayWindowWidth = std::max(m_config->displayWindowWidth,
+		dpiCompatibility.ScaleValue(m_hDisplayWindow, DISPLAY_WINDOW_MINIMUM_WIDTH));
+	m_config->displayWindowHeight = std::max(m_config->displayWindowHeight,
+		dpiCompatibility.ScaleValue(m_hDisplayWindow, DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
 	RECT rebarRect;
 	GetClientRect(m_hMainRebar, &rebarRect);
@@ -661,18 +665,14 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical)
 	{
-		m_config->displayWindowWidth =
-			std::max(static_cast<UINT>(LOWORD(wParam)), DISPLAY_WINDOW_MINIMUM_WIDTH);
+		m_config->displayWindowWidth = LOWORD(wParam);
 	}
 	else
 	{
-		m_config->displayWindowHeight =
-			std::max(static_cast<UINT>(HIWORD(wParam)), DISPLAY_WINDOW_MINIMUM_HEIGHT);
+		m_config->displayWindowHeight = HIWORD(wParam);
 	}
 
-	RECT rc;
-	GetClientRect(m_hContainer, &rc);
-	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
+	UpdateLayout();
 }
 
 /* Cycle through the current views. */

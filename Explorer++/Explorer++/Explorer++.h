@@ -121,10 +121,10 @@ private:
 
 	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
-	static const UINT DISPLAY_WINDOW_MINIMUM_WIDTH = 70;
-	static const UINT DISPLAY_WINDOW_MINIMUM_HEIGHT = 70;
+	static const int DISPLAY_WINDOW_MINIMUM_WIDTH = 70_px;
+	static const int DISPLAY_WINDOW_MINIMUM_HEIGHT = 70_px;
 
-	static constexpr auto TREEVIEW_MINIMUM_WIDTH = 70_px;
+	static constexpr int TREEVIEW_MINIMUM_WIDTH = 70_px;
 	static constexpr double TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE = 0.8;
 
 	// Main rebar band IDs. These are used to load and save data, so the values shouldn't be

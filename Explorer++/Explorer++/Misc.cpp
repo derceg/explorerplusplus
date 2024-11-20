@@ -24,16 +24,6 @@
 
 void Explorerplusplus::ValidateLoadedSettings()
 {
-	if (m_config->displayWindowWidth < DISPLAY_WINDOW_MINIMUM_WIDTH)
-	{
-		m_config->displayWindowWidth = Config::DEFAULT_DISPLAYWINDOW_WIDTH;
-	}
-
-	if (m_config->displayWindowHeight < DISPLAY_WINDOW_MINIMUM_HEIGHT)
-	{
-		m_config->displayWindowHeight = Config::DEFAULT_DISPLAYWINDOW_HEIGHT;
-	}
-
 	ValidateColumns(m_config->globalFolderSettings.folderColumns);
 }
 
