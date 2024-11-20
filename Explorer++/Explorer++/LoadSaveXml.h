@@ -32,7 +32,6 @@ public:
 
 private:
 	void InitializeLoadEnvironment();
-	void ReleaseLoadEnvironment();
 	void InitializeSaveEnvironment();
 	void ReleaseSaveEnvironment();
 
