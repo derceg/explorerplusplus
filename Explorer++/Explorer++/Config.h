@@ -49,7 +49,7 @@ struct Config
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	bool dualPane = false;
 	BOOL showStatusBar = TRUE;
-	BOOL showDisplayWindow = TRUE;
+	ValueWrapper<bool> showDisplayWindow = true;
 	BOOL alwaysOpenNewTab = FALSE;
 	BOOL openNewTabNextToCurrent = FALSE;
 	BOOL treeViewDelayEnabled = FALSE;

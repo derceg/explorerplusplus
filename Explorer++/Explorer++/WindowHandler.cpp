@@ -44,7 +44,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 		indentBottom += GetRectHeight(&rc);
 	}
 
-	if (m_config->showDisplayWindow)
+	if (m_config->showDisplayWindow.get())
 	{
 		if (m_config->displayWindowVertical)
 		{

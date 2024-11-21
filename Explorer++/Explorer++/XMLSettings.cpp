@@ -413,7 +413,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::EncodeBoolValue(m_config->showDrivesToolbar.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDisplayWindow"),
-		XMLSettings::EncodeBoolValue(m_config->showDisplayWindow));
+		XMLSettings::EncodeBoolValue(m_config->showDisplayWindow.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowExtensions"),
 		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showExtensions));

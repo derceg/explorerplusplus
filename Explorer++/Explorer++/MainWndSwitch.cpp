@@ -488,8 +488,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_DISPLAYWINDOW:
-		m_config->showDisplayWindow = !m_config->showDisplayWindow;
-		UpdateLayout();
+		m_config->showDisplayWindow = !m_config->showDisplayWindow.get();
 		break;
 
 	case IDM_DISPLAYWINDOW_VERTICAL:
@@ -1394,8 +1393,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 		/* Display window menus. */
 	case IDM_DW_HIDEDISPLAYWINDOW:
-		m_config->showDisplayWindow = FALSE;
-		UpdateLayout();
+		m_config->showDisplayWindow = false;
 		break;
 
 	case IDM_BACKGROUND_CONTEXT_MENU_CUSTOMIZE:

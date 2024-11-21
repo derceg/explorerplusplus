@@ -302,7 +302,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 			/* Only attempt to show file previews for files (not folders). Also, only
 			attempt to show a preview if the display window is actually active. */
 			if (((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
-				&& m_config->showFilePreviews && m_config->showDisplayWindow)
+				&& m_config->showFilePreviews && m_config->showDisplayWindow.get())
 			{
 				DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), fullItemName.c_str(),
 					TRUE);

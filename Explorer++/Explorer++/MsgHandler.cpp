@@ -368,7 +368,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		indentBottom += GetRectHeight(&rc);
 	}
 
-	if (m_config->showDisplayWindow)
+	if (m_config->showDisplayWindow.get())
 	{
 		if (m_config->displayWindowVertical)
 		{
@@ -473,7 +473,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	/* <---- Display window ----> */
 
 	UINT displayWindowShowFlags =
-		(m_config->showDisplayWindow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
+		(m_config->showDisplayWindow.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
 
 	if (m_config->displayWindowVertical)
 	{

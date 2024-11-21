@@ -75,7 +75,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFriendlyDates"),
 			m_config->globalFolderSettings.showFriendlyDates);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowDisplayWindow"),
-			m_config->showDisplayWindow);
+			m_config->showDisplayWindow.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFolderSizes"),
 			m_config->globalFolderSettings.showFolderSizes);
 		RegistrySettings::SaveDword(hSettingsKey, _T("DisableFolderSizesNetworkRemovable"),
