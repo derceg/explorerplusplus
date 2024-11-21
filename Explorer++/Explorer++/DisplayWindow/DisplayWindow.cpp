@@ -45,11 +45,8 @@ DisplayWindow::DisplayWindow(HWND parent, DWInitialSettings_t *initialSettings) 
 	m_bShowThumbnail = FALSE;
 	m_bThumbnailExtracted = FALSE;
 	m_bThumbnailExtractionFailed = FALSE;
-	m_hBitmapBackground = nullptr;
 
 	InitializeCriticalSection(&m_csDWThumbnails);
-
-	m_hdcBackground = CreateCompatibleDC(GetDC(m_hwnd));
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
 		std::bind_front(&DisplayWindow::DisplayWindowProc, this)));
@@ -58,9 +55,6 @@ DisplayWindow::DisplayWindow(HWND parent, DWInitialSettings_t *initialSettings) 
 DisplayWindow::~DisplayWindow()
 {
 	DeleteCriticalSection(&m_csDWThumbnails);
-
-	DeleteDC(m_hdcBackground);
-	DeleteObject(m_hBitmapBackground);
 
 	DestroyIcon(m_hMainIcon);
 }
@@ -88,7 +82,7 @@ HWND DisplayWindow::CreateDisplayWindow(HWND parent)
 ATOM DisplayWindow::RegisterDisplayWindowClass()
 {
 	WNDCLASS windowClass = {};
-	windowClass.style = 0;
+	windowClass.style = CS_HREDRAW | CS_VREDRAW;
 	windowClass.lpfnWndProc = DefWindowProc;
 	windowClass.cbClsExtra = 0;
 	windowClass.cbWndExtra = 0;
@@ -133,7 +127,7 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 
 		hdc = BeginPaint(hwnd, &ps);
 
-		PatchBackground(hdc, &rc, &updateRect);
+		Draw(hdc, &rc, &updateRect);
 
 		EndPaint(hwnd, &ps);
 	}
@@ -205,30 +199,14 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		return m_SurroundColor.ToCOLORREF();
 
 	case DWM_SETCENTRECOLOR:
-	{
 		m_CentreColor.SetFromCOLORREF((COLORREF) wParam);
-		HDC hdc;
-		hdc = GetDC(hwnd);
-		RECT rc;
-		GetClientRect(hwnd, &rc);
-		DrawGradientFill(hdc, &rc);
-		ReleaseDC(hwnd, hdc);
 		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
-	}
-	break;
+		break;
 
 	case DWM_SETSURROUNDCOLOR:
-	{
 		m_SurroundColor.SetFromCOLORREF((COLORREF) wParam);
-		HDC hdc;
-		hdc = GetDC(hwnd);
-		RECT rc;
-		GetClientRect(hwnd, &rc);
-		DrawGradientFill(hdc, &rc);
-		ReleaseDC(hwnd, hdc);
 		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
-	}
-	break;
+		break;
 
 	case DWM_GETFONT:
 		HFONT *hFont;
@@ -245,25 +223,6 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 
 	case DWM_SETTEXTCOLOR:
 		OnSetTextColor((COLORREF) wParam);
-		break;
-
-	case DWM_DRAWGRADIENTFILL:
-		PatchBackground((HDC) wParam, (RECT *) lParam, (RECT *) lParam);
-		break;
-
-	case WM_ERASEBKGND:
-		HDC hdc;
-		hdc = GetDC(hwnd);
-		RECT rc;
-		RECT updateRect;
-		GetUpdateRect(hwnd, &updateRect, FALSE);
-		GetClientRect(hwnd, &rc);
-		PatchBackground(hdc, &rc, &updateRect);
-		ReleaseDC(hwnd, hdc);
-		return 1;
-
-	case WM_SIZE:
-		OnSize(LOWORD(lParam), HIWORD(lParam));
 		break;
 
 	case WM_USER_DISPLAYWINDOWMOVED:

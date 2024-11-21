@@ -36,18 +36,34 @@ at the top and bottom of the thumbnail. */
 
 std::list<ThumbnailEntry_t> g_ThumbnailEntries;
 
-void DisplayWindow::DrawGradientFill(HDC hdc, RECT *rc)
+void DisplayWindow::Draw(HDC hdc, RECT *rc, RECT *updateRect)
 {
-	if (m_hBitmapBackground)
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hBitmap = CreateCompatibleBitmap(hdc, rc->right - rc->left, rc->bottom - rc->top);
+	HGDIOBJ hOriginalObject = SelectObject(hdcMem, hBitmap);
+
+	DrawBackground(hdcMem, rc);
+
+	PaintText(hdcMem, m_LeftIndent);
+	DrawIconEx(hdcMem, MAIN_ICON_LEFT, MAIN_ICON_TOP, m_hMainIcon, MAIN_ICON_WIDTH,
+		MAIN_ICON_HEIGHT, 0, nullptr, DI_NORMAL);
+
+	if (m_bShowThumbnail)
 	{
-		DeleteObject(m_hBitmapBackground);
+		DrawThumbnail(hdcMem);
 	}
 
-	/* Create the (temporary) off-screen buffer used for drawing. */
-	m_hBitmapBackground = CreateCompatibleBitmap(hdc, rc->right - rc->left, rc->bottom - rc->top);
-	HGDIOBJ originalBackgroundObject = SelectObject(m_hdcBackground, m_hBitmapBackground);
+	BitBlt(hdc, updateRect->left, updateRect->top, rc->right, rc->bottom, hdcMem, updateRect->left,
+		updateRect->top, SRCCOPY);
 
-	Gdiplus::Graphics graphics(m_hdcBackground);
+	SelectObject(hdcMem, hOriginalObject);
+	DeleteObject(hBitmap);
+	DeleteDC(hdcMem);
+}
+
+void DisplayWindow::DrawBackground(HDC hdcMem, RECT *rc)
+{
+	Gdiplus::Graphics graphics(hdcMem);
 
 	Gdiplus::Rect displayRect(0, 0, rc->right - rc->left, rc->bottom - rc->top);
 
@@ -74,35 +90,6 @@ void DisplayWindow::DrawGradientFill(HDC hdc, RECT *rc)
 	{
 		graphics.DrawLine(&newPen, 0, 0, rc->right, 0);
 	}
-
-	SelectObject(m_hdcBackground, originalBackgroundObject);
-}
-
-void DisplayWindow::PatchBackground(HDC hdc, RECT *rc, RECT *updateRect)
-{
-	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hdc, rc->right - rc->left, rc->bottom - rc->top);
-	HGDIOBJ hOriginalObject = SelectObject(hdcMem, hBitmap);
-
-	/* Draw the stored background on top of the patched area. */
-	BitBlt(hdcMem, updateRect->left, updateRect->top, rc->right, rc->bottom, m_hdcBackground,
-		updateRect->left, updateRect->top, SRCCOPY);
-
-	PaintText(hdcMem, m_LeftIndent);
-	DrawIconEx(hdcMem, MAIN_ICON_LEFT, MAIN_ICON_TOP, m_hMainIcon, MAIN_ICON_WIDTH,
-		MAIN_ICON_HEIGHT, 0, nullptr, DI_NORMAL);
-
-	if (m_bShowThumbnail)
-	{
-		DrawThumbnail(hdcMem);
-	}
-
-	BitBlt(hdc, updateRect->left, updateRect->top, rc->right, rc->bottom, hdcMem, updateRect->left,
-		updateRect->top, SRCCOPY);
-
-	SelectObject(hdcMem, hOriginalObject);
-	DeleteObject(hBitmap);
-	DeleteDC(hdcMem);
 }
 
 void DisplayWindow::DrawThumbnail(HDC hdcMem)
@@ -479,21 +466,6 @@ void DisplayWindow::OnSetThumbnailFile(WPARAM wParam, LPARAM lParam)
 		m_bThumbnailExtractionFailed = FALSE;
 		StringCchCopy(m_ImageFile, std::size(m_ImageFile), (TCHAR *) wParam);
 	}
-}
-
-void DisplayWindow::OnSize(int width, int height)
-{
-	HDC hdc;
-	RECT rc;
-
-	hdc = GetDC(m_hwnd);
-
-	SetRect(&rc, 0, 0, width, height);
-	DrawGradientFill(hdc, &rc);
-
-	ReleaseDC(m_hwnd, hdc);
-
-	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }
 
 void DisplayWindow::OnSetFont(HFONT hFont)

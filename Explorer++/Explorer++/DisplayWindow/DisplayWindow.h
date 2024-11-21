@@ -15,7 +15,6 @@
 #define DWM_SETSURROUNDCOLOR (DWM_BASE + 4)
 #define DWM_GETCENTRECOLOR (DWM_BASE + 7)
 #define DWM_SETCENTRECOLOR (DWM_BASE + 8)
-#define DWM_DRAWGRADIENTFILL (DWM_BASE + 10)
 #define DWM_GETFONT (DWM_BASE + 11)
 #define DWM_SETFONT (DWM_BASE + 12)
 #define DWM_GETTEXTCOLOR (DWM_BASE + 13)
@@ -104,7 +103,6 @@ private:
 	LONG OnMouseMove(LPARAM lParam);
 	void OnLButtonDown(LPARAM lParam);
 	void OnRButtonUp(WPARAM wParam, LPARAM lParam);
-	void DrawGradientFill(HDC, RECT *);
 	void PaintText(HDC, unsigned int);
 	void TransparentTextOut(HDC hdc, TCHAR *text, RECT *prcText);
 	void DrawThumbnail(HDC hdcMem);
@@ -112,9 +110,8 @@ private:
 	void OnSetFont(HFONT hFont);
 	void OnSetTextColor(COLORREF hColor);
 
-	void PatchBackground(HDC hdc, RECT *rc, RECT *updateRect);
-
-	void OnSize(int width, int height);
+	void Draw(HDC hdc, RECT *rc, RECT *updateRect);
+	void DrawBackground(HDC hdcMem, RECT *rc);
 
 	void ExtractThumbnailImage();
 	void CancelThumbnailExtraction();
@@ -147,8 +144,6 @@ private:
 
 	int m_xColumnFinal;
 
-	HDC m_hdcBackground;
-	HBITMAP m_hBitmapBackground;
 	HICON m_hMainIcon;
 	HFONT m_hDisplayFont;
 };
