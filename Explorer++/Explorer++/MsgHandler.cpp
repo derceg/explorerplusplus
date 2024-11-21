@@ -414,7 +414,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		iTabBackingWidth = mainWindowWidth - indentLeft - indentRight;
 	}
 
-	uFlags = m_bShowTabBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW;
+	uFlags = (m_bShowTabBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
 
 	int iTabTop;
 
@@ -429,8 +429,8 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
-	SetWindowPos(m_hTabBacking, m_displayWindow->GetHWND(), iTabBackingLeft, iTabTop,
-		iTabBackingWidth, tabWindowHeight, uFlags);
+	SetWindowPos(m_hTabBacking, nullptr, iTabBackingLeft, iTabTop, iTabBackingWidth,
+		tabWindowHeight, uFlags);
 
 	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0,
 		iTabBackingWidth - 25, tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
@@ -472,16 +472,19 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	/* <---- Display window ----> */
 
+	UINT displayWindowShowFlags =
+		(m_config->showDisplayWindow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
+
 	if (m_config->displayWindowVertical)
 	{
-		SetWindowPos(m_displayWindow->GetHWND(), NULL, mainWindowWidth - indentRight, iIndentRebar,
-			m_config->displayWindowWidth, mainWindowHeight - iIndentRebar - indentBottom,
-			SWP_SHOWWINDOW | SWP_NOZORDER);
+		SetWindowPos(m_displayWindow->GetHWND(), nullptr, mainWindowWidth - indentRight,
+			iIndentRebar, m_config->displayWindowWidth,
+			mainWindowHeight - iIndentRebar - indentBottom, displayWindowShowFlags);
 	}
 	else
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, 0, mainWindowHeight - indentBottom,
-			mainWindowWidth, m_config->displayWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
+			mainWindowWidth, m_config->displayWindowHeight, displayWindowShowFlags);
 	}
 
 	/* <---- ALL listview windows ----> */
