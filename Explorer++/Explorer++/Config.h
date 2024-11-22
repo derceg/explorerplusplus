@@ -50,27 +50,27 @@ struct Config
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	bool dualPane = false;
-	BOOL showStatusBar = TRUE;
+	bool showStatusBar = true;
 	ValueWrapper<bool> showDisplayWindow = true;
-	BOOL alwaysOpenNewTab = FALSE;
-	BOOL openNewTabNextToCurrent = FALSE;
-	BOOL treeViewDelayEnabled = FALSE;
-	BOOL treeViewAutoExpandSelected = FALSE;
-	BOOL showTaskbarThumbnails = FALSE;
-	ValueWrapper<BOOL> useFullRowSelect = FALSE;
-	BOOL showFilePreviews = TRUE;
-	BOOL allowMultipleInstances = TRUE;
-	BOOL doubleClickTabClose = TRUE;
-	ValueWrapper<BOOL> useLargeToolbarIcons = FALSE;
-	BOOL handleZipFiles = FALSE;
-	BOOL overwriteExistingFilesConfirmation = TRUE;
-	ValueWrapper<BOOL> checkBoxSelection = FALSE;
-	BOOL closeMainWindowOnTabClose = TRUE;
-	BOOL confirmCloseTabs = FALSE;
-	ValueWrapper<BOOL> synchronizeTreeview = TRUE;
+	bool alwaysOpenNewTab = false;
+	bool openNewTabNextToCurrent = false;
+	bool treeViewDelayEnabled = false;
+	bool treeViewAutoExpandSelected = false;
+	bool showTaskbarThumbnails = false;
+	ValueWrapper<bool> useFullRowSelect = false;
+	bool showFilePreviews = true;
+	bool allowMultipleInstances = true;
+	bool doubleClickTabClose = true;
+	ValueWrapper<bool> useLargeToolbarIcons = false;
+	bool handleZipFiles = false;
+	bool overwriteExistingFilesConfirmation = true;
+	ValueWrapper<bool> checkBoxSelection = false;
+	bool closeMainWindowOnTabClose = true;
+	bool confirmCloseTabs = false;
+	ValueWrapper<bool> synchronizeTreeview = true;
 	int displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
 	int displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
-	BOOL displayWindowVertical = FALSE;
+	bool displayWindowVertical = false;
 	int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;
@@ -78,15 +78,15 @@ struct Config
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =
 		DefaultFileManager::ReplaceExplorerMode::None;
 
-	BOOL showInfoTips = TRUE;
+	bool showInfoTips = true;
 	InfoTipType infoTipType = InfoTipType::System;
 
 	ValueWrapper<std::optional<CustomFont>> mainFont;
 
 	// Main window
-	ValueWrapper<BOOL> showFullTitlePath = FALSE;
-	ValueWrapper<BOOL> showUserNameInTitleBar = FALSE;
-	ValueWrapper<BOOL> showPrivilegeLevelInTitleBar = FALSE;
+	ValueWrapper<bool> showFullTitlePath = false;
+	ValueWrapper<bool> showUserNameInTitleBar = false;
+	ValueWrapper<bool> showPrivilegeLevelInTitleBar = false;
 
 	// Toolbar display settings
 	ValueWrapper<bool> showFolders = true;
@@ -98,9 +98,9 @@ struct Config
 	ValueWrapper<bool> lockToolbars = true;
 
 	// Tabs
-	ValueWrapper<BOOL> alwaysShowTabBar = TRUE;
-	ValueWrapper<BOOL> showTabBarAtBottom = FALSE;
-	ValueWrapper<BOOL> extendTabControl = FALSE;
+	ValueWrapper<bool> alwaysShowTabBar = true;
+	ValueWrapper<bool> showTabBarAtBottom = false;
+	ValueWrapper<bool> extendTabControl = false;
 	bool openTabsInForeground = false;
 
 	// Treeview

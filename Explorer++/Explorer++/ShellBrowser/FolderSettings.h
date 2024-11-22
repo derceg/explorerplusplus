@@ -37,20 +37,20 @@ struct FolderColumns
 
 struct GlobalFolderSettings
 {
-	BOOL showExtensions = TRUE;
-	BOOL showFriendlyDates = TRUE;
-	BOOL showFolderSizes = FALSE;
-	BOOL disableFolderSizesNetworkRemovable = FALSE;
-	BOOL hideSystemFiles = FALSE;
-	BOOL hideLinkExtension = FALSE;
-	BOOL insertSorted = TRUE;
-	ValueWrapper<BOOL> showGridlines = TRUE;
-	BOOL forceSize = FALSE;
+	bool showExtensions = true;
+	bool showFriendlyDates = true;
+	bool showFolderSizes = false;
+	bool disableFolderSizesNetworkRemovable = false;
+	bool hideSystemFiles = false;
+	bool hideLinkExtension = false;
+	bool insertSorted = true;
+	ValueWrapper<bool> showGridlines = true;
+	bool forceSize = false;
 	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::Bytes;
-	ValueWrapper<BOOL> oneClickActivate = FALSE;
+	ValueWrapper<bool> oneClickActivate = false;
 	ValueWrapper<UINT> oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
-	BOOL displayMixedFilesAndFolders = FALSE;
-	BOOL useNaturalSortOrder = TRUE;
+	bool displayMixedFilesAndFolders = false;
+	bool useNaturalSortOrder = true;
 
 	FolderColumns folderColumns;
 };
