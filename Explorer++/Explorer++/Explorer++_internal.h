@@ -30,4 +30,4 @@ static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++"
 #define ID_REBAR_MENU_FORWARD_START 3000
 #define ID_REBAR_MENU_FORWARD_END 3999
 
-BOOL TestConfigFileInternal(void);
+BOOL TestConfigFile(void);

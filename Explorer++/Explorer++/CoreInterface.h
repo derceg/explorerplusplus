@@ -109,8 +109,6 @@ public:
 
 	// Used to support the options dialog.
 	virtual void SaveAllSettings() = 0;
-	virtual BOOL GetSavePreferencesToXmlFile() const = 0;
-	virtual void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) = 0;
 
 	virtual void RequestCloseApplication() = 0;
 

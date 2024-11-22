@@ -10,10 +10,12 @@
 #include <memory>
 #include <string>
 
+class App;
+
 class GeneralOptionsPage : public OptionsPage
 {
 public:
-	GeneralOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
+	GeneralOptionsPage(HWND parent, HINSTANCE resourceInstance, App *app, Config *config,
 		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
 		HWND tooltipWindow);
 
@@ -37,6 +39,7 @@ private:
 		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 	bool UpdateReplaceExplorerSetting(DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 
+	App *const m_app;
 	wil::unique_hicon m_newTabDirectoryIcon;
 	std::wstring m_newTabDirectory;
 };

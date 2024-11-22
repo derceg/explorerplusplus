@@ -15,6 +15,7 @@ class ApplicationModel;
 
 class BookmarkTree;
 class ColorRuleModel;
+struct Config;
 struct FolderColumns;
 struct WindowStorageData;
 
@@ -23,6 +24,7 @@ class AppStorage
 public:
 	virtual ~AppStorage() = default;
 
+	virtual void LoadConfig(Config &config) = 0;
 	[[nodiscard]] virtual std::vector<WindowStorageData> LoadWindows() = 0;
 	virtual void LoadBookmarks(BookmarkTree *bookmarkTree) = 0;
 	virtual void LoadColorRules(ColorRuleModel *model) = 0;

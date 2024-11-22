@@ -22,11 +22,6 @@
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
 
-void Explorerplusplus::ValidateLoadedSettings()
-{
-	ValidateColumns(m_config->globalFolderSettings.folderColumns);
-}
-
 void Explorerplusplus::ApplyDisplayWindowPosition()
 {
 	SendMessage(m_displayWindow->GetHWND(), WM_USER_DISPLAYWINDOWMOVED,

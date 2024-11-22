@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "GeneralOptionsPage.h"
+#include "App.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
@@ -26,11 +27,12 @@ const std::unordered_map<ReplaceExplorerMode, int> REPLACE_EXPLORER_ENUM_CONTROL
 	{ ReplaceExplorerMode::All, IDC_OPTION_REPLACEEXPLORER_ALL }
 };
 
-GeneralOptionsPage::GeneralOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+GeneralOptionsPage::GeneralOptionsPage(HWND parent, HINSTANCE resourceInstance, App *app,
+	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
 	HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_GENERAL, IDS_OPTIONS_GENERAL_TITLE, parent, resourceInstance, config,
-		coreInterface, settingChangedCallback, tooltipWindow)
+		coreInterface, settingChangedCallback, tooltipWindow),
+	m_app(app)
 {
 }
 
@@ -96,7 +98,7 @@ void GeneralOptionsPage::InitializeControls()
 	CheckRadioButton(GetDialog(), IDC_OPTION_REPLACEEXPLORER_NONE, IDC_OPTION_REPLACEEXPLORER_ALL,
 		REPLACE_EXPLORER_ENUM_CONTROL_ID_MAPPINGS.at(m_config->replaceExplorerMode));
 
-	if (m_coreInterface->GetSavePreferencesToXmlFile())
+	if (m_app->GetSavePreferencesToXmlFile())
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_XML, BST_CHECKED);
 	}
@@ -368,9 +370,9 @@ void GeneralOptionsPage::SaveSettings()
 		OnReplaceExplorerSettingChanged(replaceExplorerMode);
 	}
 
-	BOOL savePreferencesToXmlFile =
+	bool savePreferencesToXmlFile =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_XML) == BST_CHECKED);
-	m_coreInterface->SetSavePreferencesToXmlFile(savePreferencesToXmlFile);
+	m_app->SetSavePreferencesToXmlFile(savePreferencesToXmlFile);
 
 	HWND hEdit = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_EDIT);
 	std::wstring newTabDir = GetWindowString(hEdit);

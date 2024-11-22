@@ -128,8 +128,8 @@ void Explorerplusplus::OnRunScript()
 
 void Explorerplusplus::OnShowOptions()
 {
-	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"OptionsDialog",
-		[this] { return new OptionsDialog(m_resourceInstance, m_hContainer, m_config, this); });
+	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"OptionsDialog", [this]
+		{ return new OptionsDialog(m_resourceInstance, m_hContainer, m_app, m_config, this); });
 }
 
 void Explorerplusplus::OnSearchTabs()

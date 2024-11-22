@@ -87,17 +87,24 @@ LSTATUS Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &o
 }
 
 template <BetterEnum T>
-void ReadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
+LSTATUS ReadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
 {
 	DWORD value;
 	auto res = ReadDword(key, valueName, value);
 
-	if (res != ERROR_SUCCESS || !T::_is_valid(value))
+	if (res != ERROR_SUCCESS)
 	{
-		return;
+		return res;
+	}
+
+	if (!T::_is_valid(value))
+	{
+		return ERROR_INVALID_DATA;
 	}
 
 	output = T::_from_integral(value);
+
+	return ERROR_SUCCESS;
 }
 
 }

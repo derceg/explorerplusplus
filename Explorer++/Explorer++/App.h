@@ -28,6 +28,8 @@ public:
 	~App();
 
 	const CommandLine::Settings *GetCommandLineSettings() const;
+	bool GetSavePreferencesToXmlFile() const;
+	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
 	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
 	Config *GetConfig();
@@ -49,6 +51,7 @@ private:
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
 
 	const CommandLine::Settings *const m_commandLineSettings;
+	bool m_savePreferencesToXmlFile = false;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;

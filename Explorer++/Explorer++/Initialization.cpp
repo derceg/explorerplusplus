@@ -29,8 +29,6 @@
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
-	LoadAllSettings();
-
 	if (m_app->GetCommandLineSettings()->shellChangeNotificationType)
 	{
 		m_config->shellChangeNotificationType =

@@ -15,13 +15,9 @@ class Explorerplusplus;
 class LoadSaveXML : public ILoadSave
 {
 public:
-	LoadSaveXML(App *app, Explorerplusplus *pContainer, BOOL bLoad);
+	LoadSaveXML(App *app, Explorerplusplus *pContainer);
 	~LoadSaveXML();
 
-	/* Loading functions. */
-	void LoadGenericSettings() override;
-
-	/* Saving functions. */
 	void SaveGenericSettings() override;
 	void SaveWindows(const std::vector<WindowStorageData> &windows) override;
 	void SaveBookmarks() override;
@@ -31,17 +27,12 @@ public:
 	void SaveDialogStates() override;
 
 private:
-	void InitializeLoadEnvironment();
 	void InitializeSaveEnvironment();
 	void ReleaseSaveEnvironment();
 
 	App *const m_app;
 	Explorerplusplus *m_pContainer;
-	BOOL m_bLoad;
 
-	/* Used for saving + loading. */
 	wil::com_ptr_nothrow<IXMLDOMDocument> m_pXMLDom;
-
-	/* Used exclusively for saving. */
 	wil::com_ptr_nothrow<IXMLDOMElement> m_pRoot;
 };

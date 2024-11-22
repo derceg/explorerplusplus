@@ -21,54 +21,16 @@
 #include <wil/com.h>
 #include <wil/resource.h>
 
-LoadSaveXML::LoadSaveXML(App *app, Explorerplusplus *pContainer, BOOL bLoad) :
+LoadSaveXML::LoadSaveXML(App *app, Explorerplusplus *pContainer) :
 	m_app(app),
-	m_pContainer(pContainer),
-	m_bLoad(bLoad)
+	m_pContainer(pContainer)
 {
-	if (bLoad)
-	{
-		/* Initialize the load environment (namely,
-		load the configuration file). */
-		InitializeLoadEnvironment();
-	}
-	else
-	{
-		/* Initialize the save environment. */
-		InitializeSaveEnvironment();
-	}
+	InitializeSaveEnvironment();
 }
 
 LoadSaveXML::~LoadSaveXML()
 {
-	if (!m_bLoad)
-	{
-		ReleaseSaveEnvironment();
-	}
-}
-
-void LoadSaveXML::InitializeLoadEnvironment()
-{
-	m_pXMLDom = XMLSettings::CreateXmlDocument();
-
-	if (!m_pXMLDom)
-	{
-		return;
-	}
-
-	TCHAR szConfigFile[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
-	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
-
-	wil::unique_variant var(XMLSettings::VariantString(Storage::CONFIG_FILE_FILENAME));
-	VARIANT_BOOL status;
-	m_pXMLDom->load(var, &status);
-
-	if (status != VARIANT_TRUE)
-	{
-		return;
-	}
+	ReleaseSaveEnvironment();
 }
 
 void LoadSaveXML::InitializeSaveEnvironment()
@@ -126,11 +88,6 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 
 	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
 	m_pXMLDom->save(var);
-}
-
-void LoadSaveXML::LoadGenericSettings()
-{
-	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom.get());
 }
 
 void LoadSaveXML::SaveGenericSettings()

@@ -17,30 +17,15 @@
 #include "WindowRegistryStorage.h"
 #include <wil/registry.h>
 
-LoadSaveRegistry::LoadSaveRegistry(App *app, Explorerplusplus *pContainer, bool load) :
+LoadSaveRegistry::LoadSaveRegistry(App *app, Explorerplusplus *pContainer) :
 	m_app(app),
 	m_pContainer(pContainer)
 {
-	if (!load)
-	{
-		// Settings are going to be saved, so remove the existing application key first. It's
-		// important to do this to ensure that, when saving a list of items (e.g. a list of tabs or
-		// bookmarks), the existing items are removed before the updated list is stored. Otherwise,
-		// if the list shrinks, some of the previous items won't be removed.
-		SHDeleteKey(HKEY_CURRENT_USER, Storage::REGISTRY_APPLICATION_KEY_PATH);
-	}
-}
-
-void LoadSaveRegistry::LoadGenericSettings()
-{
-	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::read);
-
-	if (SUCCEEDED(hr))
-	{
-		m_pContainer->LoadGenericSettingsFromRegistry(mainKey.get());
-	}
+	// Settings are going to be saved, so remove the existing application key first. It's important
+	// to do this to ensure that, when saving a list of items (e.g. a list of tabs or bookmarks),
+	// the existing items are removed before the updated list is stored. Otherwise, if the list
+	// shrinks, some of the previous items won't be removed.
+	SHDeleteKey(HKEY_CURRENT_USER, Storage::REGISTRY_APPLICATION_KEY_PATH);
 }
 
 void LoadSaveRegistry::SaveGenericSettings()

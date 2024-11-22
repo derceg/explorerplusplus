@@ -69,7 +69,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;
 
-	bLoadSettingsFromXML = TestConfigFileInternal();
+	bLoadSettingsFromXML = TestConfigFile();
 
 	if (bLoadSettingsFromXML)
 	{

@@ -987,6 +987,8 @@
     <ClCompile Include="AcceleratorManager.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
+    <ClCompile Include="ConfigRegistryStorage.cpp" />
+    <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
     <ClCompile Include="AppearanceOptionsPage.cpp" />
@@ -1268,6 +1270,8 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
+    <ClInclude Include="ConfigRegistryStorage.h" />
+    <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />
     <ClInclude Include="AppearanceOptionsPage.h" />

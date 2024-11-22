@@ -7,6 +7,7 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
+#include "ConfigXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
 #include "MainRebarStorage.h"
@@ -19,6 +20,11 @@ XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument,
 	m_xmlDocument(xmlDocument),
 	m_rootNode(rootNode)
 {
+}
+
+void XmlAppStorage::LoadConfig(Config &config)
+{
+	ConfigXmlStorage::Load(m_rootNode.get(), config);
 }
 
 std::vector<WindowStorageData> XmlAppStorage::LoadWindows()

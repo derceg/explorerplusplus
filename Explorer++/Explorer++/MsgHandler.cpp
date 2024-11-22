@@ -47,12 +47,7 @@
 #include <wil/resource.h>
 #include <algorithm>
 
-void Explorerplusplus::TestConfigFile()
-{
-	m_bLoadSettingsFromXML = TestConfigFileInternal();
-}
-
-BOOL TestConfigFileInternal()
+BOOL TestConfigFile()
 {
 	HANDLE hConfigFile;
 	TCHAR szConfigFile[MAX_PATH];
@@ -77,38 +72,6 @@ BOOL TestConfigFileInternal()
 	}
 
 	return bLoadSettingsFromXML;
-}
-
-void Explorerplusplus::LoadAllSettings()
-{
-	/* Tests for the existence of the configuration
-	file. If the file is present, a flag is set
-	indicating that the config file should be used
-	to load settings. */
-	TestConfigFile();
-
-	std::unique_ptr<ILoadSave> loadSave;
-
-	/* Initialize the LoadSave interface. Note
-	that this interface must be regenerated when
-	saving, as it's possible for the save/load
-	methods to be different. */
-	if (m_bLoadSettingsFromXML)
-	{
-		loadSave = std::make_unique<LoadSaveXML>(m_app, this, TRUE);
-
-		/* When loading from the config file, also
-		set the option to save back to it on exit. */
-		m_bSavePreferencesToXMLFile = TRUE;
-	}
-	else
-	{
-		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this, true);
-	}
-
-	loadSave->LoadGenericSettings();
-
-	ValidateLoadedSettings();
 }
 
 void Explorerplusplus::OpenItem(const std::wstring &itemPath,
@@ -1014,13 +977,13 @@ void Explorerplusplus::SaveAllSettings()
 {
 	std::unique_ptr<ILoadSave> loadSave;
 
-	if (m_bSavePreferencesToXMLFile)
+	if (m_app->GetSavePreferencesToXmlFile())
 	{
-		loadSave = std::make_unique<LoadSaveXML>(m_app, this, FALSE);
+		loadSave = std::make_unique<LoadSaveXML>(m_app, this);
 	}
 	else
 	{
-		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this, false);
+		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this);
 	}
 
 	std::vector<WindowStorageData> windows;
@@ -1097,16 +1060,6 @@ IconResourceLoader *Explorerplusplus::GetIconResourceLoader() const
 CachedIcons *Explorerplusplus::GetCachedIcons()
 {
 	return m_app->GetCachedIcons();
-}
-
-BOOL Explorerplusplus::GetSavePreferencesToXmlFile() const
-{
-	return m_bSavePreferencesToXMLFile;
-}
-
-void Explorerplusplus::SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile)
-{
-	m_bSavePreferencesToXMLFile = savePreferencesToXmlFile;
 }
 
 void Explorerplusplus::OnShowHiddenFiles()

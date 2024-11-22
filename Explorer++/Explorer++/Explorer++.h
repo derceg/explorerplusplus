@@ -381,19 +381,13 @@ private:
 
 	/* Settings. */
 	void SaveAllSettings() override;
-	void LoadAllSettings();
-	void ValidateLoadedSettings();
 	void ApplyDisplayWindowPosition();
-	void TestConfigFile();
 
 	/* Registry settings. */
-	LONG LoadGenericSettingsFromRegistry(HKEY applicationKey);
 	LONG SaveGenericSettingsToRegistry(HKEY applicationKey);
 
 	/* XML Settings. */
-	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
@@ -497,8 +491,6 @@ private:
 	IDirectoryMonitor *GetDirectoryMonitor() const override;
 	IconResourceLoader *GetIconResourceLoader() const override;
 	CachedIcons *GetCachedIcons() override;
-	BOOL GetSavePreferencesToXmlFile() const override;
-	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) override;
 	void FocusChanged() override;
 	boost::signals2::connection AddApplicationInitializatedObserver(
 		const ApplicationInitializedSignal::slot_type &observer) override;
@@ -570,7 +562,6 @@ private:
 	ULONG m_SHChangeNotifyID;
 
 	/* Initialization. */
-	BOOL m_bLoadSettingsFromXML;
 	bool m_applicationInitialized = false;
 	ApplicationInitializedSignal m_applicationInitializedSignal;
 
@@ -625,10 +616,6 @@ private:
 
 	/* User options variables. */
 	Config *const m_config;
-	BOOL m_bSavePreferencesToXMLFile;
-
-	bool m_themeValueLoadedFromXml = false;
-	bool m_groupSortDirectionGlobalLoadedFromXml = false;
 
 	std::unique_ptr<TaskbarThumbnails> m_taskbarThumbnails;
 

@@ -53,7 +53,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 {
 	m_resourceInstance = nullptr;
 
-	m_bSavePreferencesToXMLFile = FALSE;
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
 	m_hMainRebar = nullptr;

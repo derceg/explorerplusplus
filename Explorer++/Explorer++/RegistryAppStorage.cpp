@@ -7,6 +7,7 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "ColorRuleRegistryStorage.h"
+#include "ConfigRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
 #include "MainRebarStorage.h"
@@ -17,6 +18,11 @@
 RegistryAppStorage::RegistryAppStorage(wil::unique_hkey applicationKey) :
 	m_applicationKey(std::move(applicationKey))
 {
+}
+
+void RegistryAppStorage::LoadConfig(Config &config)
+{
+	ConfigRegistryStorage::Load(m_applicationKey.get(), config);
 }
 
 std::vector<WindowStorageData> RegistryAppStorage::LoadWindows()

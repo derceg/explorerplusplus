@@ -751,6 +751,12 @@
     <ClCompile Include="WindowStorage.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
+    <ClCompile Include="ConfigRegistryStorage.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigXmlStorage.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -842,9 +848,6 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\ItemData.h">
       <Filter>ShellBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="MainToolbar.h">
       <Filter>Main Toolbar</Filter>
@@ -1557,6 +1560,15 @@
     <ClInclude Include="DisplayWindowDefaults.h">
       <Filter>DisplayWindow</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigRegistryStorage.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigXmlStorage.h">
+      <Filter>Config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1733,6 +1745,9 @@
     </Filter>
     <Filter Include="Windows">
       <UniqueIdentifier>{621355b2-c29a-4b3c-b487-dc938a666f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{a4cf8f14-9fa6-451d-8143-121d7958af7b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

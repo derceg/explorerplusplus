@@ -12,12 +12,8 @@ class Explorerplusplus;
 class LoadSaveRegistry : public ILoadSave
 {
 public:
-	LoadSaveRegistry(App *app, Explorerplusplus *pContainer, bool load);
+	LoadSaveRegistry(App *app, Explorerplusplus *pContainer);
 
-	/* Loading functions. */
-	void LoadGenericSettings() override;
-
-	/* Saving functions. */
 	void SaveGenericSettings() override;
 	void SaveWindows(const std::vector<WindowStorageData> &windows) override;
 	void SaveBookmarks() override;

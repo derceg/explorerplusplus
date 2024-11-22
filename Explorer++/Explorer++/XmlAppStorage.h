@@ -16,6 +16,7 @@ public:
 	XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument,
 		wil::com_ptr_nothrow<IXMLDOMNode> rootNode);
 
+	void LoadConfig(Config &config) override;
 	[[nodiscard]] std::vector<WindowStorageData> LoadWindows() override;
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
 	void LoadColorRules(ColorRuleModel *model) override;

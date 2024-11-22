@@ -10,6 +10,7 @@
 #include <optional>
 #include <unordered_map>
 
+class App;
 struct Config;
 class CoreInterface;
 class OptionsPage;
@@ -18,7 +19,7 @@ class WindowSubclassWrapper;
 class OptionsDialog : public ThemedDialog
 {
 public:
-	OptionsDialog(HINSTANCE resourceInstance, HWND parent, Config *config,
+	OptionsDialog(HINSTANCE resourceInstance, HWND parent, App *app, Config *config,
 		CoreInterface *coreInterface);
 
 private:
@@ -57,6 +58,7 @@ private:
 	INT_PTR OnDestroy() override;
 	INT_PTR OnNcDestroy() override;
 
+	App *const m_app;
 	Config *const m_config;
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;

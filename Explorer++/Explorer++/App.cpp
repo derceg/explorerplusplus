@@ -7,6 +7,7 @@
 #include "Explorer++.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
+#include "ColumnStorage.h"
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
@@ -65,12 +66,14 @@ void App::OnBrowserRemoved()
 
 void App::LoadSettings(std::vector<WindowStorageData> &windows)
 {
-	BOOL loadSettingsFromXML = TestConfigFileInternal();
+	BOOL loadSettingsFromXML = TestConfigFile();
 	std::unique_ptr<AppStorage> appStorage;
 
 	if (loadSettingsFromXML)
 	{
 		appStorage = XmlAppStorageFactory::MaybeCreate();
+
+		m_savePreferencesToXmlFile = true;
 	}
 	else
 	{
@@ -82,12 +85,15 @@ void App::LoadSettings(std::vector<WindowStorageData> &windows)
 		return;
 	}
 
+	appStorage->LoadConfig(m_config);
 	windows = appStorage->LoadWindows();
 	appStorage->LoadBookmarks(&m_bookmarkTree);
 	appStorage->LoadColorRules(m_colorRuleModel.get());
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
 	appStorage->LoadDefaultColumns(m_config.globalFolderSettings.folderColumns);
+
+	ValidateColumns(m_config.globalFolderSettings.folderColumns);
 }
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
@@ -108,6 +114,16 @@ void App::RestoreSession(const std::vector<WindowStorageData> &windows)
 const CommandLine::Settings *App::GetCommandLineSettings() const
 {
 	return m_commandLineSettings;
+}
+
+bool App::GetSavePreferencesToXmlFile() const
+{
+	return m_savePreferencesToXmlFile;
+}
+
+void App::SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile)
+{
+	m_savePreferencesToXmlFile = savePreferencesToXmlFile;
 }
 
 FeatureList *App::GetFeatureList()
