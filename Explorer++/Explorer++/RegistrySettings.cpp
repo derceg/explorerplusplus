@@ -184,31 +184,17 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayWindowVertical"),
 			m_config->displayWindowVertical);
 
-		COLORREF centreColor;
-		COLORREF surroundColor;
-		COLORREF textColor;
-		LOGFONT logFont;
-		HFONT hFont;
-
-		centreColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETCENTRECOLOR, 0, 0);
-		surroundColor =
-			(COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETSURROUNDCOLOR, 0, 0);
-		textColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETTEXTCOLOR, 0, 0);
-		SendMessage(m_displayWindow->GetHWND(), DWM_GETFONT, (WPARAM) &hFont, 0);
-
-		RegSetValueEx(hSettingsKey, _T("DisplayCentreColor"), 0, REG_BINARY, (LPBYTE) &centreColor,
-			sizeof(centreColor));
-
+		RegSetValueEx(hSettingsKey, _T("DisplayCentreColor"), 0, REG_BINARY,
+			(LPBYTE) &m_config->displayWindowCentreColor.get(),
+			sizeof(m_config->displayWindowCentreColor.get()));
 		RegSetValueEx(hSettingsKey, _T("DisplaySurroundColor"), 0, REG_BINARY,
-			(LPBYTE) &surroundColor, sizeof(surroundColor));
-
-		RegSetValueEx(hSettingsKey, _T("DisplayTextColor"), 0, REG_BINARY, (LPBYTE) &textColor,
-			sizeof(textColor));
-
-		GetObject(hFont, sizeof(LOGFONT), (LPVOID) &logFont);
-
-		RegSetValueEx(hSettingsKey, _T("DisplayFont"), 0, REG_BINARY, (LPBYTE) &logFont,
-			sizeof(LOGFONT));
+			(LPBYTE) &m_config->displayWindowSurroundColor.get(),
+			sizeof(m_config->displayWindowSurroundColor.get()));
+		RegSetValueEx(hSettingsKey, _T("DisplayTextColor"), 0, REG_BINARY,
+			(LPBYTE) &m_config->displayWindowTextColor.get(),
+			sizeof(m_config->displayWindowTextColor.get()));
+		RegSetValueEx(hSettingsKey, _T("DisplayFont"), 0, REG_BINARY,
+			(LPBYTE) &m_config->displayWindowFont.get(), sizeof(m_config->displayWindowFont.get()));
 
 		auto &mainFont = m_config->mainFont.get();
 
@@ -412,7 +398,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 		COLORREF centreColor;
 		COLORREF surroundColor;
 		COLORREF textColor;
-		HFONT hFont;
 		LOGFONT logFont;
 		DWORD dwType;
 		DWORD dwSize;
@@ -425,7 +410,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 
 		if (surroundColorStatus == ERROR_SUCCESS)
 		{
-			m_config->displayWindowSurroundColor.SetFromCOLORREF(surroundColor);
+			m_config->displayWindowSurroundColor = surroundColor;
 		}
 
 		dwType = REG_BINARY;
@@ -436,7 +421,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 
 		if (centreColorStatus == ERROR_SUCCESS)
 		{
-			m_config->displayWindowCentreColor.SetFromCOLORREF(centreColor);
+			m_config->displayWindowCentreColor = centreColor;
 		}
 
 		dwType = REG_BINARY;
@@ -458,9 +443,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 
 		if (fontStatus == ERROR_SUCCESS)
 		{
-			hFont = CreateFontIndirect(&logFont);
-
-			m_config->displayWindowFont = hFont;
+			m_config->displayWindowFont = logFont;
 		}
 
 		wil::unique_hkey mainFontKey;

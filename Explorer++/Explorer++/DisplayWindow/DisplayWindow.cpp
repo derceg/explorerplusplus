@@ -20,22 +20,23 @@
 
 #include "stdafx.h"
 #include "DisplayWindow.h"
+#include "Config.h"
+#include "MainResource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
-DisplayWindow *DisplayWindow::Create(HWND parent, DWInitialSettings_t *initialSettings)
+DisplayWindow *DisplayWindow::Create(HWND parent, const Config *config)
 {
-	return new DisplayWindow(parent, initialSettings);
+	return new DisplayWindow(parent, config);
 }
 
-DisplayWindow::DisplayWindow(HWND parent, DWInitialSettings_t *initialSettings) :
+DisplayWindow::DisplayWindow(HWND parent, const Config *config) :
 	m_hwnd(CreateDisplayWindow(parent)),
-	m_TextColor(initialSettings->TextColor),
-	m_CentreColor(initialSettings->CentreColor),
-	m_SurroundColor(initialSettings->SurroundColor),
-	m_bVertical(FALSE),
-	m_hMainIcon(initialSettings->hIcon),
-	m_hDisplayFont(initialSettings->hFont)
+	m_config(config),
+	m_mainIcon(static_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
+		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION))),
+	m_font(CreateFontIndirect(&config->displayWindowFont.get())),
+	m_bVertical(FALSE)
 {
 	m_LineSpacing = 20;
 	m_LeftIndent = 80;
@@ -50,13 +51,20 @@ DisplayWindow::DisplayWindow(HWND parent, DWInitialSettings_t *initialSettings) 
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
 		std::bind_front(&DisplayWindow::DisplayWindowProc, this)));
+
+	m_connections.push_back(m_config->displayWindowCentreColor.addObserver(
+		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+	m_connections.push_back(m_config->displayWindowSurroundColor.addObserver(
+		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+	m_connections.push_back(m_config->displayWindowFont.addObserver(
+		std::bind(&DisplayWindow::OnFontConfigChanged, this)));
+	m_connections.push_back(m_config->displayWindowTextColor.addObserver(
+		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
 }
 
 DisplayWindow::~DisplayWindow()
 {
 	DeleteCriticalSection(&m_csDWThumbnails);
-
-	DestroyIcon(m_hMainIcon);
 }
 
 HWND DisplayWindow::CreateDisplayWindow(HWND parent)
@@ -192,39 +200,6 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
 		break;
 
-	case DWM_GETCENTRECOLOR:
-		return m_CentreColor.ToCOLORREF();
-
-	case DWM_GETSURROUNDCOLOR:
-		return m_SurroundColor.ToCOLORREF();
-
-	case DWM_SETCENTRECOLOR:
-		m_CentreColor.SetFromCOLORREF((COLORREF) wParam);
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
-		break;
-
-	case DWM_SETSURROUNDCOLOR:
-		m_SurroundColor.SetFromCOLORREF((COLORREF) wParam);
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
-		break;
-
-	case DWM_GETFONT:
-		HFONT *hFont;
-		hFont = (HFONT *) wParam;
-		*hFont = m_hDisplayFont;
-		break;
-
-	case DWM_SETFONT:
-		OnSetFont((HFONT) wParam);
-		break;
-
-	case DWM_GETTEXTCOLOR:
-		return m_TextColor;
-
-	case DWM_SETTEXTCOLOR:
-		OnSetTextColor((COLORREF) wParam);
-		break;
-
 	case WM_USER_DISPLAYWINDOWMOVED:
 		m_bVertical = (BOOL) wParam;
 		InvalidateRect(m_hwnd, nullptr, TRUE);
@@ -241,4 +216,16 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 HWND DisplayWindow::GetHWND() const
 {
 	return m_hwnd;
+}
+
+void DisplayWindow::OnDisplayConfigChanged()
+{
+	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
+}
+
+void DisplayWindow::OnFontConfigChanged()
+{
+	m_font.reset(CreateFontIndirect(&m_config->displayWindowFont.get()));
+
+	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }

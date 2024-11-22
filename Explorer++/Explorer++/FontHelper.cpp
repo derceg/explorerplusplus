@@ -5,6 +5,12 @@
 #include "stdafx.h"
 #include "FontHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include <boost/pfr.hpp>
+
+bool operator==(const LOGFONT &first, const LOGFONT &second)
+{
+	return boost::pfr::structure_to_tuple(first) == boost::pfr::structure_to_tuple(second);
+}
 
 wil::unique_hfont CreateFontFromNameAndSize(const std::wstring &name, int size, HWND hwnd)
 {

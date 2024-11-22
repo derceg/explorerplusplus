@@ -6,6 +6,8 @@
 
 #include "CustomFont.h"
 #include "DefaultColumns.h"
+#include "DisplayWindowDefaults.h"
+#include "FontHelper.h"
 #include "IconResourceLoader.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
@@ -106,12 +108,10 @@ struct Config
 	ValueWrapper<bool> showQuickAccessInTreeView = true;
 
 	// Display window
-	Gdiplus::Color displayWindowCentreColor = Gdiplus::Color(255, 255, 255);
-	Gdiplus::Color displayWindowSurroundColor = Gdiplus::Color(0, 94, 138);
-	COLORREF displayWindowTextColor = RGB(0, 0, 0);
-	HFONT displayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY,
-		FIXED_PITCH | FF_MODERN, _T("Segoe UI"));
+	ValueWrapper<COLORREF> displayWindowCentreColor = DisplayWindowDefaults::CENTRE_COLOR;
+	ValueWrapper<COLORREF> displayWindowSurroundColor = DisplayWindowDefaults::SURROUND_COLOR;
+	ValueWrapper<COLORREF> displayWindowTextColor = DisplayWindowDefaults::TEXT_COLOR;
+	ValueWrapper<LOGFONT> displayWindowFont = DisplayWindowDefaults::FONT;
 
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.

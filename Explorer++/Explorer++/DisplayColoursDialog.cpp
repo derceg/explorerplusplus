@@ -12,11 +12,9 @@
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
 DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent,
-	HWND hDisplayWindow, COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
+	Config *config) :
 	ThemedDialog(resourceInstance, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),
-	m_hDisplayWindow(hDisplayWindow),
-	m_DefaultCenterColor(DefaultCenterColor),
-	m_DefaultSurroundingColor(DefaultSurroundingColor)
+	m_config(config)
 {
 	m_pdcdps = &DisplayColoursDialogPersistentSettings::GetInstance();
 }
@@ -33,33 +31,33 @@ INT_PTR DisplayColoursDialog::OnInitDialog()
 
 void DisplayColoursDialog::InitializeColorGroups()
 {
-	m_CenterGroup[0].sliderId = IDC_SLIDER_CENTRE_RED;
-	m_CenterGroup[0].editId = IDC_EDIT_CENTRE_RED;
-	m_CenterGroup[0].color = Color::Red;
+	m_centerGroup[0].sliderId = IDC_SLIDER_CENTRE_RED;
+	m_centerGroup[0].editId = IDC_EDIT_CENTRE_RED;
+	m_centerGroup[0].color = Color::Red;
 
-	m_CenterGroup[1].sliderId = IDC_SLIDER_CENTRE_GREEN;
-	m_CenterGroup[1].editId = IDC_EDIT_CENTRE_GREEN;
-	m_CenterGroup[1].color = Color::Green;
+	m_centerGroup[1].sliderId = IDC_SLIDER_CENTRE_GREEN;
+	m_centerGroup[1].editId = IDC_EDIT_CENTRE_GREEN;
+	m_centerGroup[1].color = Color::Green;
 
-	m_CenterGroup[2].sliderId = IDC_SLIDER_CENTRE_BLUE;
-	m_CenterGroup[2].editId = IDC_EDIT_CENTRE_BLUE;
-	m_CenterGroup[2].color = Color::Blue;
+	m_centerGroup[2].sliderId = IDC_SLIDER_CENTRE_BLUE;
+	m_centerGroup[2].editId = IDC_EDIT_CENTRE_BLUE;
+	m_centerGroup[2].color = Color::Blue;
 
-	InitializeColorGroupControls(m_CenterGroup);
+	InitializeColorGroupControls(m_centerGroup);
 
-	m_SurroundingGroup[0].sliderId = IDC_SLIDER_SURROUND_RED;
-	m_SurroundingGroup[0].editId = IDC_EDIT_SURROUND_RED;
-	m_SurroundingGroup[0].color = Color::Red;
+	m_surroundingGroup[0].sliderId = IDC_SLIDER_SURROUND_RED;
+	m_surroundingGroup[0].editId = IDC_EDIT_SURROUND_RED;
+	m_surroundingGroup[0].color = Color::Red;
 
-	m_SurroundingGroup[1].sliderId = IDC_SLIDER_SURROUND_GREEN;
-	m_SurroundingGroup[1].editId = IDC_EDIT_SURROUND_GREEN;
-	m_SurroundingGroup[1].color = Color::Green;
+	m_surroundingGroup[1].sliderId = IDC_SLIDER_SURROUND_GREEN;
+	m_surroundingGroup[1].editId = IDC_EDIT_SURROUND_GREEN;
+	m_surroundingGroup[1].color = Color::Green;
 
-	m_SurroundingGroup[2].sliderId = IDC_SLIDER_SURROUND_BLUE;
-	m_SurroundingGroup[2].editId = IDC_EDIT_SURROUND_BLUE;
-	m_SurroundingGroup[2].color = Color::Blue;
+	m_surroundingGroup[2].sliderId = IDC_SLIDER_SURROUND_BLUE;
+	m_surroundingGroup[2].editId = IDC_EDIT_SURROUND_BLUE;
+	m_surroundingGroup[2].color = Color::Blue;
 
-	InitializeColorGroupControls(m_SurroundingGroup);
+	InitializeColorGroupControls(m_surroundingGroup);
 }
 
 void DisplayColoursDialog::InitializeColorGroupControls(ColorGroup colorGroup[NUM_COLORS])
@@ -104,32 +102,10 @@ void DisplayColoursDialog::SetColorGroupValues(ColorGroup colorGroup[NUM_COLORS]
 
 void DisplayColoursDialog::InitializePreviewWindow()
 {
-	auto centreColor =
-		static_cast<COLORREF>(SendMessage(m_hDisplayWindow, DWM_GETCENTRECOLOR, 0, 0));
-	auto surroundColor =
-		static_cast<COLORREF>(SendMessage(m_hDisplayWindow, DWM_GETSURROUNDCOLOR, 0, 0));
-
-	DisplayWindow_GetFont(m_hDisplayWindow, reinterpret_cast<WPARAM>(&m_hDisplayFont));
-	m_TextColor = DisplayWindow_GetTextColor(m_hDisplayWindow);
-
-	m_hDisplayWindowIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
-		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION));
-
-	DWInitialSettings_t initialSettings;
-	initialSettings.CentreColor = centreColor;
-	initialSettings.SurroundColor = surroundColor;
-	initialSettings.TextColor = m_TextColor;
-	initialSettings.hFont = m_hDisplayFont;
-	initialSettings.hIcon = m_hDisplayWindowIcon;
+	CopyDisplayConfigFields(*m_config, m_previewConfig);
 
 	HWND hStatic = GetDlgItem(m_hDlg, IDC_STATIC_PREVIEWDISPLAY);
-	m_previewDisplayWindow = DisplayWindow::Create(hStatic, &initialSettings);
-
-	SendMessage(m_previewDisplayWindow->GetHWND(), DWM_SETSURROUNDCOLOR, surroundColor, 0);
-	SendMessage(m_previewDisplayWindow->GetHWND(), DWM_SETCENTRECOLOR, centreColor, 0);
-	DisplayWindow_SetFont(m_previewDisplayWindow->GetHWND(),
-		reinterpret_cast<WPARAM>(m_hDisplayFont));
-	DisplayWindow_SetTextColor(m_previewDisplayWindow->GetHWND(), m_TextColor);
+	m_previewDisplayWindow = DisplayWindow::Create(hStatic, &m_previewConfig);
 
 	DisplayWindow_ClearTextBuffer(m_previewDisplayWindow->GetHWND());
 
@@ -148,8 +124,8 @@ void DisplayColoursDialog::InitializePreviewWindow()
 	SetWindowPos(m_previewDisplayWindow->GetHWND(), nullptr, 0, 0, rc.right, rc.bottom,
 		SWP_SHOWWINDOW | SWP_NOZORDER);
 
-	SetColorGroupValues(m_CenterGroup, centreColor);
-	SetColorGroupValues(m_SurroundingGroup, surroundColor);
+	SetColorGroupValues(m_centerGroup, m_previewConfig.displayWindowCentreColor.get());
+	SetColorGroupValues(m_surroundingGroup, m_previewConfig.displayWindowSurroundColor.get());
 }
 
 INT_PTR DisplayColoursDialog::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -192,56 +168,34 @@ INT_PTR DisplayColoursDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void DisplayColoursDialog::OnRestoreDefaults()
 {
-	/* TODO: Need to delete old display window fonts. */
-	// DeleteFont(m_DisplayWindowFont);
+	m_previewConfig.displayWindowCentreColor = DisplayWindowDefaults::CENTRE_COLOR;
+	m_previewConfig.displayWindowSurroundColor = DisplayWindowDefaults::SURROUND_COLOR;
+	m_previewConfig.displayWindowFont = DisplayWindowDefaults::FONT;
+	m_previewConfig.displayWindowTextColor = DisplayWindowDefaults::TEXT_COLOR;
 
-	/* TODO: This should be defined externally. */
-	m_hDisplayFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FIXED_PITCH | FF_MODERN,
-		_T("Segoe UI"));
-
-	/* TODO: Default text color. */
-	m_TextColor = RGB(0, 0, 0);
-
-	SendMessage(m_previewDisplayWindow->GetHWND(), DWM_SETCENTRECOLOR, m_DefaultCenterColor, 0);
-	SendMessage(m_previewDisplayWindow->GetHWND(), DWM_SETSURROUNDCOLOR, m_DefaultSurroundingColor,
-		0);
-	DisplayWindow_SetFont(m_previewDisplayWindow->GetHWND(),
-		reinterpret_cast<WPARAM>(m_hDisplayFont));
-	DisplayWindow_SetTextColor(m_previewDisplayWindow->GetHWND(), m_TextColor);
-
-	SetColorGroupValues(m_CenterGroup, m_DefaultCenterColor);
-	SetColorGroupValues(m_SurroundingGroup, m_DefaultSurroundingColor);
+	SetColorGroupValues(m_centerGroup, m_previewConfig.displayWindowCentreColor.get());
+	SetColorGroupValues(m_surroundingGroup, m_previewConfig.displayWindowSurroundColor.get());
 }
 
 void DisplayColoursDialog::OnChooseFont()
 {
-	HFONT hFont;
-	DisplayWindow_GetFont(m_previewDisplayWindow->GetHWND(), reinterpret_cast<WPARAM>(&hFont));
+	LOGFONT currentFont = m_previewConfig.displayWindowFont.get();
 
-	LOGFONT lf;
-	GetObject(hFont, sizeof(lf), reinterpret_cast<LPVOID>(&lf));
-
-	CHOOSEFONT cf;
+	CHOOSEFONT cf = {};
 	TCHAR szStyle[512];
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = m_hDlg;
 	cf.Flags = CF_FORCEFONTEXIST | CF_SCREENFONTS | CF_EFFECTS | CF_INITTOLOGFONTSTRUCT;
-	cf.lpLogFont = &lf;
-	cf.rgbColors = DisplayWindow_GetTextColor(m_previewDisplayWindow->GetHWND());
+	cf.lpLogFont = &currentFont;
+	cf.rgbColors = m_previewConfig.displayWindowTextColor.get();
 	cf.lCustData = NULL;
 	cf.lpszStyle = szStyle;
 	BOOL res = ChooseFont(&cf);
 
 	if (res)
 	{
-		/* TODO: This font must be freed. */
-		m_hDisplayFont = CreateFontIndirect(cf.lpLogFont);
-		m_TextColor = cf.rgbColors;
-
-		DisplayWindow_SetFont(m_previewDisplayWindow->GetHWND(),
-			reinterpret_cast<WPARAM>(m_hDisplayFont));
-		DisplayWindow_SetTextColor(m_previewDisplayWindow->GetHWND(), m_TextColor);
+		m_previewConfig.displayWindowFont = *cf.lpLogFont;
+		m_previewConfig.displayWindowTextColor = cf.rgbColors;
 	}
 }
 
@@ -249,8 +203,8 @@ INT_PTR DisplayColoursDialog::OnHScroll(HWND hwnd)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 
-	UpdateEditControlsFromSlider(m_CenterGroup);
-	UpdateEditControlsFromSlider(m_SurroundingGroup);
+	UpdateEditControlsFromSlider(m_centerGroup);
+	UpdateEditControlsFromSlider(m_surroundingGroup);
 
 	return 0;
 }
@@ -347,29 +301,30 @@ void DisplayColoursDialog::OnEnChange(UINT ControlID)
 	if (ControlID == IDC_EDIT_CENTRE_RED || ControlID == IDC_EDIT_CENTRE_GREEN
 		|| ControlID == IDC_EDIT_CENTRE_BLUE)
 	{
-		COLORREF color = GetColorFromSliderGroup(m_CenterGroup);
-		SendMessage(m_previewDisplayWindow->GetHWND(), DWM_SETCENTRECOLOR, color, 0);
+		COLORREF color = GetColorFromSliderGroup(m_centerGroup);
+		m_previewConfig.displayWindowCentreColor = color;
 	}
 	else if (ControlID == IDC_EDIT_SURROUND_RED || ControlID == IDC_EDIT_SURROUND_GREEN
 		|| ControlID == IDC_EDIT_SURROUND_BLUE)
 	{
-		COLORREF color = GetColorFromSliderGroup(m_SurroundingGroup);
-		SendMessage(m_previewDisplayWindow->GetHWND(), DWM_SETSURROUNDCOLOR, color, 0);
+		COLORREF color = GetColorFromSliderGroup(m_surroundingGroup);
+		m_previewConfig.displayWindowSurroundColor = color;
 	}
 }
 
 void DisplayColoursDialog::OnOk()
 {
-	COLORREF centerColor = GetColorFromSliderGroup(m_CenterGroup);
-	SendMessage(m_hDisplayWindow, DWM_SETCENTRECOLOR, centerColor, 0);
-
-	COLORREF surroundingColor = GetColorFromSliderGroup(m_SurroundingGroup);
-	SendMessage(m_hDisplayWindow, DWM_SETSURROUNDCOLOR, surroundingColor, 0);
-
-	DisplayWindow_SetFont(m_hDisplayWindow, reinterpret_cast<WPARAM>(m_hDisplayFont));
-	DisplayWindow_SetTextColor(m_hDisplayWindow, m_TextColor);
+	CopyDisplayConfigFields(m_previewConfig, *m_config);
 
 	EndDialog(m_hDlg, 1);
+}
+
+void DisplayColoursDialog::CopyDisplayConfigFields(const Config &sourceConfig, Config &destConfig)
+{
+	destConfig.displayWindowCentreColor = sourceConfig.displayWindowCentreColor.get();
+	destConfig.displayWindowSurroundColor = sourceConfig.displayWindowSurroundColor.get();
+	destConfig.displayWindowFont = sourceConfig.displayWindowFont.get();
+	destConfig.displayWindowTextColor = sourceConfig.displayWindowTextColor.get();
 }
 
 void DisplayColoursDialog::OnCancel()
@@ -380,12 +335,6 @@ void DisplayColoursDialog::OnCancel()
 INT_PTR DisplayColoursDialog::OnClose()
 {
 	EndDialog(m_hDlg, 0);
-	return 0;
-}
-
-INT_PTR DisplayColoursDialog::OnDestroy()
-{
-	DestroyIcon(m_hDisplayWindowIcon);
 	return 0;
 }
 

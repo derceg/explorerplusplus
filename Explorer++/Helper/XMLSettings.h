@@ -31,8 +31,7 @@ BOOL DecodeBoolValue(const TCHAR *value);
 WCHAR *EncodeIntValue(int iValue);
 int DecodeIntValue(const WCHAR *wszValue);
 COLORREF ReadXMLColorData(IXMLDOMNode *pNode);
-Gdiplus::Color ReadXMLColorData2(IXMLDOMNode *pNode);
-HFONT ReadXMLFontData(IXMLDOMNode *pNode);
+LOGFONT ReadXMLFontData(IXMLDOMNode *pNode);
 
 bool ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName,
 	FILETIME &dateTime);

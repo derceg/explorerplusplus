@@ -1554,6 +1554,9 @@
     <ClInclude Include="WindowXmlStorage.h">
       <Filter>Windows</Filter>
     </ClInclude>
+    <ClInclude Include="DisplayWindowDefaults.h">
+      <Filter>DisplayWindow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

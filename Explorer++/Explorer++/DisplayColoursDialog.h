@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Config.h"
 #include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 
@@ -30,15 +31,13 @@ private:
 class DisplayColoursDialog : public ThemedDialog
 {
 public:
-	DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent, HWND hDisplayWindow,
-		COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor);
+	DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent, Config *config);
 
 protected:
 	INT_PTR OnInitDialog() override;
 	INT_PTR OnHScroll(HWND hwnd) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
-	INT_PTR OnDestroy() override;
 
 	void SaveState() override;
 
@@ -65,6 +64,7 @@ private:
 	void OnEnChange(UINT ControlID);
 
 	void OnOk();
+	static void CopyDisplayConfigFields(const Config &sourceConfig, Config &destConfig);
 	void OnCancel();
 
 	void InitializeColorGroups();
@@ -75,18 +75,12 @@ private:
 	void UpdateEditControlsFromSlider(ColorGroup colorGroup[NUM_COLORS]);
 	COLORREF GetColorFromSliderGroup(ColorGroup colorGroup[NUM_COLORS]);
 
-	HWND m_hDisplayWindow;
+	Config *const m_config;
+	Config m_previewConfig;
 	DisplayWindow *m_previewDisplayWindow = nullptr;
-	HICON m_hDisplayWindowIcon;
 
-	ColorGroup m_CenterGroup[NUM_COLORS];
-	ColorGroup m_SurroundingGroup[NUM_COLORS];
-
-	HFONT m_hDisplayFont;
-	COLORREF m_TextColor;
-
-	COLORREF m_DefaultCenterColor;
-	COLORREF m_DefaultSurroundingColor;
+	ColorGroup m_centerGroup[NUM_COLORS];
+	ColorGroup m_surroundingGroup[NUM_COLORS];
 
 	DisplayColoursDialogPersistentSettings *m_pdcdps;
 };

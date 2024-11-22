@@ -264,67 +264,54 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::EncodeBoolValue(
 			m_config->globalFolderSettings.disableFolderSizesNetworkRemovable));
 
-	COLORREF centreColor;
-
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayCentreColor"));
-	centreColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETCENTRECOLOR, 0, 0);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
-		XMLSettings::EncodeIntValue(GetRValue(centreColor)));
+		XMLSettings::EncodeIntValue(GetRValue(m_config->displayWindowCentreColor.get())));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
-		XMLSettings::EncodeIntValue(GetGValue(centreColor)));
+		XMLSettings::EncodeIntValue(GetGValue(m_config->displayWindowCentreColor.get())));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
-		XMLSettings::EncodeIntValue(GetBValue(centreColor)));
-
-	HFONT hFont;
-	LOGFONT fontInfo;
+		XMLSettings::EncodeIntValue(GetBValue(m_config->displayWindowCentreColor.get())));
 
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayFont"));
-	SendMessage(m_displayWindow->GetHWND(), DWM_GETFONT, (WPARAM) &hFont, 0);
-	GetObject(hFont, sizeof(LOGFONT), &fontInfo);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Height"),
-		XMLSettings::EncodeIntValue(fontInfo.lfHeight));
+		XMLSettings::EncodeIntValue(m_config->displayWindowFont.get().lfHeight));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Width"),
-		XMLSettings::EncodeIntValue(fontInfo.lfWidth));
+		XMLSettings::EncodeIntValue(m_config->displayWindowFont.get().lfWidth));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Weight"),
-		XMLSettings::EncodeIntValue(fontInfo.lfWeight));
+		XMLSettings::EncodeIntValue(m_config->displayWindowFont.get().lfWeight));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Italic"),
-		XMLSettings::EncodeBoolValue(fontInfo.lfItalic));
+		XMLSettings::EncodeBoolValue(m_config->displayWindowFont.get().lfItalic));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Underline"),
-		XMLSettings::EncodeBoolValue(fontInfo.lfUnderline));
+		XMLSettings::EncodeBoolValue(m_config->displayWindowFont.get().lfUnderline));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Strikeout"),
-		XMLSettings::EncodeBoolValue(fontInfo.lfStrikeOut));
-	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Font"), fontInfo.lfFaceName);
-
-	COLORREF surroundColor;
+		XMLSettings::EncodeBoolValue(m_config->displayWindowFont.get().lfStrikeOut));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Font"),
+		m_config->displayWindowFont.get().lfFaceName);
 
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplaySurroundColor"));
-	surroundColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETSURROUNDCOLOR, 0, 0);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
-		XMLSettings::EncodeIntValue(GetRValue(surroundColor)));
+		XMLSettings::EncodeIntValue(GetRValue(m_config->displayWindowSurroundColor.get())));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
-		XMLSettings::EncodeIntValue(GetGValue(surroundColor)));
+		XMLSettings::EncodeIntValue(GetGValue(m_config->displayWindowSurroundColor.get())));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
-		XMLSettings::EncodeIntValue(GetBValue(surroundColor)));
-
-	COLORREF textColor;
+		XMLSettings::EncodeIntValue(GetBValue(m_config->displayWindowSurroundColor.get())));
 
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayTextColor"));
-	textColor = (COLORREF) SendMessage(m_displayWindow->GetHWND(), DWM_GETTEXTCOLOR, 0, 0);
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
-		XMLSettings::EncodeIntValue(GetRValue(textColor)));
+		XMLSettings::EncodeIntValue(GetRValue(m_config->displayWindowTextColor.get())));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
-		XMLSettings::EncodeIntValue(GetGValue(textColor)));
+		XMLSettings::EncodeIntValue(GetGValue(m_config->displayWindowTextColor.get())));
 	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
-		XMLSettings::EncodeIntValue(GetBValue(textColor)));
+		XMLSettings::EncodeIntValue(GetBValue(m_config->displayWindowTextColor.get())));
 
 	WCHAR szValue[32];
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
@@ -612,7 +599,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_DISPLAYCENTRECOLOR:
-		m_config->displayWindowCentreColor = XMLSettings::ReadXMLColorData2(pNode);
+		m_config->displayWindowCentreColor = XMLSettings::ReadXMLColorData(pNode);
 		break;
 
 	case HASH_DISPLAYFONT:
@@ -620,7 +607,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_DISPLAYSURROUNDCOLOR:
-		m_config->displayWindowSurroundColor = XMLSettings::ReadXMLColorData2(pNode);
+		m_config->displayWindowSurroundColor = XMLSettings::ReadXMLColorData(pNode);
 		break;
 
 	case HASH_DISPLAYTEXTCOLOR:

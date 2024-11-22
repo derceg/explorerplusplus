@@ -99,15 +99,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 void Explorerplusplus::InitializeDisplayWindow()
 {
-	DWInitialSettings_t initialSettings;
-	initialSettings.CentreColor = m_config->displayWindowCentreColor;
-	initialSettings.SurroundColor = m_config->displayWindowSurroundColor;
-	initialSettings.TextColor = m_config->displayWindowTextColor;
-	initialSettings.hFont = m_config->displayWindowFont;
-	initialSettings.hIcon = (HICON) LoadImage(GetModuleHandle(nullptr),
-		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION);
-
-	m_displayWindow = DisplayWindow::Create(m_hContainer, &initialSettings);
+	m_displayWindow = DisplayWindow::Create(m_hContainer, m_config);
 
 	ApplyDisplayWindowPosition();
 

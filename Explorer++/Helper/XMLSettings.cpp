@@ -253,54 +253,7 @@ COLORREF XMLSettings::ReadXMLColorData(IXMLDOMNode *pNode)
 	return RGB(r, g, b);
 }
 
-Gdiplus::Color XMLSettings::ReadXMLColorData2(IXMLDOMNode *pNode)
-{
-	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-	pNode->get_attributes(&am);
-
-	long lChildNodes;
-	am->get_length(&lChildNodes);
-
-	/* RGB data requires three attributes (R,G,B). */
-	/*if(lChildNodes != 3)*/
-
-	BYTE r = 0;
-	BYTE g = 0;
-	BYTE b = 0;
-
-	/* Attribute name should be one of: r,g,b
-	Attribute value should be a value between 0x00 and 0xFF. */
-	for (long i = 1; i < lChildNodes; i++)
-	{
-		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
-		am->get_item(i, &pChildNode);
-
-		/* Element name. */
-		wil::unique_bstr bstrName;
-		pChildNode->get_nodeName(&bstrName);
-
-		/* Element value. */
-		wil::unique_bstr bstrValue;
-		pChildNode->get_text(&bstrValue);
-
-		if (lstrcmp(bstrName.get(), L"r") == 0)
-		{
-			r = (BYTE) XMLSettings::DecodeIntValue(bstrValue.get());
-		}
-		else if (lstrcmp(bstrName.get(), L"g") == 0)
-		{
-			g = (BYTE) XMLSettings::DecodeIntValue(bstrValue.get());
-		}
-		else if (lstrcmp(bstrName.get(), L"b") == 0)
-		{
-			b = (BYTE) XMLSettings::DecodeIntValue(bstrValue.get());
-		}
-	}
-
-	return Gdiplus::Color(r, g, b);
-}
-
-HFONT XMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
+LOGFONT XMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
@@ -360,7 +313,7 @@ HFONT XMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 	fontInfo.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
 	fontInfo.lfQuality = PROOF_QUALITY;
 
-	return CreateFontIndirect(&fontInfo);
+	return fontInfo;
 }
 
 bool XMLSettings::ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName,

@@ -3,6 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+#include "Config.h"
 #include "DisplayWindow.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -45,7 +46,7 @@ void DisplayWindow::Draw(HDC hdc, RECT *rc, RECT *updateRect)
 	DrawBackground(hdcMem, rc);
 
 	PaintText(hdcMem, m_LeftIndent);
-	DrawIconEx(hdcMem, MAIN_ICON_LEFT, MAIN_ICON_TOP, m_hMainIcon, MAIN_ICON_WIDTH,
+	DrawIconEx(hdcMem, MAIN_ICON_LEFT, MAIN_ICON_TOP, m_mainIcon.get(), MAIN_ICON_WIDTH,
 		MAIN_ICON_HEIGHT, 0, nullptr, DI_NORMAL);
 
 	if (m_bShowThumbnail)
@@ -72,10 +73,14 @@ void DisplayWindow::DrawBackground(HDC hdcMem, RECT *rc)
 	Gdiplus::PathGradientBrush pgb(&path);
 	pgb.SetCenterPoint(Gdiplus::Point(0, 0));
 
-	pgb.SetCenterColor(m_CentreColor);
+	Gdiplus::Color centreColor;
+	centreColor.SetFromCOLORREF(m_config->displayWindowCentreColor.get());
+	pgb.SetCenterColor(centreColor);
 
+	Gdiplus::Color surroundColor;
+	surroundColor.SetFromCOLORREF(m_config->displayWindowSurroundColor.get());
 	INT count = 1;
-	pgb.SetSurroundColors(&m_SurroundColor, &count);
+	pgb.SetSurroundColors(&surroundColor, &count);
 	graphics.FillRectangle(&pgb, displayRect);
 
 	/* This draws a separator line across the top edge of the window,
@@ -269,10 +274,10 @@ void DisplayWindow::PaintText(HDC hdc, unsigned int x)
 	unsigned int i = 0;
 
 	/* Needed to get character widths properly. */
-	HGDIOBJ hOriginalObject = SelectObject(hdc, m_hDisplayFont);
+	HGDIOBJ hOriginalObject = SelectObject(hdc, m_font.get());
 
 	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, m_TextColor);
+	SetTextColor(hdc, m_config->displayWindowTextColor.get());
 
 	GetClientRect(m_hwnd, &rcClient);
 	xCurrent = x;
@@ -466,18 +471,4 @@ void DisplayWindow::OnSetThumbnailFile(WPARAM wParam, LPARAM lParam)
 		m_bThumbnailExtractionFailed = FALSE;
 		StringCchCopy(m_ImageFile, std::size(m_ImageFile), (TCHAR *) wParam);
 	}
-}
-
-void DisplayWindow::OnSetFont(HFONT hFont)
-{
-	m_hDisplayFont = hFont;
-
-	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
-}
-
-void DisplayWindow::OnSetTextColor(COLORREF hColor)
-{
-	m_TextColor = hColor;
-
-	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }

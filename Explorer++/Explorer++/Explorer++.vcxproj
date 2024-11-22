@@ -1306,6 +1306,7 @@
     <ClInclude Include="DefaultColumnRegistryStorage.h" />
     <ClInclude Include="DefaultColumnXmlStorage.h" />
     <ClInclude Include="DirectoryOperationsHelper.h" />
+    <ClInclude Include="DisplayWindowDefaults.h" />
     <ClInclude Include="ExitCode.h" />
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
