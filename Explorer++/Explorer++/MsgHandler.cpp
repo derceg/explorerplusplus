@@ -334,7 +334,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	int iTabBackingWidth;
 	int iTabBackingLeft;
 
-	if (!m_applicationInitialized)
+	if (!m_applicationInitialized || m_browserClosing)
 	{
 		return;
 	}
@@ -561,6 +561,7 @@ void Explorerplusplus::OnThemeUpdated(Theme theme)
 
 int Explorerplusplus::OnDestroy()
 {
+	DCHECK(!m_browserClosing);
 	m_browserClosing = true;
 
 	// Broadcasting focus changed events when the browser is being closed is both unnecessary and
