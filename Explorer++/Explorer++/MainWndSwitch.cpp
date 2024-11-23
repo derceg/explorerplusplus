@@ -182,24 +182,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	}
 	break;
 
-	case WM_COPYDATA:
-	{
-		auto *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
-
-		if (pcds->lpData != nullptr)
-		{
-			GetActivePane()->GetTabContainer()->CreateNewTab((TCHAR *) pcds->lpData,
-				TabSettings(_selected = true));
-		}
-		else
-		{
-			GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory(
-				TabSettings(_selected = true));
-		}
-
-		return TRUE;
-	}
-
 	case WM_NDW_RCLICK:
 	{
 		POINT pt;

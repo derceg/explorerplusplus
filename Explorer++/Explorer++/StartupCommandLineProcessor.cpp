@@ -12,7 +12,6 @@
 #include "ResourceHelper.h"
 #include "Storage.h"
 #include "../Helper/SetDefaultFileManager.h"
-#include "../Helper/WindowHelper.h"
 
 namespace
 {
@@ -25,7 +24,6 @@ struct ReplaceExplorerResults
 	std::optional<LSTATUS> setAll;
 };
 
-std::optional<ExitCode> OnJumplistNewTab();
 void OnClearRegistrySettings();
 void OnUpdateReplaceExplorerSetting(DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 ReplaceExplorerResults UpdateReplaceExplorerSetting(
@@ -53,16 +51,6 @@ std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings
 		client.NotifyServerOfResult(pastedItems);
 
 		return EXIT_CODE_NORMAL;
-	}
-
-	if (commandLineSettings->jumplistNewTab)
-	{
-		auto exitInfo = OnJumplistNewTab();
-
-		if (exitInfo)
-		{
-			return exitInfo;
-		}
 	}
 
 	if (commandLineSettings->clearRegistrySettings)
@@ -93,32 +81,6 @@ std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings
 
 namespace
 {
-
-std::optional<ExitCode> OnJumplistNewTab()
-{
-	wil::unique_mutex_nothrow mutex;
-
-	if (!mutex.try_open(NExplorerplusplus::APPLICATION_MUTEX_NAME))
-	{
-		return std::nullopt;
-	}
-
-	HWND existingWindow = FindWindow(NExplorerplusplus::CLASS_NAME, nullptr);
-
-	if (!existingWindow)
-	{
-		return std::nullopt;
-	}
-
-	COPYDATASTRUCT cds;
-	cds.cbData = 0;
-	cds.lpData = nullptr;
-	SendMessage(existingWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
-
-	BringWindowToForeground(existingWindow);
-
-	return EXIT_CODE_NORMAL_EXISTING_PROCESS;
-}
 
 void OnClearRegistrySettings()
 {

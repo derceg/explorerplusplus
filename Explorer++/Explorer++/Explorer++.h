@@ -115,6 +115,7 @@ public:
 
 	HWND GetHWND() const override;
 	WindowStorageData GetStorageData() const override;
+	void Activate() override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -422,7 +423,9 @@ private:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 
 	// Navigator
+	using Navigator::OpenDefaultItem;
 	using Navigator::OpenItem;
+	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;
 	void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;

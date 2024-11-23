@@ -23,4 +23,5 @@ public:
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual HWND GetHWND() const = 0;
 	virtual WindowStorageData GetStorageData() const = 0;
+	virtual void Activate() = 0;
 };

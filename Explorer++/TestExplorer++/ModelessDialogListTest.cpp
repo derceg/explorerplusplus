@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "ModelessDialogList.h"
 #include "GeneratorTestHelper.h"
+#include "MessageWindowHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <gtest/gtest.h>
 
@@ -19,13 +20,13 @@ protected:
 TEST_F(ModelessDialogListTest, AddRemoveDialog)
 {
 	std::wstring dialogId1 = L"dialog1";
-	auto dialog1 = CreateMessageOnlyWindow();
+	auto dialog1 = MessageWindowHelper::CreateMessageOnlyWindow();
 	m_modelessDialogList.AddDialog(dialogId1, dialog1.get());
 	EXPECT_THAT(GeneratorToVector(m_modelessDialogList.GetList()),
 		UnorderedElementsAre(dialog1.get()));
 
 	std::wstring dialogId2 = L"dialog2";
-	auto dialog2 = CreateMessageOnlyWindow();
+	auto dialog2 = MessageWindowHelper::CreateMessageOnlyWindow();
 	m_modelessDialogList.AddDialog(dialogId2, dialog2.get());
 	EXPECT_THAT(GeneratorToVector(m_modelessDialogList.GetList()),
 		UnorderedElementsAre(dialog1.get(), dialog2.get()));
@@ -41,7 +42,7 @@ TEST_F(ModelessDialogListTest, AddRemoveDialog)
 TEST_F(ModelessDialogListTest, MaybeGetDialogById)
 {
 	std::wstring dialogId = L"dialog";
-	auto dialog = CreateMessageOnlyWindow();
+	auto dialog = MessageWindowHelper::CreateMessageOnlyWindow();
 	m_modelessDialogList.AddDialog(dialogId, dialog.get());
 	EXPECT_EQ(m_modelessDialogList.MaybeGetDialogById(dialogId), dialog.get());
 

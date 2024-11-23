@@ -4,6 +4,5 @@
 
 #pragma once
 
-#include <Windows.h>
-
-BOOL LoadAllowMultipleInstancesFromXML(void);
+bool IsInTest();
+void SetIsInTest();

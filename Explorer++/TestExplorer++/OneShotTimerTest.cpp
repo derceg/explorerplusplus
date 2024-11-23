@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "OneShotTimer.h"
+#include "MessageWindowHelper.h"
 #include "OneShotTimerManager.h"
 #include "../Helper/WindowHelper.h"
 #include <gmock/gmock.h>
@@ -16,13 +17,11 @@ using namespace std::chrono_literals;
 class OneShotTimerTest : public Test
 {
 protected:
-	void SetUp() override
+	OneShotTimerTest() :
+		m_messageWindow(MessageWindowHelper::CreateMessageOnlyWindow()),
+		m_timerManager(std::make_unique<OneShotTimerManager>(m_messageWindow.get())),
+		m_timer(std::make_unique<OneShotTimer>(m_timerManager.get()))
 	{
-		m_messageWindow = CreateMessageOnlyWindow();
-		ASSERT_NE(m_messageWindow, nullptr);
-
-		m_timerManager = std::make_unique<OneShotTimerManager>(m_messageWindow.get());
-		m_timer = std::make_unique<OneShotTimer>(m_timerManager.get());
 	}
 
 	wil::unique_hwnd m_messageWindow;

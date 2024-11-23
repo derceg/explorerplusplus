@@ -27,6 +27,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
+	m_processManager(&m_browserList),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
@@ -52,6 +53,16 @@ void App::Initialize()
 
 	std::vector<WindowStorageData> windows;
 	LoadSettings(windows);
+
+	// This function may attempt to notify an existing process if the allowMultipleInstances config
+	// value is disabled. Therefore, this call needs to be made after the settings have been loaded.
+	// If the allowMultipleInstances setting is removed, this call can be made earlier.
+	if (!m_processManager.InitializeCurrentProcess(m_commandLineSettings, &m_config))
+	{
+		PostQuitMessage(EXIT_CODE_NORMAL_EXISTING_PROCESS);
+		return;
+	}
+
 	RestoreSession(windows);
 }
 

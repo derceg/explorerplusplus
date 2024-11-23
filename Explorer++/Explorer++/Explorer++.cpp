@@ -186,6 +186,11 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		m_mainToolbar->GetButtonsForStorage());
 }
 
+void Explorerplusplus::Activate()
+{
+	BringWindowToForeground(m_hContainer);
+}
+
 BrowserCommandController *Explorerplusplus::GetCommandController()
 {
 	return &m_commandController;

@@ -157,23 +157,6 @@ bool BringWindowToForeground(HWND wnd)
 	return SetForegroundWindow(wnd);
 }
 
-wil::unique_hwnd CreateMessageOnlyWindow()
-{
-	static constexpr WCHAR MESSAGE_CLASS_NAME[] = L"MessageClass";
-
-	WNDCLASS windowClass = {};
-	windowClass.lpfnWndProc = DefWindowProc;
-	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	windowClass.lpszClassName = MESSAGE_CLASS_NAME;
-	windowClass.hInstance = GetModuleHandle(nullptr);
-	windowClass.style = CS_HREDRAW | CS_VREDRAW;
-	RegisterClass(&windowClass);
-
-	return wil::unique_hwnd(CreateWindow(MESSAGE_CLASS_NAME, MESSAGE_CLASS_NAME, WS_DISABLED,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, nullptr,
-		GetModuleHandle(nullptr), nullptr));
-}
-
 bool operator==(const RECT &first, const RECT &second)
 {
 	return EqualRect(&first, &second);

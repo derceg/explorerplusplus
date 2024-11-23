@@ -1032,13 +1032,16 @@
     <ClCompile Include="MainMenuSubMenuView.cpp" />
     <ClCompile Include="BrowserList.cpp" />
     <ClCompile Include="BrowserTracker.cpp" />
+    <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="ModelessDialogHelper.cpp" />
     <ClCompile Include="ModelessDialogList.cpp" />
+    <ClCompile Include="ProcessManager.cpp" />
     <ClCompile Include="RegistryAppStorage.cpp" />
     <ClCompile Include="RegistryAppStorageFactory.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
+    <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="UIThreadExecutor.cpp" />
     <ClCompile Include="MenuBase.cpp" />
     <ClCompile Include="MenuView.cpp" />
@@ -1322,8 +1325,10 @@
     <ClInclude Include="MainMenuSubMenuView.h" />
     <ClInclude Include="BrowserList.h" />
     <ClInclude Include="BrowserTracker.h" />
+    <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ModelessDialogHelper.h" />
     <ClInclude Include="ModelessDialogList.h" />
+    <ClInclude Include="ProcessManager.h" />
     <ClInclude Include="RegistryAppStorage.h" />
     <ClInclude Include="RegistryAppStorageFactory.h" />
     <ClInclude Include="Runtime.h" />
@@ -1331,6 +1336,7 @@
     <ClInclude Include="ShellChangeNotificationType.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
     <ClInclude Include="Storage.h" />
+    <ClInclude Include="TestHelper.h" />
     <ClInclude Include="UIThreadExecutor.h" />
     <ClInclude Include="MenuBase.h" />
     <ClInclude Include="MenuView.h" />
@@ -1470,7 +1476,6 @@
     <ClInclude Include="Plugins\PluginMenuManager.h" />
     <ClInclude Include="FileProgressSink.h" />
     <ClInclude Include="PreservedTab.h" />
-    <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceHelper.h" />
@@ -1531,7 +1536,6 @@
     <ClInclude Include="WindowXmlStorage.h" />
     <ClInclude Include="XmlAppStorage.h" />
     <ClInclude Include="XmlAppStorageFactory.h" />
-    <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Display Window.ico" />

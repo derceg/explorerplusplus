@@ -3,6 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
+#include "TestHelper.h"
 #include "../Helper/UniqueResources.h"
 #include <gtest/gtest.h>
 #include <gdiplus.h>
@@ -61,6 +62,8 @@ public:
 
 int wmain(int argc, wchar_t *argv[])
 {
+	SetIsInTest();
+
 	AddGlobalTestEnvironment(new ComEnvironment);
 	AddGlobalTestEnvironment(new GdiplusEnvironment);
 	InitGoogleTest(&argc, argv);

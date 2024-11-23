@@ -12,6 +12,7 @@
 #include "Config.h"
 #include "FeatureList.h"
 #include "ModelessDialogList.h"
+#include "ProcessManager.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -61,6 +62,7 @@ private:
 	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
+	ProcessManager m_processManager;
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;

@@ -6,6 +6,7 @@
 #include "ComStaThreadPoolExecutor.h"
 #include "ExecutorTestBase.h"
 #include "ExecutorTestHelper.h"
+#include "MessageWindowHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <gtest/gtest.h>
 
@@ -46,7 +47,7 @@ TEST_F(ComStaThreadPoolExecutorTest, QueueMessagesAndRunTasks)
 			// which is only going to be doable if it's possible to invoke code on that thread.
 			// The window will, however, be automatically cleaned up when its creating thread exits
 			// (at the end of this test).
-			auto ownedWindow = CreateMessageOnlyWindow();
+			auto ownedWindow = MessageWindowHelper::CreateMessageOnlyWindow();
 			hwnd = ownedWindow.release();
 		});
 

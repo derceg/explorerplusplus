@@ -13,6 +13,13 @@ class Navigator
 public:
 	virtual ~Navigator() = default;
 
+	virtual void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) = 0;
+
+	void OpenDefaultItem()
+	{
+		OpenDefaultItem(OpenFolderDisposition::CurrentTab);
+	}
+
 	virtual void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition) = 0;
 

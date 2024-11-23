@@ -280,6 +280,9 @@
     <ClCompile Include="WindowStorageTestHelper.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
+    <ClCompile Include="ProcessManagerTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

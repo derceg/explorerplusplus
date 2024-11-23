@@ -757,6 +757,15 @@
     <ClCompile Include="ConfigXmlStorage.cpp">
       <Filter>Config</Filter>
     </ClCompile>
+    <ClCompile Include="MessageWindowHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -821,12 +830,6 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="XMLSettings.h">
-      <Filter>Settings</Filter>
-    </ClInclude>
-    <ClInclude Include="RegistrySettings.h">
-      <Filter>Settings</Filter>
     </ClInclude>
     <ClInclude Include="..\targetver.h">
       <Filter>Core</Filter>
@@ -1568,6 +1571,15 @@
     </ClInclude>
     <ClInclude Include="ConfigXmlStorage.h">
       <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageWindowHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHelper.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

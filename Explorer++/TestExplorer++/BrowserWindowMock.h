@@ -20,8 +20,10 @@ public:
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
+	MOCK_METHOD(void, Activate, (), (override));
 
 	// Navigator
+	MOCK_METHOD(void, OpenDefaultItem, (OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(void, OpenItem,
 		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(void, OpenItem,

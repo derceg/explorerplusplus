@@ -74,6 +74,11 @@ BOOL TestConfigFile()
 	return bLoadSettingsFromXML;
 }
 
+void Explorerplusplus::OpenDefaultItem(OpenFolderDisposition openFolderDisposition)
+{
+	OpenItem(m_config->defaultTabDirectory, openFolderDisposition);
+}
+
 void Explorerplusplus::OpenItem(const std::wstring &itemPath,
 	OpenFolderDisposition openFolderDisposition)
 {
@@ -1091,6 +1096,11 @@ void Explorerplusplus::FocusActiveTab()
 
 bool Explorerplusplus::OnActivate(int activationState, bool minimized)
 {
+	if (activationState != WA_INACTIVE && !minimized)
+	{
+		m_app->GetBrowserList()->SetLastActive(this);
+	}
+
 	if (activationState == WA_INACTIVE)
 	{
 		m_lastActiveWindow = GetFocus();

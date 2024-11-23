@@ -14,10 +14,6 @@ const TCHAR CLASS_NAME[] = _T("Explorer++");
 constexpr WCHAR DOCUMENTATION_LINK[] = L"https://explorerplusplus.readthedocs.io/en/latest/";
 
 const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
-
-// The first instance of the application will create a mutex with this name, which later instances
-// can then use to detect whether or not the application is already running.
-const TCHAR APPLICATION_MUTEX_NAME[] = _T("Explorer++");
 }
 
 /* Used when setting Explorer++ as the default

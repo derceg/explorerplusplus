@@ -4,14 +4,13 @@
 
 #include "stdafx.h"
 #include "UIThreadExecutor.h"
+#include "MessageWindowHelper.h"
 #include "../Helper/WindowHelper.h"
 
 UIThreadExecutor::UIThreadExecutor() :
 	concurrencpp::derivable_executor<UIThreadExecutor>("UIThreadExecutor"),
-	m_hwnd(CreateMessageOnlyWindow())
+	m_hwnd(MessageWindowHelper::CreateMessageOnlyWindow())
 {
-	CHECK(m_hwnd);
-
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd.get(),
 		std::bind_front(&UIThreadExecutor::WndProc, this)));
 }

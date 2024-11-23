@@ -72,3 +72,30 @@ TEST_F(BrowserListTest, RemovedSignal)
 	m_browserList.RemoveBrowser(&browser1);
 	m_browserList.RemoveBrowser(&browser2);
 }
+
+TEST_F(BrowserListTest, LastActive)
+{
+	EXPECT_THAT(m_browserList.GetLastActive(), IsNull());
+
+	BrowserWindowMock browser1;
+	BrowserWindowMock browser2;
+	BrowserWindowMock browser3;
+	m_browserList.AddBrowser(&browser1);
+	m_browserList.AddBrowser(&browser2);
+	m_browserList.AddBrowser(&browser3);
+
+	m_browserList.SetLastActive(&browser1);
+	EXPECT_EQ(m_browserList.GetLastActive(), &browser1);
+
+	m_browserList.SetLastActive(&browser2);
+	EXPECT_EQ(m_browserList.GetLastActive(), &browser2);
+
+	m_browserList.RemoveBrowser(&browser2);
+	EXPECT_EQ(m_browserList.GetLastActive(), &browser1);
+
+	m_browserList.SetLastActive(&browser3);
+	EXPECT_EQ(m_browserList.GetLastActive(), &browser3);
+
+	m_browserList.RemoveBrowser(&browser1);
+	EXPECT_EQ(m_browserList.GetLastActive(), &browser3);
+}

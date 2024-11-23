@@ -8,14 +8,9 @@
 #include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "CrashHandlerHelper.h"
-#include "ExitCode.h"
-#include "Explorer++_internal.h"
-#include "RegistrySettings.h"
 #include "StartupCommandLineProcessor.h"
-#include "XMLSettings.h"
-#include "../Helper/WindowHelper.h"
 #include <boost/locale.hpp>
-#include <wil/resource.h>
+#include <wil/result.h>
 #include <cstdlib>
 #include <format>
 
@@ -64,66 +59,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (exitCode)
 	{
 		return *exitCode;
-	}
-
-	BOOL bAllowMultipleInstances = TRUE;
-	BOOL bLoadSettingsFromXML;
-
-	bLoadSettingsFromXML = TestConfigFile();
-
-	if (bLoadSettingsFromXML)
-	{
-		bAllowMultipleInstances = LoadAllowMultipleInstancesFromXML();
-	}
-	else
-	{
-		bAllowMultipleInstances = LoadAllowMultipleInstancesFromRegistry();
-	}
-
-	/* Create the mutex regardless of the actual setting. For example,
-	if the first instance is run, and multiple instances are allowed,
-	and then disallowed, still need to be able to load back to the
-	original instance. */
-	wil::unique_mutex_nothrow applicationMutex(
-		CreateMutex(nullptr, TRUE, NExplorerplusplus::APPLICATION_MUTEX_NAME));
-
-	if (!bAllowMultipleInstances)
-	{
-		if (GetLastError() == ERROR_ALREADY_EXISTS)
-		{
-			HWND hPrev;
-
-			hPrev = FindWindow(NExplorerplusplus::CLASS_NAME, nullptr);
-
-			if (hPrev != nullptr)
-			{
-				if (!commandLineSettings.directories.empty())
-				{
-					for (const auto &strDirectory : commandLineSettings.directories)
-					{
-						COPYDATASTRUCT cds;
-						TCHAR szDirectory[MAX_PATH];
-
-						StringCchCopy(szDirectory, std::size(szDirectory), strDirectory.c_str());
-
-						cds.cbData = static_cast<DWORD>((strDirectory.size() + 1) * sizeof(TCHAR));
-						cds.lpData = szDirectory;
-						SendMessage(hPrev, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
-					}
-				}
-				else
-				{
-					COPYDATASTRUCT cds;
-
-					cds.cbData = 0;
-					cds.lpData = nullptr;
-					SendMessage(hPrev, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
-				}
-
-				BringWindowToForeground(hPrev);
-				return EXIT_CODE_NORMAL_EXISTING_PROCESS;
-			}
-		}
 	}
 
 	App app(&commandLineSettings);

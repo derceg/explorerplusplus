@@ -51,6 +51,15 @@ public:
 		return { {}, WindowShowState::Normal };
 	}
 
+	void Activate() override
+	{
+	}
+
+	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override
+	{
+		UNREFERENCED_PARAMETER(openFolderDisposition);
+	}
+
 	void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition) override
 	{

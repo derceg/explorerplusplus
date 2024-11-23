@@ -11,29 +11,6 @@
 #include "../Helper/RegistrySettings.h"
 #include <wil/registry.h>
 
-using namespace std::string_literals;
-
-BOOL LoadAllowMultipleInstancesFromRegistry()
-{
-	BOOL bAllowMultipleInstances = TRUE;
-
-	HKEY hSettingsKey;
-	auto settingsKeyPath =
-		Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s + Storage::REGISTRY_SETTINGS_KEY_NAME;
-	LONG lRes =
-		RegOpenKeyEx(HKEY_CURRENT_USER, settingsKeyPath.c_str(), 0, KEY_READ, &hSettingsKey);
-
-	if (lRes == ERROR_SUCCESS)
-	{
-		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AllowMultipleInstances"),
-			bAllowMultipleInstances);
-
-		RegCloseKey(hSettingsKey);
-	}
-
-	return bAllowMultipleInstances;
-}
-
 LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 {
 	HKEY hSettingsKey;

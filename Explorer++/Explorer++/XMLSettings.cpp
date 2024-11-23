@@ -17,82 +17,10 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "CustomFontStorage.h"
-#include "Storage.h"
 #include "../Helper/Macros.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 #include <wil/resource.h>
-
-BOOL LoadAllowMultipleInstancesFromXML()
-{
-	BOOL bAllowMultipleInstances = TRUE;
-
-	auto pXMLDom = XMLSettings::CreateXmlDocument();
-
-	if (!pXMLDom)
-	{
-		return bAllowMultipleInstances;
-	}
-
-	TCHAR szConfigFile[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
-	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
-
-	VARIANT_BOOL status;
-	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
-	pXMLDom->load(var, &status);
-
-	if (status != VARIANT_TRUE)
-	{
-		return bAllowMultipleInstances;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr_nothrow(L"//Settings/*");
-	pXMLDom->selectNodes(bstr.get(), &pNodes);
-
-	if (!pNodes)
-	{
-		return bAllowMultipleInstances;
-	}
-
-	long length;
-	pNodes->get_length(&length);
-
-	for (long i = 0; i < length; i++)
-	{
-		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
-		pNodes->get_item(i, &pNode);
-
-		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-		HRESULT hr = pNode->get_attributes(&am);
-
-		if (SUCCEEDED(hr))
-		{
-			wil::com_ptr_nothrow<IXMLDOMNode> pNodeAttribute;
-			hr = am->get_item(0, &pNodeAttribute);
-
-			if (SUCCEEDED(hr))
-			{
-				wil::unique_bstr bstrName;
-				pNodeAttribute->get_text(&bstrName);
-
-				wil::unique_bstr bstrValue;
-				pNode->get_text(&bstrValue);
-
-				if (lstrcmp(bstrName.get(), _T("AllowMultipleInstances")) == 0)
-				{
-					bAllowMultipleInstances = XMLSettings::DecodeBoolValue(bstrValue.get());
-					break;
-				}
-			}
-		}
-	}
-
-	return bAllowMultipleInstances;
-}
 
 void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
