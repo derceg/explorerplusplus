@@ -384,12 +384,6 @@ private:
 	void SaveAllSettings() override;
 	void ApplyDisplayWindowPosition();
 
-	/* Registry settings. */
-	LONG SaveGenericSettingsToRegistry(HKEY applicationKey);
-
-	/* XML Settings. */
-	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
 	void SetListViewInitialPosition(HWND hListView) override;

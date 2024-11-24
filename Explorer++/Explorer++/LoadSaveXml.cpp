@@ -11,6 +11,7 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
+#include "ConfigXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
 #include "Storage.h"
@@ -92,7 +93,7 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 
 void LoadSaveXML::SaveGenericSettings()
 {
-	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom.get(), m_pRoot.get());
+	ConfigXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), *m_app->GetConfig());
 }
 
 void LoadSaveXML::SaveWindows(const std::vector<WindowStorageData> &windows)

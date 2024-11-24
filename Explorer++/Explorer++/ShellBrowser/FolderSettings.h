@@ -53,6 +53,9 @@ struct GlobalFolderSettings
 	bool useNaturalSortOrder = true;
 
 	FolderColumns folderColumns;
+
+	// This is only used in tests.
+	bool operator==(const GlobalFolderSettings &) const = default;
 };
 
 struct FolderSettings

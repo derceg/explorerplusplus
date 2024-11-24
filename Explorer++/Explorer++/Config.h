@@ -119,6 +119,9 @@ struct Config
 
 	FolderSettings defaultFolderSettings;
 
+	// This is only used in tests.
+	bool operator==(const Config &) const = default;
+
 private:
 	static std::wstring GetComputerFolderPath()
 	{

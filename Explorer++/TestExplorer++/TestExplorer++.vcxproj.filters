@@ -283,6 +283,15 @@
     <ClCompile Include="ProcessManagerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ConfigXmlStorageTest.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigRegistryStorageTest.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigStorageTestHelper.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -384,6 +393,9 @@
     <Filter Include="Windows">
       <UniqueIdentifier>{099d031f-db3c-4d82-87a6-265361e70edf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{1980882f-109e-4b79-a547-fea9e4850a36}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -470,6 +482,9 @@
     </ClInclude>
     <ClInclude Include="StorageTestHelper.h">
       <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigStorageTestHelper.h">
+      <Filter>Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

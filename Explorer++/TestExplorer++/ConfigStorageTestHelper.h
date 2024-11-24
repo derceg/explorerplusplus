@@ -6,10 +6,9 @@
 
 struct Config;
 
-namespace ConfigRegistryStorage
+namespace ConfigStorageTestHelper
 {
 
-void Load(HKEY applicationKey, Config &config);
-void Save(HKEY applicationKey, const Config &config);
+Config BuildReference();
 
 }

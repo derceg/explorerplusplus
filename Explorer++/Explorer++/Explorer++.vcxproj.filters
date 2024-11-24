@@ -103,12 +103,6 @@
     <ClCompile Include="WinMain.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="XMLSettings.cpp">
-      <Filter>Settings</Filter>
-    </ClCompile>
-    <ClCompile Include="RegistrySettings.cpp">
-      <Filter>Settings</Filter>
-    </ClCompile>
     <ClCompile Include="Language.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1649,9 +1643,6 @@
     </Filter>
     <Filter Include="Context Menu Support\New Menu">
       <UniqueIdentifier>{ab5e701f-15f5-4cd1-901a-77738a8f1779}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Settings">
-      <UniqueIdentifier>{7611b74e-ed4f-469a-9ac8-eb7ce05b6942}</UniqueIdentifier>
     </Filter>
     <Filter Include="Holder Window">
       <UniqueIdentifier>{d9276f12-e3f5-4d23-a177-79772ff8b9dc}</UniqueIdentifier>

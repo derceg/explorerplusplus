@@ -11,6 +11,7 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "ColorRuleRegistryStorage.h"
+#include "ConfigRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
 #include "Storage.h"
@@ -36,7 +37,7 @@ void LoadSaveRegistry::SaveGenericSettings()
 
 	if (SUCCEEDED(hr))
 	{
-		m_pContainer->SaveGenericSettingsToRegistry(mainKey.get());
+		ConfigRegistryStorage::Save(mainKey.get(), *m_app->GetConfig());
 	}
 }
 

@@ -63,6 +63,11 @@ public:
 		return m_valueUpdatedSignal.connect(std::forward<Args>(args)...);
 	}
 
+	bool operator==(const ValueWrapper &other) const
+	{
+		return m_value == other.m_value;
+	}
+
 private:
 	T m_value;
 	mutable ValueUpdatedSignal m_valueUpdatedSignal;

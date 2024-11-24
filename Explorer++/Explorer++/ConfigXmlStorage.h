@@ -12,5 +12,6 @@ namespace ConfigXmlStorage
 {
 
 void Load(IXMLDOMNode *rootNode, Config &config);
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const Config &config);
 
 }

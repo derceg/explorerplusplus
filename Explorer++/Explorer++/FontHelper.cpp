@@ -5,11 +5,17 @@
 #include "stdafx.h"
 #include "FontHelper.h"
 #include "../Helper/DpiCompatibility.h"
-#include <boost/pfr.hpp>
 
 bool operator==(const LOGFONT &first, const LOGFONT &second)
 {
-	return boost::pfr::structure_to_tuple(first) == boost::pfr::structure_to_tuple(second);
+	return first.lfHeight == second.lfHeight && first.lfWidth == second.lfWidth
+		&& first.lfEscapement == second.lfEscapement && first.lfOrientation == second.lfOrientation
+		&& first.lfWeight == second.lfWeight && first.lfItalic == second.lfItalic
+		&& first.lfUnderline == second.lfUnderline && first.lfStrikeOut == second.lfStrikeOut
+		&& first.lfCharSet == second.lfCharSet && first.lfOutPrecision == second.lfOutPrecision
+		&& first.lfClipPrecision == second.lfClipPrecision && first.lfQuality == second.lfQuality
+		&& first.lfPitchAndFamily == second.lfPitchAndFamily
+		&& lstrcmp(first.lfFaceName, second.lfFaceName) == 0;
 }
 
 wil::unique_hfont CreateFontFromNameAndSize(const std::wstring &name, int size, HWND hwnd)

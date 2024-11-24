@@ -1181,7 +1181,6 @@
     <ClCompile Include="Plugins\PluginManager.cpp" />
     <ClCompile Include="Plugins\PluginMenuManager.cpp" />
     <ClCompile Include="FileProgressSink.cpp" />
-    <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
     <ClCompile Include="ResourceHelper.cpp" />
     <ClCompile Include="ScriptingDialog.cpp" />
@@ -1262,7 +1261,6 @@
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XmlAppStorage.cpp" />
     <ClCompile Include="XmlAppStorageFactory.cpp" />
-    <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\targetver.h" />
