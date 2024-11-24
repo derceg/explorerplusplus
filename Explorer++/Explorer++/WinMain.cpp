@@ -3,9 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "AcceleratorManager.h"
 #include "App.h"
-#include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "CrashHandlerHelper.h"
 #include "StartupCommandLineProcessor.h"
@@ -16,8 +14,6 @@
 
 [[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
-bool IsModelessDialogMessage(App *app, MSG *msg);
-bool MaybeTranslateAccelerator(App *app, MSG *msg);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -62,19 +58,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	App app(&commandLineSettings);
-
-	MSG msg;
-
-	while (GetMessage(&msg, nullptr, 0, 0) > 0)
-	{
-		if (!IsModelessDialogMessage(&app, &msg) && !MaybeTranslateAccelerator(&app, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
-
-	return static_cast<int>(msg.wParam);
+	return app.Run();
 }
 
 unique_glog_shutdown_call InitializeLogging()
@@ -150,31 +134,4 @@ void InitializeLocale()
 	// Use the system default locale.
 	boost::locale::generator gen;
 	std::locale::global(gen(""));
-}
-
-bool IsModelessDialogMessage(App *app, MSG *msg)
-{
-	for (auto modelessDialog : app->GetModelessDialogList()->GetList())
-	{
-		if (IsChild(modelessDialog, msg->hwnd))
-		{
-			return IsDialogMessage(modelessDialog, msg);
-		}
-	}
-
-	return false;
-}
-
-bool MaybeTranslateAccelerator(App *app, MSG *msg)
-{
-	for (auto *browser : app->GetBrowserList()->GetList())
-	{
-		if (IsChild(browser->GetHWND(), msg->hwnd))
-		{
-			return TranslateAccelerator(browser->GetHWND(),
-				app->GetAcceleratorManager()->GetAcceleratorTable(), msg);
-		}
-	}
-
-	return false;
 }

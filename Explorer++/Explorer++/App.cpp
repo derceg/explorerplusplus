@@ -35,13 +35,6 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 {
 	CHECK(m_richEditLib);
 
-	Initialize();
-}
-
-App::~App() = default;
-
-void App::Initialize()
-{
 	INITCOMMONCONTROLSEX commonControls = {};
 	commonControls.dwSize = sizeof(commonControls);
 	commonControls.dwICC = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES
@@ -50,21 +43,9 @@ void App::Initialize()
 	CHECK(res);
 
 	m_browserList.browserRemovedSignal.AddObserver(std::bind_front(&App::OnBrowserRemoved, this));
-
-	std::vector<WindowStorageData> windows;
-	LoadSettings(windows);
-
-	// This function may attempt to notify an existing process if the allowMultipleInstances config
-	// value is disabled. Therefore, this call needs to be made after the settings have been loaded.
-	// If the allowMultipleInstances setting is removed, this call can be made earlier.
-	if (!m_processManager.InitializeCurrentProcess(m_commandLineSettings, &m_config))
-	{
-		PostQuitMessage(EXIT_CODE_NORMAL_EXISTING_PROCESS);
-		return;
-	}
-
-	RestoreSession(windows);
 }
+
+App::~App() = default;
 
 void App::OnBrowserRemoved()
 {
@@ -73,6 +54,62 @@ void App::OnBrowserRemoved()
 		// The last top-level browser window has been closed, so exit the application.
 		PostQuitMessage(EXIT_CODE_NORMAL);
 	}
+}
+
+int App::Run()
+{
+	std::vector<WindowStorageData> windows;
+	LoadSettings(windows);
+
+	// This function may attempt to notify an existing process if the allowMultipleInstances config
+	// value is disabled. Therefore, this call needs to be made after the settings have been loaded.
+	// If the allowMultipleInstances setting is removed, this call can be made earlier.
+	if (!m_processManager.InitializeCurrentProcess(m_commandLineSettings, &m_config))
+	{
+		return EXIT_CODE_NORMAL_EXISTING_PROCESS;
+	}
+
+	RestoreSession(windows);
+
+	MSG msg;
+
+	while (GetMessage(&msg, nullptr, 0, 0) > 0)
+	{
+		if (!IsModelessDialogMessage(&msg) && !MaybeTranslateAccelerator(&msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+
+	return static_cast<int>(msg.wParam);
+}
+
+bool App::IsModelessDialogMessage(MSG *msg)
+{
+	for (auto modelessDialog : m_modelessDialogList.GetList())
+	{
+		if (IsChild(modelessDialog, msg->hwnd))
+		{
+			return IsDialogMessage(modelessDialog, msg);
+		}
+	}
+
+	return false;
+}
+
+bool App::MaybeTranslateAccelerator(MSG *msg)
+{
+	for (auto *browser : m_browserList.GetList())
+	{
+		if (IsChild(browser->GetHWND(), msg->hwnd))
+		{
+			return TranslateAccelerator(browser->GetHWND(),
+				m_acceleratorManager.GetAcceleratorTable(), msg);
+		}
+	}
+
+	return false;
 }
 
 void App::LoadSettings(std::vector<WindowStorageData> &windows)

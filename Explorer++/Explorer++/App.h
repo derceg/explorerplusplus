@@ -28,6 +28,8 @@ public:
 	App(const CommandLine::Settings *commandLineSettings);
 	~App();
 
+	int Run();
+
 	const CommandLine::Settings *GetCommandLineSettings() const;
 	bool GetSavePreferencesToXmlFile() const;
 	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
@@ -46,8 +48,9 @@ private:
 	// various components in the application.
 	static constexpr int MAX_CACHED_ICONS = 1000;
 
-	void Initialize();
 	void OnBrowserRemoved();
+	bool IsModelessDialogMessage(MSG *msg);
+	bool MaybeTranslateAccelerator(MSG *msg);
 	void LoadSettings(std::vector<WindowStorageData> &windows);
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
 
