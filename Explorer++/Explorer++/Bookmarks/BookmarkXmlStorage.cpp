@@ -25,8 +25,8 @@ void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentBookmarkItem);
 std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
-	int indent);
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkTree *bookmarkTree, int indent);
 void SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const BookmarkItem *bookmarkItem, const std::wstring &name, int indent);
 void SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
@@ -78,7 +78,7 @@ void Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
 	}
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, BookmarkTree *bookmarkTree,
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const BookmarkTree *bookmarkTree,
 	int indent)
 {
 	auto newline =
@@ -205,8 +205,8 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, Bookmark
 	return bookmarkItem;
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
-	int indent)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkTree *bookmarkTree, int indent)
 {
 	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksToolbarFolder(),
 		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME, indent);

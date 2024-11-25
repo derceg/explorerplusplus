@@ -12,6 +12,6 @@ namespace BookmarkRegistryStorage
 {
 
 void Load(HKEY applicationKey, BookmarkTree *bookmarkTree);
-void Save(HKEY applicationKey, BookmarkTree *bookmarkTree);
+void Save(HKEY applicationKey, const BookmarkTree *bookmarkTree);
 
 }

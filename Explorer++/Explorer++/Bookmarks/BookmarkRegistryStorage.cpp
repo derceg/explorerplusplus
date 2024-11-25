@@ -25,7 +25,7 @@ void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentBookmarkItem);
 std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
 
-void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
+void Save(HKEY parentKey, const BookmarkTree *bookmarkTree);
 void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
 	const std::wstring &name);
 void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
@@ -76,7 +76,7 @@ void Load(HKEY applicationKey, BookmarkTree *bookmarkTree)
 	}
 }
 
-void Save(HKEY applicationKey, BookmarkTree *bookmarkTree)
+void Save(HKEY applicationKey, const BookmarkTree *bookmarkTree)
 {
 	wil::unique_hkey bookmarksKey;
 	LSTATUS res = RegCreateKeyEx(applicationKey, V2::bookmarksKeyPath, 0, nullptr,
@@ -190,7 +190,7 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkT
 	return bookmarkItem;
 }
 
-void Save(HKEY parentKey, BookmarkTree *bookmarkTree)
+void Save(HKEY parentKey, const BookmarkTree *bookmarkTree)
 {
 	SavePermanentFolder(parentKey, bookmarkTree->GetBookmarksToolbarFolder(),
 		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME);
