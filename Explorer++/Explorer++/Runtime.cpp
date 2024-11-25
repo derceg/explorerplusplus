@@ -5,10 +5,10 @@
 #include "stdafx.h"
 #include "Runtime.h"
 
-Runtime::Runtime(std::unique_ptr<concurrencpp::executor> uiThreadExecutor,
-	std::unique_ptr<concurrencpp::executor> comStaExecutor) :
-	m_uiThreadExecutor(std::move(uiThreadExecutor)),
-	m_comStaExecutor(std::move(comStaExecutor)),
+Runtime::Runtime(std::shared_ptr<concurrencpp::executor> uiThreadExecutor,
+	std::shared_ptr<concurrencpp::executor> comStaExecutor) :
+	m_uiThreadExecutor(uiThreadExecutor),
+	m_comStaExecutor(comStaExecutor),
 	m_uiThreadId(UniqueThreadId::GetForCurrentThread())
 {
 }
@@ -19,14 +19,14 @@ Runtime::~Runtime()
 	m_comStaExecutor->shutdown();
 }
 
-concurrencpp::executor *Runtime::GetUiThreadExecutor() const
+std::shared_ptr<concurrencpp::executor> Runtime::GetUiThreadExecutor() const
 {
-	return m_uiThreadExecutor.get();
+	return m_uiThreadExecutor;
 }
 
-concurrencpp::executor *Runtime::GetComStaExecutor() const
+std::shared_ptr<concurrencpp::executor> Runtime::GetComStaExecutor() const
 {
-	return m_comStaExecutor.get();
+	return m_comStaExecutor;
 }
 
 bool Runtime::IsUiThread() const

@@ -5,8 +5,8 @@
 #include "pch.h"
 #include "ExecutorTestBase.h"
 
-ExecutorTestBase::ExecutorTestBase(std::unique_ptr<concurrencpp::executor> executor) :
-	m_executor(std::move(executor))
+ExecutorTestBase::ExecutorTestBase(std::shared_ptr<concurrencpp::executor> executor) :
+	m_executor(executor)
 {
 }
 

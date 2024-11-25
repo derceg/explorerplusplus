@@ -15,7 +15,7 @@ using namespace testing;
 class ComStaThreadPoolExecutorTest : public ExecutorTestBase
 {
 protected:
-	ComStaThreadPoolExecutorTest() : ExecutorTestBase(std::make_unique<ComStaThreadPoolExecutor>(1))
+	ComStaThreadPoolExecutorTest() : ExecutorTestBase(std::make_shared<ComStaThreadPoolExecutor>(1))
 	{
 	}
 
@@ -36,7 +36,7 @@ TEST_F(ComStaThreadPoolExecutorTest, QueueMessagesAndRunTasks)
 {
 	HWND hwnd = nullptr;
 
-	RunTaskOnExecutorForTest(m_executor.get(),
+	RunTaskOnExecutorForTest(m_executor,
 		[this, &hwnd]
 		{
 			// Note that this window isn't explicitly destroyed. That's because the test here is
@@ -60,14 +60,14 @@ TEST_F(ComStaThreadPoolExecutorTest, QueueMessagesAndRunTasks)
 
 	auto task = std::make_shared<MockFunction<void()>>();
 	EXPECT_CALL(*task, Call());
-	RunTaskOnExecutorForTest(m_executor.get(), [task] { task->Call(); });
+	RunTaskOnExecutorForTest(m_executor, [task] { task->Call(); });
 
 	QueueMessage(hwnd);
 }
 
 TEST_F(ComStaThreadPoolExecutorTest, CheckComInitialized)
 {
-	RunTaskOnExecutorForTest(m_executor.get(),
+	RunTaskOnExecutorForTest(m_executor,
 		[]
 		{
 			// COM should already have been initialized on this worker thread, with the

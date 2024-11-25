@@ -6,7 +6,8 @@
 #include "ExecutorTestHelper.h"
 #include <future>
 
-void RunTaskOnExecutorForTest(concurrencpp::executor *executor, std::function<void()> task)
+void RunTaskOnExecutorForTest(std::shared_ptr<concurrencpp::executor> executor,
+	std::function<void()> task)
 {
 	auto promise = std::make_shared<std::promise<void>>();
 

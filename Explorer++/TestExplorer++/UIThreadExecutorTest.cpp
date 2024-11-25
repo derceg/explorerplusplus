@@ -13,7 +13,7 @@ using namespace testing;
 class UIThreadExecutorTest : public ExecutorTestBase
 {
 protected:
-	UIThreadExecutorTest() : ExecutorTestBase(std::make_unique<UIThreadExecutor>())
+	UIThreadExecutorTest() : ExecutorTestBase(std::make_shared<UIThreadExecutor>())
 	{
 	}
 };

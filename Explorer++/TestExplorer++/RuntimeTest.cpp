@@ -11,15 +11,15 @@
 
 TEST(RuntimeTest, RetrievalMethods)
 {
-	auto uiThreadExecutor = std::make_unique<UIThreadExecutor>();
+	auto uiThreadExecutor = std::make_shared<UIThreadExecutor>();
 	auto rawUiThreadExecutor = uiThreadExecutor.get();
-	auto comStaExecutor = std::make_unique<ComStaThreadPoolExecutor>(1);
+	auto comStaExecutor = std::make_shared<ComStaThreadPoolExecutor>(1);
 	auto rawComStaExecutor = comStaExecutor.get();
 
 	Runtime runtime(std::move(uiThreadExecutor), std::move(comStaExecutor));
 
-	EXPECT_EQ(runtime.GetUiThreadExecutor(), rawUiThreadExecutor);
-	EXPECT_EQ(runtime.GetComStaExecutor(), rawComStaExecutor);
+	EXPECT_EQ(runtime.GetUiThreadExecutor().get(), rawUiThreadExecutor);
+	EXPECT_EQ(runtime.GetComStaExecutor().get(), rawComStaExecutor);
 	EXPECT_TRUE(runtime.IsUiThread());
 
 	RunTaskOnExecutorForTest(runtime.GetComStaExecutor(),

@@ -11,8 +11,8 @@
 class ExecutorTestBase : public testing::Test
 {
 protected:
-	ExecutorTestBase(std::unique_ptr<concurrencpp::executor> executor);
+	ExecutorTestBase(std::shared_ptr<concurrencpp::executor> executor);
 	~ExecutorTestBase();
 
-	std::unique_ptr<concurrencpp::executor> m_executor;
+	std::shared_ptr<concurrencpp::executor> m_executor;
 };

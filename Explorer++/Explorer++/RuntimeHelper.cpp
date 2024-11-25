@@ -13,10 +13,10 @@
 		co_return;
 	}
 
-	co_await concurrencpp::resume_on(*runtime->GetUiThreadExecutor());
+	co_await concurrencpp::resume_on(runtime->GetUiThreadExecutor());
 }
 
 [[nodiscard]] concurrencpp::lazy_result<void> ResumeOnComStaThread(const Runtime *runtime)
 {
-	co_await concurrencpp::resume_on(*runtime->GetComStaExecutor());
+	co_await concurrencpp::resume_on(runtime->GetComStaExecutor());
 }
