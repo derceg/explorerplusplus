@@ -4,12 +4,18 @@
 
 #include "stdafx.h"
 #include "BrowserList.h"
+#include "BrowserWindow.h"
 
 void BrowserList::AddBrowser(BrowserWindow *browser)
 {
 	// Browsers should only be added a single time.
 	auto [itr, didInsert] = m_browsers.insert(browser);
 	DCHECK(didInsert);
+
+	if (browser->IsActive())
+	{
+		SetLastActive(browser);
+	}
 
 	browserAddedSignal.m_signal();
 }

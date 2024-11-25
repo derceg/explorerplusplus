@@ -98,4 +98,9 @@ TEST_F(BrowserListTest, LastActive)
 
 	m_browserList.RemoveBrowser(&browser1);
 	EXPECT_EQ(m_browserList.GetLastActive(), &browser3);
+
+	BrowserWindowMock browser4;
+	EXPECT_CALL(browser4, IsActive()).WillOnce(Return(true));
+	m_browserList.AddBrowser(&browser4);
+	EXPECT_EQ(m_browserList.GetLastActive(), &browser4);
 }

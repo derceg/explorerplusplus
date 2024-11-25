@@ -51,6 +51,11 @@ public:
 		return { {}, WindowShowState::Normal };
 	}
 
+	bool IsActive() const override
+	{
+		return false;
+	}
+
 	void Activate() override
 	{
 	}

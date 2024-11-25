@@ -8,6 +8,7 @@
 #include "Application.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "BrowserTracker.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "GlobalHistoryMenu.h"
@@ -40,7 +41,6 @@ Explorerplusplus *Explorerplusplus::Create(App *app, const WindowStorageData *st
 Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageData) :
 	m_app(app),
 	m_hContainer(CreateMainWindow(storageData)),
-	m_browserTracker(app->GetBrowserList(), this),
 	m_commandController(this),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_pluginMenuManager(m_hContainer, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
@@ -78,6 +78,8 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 
 	ShowWindow(m_hContainer, ShowStateToNativeShowState(showState));
 	UpdateWindow(m_hContainer);
+
+	m_browserTracker = std::make_unique<BrowserTracker>(app->GetBrowserList(), this);
 }
 
 Explorerplusplus::~Explorerplusplus()
@@ -184,6 +186,11 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		NativeShowStateToShowState(placement.showCmd), tabContainer->GetStorageData(),
 		tabContainer->GetSelectedTabIndex(), GetMainRebarStorageInfo(),
 		m_mainToolbar->GetButtonsForStorage());
+}
+
+bool Explorerplusplus::IsActive() const
+{
+	return GetActiveWindow() == m_hContainer;
 }
 
 void Explorerplusplus::Activate()

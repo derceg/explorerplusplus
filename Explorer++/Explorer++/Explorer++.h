@@ -7,7 +7,6 @@
 #include "AcceleratorUpdater.h"
 #include "BrowserCommandController.h"
 #include "BrowserPane.h"
-#include "BrowserTracker.h"
 #include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
@@ -43,6 +42,7 @@ class AddressBar;
 class App;
 class BookmarksMainMenu;
 class BookmarksToolbar;
+class BrowserTracker;
 class CachedIcons;
 struct Config;
 class DisplayWindow;
@@ -115,6 +115,7 @@ public:
 
 	HWND GetHWND() const override;
 	WindowStorageData GetStorageData() const override;
+	bool IsActive() const override;
 	void Activate() override;
 
 private:
@@ -538,7 +539,7 @@ private:
 
 	App *const m_app;
 	HWND m_hContainer;
-	BrowserTracker m_browserTracker;
+	std::unique_ptr<BrowserTracker> m_browserTracker;
 
 	BrowserCommandController m_commandController;
 

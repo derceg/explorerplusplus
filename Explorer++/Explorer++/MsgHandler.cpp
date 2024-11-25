@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "AddressBar.h"
 #include "App.h"
+#include "BrowserTracker.h"
 #include "ColorRule.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
@@ -532,6 +533,8 @@ int Explorerplusplus::OnDestroy()
 	DCHECK(!m_browserClosing);
 	m_browserClosing = true;
 
+	m_browserTracker.reset();
+
 	// Broadcasting focus changed events when the browser is being closed is both unnecessary and
 	// unsafe. It's unsafe, because guarantees that are normally upheld during the lifetime of the
 	// browser window won't necessarily be upheld while the browser window is closing. For example,
@@ -998,6 +1001,8 @@ void Explorerplusplus::SaveAllSettings()
 		windows.push_back(browser->GetStorageData());
 	}
 
+	DCHECK_GE(windows.size(), 1u);
+
 	loadSave->SaveGenericSettings();
 	loadSave->SaveWindows(windows);
 	loadSave->SaveBookmarks();
@@ -1096,7 +1101,10 @@ void Explorerplusplus::FocusActiveTab()
 
 bool Explorerplusplus::OnActivate(int activationState, bool minimized)
 {
-	if (activationState != WA_INACTIVE && !minimized)
+	// This may be called while the window is being constructed, before it has been added to the
+	// browser list. In that case, the window won't be visible and there's no need to try and set it
+	// as the active browser.
+	if (IsWindowVisible(m_hContainer) && activationState != WA_INACTIVE && !minimized)
 	{
 		m_app->GetBrowserList()->SetLastActive(this);
 	}
