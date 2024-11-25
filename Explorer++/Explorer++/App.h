@@ -49,10 +49,11 @@ private:
 	static constexpr int MAX_CACHED_ICONS = 1000;
 
 	void OnBrowserRemoved();
-	bool IsModelessDialogMessage(MSG *msg);
-	bool MaybeTranslateAccelerator(MSG *msg);
+	void SetUpSession();
 	void LoadSettings(std::vector<WindowStorageData> &windows);
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
+	bool IsModelessDialogMessage(MSG *msg);
+	bool MaybeTranslateAccelerator(MSG *msg);
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	bool m_savePreferencesToXmlFile = false;

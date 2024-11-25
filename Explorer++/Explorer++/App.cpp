@@ -58,18 +58,7 @@ void App::OnBrowserRemoved()
 
 int App::Run()
 {
-	std::vector<WindowStorageData> windows;
-	LoadSettings(windows);
-
-	// This function may attempt to notify an existing process if the allowMultipleInstances config
-	// value is disabled. Therefore, this call needs to be made after the settings have been loaded.
-	// If the allowMultipleInstances setting is removed, this call can be made earlier.
-	if (!m_processManager.InitializeCurrentProcess(m_commandLineSettings, &m_config))
-	{
-		return EXIT_CODE_NORMAL_EXISTING_PROCESS;
-	}
-
-	RestoreSession(windows);
+	SetUpSession();
 
 	MSG msg;
 
@@ -85,31 +74,21 @@ int App::Run()
 	return static_cast<int>(msg.wParam);
 }
 
-bool App::IsModelessDialogMessage(MSG *msg)
+void App::SetUpSession()
 {
-	for (auto modelessDialog : m_modelessDialogList.GetList())
+	std::vector<WindowStorageData> windows;
+	LoadSettings(windows);
+
+	// This function may attempt to notify an existing process if the allowMultipleInstances config
+	// value is disabled. Therefore, this call needs to be made after the settings have been loaded.
+	// If the allowMultipleInstances setting is removed, this call can be made earlier.
+	if (!m_processManager.InitializeCurrentProcess(m_commandLineSettings, &m_config))
 	{
-		if (IsChild(modelessDialog, msg->hwnd))
-		{
-			return IsDialogMessage(modelessDialog, msg);
-		}
+		PostQuitMessage(EXIT_CODE_NORMAL_EXISTING_PROCESS);
+		return;
 	}
 
-	return false;
-}
-
-bool App::MaybeTranslateAccelerator(MSG *msg)
-{
-	for (auto *browser : m_browserList.GetList())
-	{
-		if (IsChild(browser->GetHWND(), msg->hwnd))
-		{
-			return TranslateAccelerator(browser->GetHWND(),
-				m_acceleratorManager.GetAcceleratorTable(), msg);
-		}
-	}
-
-	return false;
+	RestoreSession(windows);
 }
 
 void App::LoadSettings(std::vector<WindowStorageData> &windows)
@@ -157,6 +136,33 @@ void App::RestoreSession(const std::vector<WindowStorageData> &windows)
 		// No windows were loaded from the previous session, so create the default window.
 		Explorerplusplus::Create(this);
 	}
+}
+
+bool App::IsModelessDialogMessage(MSG *msg)
+{
+	for (auto modelessDialog : m_modelessDialogList.GetList())
+	{
+		if (IsChild(modelessDialog, msg->hwnd))
+		{
+			return IsDialogMessage(modelessDialog, msg);
+		}
+	}
+
+	return false;
+}
+
+bool App::MaybeTranslateAccelerator(MSG *msg)
+{
+	for (auto *browser : m_browserList.GetList())
+	{
+		if (IsChild(browser->GetHWND(), msg->hwnd))
+		{
+			return TranslateAccelerator(browser->GetHWND(),
+				m_acceleratorManager.GetAcceleratorTable(), msg);
+		}
+	}
+
+	return false;
 }
 
 const CommandLine::Settings *App::GetCommandLineSettings() const
