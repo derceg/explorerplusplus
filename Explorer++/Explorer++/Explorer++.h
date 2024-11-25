@@ -383,7 +383,7 @@ private:
 	void OnCustomizeMainToolbar();
 
 	/* Settings. */
-	void SaveAllSettings() override;
+	void SaveAllSettings();
 	void ApplyDisplayWindowPosition();
 
 	/* Window state update. */

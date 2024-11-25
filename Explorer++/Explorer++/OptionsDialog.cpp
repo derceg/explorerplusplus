@@ -385,8 +385,6 @@ void OptionsDialog::OnApply()
 		page->SaveSettings();
 	}
 
-	m_coreInterface->SaveAllSettings();
-
 	EnableWindow(GetDlgItem(m_hDlg, IDAPPLY), false);
 }
 
