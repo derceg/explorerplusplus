@@ -18,6 +18,9 @@ class BrowserWindow;
 class BrowserList
 {
 public:
+	// Note that the browser window should be in a fully constructed state when passed to both of
+	// these functions. That is, AddBrowser() shouldn't be called until the window is completely
+	// constructed and RemoveBrowser() should be called before the window destruction begins.
 	void AddBrowser(BrowserWindow *browser);
 	void RemoveBrowser(BrowserWindow *browser);
 
@@ -29,7 +32,8 @@ public:
 
 	// Signals
 	SignalWrapper<BrowserList, void(BrowserWindow *browser)> browserAddedSignal;
-	SignalWrapper<BrowserList, void()> browserRemovedSignal;
+	SignalWrapper<BrowserList, void(BrowserWindow *browser)> willRemoveBrowserSignal;
+	SignalWrapper<BrowserList, void(BrowserWindow *browser)> browserRemovedSignal;
 
 private:
 	class BrowserData

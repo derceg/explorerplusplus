@@ -22,10 +22,12 @@ void BrowserList::AddBrowser(BrowserWindow *browser)
 
 void BrowserList::RemoveBrowser(BrowserWindow *browser)
 {
+	willRemoveBrowserSignal.m_signal(browser);
+
 	auto numRemoved = m_browsers.erase(browser);
 	DCHECK_EQ(numRemoved, 1u);
 
-	browserRemovedSignal.m_signal();
+	browserRemovedSignal.m_signal(browser);
 }
 
 concurrencpp::generator<BrowserWindow *> BrowserList::GetList() const

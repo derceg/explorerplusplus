@@ -46,7 +46,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	BOOL res = InitCommonControlsEx(&commonControls);
 	CHECK(res);
 
-	m_browserList.browserRemovedSignal.AddObserver(std::bind_front(&App::OnBrowserRemoved, this));
+	m_browserList.browserRemovedSignal.AddObserver(std::bind(&App::OnBrowserRemoved, this));
 }
 
 App::~App() = default;
