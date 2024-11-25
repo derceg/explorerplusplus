@@ -60,6 +60,14 @@ public:
 	{
 	}
 
+	void TryClose() override
+	{
+	}
+
+	void Close() override
+	{
+	}
+
 	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override
 	{
 		UNREFERENCED_PARAMETER(openFolderDisposition);

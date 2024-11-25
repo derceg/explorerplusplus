@@ -233,7 +233,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		return 0;
 
 	case WM_APP_CLOSE:
-		RequestCloseApplication();
+		TryClose();
 		break;
 
 	case WM_DESTROY:
@@ -376,7 +376,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILE_EXIT:
-		RequestCloseApplication();
+		m_app->TryExit();
 		break;
 
 	case IDM_EDIT_UNDO:

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "TabContainer.h"
 #include "Bookmarks/BookmarkHelper.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "Icon.h"
@@ -49,20 +50,21 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 // clang-format on
 
-TabContainer *TabContainer::Create(HWND parent, ShellBrowserEmbedder *embedder,
-	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, const Config *config)
+TabContainer *TabContainer::Create(HWND parent, BrowserWindow *browser,
+	ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation, App *app,
+	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, const Config *config)
 {
-	return new TabContainer(parent, embedder, tabNavigation, app, coreInterface, fileActionHandler,
-		cachedIcons, bookmarkTree, resourceInstance, config);
+	return new TabContainer(parent, browser, embedder, tabNavigation, app, coreInterface,
+		fileActionHandler, cachedIcons, bookmarkTree, resourceInstance, config);
 }
 
-TabContainer::TabContainer(HWND parent, ShellBrowserEmbedder *embedder,
+TabContainer::TabContainer(HWND parent, BrowserWindow *browser, ShellBrowserEmbedder *embedder,
 	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 	HINSTANCE resourceInstance, const Config *config) :
 	ShellDropTargetWindow(CreateTabControl(parent)),
+	m_browser(browser),
 	m_embedder(embedder),
 	m_tabNavigation(tabNavigation),
 	m_app(app),
@@ -1049,7 +1051,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 	{
 		if (m_config->closeMainWindowOnTabClose)
 		{
-			m_coreInterface->RequestCloseApplication();
+			m_browser->Close();
 			return true;
 		}
 		else

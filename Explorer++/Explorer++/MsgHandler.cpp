@@ -549,6 +549,16 @@ int Explorerplusplus::OnDestroy()
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);
 	}
 
+	// It's important that the plugins are destroyed before the main window is destroyed and before
+	// this class is destroyed.
+	// The first reason is that the API binding classes may interact with the UI on destruction
+	// (e.g. to remove menu entries they've added).
+	// The second reason is that the API bindings assume they can use the objects passed to them
+	// until their destruction. Those objects are destroyed automatically when this class is
+	// destroyed, so letting the plugins be destroyed automatically could result in objects being
+	// destroyed in the wrong order.
+	m_pluginManager.reset();
+
 	// This class depends on the TabContainer instance and needs to be destroyed before the
 	// TabContainer instance is destroyed.
 	m_taskbarThumbnails.reset();
@@ -556,39 +566,6 @@ int Explorerplusplus::OnDestroy()
 	delete m_pStatusBar;
 
 	return 0;
-}
-
-void Explorerplusplus::RequestCloseApplication()
-{
-	if (m_config->confirmCloseTabs && (GetActivePane()->GetTabContainer()->GetNumTabs() > 1))
-	{
-		std::wstring message =
-			ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_CLOSE_ALL_TABS);
-		int response = MessageBox(m_hContainer, message.c_str(), NExplorerplusplus::APP_NAME,
-			MB_ICONINFORMATION | MB_YESNO);
-
-		if (response == IDNO)
-		{
-			return;
-		}
-	}
-
-	// It's important that the plugins are destroyed before the main
-	// window is destroyed and before this class is destroyed.
-	// The first because the API binding classes may interact with the
-	// UI on destruction (e.g. to remove menu entries they've added).
-	// The second because the API bindings assume they can use the
-	// objects passed to them until their destruction. Those objects are
-	// destroyed automatically when this class is destroyed, so letting
-	// the plugins be destroyed automatically could result in objects
-	// being destroyed in the wrong order.
-	m_pluginManager.reset();
-
-	KillTimer(m_hContainer, AUTOSAVE_TIMER_ID);
-
-	SaveAllSettings();
-
-	DestroyWindow(m_hContainer);
 }
 
 void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)

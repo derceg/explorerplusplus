@@ -43,6 +43,8 @@ public:
 	ColorRuleModel *GetColorRuleModel() const;
 	Applications::ApplicationModel *GetApplicationModel();
 
+	void TryExit();
+
 private:
 	// Represents the maximum number of icons that can be cached. This cache is shared between
 	// various components in the application.
@@ -54,6 +56,9 @@ private:
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
 	bool IsModelessDialogMessage(MSG *msg);
 	bool MaybeTranslateAccelerator(MSG *msg);
+
+	bool ConfirmExit();
+	void Exit();
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	bool m_savePreferencesToXmlFile = false;

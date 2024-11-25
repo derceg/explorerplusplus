@@ -24,6 +24,7 @@ public:
 	concurrencpp::generator<BrowserWindow *> GetList() const;
 	BrowserWindow *GetLastActive() const;
 	void SetLastActive(BrowserWindow *browser);
+	size_t GetSize() const;
 	bool IsEmpty() const;
 
 	// Signals

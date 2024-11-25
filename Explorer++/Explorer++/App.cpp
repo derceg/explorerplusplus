@@ -12,13 +12,17 @@
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
 #include "MainRebarStorage.h"
+#include "MainResource.h"
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
+#include "ResourceManager.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include "XmlAppStorage.h"
 #include "XmlAppStorageFactory.h"
 #include "../Helper/Helper.h"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 #include <ranges>
 
 App::App(const CommandLine::Settings *commandLineSettings) :
@@ -223,4 +227,61 @@ ColorRuleModel *App::GetColorRuleModel() const
 Applications::ApplicationModel *App::GetApplicationModel()
 {
 	return &m_applicationModel;
+}
+
+void App::TryExit()
+{
+	if (!ConfirmExit())
+	{
+		return;
+	}
+
+	Exit();
+}
+
+bool App::ConfirmExit()
+{
+	if (!m_config.confirmCloseTabs)
+	{
+		return true;
+	}
+
+	auto numWindows = m_browserList.GetSize();
+
+	if (numWindows == 1)
+	{
+		return true;
+	}
+
+	auto *browser = m_browserList.GetLastActive();
+	CHECK(browser);
+
+	std::wstring message = fmt::format(fmt::runtime(Resources::LoadString(IDS_CLOSE_ALL_WINDOWS)),
+		fmt::arg(L"num_windows", numWindows));
+	int response = MessageBox(browser->GetHWND(), message.c_str(), NExplorerplusplus::APP_NAME,
+		MB_ICONINFORMATION | MB_YESNO);
+
+	if (response == IDNO)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void App::Exit()
+{
+	std::vector<BrowserWindow *> browsers;
+
+	// Closing a browser window will alter the list of browsers, which is why the list is copied
+	// here.
+	for (auto *browser : m_browserList.GetList())
+	{
+		browsers.push_back(browser);
+	}
+
+	for (auto *browser : browsers)
+	{
+		browser->Close();
+	}
 }

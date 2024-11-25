@@ -104,3 +104,22 @@ TEST_F(BrowserListTest, LastActive)
 	m_browserList.AddBrowser(&browser4);
 	EXPECT_EQ(m_browserList.GetLastActive(), &browser4);
 }
+
+TEST_F(BrowserListTest, GetSize)
+{
+	EXPECT_EQ(m_browserList.GetSize(), 0u);
+
+	BrowserWindowMock browser1;
+	m_browserList.AddBrowser(&browser1);
+	EXPECT_EQ(m_browserList.GetSize(), 1u);
+
+	BrowserWindowMock browser2;
+	m_browserList.AddBrowser(&browser2);
+	EXPECT_EQ(m_browserList.GetSize(), 2u);
+
+	m_browserList.RemoveBrowser(&browser2);
+	EXPECT_EQ(m_browserList.GetSize(), 1u);
+
+	m_browserList.RemoveBrowser(&browser1);
+	EXPECT_EQ(m_browserList.GetSize(), 0u);
+}

@@ -25,4 +25,6 @@ public:
 	virtual WindowStorageData GetStorageData() const = 0;
 	virtual bool IsActive() const = 0;
 	virtual void Activate() = 0;
+	virtual void TryClose() = 0;
+	virtual void Close() = 0;
 };

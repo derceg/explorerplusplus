@@ -25,7 +25,7 @@ void Explorerplusplus::InitializeTabs()
 	CreateTabBacking();
 
 	auto *tabContainer =
-		TabContainer::Create(m_hTabBacking, this, this, m_app, this, &m_FileActionHandler,
+		TabContainer::Create(m_hTabBacking, this, this, this, m_app, this, &m_FileActionHandler,
 			m_app->GetCachedIcons(), m_app->GetBookmarkTree(), m_resourceInstance, m_config);
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
 

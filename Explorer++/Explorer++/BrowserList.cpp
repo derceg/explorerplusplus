@@ -60,6 +60,11 @@ void BrowserList::SetLastActive(BrowserWindow *browser)
 	m_browsers.modify(itr, [](auto &browserData) { browserData.UpdateLastActiveTime(); });
 }
 
+size_t BrowserList::GetSize() const
+{
+	return m_browsers.size();
+}
+
 bool BrowserList::IsEmpty() const
 {
 	return m_browsers.empty();

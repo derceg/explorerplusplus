@@ -110,8 +110,6 @@ public:
 	// Used to support the options dialog.
 	virtual void SaveAllSettings() = 0;
 
-	virtual void RequestCloseApplication() = 0;
-
 	virtual boost::signals2::connection AddTabsInitializedObserver(
 		const TabsInitializedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddApplicationInitializatedObserver(

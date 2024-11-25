@@ -20,6 +20,7 @@
 #include "MainToolbar.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowserHistoryHelper.h"
 #include "TabRestorer.h"
@@ -32,6 +33,8 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 Explorerplusplus *Explorerplusplus::Create(App *app, const WindowStorageData *storageData)
 {
@@ -196,6 +199,52 @@ bool Explorerplusplus::IsActive() const
 void Explorerplusplus::Activate()
 {
 	BringWindowToForeground(m_hContainer);
+}
+
+void Explorerplusplus::TryClose()
+{
+	if (!ConfirmClose())
+	{
+		return;
+	}
+
+	Close();
+}
+
+bool Explorerplusplus::ConfirmClose()
+{
+	if (!m_config->confirmCloseTabs)
+	{
+		return true;
+	}
+
+	auto numTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
+
+	if (numTabs == 1)
+	{
+		return true;
+	}
+
+	std::wstring message = fmt::format(
+		fmt::runtime(ResourceHelper::LoadString(m_resourceInstance, IDS_CLOSE_ALL_TABS)),
+		fmt::arg(L"num_tabs", numTabs));
+	int response = MessageBox(m_hContainer, message.c_str(), NExplorerplusplus::APP_NAME,
+		MB_ICONINFORMATION | MB_YESNO);
+
+	if (response == IDNO)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void Explorerplusplus::Close()
+{
+	KillTimer(m_hContainer, AUTOSAVE_TIMER_ID);
+	SaveAllSettings();
+
+	DestroyWindow(m_hContainer);
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

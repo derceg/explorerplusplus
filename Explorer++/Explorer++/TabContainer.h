@@ -24,6 +24,7 @@
 
 class App;
 class BookmarkTree;
+class BrowserWindow;
 class CachedIcons;
 struct Config;
 class CoreInterface;
@@ -82,7 +83,7 @@ struct TabSettings : TabSettingsImpl
 class TabContainer : public ShellDropTargetWindow<int>
 {
 public:
-	static TabContainer *Create(HWND parent, ShellBrowserEmbedder *embedder,
+	static TabContainer *Create(HWND parent, BrowserWindow *browser, ShellBrowserEmbedder *embedder,
 		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE resourceInstance, const Config *config);
@@ -171,10 +172,10 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainer(HWND parent, ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation,
-		App *app, CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		const Config *config);
+	TabContainer(HWND parent, BrowserWindow *browser, ShellBrowserEmbedder *embedder,
+		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		HINSTANCE resourceInstance, const Config *config);
 
 	static HWND CreateTabControl(HWND parent);
 
@@ -247,6 +248,7 @@ private:
 
 	void OnFontUpdated();
 
+	BrowserWindow *const m_browser;
 	ShellBrowserEmbedder *m_embedder = nullptr;
 	TabNavigationInterface *m_tabNavigation;
 	App *const m_app;

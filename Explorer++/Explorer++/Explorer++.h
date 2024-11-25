@@ -117,6 +117,8 @@ public:
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;
+	void TryClose() override;
+	void Close() override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -224,7 +226,6 @@ private:
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	void OnSettingChange(const WCHAR *systemParameter);
-	void RequestCloseApplication() override;
 	int OnDestroy();
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnFocusNextWindow(FocusChangeDirection direction);
@@ -536,6 +537,8 @@ private:
 		LPVOID pData);
 	void FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
 		PULARGE_INTEGER lTotalFolderSize);
+
+	bool ConfirmClose();
 
 	App *const m_app;
 	HWND m_hContainer;
