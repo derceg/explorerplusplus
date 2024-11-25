@@ -19,10 +19,12 @@ public:
 
 	std::shared_ptr<concurrencpp::executor> GetUiThreadExecutor() const;
 	std::shared_ptr<concurrencpp::executor> GetComStaExecutor() const;
+	std::shared_ptr<concurrencpp::timer_queue> GetTimerQueue() const;
 	bool IsUiThread() const;
 
 private:
 	const std::shared_ptr<concurrencpp::executor> m_uiThreadExecutor;
 	const std::shared_ptr<concurrencpp::executor> m_comStaExecutor;
+	const std::shared_ptr<concurrencpp::timer_queue> m_timerQueue;
 	const UniqueThreadId m_uiThreadId;
 };
