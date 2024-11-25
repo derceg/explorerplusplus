@@ -48,13 +48,15 @@ TEST_F(BrowserListTest, AddRemoveBrowser)
 
 TEST_F(BrowserListTest, AddedSignal)
 {
-	MockFunction<void()> callback;
+	MockFunction<void(BrowserWindow *)> callback;
 	m_browserList.browserAddedSignal.AddObserver(callback.AsStdFunction());
 
-	EXPECT_CALL(callback, Call()).Times(2);
 	BrowserWindowMock browser1;
-	BrowserWindowMock browser2;
+	EXPECT_CALL(callback, Call(&browser1));
 	m_browserList.AddBrowser(&browser1);
+
+	BrowserWindowMock browser2;
+	EXPECT_CALL(callback, Call(&browser2));
 	m_browserList.AddBrowser(&browser2);
 }
 

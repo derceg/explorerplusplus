@@ -28,7 +28,7 @@ public:
 	bool IsEmpty() const;
 
 	// Signals
-	SignalWrapper<BrowserList, void()> browserAddedSignal;
+	SignalWrapper<BrowserList, void(BrowserWindow *browser)> browserAddedSignal;
 	SignalWrapper<BrowserList, void()> browserRemovedSignal;
 
 private:

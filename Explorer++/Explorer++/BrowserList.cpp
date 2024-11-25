@@ -17,7 +17,7 @@ void BrowserList::AddBrowser(BrowserWindow *browser)
 		SetLastActive(browser);
 	}
 
-	browserAddedSignal.m_signal();
+	browserAddedSignal.m_signal(browser);
 }
 
 void BrowserList::RemoveBrowser(BrowserWindow *browser)
