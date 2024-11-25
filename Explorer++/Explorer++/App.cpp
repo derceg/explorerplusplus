@@ -5,9 +5,11 @@
 #include "stdafx.h"
 #include "App.h"
 #include "Explorer++.h"
+#include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
 #include "ColumnStorage.h"
+#include "ComStaThreadPoolExecutor.h"
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
@@ -17,6 +19,7 @@
 #include "RegistryAppStorageFactory.h"
 #include "ResourceManager.h"
 #include "TabStorage.h"
+#include "UIThreadExecutor.h"
 #include "WindowStorage.h"
 #include "XmlAppStorage.h"
 #include "XmlAppStorageFactory.h"
@@ -25,8 +28,11 @@
 #include <fmt/xchar.h>
 #include <ranges>
 
+using namespace std::chrono_literals;
+
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
+	m_runtime(std::make_unique<UIThreadExecutor>(), std::make_unique<ComStaThreadPoolExecutor>(1)),
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(MAX_CACHED_ICONS),
@@ -46,6 +52,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	BOOL res = InitCommonControlsEx(&commonControls);
 	CHECK(res);
 
+	m_browserList.willRemoveBrowserSignal.AddObserver(std::bind(&App::OnWillRemoveBrowser, this));
 	m_browserList.browserRemovedSignal.AddObserver(std::bind(&App::OnBrowserRemoved, this));
 }
 
@@ -63,6 +70,10 @@ void App::OnBrowserRemoved()
 int App::Run()
 {
 	SetUpSession();
+
+	const auto saveFrequency = 30s;
+	m_saveSettingsTimer = m_runtime.GetTimerQueue()->make_timer(saveFrequency, saveFrequency,
+		m_runtime.GetUiThreadExecutor(), std::bind_front(&App::SaveSettings, this));
 
 	MSG msg;
 
@@ -102,13 +113,15 @@ void App::LoadSettings(std::vector<WindowStorageData> &windows)
 
 	if (loadSettingsFromXML)
 	{
-		appStorage = XmlAppStorageFactory::MaybeCreate();
+		appStorage = XmlAppStorageFactory::MaybeCreate(Storage::GetConfigFilePath(),
+			Storage::OperationType::Load);
 
 		m_savePreferencesToXmlFile = true;
 	}
 	else
 	{
-		appStorage = RegistryAppStorageFactory::MaybeCreate();
+		appStorage = RegistryAppStorageFactory::MaybeCreate(Storage::REGISTRY_APPLICATION_KEY_PATH,
+			Storage::OperationType::Load);
 	}
 
 	if (!appStorage)
@@ -125,6 +138,51 @@ void App::LoadSettings(std::vector<WindowStorageData> &windows)
 	appStorage->LoadDefaultColumns(m_config.globalFolderSettings.folderColumns);
 
 	ValidateColumns(m_config.globalFolderSettings.folderColumns);
+}
+
+void App::SaveSettings()
+{
+	// If the application has started exiting, it's not possible to save the settings, so that's not
+	// something that should be attempted. That's because one or more of the windows may have
+	// already been closed.
+	CHECK(!m_exitStarted);
+
+	std::unique_ptr<AppStorage> appStorage;
+
+	if (m_savePreferencesToXmlFile)
+	{
+		appStorage = XmlAppStorageFactory::MaybeCreate(Storage::GetConfigFilePath(),
+			Storage::OperationType::Save);
+	}
+	else
+	{
+		appStorage = RegistryAppStorageFactory::MaybeCreate(Storage::REGISTRY_APPLICATION_KEY_PATH,
+			Storage::OperationType::Save);
+	}
+
+	if (!appStorage)
+	{
+		return;
+	}
+
+	std::vector<WindowStorageData> windows;
+
+	for (const auto *browser : m_browserList.GetList())
+	{
+		windows.push_back(browser->GetStorageData());
+	}
+
+	DCHECK_GE(windows.size(), 1u);
+
+	appStorage->SaveConfig(m_config);
+	appStorage->SaveWindows(windows);
+	appStorage->SaveBookmarks(&m_bookmarkTree);
+	appStorage->SaveColorRules(m_colorRuleModel.get());
+	appStorage->SaveApplications(&m_applicationModel);
+	appStorage->SaveDialogStates();
+	appStorage->SaveDefaultColumns(m_config.globalFolderSettings.folderColumns);
+
+	appStorage->Commit();
 }
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
@@ -229,6 +287,18 @@ Applications::ApplicationModel *App::GetApplicationModel()
 	return &m_applicationModel;
 }
 
+void App::OnWillRemoveBrowser()
+{
+	if (m_browserList.GetSize() == 1 && !m_exitStarted)
+	{
+		// The last browser window is about to be closed, which indicates that the application is
+		// going to exit. Note that the exit may have already started (e.g. if there were multiple
+		// windows open and the user selected the "Exit" menu item). In that case, this branch won't
+		// be taken.
+		OnExitStarted();
+	}
+}
+
 void App::TryExit()
 {
 	if (!ConfirmExit())
@@ -271,6 +341,14 @@ bool App::ConfirmExit()
 
 void App::Exit()
 {
+	if (m_exitStarted)
+	{
+		DCHECK(false);
+		return;
+	}
+
+	OnExitStarted();
+
 	std::vector<BrowserWindow *> browsers;
 
 	// Closing a browser window will alter the list of browsers, which is why the list is copied
@@ -284,4 +362,16 @@ void App::Exit()
 	{
 		browser->Close();
 	}
+}
+
+void App::OnExitStarted()
+{
+	CHECK(!m_exitStarted);
+
+	// The application is going to exit, so the settings need to be saved before the shutdown
+	// begins.
+	m_saveSettingsTimer.cancel();
+	SaveSettings();
+
+	m_exitStarted = true;
 }

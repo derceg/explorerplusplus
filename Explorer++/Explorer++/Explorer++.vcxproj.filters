@@ -226,12 +226,6 @@
     <ClCompile Include="StatusBar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="LoadSaveRegistry.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="LoadSaveXml.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -760,6 +754,9 @@
     <ClCompile Include="TestHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Storage.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -934,15 +931,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeHelper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="LoadSaveInterface.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="LoadSaveRegistry.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="LoadSaveXml.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="CoreInterface.h">

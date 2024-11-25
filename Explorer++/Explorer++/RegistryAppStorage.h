@@ -22,6 +22,15 @@ public:
 	void LoadDialogStates() override;
 	void LoadDefaultColumns(FolderColumns &defaultColumns) override;
 
+	void SaveConfig(const Config &config) override;
+	void SaveWindows(const std::vector<WindowStorageData> &windows) override;
+	void SaveBookmarks(const BookmarkTree *bookmarkTree) override;
+	void SaveColorRules(const ColorRuleModel *model) override;
+	void SaveApplications(const Applications::ApplicationModel *model) override;
+	void SaveDialogStates() override;
+	void SaveDefaultColumns(const FolderColumns &defaultColumns) override;
+	void Commit() override;
+
 private:
 	const wil::unique_hkey m_applicationKey;
 };

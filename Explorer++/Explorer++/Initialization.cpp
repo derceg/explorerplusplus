@@ -10,7 +10,6 @@
 #include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
-#include "LoadSaveInterface.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MainWindow.h"
@@ -88,8 +87,6 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	InitializePlugins();
 
 	m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(m_hContainer);
-
-	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
 	m_applicationInitialized = true;
 	m_applicationInitializedSignal();

@@ -4,13 +4,24 @@
 
 #include "stdafx.h"
 #include "XmlAppStorageFactory.h"
-#include "Storage.h"
 #include "XmlAppStorage.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
 
-std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::MaybeCreate()
+std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::MaybeCreate(const std::wstring &configFilePath,
+	Storage::OperationType operationType)
+{
+	if (operationType == Storage::OperationType::Load)
+	{
+		return BuildForLoad(configFilePath);
+	}
+	else
+	{
+		return BuildForSave(configFilePath);
+	}
+}
+
+std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::BuildForLoad(
+	const std::wstring &configFilePath)
 {
 	auto xmlDocument = XMLSettings::CreateXmlDocument();
 
@@ -18,13 +29,6 @@ std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::MaybeCreate()
 	{
 		return nullptr;
 	}
-
-	wchar_t currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath,
-		SIZEOF_ARRAY(currentProcessPath));
-
-	std::filesystem::path configFilePath(currentProcessPath);
-	configFilePath.replace_filename(Storage::CONFIG_FILE_FILENAME);
 
 	auto configFilePathVariant = wil::make_variant_bstr_failfast(configFilePath.c_str());
 	VARIANT_BOOL status;
@@ -44,5 +48,55 @@ std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::MaybeCreate()
 		return nullptr;
 	}
 
-	return std::make_unique<XmlAppStorage>(xmlDocument, rootNode);
+	return std::make_unique<XmlAppStorage>(xmlDocument, rootNode, configFilePath,
+		Storage::OperationType::Load);
+}
+
+std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::BuildForSave(
+	const std::wstring &configFilePath)
+{
+	auto xmlDocument = XMLSettings::CreateXmlDocument();
+
+	if (!xmlDocument)
+	{
+		return nullptr;
+	}
+
+	auto tag = wil::make_bstr_failfast(L"xml");
+	auto attribute = wil::make_bstr_failfast(L"version='1.0'");
+	wil::com_ptr_nothrow<IXMLDOMProcessingInstruction> processingInstruction;
+	HRESULT hr = xmlDocument->createProcessingInstruction(tag.get(), attribute.get(),
+		&processingInstruction);
+
+	if (hr != S_OK)
+	{
+		return nullptr;
+	}
+
+	XMLSettings::AppendChildToParent(processingInstruction.get(), xmlDocument.get());
+
+	wil::com_ptr_nothrow<IXMLDOMComment> comment;
+	auto commentText = wil::make_bstr_failfast(L" Preference file for Explorer++ ");
+	hr = xmlDocument->createComment(commentText.get(), &comment);
+
+	if (hr != S_OK)
+	{
+		return nullptr;
+	}
+
+	XMLSettings::AppendChildToParent(comment.get(), xmlDocument.get());
+
+	auto rootTag = wil::make_bstr_nothrow(Storage::CONFIG_FILE_ROOT_NODE_NAME);
+	wil::com_ptr_nothrow<IXMLDOMElement> rootNode;
+	hr = xmlDocument->createElement(rootTag.get(), &rootNode);
+
+	if (hr != S_OK)
+	{
+		return nullptr;
+	}
+
+	XMLSettings::AppendChildToParent(rootNode.get(), xmlDocument.get());
+
+	return std::make_unique<XmlAppStorage>(xmlDocument, rootNode, configFilePath,
+		Storage::OperationType::Save);
 }

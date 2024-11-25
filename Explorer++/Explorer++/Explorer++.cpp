@@ -241,8 +241,7 @@ bool Explorerplusplus::ConfirmClose()
 
 void Explorerplusplus::Close()
 {
-	KillTimer(m_hContainer, AUTOSAVE_TIMER_ID);
-	SaveAllSettings();
+	m_browserTracker.reset();
 
 	DestroyWindow(m_hContainer);
 }

@@ -13,8 +13,6 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
-#include "LoadSaveRegistry.h"
-#include "LoadSaveXml.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
@@ -533,8 +531,6 @@ int Explorerplusplus::OnDestroy()
 	DCHECK(!m_browserClosing);
 	m_browserClosing = true;
 
-	m_browserTracker.reset();
-
 	// Broadcasting focus changed events when the browser is being closed is both unnecessary and
 	// unsafe. It's unsafe, because guarantees that are normally upheld during the lifetime of the
 	// browser window won't necessarily be upheld while the browser window is closing. For example,
@@ -956,37 +952,6 @@ void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->SetGroupSortDirection(direction);
-}
-
-void Explorerplusplus::SaveAllSettings()
-{
-	std::unique_ptr<ILoadSave> loadSave;
-
-	if (m_app->GetSavePreferencesToXmlFile())
-	{
-		loadSave = std::make_unique<LoadSaveXML>(m_app, this);
-	}
-	else
-	{
-		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this);
-	}
-
-	std::vector<WindowStorageData> windows;
-
-	for (const auto *browser : m_app->GetBrowserList()->GetList())
-	{
-		windows.push_back(browser->GetStorageData());
-	}
-
-	DCHECK_GE(windows.size(), 1u);
-
-	loadSave->SaveGenericSettings();
-	loadSave->SaveWindows(windows);
-	loadSave->SaveBookmarks();
-	loadSave->SaveDefaultColumns();
-	loadSave->SaveApplicationToolbar();
-	loadSave->SaveColorRules();
-	loadSave->SaveDialogStates();
 }
 
 const Config *Explorerplusplus::GetConfig() const

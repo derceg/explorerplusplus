@@ -168,7 +168,7 @@ void LoadDialogStatesFromXML(IXMLDOMDocument *xmlDocument)
 	}
 }
 
-void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode)
+void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode)
 {
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	XMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), rootNode);

@@ -90,11 +90,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		break;
 
 	case WM_TIMER:
-		if (wParam == AUTOSAVE_TIMER_ID)
-		{
-			SaveAllSettings();
-		}
-		else if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
+		if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
 		{
 			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 

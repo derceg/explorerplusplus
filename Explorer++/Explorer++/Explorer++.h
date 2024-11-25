@@ -140,9 +140,6 @@ private:
 	static const UINT REBAR_BAND_ID_DRIVES_TOOLBAR = 3;
 	static const UINT REBAR_BAND_ID_APPLICATIONS_TOOLBAR = 4;
 
-	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
-	static const UINT AUTOSAVE_TIMEOUT = 30000;
-
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
 
@@ -383,7 +380,6 @@ private:
 	void OnCustomizeMainToolbar();
 
 	/* Settings. */
-	void SaveAllSettings();
 	void ApplyDisplayWindowPosition();
 
 	/* Window state update. */

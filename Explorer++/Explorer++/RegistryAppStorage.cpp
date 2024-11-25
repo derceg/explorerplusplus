@@ -54,3 +54,42 @@ void RegistryAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
 {
 	DefaultColumnRegistryStorage::Load(m_applicationKey.get(), defaultColumns);
 }
+
+void RegistryAppStorage::SaveConfig(const Config &config)
+{
+	ConfigRegistryStorage::Save(m_applicationKey.get(), config);
+}
+
+void RegistryAppStorage::SaveWindows(const std::vector<WindowStorageData> &windows)
+{
+	WindowRegistryStorage::Save(m_applicationKey.get(), windows);
+}
+
+void RegistryAppStorage::SaveBookmarks(const BookmarkTree *bookmarkTree)
+{
+	BookmarkRegistryStorage::Save(m_applicationKey.get(), bookmarkTree);
+}
+
+void RegistryAppStorage::SaveColorRules(const ColorRuleModel *model)
+{
+	ColorRuleRegistryStorage::Save(m_applicationKey.get(), model);
+}
+
+void RegistryAppStorage::SaveApplications(const Applications::ApplicationModel *model)
+{
+	Applications::ApplicationToolbarRegistryStorage::Save(m_applicationKey.get(), model);
+}
+
+void RegistryAppStorage::SaveDialogStates()
+{
+	DialogHelper::SaveDialogStatesToRegistry(m_applicationKey.get());
+}
+
+void RegistryAppStorage::SaveDefaultColumns(const FolderColumns &defaultColumns)
+{
+	DefaultColumnRegistryStorage::Save(m_applicationKey.get(), defaultColumns);
+}
+
+void RegistryAppStorage::Commit()
+{
+}

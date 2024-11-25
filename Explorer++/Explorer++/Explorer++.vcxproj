@@ -1041,6 +1041,7 @@
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
+    <ClCompile Include="Storage.cpp" />
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="UIThreadExecutor.cpp" />
     <ClCompile Include="MenuBase.cpp" />
@@ -1154,8 +1155,6 @@
     <ClCompile Include="IconResourceLoader.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
-    <ClCompile Include="LoadSaveRegistry.cpp" />
-    <ClCompile Include="LoadSaveXml.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="AcceleratorHelper.cpp" />
@@ -1450,9 +1449,6 @@
     <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="NewMenuClient.h" />
     <ClInclude Include="ServiceProvider.h" />
-    <ClInclude Include="LoadSaveInterface.h" />
-    <ClInclude Include="LoadSaveRegistry.h" />
-    <ClInclude Include="LoadSaveXml.h" />
     <ClInclude Include="Plugins\LuaPlugin.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />

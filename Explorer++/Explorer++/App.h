@@ -13,6 +13,7 @@
 #include "FeatureList.h"
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
+#include "Runtime.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -53,15 +54,19 @@ private:
 	void OnBrowserRemoved();
 	void SetUpSession();
 	void LoadSettings(std::vector<WindowStorageData> &windows);
+	void SaveSettings();
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
 	bool IsModelessDialogMessage(MSG *msg);
 	bool MaybeTranslateAccelerator(MSG *msg);
 
+	void OnWillRemoveBrowser();
 	bool ConfirmExit();
 	void Exit();
+	void OnExitStarted();
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	bool m_savePreferencesToXmlFile = false;
+	Runtime m_runtime;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
@@ -73,7 +78,11 @@ private:
 	Applications::ApplicationModel m_applicationModel;
 	ProcessManager m_processManager;
 
+	concurrencpp::timer m_saveSettingsTimer;
+
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;
 	wil::unique_oleuninitialize_call m_oleCleanup;
+
+	bool m_exitStarted = false;
 };
