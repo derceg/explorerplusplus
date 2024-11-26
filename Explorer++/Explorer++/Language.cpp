@@ -130,75 +130,8 @@ void Explorerplusplus::SetLanguageModule()
 
 			if (bLanguageMismatch)
 			{
-				UINT stringId;
-
-				/* Attempt to show an error message in the language
-				that was specified. */
-				switch (wLanguage)
-				{
-				case LANG_CHINESE_SIMPLIFIED:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CHINESE_SIMPLIFIED;
-					break;
-
-				case LANG_CZECH:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CZECH;
-					break;
-
-				case LANG_DANISH:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DANISH;
-					break;
-
-				case LANG_DUTCH:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DUTCH;
-					break;
-
-				case LANG_FRENCH:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_FRENCH;
-					break;
-
-				case LANG_GERMAN:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_GERMAN;
-					break;
-
-				case LANG_ITALIAN:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ITALIAN;
-					break;
-
-				case LANG_JAPANESE:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_JAPANESE;
-					break;
-
-				case LANG_KOREAN:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_KOREAN;
-					break;
-
-				case LANG_NORWEGIAN:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_NORWEGIAN;
-					break;
-
-				case LANG_PORTUGUESE:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_PORTUGUESE;
-					break;
-
-				case LANG_ROMANIAN:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ROMANIAN;
-					break;
-
-				case LANG_RUSSIAN:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_RUSSIAN;
-					break;
-
-				case LANG_SPANISH:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_SPANISH;
-					break;
-
-				default:
-					stringId = IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH;
-					break;
-				}
-
-				std::wstring versionMismatchMessage =
-					ResourceHelper::LoadString(GetModuleHandle(nullptr), stringId);
+				std::wstring versionMismatchMessage = ResourceHelper::LoadString(
+					GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH);
 
 				/* Main window hasn't been constructed yet, so this
 				message box doesn't have any owner window. */
