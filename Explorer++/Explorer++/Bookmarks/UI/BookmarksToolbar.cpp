@@ -130,21 +130,26 @@ private:
 };
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
 {
-	return new BookmarksToolbar(view, browserWindow, coreInterface, iconFetcher, bookmarkTree);
+	return new BookmarksToolbar(view, browserWindow, coreInterface, iconResourceLoader, iconFetcher,
+		bookmarkTree);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
+	m_iconResourceLoader(iconResourceLoader),
 	m_bookmarkTree(bookmarkTree),
-	m_contextMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface),
+	m_contextMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface,
+		iconResourceLoader),
 	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface,
-		iconFetcher, view->GetHWND())
+		iconResourceLoader, iconFetcher, view->GetHWND())
 {
 	Initialize(iconFetcher);
 }
@@ -155,8 +160,8 @@ void BookmarksToolbar::Initialize(IconFetcher *iconFetcher)
 	UINT dpi = dpiCompat.GetDpiForWindow(m_view->GetHWND());
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_bookmarkIconManager =
-		std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher, iconWidth, iconHeight);
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_iconResourceLoader, iconFetcher,
+		iconWidth, iconHeight);
 
 	m_view->SetImageList(m_bookmarkIconManager->GetImageList());
 
@@ -380,7 +385,7 @@ void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetI
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type,
 		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_view->GetHWND(),
-		m_coreInterface);
+		m_coreInterface, m_iconResourceLoader);
 }
 
 void BookmarksToolbar::OnPaste(size_t targetIndex)

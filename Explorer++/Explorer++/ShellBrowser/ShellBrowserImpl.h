@@ -44,7 +44,6 @@ struct Config;
 class CoreInterface;
 class FileActionHandler;
 class IconFetcher;
-class IconResourceLoader;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
 class ShellBrowserEmbedder;
@@ -674,8 +673,6 @@ private:
 
 	std::unique_ptr<IconFetcher> m_iconFetcher;
 	CachedIcons *m_cachedIcons;
-
-	IconResourceLoader *m_iconResourceLoader;
 
 	ctpl::thread_pool m_thumbnailThreadPool;
 	std::unordered_map<int, std::future<std::optional<ThumbnailResult_t>>> m_thumbnailResults;

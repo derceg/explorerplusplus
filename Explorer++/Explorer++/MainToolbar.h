@@ -21,6 +21,7 @@
 
 class BrowserWindow;
 struct Config;
+class IconResourceLoader;
 struct NavigateParams;
 class ShellIconLoader;
 
@@ -29,7 +30,8 @@ class MainToolbar : public BaseWindow
 public:
 	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		ShellIconLoader *shellIconLoader, const Config *config,
+		const IconResourceLoader *iconResourceLoader, ShellIconLoader *shellIconLoader,
+		const Config *config,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
 	void UpdateConfigDependentButtonStates();
@@ -44,7 +46,8 @@ public:
 
 private:
 	MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, ShellIconLoader *shellIconLoader, const Config *config,
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		ShellIconLoader *shellIconLoader, const Config *config,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	~MainToolbar();
 
@@ -53,11 +56,11 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void Initialize(HWND parent,
+	void Initialize(HWND parent, const IconResourceLoader *iconResourceLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	void SetTooolbarImageList();
 	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
-		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
+		const IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
 	std::vector<MainToolbarButton> GetDefaultButtons() const;
 	void AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons);
 	void AddButtonToToolbar(MainToolbarButton button);

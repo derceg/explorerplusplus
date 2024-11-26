@@ -10,12 +10,14 @@
 class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
+class IconResourceLoader;
 
 class BookmarkContextMenuController
 {
 public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface);
+		BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		const IconResourceLoader *iconResourceLoader);
 
 	void OnMenuItemSelected(UINT menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);
@@ -33,4 +35,5 @@ private:
 	HINSTANCE m_resourceInstance;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
+	const IconResourceLoader *const m_iconResourceLoader;
 };

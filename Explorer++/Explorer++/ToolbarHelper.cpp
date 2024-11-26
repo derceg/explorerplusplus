@@ -13,7 +13,7 @@ namespace ToolbarHelper
 {
 
 std::tuple<HWND, wil::unique_himagelist> CreateCloseButtonToolbar(HWND parent, int closeButtonId,
-	const std::wstring &tooltip, IconResourceLoader *iconResourceLoader)
+	const std::wstring &tooltip, const IconResourceLoader *iconResourceLoader)
 {
 	HWND toolbar = CreateToolbar(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

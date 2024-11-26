@@ -940,7 +940,7 @@ void ShellBrowserImpl::OnListViewHeaderMenuItemSelected(int menuItemId,
 void ShellBrowserImpl::OnShowMoreColumnsSelected()
 {
 	SelectColumnsDialog selectColumnsDialog(m_resourceInstance, m_hListView, this,
-		m_iconResourceLoader);
+		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();
 }
 

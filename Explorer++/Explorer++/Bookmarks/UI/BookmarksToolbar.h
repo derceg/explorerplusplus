@@ -18,13 +18,15 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
+class IconResourceLoader;
 struct MouseEvent;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
 	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
 	BookmarksToolbar(BookmarksToolbar &&) = delete;
@@ -49,7 +51,8 @@ private:
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
 	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
 	void Initialize(IconFetcher *iconFetcher);
 	void AddBookmarkItems();
@@ -86,6 +89,7 @@ private:
 	BookmarksToolbarView *m_view = nullptr;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
+	const IconResourceLoader *const m_iconResourceLoader;
 	BookmarkTree *m_bookmarkTree = nullptr;
 
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;

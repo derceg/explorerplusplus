@@ -60,12 +60,13 @@ const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern
 
 SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
 	std::wstring_view searchDirectory, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	TabContainer *tabContainer) :
+	TabContainer *tabContainer, const IconResourceLoader *iconResourceLoader) :
 	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer),
+	m_iconResourceLoader(iconResourceLoader),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
 	m_pSearch(nullptr),
@@ -88,8 +89,7 @@ SearchDialog::~SearchDialog()
 INT_PTR SearchDialog::OnInitDialog()
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
-	m_directoryIcon =
-		m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+	m_directoryIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 	SendMessage(GetDlgItem(m_hDlg, IDC_BUTTON_DIRECTORY), BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_directoryIcon.get()));
 
@@ -172,8 +172,7 @@ INT_PTR SearchDialog::OnInitDialog()
 
 wil::unique_hicon SearchDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Search,
-		iconWidth, iconHeight);
+	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::Search, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> SearchDialog::GetResizableControls()

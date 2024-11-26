@@ -6,7 +6,6 @@
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -19,7 +18,7 @@
 #include <wil/com.h>
 
 BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
-	CoreInterface *coreInterface, BookmarkTree *bookmarkTree,
+	const IconResourceLoader *iconResourceLoader, BookmarkTree *bookmarkTree,
 	const std::unordered_set<std::wstring> &setExpansion,
 	std::optional<std::wstring> guidSelected) :
 	BookmarkDropTargetWindow(hTreeView, bookmarkTree),
@@ -38,7 +37,7 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(
-		coreInterface->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder });
+		iconResourceLoader, iconWidth, iconHeight, { Icon::Folder });
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
 	SetupTreeView(setExpansion, guidSelected);

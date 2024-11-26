@@ -12,12 +12,13 @@
 #include <glog/logging.h>
 
 BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface, HWND parentWindow) :
+	BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader, HWND parentWindow) :
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_parentWindow(parentWindow),
 	m_bookmarkContextMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow,
-		coreInterface)
+		coreInterface, iconResourceLoader)
 {
 }
 

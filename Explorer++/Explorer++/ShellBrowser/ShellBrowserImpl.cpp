@@ -84,7 +84,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 		CoUninitialize),
 	m_columnResultIDCounter(0),
 	m_cachedIcons(coreInterface->GetCachedIcons()),
-	m_iconResourceLoader(coreInterface->GetIconResourceLoader()),
 	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_thumbnailResultIDCounter(0),
@@ -671,8 +670,7 @@ std::optional<int> ShellBrowserImpl::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl)
 
 std::optional<int> ShellBrowserImpl::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
 {
-	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(),
-		[pidl](const auto &pair)
+	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(), [pidl](const auto &pair)
 		{ return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get()); });
 
 	if (itr == m_itemInfoMap.end())
@@ -880,8 +878,7 @@ void ShellBrowserImpl::VerifySortMode()
 
 	auto firstChecked = GetFirstCheckedColumn();
 
-	auto itr = std::find_if(columns->begin(), columns->end(),
-		[this](const Column_t &column)
+	auto itr = std::find_if(columns->begin(), columns->end(), [this](const Column_t &column)
 		{ return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode; });
 
 	if (itr == columns->end())
@@ -889,8 +886,7 @@ void ShellBrowserImpl::VerifySortMode()
 		m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked.type);
 	}
 
-	itr = std::find_if(columns->begin(), columns->end(),
-		[this](const Column_t &column)
+	itr = std::find_if(columns->begin(), columns->end(), [this](const Column_t &column)
 		{ return DetermineColumnSortMode(column.type) == m_folderSettings.groupMode; });
 
 	if (itr == columns->end())
@@ -1240,7 +1236,7 @@ void ShellBrowserImpl::StartRenamingMultipleFiles()
 	}
 
 	MassRenameDialog massRenameDialog(m_resourceInstance, m_hListView, fullFilenameList,
-		m_iconResourceLoader, m_fileActionHandler);
+		m_app->GetIconResourceLoader(), m_fileActionHandler);
 	massRenameDialog.ShowModalDialog();
 }
 

@@ -9,7 +9,6 @@
 
 #include "stdafx.h"
 #include "HolderWindow.h"
-#include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "MainFontSetter.h"
 #include "SystemFontHelper.h"
@@ -18,13 +17,15 @@
 #include "../Helper/WindowHelper.h"
 
 HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
-	const std::wstring &closeButtonTooltip, CoreInterface *coreInterface)
+	const std::wstring &closeButtonTooltip, const Config *config,
+	const IconResourceLoader *iconResourceLoader)
 {
-	return new HolderWindow(parent, caption, style, closeButtonTooltip, coreInterface);
+	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, iconResourceLoader);
 }
 
 HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
-	const std::wstring &closeButtonTooltip, CoreInterface *coreInterface) :
+	const std::wstring &closeButtonTooltip, const Config *config,
+	const IconResourceLoader *iconResourceLoader) :
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
@@ -35,7 +36,7 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	m_font = m_defaultFont.get();
 
 	std::tie(m_toolbar, m_toolbarImageList) = ToolbarHelper::CreateCloseButtonToolbar(m_hwnd,
-		CLOSE_BUTTON_ID, closeButtonTooltip, coreInterface->GetIconResourceLoader());
+		CLOSE_BUTTON_ID, closeButtonTooltip, iconResourceLoader);
 
 	SIZE toolbarSize;
 	[[maybe_unused]] auto sizeRes =
@@ -45,10 +46,9 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 		SWP_NOZORDER | SWP_NOMOVE);
 
 	m_tooltipFontSetter = std::make_unique<MainFontSetter>(
-		reinterpret_cast<HWND>(SendMessage(m_toolbar, TB_GETTOOLTIPS, 0, 0)),
-		coreInterface->GetConfig());
+		reinterpret_cast<HWND>(SendMessage(m_toolbar, TB_GETTOOLTIPS, 0, 0)), config);
 
-	m_fontSetter = std::make_unique<MainFontSetter>(m_hwnd, coreInterface->GetConfig());
+	m_fontSetter = std::make_unique<MainFontSetter>(m_hwnd, config);
 
 	m_initialized = true;
 }

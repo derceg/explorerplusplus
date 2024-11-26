@@ -14,10 +14,11 @@
 #include <wil/resource.h>
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface) :
+	BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceInstance(resourceInstance),
-	m_controller(bookmarkTree, resourceInstance, browserWindow, coreInterface),
+	m_controller(bookmarkTree, resourceInstance, browserWindow, coreInterface, iconResourceLoader),
 	m_showingMenu(false)
 {
 }

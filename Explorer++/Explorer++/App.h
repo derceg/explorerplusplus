@@ -18,9 +18,11 @@
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
+#include <memory>
 #include <vector>
 
 class ColorRuleModel;
+class IconResourceLoader;
 struct WindowStorageData;
 
 class App : private boost::noncopyable
@@ -43,6 +45,7 @@ public:
 	BookmarkTree *GetBookmarkTree();
 	ColorRuleModel *GetColorRuleModel() const;
 	Applications::ApplicationModel *GetApplicationModel();
+	IconResourceLoader *GetIconResourceLoader() const;
 
 	void TryExit();
 	void SessionEnding();
@@ -77,6 +80,7 @@ private:
 	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
+	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 	ProcessManager m_processManager;
 
 	concurrencpp::timer m_saveSettingsTimer;

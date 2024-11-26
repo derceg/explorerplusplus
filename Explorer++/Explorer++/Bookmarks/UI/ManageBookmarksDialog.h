@@ -18,6 +18,7 @@ class BookmarkTreeView;
 class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
+class IconResourceLoader;
 class ManageBookmarksDialog;
 class WindowSubclassWrapper;
 
@@ -50,7 +51,8 @@ class ManageBookmarksDialog : public ThemedDialog
 {
 public:
 	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:
@@ -118,6 +120,7 @@ private:
 
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
+	const IconResourceLoader *const m_iconResourceLoader;
 	IconFetcher *m_iconFetcher = nullptr;
 
 	BookmarkTree *m_bookmarkTree = nullptr;

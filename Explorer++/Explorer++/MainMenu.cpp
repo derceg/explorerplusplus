@@ -109,7 +109,7 @@ void Explorerplusplus::SetMainMenuImages()
 
 	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{
-		ResourceHelper::SetMenuItemImage(mainMenu, mapping.first, m_iconResourceLoader.get(),
+		ResourceHelper::SetMenuItemImage(mainMenu, mapping.first, m_app->GetIconResourceLoader(),
 			mapping.second, dpi, m_mainMenuImages);
 	}
 

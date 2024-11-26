@@ -25,7 +25,8 @@ void Explorerplusplus::CreateFolderControls()
 
 	m_treeViewHolder = HolderWindow::Create(m_hContainer,
 		ResourceHelper::LoadString(m_resourceInstance, IDS_FOLDERS_WINDOW_TEXT), holderStyle,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_HIDE_FOLDERS_PANE), this);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_HIDE_FOLDERS_PANE), m_app->GetConfig(),
+		m_app->GetIconResourceLoader());
 	m_treeViewHolder->SetCloseButtonClickedCallback(
 		std::bind(&Explorerplusplus::ToggleFolders, this));
 	m_treeViewHolder->SetResizedCallback(

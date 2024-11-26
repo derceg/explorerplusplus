@@ -30,7 +30,7 @@ std::optional<std::wstring> ResourceHelper::MaybeLoadString(HINSTANCE resourceIn
 }
 
 void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId,
-	IconResourceLoader *iconResourceLoader, Icon icon, int dpi,
+	const IconResourceLoader *iconResourceLoader, Icon icon, int dpi,
 	std::vector<wil::unique_hbitmap> &menuImages)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
@@ -53,7 +53,7 @@ void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId,
 }
 
 std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateIconImageList(
-	IconResourceLoader *iconResourceLoader, int iconWidth, int iconHeight,
+	const IconResourceLoader *iconResourceLoader, int iconWidth, int iconHeight,
 	const std::initializer_list<Icon> &icons)
 {
 	wil::unique_himagelist imageList(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK,
@@ -70,7 +70,7 @@ std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateI
 }
 
 void ResourceHelper::AddIconToImageList(HIMAGELIST imageList,
-	IconResourceLoader *iconResourceLoader, Icon icon, int iconWidth, int iconHeight,
+	const IconResourceLoader *iconResourceLoader, Icon icon, int iconWidth, int iconHeight,
 	IconImageListMapping &imageListMappings)
 {
 	wil::unique_hbitmap bitmap =

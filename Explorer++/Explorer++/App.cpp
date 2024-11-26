@@ -13,6 +13,7 @@
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
 #include "RegistryAppStorage.h"
@@ -102,6 +103,8 @@ void App::SetUpSession()
 		PostQuitMessage(EXIT_CODE_NORMAL_EXISTING_PROCESS);
 		return;
 	}
+
+	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config.iconSet);
 
 	RestoreSession(windows);
 }
@@ -285,6 +288,11 @@ ColorRuleModel *App::GetColorRuleModel() const
 Applications::ApplicationModel *App::GetApplicationModel()
 {
 	return &m_applicationModel;
+}
+
+IconResourceLoader *App::GetIconResourceLoader() const
+{
+	return m_iconResourceLoader.get();
 }
 
 void App::OnWillRemoveBrowser()

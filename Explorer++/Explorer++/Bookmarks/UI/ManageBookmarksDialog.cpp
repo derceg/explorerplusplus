@@ -25,11 +25,13 @@
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
 	ThemedDialog(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
+	m_iconResourceLoader(iconResourceLoader),
 	m_iconFetcher(iconFetcher),
 	m_bookmarkTree(bookmarkTree)
 {
@@ -82,8 +84,7 @@ std::vector<ResizableDialogControl> ManageBookmarksDialog::GetResizableControls(
 
 wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Bookmarks,
-		iconWidth, iconHeight);
+	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);
 }
 
 void ManageBookmarksDialog::CreateToolbar()
@@ -112,8 +113,8 @@ void ManageBookmarksDialog::SetupToolbar()
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
 	std::tie(m_imageListToolbar, m_imageListToolbarMappings) =
-		ResourceHelper::CreateIconImageList(m_coreInterface->GetIconResourceLoader(), iconWidth,
-			iconHeight, { Icon::Back, Icon::Forward, Icon::Copy, Icon::Views });
+		ResourceHelper::CreateIconImageList(m_iconResourceLoader, iconWidth, iconHeight,
+			{ Icon::Back, Icon::Forward, Icon::Copy, Icon::Views });
 	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(m_imageListToolbar.get()));
 
 	TBBUTTON tbb;
@@ -180,8 +181,8 @@ void ManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetResourceInstance(), m_coreInterface,
-		m_bookmarkTree, m_persistentSettings->m_setExpansion);
+	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetResourceInstance(),
+		m_iconResourceLoader, m_bookmarkTree, m_persistentSettings->m_setExpansion);
 
 	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
 		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
@@ -192,7 +193,8 @@ void ManageBookmarksDialog::SetupListView()
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	m_bookmarkListView = new BookmarkListView(hListView, GetResourceInstance(), m_bookmarkTree,
-		m_browserWindow, m_coreInterface, m_iconFetcher, m_persistentSettings->m_listViewColumns);
+		m_browserWindow, m_coreInterface, m_iconResourceLoader, m_iconFetcher,
+		m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
@@ -617,7 +619,7 @@ void ManageBookmarksDialog::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, focus, m_coreInterface);
+		m_currentBookmarkFolder, targetIndex, focus, m_coreInterface, m_iconResourceLoader);
 
 	if (!bookmark || focus != listView || bookmark->GetParent() != m_currentBookmarkFolder)
 	{

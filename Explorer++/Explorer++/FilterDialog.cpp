@@ -18,11 +18,12 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface) :
-	ThemedDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal)
+FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader) :
+	ThemedDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal),
+	m_coreInterface(coreInterface),
+	m_iconResourceLoader(iconResourceLoader)
 {
-	m_coreInterface = coreInterface;
-
 	m_persistentSettings = &FilterDialogPersistentSettings::GetInstance();
 }
 
@@ -56,8 +57,7 @@ INT_PTR FilterDialog::OnInitDialog()
 
 wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Filter,
-		iconWidth, iconHeight);
+	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> FilterDialog::GetResizableControls()

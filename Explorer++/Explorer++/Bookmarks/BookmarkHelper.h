@@ -10,6 +10,7 @@
 
 class BookmarkTree;
 class CoreInterface;
+class IconResourceLoader;
 class TabContainer;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
@@ -33,12 +34,13 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, HWND parentWindow,
-	CoreInterface *coreInterface);
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	CoreInterface *coreInterface, std::optional<std::wstring> customDialogTitle = std::nullopt);
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, HWND parentWindow, CoreInterface *coreInterface);
+	HINSTANCE resourceInstance, HWND parentWindow, const IconResourceLoader *iconResourceLoader);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, CoreInterface *coreInterface, Navigator *navigator);
 

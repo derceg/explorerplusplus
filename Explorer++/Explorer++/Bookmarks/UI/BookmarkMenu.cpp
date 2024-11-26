@@ -13,12 +13,12 @@
 #include <glog/logging.h>
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	HWND parentWindow) :
+	BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher, HWND parentWindow) :
 	m_bookmarkTree(bookmarkTree),
 	m_parentWindow(parentWindow),
-	m_menuBuilder(coreInterface, iconFetcher, resourceInstance),
-	m_controller(bookmarkTree, browserWindow, coreInterface, parentWindow)
+	m_menuBuilder(iconResourceLoader, iconFetcher, resourceInstance),
+	m_controller(bookmarkTree, browserWindow, coreInterface, iconResourceLoader, parentWindow)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,
 		std::bind_front(&BookmarkMenu::ParentWindowSubclass, this)));

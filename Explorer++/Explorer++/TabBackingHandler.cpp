@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabBacking.h"
@@ -27,7 +28,7 @@ void Explorerplusplus::CreateTabBacking()
 	std::tie(m_hTabWindowToolbar, m_tabWindowToolbarImageList) =
 		ToolbarHelper::CreateCloseButtonToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
 			ResourceHelper::LoadString(m_resourceInstance, IDS_TAB_CLOSE_TIP),
-			m_iconResourceLoader.get());
+			m_app->GetIconResourceLoader());
 
 	SIZE toolbarSize;
 	[[maybe_unused]] auto sizeRes =

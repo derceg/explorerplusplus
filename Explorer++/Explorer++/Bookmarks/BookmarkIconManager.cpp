@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkItem.h"
-#include "CoreInterface.h"
 #include "Icon.h"
 #include "IconFetcher.h"
 #include "IconResourceLoader.h"
@@ -13,17 +12,15 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-BookmarkIconManager::BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	int iconWidth, int iconHeight) :
-	m_coreInterface(coreInterface),
+BookmarkIconManager::BookmarkIconManager(const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, int iconWidth, int iconHeight) :
 	m_iconFetcher(iconFetcher),
 	m_destroyed(std::make_shared<bool>(false))
 {
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
 
 	wil::unique_hbitmap folderIcon =
-		m_coreInterface->GetIconResourceLoader()->LoadBitmapFromPNGAndScale(Icon::Folder, iconWidth,
-			iconHeight);
+		iconResourceLoader->LoadBitmapFromPNGAndScale(Icon::Folder, iconWidth, iconHeight);
 	m_bookmarkFolderIconIndex = ImageList_Add(m_imageList.get(), folderIcon.get(), nullptr);
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));

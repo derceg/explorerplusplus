@@ -49,7 +49,6 @@ class DisplayWindow;
 class DrivesToolbar;
 class GlobalHistoryMenu;
 class HolderWindow;
-class IconResourceLoader;
 __interface IDirectoryMonitor;
 class ILoadSave;
 class LoadSaveRegistry;
@@ -486,7 +485,6 @@ private:
 	TabRestorer *GetTabRestorer() const override;
 	HWND GetTreeView() const override;
 	IDirectoryMonitor *GetDirectoryMonitor() const override;
-	IconResourceLoader *GetIconResourceLoader() const override;
 	CachedIcons *GetCachedIcons() override;
 	void FocusChanged() override;
 	boost::signals2::connection AddFocusChangeObserver(
@@ -565,8 +563,6 @@ private:
 	MainWindow *m_mainWindow = nullptr;
 	AddressBar *m_addressBar = nullptr;
 	DisplayWindow *m_displayWindow = nullptr;
-
-	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 
 	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
 	std::vector<wil::unique_hbitmap> m_mainMenuImages;

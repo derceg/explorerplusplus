@@ -11,8 +11,8 @@
 #include <utility>
 
 class BookmarkIconManager;
-class CoreInterface;
 class IconFetcher;
+class IconResourceLoader;
 
 class BookmarkMenuBuilder
 {
@@ -59,7 +59,7 @@ public:
 		UINT nextMenuId;
 	};
 
-	BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
+	BookmarkMenuBuilder(const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
 		HINSTANCE resourceInstance);
 
 	BOOL BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem *bookmarkItem,
@@ -82,7 +82,7 @@ private:
 	void AddIconToMenuItem(HMENU menu, int position, const BookmarkItem *bookmarkItem,
 		BookmarkIconManager &bookmarkIconManager, std::vector<wil::unique_hbitmap> &menuImages);
 
-	CoreInterface *m_coreInterface;
+	const IconResourceLoader *const m_iconResourceLoader;
 	IconFetcher *m_iconFetcher;
 	HINSTANCE m_resourceInstance;
 	MenuIdRange m_menuIdRange;

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "OptionsDialog.h"
 #include "AdvancedOptionsPage.h"
+#include "App.h"
 #include "AppearanceOptionsPage.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
@@ -103,8 +104,8 @@ void OptionsDialog::AddDynamicControls()
 
 wil::unique_hicon OptionsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Options,
-		iconWidth, iconHeight);
+	return m_app->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Options, iconWidth,
+		iconHeight);
 }
 
 std::vector<ResizableDialogControl> OptionsDialog::GetResizableControls()

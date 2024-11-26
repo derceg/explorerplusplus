@@ -105,7 +105,7 @@ void GeneralOptionsPage::InitializeControls()
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(GetDialog());
 	m_newTabDirectoryIcon =
-		m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+		m_app->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 
 	hButton = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_BUTTON);
 	SendMessage(hButton, BM_SETIMAGE, IMAGE_ICON, (LPARAM) m_newTabDirectoryIcon.get());

@@ -43,7 +43,8 @@ void Explorerplusplus::OnChangeDisplayColors()
 
 void Explorerplusplus::OnFilterResults()
 {
-	FilterDialog filterDialog(m_resourceInstance, m_hContainer, this);
+	FilterDialog filterDialog(m_resourceInstance, m_hContainer, this,
+		m_app->GetIconResourceLoader());
 	filterDialog.ShowModalDialog();
 }
 
@@ -60,8 +61,9 @@ void Explorerplusplus::OnMergeFiles()
 		fullFilenameList.push_back(fullFilename);
 	}
 
-	MergeFilesDialog mergeFilesDialog(m_resourceInstance, m_hContainer, this, currentDirectory,
-		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+	MergeFilesDialog mergeFilesDialog(m_resourceInstance, m_hContainer,
+		m_app->GetIconResourceLoader(), currentDirectory, fullFilenameList,
+		m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
 }
 
@@ -73,7 +75,8 @@ void Explorerplusplus::OnSplitFile()
 	{
 		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iSelected);
 
-		SplitFileDialog splitFileDialog(m_resourceInstance, m_hContainer, this, fullFilename);
+		SplitFileDialog splitFileDialog(m_resourceInstance, m_hContainer,
+			m_app->GetIconResourceLoader(), fullFilename);
 		splitFileDialog.ShowModalDialog();
 	}
 }
@@ -109,14 +112,14 @@ void Explorerplusplus::OnSearch()
 			std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
 			return new SearchDialog(m_resourceInstance, m_hContainer, currentDirectory, this, this,
-				GetActivePane()->GetTabContainer());
+				GetActivePane()->GetTabContainer(), m_app->GetIconResourceLoader());
 		});
 }
 
 void Explorerplusplus::OnCustomizeColors()
 {
-	CustomizeColorsDialog customizeColorsDialog(m_resourceInstance, m_hContainer, this,
-		m_app->GetColorRuleModel());
+	CustomizeColorsDialog customizeColorsDialog(m_resourceInstance, m_hContainer,
+		m_app->GetColorRuleModel(), m_app->GetIconResourceLoader());
 	customizeColorsDialog.ShowModalDialog();
 }
 

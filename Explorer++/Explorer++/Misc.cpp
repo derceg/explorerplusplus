@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "ColumnStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -139,7 +140,7 @@ void Explorerplusplus::OnSelectColumns()
 {
 	SelectColumnsDialog selectColumnsDialog(m_resourceInstance, m_hContainer,
 		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser(),
-		m_iconResourceLoader.get());
+		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();
 }
 

@@ -13,13 +13,14 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
+class IconResourceLoader;
 
 class BookmarksMainMenu
 {
 public:
 	BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
-		const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
+		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree, const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(UINT menuItemId);
@@ -39,6 +40,7 @@ private:
 	bool OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt);
 
 	CoreInterface *m_coreInterface = nullptr;
+	const IconResourceLoader *const m_iconResourceLoader;
 	BookmarkTree *m_bookmarkTree = nullptr;
 	const BookmarkMenuBuilder::MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;

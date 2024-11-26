@@ -19,6 +19,7 @@
 
 class BrowserWindow;
 class CoreInterface;
+class IconResourceLoader;
 class SearchDialog;
 class TabContainer;
 
@@ -137,7 +138,8 @@ class SearchDialog : public ThemedDialog, private ShellContextMenuHandler
 {
 public:
 	SearchDialog(HINSTANCE resourceInstance, HWND hParent, std::wstring_view searchDirectory,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface, TabContainer *tabContainer);
+		BrowserWindow *browserWindow, CoreInterface *coreInterface, TabContainer *tabContainer,
+		const IconResourceLoader *iconResourceLoader);
 	~SearchDialog();
 
 	/* Sorting methods. */
@@ -186,6 +188,7 @@ private:
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
 	TabContainer *m_tabContainer = nullptr;
+	const IconResourceLoader *const m_iconResourceLoader;
 	wil::unique_hicon m_directoryIcon;
 	BOOL m_bSearching;
 	BOOL m_bStopSearching;

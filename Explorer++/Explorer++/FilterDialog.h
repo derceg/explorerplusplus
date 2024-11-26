@@ -12,6 +12,7 @@
 
 class CoreInterface;
 class FilterDialog;
+class IconResourceLoader;
 
 class FilterDialogPersistentSettings : public DialogSettings
 {
@@ -42,7 +43,8 @@ private:
 class FilterDialog : public ThemedDialog
 {
 public:
-	FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface);
+	FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
+		const IconResourceLoader *iconResourceLoader);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -59,6 +61,7 @@ private:
 	void OnCancel();
 
 	CoreInterface *m_coreInterface;
+	const IconResourceLoader *const m_iconResourceLoader;
 
 	FilterDialogPersistentSettings *m_persistentSettings;
 };

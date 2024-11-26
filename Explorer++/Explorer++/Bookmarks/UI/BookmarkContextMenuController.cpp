@@ -14,11 +14,13 @@
 #include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface) :
+	HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface)
+	m_coreInterface(coreInterface),
+	m_iconResourceLoader(iconResourceLoader)
 {
 }
 
@@ -106,7 +108,7 @@ void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex, HWND parentWindow)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		parentWindow, m_coreInterface);
+		parentWindow, m_coreInterface, m_iconResourceLoader);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
@@ -131,5 +133,5 @@ void BookmarkContextMenuController::OnEditBookmarkItem(BookmarkItem *bookmarkIte
 	HWND parentWindow)
 {
 	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceInstance, parentWindow,
-		m_coreInterface);
+		m_iconResourceLoader);
 }

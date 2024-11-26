@@ -1004,11 +1004,6 @@ IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const
 	return m_pDirMon;
 }
 
-IconResourceLoader *Explorerplusplus::GetIconResourceLoader() const
-{
-	return m_iconResourceLoader.get();
-}
-
 CachedIcons *Explorerplusplus::GetCachedIcons()
 {
 	return m_app->GetCachedIcons();

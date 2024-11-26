@@ -10,12 +10,14 @@ class BookmarkItem;
 class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
+class IconResourceLoader;
 
 class BookmarkMenuController
 {
 public:
 	BookmarkMenuController(BookmarkTree *bookmarkTree, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, HWND parentWindow);
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		HWND parentWindow);
 
 	void OnMenuItemSelected(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
 		bool isShiftKeyDown);

@@ -13,9 +13,9 @@
 #include <wil/common.h>
 #include <format>
 
-BookmarkMenuBuilder::BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	HINSTANCE resourceInstance) :
-	m_coreInterface(coreInterface),
+BookmarkMenuBuilder::BookmarkMenuBuilder(const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, HINSTANCE resourceInstance) :
+	m_iconResourceLoader(iconResourceLoader),
 	m_iconFetcher(iconFetcher),
 	m_resourceInstance(resourceInstance)
 {
@@ -35,7 +35,8 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	BookmarkIconManager bookmarkIconManager(m_coreInterface, m_iconFetcher, iconWidth, iconHeight);
+	BookmarkIconManager bookmarkIconManager(m_iconResourceLoader, m_iconFetcher, iconWidth,
+		iconHeight);
 
 	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, bookmarkIconManager, menuImages,
 		menuInfo, true, includePredicate);

@@ -18,13 +18,15 @@
 #include "../Helper/MenuHelper.h"
 
 BookmarksMainMenu::BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
-	const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
+	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+	BookmarkTree *bookmarkTree, const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
 	m_coreInterface(coreInterface),
+	m_iconResourceLoader(iconResourceLoader),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceInstance()),
-	m_controller(bookmarkTree, browserWindow, coreInterface, coreInterface->GetMainWindow())
+	m_menuBuilder(iconResourceLoader, iconFetcher, coreInterface->GetResourceInstance()),
+	m_controller(bookmarkTree, browserWindow, coreInterface, iconResourceLoader,
+		coreInterface->GetMainWindow())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
@@ -74,7 +76,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB, bookmarkThisTabText, 0,
 		TRUE);
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB,
-		m_coreInterface->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
+		m_iconResourceLoader, Icon::AddBookmark, dpi, menuImages);
 
 	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(
 		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_ALL_TABS);
@@ -86,7 +88,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS, manageBookmarksText, 2,
 		TRUE);
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,
-		m_coreInterface->GetIconResourceLoader(), Icon::Bookmarks, dpi, menuImages);
+		m_iconResourceLoader, Icon::Bookmarks, dpi, menuImages);
 
 	AddBookmarkItemsToMenu(menu.get(), m_menuIdRange, GetMenuItemCount(menu.get()), menuImages,
 		menuInfo);

@@ -10,15 +10,15 @@
 
 class BookmarkItem;
 class IconFetcher;
-class CoreInterface;
+class IconResourceLoader;
 
 class BookmarkIconManager
 {
 public:
 	using IconAvailableCallback = std::function<void(int iconIndex)>;
 
-	BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher, int iconWidth,
-		int iconHeight);
+	BookmarkIconManager(const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+		int iconWidth, int iconHeight);
 	~BookmarkIconManager();
 
 	BookmarkIconManager(const BookmarkIconManager &other) = delete;
@@ -33,8 +33,6 @@ public:
 private:
 	int GetIconForBookmark(const BookmarkItem *bookmark, IconAvailableCallback callback);
 	int AddSystemIconToImageList(int systemIconIndex);
-
-	CoreInterface *m_coreInterface;
 
 	wil::unique_himagelist m_imageList;
 

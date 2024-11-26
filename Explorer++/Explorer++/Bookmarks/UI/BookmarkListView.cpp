@@ -28,17 +28,20 @@
 
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
+	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+	const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
+	m_iconResourceLoader(iconResourceLoader),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
-	m_bookmarkContextMenu(bookmarkTree, resourceInstance, browserWindow, coreInterface)
+	m_bookmarkContextMenu(bookmarkTree, resourceInstance, browserWindow, coreInterface,
+		iconResourceLoader)
 {
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP,
@@ -70,8 +73,8 @@ void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	m_bookmarkIconManager =
-		std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher, iconWidth, iconHeight);
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_iconResourceLoader, iconFetcher,
+		iconWidth, iconHeight);
 
 	ListView_SetImageList(m_hListView, m_bookmarkIconManager->GetImageList(), LVSIL_SMALL);
 }
@@ -589,7 +592,7 @@ void BookmarkListView::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, m_hListView, m_coreInterface);
+		m_currentBookmarkFolder, targetIndex, m_hListView, m_coreInterface, m_iconResourceLoader);
 
 	if (!bookmark)
 	{

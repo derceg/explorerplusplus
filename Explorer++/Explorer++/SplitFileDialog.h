@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_map>
 
-class CoreInterface;
+class IconResourceLoader;
 class SplitFileDialog;
 
 class SplitFileDialogPersistentSettings : public DialogSettings
@@ -69,8 +69,8 @@ private:
 class SplitFileDialog : public ThemedDialog
 {
 public:
-	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
-		const std::wstring &strFullFilename);
+	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
+		const IconResourceLoader *iconResourceLoader, const std::wstring &strFullFilename);
 	~SplitFileDialog();
 
 protected:
@@ -116,7 +116,7 @@ private:
 	void OnChangeOutputDirectory();
 	void OnSplitFinished();
 
-	CoreInterface *m_coreInterface;
+	const IconResourceLoader *const m_iconResourceLoader;
 
 	std::wstring m_strFullFilename;
 	bool m_bSplittingFile;

@@ -9,7 +9,8 @@
 #include <functional>
 #include <optional>
 
-class CoreInterface;
+struct Config;
+class IconResourceLoader;
 class MainFontSetter;
 
 class HolderWindow
@@ -19,7 +20,8 @@ public:
 	using CloseButtonClickedCallback = std::function<void()>;
 
 	static HolderWindow *Create(HWND parent, const std::wstring &caption, DWORD style,
-		const std::wstring &closeButtonTooltip, CoreInterface *coreInterface);
+		const std::wstring &closeButtonTooltip, const Config *config,
+		const IconResourceLoader *iconResourceLoader);
 
 	HWND GetHWND() const;
 	void SetContentChild(HWND contentChild);
@@ -40,7 +42,8 @@ private:
 	static constexpr int RESIZE_START_RANGE = 6_px;
 
 	HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
-		const std::wstring &closeButtonTooltip, CoreInterface *coreInterface);
+		const std::wstring &closeButtonTooltip, const Config *config,
+		const IconResourceLoader *iconResourceLoader);
 	HWND CreateHolderWindow(HWND parent, const std::wstring &caption, DWORD style);
 	static ATOM RegisterHolderWindowClass();
 

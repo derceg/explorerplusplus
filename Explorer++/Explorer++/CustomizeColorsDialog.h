@@ -11,8 +11,8 @@
 
 class ColorRuleListView;
 class ColorRuleModel;
-class CoreInterface;
 class CustomizeColorsDialog;
+class IconResourceLoader;
 
 class CustomizeColorsDialogPersistentSettings : public DialogSettings
 {
@@ -34,8 +34,8 @@ private:
 class CustomizeColorsDialog : public ThemedDialog
 {
 public:
-	CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent, CoreInterface *coreInterface,
-		ColorRuleModel *model);
+	CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent, ColorRuleModel *model,
+		const IconResourceLoader *iconResourceLoader);
 	~CustomizeColorsDialog();
 
 protected:
@@ -65,8 +65,8 @@ private:
 
 	void UpdateControlStates();
 
-	CoreInterface *m_coreInterface;
 	ColorRuleModel *m_model;
+	const IconResourceLoader *const m_iconResourceLoader;
 	std::unique_ptr<ColorRuleListView> m_colorRuleListView;
 
 	CustomizeColorsDialogPersistentSettings *m_persistentSettings;

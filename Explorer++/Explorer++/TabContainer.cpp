@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabContainer.h"
+#include "App.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "BrowserWindow.h"
 #include "Config.h"
@@ -128,8 +129,8 @@ void TabContainer::Initialize(HWND parent)
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-	wil::unique_hbitmap bitmap = m_coreInterface->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(
-		Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
+	wil::unique_hbitmap bitmap = m_app->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock,
+		ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 
 	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
@@ -422,8 +423,8 @@ void TabContainer::AddImagesToTabContextMenu(HMENU menu,
 
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		ResourceHelper::SetMenuItemImage(menu, mapping.first,
-			m_coreInterface->GetIconResourceLoader(), mapping.second, dpi, menuImages);
+		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_app->GetIconResourceLoader(),
+			mapping.second, dpi, menuImages);
 	}
 }
 
@@ -614,7 +615,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	PopupMenuView popupMenu;
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(),
-		this, m_bookmarkTree, m_coreInterface);
+		this, m_bookmarkTree, m_coreInterface, m_app->GetIconResourceLoader());
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

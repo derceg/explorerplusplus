@@ -17,13 +17,14 @@
 #include <unordered_set>
 
 class BookmarkTree;
-class CoreInterface;
+class IconResourceLoader;
 
 class BookmarkTreeView : private BookmarkDropTargetWindow
 {
 public:
-	BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance, CoreInterface *coreInterface,
-		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
+	BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
+		const IconResourceLoader *iconResourceLoader, BookmarkTree *bookmarkTree,
+		const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 
 	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem);

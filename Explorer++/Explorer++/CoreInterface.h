@@ -52,7 +52,6 @@ using DeviceChangeSignal = boost::signals2::signal<void(UINT eventType, LONG_PTR
 class AcceleratorManager;
 class CachedIcons;
 struct Config;
-class IconResourceLoader;
 __interface IDirectoryMonitor;
 class ShellBrowserImpl;
 class StatusBar;
@@ -79,7 +78,6 @@ public:
 	virtual TabRestorer *GetTabRestorer() const = 0;
 	virtual IDirectoryMonitor *GetDirectoryMonitor() const = 0;
 
-	virtual IconResourceLoader *GetIconResourceLoader() const = 0;
 	virtual CachedIcons *GetCachedIcons() = 0;
 
 	virtual HWND GetTreeView() const = 0;
