@@ -120,7 +120,15 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 
 	RegistrySettings::ReadString(settingsKey, L"NewTabDirectory", config.defaultTabDirectory);
 	RegistrySettings::ReadBetterEnumValue(settingsKey, L"IconTheme", config.iconSet);
-	RegistrySettings::ReadDword(settingsKey, L"Language", config.language);
+
+	DWORD language;
+	res = RegistrySettings::ReadDword(settingsKey, L"Language", language);
+
+	if (res == ERROR_SUCCESS)
+	{
+		config.language = static_cast<LANGID>(language);
+	}
+
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"OpenTabsInForeground",
 		config.openTabsInForeground);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DisplayMixedFilesAndFolders",

@@ -757,6 +757,9 @@
     <ClCompile Include="Storage.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
+    <ClCompile Include="LanguageHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1561,6 +1564,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TestHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LanguageHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

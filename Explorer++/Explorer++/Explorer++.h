@@ -406,7 +406,6 @@ private:
 
 	/* Languages. */
 	void SetLanguageModule();
-	BOOL VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* File operations. */
 	void CopyToFolder(bool move);

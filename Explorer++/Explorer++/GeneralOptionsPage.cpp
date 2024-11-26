@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
+#include "LanguageHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -166,7 +167,6 @@ void GeneralOptionsPage::AddLanguages()
 	/* English will always be added to the combox, and will
 	always be the first item. */
 	SendMessage(hLanguageComboBox, CB_ADDSTRING, 0, (LPARAM) _T("English"));
-	SendMessage(hLanguageComboBox, CB_SETITEMDATA, 0, 9);
 
 	GetProcessImageName(GetCurrentProcessId(), szImageDirectory, SIZEOF_ARRAY(szImageDirectory));
 	PathRemoveFileSpec(szImageDirectory);
@@ -392,9 +392,18 @@ void GeneralOptionsPage::SaveSettings()
 	}
 
 	HWND comboBox = GetDlgItem(GetDialog(), IDC_OPTIONS_LANGUAGE);
-	int selectedIndex = static_cast<int>(SendMessage(comboBox, CB_GETCURSEL, 0, 0));
-	DWORD language = static_cast<DWORD>(SendMessage(comboBox, CB_GETITEMDATA, selectedIndex, 0));
-	m_config->language = language;
+	auto selectedIndex = static_cast<int>(SendMessage(comboBox, CB_GETCURSEL, 0, 0));
+
+	if (selectedIndex == 0)
+	{
+		// The first item is always the default language.
+		m_config->language = LanguageHelper::DEFAULT_LANGUAGE;
+	}
+	else
+	{
+		auto language = static_cast<WORD>(SendMessage(comboBox, CB_GETITEMDATA, selectedIndex, 0));
+		m_config->language = language;
+	}
 }
 
 void GeneralOptionsPage::OnReplaceExplorerSettingChanged(ReplaceExplorerMode updatedReplaceMode)

@@ -161,7 +161,15 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"HideSystemFilesGlobal",
 		config.globalFolderSettings.hideSystemFiles);
 	GetBoolSetting(settingsNode, L"InsertSorted", config.globalFolderSettings.insertSorted);
-	GetIntSetting(settingsNode, L"Language", config.language);
+
+	DWORD language;
+	HRESULT hr = GetIntSetting(settingsNode, L"Language", language);
+
+	if (hr == S_OK)
+	{
+		config.language = static_cast<LANGID>(language);
+	}
+
 	GetBoolSetting(settingsNode, L"LargeToolbarIcons", config.useLargeToolbarIcons);
 	GetBoolSetting(settingsNode, L"LockToolbars", config.lockToolbars);
 	GetBoolSetting(settingsNode, L"NextToCurrent", config.openNewTabNextToCurrent);

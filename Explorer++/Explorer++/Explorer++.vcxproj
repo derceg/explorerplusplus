@@ -1028,6 +1028,7 @@
     <ClCompile Include="FrequentLocationsService.cpp" />
     <ClCompile Include="GlobalHistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
+    <ClCompile Include="LanguageHelper.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
     <ClCompile Include="MainMenuSubMenuView.cpp" />
     <ClCompile Include="BrowserList.cpp" />
@@ -1318,6 +1319,7 @@
     <ClInclude Include="FrequentLocationsService.h" />
     <ClInclude Include="GlobalHistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
+    <ClInclude Include="LanguageHelper.h" />
     <ClInclude Include="LocationVisitInfo.h" />
     <ClInclude Include="MainMenuSubMenuView.h" />
     <ClInclude Include="BrowserList.h" />

@@ -9,6 +9,7 @@
 #include "DisplayWindowDefaults.h"
 #include "FontHelper.h"
 #include "IconResourceLoader.h"
+#include "LanguageHelper.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellChangeNotificationType.h"
@@ -43,7 +44,7 @@ struct Config
 
 	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
-	DWORD language = LANG_ENGLISH;
+	LANGID language = LanguageHelper::DEFAULT_LANGUAGE;
 	IconSet iconSet = IconSet::Color;
 	ValueWrapper<Theme> theme = Theme::Light;
 	StartupMode startupMode = StartupMode::PreviousTabs;
