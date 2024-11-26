@@ -171,6 +171,12 @@ RECT Explorerplusplus::GetDefaultMainWindowBounds()
 	return { x, y, x + width, y + height };
 }
 
+boost::signals2::connection Explorerplusplus::AddBrowserInitializedObserver(
+	const BrowserInitializedSignal::slot_type &observer)
+{
+	return m_browserInitializedSignal.connect(observer);
+}
+
 HWND Explorerplusplus::GetHWND() const
 {
 	return m_hContainer;

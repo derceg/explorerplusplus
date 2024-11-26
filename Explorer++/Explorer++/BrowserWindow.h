@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Navigator.h"
+#include <boost/signals2.hpp>
 
 class BrowserCommandController;
 class BrowserPane;
@@ -15,8 +16,12 @@ struct WindowStorageData;
 class BrowserWindow : public Navigator
 {
 public:
+	using BrowserInitializedSignal = boost::signals2::signal<void()>;
+
 	virtual ~BrowserWindow() = default;
 
+	virtual boost::signals2::connection AddBrowserInitializedObserver(
+		const BrowserInitializedSignal::slot_type &observer) = 0;
 	virtual BrowserCommandController *GetCommandController() = 0;
 	virtual BrowserPane *GetActivePane() const = 0;
 	virtual void FocusActiveTab() = 0;

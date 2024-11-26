@@ -102,6 +102,8 @@ public:
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 	// BrowserWindow
+	boost::signals2::connection AddBrowserInitializedObserver(
+		const BrowserInitializedSignal::slot_type &observer) override;
 	BrowserPane *GetActivePane() const override;
 	BrowserCommandController *GetCommandController() override;
 	void FocusActiveTab() override;
@@ -487,8 +489,6 @@ private:
 	IconResourceLoader *GetIconResourceLoader() const override;
 	CachedIcons *GetCachedIcons() override;
 	void FocusChanged() override;
-	boost::signals2::connection AddApplicationInitializatedObserver(
-		const ApplicationInitializedSignal::slot_type &observer) override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
 	boost::signals2::connection AddDeviceChangeObserver(
@@ -559,8 +559,8 @@ private:
 	ULONG m_SHChangeNotifyID;
 
 	/* Initialization. */
-	bool m_applicationInitialized = false;
-	ApplicationInitializedSignal m_applicationInitializedSignal;
+	bool m_browserInitialized = false;
+	BrowserInitializedSignal m_browserInitializedSignal;
 
 	MainWindow *m_mainWindow = nullptr;
 	AddressBar *m_addressBar = nullptr;

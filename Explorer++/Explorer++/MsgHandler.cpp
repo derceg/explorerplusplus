@@ -301,7 +301,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	int iTabBackingWidth;
 	int iTabBackingLeft;
 
-	if (!m_applicationInitialized || m_browserClosing)
+	if (!m_browserInitialized || m_browserClosing)
 	{
 		return;
 	}

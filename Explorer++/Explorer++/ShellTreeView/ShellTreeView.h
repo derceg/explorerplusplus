@@ -235,7 +235,7 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *m_config;
 	FileActionHandler *m_fileActionHandler;
-	bool m_applicationInitializationFinished = false;
+	bool m_browserInitialized = false;
 
 	// Note that the treeview control sets the font on the tooltip control it creates each time the
 	// tooltip is shown (which can be seen by logging WM_SETFONT calls made on the tooltip control).

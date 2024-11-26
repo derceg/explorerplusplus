@@ -135,8 +135,8 @@ void MainToolbar::Initialize(HWND parent,
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
 		std::bind_front(&MainToolbar::ParentWndProc, this)));
 
-	m_connections.push_back(m_coreInterface->AddApplicationInitializatedObserver(
-		std::bind_front(&MainToolbar::OnApplicationInitialized, this)));
+	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(
+		std::bind_front(&MainToolbar::OnBrowserInitialized, this)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
@@ -455,9 +455,9 @@ int MainToolbar::LookupToolbarButtonTextID(MainToolbarButton button) const
 	return 0;
 }
 
-void MainToolbar::OnApplicationInitialized()
+void MainToolbar::OnBrowserInitialized()
 {
-	m_applicationInitialized = true;
+	m_browserInitialized = true;
 	UpdateToolbarButtonStates();
 }
 
@@ -743,7 +743,7 @@ void MainToolbar::UpdateConfigDependentButtonStates()
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	if (!m_applicationInitialized)
+	if (!m_browserInitialized)
 	{
 		return;
 	}
@@ -783,7 +783,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 void MainToolbar::OnClipboardUpdate()
 {
-	if (!m_applicationInitialized)
+	if (!m_browserInitialized)
 	{
 		return;
 	}

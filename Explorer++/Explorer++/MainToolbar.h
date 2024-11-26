@@ -86,7 +86,7 @@ private:
 
 	void UpdateToolbarButtonImageIndexes();
 
-	void OnApplicationInitialized();
+	void OnBrowserInitialized();
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	void OnShowFoldersUpdated(bool showFolders);
 
@@ -101,7 +101,7 @@ private:
 	CoreInterface *m_coreInterface = nullptr;
 	ShellIconLoader *const m_shellIconLoader;
 	const Config *const m_config;
-	bool m_applicationInitialized = false;
+	bool m_browserInitialized = false;
 
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;

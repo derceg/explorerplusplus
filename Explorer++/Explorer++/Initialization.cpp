@@ -88,8 +88,8 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(m_hContainer);
 
-	m_applicationInitialized = true;
-	m_applicationInitializedSignal();
+	m_browserInitialized = true;
+	m_browserInitializedSignal();
 }
 
 void Explorerplusplus::InitializeDisplayWindow()
@@ -142,10 +142,4 @@ bool Explorerplusplus::ShouldEnableDarkMode(Theme theme)
 {
 	return theme == +Theme::Dark
 		|| (theme == +Theme::System && !DarkModeHelper::GetInstance().IsSystemAppModeLight());
-}
-
-boost::signals2::connection Explorerplusplus::AddApplicationInitializatedObserver(
-	const ApplicationInitializedSignal::slot_type &observer)
-{
-	return m_applicationInitializedSignal.connect(observer);
 }
