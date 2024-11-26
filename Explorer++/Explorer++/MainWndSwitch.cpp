@@ -232,6 +232,13 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		TryClose();
 		break;
 
+	case WM_ENDSESSION:
+		if (wParam)
+		{
+			m_app->SessionEnding();
+		}
+		return 0;
+
 	case WM_DESTROY:
 		return OnDestroy();
 

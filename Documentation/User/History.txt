@@ -24,6 +24,9 @@ New features:
   updated. The change means that relative paths like ".." should
   now be correctly handled and a wider range of paths should be
   accepted. The updated handling also applies to the address bar.
+- If Explorer++ is running when the session is ended (e.g. when
+  logging off), the settings will now be saved first. Previously,
+  the application would simply be terminated.
 - DPI changes are now better handled.
 - A global history menu is now available at Go > History. That
   menu will display a list of all history items, with more recent

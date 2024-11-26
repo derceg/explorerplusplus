@@ -45,6 +45,7 @@ public:
 	Applications::ApplicationModel *GetApplicationModel();
 
 	void TryExit();
+	void SessionEnding();
 
 private:
 	// Represents the maximum number of icons that can be cached. This cache is shared between

@@ -375,3 +375,15 @@ void App::OnExitStarted()
 
 	m_exitStarted = true;
 }
+
+void App::SessionEnding()
+{
+	if (m_exitStarted)
+	{
+		// The application has already started exiting, so there's no need to try and save the
+		// settings, since it will have already been done.
+		return;
+	}
+
+	SaveSettings();
+}
