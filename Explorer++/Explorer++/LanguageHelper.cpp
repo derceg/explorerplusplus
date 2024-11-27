@@ -216,9 +216,30 @@ std::variant<LanguageInfo, LoadError> MaybeLoadTranslationDll(
 	return LanguageInfo(loadedLanguage, resourceInstance);
 }
 
-bool IsLanguageRTL(WORD primaryLanguageId)
+bool IsLanguageRTL(LANGID language)
 {
-	return primaryLanguageId == LANG_ARABIC || primaryLanguageId == LANG_HEBREW;
+	LCID id = MAKELCID(language, SORT_DEFAULT);
+	wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
+	auto res = LCIDToLocaleName(id, localeName, std::size(localeName), 0);
+
+	if (!res)
+	{
+		DCHECK(false);
+		return false;
+	}
+
+	DWORD readingLayout;
+	res = GetLocaleInfoEx(localeName, LOCALE_IREADINGLAYOUT | LOCALE_RETURN_NUMBER,
+		reinterpret_cast<wchar_t *>(&readingLayout), sizeof(readingLayout) / sizeof(wchar_t));
+
+	if (!res)
+	{
+		DCHECK(false);
+		return false;
+	}
+
+	// A value of 1 indicates an RTL language.
+	return readingLayout == 1;
 }
 
 }

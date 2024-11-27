@@ -292,6 +292,9 @@
     <ClCompile Include="ConfigStorageTestHelper.cpp">
       <Filter>Config</Filter>
     </ClCompile>
+    <ClCompile Include="LanguageHelperTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

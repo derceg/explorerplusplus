@@ -236,6 +236,7 @@
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryServiceTest.cpp" />
     <ClCompile Include="BrowserTrackerTest.cpp" />
+    <ClCompile Include="LanguageHelperTest.cpp" />
     <ClCompile Include="MessageLoop.cpp" />
     <ClCompile Include="ModelessDialogListTest.cpp" />
     <ClCompile Include="ProcessManagerTest.cpp" />
