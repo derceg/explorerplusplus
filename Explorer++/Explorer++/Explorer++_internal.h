@@ -4,11 +4,10 @@
 
 #pragma once
 
-/* Used when setting Explorer++ as the default
-file manager. */
-static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++");
+// Used when setting Explorer++ as the default file manager.
+inline constexpr wchar_t SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = L"openinexplorer++";
 
-/* Rebar menu id's. */
+// Rebar menu IDs.
 #define ID_REBAR_MENU_BACK_START 2000
 #define ID_REBAR_MENU_BACK_END 2999
 #define ID_REBAR_MENU_FORWARD_START 3000
