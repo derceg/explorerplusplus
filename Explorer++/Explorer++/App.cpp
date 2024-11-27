@@ -111,14 +111,13 @@ void App::SetUpSession()
 
 void App::LoadSettings(std::vector<WindowStorageData> &windows)
 {
-	BOOL loadSettingsFromXML = TestConfigFile();
-	std::unique_ptr<AppStorage> appStorage;
+	// Settings will be loaded from the config file by default, if that file is present and can be
+	// read.
+	std::unique_ptr<AppStorage> appStorage = XmlAppStorageFactory::MaybeCreate(
+		Storage::GetConfigFilePath(), Storage::OperationType::Load);
 
-	if (loadSettingsFromXML)
+	if (appStorage)
 	{
-		appStorage = XmlAppStorageFactory::MaybeCreate(Storage::GetConfigFilePath(),
-			Storage::OperationType::Load);
-
 		m_savePreferencesToXmlFile = true;
 	}
 	else

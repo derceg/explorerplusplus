@@ -46,33 +46,6 @@
 #include <wil/resource.h>
 #include <algorithm>
 
-BOOL TestConfigFile()
-{
-	HANDLE hConfigFile;
-	TCHAR szConfigFile[MAX_PATH];
-	BOOL bLoadSettingsFromXML = FALSE;
-
-	/* To ensure the configuration file is loaded from the same directory
-	as the executable, determine the fully qualified path of the executable,
-	then save the configuration file in that directory. */
-	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
-
-	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
-
-	hConfigFile =
-		CreateFile(szConfigFile, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
-
-	if (hConfigFile != INVALID_HANDLE_VALUE)
-	{
-		bLoadSettingsFromXML = TRUE;
-
-		CloseHandle(hConfigFile);
-	}
-
-	return bLoadSettingsFromXML;
-}
-
 void Explorerplusplus::OpenDefaultItem(OpenFolderDisposition openFolderDisposition)
 {
 	OpenItem(m_config->defaultTabDirectory, openFolderDisposition);
