@@ -229,9 +229,8 @@ void DialogSettings::RestoreDialogPosition(HWND hDlg, bool bRestoreSize)
 		// still be moved back on screen.
 		RECT dialogRect = { m_ptDialog.x, m_ptDialog.y, m_ptDialog.x + m_iWidth,
 			m_ptDialog.y + m_iHeight };
-		HMONITOR monitor = MonitorFromRect(&dialogRect, MONITOR_DEFAULTTONULL);
 
-		if (monitor)
+		if (IsRectVisible(&dialogRect))
 		{
 			shouldRestore = true;
 		}

@@ -142,9 +142,7 @@ RECT Explorerplusplus::GetValidatedMainWindowBounds(const RECT *requestedBounds)
 {
 	// When shown in its normal size, the window should at least be on screen somewhere, even if
 	// it's not completely visible.
-	HMONITOR monitor = MonitorFromRect(requestedBounds, MONITOR_DEFAULTTONULL);
-
-	if (!monitor)
+	if (!IsRectVisible(requestedBounds))
 	{
 		return GetDefaultMainWindowBounds();
 	}

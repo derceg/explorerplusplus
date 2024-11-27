@@ -320,7 +320,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILE_NEW_WINDOW:
-		Explorerplusplus::Create(m_app);
+		OnNewWindow();
 		break;
 
 	case IDM_FILE_CLONEWINDOW:

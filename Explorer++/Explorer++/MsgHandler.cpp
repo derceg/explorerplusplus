@@ -838,6 +838,30 @@ void Explorerplusplus::OnAssocChanged()
 	/* TODO: Update the address bar. */
 }
 
+void Explorerplusplus::OnNewWindow()
+{
+	WINDOWPLACEMENT placement = {};
+	placement.length = sizeof(placement);
+	BOOL res = GetWindowPlacement(m_hContainer, &placement);
+	CHECK(res);
+
+	constexpr int windowOffsetInPixels = 10;
+
+	RECT bounds = placement.rcNormalPosition;
+	OffsetRect(&bounds, windowOffsetInPixels, windowOffsetInPixels);
+
+	if (!IsRectVisible(&bounds))
+	{
+		bounds = placement.rcNormalPosition;
+	}
+
+	WindowStorageData initialData = {};
+	initialData.bounds = bounds;
+	initialData.showState = NativeShowStateToShowState(placement.showCmd);
+
+	Explorerplusplus::Create(m_app, &initialData);
+}
+
 void Explorerplusplus::OnCloneWindow()
 {
 	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();

@@ -14,6 +14,7 @@ BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd);
 int GetRectHeight(const RECT *rc);
 int GetRectWidth(const RECT *rc);
 bool BringWindowToForeground(HWND wnd);
+bool IsRectVisible(const RECT *rect);
 
 // This is only used in tests.
 bool operator==(const RECT &first, const RECT &second);

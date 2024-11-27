@@ -157,6 +157,12 @@ bool BringWindowToForeground(HWND wnd)
 	return SetForegroundWindow(wnd);
 }
 
+bool IsRectVisible(const RECT *rect)
+{
+	HMONITOR monitor = MonitorFromRect(rect, MONITOR_DEFAULTTONULL);
+	return monitor != nullptr;
+}
+
 bool operator==(const RECT &first, const RECT &second)
 {
 	return EqualRect(&first, &second);
