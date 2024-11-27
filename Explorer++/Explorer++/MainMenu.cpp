@@ -76,6 +76,13 @@ void Explorerplusplus::InitializeMainMenu()
 	{
 		DeleteMenu(mainMenu, IDM_FILE_NEW_WINDOW, MF_BYCOMMAND);
 	}
+	else
+	{
+		// TODO: Selecting clone window launches a separate process. That doesn't fit in with how
+		// MultipleWindowsPerSession is designed to work and the menu item should be removed when
+		// the feature is enabled by default.
+		DeleteMenu(mainMenu, IDM_FILE_CLONEWINDOW, MF_BYCOMMAND);
+	}
 
 	if (!m_app->GetFeatureList()->IsEnabled(Feature::DualPane))
 	{
