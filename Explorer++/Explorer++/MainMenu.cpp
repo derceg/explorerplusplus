@@ -72,6 +72,11 @@ void Explorerplusplus::InitializeMainMenu()
 	// before the tabs are restored.
 	HMENU mainMenu = LoadMenu(m_app->GetResourceInstance(), MAKEINTRESOURCE(IDR_MAINMENU));
 
+	if (!m_app->GetFeatureList()->IsEnabled(Feature::MultipleWindowsPerSession))
+	{
+		DeleteMenu(mainMenu, IDM_FILE_NEW_WINDOW, MF_BYCOMMAND);
+	}
+
 	if (!m_app->GetFeatureList()->IsEnabled(Feature::DualPane))
 	{
 		DeleteMenu(mainMenu, IDM_VIEW_DUAL_PANE, MF_BYCOMMAND);

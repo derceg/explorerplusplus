@@ -319,6 +319,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnCloseTab();
 		break;
 
+	case IDM_FILE_NEW_WINDOW:
+		Explorerplusplus::Create(m_app);
+		break;
+
 	case IDM_FILE_CLONEWINDOW:
 		OnCloneWindow();
 		break;

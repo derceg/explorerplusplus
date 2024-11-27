@@ -12,6 +12,10 @@ BETTER_ENUM(Feature, int,
 	Plugins,
 
 	// When enabled, the quick access folder in the treeview will be automatically updated.
-	AutomaticQuickAccessUpdates
+	AutomaticQuickAccessUpdates,
+
+	// When enabled, the application will allow multiple windows to be created and restored in each
+	// session, rather than just a single window.
+	MultipleWindowsPerSession
 )
 // clang-format on

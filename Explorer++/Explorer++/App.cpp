@@ -29,7 +29,6 @@
 #include "../Helper/Helper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
-#include <ranges>
 
 using namespace std::chrono_literals;
 
@@ -228,9 +227,15 @@ void App::SetUpLanguageResourceInstance()
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
 {
 	// At the moment, only a single window is supported.
-	for (const auto &window : windows | std::views::take(1))
+	for (const auto &window : windows)
 	{
 		Explorerplusplus::Create(this, &window);
+
+		// If this feature isn't enabled, only a single window is supported.
+		if (!m_featureList.IsEnabled(Feature::MultipleWindowsPerSession))
+		{
+			break;
+		}
 	}
 
 	if (m_browserList.IsEmpty())
