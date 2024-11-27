@@ -3,9 +3,11 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+// clang-format off
 #include "ThemeManager.h"
+// clang-format on
+#include "Explorer++.h"
 #include "DarkModeHelper.h"
-#include "Explorer++_internal.h"
 #include "SystemFontHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -115,7 +117,7 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 		return;
 	}
 
-	if (lstrcmp(className, NExplorerplusplus::CLASS_NAME) == 0)
+	if (lstrcmp(className, Explorerplusplus::WINDOW_CLASS_NAME) == 0)
 	{
 		ApplyThemeToMainWindow(hwnd, enableDarkMode);
 	}

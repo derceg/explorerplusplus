@@ -10,7 +10,6 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "BrowserTracker.h"
 #include "Config.h"
-#include "Explorer++_internal.h"
 #include "GlobalHistoryMenu.h"
 #include "HistoryServiceFactory.h"
 #include "MainFontSetter.h"
@@ -113,7 +112,7 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 		finalBounds = GetDefaultMainWindowBounds();
 	}
 
-	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, App::APP_NAME, WS_OVERLAPPEDWINDOW,
+	HWND hwnd = CreateWindow(WINDOW_CLASS_NAME, App::APP_NAME, WS_OVERLAPPEDWINDOW,
 		finalBounds.left, finalBounds.top, GetRectWidth(&finalBounds), GetRectHeight(&finalBounds),
 		nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 	CHECK(hwnd);
@@ -137,7 +136,7 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	windowClass.hbrBackground = nullptr;
 	windowClass.lpszMenuName = nullptr;
-	windowClass.lpszClassName = NExplorerplusplus::CLASS_NAME;
+	windowClass.lpszClassName = WINDOW_CLASS_NAME;
 	return RegisterClassEx(&windowClass);
 }
 

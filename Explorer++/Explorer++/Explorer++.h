@@ -93,6 +93,8 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
+	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
+
 	static Explorerplusplus *Create(App *app, const WindowStorageData *storageData = nullptr);
 
 	~Explorerplusplus();
