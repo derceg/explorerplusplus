@@ -24,9 +24,10 @@ void Explorerplusplus::CreateFolderControls()
 	}
 
 	m_treeViewHolder = HolderWindow::Create(m_hContainer,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_FOLDERS_WINDOW_TEXT), holderStyle,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_HIDE_FOLDERS_PANE), m_app->GetConfig(),
-		m_app->GetIconResourceLoader());
+		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_FOLDERS_WINDOW_TEXT),
+		holderStyle,
+		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_HIDE_FOLDERS_PANE),
+		m_app->GetConfig(), m_app->GetIconResourceLoader());
 	m_treeViewHolder->SetCloseButtonClickedCallback(
 		std::bind(&Explorerplusplus::ToggleFolders, this));
 	m_treeViewHolder->SetResizedCallback(
@@ -94,8 +95,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 			sfaiList.push_back(sfai);
 
-			SetFileAttributesDialog setFileAttributesDialog(m_resourceInstance, m_hContainer,
-				sfaiList);
+			SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceInstance(),
+				m_hContainer, sfaiList);
 			setFileAttributesDialog.ShowModalDialog();
 		}
 	}

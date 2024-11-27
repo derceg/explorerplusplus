@@ -103,9 +103,6 @@
     <ClCompile Include="WinMain.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Language.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenuHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>

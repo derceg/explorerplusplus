@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Config.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -132,7 +133,8 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 
 			if (!helperText)
 			{
-				helperText = ResourceHelper::MaybeLoadString(m_resourceInstance, menuItemId);
+				helperText =
+					ResourceHelper::MaybeLoadString(m_app->GetResourceInstance(), menuItemId);
 			}
 		}
 
@@ -169,7 +171,7 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	}
 
 	std::wstring loadingTemplate =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_LOADING);
+		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_GENERAL_LOADING);
 	std::wstring loadingText =
 		fmt::format(fmt::runtime(loadingTemplate), fmt::arg(L"folder_name", displayName));
 
@@ -215,13 +217,13 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	{
 		if (numItemsSelected == 1)
 		{
-			numItemsText =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_SELECTED_ONE_ITEM);
+			numItemsText = ResourceHelper::LoadString(m_app->GetResourceInstance(),
+				IDS_GENERAL_SELECTED_ONE_ITEM);
 		}
 		else
 		{
-			auto multipleItemsText =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_SELECTED_MULTIPLE_ITEMS);
+			auto multipleItemsText = ResourceHelper::LoadString(m_app->GetResourceInstance(),
+				IDS_GENERAL_SELECTED_MULTIPLE_ITEMS);
 			numItemsText = std::format(L"{:L} {}", numItemsSelected, multipleItemsText);
 		}
 	}
@@ -231,19 +233,21 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if (numItems == 1)
 		{
-			numItemsText = ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_ONE_ITEM);
+			numItemsText =
+				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_GENERAL_ONE_ITEM);
 		}
 		else
 		{
-			auto multipleItemsText =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_MULTIPLE_ITEMS);
+			auto multipleItemsText = ResourceHelper::LoadString(m_app->GetResourceInstance(),
+				IDS_GENERAL_MULTIPLE_ITEMS);
 			numItemsText = std::format(L"{:L} {}", numItems, multipleItemsText);
 		}
 	}
 
 	if (tab.GetShellBrowser()->IsFilterApplied())
 	{
-		auto filterAppliedText = ResourceHelper::LoadString(m_resourceInstance, IDS_FILTER_APPLIED);
+		auto filterAppliedText =
+			ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_FILTER_APPLIED);
 		numItemsText += L" | " + filterAppliedText;
 	}
 
@@ -293,6 +297,6 @@ std::wstring Explorerplusplus::CreateDriveFreeSpaceString(const std::wstring &pa
 	}
 
 	return std::format(L"{} {} ({:.0Lf}%)", FormatSizeString(totalNumberOfFreeBytes.QuadPart),
-		ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_FREE),
+		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_GENERAL_FREE),
 		totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
 }

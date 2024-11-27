@@ -143,7 +143,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 			tab.GetShellBrowser()->GetAutoArrange());
 	}
 
-	SortMenuBuilder sortMenuBuilder(m_resourceInstance);
+	SortMenuBuilder sortMenuBuilder(m_app->GetResourceInstance());
 	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(tab);
 
 	MenuHelper::AttachSubMenu(hProgramMenu, std::move(sortByMenu), IDM_VIEW_SORTBY, FALSE);

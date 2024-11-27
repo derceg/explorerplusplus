@@ -406,9 +406,6 @@ private:
 	HRESULT UpdateStatusBarText(const Tab &tab);
 	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);
 
-	/* Languages. */
-	void SetLanguageModule();
-
 	/* File operations. */
 	void CopyToFolder(bool move);
 	void OpenAllSelectedItems(
@@ -549,8 +546,6 @@ private:
 	wil::unique_himagelist m_tabWindowToolbarImageList;
 
 	IDirectoryMonitor *m_pDirMon;
-
-	HINSTANCE m_resourceInstance;
 
 	/** Internal state. **/
 	HWND m_lastActiveWindow;

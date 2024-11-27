@@ -259,8 +259,8 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 
 void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 {
-	auto parentMenu =
-		wil::unique_hmenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
+	auto parentMenu = wil::unique_hmenu(
+		LoadMenu(m_app->GetResourceInstance(), MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
 
 	if (!parentMenu)
 	{
@@ -468,7 +468,7 @@ void Explorerplusplus::OnAddressBarSizeUpdated()
 void Explorerplusplus::CreateMainToolbar(
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, this,
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_app->GetResourceInstance(), this, this,
 		m_app->GetIconResourceLoader(), &m_shellIconLoader, m_config, initialButtons);
 	m_mainToolbar->sizeUpdatedSignal.AddObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));

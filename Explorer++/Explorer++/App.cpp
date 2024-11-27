@@ -13,13 +13,16 @@
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
 #include "IconResourceLoader.h"
+#include "LanguageHelper.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
+#include "ResourceHelper.h"
 #include "ResourceManager.h"
 #include "TabStorage.h"
 #include "UIThreadExecutor.h"
+#include "Win32ResourceLoader.h"
 #include "WindowStorage.h"
 #include "XmlAppStorage.h"
 #include "XmlAppStorageFactory.h"
@@ -37,6 +40,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
+	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
@@ -104,6 +108,7 @@ void App::SetUpSession()
 	}
 
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config.iconSet);
+	SetUpLanguageResourceInstance();
 
 	RestoreSession(windows);
 }
@@ -184,6 +189,40 @@ void App::SaveSettings()
 	appStorage->SaveDefaultColumns(m_config.globalFolderSettings.folderColumns);
 
 	appStorage->Commit();
+}
+
+void App::SetUpLanguageResourceInstance()
+{
+	auto languageResult = LanguageHelper::MaybeLoadTranslationDll(m_commandLineSettings, &m_config);
+	LanguageHelper::LanguageInfo languageInfo;
+
+	if (std::holds_alternative<LanguageHelper::LanguageInfo>(languageResult))
+	{
+		languageInfo = std::get<LanguageHelper::LanguageInfo>(languageResult);
+	}
+	else
+	{
+		auto errorCode = std::get<LanguageHelper::LoadError>(languageResult);
+
+		if (errorCode == LanguageHelper::LoadError::VersionMismatch)
+		{
+			std::wstring versionMismatchMessage = ResourceHelper::LoadString(
+				GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH);
+			MessageBox(nullptr, versionMismatchMessage.c_str(), App::APP_NAME, MB_ICONWARNING);
+		}
+
+		languageInfo = { LanguageHelper::DEFAULT_LANGUAGE, GetModuleHandle(nullptr) };
+	}
+
+	m_config.language = languageInfo.language;
+	m_resourceInstance = languageInfo.resourceInstance;
+
+	if (LanguageHelper::IsLanguageRTL(m_config.language))
+	{
+		SetProcessDefaultLayout(LAYOUT_RTL);
+	}
+
+	ResourceManager::Initialize(std::make_unique<Win32ResourceLoader>(m_resourceInstance));
 }
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
@@ -291,6 +330,11 @@ Applications::ApplicationModel *App::GetApplicationModel()
 IconResourceLoader *App::GetIconResourceLoader() const
 {
 	return m_iconResourceLoader.get();
+}
+
+HINSTANCE App::GetResourceInstance() const
+{
+	return m_resourceInstance;
 }
 
 void App::OnWillRemoveBrowser()

@@ -70,7 +70,7 @@ void Explorerplusplus::InitializeMainMenu()
 
 	// These need to occur after the language module has been initialized, but
 	// before the tabs are restored.
-	HMENU mainMenu = LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU));
+	HMENU mainMenu = LoadMenu(m_app->GetResourceInstance(), MAKEINTRESOURCE(IDR_MAINMENU));
 
 	if (!m_app->GetFeatureList()->IsEnabled(Feature::DualPane))
 	{

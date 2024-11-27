@@ -33,8 +33,6 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 			*m_app->GetCommandLineSettings()->shellChangeNotificationType;
 	}
 
-	SetLanguageModule();
-
 	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
@@ -42,7 +40,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 		m_app->GetIconResourceLoader(), &m_iconFetcher, m_app->GetBookmarkTree(),
 		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_resourceInstance, this);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_app->GetResourceInstance(), this);
 
 	InitializeMainMenu();
 
@@ -65,7 +63,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	UpdateLayout();
 
 	m_taskbarThumbnails = std::make_unique<TaskbarThumbnails>(this,
-		GetActivePane()->GetTabContainer(), m_resourceInstance, m_config);
+		GetActivePane()->GetTabContainer(), m_app->GetResourceInstance(), m_config);
 
 	CreateInitialTabs(storageData);
 
@@ -119,7 +117,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		std::wstring text = GetViewModeMenuText(viewMode, m_resourceInstance);
+		std::wstring text = GetViewModeMenuText(viewMode, m_app->GetResourceInstance());
 
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(itemInfo);

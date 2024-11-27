@@ -1161,7 +1161,6 @@
     <ClCompile Include="AcceleratorHelper.cpp" />
     <ClCompile Include="PluginInterface.cpp" />
     <ClCompile Include="ServiceProvider.cpp" />
-    <ClCompile Include="Language.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Plugins\LuaPlugin.cpp" />
     <ClCompile Include="MainMenuHandler.cpp" />

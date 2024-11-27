@@ -27,7 +27,7 @@ void Explorerplusplus::CreateTabBacking()
 	Only contains the close button used to close tabs. */
 	std::tie(m_hTabWindowToolbar, m_tabWindowToolbarImageList) =
 		ToolbarHelper::CreateCloseButtonToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
-			ResourceHelper::LoadString(m_resourceInstance, IDS_TAB_CLOSE_TIP),
+			ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_TAB_CLOSE_TIP),
 			m_app->GetIconResourceLoader());
 
 	SIZE toolbarSize;

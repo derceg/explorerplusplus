@@ -53,8 +53,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	m_iconFetcher(m_hContainer, m_app->GetCachedIcons()),
 	m_shellIconLoader(&m_iconFetcher)
 {
-	m_resourceInstance = nullptr;
-
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
 	m_hMainRebar = nullptr;
@@ -231,7 +229,7 @@ bool Explorerplusplus::ConfirmClose()
 	}
 
 	std::wstring message = fmt::format(
-		fmt::runtime(ResourceHelper::LoadString(m_resourceInstance, IDS_CLOSE_ALL_TABS)),
+		fmt::runtime(ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_CLOSE_ALL_TABS)),
 		fmt::arg(L"num_tabs", numTabs));
 	int response =
 		MessageBox(m_hContainer, message.c_str(), App::APP_NAME, MB_ICONINFORMATION | MB_YESNO);

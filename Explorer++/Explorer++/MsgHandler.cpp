@@ -716,7 +716,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	{
 		if (column.checked)
 		{
-			auto columnName = ResourceHelper::LoadString(m_resourceInstance,
+			auto columnName = ResourceHelper::LoadString(m_app->GetResourceInstance(),
 				ShellBrowserImpl::LookupColumnNameStringIndex(column.type));
 			strColumnInfo += columnName + L"\t";
 
@@ -852,7 +852,7 @@ void Explorerplusplus::OnCloneWindow()
 void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)));
+		LoadMenu(m_app->GetResourceInstance(), MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)));
 
 	if (!parentMenu)
 	{
@@ -933,7 +933,7 @@ const Config *Explorerplusplus::GetConfig() const
 
 HINSTANCE Explorerplusplus::GetResourceInstance() const
 {
-	return m_resourceInstance;
+	return m_app->GetResourceInstance();
 }
 
 AcceleratorManager *Explorerplusplus::GetAcceleratorManager() const

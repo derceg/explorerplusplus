@@ -50,6 +50,7 @@ public:
 	ColorRuleModel *GetColorRuleModel() const;
 	Applications::ApplicationModel *GetApplicationModel();
 	IconResourceLoader *GetIconResourceLoader() const;
+	HINSTANCE GetResourceInstance() const;
 
 	void TryExit();
 	void SessionEnding();
@@ -63,6 +64,7 @@ private:
 	void SetUpSession();
 	void LoadSettings(std::vector<WindowStorageData> &windows);
 	void SaveSettings();
+	void SetUpLanguageResourceInstance();
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
 	bool IsModelessDialogMessage(MSG *msg);
 	bool MaybeTranslateAccelerator(MSG *msg);
@@ -85,6 +87,7 @@ private:
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
+	HINSTANCE m_resourceInstance;
 	ProcessManager m_processManager;
 
 	concurrencpp::timer m_saveSettingsTimer;

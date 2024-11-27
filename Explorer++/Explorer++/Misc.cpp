@@ -52,7 +52,8 @@ void Explorerplusplus::CopyToFolder(bool move)
 		pidlPtrs.push_back(std::move(pidlPtr));
 	}
 
-	auto title = ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_COPY_TO_FOLDER_TITLE);
+	auto title =
+		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_GENERAL_COPY_TO_FOLDER_TITLE);
 	FileOperations::CopyFilesToFolder(m_hContainer, title, pidls, move);
 }
 
@@ -137,7 +138,7 @@ void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolde
 
 void Explorerplusplus::OnSelectColumns()
 {
-	SelectColumnsDialog selectColumnsDialog(m_resourceInstance, m_hContainer,
+	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceInstance(), m_hContainer,
 		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser(),
 		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();
