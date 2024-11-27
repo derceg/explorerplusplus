@@ -4,13 +4,6 @@
 
 #pragma once
 
-/* Used to share global data across the
-classes within the Explorer++ project. */
-namespace NExplorerplusplus
-{
-const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
-}
-
 /* Used when setting Explorer++ as the default
 file manager. */
 static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++");

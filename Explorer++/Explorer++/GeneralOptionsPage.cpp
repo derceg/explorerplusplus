@@ -171,7 +171,7 @@ void GeneralOptionsPage::AddLanguages()
 	GetProcessImageName(GetCurrentProcessId(), szImageDirectory, SIZEOF_ARRAY(szImageDirectory));
 	PathRemoveFileSpec(szImageDirectory);
 	StringCchCopy(szNamePattern, SIZEOF_ARRAY(szNamePattern), szImageDirectory);
-	PathAppend(szNamePattern, NExplorerplusplus::LANGUAGE_DLL_FILENAME_PATTERN);
+	PathAppend(szNamePattern, L"Explorer++*.dll");
 
 	hFindFile = FindFirstFile(szNamePattern, &wfd);
 
