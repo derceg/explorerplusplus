@@ -9,7 +9,6 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MainWindow.h"

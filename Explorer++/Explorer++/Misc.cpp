@@ -8,7 +8,6 @@
 #include "ColumnStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "SelectColumnsDialog.h"

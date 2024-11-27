@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "AcceleratorHelper.h"
 #include "App.h"
-#include "Explorer++_internal.h"
 #include "FeatureList.h"
 #include "Plugins/PluginManager.h"
 #include "../Helper/Macros.h"

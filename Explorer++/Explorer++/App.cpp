@@ -12,7 +12,6 @@
 #include "ComStaThreadPoolExecutor.h"
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
-#include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"

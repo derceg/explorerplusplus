@@ -11,7 +11,6 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
