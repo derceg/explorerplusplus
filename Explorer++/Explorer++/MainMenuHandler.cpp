@@ -11,7 +11,6 @@
 #include "DestroyFilesDialog.h"
 #include "DisplayColoursDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "Explorer++_internal.h"
 #include "FileProgressSink.h"
 #include "FilterDialog.h"
 #include "MainResource.h"
@@ -143,8 +142,7 @@ void Explorerplusplus::OnSearchTabs()
 
 void Explorerplusplus::OnOpenOnlineDocumentation()
 {
-	ShellExecute(nullptr, L"open", NExplorerplusplus::DOCUMENTATION_LINK, nullptr, nullptr,
-		SW_SHOWNORMAL);
+	ShellExecute(nullptr, L"open", App::DOCUMENTATION_URL, nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 void Explorerplusplus::OnCheckForUpdates()

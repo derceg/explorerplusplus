@@ -29,6 +29,8 @@ class App : private boost::noncopyable
 {
 public:
 	static constexpr wchar_t APP_NAME[] = L"Explorer++";
+	static constexpr wchar_t DOCUMENTATION_URL[] =
+		L"https://explorerplusplus.readthedocs.io/en/latest/";
 
 	App(const CommandLine::Settings *commandLineSettings);
 	~App();

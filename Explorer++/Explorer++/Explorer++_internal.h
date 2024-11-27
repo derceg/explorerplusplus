@@ -8,8 +8,6 @@
 classes within the Explorer++ project. */
 namespace NExplorerplusplus
 {
-constexpr WCHAR DOCUMENTATION_LINK[] = L"https://explorerplusplus.readthedocs.io/en/latest/";
-
 const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
 }
 
