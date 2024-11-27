@@ -428,8 +428,8 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 		std::wstring warningMessage = ResourceHelper::LoadString(m_resourceInstance,
 			IDS_OPTIONS_DIALOG_REPLACE_EXPLORER_WARNING);
 
-		int selectedButton = MessageBox(GetDialog(), warningMessage.c_str(),
-			NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+		int selectedButton = MessageBox(GetDialog(), warningMessage.c_str(), App::APP_NAME,
+			MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
 
 		if (selectedButton == IDNO)
 		{
@@ -503,7 +503,7 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 			ResourceHelper::LoadString(m_resourceInstance, IDS_ERROR_REPLACE_EXPLORER_SETTING)
 			+ L"\n\n" + finalSystemErrorMessage;
 
-		MessageBox(GetDialog(), errorMessage.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
+		MessageBox(GetDialog(), errorMessage.c_str(), App::APP_NAME, MB_ICONWARNING);
 
 		return false;
 	}

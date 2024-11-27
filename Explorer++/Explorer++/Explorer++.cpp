@@ -113,9 +113,9 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 		finalBounds = GetDefaultMainWindowBounds();
 	}
 
-	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
-		WS_OVERLAPPEDWINDOW, finalBounds.left, finalBounds.top, GetRectWidth(&finalBounds),
-		GetRectHeight(&finalBounds), nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, App::APP_NAME, WS_OVERLAPPEDWINDOW,
+		finalBounds.left, finalBounds.top, GetRectWidth(&finalBounds), GetRectHeight(&finalBounds),
+		nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 	CHECK(hwnd);
 
 	return hwnd;
@@ -234,8 +234,8 @@ bool Explorerplusplus::ConfirmClose()
 	std::wstring message = fmt::format(
 		fmt::runtime(ResourceHelper::LoadString(m_resourceInstance, IDS_CLOSE_ALL_TABS)),
 		fmt::arg(L"num_tabs", numTabs));
-	int response = MessageBox(m_hContainer, message.c_str(), NExplorerplusplus::APP_NAME,
-		MB_ICONINFORMATION | MB_YESNO);
+	int response =
+		MessageBox(m_hContainer, message.c_str(), App::APP_NAME, MB_ICONINFORMATION | MB_YESNO);
 
 	if (response == IDNO)
 	{

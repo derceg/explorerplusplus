@@ -336,8 +336,8 @@ bool App::ConfirmExit()
 
 	std::wstring message = fmt::format(fmt::runtime(Resources::LoadString(IDS_CLOSE_ALL_WINDOWS)),
 		fmt::arg(L"num_windows", numWindows));
-	int response = MessageBox(browser->GetHWND(), message.c_str(), NExplorerplusplus::APP_NAME,
-		MB_ICONINFORMATION | MB_YESNO);
+	int response =
+		MessageBox(browser->GetHWND(), message.c_str(), APP_NAME, MB_ICONINFORMATION | MB_YESNO);
 
 	if (response == IDNO)
 	{

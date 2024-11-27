@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "App.h"
 #include "Config.h"
-#include "Explorer++_internal.h"
 #include "LanguageHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -31,8 +30,7 @@ void Explorerplusplus::SetLanguageModule()
 		{
 			std::wstring versionMismatchMessage = ResourceHelper::LoadString(
 				GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH);
-			MessageBox(nullptr, versionMismatchMessage.c_str(), NExplorerplusplus::APP_NAME,
-				MB_ICONWARNING);
+			MessageBox(nullptr, versionMismatchMessage.c_str(), App::APP_NAME, MB_ICONWARNING);
 		}
 
 		languageInfo = { LanguageHelper::DEFAULT_LANGUAGE, GetModuleHandle(nullptr) };

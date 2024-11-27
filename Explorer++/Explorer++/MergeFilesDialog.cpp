@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "MergeFilesDialog.h"
-#include "Explorer++_internal.h"
+#include "App.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -273,8 +273,7 @@ INT_PTR MergeFilesDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 	{
 		auto errorMessage =
 			ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_FILES_OUTPUTFILEINVALID);
-		MessageBox(m_hDlg, errorMessage.c_str(), NExplorerplusplus::APP_NAME,
-			MB_ICONWARNING | MB_OK);
+		MessageBox(m_hDlg, errorMessage.c_str(), App::APP_NAME, MB_ICONWARNING | MB_OK);
 
 		assert(m_pMergeFiles != nullptr);
 
@@ -308,8 +307,7 @@ void MergeFilesDialog::OnOk()
 		{
 			auto errorMessage =
 				ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_OUTPUTINVALID);
-			MessageBox(m_hDlg, errorMessage.c_str(), NExplorerplusplus::APP_NAME,
-				MB_ICONWARNING | MB_OK);
+			MessageBox(m_hDlg, errorMessage.c_str(), App::APP_NAME, MB_ICONWARNING | MB_OK);
 			return;
 		}
 

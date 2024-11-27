@@ -205,8 +205,7 @@ void Explorerplusplus::OnCreateNewFolder()
 	if (FAILED(hr))
 	{
 		auto errorMessage = ResourceHelper::LoadString(m_resourceInstance, IDS_NEWFOLDERERROR);
-		MessageBox(m_hContainer, errorMessage.c_str(), NExplorerplusplus::APP_NAME,
-			MB_ICONERROR | MB_OK);
+		MessageBox(m_hContainer, errorMessage.c_str(), App::APP_NAME, MB_ICONERROR | MB_OK);
 	}
 }
 

@@ -4,12 +4,12 @@
 
 #include "stdafx.h"
 #include "ApplicationContextMenuController.h"
+#include "App.h"
 #include "Application.h"
 #include "ApplicationEditorDialog.h"
 #include "ApplicationExecutor.h"
 #include "ApplicationModel.h"
 #include "CoreInterface.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceManager.h"
 
@@ -72,7 +72,7 @@ void ApplicationContextMenuController::OnDelete()
 {
 	std::wstring message = Resources::LoadString(IDS_APPLICATIONBUTTON_DELETE);
 	int messageBoxReturn = MessageBox(m_coreInterface->GetMainWindow(), message.c_str(),
-		NExplorerplusplus::APP_NAME, MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
+		App::APP_NAME, MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
 	if (messageBoxReturn != IDYES)
 	{

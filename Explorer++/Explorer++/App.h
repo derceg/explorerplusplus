@@ -28,6 +28,8 @@ struct WindowStorageData;
 class App : private boost::noncopyable
 {
 public:
+	static constexpr wchar_t APP_NAME[] = L"Explorer++";
+
 	App(const CommandLine::Settings *commandLineSettings);
 	~App();
 

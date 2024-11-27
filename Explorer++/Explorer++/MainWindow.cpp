@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "MainWindow.h"
+#include "App.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -130,7 +130,7 @@ void MainWindow::UpdateWindowText()
 		GetDisplayName(pidlDirectory.get(), SHGDN_NORMAL, folderDisplayName);
 	}
 
-	std::wstring title = std::format(L"{} - {}", folderDisplayName, NExplorerplusplus::APP_NAME);
+	std::wstring title = std::format(L"{} - {}", folderDisplayName, App::APP_NAME);
 
 	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
 	{

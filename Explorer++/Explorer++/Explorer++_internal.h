@@ -8,7 +8,6 @@
 classes within the Explorer++ project. */
 namespace NExplorerplusplus
 {
-const TCHAR APP_NAME[] = _T("Explorer++");
 const TCHAR CLASS_NAME[] = _T("Explorer++");
 
 constexpr WCHAR DOCUMENTATION_LINK[] = L"https://explorerplusplus.readthedocs.io/en/latest/";

@@ -4,10 +4,10 @@
 
 #include "stdafx.h"
 #include "CustomizeColorsDialog.h"
+#include "App.h"
 #include "ColorRuleEditorDialog.h"
 #include "ColorRuleListView.h"
 #include "ColorRuleModel.h"
-#include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -199,7 +199,7 @@ void CustomizeColorsDialog::OnDelete()
 
 	std::wstring deleteMessage =
 		ResourceHelper::LoadString(GetResourceInstance(), IDS_COLOR_RULE_DELETE);
-	int confirmResult = MessageBox(m_hDlg, deleteMessage.c_str(), NExplorerplusplus::APP_NAME,
+	int confirmResult = MessageBox(m_hDlg, deleteMessage.c_str(), App::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
 	if (confirmResult != IDYES)
@@ -216,7 +216,7 @@ void CustomizeColorsDialog::OnDeleteAll()
 {
 	std::wstring deleteAllMessage =
 		ResourceHelper::LoadString(GetResourceInstance(), IDS_COLOR_RULE_DELETE_ALL);
-	int confirmResult = MessageBox(m_hDlg, deleteAllMessage.c_str(), NExplorerplusplus::APP_NAME,
+	int confirmResult = MessageBox(m_hDlg, deleteAllMessage.c_str(), App::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
 	if (confirmResult != IDYES)
