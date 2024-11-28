@@ -1,0 +1,36 @@
+{
+  "FileVersion": 2,
+  "Id": "7544a240-2ebf-4dc1-b55b-c8ae32672ed0",
+  "Items": [
+    {
+      "Id": "105b54ba-b99f-4a1e-80c0-019788b6a279",
+      "Command": "Features",
+      "Items": [
+        {
+          "Id": "39312888-138a-4a4c-ab13-357bbb4eb0cf",
+          "Command": "--enable-features DualPane"
+        },
+        {
+          "Id": "43cf330b-d035-476a-862b-ece1829ee651",
+          "Command": "--enable-features Plugins"
+        },
+        {
+          "Id": "ef398640-b67c-48f9-ade8-2390d1d26f45",
+          "Command": "--enable-features AutomaticQuickAccessUpdates"
+        },
+        {
+          "Id": "a4e3f345-13d9-4044-9cb3-32eacd9bcbed",
+          "Command": "--enable-features MultipleWindowsPerSession"
+        }
+      ]
+    },
+    {
+      "Id": "10037857-7723-4579-a4d2-9ab1b32334d6",
+      "Command": "--enable-logging"
+    },
+    {
+      "Id": "4ef8d90d-c368-4b8f-bf6b-631bda596094",
+      "Command": "--open-new-tab"
+    }
+  ]
+}
