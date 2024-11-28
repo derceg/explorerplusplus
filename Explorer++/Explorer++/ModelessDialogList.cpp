@@ -20,6 +20,7 @@ void ModelessDialogList::RemoveDialog(std::wstring id)
 	DCHECK_EQ(numRemoved, 1u);
 }
 
+// TODO: This should use std::generator once C++23 support is available.
 concurrencpp::generator<HWND> ModelessDialogList::GetList() const
 {
 	for (auto dialog : m_dialogMap | std::views::values)

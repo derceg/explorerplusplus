@@ -243,6 +243,7 @@
     <ClCompile Include="RuntimeHelperTest.cpp" />
     <ClCompile Include="RuntimeTest.cpp" />
     <ClCompile Include="RuntimeTestHelper.cpp" />
+    <ClCompile Include="TabRestorerTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
     <ClCompile Include="PasteSymLinksServerClientTest.cpp" />

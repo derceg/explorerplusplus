@@ -56,7 +56,6 @@ __interface IDirectoryMonitor;
 class ShellBrowserImpl;
 class StatusBar;
 class TabContainer;
-class TabRestorer;
 
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
@@ -75,7 +74,6 @@ public:
 	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;
 
 	virtual TabContainer *GetTabContainer() const = 0;
-	virtual TabRestorer *GetTabRestorer() const = 0;
 	virtual IDirectoryMonitor *GetDirectoryMonitor() const = 0;
 
 	virtual CachedIcons *GetCachedIcons() = 0;

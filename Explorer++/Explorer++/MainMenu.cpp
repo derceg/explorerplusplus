@@ -15,6 +15,7 @@
 #include "MainResource.h"
 #include "MenuRanges.h"
 #include "ResourceHelper.h"
+#include "TabRestorerMenu.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -95,6 +96,12 @@ void Explorerplusplus::InitializeMainMenu()
 	}
 
 	SetMenu(m_hContainer, mainMenu);
+
+	m_tabRestorerMenuView =
+		std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_FILE_REOPEN_RECENT_TAB);
+	m_tabRestorerMenu = std::make_unique<TabRestorerMenu>(m_tabRestorerMenuView.get(),
+		m_app->GetAcceleratorManager(), m_app->GetTabRestorer(), &m_shellIconLoader,
+		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 
 	AddViewModesToMenu(mainMenu, IDM_VIEW_PLACEHOLDER, FALSE);
 	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);

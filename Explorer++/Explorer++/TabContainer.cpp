@@ -22,7 +22,6 @@
 #include "SystemFontHelper.h"
 #include "TabBacking.h"
 #include "TabContainerBackgroundContextMenu.h"
-#include "TabRestorer.h"
 #include "TabStorage.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
@@ -615,7 +614,8 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	PopupMenuView popupMenu;
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(),
-		this, m_bookmarkTree, m_coreInterface, m_app->GetIconResourceLoader());
+		this, m_app->GetTabRestorer(), m_bookmarkTree, m_coreInterface,
+		m_app->GetIconResourceLoader());
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 
@@ -1068,7 +1068,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 		return false;
 	}
 
-	tabPreRemovalSignal.m_signal(tab);
+	m_app->GetGlobalTabEventDispatcher()->NotifyPreRemoval(tab, GetTabIndex(tab));
 
 	RemoveTabFromControl(tab);
 

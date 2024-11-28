@@ -11,9 +11,11 @@
 #include "CommandLine.h"
 #include "Config.h"
 #include "FeatureList.h"
+#include "GlobalTabEventDispatcher.h"
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
+#include "TabRestorer.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -51,6 +53,8 @@ public:
 	Applications::ApplicationModel *GetApplicationModel();
 	IconResourceLoader *GetIconResourceLoader() const;
 	HINSTANCE GetResourceInstance() const;
+	GlobalTabEventDispatcher *GetGlobalTabEventDispatcher();
+	TabRestorer *GetTabRestorer();
 
 	void TryExit();
 	void SessionEnding();
@@ -89,6 +93,8 @@ private:
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 	HINSTANCE m_resourceInstance;
 	ProcessManager m_processManager;
+	GlobalTabEventDispatcher m_globalTabEventDispatcher;
+	TabRestorer m_tabRestorer;
 
 	concurrencpp::timer m_saveSettingsTimer;
 

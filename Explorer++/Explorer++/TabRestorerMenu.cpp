@@ -39,7 +39,7 @@ void TabRestorerMenu::RebuildMenu()
 	m_idCounter = m_menuStartId;
 	m_menuItemMappings.clear();
 
-	if (m_tabRestorer->GetClosedTabs().empty())
+	if (m_tabRestorer->IsEmpty())
 	{
 		auto id = m_idCounter++;
 		m_menuView->AppendItem(id, Resources::LoadString(IDS_NO_RECENT_TABS));
@@ -47,8 +47,8 @@ void TabRestorerMenu::RebuildMenu()
 		return;
 	}
 
-	for (size_t index = 0; const auto &closedTab :
-		 m_tabRestorer->GetClosedTabs() | std::ranges::views::take(MAX_MENU_ITEMS))
+	for (size_t index = 0;
+		 const auto &closedTab : m_tabRestorer->GetClosedTabs() | std::views::take(MAX_MENU_ITEMS))
 	{
 		AddMenuItemForClosedTab(closedTab.get(), index == 0);
 		index++;

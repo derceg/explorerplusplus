@@ -7,18 +7,22 @@
 #include "PreservedTab.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
+#include <list>
+#include <vector>
 
-class TabContainer;
+class BrowserList;
+class GlobalTabEventDispatcher;
 
 class TabRestorer : private boost::noncopyable
 {
 public:
 	using ItemsChangedSignal = boost::signals2::signal<void()>;
 
-	TabRestorer(TabContainer *tabContainer);
+	TabRestorer(GlobalTabEventDispatcher *globalTabEventDispatcher, const BrowserList *browserList);
 
-	const std::vector<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
+	const std::list<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
 	const PreservedTab *GetTabById(int id) const;
+	bool IsEmpty() const;
 	void RestoreLastTab();
 	void RestoreTabById(int id);
 
@@ -26,12 +30,13 @@ public:
 		const ItemsChangedSignal::slot_type &observer);
 
 private:
-	void OnTabPreRemoval(const Tab &tab);
+	void OnTabPreRemoval(const Tab &tab, int index);
+	void RestoreTabIntoBrowser(PreservedTab *tab);
 
-	TabContainer *m_tabContainer;
+	const BrowserList *const m_browserList;
+
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	std::vector<std::unique_ptr<PreservedTab>> m_closedTabs;
-
+	std::list<std::unique_ptr<PreservedTab>> m_closedTabs;
 	ItemsChangedSignal m_itemsChangedSignal;
 };

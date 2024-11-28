@@ -1374,7 +1374,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDA_RESTORE_LAST_TAB:
-		m_tabRestorer->RestoreLastTab();
+		m_app->GetTabRestorer()->RestoreLastTab();
 		break;
 
 	case MainToolbarButton::Views:

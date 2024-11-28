@@ -757,6 +757,9 @@
     <ClCompile Include="LanguageHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="GlobalTabEventDispatcher.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1565,6 +1568,9 @@
     </ClInclude>
     <ClInclude Include="LanguageHelper.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalTabEventDispatcher.h">
+      <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

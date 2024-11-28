@@ -13,13 +13,14 @@ class CoreInterface;
 class IconResourceLoader;
 class MenuView;
 class TabContainer;
+class TabRestorer;
 
 class TabContainerBackgroundContextMenu : public MenuBase
 {
 public:
 	TabContainerBackgroundContextMenu(MenuView *menuView,
 		const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
-		BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
+		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
 		const IconResourceLoader *iconResourceLoader);
 
 private:
@@ -27,6 +28,7 @@ private:
 	void OnMenuItemSelected(UINT menuItemId);
 
 	TabContainer *const m_tabContainer;
+	TabRestorer *const m_tabRestorer;
 	BookmarkTree *const m_bookmarkTree;
 	CoreInterface *const m_coreInterface;
 	const IconResourceLoader *const m_iconResourceLoader;

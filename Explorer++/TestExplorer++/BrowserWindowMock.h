@@ -19,6 +19,7 @@ public:
 	MOCK_METHOD(BrowserCommandController *, GetCommandController, (), (override));
 	MOCK_METHOD(BrowserPane *, GetActivePane, (), (const, override));
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
+	MOCK_METHOD(void, CreateTabFromPreservedTab, (PreservedTab * tab), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));

@@ -30,6 +30,7 @@ void BrowserList::RemoveBrowser(BrowserWindow *browser)
 	browserRemovedSignal.m_signal(browser);
 }
 
+// TODO: This should use std::generator once C++23 support is available.
 concurrencpp::generator<BrowserWindow *> BrowserList::GetList() const
 {
 	for (const auto &browserData : m_browsers)

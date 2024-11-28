@@ -4,22 +4,27 @@
 
 #include "stdafx.h"
 #include "TabRestorer.h"
-#include "TabContainer.h"
+#include "BrowserList.h"
+#include "BrowserWindow.h"
+#include "GlobalTabEventDispatcher.h"
 
-TabRestorer::TabRestorer(TabContainer *tabContainer) : m_tabContainer(tabContainer)
+TabRestorer::TabRestorer(GlobalTabEventDispatcher *globalTabEventDispatcher,
+	const BrowserList *browserList) :
+	m_browserList(browserList)
 {
-	m_connections.push_back(m_tabContainer->tabPreRemovalSignal.AddObserver(
+	m_connections.push_back(globalTabEventDispatcher->AddPreRemovalObserver(
 		std::bind_front(&TabRestorer::OnTabPreRemoval, this)));
 }
 
-void TabRestorer::OnTabPreRemoval(const Tab &tab)
+void TabRestorer::OnTabPreRemoval(const Tab &tab, int index)
 {
-	auto closedTab = std::make_unique<PreservedTab>(tab, m_tabContainer->GetTabIndex(tab));
+	auto closedTab = std::make_unique<PreservedTab>(tab, index);
 	m_closedTabs.insert(m_closedTabs.begin(), std::move(closedTab));
 	m_itemsChangedSignal();
 }
 
-const std::vector<std::unique_ptr<PreservedTab>> &TabRestorer::GetClosedTabs() const
+// TODO: This should use std::generator once C++23 support is available.
+const std::list<std::unique_ptr<PreservedTab>> &TabRestorer::GetClosedTabs() const
 {
 	return m_closedTabs;
 }
@@ -37,6 +42,11 @@ const PreservedTab *TabRestorer::GetTabById(int id) const
 	return itr->get();
 }
 
+bool TabRestorer::IsEmpty() const
+{
+	return m_closedTabs.empty();
+}
+
 void TabRestorer::RestoreLastTab()
 {
 	if (m_closedTabs.empty())
@@ -47,7 +57,7 @@ void TabRestorer::RestoreLastTab()
 	auto itr = m_closedTabs.begin();
 
 	auto lastClosedTab = itr->get();
-	m_tabContainer->CreateNewTab(*lastClosedTab);
+	RestoreTabIntoBrowser(lastClosedTab);
 	m_closedTabs.erase(itr);
 	m_itemsChangedSignal();
 }
@@ -63,9 +73,23 @@ void TabRestorer::RestoreTabById(int id)
 	}
 
 	auto closedTab = itr->get();
-	m_tabContainer->CreateNewTab(*closedTab);
+	RestoreTabIntoBrowser(closedTab);
 	m_closedTabs.erase(itr);
 	m_itemsChangedSignal();
+}
+
+void TabRestorer::RestoreTabIntoBrowser(PreservedTab *tab)
+{
+	// TODO: Should attempt to find the original browser, instead of always restoring to the last
+	// active browser.
+	auto *lastActiveBrowser = m_browserList->GetLastActive();
+
+	if (!lastActiveBrowser)
+	{
+		return;
+	}
+
+	lastActiveBrowser->CreateTabFromPreservedTab(tab);
 }
 
 boost::signals2::connection TabRestorer::AddItemsChangedObserver(

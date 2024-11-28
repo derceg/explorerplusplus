@@ -985,11 +985,6 @@ TabContainer *Explorerplusplus::GetTabContainer() const
 	return GetActivePane()->GetTabContainer();
 }
 
-TabRestorer *Explorerplusplus::GetTabRestorer() const
-{
-	return m_tabRestorer.get();
-}
-
 HWND Explorerplusplus::GetTreeView() const
 {
 	return m_shellTreeView->GetHWND();

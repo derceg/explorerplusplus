@@ -14,10 +14,11 @@
 
 TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
-	BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
+	TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
 	const IconResourceLoader *iconResourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_tabContainer(tabContainer),
+	m_tabRestorer(tabRestorer),
 	m_bookmarkTree(bookmarkTree),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader)
@@ -40,7 +41,7 @@ void TabContainerBackgroundContextMenu::BuildMenu()
 		Resources::LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
-	if (m_coreInterface->GetTabRestorer()->GetClosedTabs().empty())
+	if (m_tabRestorer->IsEmpty())
 	{
 		m_menuView->EnableItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, false);
 	}
@@ -55,7 +56,7 @@ void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
 		break;
 
 	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
-		m_coreInterface->GetTabRestorer()->RestoreLastTab();
+		m_tabRestorer->RestoreLastTab();
 		break;
 
 	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:

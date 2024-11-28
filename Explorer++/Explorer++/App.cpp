@@ -41,6 +41,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
+	m_tabRestorer(&m_globalTabEventDispatcher, &m_browserList),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
@@ -340,6 +341,16 @@ IconResourceLoader *App::GetIconResourceLoader() const
 HINSTANCE App::GetResourceInstance() const
 {
 	return m_resourceInstance;
+}
+
+GlobalTabEventDispatcher *App::GetGlobalTabEventDispatcher()
+{
+	return &m_globalTabEventDispatcher;
+}
+
+TabRestorer *App::GetTabRestorer()
+{
+	return &m_tabRestorer;
 }
 
 void App::OnWillRemoveBrowser()

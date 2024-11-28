@@ -62,7 +62,6 @@ struct RebarBandStorageInfo;
 class ShellBrowserImpl;
 class ShellTreeView;
 class TabContainer;
-class TabRestorer;
 class TabRestorerMenu;
 struct TabSettings;
 struct TabStorageData;
@@ -108,6 +107,7 @@ public:
 	BrowserPane *GetActivePane() const override;
 	BrowserCommandController *GetCommandController() override;
 	void FocusActiveTab() override;
+	void CreateTabFromPreservedTab(PreservedTab *tab) override;
 
 	// Note that there is also GetActiveShellBrowserImpl() declared below. There are some places
 	// where this method can be used, as the calling code only uses methods from the ShellBrowser
@@ -481,7 +481,6 @@ private:
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainer *GetTabContainer() const override;
-	TabRestorer *GetTabRestorer() const override;
 	HWND GetTreeView() const override;
 	IDirectoryMonitor *GetDirectoryMonitor() const override;
 	CachedIcons *GetCachedIcons() override;
@@ -583,7 +582,6 @@ private:
 	/* Tabs. */
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
-	std::unique_ptr<TabRestorer> m_tabRestorer;
 	std::unique_ptr<MainMenuSubMenuView> m_tabRestorerMenuView;
 	std::unique_ptr<TabRestorerMenu> m_tabRestorerMenu;
 	TabsInitializedSignal m_tabsInitializedSignal;

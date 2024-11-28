@@ -44,6 +44,11 @@ public:
 	{
 	}
 
+	void CreateTabFromPreservedTab(PreservedTab *tab) override
+	{
+		UNREFERENCED_PARAMETER(tab);
+	}
+
 	ShellBrowser *GetActiveShellBrowser() override
 	{
 		return nullptr;

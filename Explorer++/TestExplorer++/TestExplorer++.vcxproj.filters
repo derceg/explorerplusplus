@@ -295,6 +295,9 @@
     <ClCompile Include="LanguageHelperTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="TabRestorerTest.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
