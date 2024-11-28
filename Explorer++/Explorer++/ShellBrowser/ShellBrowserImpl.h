@@ -78,9 +78,9 @@ public:
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
-	FolderSettings GetFolderSettings() const;
 
-	// ShellBrowserInterface
+	// ShellBrowser
+	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 

@@ -7,12 +7,12 @@
 #include "FolderSettings.h"
 #include <boost/core/noncopyable.hpp>
 
-class ShellBrowserImpl;
+class ShellBrowser;
 
 struct PreservedFolderState : private boost::noncopyable
 {
 public:
-	PreservedFolderState(const ShellBrowserImpl *shellBrowser);
+	PreservedFolderState(const ShellBrowser *shellBrowser);
 
 	FolderSettings folderSettings;
 };

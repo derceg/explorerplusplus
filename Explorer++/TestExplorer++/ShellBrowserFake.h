@@ -25,7 +25,8 @@ public:
 		HistoryEntryType addHistoryType = HistoryEntryType::AddEntry,
 		PidlAbsolute *outputPidl = nullptr);
 
-	// ShellBrowserInterface
+	// ShellBrowser
+	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 

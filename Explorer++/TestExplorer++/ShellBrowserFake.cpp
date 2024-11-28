@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "ShellBrowserFake.h"
+#include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowserHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
@@ -39,6 +40,11 @@ HRESULT ShellBrowserFake::NavigateToPath(const std::wstring &path, HistoryEntryT
 	}
 
 	return hr;
+}
+
+FolderSettings ShellBrowserFake::GetFolderSettings() const
+{
+	return {};
 }
 
 ShellNavigationController *ShellBrowserFake::GetNavigationController() const
