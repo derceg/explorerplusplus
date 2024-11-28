@@ -5,18 +5,18 @@
 #include "stdafx.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 
 PreservedTab::PreservedTab(const Tab &tab, int index) :
 	id(tab.GetId()),
 	index(index),
 	history(CopyHistoryEntries(tab)),
-	currentEntry(tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentIndex()),
+	currentEntry(tab.GetShellBrowser()->GetNavigationController()->GetCurrentIndex()),
 	useCustomName(tab.GetUseCustomName()),
 	customName(tab.GetUseCustomName() ? tab.GetName() : std::wstring()),
 	lockState(tab.GetLockState()),
-	preservedFolderState(tab.GetShellBrowserImpl())
+	preservedFolderState(tab.GetShellBrowser())
 {
 }
 
@@ -26,11 +26,11 @@ std::vector<std::unique_ptr<PreservedHistoryEntry>> PreservedTab::CopyHistoryEnt
 {
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> history;
 
-	for (int i = 0;
-		 i < tab.GetShellBrowserImpl()->GetNavigationController()->GetNumHistoryEntries(); i++)
+	for (int i = 0; i < tab.GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries();
+		 i++)
 	{
 		auto entry = std::make_unique<PreservedHistoryEntry>(
-			*tab.GetShellBrowserImpl()->GetNavigationController()->GetEntryAtIndex(i));
+			*tab.GetShellBrowser()->GetNavigationController()->GetEntryAtIndex(i));
 		history.push_back(std::move(entry));
 	}
 
