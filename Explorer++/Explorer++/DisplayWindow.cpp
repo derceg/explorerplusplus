@@ -19,7 +19,7 @@ void Explorerplusplus::UpdateDisplayWindow(const Tab &tab)
 {
 	DisplayWindow_ClearTextBuffer(m_displayWindow->GetHWND());
 
-	int nSelected = tab.GetShellBrowser()->GetNumSelected();
+	int nSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 
 	if (nSelected == 0)
 	{
@@ -41,8 +41,8 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 	DisplayWindow_ClearTextBuffer(m_displayWindow->GetHWND());
 	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), EMPTY_STRING, FALSE);
 
-	std::wstring currentDirectory = tab.GetShellBrowser()->GetDirectory();
-	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
+	std::wstring currentDirectory = tab.GetShellBrowserImpl()->GetDirectory();
+	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlComputer;
 	SHGetFolderLocation(nullptr, CSIDL_DRIVES, nullptr, 0, wil::out_param(pidlComputer));
@@ -104,18 +104,18 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 	if (iSelected != -1)
 	{
-		std::wstring filename = tab.GetShellBrowser()->GetItemName(iSelected);
+		std::wstring filename = tab.GetShellBrowserImpl()->GetItemName(iSelected);
 
 		/* File name. */
 		DisplayWindow_BufferText(m_displayWindow->GetHWND(), filename.c_str());
 
-		std::wstring fullItemName = tab.GetShellBrowser()->GetItemFullName(iSelected);
+		std::wstring fullItemName = tab.GetShellBrowserImpl()->GetItemFullName(iSelected);
 
-		if (!tab.GetShellBrowser()->InVirtualFolder())
+		if (!tab.GetShellBrowserImpl()->InVirtualFolder())
 		{
 			DWORD dwAttributes;
 
-			wfd = tab.GetShellBrowser()->GetItemFileFindData(iSelected);
+			wfd = tab.GetShellBrowserImpl()->GetItemFileFindData(iSelected);
 
 			dwAttributes = GetFileAttributes(fullItemName.c_str());
 
@@ -367,7 +367,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 
 	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), EMPTY_STRING, FALSE);
 
-	nSelected = tab.GetShellBrowser()->GetNumSelected();
+	nSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 
 	LoadString(m_app->GetResourceInstance(), IDS_GENERAL_SELECTED_MULTIPLE_ITEMS, szMore,
 		SIZEOF_ARRAY(szMore));
@@ -376,9 +376,9 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 
 	DisplayWindow_BufferText(m_displayWindow->GetHWND(), szNumSelected);
 
-	if (!tab.GetShellBrowser()->InVirtualFolder())
+	if (!tab.GetShellBrowserImpl()->InVirtualFolder())
 	{
-		uint64_t selectionSize = tab.GetShellBrowser()->GetSelectionSize();
+		uint64_t selectionSize = tab.GetShellBrowserImpl()->GetSelectionSize();
 		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
 			: +SizeDisplayFormat::None;

@@ -377,6 +377,6 @@ void FilesFoldersOptionsPage::SaveSettings()
 
 	for (auto &tab : m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab->GetShellBrowser()->GetNavigationController()->Refresh();
+		tab->GetShellBrowserImpl()->GetNavigationController()->Refresh();
 	}
 }

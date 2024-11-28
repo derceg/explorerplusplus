@@ -200,7 +200,7 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	{
 		Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+		tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
 	}
 	break;
 
@@ -445,7 +445,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 			height -= tabWindowHeight;
 		}
 
-		SetWindowPos(tab->GetShellBrowser()->GetListView(), NULL, indentLeft, indentTop, width,
+		SetWindowPos(tab->GetShellBrowserImpl()->GetListView(), NULL, indentLeft, indentTop, width,
 			height, uFlags);
 	}
 
@@ -538,7 +538,7 @@ int Explorerplusplus::OnDestroy()
 
 void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
 {
-	if (tab.GetShellBrowser()->InVirtualFolder())
+	if (tab.GetShellBrowserImpl()->InVirtualFolder())
 	{
 		return;
 	}
@@ -546,10 +546,10 @@ void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
 	DirectoryAltered *directoryAltered = (DirectoryAltered *) malloc(sizeof(DirectoryAltered));
 
 	directoryAltered->iIndex = tab.GetId();
-	directoryAltered->iFolderIndex = tab.GetShellBrowser()->GetUniqueFolderId();
+	directoryAltered->iFolderIndex = tab.GetShellBrowserImpl()->GetUniqueFolderId();
 	directoryAltered->pData = this;
 
-	std::wstring directoryToWatch = tab.GetShellBrowser()->GetDirectory();
+	std::wstring directoryToWatch = tab.GetShellBrowserImpl()->GetDirectory();
 
 	/* Start monitoring the directory that was opened. */
 	LOG(INFO) << "Starting directory monitoring for \"" << wstrToUtf8Str(directoryToWatch) << "\"";
@@ -565,12 +565,12 @@ void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
 		return;
 	}
 
-	tab.GetShellBrowser()->SetDirMonitorId(*dirMonitorId);
+	tab.GetShellBrowserImpl()->SetDirMonitorId(*dirMonitorId);
 }
 
 void Explorerplusplus::StopDirectoryMonitoringForTab(const Tab &tab)
 {
-	auto dirMonitorId = tab.GetShellBrowser()->GetDirMonitorId();
+	auto dirMonitorId = tab.GetShellBrowserImpl()->GetDirMonitorId();
 
 	if (!dirMonitorId)
 	{
@@ -578,7 +578,7 @@ void Explorerplusplus::StopDirectoryMonitoringForTab(const Tab &tab)
 	}
 
 	m_pDirMon->StopDirectoryMonitor(*dirMonitorId);
-	tab.GetShellBrowser()->ClearDirMonitorId();
+	tab.GetShellBrowserImpl()->ClearDirMonitorId();
 }
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
@@ -599,7 +599,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 void Explorerplusplus::OnToolbarViews()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->CycleViewMode(true);
+	selectedTab.GetShellBrowserImpl()->CycleViewMode(true);
 }
 
 // This is used for both Tab/Shift+Tab and F6/Shift+F6. While IsDialogMessage() could be used to
@@ -702,7 +702,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 void Explorerplusplus::OnRefresh()
 {
 	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	tab.GetShellBrowser()->GetNavigationController()->Refresh();
+	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard()
@@ -829,7 +829,7 @@ void Explorerplusplus::OnAssocChanged()
 	/* Now, go through each tab, and refresh each icon. */
 	for (auto &tab : GetActivePane()->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab->GetShellBrowser()->GetNavigationController()->Refresh();
+		tab->GetShellBrowserImpl()->GetNavigationController()->Refresh();
 	}
 
 	/* Now, refresh the treeview. */
@@ -902,52 +902,52 @@ void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 void Explorerplusplus::OnSortBy(SortMode sortMode)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	SortMode currentSortMode = selectedTab.GetShellBrowser()->GetSortMode();
+	SortMode currentSortMode = selectedTab.GetShellBrowserImpl()->GetSortMode();
 
 	if (sortMode == currentSortMode)
 	{
-		selectedTab.GetShellBrowser()->SetSortDirection(
-			InvertSortDirection(selectedTab.GetShellBrowser()->GetSortDirection()));
+		selectedTab.GetShellBrowserImpl()->SetSortDirection(
+			InvertSortDirection(selectedTab.GetShellBrowserImpl()->GetSortDirection()));
 	}
 	else
 	{
-		selectedTab.GetShellBrowser()->SetSortMode(sortMode);
+		selectedTab.GetShellBrowserImpl()->SetSortMode(sortMode);
 	}
 }
 
 void Explorerplusplus::OnGroupBy(SortMode groupMode)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	SortMode currentGroupMode = selectedTab.GetShellBrowser()->GetGroupMode();
+	SortMode currentGroupMode = selectedTab.GetShellBrowserImpl()->GetGroupMode();
 
-	if (selectedTab.GetShellBrowser()->GetShowInGroups() && groupMode == currentGroupMode)
+	if (selectedTab.GetShellBrowserImpl()->GetShowInGroups() && groupMode == currentGroupMode)
 	{
-		selectedTab.GetShellBrowser()->SetGroupSortDirection(
-			InvertSortDirection(selectedTab.GetShellBrowser()->GetGroupSortDirection()));
+		selectedTab.GetShellBrowserImpl()->SetGroupSortDirection(
+			InvertSortDirection(selectedTab.GetShellBrowserImpl()->GetGroupSortDirection()));
 	}
 	else
 	{
-		selectedTab.GetShellBrowser()->SetGroupMode(groupMode);
-		selectedTab.GetShellBrowser()->SetShowInGroups(true);
+		selectedTab.GetShellBrowserImpl()->SetGroupMode(groupMode);
+		selectedTab.GetShellBrowserImpl()->SetShowInGroups(true);
 	}
 }
 
 void Explorerplusplus::OnGroupByNone()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->SetShowInGroups(false);
+	selectedTab.GetShellBrowserImpl()->SetShowInGroups(false);
 }
 
 void Explorerplusplus::OnSortDirectionSelected(SortDirection direction)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->SetSortDirection(direction);
+	selectedTab.GetShellBrowserImpl()->SetSortDirection(direction);
 }
 
 void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->SetGroupSortDirection(direction);
+	selectedTab.GetShellBrowserImpl()->SetGroupSortDirection(direction);
 }
 
 const Config *Explorerplusplus::GetConfig() const
@@ -1008,8 +1008,8 @@ CachedIcons *Explorerplusplus::GetCachedIcons()
 void Explorerplusplus::OnShowHiddenFiles()
 {
 	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	tab.GetShellBrowser()->SetShowHidden(!tab.GetShellBrowser()->GetShowHidden());
-	tab.GetShellBrowser()->GetNavigationController()->Refresh();
+	tab.GetShellBrowserImpl()->SetShowHidden(!tab.GetShellBrowserImpl()->GetShowHidden());
+	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
 void Explorerplusplus::FocusChanged()
@@ -1029,7 +1029,7 @@ boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 void Explorerplusplus::FocusActiveTab()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	SetFocus(selectedTab.GetShellBrowser()->GetListView());
+	SetFocus(selectedTab.GetShellBrowserImpl()->GetListView());
 }
 
 bool Explorerplusplus::OnActivate(int activationState, bool minimized)

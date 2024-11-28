@@ -191,5 +191,8 @@ ShellBrowser *BrowserCommandController::GetSelectedShellBrowser() const
 		return m_testShellBrowser;
 	}
 
-	return m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	return m_browserWindow->GetActivePane()
+		->GetTabContainer()
+		->GetSelectedTab()
+		.GetShellBrowserImpl();
 }

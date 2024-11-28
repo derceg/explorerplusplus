@@ -13,6 +13,7 @@ class FileActionHandler;
 struct FolderColumns;
 struct FolderSettings;
 struct PreservedTab;
+class ShellBrowser;
 class ShellBrowserImpl;
 class TabNavigationInterface;
 struct TabStorageData;
@@ -42,13 +43,14 @@ public:
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)>
 		TabUpdatedSignal;
 
-	Tab(std::shared_ptr<ShellBrowserImpl> shellBrowser);
-	Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowserImpl> shellBrowser);
+	Tab(std::shared_ptr<ShellBrowser> shellBrowser);
+	Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser);
 
 	int GetId() const;
 
-	ShellBrowserImpl *GetShellBrowser() const;
-	std::weak_ptr<ShellBrowserImpl> GetShellBrowserWeak() const;
+	ShellBrowser *GetShellBrowser() const;
+	ShellBrowserImpl *GetShellBrowserImpl() const;
+	std::weak_ptr<ShellBrowserImpl> GetShellBrowserImplWeak() const;
 
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
@@ -73,7 +75,8 @@ private:
 	static int idCounter;
 	const int m_id;
 
-	std::shared_ptr<ShellBrowserImpl> m_shellBrowser;
+	std::shared_ptr<ShellBrowser> m_shellBrowser;
+	std::shared_ptr<ShellBrowserImpl> m_shellBrowserImpl;
 
 	bool m_useCustomName;
 	std::wstring m_customName;

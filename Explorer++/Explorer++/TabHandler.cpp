@@ -82,7 +82,7 @@ void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
 	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
 
 	/* TODO: This subclass needs to be removed. */
-	SetWindowSubclass(tab.GetShellBrowser()->GetListView(), ListViewProcStub, 0,
+	SetWindowSubclass(tab.GetShellBrowserImpl()->GetListView(), ListViewProcStub, 0,
 		reinterpret_cast<DWORD_PTR>(this));
 }
 
@@ -105,7 +105,7 @@ void Explorerplusplus::OnNavigationCommitted(const Tab &tab, const NavigateParam
 
 	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::Disabled
 		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
-			&& !tab.GetShellBrowser()->InVirtualFolder()))
+			&& !tab.GetShellBrowserImpl()->InVirtualFolder()))
 	{
 		StartDirectoryMonitoringForTab(tab);
 	}
@@ -116,19 +116,19 @@ void Explorerplusplus::OnNavigationCommitted(const Tab &tab, const NavigateParam
 void Explorerplusplus::OnNewTab()
 {
 	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(), -1,
+	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowserImpl()->GetListView(), -1,
 		LVNI_FOCUSED | LVNI_SELECTED);
 
 	if (selectionIndex != -1)
 	{
-		auto fileFindData = selectedTab.GetShellBrowser()->GetItemFileFindData(selectionIndex);
+		auto fileFindData = selectedTab.GetShellBrowserImpl()->GetItemFileFindData(selectionIndex);
 
 		/* If the selected item is a folder, open that folder in a new tab, else
 		 * just use the default new tab directory. */
 		if (WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 		{
-			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
-			FolderColumns cols = selectedTab.GetShellBrowser()->ExportAllColumns();
+			auto pidl = selectedTab.GetShellBrowserImpl()->GetItemCompleteIdl(selectionIndex);
+			FolderColumns cols = selectedTab.GetShellBrowserImpl()->ExportAllColumns();
 
 			auto navigateParams = NavigateParams::Normal(pidl.get());
 			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
@@ -240,9 +240,10 @@ void Explorerplusplus::CreateCommandLineTabs()
 		Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
 			TabSettings(_selected = true));
 
-		if (ArePidlsEquivalent(newTab.GetShellBrowser()->GetDirectoryIdl().get(), parentPidl.get()))
+		if (ArePidlsEquivalent(newTab.GetShellBrowserImpl()->GetDirectoryIdl().get(),
+				parentPidl.get()))
 		{
-			newTab.GetShellBrowser()->SelectItems({ fullPidl.get() });
+			newTab.GetShellBrowserImpl()->SelectItems({ fullPidl.get() });
 		}
 	}
 
@@ -277,8 +278,8 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView, SW_HIDE);
 
-	m_hActiveListView = tab.GetShellBrowser()->GetListView();
-	m_pActiveShellBrowser = tab.GetShellBrowser();
+	m_hActiveListView = tab.GetShellBrowserImpl()->GetListView();
+	m_pActiveShellBrowser = tab.GetShellBrowserImpl();
 
 	UpdateWindowStates(tab);
 

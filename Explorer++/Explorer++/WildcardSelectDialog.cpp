@@ -124,13 +124,13 @@ void WildcardSelectDialog::OnOk()
 void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
 {
 	const auto &tab = m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab();
-	HWND hListView = tab.GetShellBrowser()->GetListView();
+	HWND hListView = tab.GetShellBrowserImpl()->GetListView();
 
 	int nItems = ListView_GetItemCount(hListView);
 
 	for (int i = 0; i < nItems; i++)
 	{
-		std::wstring filename = tab.GetShellBrowser()->GetItemName(i);
+		std::wstring filename = tab.GetShellBrowserImpl()->GetItemName(i);
 
 		if (CheckWildcardMatch(szPattern, filename.c_str(), FALSE) == 1)
 		{

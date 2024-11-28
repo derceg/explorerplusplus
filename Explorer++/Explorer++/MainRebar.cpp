@@ -532,12 +532,12 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	if (bBack)
 	{
 		iBase = ID_REBAR_MENU_BACK_START;
-		history = tab.GetShellBrowser()->GetNavigationController()->GetBackHistory();
+		history = tab.GetShellBrowserImpl()->GetNavigationController()->GetBackHistory();
 	}
 	else
 	{
 		iBase = ID_REBAR_MENU_FORWARD_START;
-		history = tab.GetShellBrowser()->GetNavigationController()->GetForwardHistory();
+		history = tab.GetShellBrowserImpl()->GetNavigationController()->GetForwardHistory();
 	}
 
 	if (!history.empty())

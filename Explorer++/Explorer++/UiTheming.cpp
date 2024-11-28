@@ -61,11 +61,12 @@ bool UiTheming::ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF
 bool UiTheming::ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor,
 	COLORREF textColor)
 {
-	BOOL bkRes = ListView_SetBkColor(tab.GetShellBrowser()->GetListView(), backgroundColor);
-	BOOL textBkRes = ListView_SetTextBkColor(tab.GetShellBrowser()->GetListView(), backgroundColor);
-	BOOL textRes = ListView_SetTextColor(tab.GetShellBrowser()->GetListView(), textColor);
+	BOOL bkRes = ListView_SetBkColor(tab.GetShellBrowserImpl()->GetListView(), backgroundColor);
+	BOOL textBkRes =
+		ListView_SetTextBkColor(tab.GetShellBrowserImpl()->GetListView(), backgroundColor);
+	BOOL textRes = ListView_SetTextColor(tab.GetShellBrowserImpl()->GetListView(), textColor);
 
-	InvalidateRect(tab.GetShellBrowser()->GetListView(), nullptr, TRUE);
+	InvalidateRect(tab.GetShellBrowserImpl()->GetListView(), nullptr, TRUE);
 
 	if (!bkRes || !textBkRes || !textRes)
 	{

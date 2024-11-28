@@ -109,7 +109,7 @@ void Explorerplusplus::OnSearch()
 		[this]
 		{
 			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-			std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
+			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
 
 			return new SearchDialog(m_app->GetResourceInstance(), m_hContainer, currentDirectory,
 				this, this, GetActivePane()->GetTabContainer(), m_app->GetIconResourceLoader());
@@ -238,10 +238,10 @@ void Explorerplusplus::OnResolveLink()
 			Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(szPath,
 				TabSettings(_selected = true));
 
-			if (newTab.GetShellBrowser()->GetDirectory() == szPath)
+			if (newTab.GetShellBrowserImpl()->GetDirectory() == szPath)
 			{
 				wil::com_ptr_nothrow<IShellFolder> parent;
-				hr = SHBindToObject(nullptr, newTab.GetShellBrowser()->GetDirectoryIdl().get(),
+				hr = SHBindToObject(nullptr, newTab.GetShellBrowserImpl()->GetDirectoryIdl().get(),
 					nullptr, IID_PPV_ARGS(&parent));
 
 				if (hr == S_OK)
@@ -267,18 +267,18 @@ void Explorerplusplus::OnResolveLink()
 HRESULT Explorerplusplus::OnGoToOffset(int offset)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	return selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(offset);
+	return selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
 }
 
 HRESULT Explorerplusplus::OnGoHome()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(
+	HRESULT hr = selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
 		m_config->defaultTabDirectory);
 
 	if (FAILED(hr))
 	{
-		hr = selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(
+		hr = selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
 			m_config->defaultTabDirectoryStatic);
 	}
 

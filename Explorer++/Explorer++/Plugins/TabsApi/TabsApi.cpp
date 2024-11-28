@@ -41,10 +41,10 @@ std::wstring Plugins::TabsApi::FolderSettings::toString()
 }
 
 Plugins::TabsApi::Tab::Tab(const ::Tab &tabInternal) :
-	folderSettings(*tabInternal.GetShellBrowser())
+	folderSettings(*tabInternal.GetShellBrowserImpl())
 {
 	id = tabInternal.GetId();
-	location = tabInternal.GetShellBrowser()->GetDirectory();
+	location = tabInternal.GetShellBrowserImpl()->GetDirectory();
 	name = tabInternal.GetName();
 	locked = (tabInternal.GetLockState() == ::Tab::LockState::Locked);
 	addressLocked = (tabInternal.GetLockState() == ::Tab::LockState::AddressLocked);
@@ -249,7 +249,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		tabInternal->GetShellBrowser()->GetNavigationController()->Navigate(*location);
+		tabInternal->GetShellBrowserImpl()->GetNavigationController()->Navigate(*location);
 	}
 
 	sol::optional<std::wstring> name = properties[TabConstants::NAME];
@@ -291,7 +291,7 @@ void Plugins::TabsApi::refresh(int tabId)
 		return;
 	}
 
-	tabInternal->GetShellBrowser()->GetNavigationController()->Refresh();
+	tabInternal->GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)

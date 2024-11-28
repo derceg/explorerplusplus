@@ -112,7 +112,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 		if (tab)
 		{
-			tab->GetShellBrowser()->DirectoryAltered();
+			tab->GetShellBrowserImpl()->DirectoryAltered();
 		}
 	}
 	break;
@@ -527,52 +527,52 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_EXTRALARGEICONS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::ExtraLargeIcons);
 		break;
 
 	case IDM_VIEW_LARGEICONS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::LargeIcons);
 		break;
 
 	case IDM_VIEW_ICONS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::Icons);
 		break;
 
 	case IDM_VIEW_SMALLICONS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::SmallIcons);
 		break;
 
 	case IDM_VIEW_LIST:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::List);
 		break;
 
 	case IDM_VIEW_DETAILS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::Details);
 		break;
 
 	case IDM_VIEW_EXTRALARGETHUMBNAILS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::ExtraLargeThumbnails);
 		break;
 
 	case IDM_VIEW_LARGETHUMBNAILS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::LargeThumbnails);
 		break;
 
 	case IDM_VIEW_THUMBNAILS:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::Thumbnails);
 		break;
 
 	case IDM_VIEW_TILES:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
 			ViewMode::Tiles);
 		break;
 
@@ -1105,11 +1105,11 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_AUTOARRANGE:
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetAutoArrange(
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetAutoArrange(
 			!GetActivePane()
 				 ->GetTabContainer()
 				 ->GetSelectedTab()
-				 .GetShellBrowser()
+				 .GetShellBrowserImpl()
 				 ->GetAutoArrange());
 		break;
 

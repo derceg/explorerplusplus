@@ -145,7 +145,7 @@ void AddressBar::OnEnterPressed()
 	std::wstring path = GetWindowString(m_hwnd);
 
 	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
+	std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
 
 	// When entering a path in the address bar in Windows Explorer, environment variables will be
 	// expanded. The behavior here is designed to match that.
@@ -202,7 +202,7 @@ void AddressBar::OnEscapePressed()
 void AddressBar::OnBeginDrag()
 {
 	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	SFGAOF attributes = SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK;
 	HRESULT hr = GetItemAttributes(pidlDirectory.get(), &attributes);
@@ -273,7 +273,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	// (if necessary).
 	m_historyEntryUpdatedConnection.disconnect();
 
-	auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+	auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
 
 	auto fullPathForDisplay = entry->GetFullPathForDisplay();
 

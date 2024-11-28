@@ -208,7 +208,7 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
-	int numItemsSelected = tab.GetShellBrowser()->GetNumSelected();
+	int numItemsSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 	std::wstring numItemsText;
 
 	// The item count that's shown will either be the number of items selected, or the total number
@@ -229,7 +229,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	}
 	else
 	{
-		int numItems = tab.GetShellBrowser()->GetNumItems();
+		int numItems = tab.GetShellBrowserImpl()->GetNumItems();
 
 		if (numItems == 1)
 		{
@@ -244,7 +244,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 	}
 
-	if (tab.GetShellBrowser()->IsFilterApplied())
+	if (tab.GetShellBrowserImpl()->IsFilterApplied())
 	{
 		auto filterAppliedText =
 			ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_FILTER_APPLIED);
@@ -260,24 +260,26 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
 			: +SizeDisplayFormat::None;
-		sizeText = FormatSizeString(tab.GetShellBrowser()->GetTotalDirectorySize(), displayFormat);
+		sizeText =
+			FormatSizeString(tab.GetShellBrowserImpl()->GetTotalDirectorySize(), displayFormat);
 	}
 	else
 	{
 		// Note that no size will be shown if only folders are selected.
-		if (tab.GetShellBrowser()->GetNumSelectedFiles() != 0)
+		if (tab.GetShellBrowserImpl()->GetNumSelectedFiles() != 0)
 		{
 			auto displayFormat = m_config->globalFolderSettings.forceSize
 				? m_config->globalFolderSettings.sizeDisplayFormat
 				: +SizeDisplayFormat::None;
-			sizeText = FormatSizeString(tab.GetShellBrowser()->GetSelectionSize(), displayFormat);
+			sizeText =
+				FormatSizeString(tab.GetShellBrowserImpl()->GetSelectionSize(), displayFormat);
 		}
 	}
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, 1, reinterpret_cast<LPARAM>(sizeText.c_str()));
 
 	std::wstring driveFreeSpaceText =
-		CreateDriveFreeSpaceString(tab.GetShellBrowser()->GetDirectory().c_str());
+		CreateDriveFreeSpaceString(tab.GetShellBrowserImpl()->GetDirectory().c_str());
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(driveFreeSpaceText.c_str()));
 

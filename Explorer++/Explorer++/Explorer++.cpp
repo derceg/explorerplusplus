@@ -259,7 +259,7 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 {
-	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl();
 }
 
 void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)

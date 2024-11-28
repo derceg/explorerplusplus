@@ -192,7 +192,7 @@ bool SearchTabsDialog::TabFilter(const Tab &tab, const std::wstring &filter)
 		return true;
 	}
 
-	if (boost::icontains(tab.GetShellBrowser()->GetDirectory(), filter))
+	if (boost::icontains(tab.GetShellBrowserImpl()->GetDirectory(), filter))
 	{
 		return true;
 	}
@@ -322,7 +322,7 @@ std::wstring SearchTabsDialog::GetTabColumnText(const Tab &tab, ColumnType colum
 		return tab.GetName();
 
 	case SearchTabsDialog::ColumnType::Path:
-		return tab.GetShellBrowser()->GetDirectory();
+		return tab.GetShellBrowserImpl()->GetDirectory();
 
 	default:
 		LOG(FATAL) << "Search tabs column type not found";

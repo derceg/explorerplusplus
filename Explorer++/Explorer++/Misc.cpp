@@ -97,12 +97,12 @@ void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD d
 
 	if (tab)
 	{
-		std::wstring directory = tab->GetShellBrowser()->GetDirectory();
+		std::wstring directory = tab->GetShellBrowserImpl()->GetDirectory();
 		LOG(INFO) << "Directory change notification received for \"" << wstrToUtf8Str(directory)
 				  << "\", Action = " << dwAction << ", Filename = \"" << wstrToUtf8Str(szFileName)
 				  << "\"";
 
-		tab->GetShellBrowser()->FilesModified(dwAction, szFileName, pDirectoryAltered->iIndex,
+		tab->GetShellBrowserImpl()->FilesModified(dwAction, szFileName, pDirectoryAltered->iIndex,
 			pDirectoryAltered->iFolderIndex);
 	}
 }
@@ -139,7 +139,7 @@ void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolde
 void Explorerplusplus::OnSelectColumns()
 {
 	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceInstance(), m_hContainer,
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser(),
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl(),
 		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();
 }

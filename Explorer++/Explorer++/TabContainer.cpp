@@ -403,7 +403,7 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	AddImagesToTabContextMenu(menu, menuImages);
 
 	MenuHelper::EnableItem(menu, IDM_TAB_OPENPARENTINNEWTAB,
-		!IsNamespaceRoot(tab.GetShellBrowser()->GetDirectoryIdl().get()));
+		!IsNamespaceRoot(tab.GetShellBrowserImpl()->GetDirectoryIdl().get()));
 	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
 	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTABANDADDRESS,
 		tab.GetLockState() == Tab::LockState::AddressLocked);
@@ -481,7 +481,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 
 void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
-	auto pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlCurrent = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlParent;
 	HRESULT hr = GetVirtualParentPath(pidlCurrent.get(), wil::out_param(pidlParent));
@@ -495,14 +495,14 @@ void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 
 void TabContainer::OnRefreshTab(Tab &tab)
 {
-	tab.GetShellBrowser()->GetNavigationController()->Refresh();
+	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
 void TabContainer::OnRefreshAllTabs()
 {
 	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab->GetShellBrowser()->GetNavigationController()->Refresh();
+		tab->GetShellBrowserImpl()->GetNavigationController()->Refresh();
 	}
 }
 
@@ -632,7 +632,7 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 
 	const Tab &tab = GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
 
-	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 	auto path = GetFolderPathForDisplay(pidlDirectory.get());
 
 	if (!path)
@@ -739,7 +739,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	else
 	{
 		auto cachedIconIndex =
-			m_cachedIcons->MaybeGetIconIndex(tab.GetShellBrowser()->GetDirectory());
+			m_cachedIcons->MaybeGetIconIndex(tab.GetShellBrowserImpl()->GetDirectory());
 
 		if (cachedIconIndex)
 		{
@@ -750,10 +750,10 @@ void TabContainer::SetTabIcon(const Tab &tab)
 			SetTabIconFromImageList(tab, m_defaultFolderIconIndex);
 		}
 
-		auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
+		auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
-			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetUniqueFolderId()](
+			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowserImpl()->GetUniqueFolderId()](
 				int iconIndex)
 			{
 				auto tab = GetTabOptional(tabId);
@@ -763,7 +763,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 					return;
 				}
 
-				if (tab->GetShellBrowser()->GetUniqueFolderId() != folderId)
+				if (tab->GetShellBrowserImpl()->GetUniqueFolderId() != folderId)
 				{
 					return;
 				}
@@ -937,7 +937,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	// hidden, even if it's later resized. Currently, if the tab is selected,
 	// the listview is shown during the OnTabSelected() call below. Therefore,
 	// the listview needs to have a non-zero size before that point.
-	m_coreInterface->SetListViewInitialPosition(tab.GetShellBrowser()->GetListView());
+	m_coreInterface->SetListViewInitialPosition(tab.GetShellBrowserImpl()->GetListView());
 
 	bool selected = false;
 
@@ -953,17 +953,17 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	tab.GetShellBrowser()->AddNavigationStartedObserver(
+	tab.GetShellBrowserImpl()->AddNavigationStartedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationStartedSignal.m_signal(tab, navigateParams); });
 
-	tab.GetShellBrowser()->AddNavigationCommittedObserver(
+	tab.GetShellBrowserImpl()->AddNavigationCommittedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationCommittedSignal.m_signal(tab, navigateParams); });
 
 	// Capturing the tab by reference here is safe, since the tab object is
 	// guaranteed to exist whenever this method is called.
-	tab.GetShellBrowser()->AddNavigationCompletedObserver(
+	tab.GetShellBrowserImpl()->AddNavigationCompletedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
 		{
 			// Re-broadcast the event. This allows other classes to be notified of
@@ -972,30 +972,30 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 			tabNavigationCompletedSignal.m_signal(tab, navigateParams);
 		});
 
-	tab.GetShellBrowser()->AddNavigationFailedObserver(
+	tab.GetShellBrowserImpl()->AddNavigationFailedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationFailedSignal.m_signal(tab, navigateParams); });
 
-	tab.GetShellBrowser()->directoryModified.AddObserver(
+	tab.GetShellBrowserImpl()->directoryModified.AddObserver(
 		[this, &tab]() { tabDirectoryModifiedSignal.m_signal(tab); });
 
-	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver(
+	tab.GetShellBrowserImpl()->listViewSelectionChanged.AddObserver(
 		[this, &tab]() { tabListViewSelectionChangedSignal.m_signal(tab); });
 
-	tab.GetShellBrowser()->columnsChanged.AddObserver(
+	tab.GetShellBrowserImpl()->columnsChanged.AddObserver(
 		[this, &tab]() { tabColumnsChangedSignal.m_signal(tab); });
 
-	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+	HRESULT hr = tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
 
 	if (FAILED(hr))
 	{
-		hr = tab.GetShellBrowser()->GetNavigationController()->Navigate(
+		hr = tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
 			m_config->defaultTabDirectory);
 
 		if (FAILED(hr))
 		{
 			// The computer folder should always exist, so this call shouldn't fail.
-			tab.GetShellBrowser()->GetNavigationController()->Navigate(
+			tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
 				m_config->defaultTabDirectoryStatic);
 		}
 	}
@@ -1072,7 +1072,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 	RemoveTabFromControl(tab);
 
-	auto dirMonitorId = tab.GetShellBrowser()->GetDirMonitorId();
+	auto dirMonitorId = tab.GetShellBrowserImpl()->GetDirMonitorId();
 
 	if (dirMonitorId)
 	{
@@ -1326,9 +1326,10 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 void TabContainer::DuplicateTab(const Tab &tab)
 {
-	auto folderSettings = tab.GetShellBrowser()->GetFolderSettings();
-	auto folderColumns = tab.GetShellBrowser()->ExportAllColumns();
-	auto navigateParams = NavigateParams::Normal(tab.GetShellBrowser()->GetDirectoryIdl().get());
+	auto folderSettings = tab.GetShellBrowserImpl()->GetFolderSettings();
+	auto folderColumns = tab.GetShellBrowserImpl()->ExportAllColumns();
+	auto navigateParams =
+		NavigateParams::Normal(tab.GetShellBrowserImpl()->GetDirectoryIdl().get());
 	CreateNewTab(navigateParams, {}, &folderSettings, &folderColumns);
 }
 
@@ -1355,7 +1356,7 @@ unique_pidl_absolute TabContainer::GetPidlForTargetItem(int targetItem)
 	}
 
 	const auto &tab = GetTabByIndex(targetItem);
-	return tab.GetShellBrowser()->GetDirectoryIdl();
+	return tab.GetShellBrowserImpl()->GetDirectoryIdl();
 }
 
 IUnknown *TabContainer::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)

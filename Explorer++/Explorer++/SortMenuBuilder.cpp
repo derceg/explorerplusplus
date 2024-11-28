@@ -21,7 +21,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 	auto sortByMenu = CreateDefaultMenu(IDM_SORT_ASCENDING, IDM_SORT_DESCENDING);
 	auto groupByMenu = CreateDefaultMenu(IDM_GROUP_SORT_ASCENDING, IDM_GROUP_SORT_DESCENDING);
 
-	auto sortModes = tab.GetShellBrowser()->GetAvailableSortModes();
+	auto sortModes = tab.GetShellBrowserImpl()->GetAvailableSortModes();
 	int position = 0;
 
 	for (SortMode sortMode : sortModes)
@@ -38,7 +38,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 		position++;
 	}
 
-	if (tab.GetShellBrowser()->GetShowInGroups())
+	if (tab.GetShellBrowserImpl()->GetShowInGroups())
 	{
 		std::wstring groupByNoneText =
 			ResourceHelper::LoadString(m_resourceInstance, IDS_GROUP_BY_NONE);
@@ -76,28 +76,28 @@ wil::unique_hmenu SortMenuBuilder::CreateDefaultMenu(UINT ascendingMenuItemId,
 
 void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab)
 {
-	SortMode sortMode = tab.GetShellBrowser()->GetSortMode();
+	SortMode sortMode = tab.GetShellBrowserImpl()->GetSortMode();
 	CheckMenuRadioItem(sortByMenu, IDM_SORTBY_NAME,
 		IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1), DetermineSortModeMenuId(sortMode),
 		MF_BYCOMMAND);
 
 	CheckMenuRadioItem(sortByMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
-		tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending
+		tab.GetShellBrowserImpl()->GetSortDirection() == +SortDirection::Ascending
 			? IDM_SORT_ASCENDING
 			: IDM_SORT_DESCENDING,
 		MF_BYCOMMAND);
 
-	BOOL showInGroups = tab.GetShellBrowser()->GetShowInGroups();
+	BOOL showInGroups = tab.GetShellBrowserImpl()->GetShowInGroups();
 
 	if (showInGroups)
 	{
-		SortMode groupMode = tab.GetShellBrowser()->GetGroupMode();
+		SortMode groupMode = tab.GetShellBrowserImpl()->GetGroupMode();
 		CheckMenuRadioItem(groupByMenu, IDM_GROUPBY_NAME,
 			IDM_GROUPBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1),
 			DetermineGroupModeMenuId(groupMode), MF_BYCOMMAND);
 
 		CheckMenuRadioItem(groupByMenu, IDM_GROUP_SORT_ASCENDING, IDM_GROUP_SORT_DESCENDING,
-			tab.GetShellBrowser()->GetGroupSortDirection() == +SortDirection::Ascending
+			tab.GetShellBrowserImpl()->GetGroupSortDirection() == +SortDirection::Ascending
 				? IDM_GROUP_SORT_ASCENDING
 				: IDM_GROUP_SORT_DESCENDING,
 			MF_BYCOMMAND);

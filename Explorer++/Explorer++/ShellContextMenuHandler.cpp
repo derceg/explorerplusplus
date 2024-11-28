@@ -194,14 +194,14 @@ bool Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	else if (verb == L"copy")
 	{
 		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(true);
+		selectedTab.GetShellBrowserImpl()->CopySelectedItemsToClipboard(true);
 
 		return true;
 	}
 	else if (verb == L"cut")
 	{
 		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(false);
+		selectedTab.GetShellBrowserImpl()->CopySelectedItemsToClipboard(false);
 
 		return true;
 	}

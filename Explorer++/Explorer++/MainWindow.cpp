@@ -115,13 +115,13 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 void MainWindow::UpdateWindowText()
 {
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	std::wstring folderDisplayName;
 
 	/* Don't show full paths for virtual folders (as only the folders
 	GUID will be shown). */
-	if (m_config->showFullTitlePath.get() && !tab.GetShellBrowser()->InVirtualFolder())
+	if (m_config->showFullTitlePath.get() && !tab.GetShellBrowserImpl()->InVirtualFolder())
 	{
 		GetDisplayName(pidlDirectory.get(), SHGDN_FORPARSING, folderDisplayName);
 	}

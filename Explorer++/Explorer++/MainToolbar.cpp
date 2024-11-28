@@ -585,7 +585,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	if (ptbgit->iItem == MainToolbarButton::Back)
 	{
-		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(-1);
+		auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetEntry(-1);
 
 		if (entry)
 		{
@@ -598,7 +598,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	}
 	else if (ptbgit->iItem == MainToolbarButton::Forward)
 	{
-		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(1);
+		auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetEntry(1);
 
 		if (entry)
 		{
@@ -625,7 +625,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 {
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	auto currentPidl = tab.GetShellBrowser()->GetDirectoryIdl();
+	auto currentPidl = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	unique_pidl_absolute parentPidl;
 	HRESULT hr = GetVirtualParentPath(currentPidl.get(), wil::out_param(parentPidl));
@@ -680,7 +680,7 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 {
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	const auto *navigationController = tab.GetShellBrowser()->GetNavigationController();
+	const auto *navigationController = tab.GetShellBrowserImpl()->GetNavigationController();
 
 	if ((historyType == TabHistoryMenu::MenuType::Back && !navigationController->CanGoBack())
 		|| (historyType == TabHistoryMenu::MenuType::Forward
@@ -753,13 +753,13 @@ void MainToolbar::UpdateToolbarButtonStates()
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
-		tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
+		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoBack());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Forward,
-		tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
+		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoForward());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Up,
-		tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
+		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoUp());
 
-	bool virtualFolder = tab.GetShellBrowser()->InVirtualFolder();
+	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
 		m_coreInterface->CanCopy() && GetFocus() != m_coreInterface->GetTreeView());
@@ -775,9 +775,9 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,
 		m_coreInterface->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
-		tab.GetShellBrowser()->GetNumSelectedFiles() == 1);
+		tab.GetShellBrowserImpl()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
-		tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
+		tab.GetShellBrowserImpl()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt, !virtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder,
 		m_coreInterface->CanCreate());

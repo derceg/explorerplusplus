@@ -1766,7 +1766,10 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 
 ShellBrowserImpl *ShellTreeView::GetSelectedShellBrowser() const
 {
-	return m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	return m_browserWindow->GetActivePane()
+		->GetTabContainer()
+		->GetSelectedTab()
+		.GetShellBrowserImpl();
 }
 
 void ShellTreeView::CutCopiedItemManager::SetCopiedItem(IDataObject *clipboardDataObject)

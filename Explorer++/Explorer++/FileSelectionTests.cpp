@@ -19,7 +19,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 	{
 		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
-		if (ListView_GetSelectedCount(selectedTab.GetShellBrowser()->GetListView()) > 0)
+		if (ListView_GetSelectedCount(selectedTab.GetShellBrowserImpl()->GetListView()) > 0)
 		{
 			return TRUE;
 		}
@@ -38,7 +38,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 bool Explorerplusplus::CanCreate() const
 {
 	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 	return CanCreateInDirectory(pidlDirectory.get());
 }
 
@@ -91,7 +91,7 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 	if (hFocus == m_hActiveListView)
 	{
 		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-		hr = selectedTab.GetShellBrowser()->GetListViewSelectionAttributes(pItemAttributes);
+		hr = selectedTab.GetShellBrowserImpl()->GetListViewSelectionAttributes(pItemAttributes);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
 	{

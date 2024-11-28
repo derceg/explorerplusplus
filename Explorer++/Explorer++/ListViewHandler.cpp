@@ -61,7 +61,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			== GetActivePane()
 				   ->GetTabContainer()
 				   ->GetSelectedTab()
-				   .GetShellBrowser()
+				   .GetShellBrowserImpl()
 				   ->GetListView())
 		{
 			OnShowListViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
@@ -128,7 +128,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			m_pActiveShellBrowser->SetCurrentColumns(currentColumns);
 
 			Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-			tab.GetShellBrowser()->GetNavigationController()->Refresh();
+			tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 
 			return TRUE;
 		}
@@ -179,7 +179,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	for (auto &item : GetActivePane()->GetTabContainer()->GetAllTabs())
 	{
-		if (item.second->GetShellBrowser()->GetListView() == hListView)
+		if (item.second->GetShellBrowserImpl()->GetListView() == hListView)
 		{
 			return item.first;
 		}
@@ -201,12 +201,12 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 
 	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
-	if (ListView_GetSelectedCount(tab.GetShellBrowser()->GetListView()) == 0)
+	if (ListView_GetSelectedCount(tab.GetShellBrowserImpl()->GetListView()) == 0)
 	{
 		if (keyboardGenerated)
 		{
 			finalPoint = { 0, 0 };
-			ClientToScreen(tab.GetShellBrowser()->GetListView(), &finalPoint);
+			ClientToScreen(tab.GetShellBrowserImpl()->GetListView(), &finalPoint);
 		}
 
 		OnListViewBackgroundRClick(&finalPoint);
@@ -215,23 +215,23 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 	{
 		if (keyboardGenerated)
 		{
-			int targetItem = ListView_GetNextItem(tab.GetShellBrowser()->GetListView(), -1,
+			int targetItem = ListView_GetNextItem(tab.GetShellBrowserImpl()->GetListView(), -1,
 				LVNI_FOCUSED | LVNI_SELECTED);
 
 			if (targetItem == -1)
 			{
-				auto lastSelectedItem =
-					ListViewHelper::GetLastSelectedItemIndex(tab.GetShellBrowser()->GetListView());
+				auto lastSelectedItem = ListViewHelper::GetLastSelectedItemIndex(
+					tab.GetShellBrowserImpl()->GetListView());
 				targetItem = lastSelectedItem.value();
 			}
 
 			RECT itemRect;
-			ListView_GetItemRect(tab.GetShellBrowser()->GetListView(), targetItem, &itemRect,
+			ListView_GetItemRect(tab.GetShellBrowserImpl()->GetListView(), targetItem, &itemRect,
 				LVIR_ICON);
 
 			finalPoint = { itemRect.left + (itemRect.right - itemRect.left) / 2,
 				itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
-			ClientToScreen(tab.GetShellBrowser()->GetListView(), &finalPoint);
+			ClientToScreen(tab.GetShellBrowserImpl()->GetListView(), &finalPoint);
 		}
 
 		OnListViewItemRClick(&finalPoint);
@@ -241,20 +241,20 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 {
 	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this, m_pStatusBar);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowser());
+	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowserImpl());
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
 	winrt::com_ptr<IFolderView2> folderView =
-		winrt::make<FolderView>(selectedTab.GetShellBrowserWeak());
+		winrt::make<FolderView>(selectedTab.GetShellBrowserImplWeak());
 	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
-	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserWeak(), this, false);
+	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserImplWeak(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
@@ -264,7 +264,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	shellContextMenu.ShowMenu(selectedTab.GetShellBrowser()->GetListView(), pCursorPos,
+	shellContextMenu.ShowMenu(selectedTab.GetShellBrowserImpl()->GetListView(), pCursorPos,
 		serviceProvider.get(), flags);
 }
 
@@ -389,7 +389,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 void Explorerplusplus::OnListViewSetFileAttributes() const
 {
 	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->SetFileAttributesForSelection();
+	selectedTab.GetShellBrowserImpl()->SetFileAttributesForSelection();
 }
 
 void Explorerplusplus::OnListViewPaste()
@@ -403,17 +403,17 @@ void Explorerplusplus::OnListViewPaste()
 	}
 
 	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	auto directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+	auto directory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(), PasteType::Normal))
 	{
 		auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-		auto folderView = winrt::make<FolderView>(selectedTab.GetShellBrowserWeak());
+		auto folderView = winrt::make<FolderView>(selectedTab.GetShellBrowserImplWeak());
 		serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
 		ExecuteActionFromContextMenu(directory.get(), {},
-			selectedTab.GetShellBrowser()->GetListView(), L"paste", 0, serviceProvider.get());
+			selectedTab.GetShellBrowserImpl()->GetListView(), L"paste", 0, serviceProvider.get());
 	}
 	else
 	{
@@ -424,7 +424,7 @@ void Explorerplusplus::OnListViewPaste()
 		 will cause the destination directory to change in the
 		 middle of the copy operation. */
 		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination),
-			selectedTab.GetShellBrowser()->GetDirectory().c_str());
+			selectedTab.GetShellBrowserImpl()->GetDirectory().c_str());
 
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';

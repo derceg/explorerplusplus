@@ -103,7 +103,7 @@ wil::unique_hmenu Explorerplusplus::BuildViewsMenu()
 	AddViewModesToMenu(viewsMenu.get(), 0, TRUE);
 
 	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	ViewMode currentViewMode = tab.GetShellBrowser()->GetViewMode();
+	ViewMode currentViewMode = tab.GetShellBrowserImpl()->GetViewMode();
 
 	CheckMenuRadioItem(viewsMenu.get(), IDM_VIEW_EXTRALARGEICONS, IDM_VIEW_TILES,
 		GetViewModeMenuId(currentViewMode), MF_BYCOMMAND);
