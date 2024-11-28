@@ -14,6 +14,8 @@ using BookmarkNavigationCompletedSignal =
 class BookmarkNavigatorInterface
 {
 public:
+	virtual ~BookmarkNavigatorInterface() = default;
+
 	virtual void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
 		bool addHistoryEntry = true) = 0;
 	virtual boost::signals2::connection AddNavigationCompletedObserver(
