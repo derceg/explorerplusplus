@@ -27,12 +27,6 @@
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
-	if (m_app->GetCommandLineSettings()->shellChangeNotificationType)
-	{
-		m_config->shellChangeNotificationType =
-			*m_app->GetCommandLineSettings()->shellChangeNotificationType;
-	}
-
 	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
