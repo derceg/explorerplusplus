@@ -24,7 +24,7 @@ ItemNameEditControl::ItemNameEditControl(HWND hwnd, AcceleratorManager *accelera
 	m_renameStage(RenameStage::Filename),
 	m_beginRename(true)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 		std::bind_front(&ItemNameEditControl::WndProc, this)));
 
 	UpdateAcceleratorTable();
@@ -57,9 +57,9 @@ void ItemNameEditControl::RemoveAcceleratorFromTable(std::vector<ACCEL> &acceler
 {
 	for (auto &item : itemsToRemove)
 	{
-		auto itr = std::find_if(accelerators.begin(), accelerators.end(),
-			[&item](const ACCEL &accel)
-			{ return (accel.fVirt & ~FNOINVERT) == item.modifiers && accel.key == item.key; });
+		auto itr =
+			std::find_if(accelerators.begin(), accelerators.end(), [&item](const ACCEL &accel)
+				{ return (accel.fVirt & ~FNOINVERT) == item.modifiers && accel.key == item.key; });
 
 		if (itr != accelerators.end())
 		{

@@ -28,7 +28,7 @@ void Explorerplusplus::CreateStatusBar()
 	m_hStatusBar = ::CreateStatusBar(m_hContainer, style);
 	m_pStatusBar = new StatusBar(m_hStatusBar);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hStatusBar,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hStatusBar,
 		std::bind_front(&Explorerplusplus::StatusBarSubclass, this)));
 
 	SetStatusBarParts();

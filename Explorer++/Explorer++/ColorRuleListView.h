@@ -9,7 +9,7 @@
 
 class ColorRule;
 class ColorRuleModel;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class ColorRuleListView
 {
@@ -40,6 +40,6 @@ private:
 	HINSTANCE m_resourceInstance;
 	ColorRuleModel *m_model;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -21,7 +21,7 @@
 #include "WindowOptionsPage.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <boost/algorithm/string/predicate.hpp>
 
 OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent, App *app, Config *config,
@@ -59,7 +59,7 @@ INT_PTR OptionsDialog::OnInitDialog()
 void OptionsDialog::SetupSearchField()
 {
 	auto searchField = GetDlgItem(m_hDlg, IDC_OPTIONS_SEARCH);
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(searchField,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(searchField,
 		std::bind_front(&OptionsDialog::SearchFieldWndProc, this)));
 
 	auto placeholderText = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),

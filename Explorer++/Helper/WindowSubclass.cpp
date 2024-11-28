@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "WindowSubclassWrapper.h"
+#include "WindowSubclass.h"
 
-WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, Subclass subclass) :
+WindowSubclass::WindowSubclass(HWND hwnd, Subclass subclass) :
 	m_hwnd(hwnd),
 	m_subclass(subclass),
 	m_subclassId(m_subclassIdCounter++)
@@ -14,7 +14,7 @@ WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, Subclass subclass) :
 		SetWindowSubclass(hwnd, SubclassProcStub, m_subclassId, reinterpret_cast<DWORD_PTR>(this));
 }
 
-WindowSubclassWrapper::~WindowSubclassWrapper()
+WindowSubclass::~WindowSubclass()
 {
 	if (m_subclassInstalled)
 	{
@@ -23,12 +23,12 @@ WindowSubclassWrapper::~WindowSubclassWrapper()
 	}
 }
 
-LRESULT CALLBACK WindowSubclassWrapper::SubclassProcStub(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK WindowSubclass::SubclassProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(subclassId);
 
-	auto *subclassWrapper = reinterpret_cast<WindowSubclassWrapper *>(data);
+	auto *subclassWrapper = reinterpret_cast<WindowSubclass *>(data);
 
 	if (msg == WM_NCDESTROY)
 	{

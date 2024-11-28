@@ -12,7 +12,7 @@
 
 class ColorRuleEditorDialog;
 class ColorRuleModel;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class ColorRuleEditorDialogPersistentSettings : public DialogSettings
 {
@@ -115,5 +115,5 @@ private:
 
 	ColorRuleEditorDialogPersistentSettings *m_persistentSettings;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 };

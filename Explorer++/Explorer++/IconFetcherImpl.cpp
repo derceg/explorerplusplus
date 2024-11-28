@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "IconFetcherImpl.h"
 #include "../Helper/CachedIcons.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 IconFetcherImpl::IconFetcherImpl(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),
@@ -17,8 +17,8 @@ IconFetcherImpl::IconFetcherImpl(HWND hwnd, CachedIcons *cachedIcons) :
 	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_defaultFileIconIndex));
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd,
-		std::bind_front(&IconFetcherImpl::WindowSubclass, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+		std::bind_front(&IconFetcherImpl::OwnerWindowSubclass, this)));
 }
 
 IconFetcherImpl::~IconFetcherImpl()
@@ -26,7 +26,7 @@ IconFetcherImpl::~IconFetcherImpl()
 	m_iconThreadPool.clear_queue();
 }
 
-LRESULT IconFetcherImpl::WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT IconFetcherImpl::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{

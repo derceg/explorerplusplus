@@ -14,7 +14,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 
 MainWindow *MainWindow::Create(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
@@ -30,8 +30,8 @@ MainWindow::MainWindow(HWND hwnd, const Config *config, HINSTANCE resourceInstan
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&MainWindow::WndProc, this)));
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainWindow::WndProc, this)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]

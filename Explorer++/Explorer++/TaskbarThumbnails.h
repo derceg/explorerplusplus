@@ -15,7 +15,7 @@ struct Config;
 class CoreInterface;
 struct NavigateParams;
 class TabContainer;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class TaskbarThumbnails : private boost::noncopyable
 {
@@ -61,7 +61,7 @@ private:
 	TabContainer *m_tabContainer;
 	HINSTANCE m_instance;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-	std::unique_ptr<WindowSubclassWrapper> m_mainWindowSubclass;
+	std::unique_ptr<WindowSubclass> m_mainWindowSubclass;
 
 	wil::com_ptr_nothrow<ITaskbarList4> m_taskbarList;
 	std::list<TabProxyInfo> m_TabProxyList;

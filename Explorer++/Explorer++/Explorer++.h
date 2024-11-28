@@ -68,7 +68,7 @@ struct TabStorageData;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
 class UiTheming;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 namespace Applications
 {
@@ -607,7 +607,7 @@ private:
 
 	std::unique_ptr<TaskbarThumbnails> m_taskbarThumbnails;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	/* Bookmarks. */

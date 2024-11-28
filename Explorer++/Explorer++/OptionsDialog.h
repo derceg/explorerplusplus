@@ -14,7 +14,7 @@ class App;
 struct Config;
 class CoreInterface;
 class OptionsPage;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class OptionsDialog : public ThemedDialog
 {
@@ -63,7 +63,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	int m_idCounter = 0;
 	std::unordered_map<int, std::unique_ptr<OptionsPage>> m_pageMap;

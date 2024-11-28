@@ -17,7 +17,7 @@ struct Settings;
 
 class BrowserList;
 struct Config;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class ProcessManager : private boost::noncopyable
 {
@@ -37,5 +37,5 @@ private:
 	const BrowserList *const m_browserList;
 	bool m_initializationRun = false;
 	wil::unique_hwnd m_messageWindow;
-	std::unique_ptr<WindowSubclassWrapper> m_messageWindowSubclass;
+	std::unique_ptr<WindowSubclass> m_messageWindowSubclass;
 };

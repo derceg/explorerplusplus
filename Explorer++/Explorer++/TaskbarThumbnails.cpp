@@ -20,7 +20,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <dwmapi.h>
 
 namespace
@@ -66,7 +66,7 @@ void TaskbarThumbnails::Initialize()
 	ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP, MSGFLT_ADD);
 
 	// Subclass the main window until the above message (TaskbarButtonCreated) is caught.
-	m_mainWindowSubclass = std::make_unique<WindowSubclassWrapper>(m_coreInterface->GetMainWindow(),
+	m_mainWindowSubclass = std::make_unique<WindowSubclass>(m_coreInterface->GetMainWindow(),
 		std::bind_front(&TaskbarThumbnails::MainWndProc, this));
 }
 

@@ -11,7 +11,7 @@ UIThreadExecutor::UIThreadExecutor() :
 	concurrencpp::derivable_executor<UIThreadExecutor>("UIThreadExecutor"),
 	m_hwnd(MessageWindowHelper::CreateMessageOnlyWindow())
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd.get(),
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd.get(),
 		std::bind_front(&UIThreadExecutor::WndProc, this)));
 }
 

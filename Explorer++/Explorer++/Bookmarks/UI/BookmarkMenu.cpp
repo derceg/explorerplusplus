@@ -20,7 +20,7 @@ BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstanc
 	m_menuBuilder(iconResourceLoader, iconFetcher, resourceInstance),
 	m_controller(bookmarkTree, browserWindow, coreInterface, iconResourceLoader, parentWindow)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parentWindow,
 		std::bind_front(&BookmarkMenu::ParentWindowSubclass, this)));
 }
 

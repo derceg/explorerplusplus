@@ -13,7 +13,7 @@
 class CoreInterface;
 class SearchTabsDialog;
 class Tab;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class SearchTabsDialogPersistentSettings : public DialogSettings
 {
@@ -94,7 +94,7 @@ private:
 	INT_PTR OnNcDestroy() override;
 
 	CoreInterface *m_coreInterface;
-	std::unique_ptr<WindowSubclassWrapper> m_editSubclass;
+	std::unique_ptr<WindowSubclass> m_editSubclass;
 	static inline std::wstring m_filter;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	SearchTabsDialogPersistentSettings *m_persistentSettings;

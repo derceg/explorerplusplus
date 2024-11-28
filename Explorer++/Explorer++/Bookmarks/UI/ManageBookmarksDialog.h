@@ -20,7 +20,7 @@ class CoreInterface;
 class IconFetcher;
 class IconResourceLoader;
 class ManageBookmarksDialog;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class ManageBookmarksDialogPersistentSettings : public DialogSettings
 {
@@ -132,7 +132,7 @@ private:
 
 	std::unique_ptr<BookmarkNavigationController> m_navigationController;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	ManageBookmarksDialogPersistentSettings *m_persistentSettings = nullptr;

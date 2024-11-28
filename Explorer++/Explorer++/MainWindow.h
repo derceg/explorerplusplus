@@ -11,7 +11,7 @@
 struct Config;
 class CoreInterface;
 struct NavigateParams;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class MainWindow : private DropTargetInternal
 {
@@ -48,7 +48,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;

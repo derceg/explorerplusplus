@@ -12,7 +12,7 @@
 #include "TestHelper.h"
 #include "Version.h"
 #include "VersionHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 ProcessManager::ProcessManager(const BrowserList *browserList) : m_browserList(browserList)
 {
@@ -66,7 +66,7 @@ bool ProcessManager::InitializeCurrentProcess(const CommandLine::Settings *comma
 	}
 
 	m_messageWindow = MessageWindowHelper::CreateMessageOnlyWindow(windowName);
-	m_messageWindowSubclass = std::make_unique<WindowSubclassWrapper>(m_messageWindow.get(),
+	m_messageWindowSubclass = std::make_unique<WindowSubclass>(m_messageWindow.get(),
 		std::bind_front(&ProcessManager::MessageWindowProc, this));
 
 	return true;

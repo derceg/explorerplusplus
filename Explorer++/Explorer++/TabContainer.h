@@ -13,7 +13,7 @@
 #include "Tab.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
@@ -271,7 +271,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	const Config *const m_config;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	std::vector<int> m_tabSelectionHistory;

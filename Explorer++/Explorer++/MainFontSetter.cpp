@@ -7,7 +7,7 @@
 #include "Config.h"
 #include "FontHelper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
 	std::optional<LOGFONT> defaultFontAt96Dpi) :
@@ -27,8 +27,8 @@ MainFontSetter::~MainFontSetter() = default;
 
 void MainFontSetter::SubclassWindowForDpiChanges()
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&MainFontSetter::WndProc, this)));
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainFontSetter::WndProc, this)));
 }
 
 LRESULT MainFontSetter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -68,7 +68,7 @@ void MainFontSetter::MaybeSubclassSpecificWindowClasses()
 
 	if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
 	{
-		m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 			std::bind_front(&MainFontSetter::TooltipWndProc, this)));
 	}
 }

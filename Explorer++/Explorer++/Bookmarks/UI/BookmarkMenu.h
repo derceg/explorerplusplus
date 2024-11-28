@@ -7,7 +7,7 @@
 #include "Bookmarks/UI/BookmarkMenuBuilder.h"
 #include "Bookmarks/UI/BookmarkMenuController.h"
 #include "../Helper/WinRTBaseWrapper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 class BookmarkItem;
 class BookmarkTree;
@@ -53,5 +53,5 @@ private:
 	BookmarkMenuBuilder::MenuInfo *m_menuInfo = nullptr;
 	winrt::com_ptr<IDropTarget> m_dropTarget;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 };

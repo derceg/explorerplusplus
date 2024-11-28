@@ -13,7 +13,7 @@
 #include "Tab.h"
 #include "TabHistoryMenu.h"
 #include "../Helper/BaseWindow.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
@@ -114,7 +114,7 @@ private:
 	MainFontSetter m_fontSetter;
 	MainFontSetter m_tooltipFontSetter;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	std::optional<int> m_middleButtonItem;

@@ -210,9 +210,9 @@ void ShellBrowserImpl::InitializeListView()
 
 	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hListView);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hListView,
 		std::bind_front(&ShellBrowserImpl::ListViewProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hListView),
 		std::bind_front(&ShellBrowserImpl::ListViewParentProc, this)));
 
 	m_connections.push_back(m_app->GetColorRuleModel()->AddItemAddedObserver(

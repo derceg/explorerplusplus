@@ -23,7 +23,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 DisplayWindow *DisplayWindow::Create(HWND parent, const Config *config)
 {
@@ -49,7 +49,7 @@ DisplayWindow::DisplayWindow(HWND parent, const Config *config) :
 
 	InitializeCriticalSection(&m_csDWThumbnails);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 		std::bind_front(&DisplayWindow::DisplayWindowProc, this)));
 
 	m_connections.push_back(m_config->displayWindowCentreColor.addObserver(

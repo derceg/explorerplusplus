@@ -11,7 +11,7 @@
 #include <unordered_map>
 
 class CachedIcons;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 class IconFetcherImpl : public IconFetcher
 {
@@ -57,14 +57,14 @@ private:
 		std::future<std::optional<IconResult>> iconResult;
 	};
 
-	LRESULT WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static std::optional<int> FindIconAsync(PCIDLIST_ABSOLUTE pidl);
 	void ProcessIconResult(int iconResultId);
 
 	const HWND m_hwnd;
 	CachedIcons *const m_cachedIcons;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	int m_defaultFileIconIndex;
 	int m_defaultFolderIconIndex;
 

@@ -13,7 +13,7 @@ DriveWatcherImpl::DriveWatcherImpl(HWND topLevelWindow)
 	auto style = GetWindowLongPtr(topLevelWindow, GWL_STYLE);
 	DCHECK(style && WI_IsFlagClear(style, WS_CHILD));
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(topLevelWindow,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(topLevelWindow,
 		std::bind_front(&DriveWatcherImpl::WndProc, this)));
 }
 

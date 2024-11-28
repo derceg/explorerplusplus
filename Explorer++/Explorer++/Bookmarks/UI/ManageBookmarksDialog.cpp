@@ -19,7 +19,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
@@ -101,7 +101,7 @@ void ManageBookmarksDialog::CreateToolbar()
 
 void ManageBookmarksDialog::SetupToolbar()
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_toolbarParent,
 		std::bind_front(&ManageBookmarksDialog::ToolbarParentWndProc, this)));
 
 	SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, static_cast<WPARAM>(sizeof(TBBUTTON)), 0);

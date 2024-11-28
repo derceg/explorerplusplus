@@ -35,7 +35,7 @@
 #define WM_NDW_RCLICK (WM_APP + 102)
 
 struct Config;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 typedef struct
 {
@@ -89,7 +89,7 @@ private:
 	void OnFontConfigChanged();
 
 	const HWND m_hwnd;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *const m_config;
 

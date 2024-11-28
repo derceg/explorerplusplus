@@ -105,9 +105,9 @@ void TabContainer::Initialize(HWND parent)
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&TabContainer::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TabContainer::WndProc, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 
 	m_connections.push_back(

@@ -33,7 +33,7 @@ void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData *stora
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | CCS_NODIVIDER
 			| CCS_TOP | CCS_NOPARENTALIGN | RBS_BANDBORDERS | RBS_VARHEIGHT,
 		0, 0, 0, 0, m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hMainRebar,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hMainRebar,
 		std::bind_front(&Explorerplusplus::RebarSubclass, this)));
 
 	auto bands = InitializeMainRebarBands(storageData);

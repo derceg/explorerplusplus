@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ShellChangeWatcher.h"
 #include "../Helper/StringHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
 
 ShellChangeWatcher::ShellChangeWatcher(HWND hwnd,
@@ -13,7 +13,7 @@ ShellChangeWatcher::ShellChangeWatcher(HWND hwnd,
 	m_hwnd(hwnd),
 	m_processNotificationsCallback(processNotificationsCallback)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ShellChangeWatcher::WndProc, this)));
 }
 

@@ -15,7 +15,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 const TCHAR CustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 

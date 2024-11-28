@@ -11,7 +11,7 @@
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/signals2.hpp>
@@ -231,7 +231,7 @@ private:
 	CoreInterface *m_coreInterface = nullptr;
 	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *m_config;
 	FileActionHandler *m_fileActionHandler;

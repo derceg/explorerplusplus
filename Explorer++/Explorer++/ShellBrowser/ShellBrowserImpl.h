@@ -49,7 +49,7 @@ struct PreservedHistoryEntry;
 class ShellBrowserEmbedder;
 class ShellNavigationController;
 class TabNavigationInterface;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 typedef struct
 {
@@ -651,7 +651,7 @@ private:
 	TabNavigationInterface *m_tabNavigation;
 	FileActionHandler *m_fileActionHandler;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	// When the listview is assigned a font, it will also set the font for the tooltip control.

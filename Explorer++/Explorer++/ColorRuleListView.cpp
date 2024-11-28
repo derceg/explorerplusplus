@@ -11,7 +11,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 ColorRuleListView::ColorRuleListView(HWND listView, HINSTANCE resourceInstance,
 	ColorRuleModel *model) :
@@ -26,7 +26,7 @@ ColorRuleListView::ColorRuleListView(HWND listView, HINSTANCE resourceInstance,
 	InsertColumns();
 	InsertColorRules();
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(listView),
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(listView),
 		std::bind_front(&ColorRuleListView::ParentWndProc, this)));
 
 	m_connections.push_back(

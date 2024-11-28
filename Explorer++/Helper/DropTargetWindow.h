@@ -5,7 +5,7 @@
 #pragma once
 
 #include "WinRTBaseWrapper.h"
-#include "WindowSubclassWrapper.h"
+#include "WindowSubclass.h"
 
 class DropTargetInternal
 {
@@ -41,7 +41,7 @@ private:
 	HWND m_hwnd;
 	DropTargetInternal *m_dropTargetInternal;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	bool m_withinDrag;
 };

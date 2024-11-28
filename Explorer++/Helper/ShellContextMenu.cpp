@@ -8,7 +8,7 @@
 #include "ShellHelper.h"
 #include "StatusBar.h"
 #include "StringHelper.h"
-#include "WindowSubclassWrapper.h"
+#include "WindowSubclass.h"
 
 ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent,
 	const std::vector<PCITEMID_CHILD> &pidlItems, ShellContextMenuHandler *handler,
@@ -72,7 +72,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 	}
 
 	// Subclass the owner window, so that menu messages can be handled.
-	auto subclass = std::make_unique<WindowSubclassWrapper>(hwnd,
+	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ShellContextMenu::ParentWindowSubclass, this));
 
 	UINT cmd =

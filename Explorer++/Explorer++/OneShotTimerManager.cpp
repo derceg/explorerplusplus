@@ -4,11 +4,11 @@
 
 #include "stdafx.h"
 #include "OneShotTimerManager.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 OneShotTimerManager::OneShotTimerManager(HWND hwnd) : m_hwnd(hwnd)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 		std::bind_front(&OneShotTimerManager::WndProc, this)));
 }
 

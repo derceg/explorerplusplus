@@ -132,9 +132,9 @@ ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Co
 
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&ToolbarView::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hwnd),
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&ToolbarView::WndProc, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
 		std::bind_front(&ToolbarView::ParentWndProc, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ToolbarView::OnFontOrDpiUpdated, this));

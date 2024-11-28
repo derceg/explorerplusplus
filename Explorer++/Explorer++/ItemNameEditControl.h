@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 
 struct Accelerator;
@@ -60,7 +60,7 @@ private:
 	bool OnChar(TCHAR character);
 
 	const HWND m_hwnd;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	AcceleratorManager *const m_acceleratorManager;
 	std::vector<ACCEL> m_originalAccelerators;
 

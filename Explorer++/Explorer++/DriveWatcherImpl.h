@@ -5,7 +5,7 @@
 #pragma once
 
 #include "DriveWatcher.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <Dbt.h>
 #include <memory>
 #include <vector>
@@ -40,7 +40,7 @@ private:
 	void OnDeviceArrivedOrRemoved(DeviceChangeType deviceChangeType,
 		const DEV_BROADCAST_HDR *deviceBroadcast);
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	DriveAddedSignal m_driveAddedSignal;
 	DriveUpdatedSignal m_driveUpdatedSignal;

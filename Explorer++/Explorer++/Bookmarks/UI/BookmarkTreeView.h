@@ -9,7 +9,7 @@
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <optional>
@@ -97,6 +97,6 @@ private:
 
 	std::optional<HTREEITEM> m_previousDropItem;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

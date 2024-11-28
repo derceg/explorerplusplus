@@ -132,9 +132,9 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 	AddButtonsToToolbar(initialButtons ? initialButtons->GetButtons() : GetDefaultButtons());
 	UpdateConfigDependentButtonStates();
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&MainToolbar::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainToolbar::WndProc, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&MainToolbar::ParentWndProc, this)));
 
 	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(

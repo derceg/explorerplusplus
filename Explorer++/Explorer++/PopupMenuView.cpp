@@ -6,7 +6,7 @@
 #include "PopupMenuView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 
 PopupMenuView::PopupMenuView() : m_menu(CreatePopupMenu())
 {
@@ -17,7 +17,7 @@ void PopupMenuView::Show(HWND hwnd, const POINT &point)
 	DCHECK_GT(GetMenuItemCount(m_menu.get()), 0);
 
 	// Subclass the parent window to allow middle clicks to be detected.
-	auto subclass = std::make_unique<WindowSubclassWrapper>(hwnd,
+	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&PopupMenuView::ParentWindowSubclass, this));
 
 	UINT cmd = TrackPopupMenu(m_menu.get(), TPM_LEFTALIGN | TPM_VERTICAL | TPM_RETURNCMD, point.x,

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <concurrencpp/concurrencpp.h>
 #include <wil/resource.h>
 #include <atomic>
@@ -32,7 +32,7 @@ private:
 	void OnTaskQueued();
 
 	wil::unique_hwnd m_hwnd;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::mutex m_mutex;
 	std::queue<concurrencpp::task> m_queue;
 	std::atomic_bool m_shutdownRequested = false;

@@ -8,7 +8,7 @@
 #include <optional>
 
 struct Config;
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 // Applies the main font (if any) to a window. If the main font is changed or reset to default, the
 // window font will be updated. The lifetime of this class should be the same as the lifetime of the
@@ -37,6 +37,6 @@ private:
 	wil::unique_hfont m_font;
 	const std::optional<LOGFONT> m_defaultFontAt96Dpi;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

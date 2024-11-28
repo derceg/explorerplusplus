@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-class WindowSubclassWrapper;
+class WindowSubclass;
 
 // Allows a one-shot timer to be created. The advantage of this class over WM_TIMER is that it
 // guarantees the timer won't be run once StopTimer() has been called. When using WM_TIMER, a timer
@@ -61,7 +61,7 @@ private:
 	void RemoveTimerAndOptionallyRunCallback(UINT_PTR timerId, CallbackRunType runType);
 
 	HWND m_hwnd;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	// Maps between timer IDs and their associated callbacks.
 	std::unordered_map<UINT_PTR, Callback> m_timerCallbacks;

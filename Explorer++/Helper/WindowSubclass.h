@@ -7,13 +7,13 @@
 #include <boost/core/noncopyable.hpp>
 #include <functional>
 
-class WindowSubclassWrapper : private boost::noncopyable
+class WindowSubclass : private boost::noncopyable
 {
 public:
 	using Subclass = std::function<LRESULT(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)>;
 
-	WindowSubclassWrapper(HWND hwnd, Subclass subclass);
-	~WindowSubclassWrapper();
+	WindowSubclass(HWND hwnd, Subclass subclass);
+	~WindowSubclass();
 
 private:
 	static LRESULT CALLBACK SubclassProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,

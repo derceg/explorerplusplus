@@ -55,18 +55,18 @@ void AddressBar::Initialize(HWND parent)
 	Shell_GetImageLists(nullptr, &smallIcons);
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 		std::bind_front(&AddressBar::ComboBoxSubclass, this)));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit,
-		std::bind_front(&AddressBar::EditSubclass, this)));
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(hEdit, std::bind_front(&AddressBar::EditSubclass, this)));
 
 	/* Turn on auto complete for the edit control within the combobox.
 	This will let the os complete paths as they are typed. */
 	SHAutoComplete(hEdit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&AddressBar::ParentWndProc, this)));
 
 	m_coreInterface->AddTabsInitializedObserver(

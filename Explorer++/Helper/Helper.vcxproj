@@ -717,7 +717,7 @@
     <ClCompile Include="TimeHelper.cpp" />
     <ClCompile Include="UniqueThreadId.cpp" />
     <ClCompile Include="WindowHelper.cpp" />
-    <ClCompile Include="WindowSubclassWrapper.cpp" />
+    <ClCompile Include="WindowSubclass.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -782,7 +782,7 @@
     <ClInclude Include="UniqueThreadId.h" />
     <ClInclude Include="UniqueVariableSizeStruct.h" />
     <ClInclude Include="WindowHelper.h" />
-    <ClInclude Include="WindowSubclassWrapper.h" />
+    <ClInclude Include="WindowSubclass.h" />
     <ClInclude Include="WinRTBaseWrapper.h" />
     <ClInclude Include="WinUserBackwardsCompatibility.h" />
     <ClInclude Include="XMLSettings.h" />

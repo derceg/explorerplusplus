@@ -5,7 +5,7 @@
 #pragma once
 
 #include "MainFontSetter.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <chrono>
 #include <functional>
@@ -204,7 +204,7 @@ private:
 	// Drag and drop
 	std::optional<POINT> m_leftButtonDownPoint;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	ToolbarSizeChangedSignal m_toolbarSizeUpdatedSignal;
 	WindowDestroyedSignal m_windowDestroyedSignal;

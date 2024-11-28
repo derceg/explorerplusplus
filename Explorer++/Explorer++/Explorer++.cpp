@@ -30,7 +30,7 @@
 #include "UiTheming.h"
 #include "WindowStorage.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
@@ -64,7 +64,7 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 
 	m_iDWFolderSizeUniqueId = 0;
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hContainer,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hContainer,
 		std::bind_front(&Explorerplusplus::WindowProcedure, this)));
 
 	Initialize(storageData);

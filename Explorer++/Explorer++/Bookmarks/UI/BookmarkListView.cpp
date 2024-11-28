@@ -51,9 +51,9 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 
 	InsertColumns(initialColumns);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hListView,
 		std::bind_front(&BookmarkListView::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hListView),
 		std::bind_front(&BookmarkListView::ParentWndProc, this)));
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(

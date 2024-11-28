@@ -109,7 +109,7 @@
     <ClCompile Include="DpiCompatibility.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="WindowSubclassWrapper.cpp">
+    <ClCompile Include="WindowSubclass.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
     <ClCompile Include="CachedIcons.cpp">
@@ -291,7 +291,7 @@
     <ClInclude Include="WinUserBackwardsCompatibility.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="WindowSubclassWrapper.h">
+    <ClInclude Include="WindowSubclass.h">
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="CachedIcons.h">

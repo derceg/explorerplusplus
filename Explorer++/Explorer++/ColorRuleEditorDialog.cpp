@@ -11,7 +11,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/resource.h>
 
@@ -87,7 +87,7 @@ INT_PTR ColorRuleEditorDialog::OnInitDialog()
 	}
 
 	HWND staticColorControl = GetDlgItem(m_hDlg, IDC_STATIC_COLOR);
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(staticColorControl,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(staticColorControl,
 		std::bind_front(&ColorRuleEditorDialog::StaticColorControlProc, this)));
 
 	SendMessage(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION), EM_SETSEL, 0, -1);

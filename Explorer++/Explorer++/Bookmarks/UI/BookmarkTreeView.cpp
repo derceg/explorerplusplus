@@ -27,9 +27,9 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
 	m_bookmarkTree(bookmarkTree),
 	m_bNewFolderCreated(false)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hTreeView,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hTreeView,
 		std::bind_front(&BookmarkTreeView::TreeViewProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(hTreeView),
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(hTreeView),
 		std::bind_front(&BookmarkTreeView::TreeViewParentProc, this)));
 
 	auto &dpiCompat = DpiCompatibility::GetInstance();

@@ -11,7 +11,7 @@
 #include "TabContainer.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <glog/logging.h>
 
@@ -218,7 +218,7 @@ void SearchTabsDialog::SetupEditControl()
 {
 	HWND edit = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM);
 
-	m_editSubclass = std::make_unique<WindowSubclassWrapper>(edit,
+	m_editSubclass = std::make_unique<WindowSubclass>(edit,
 		std::bind_front(&SearchTabsDialog::EditWndProc, this));
 
 	auto placeHolderText = Resources::LoadString(IDS_SEARCH_TABS_SEARCH_TERM_PLACEHOLDER_TEXT);
