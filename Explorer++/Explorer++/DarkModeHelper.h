@@ -10,6 +10,9 @@
 // Based on the code contained within:
 // https://github.com/ysc3839/win32-darkmode/blob/bb241c369fee7b56440420179654bb487f7259cd/win32-darkmode/DarkMode.h
 
+// This class allows dark mode to be enabled and disabled. An instance of this class is designed to
+// be held for the lifetime of the application. If dark mode is enabled when the instance is
+// destroyed, no attempt will be made to disable it.
 class DarkModeHelper
 {
 public:
@@ -61,18 +64,18 @@ public:
 		SIZE_T cbData;
 	};
 
-	static inline constexpr COLORREF BACKGROUND_COLOR = RGB(32, 32, 32);
-	static inline constexpr COLORREF TEXT_COLOR = RGB(255, 255, 255);
+	static constexpr COLORREF BACKGROUND_COLOR = RGB(32, 32, 32);
+	static constexpr COLORREF TEXT_COLOR = RGB(255, 255, 255);
 
-	static inline constexpr COLORREF TEXT_COLOR_DISABLED = RGB(121, 121, 121);
+	static constexpr COLORREF TEXT_COLOR_DISABLED = RGB(121, 121, 121);
 
 	// The color of foreground elements (e.g. the toolbar insertion mark).
-	static inline constexpr COLORREF FOREGROUND_COLOR = RGB(255, 255, 255);
+	static constexpr COLORREF FOREGROUND_COLOR = RGB(255, 255, 255);
 
 	// The color of the hot item (i.e. the item that's selected/under the mouse).
-	static inline constexpr COLORREF HOT_ITEM_HIGHLIGHT_COLOR = RGB(71, 71, 71);
+	static constexpr COLORREF HOT_ITEM_HIGHLIGHT_COLOR = RGB(71, 71, 71);
 
-	static DarkModeHelper &GetInstance();
+	DarkModeHelper();
 
 	bool IsDarkModeSupported() const;
 	bool IsDarkModeEnabled() const;
@@ -80,35 +83,33 @@ public:
 	void EnableForApp(bool enable);
 
 	bool IsSystemAppModeLight();
-	void AllowDarkModeForWindow(HWND hWnd, bool allow);
-	void SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
+	void AllowDarkModeForWindow(HWND hwnd, bool allow);
+	void SetWindowCompositionAttribute(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *data);
 
 	static bool IsHighContrast();
 
-	HBRUSH GetBackgroundBrush();
+	HBRUSH GetBackgroundBrush() const;
 
 	SignalWrapper<DarkModeHelper, void(bool darkModeEnabled)> darkModeStatusChanged;
 
 private:
-	static inline const DWORD BUILD_NUMBER_1809 = 17763;
-	static inline const DWORD BUILD_NUMBER_1903 = 18362;
-	static inline const DWORD BUILD_NUMBER_1909 = 18363;
+	static constexpr DWORD BUILD_NUMBER_1809 = 17763;
+	static constexpr DWORD BUILD_NUMBER_1903 = 18362;
+	static constexpr DWORD BUILD_NUMBER_1909 = 18363;
 
 	using RtlGetVersionType = NTSTATUS(WINAPI *)(LPOSVERSIONINFOEXW);
 	using SetWindowCompositionAttributeType = BOOL(
-		WINAPI *)(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
+		WINAPI *)(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *data);
 
 	// Windows 10 1809
 	using AllowDarkModeForAppType = bool(WINAPI *)(bool allow);
 	using FlushMenuThemesType = void(WINAPI *)();
 	using RefreshImmersiveColorPolicyStateType = void(WINAPI *)();
-	using AllowDarkModeForWindowType = bool(WINAPI *)(HWND hWnd, bool allow);
+	using AllowDarkModeForWindowType = bool(WINAPI *)(HWND hwnd, bool allow);
 	using OpenNcThemeDataType = HTHEME(WINAPI *)(HWND hwnd, LPCWSTR classList);
 
 	// Windows 10 1903
 	using SetPreferredAppModeType = PreferredAppMode(WINAPI *)(PreferredAppMode appMode);
-
-	DarkModeHelper();
 
 	void AllowDarkModeForApp(bool allow);
 	void FlushMenuThemes();
@@ -130,11 +131,11 @@ private:
 
 	// This is static, as it needs to be called by DetouredOpenNcThemeData(). The only two options
 	// here are a static variable or a global variable.
-	static OpenNcThemeDataType m_OpenNcThemeData;
+	static inline OpenNcThemeDataType m_OpenNcThemeData = nullptr;
 
 	wil::unique_hmodule m_uxThemeLib;
 	bool m_isWindows10Version1809 = false;
-	bool m_darkModeSupported;
-	bool m_darkModeEnabled;
+	bool m_darkModeSupported = false;
+	bool m_darkModeEnabled = false;
 	wil::unique_hbrush m_backgroundBrush;
 };

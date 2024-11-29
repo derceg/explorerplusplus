@@ -10,6 +10,7 @@
 #include "BrowserList.h"
 #include "CommandLine.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "FeatureList.h"
 #include "GlobalTabEventDispatcher.h"
 #include "ModelessDialogList.h"
@@ -56,6 +57,7 @@ public:
 	HINSTANCE GetResourceInstance() const;
 	GlobalTabEventDispatcher *GetGlobalTabEventDispatcher();
 	TabRestorer *GetTabRestorer();
+	DarkModeHelper *GetDarkModeHelper();
 	ThemeManager *GetThemeManager();
 
 	void TryExit();
@@ -97,6 +99,7 @@ private:
 	ProcessManager m_processManager;
 	GlobalTabEventDispatcher m_globalTabEventDispatcher;
 	TabRestorer m_tabRestorer;
+	DarkModeHelper m_darkModeHelper;
 	ThemeManager m_themeManager;
 
 	concurrencpp::timer m_saveSettingsTimer;

@@ -27,7 +27,7 @@
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
-	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
+	m_app->GetDarkModeHelper()->EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
 	m_bookmarksMainMenu =
@@ -129,8 +129,8 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 	}
 }
 
-bool Explorerplusplus::ShouldEnableDarkMode(Theme theme)
+bool Explorerplusplus::ShouldEnableDarkMode(Theme theme) const
 {
 	return theme == +Theme::Dark
-		|| (theme == +Theme::System && !DarkModeHelper::GetInstance().IsSystemAppModeLight());
+		|| (theme == +Theme::System && !m_app->GetDarkModeHelper()->IsSystemAppModeLight());
 }

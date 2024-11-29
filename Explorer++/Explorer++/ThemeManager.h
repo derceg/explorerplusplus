@@ -7,6 +7,7 @@
 #include <boost/signals2.hpp>
 #include <unordered_set>
 
+class DarkModeHelper;
 class WindowSubclass;
 
 // Based on
@@ -14,7 +15,7 @@ class WindowSubclass;
 class ThemeManager
 {
 public:
-	ThemeManager();
+	ThemeManager(DarkModeHelper *darkModeHelper);
 
 	// This will theme a top-level window, plus all of its nested children. Once a window is
 	// tracked, any changes to the dark mode status will result in the window theme being
@@ -68,6 +69,7 @@ private:
 	LRESULT GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	DarkModeHelper *const m_darkModeHelper;
 	std::unordered_set<HWND> m_trackedTopLevelWindows;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

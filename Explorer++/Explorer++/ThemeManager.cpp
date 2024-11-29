@@ -20,9 +20,9 @@
 
 static const wchar_t DIALOG_CLASS_NAME[] = L"#32770";
 
-ThemeManager::ThemeManager()
+ThemeManager::ThemeManager(DarkModeHelper *darkModeHelper) : m_darkModeHelper(darkModeHelper)
 {
-	m_connections.push_back(DarkModeHelper::GetInstance().darkModeStatusChanged.AddObserver(
+	m_connections.push_back(darkModeHelper->darkModeStatusChanged.AddObserver(
 		std::bind(&ThemeManager::OnDarkModeStatusChanged, this)));
 }
 
@@ -109,9 +109,8 @@ BOOL ThemeManager::ProcessThreadWindow(HWND hwnd)
 
 void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 {
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-	bool enableDarkMode = darkModeHelper.IsDarkModeEnabled();
-	darkModeHelper.AllowDarkModeForWindow(hwnd, enableDarkMode);
+	bool enableDarkMode = m_darkModeHelper->IsDarkModeEnabled();
+	m_darkModeHelper->AllowDarkModeForWindow(hwnd, enableDarkMode);
 
 	// The maximum length of a class name is 256 characters (see the documentation for lpszClassName
 	// in https://learn.microsoft.com/en-au/windows/win32/api/winuser/ns-winuser-wndclassw).
@@ -184,12 +183,6 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 
 void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 {
-	BOOL dark = enableDarkMode;
-	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-	};
-	DarkModeHelper::GetInstance().SetWindowCompositionAttribute(hwnd, &compositionData);
-
 	// There's no need to owner-draw the menu bar if dark mode isn't supported (in practice, this
 	// means that the menu bar will only be owner-drawn on Windows 10 and 11). Additionally,
 	// owner-drawing the menu bar is problematic on Windows 7, for at least two reasons:
@@ -200,10 +193,16 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 	// the menu bar, rather than providing a DC to paint into.
 	// 2. Visual styles can be turned off, so the current owner-drawing implementation wouldn't work
 	// in that scenario.
-	if (!DarkModeHelper::GetInstance().IsDarkModeSupported())
+	if (!m_darkModeHelper->IsDarkModeSupported())
 	{
 		return;
 	}
+
+	BOOL dark = enableDarkMode;
+	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	};
+	m_darkModeHelper->SetWindowCompositionAttribute(hwnd, &compositionData);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ThemeManager::MainWindowSubclass, this)));
@@ -252,7 +251,7 @@ void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
 		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
 	};
-	DarkModeHelper::GetInstance().SetWindowCompositionAttribute(hwnd, &compositionData);
+	m_darkModeHelper->SetWindowCompositionAttribute(hwnd, &compositionData);
 
 	if (enableDarkMode)
 	{
@@ -582,7 +581,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			}
 		}
 
-		bool darkModeEnabled = DarkModeHelper::GetInstance().IsDarkModeEnabled();
+		bool darkModeEnabled = m_darkModeHelper->IsDarkModeEnabled();
 		bool selected = false;
 		bool selectionPartiallyTransparent = false;
 
@@ -700,7 +699,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	case WM_NCPAINT:
 	case WM_NCACTIVATE:
 	{
-		if (!DarkModeHelper::GetInstance().IsDarkModeEnabled())
+		if (!m_darkModeHelper->IsDarkModeEnabled())
 		{
 			break;
 		}
@@ -722,7 +721,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		OffsetRect(&menuBarBorderRect, -windowRect.left, -windowRect.top);
 
 		auto hdc = wil::GetWindowDC(hwnd);
-		FillRect(hdc.get(), &menuBarBorderRect, DarkModeHelper::GetInstance().GetBackgroundBrush());
+		FillRect(hdc.get(), &menuBarBorderRect, m_darkModeHelper->GetBackgroundBrush());
 
 		return defWindowProcResult;
 	}
@@ -736,7 +735,7 @@ HBRUSH ThemeManager::GetMenuBarBackgroundBrush(bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
-		return DarkModeHelper::GetInstance().GetBackgroundBrush();
+		return m_darkModeHelper->GetBackgroundBrush();
 	}
 	else
 	{
@@ -782,7 +781,7 @@ LRESULT ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 		auto hdc = reinterpret_cast<HDC>(wParam);
 		SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
 		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
-		return reinterpret_cast<LRESULT>(DarkModeHelper::GetInstance().GetBackgroundBrush());
+		return reinterpret_cast<LRESULT>(m_darkModeHelper->GetBackgroundBrush());
 	}
 	break;
 
@@ -1019,7 +1018,7 @@ LRESULT ThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 		RECT rc;
 		GetClientRect(hwnd, &rc);
-		FillRect(hdc, &rc, DarkModeHelper::GetInstance().GetBackgroundBrush());
+		FillRect(hdc, &rc, m_darkModeHelper->GetBackgroundBrush());
 
 		return 1;
 	}

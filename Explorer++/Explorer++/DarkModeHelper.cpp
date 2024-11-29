@@ -10,15 +10,7 @@
 #include <detours/detours.h>
 #include <wil/common.h>
 
-DarkModeHelper::OpenNcThemeDataType DarkModeHelper::m_OpenNcThemeData = nullptr;
-
-DarkModeHelper &DarkModeHelper::GetInstance()
-{
-	static DarkModeHelper darkModeHelper;
-	return darkModeHelper;
-}
-
-DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled(false)
+DarkModeHelper::DarkModeHelper() : m_backgroundBrush(CreateSolidBrush(BACKGROUND_COLOR))
 {
 	auto RtlGetVersion = reinterpret_cast<RtlGetVersionType>(
 		GetProcAddress(GetModuleHandle(L"ntdll.dll"), "RtlGetVersion"));
@@ -149,11 +141,11 @@ void DarkModeHelper::AllowDarkModeForApp(bool allow)
 	}
 }
 
-void DarkModeHelper::AllowDarkModeForWindow(HWND hWnd, bool allow)
+void DarkModeHelper::AllowDarkModeForWindow(HWND hwnd, bool allow)
 {
 	if (m_AllowDarkModeForWindow)
 	{
-		m_AllowDarkModeForWindow(hWnd, allow);
+		m_AllowDarkModeForWindow(hwnd, allow);
 	}
 }
 
@@ -223,11 +215,11 @@ HTHEME WINAPI DarkModeHelper::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classLi
 	return m_OpenNcThemeData(hwnd, classList);
 }
 
-void DarkModeHelper::SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data)
+void DarkModeHelper::SetWindowCompositionAttribute(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *data)
 {
 	if (m_SetWindowCompositionAttribute)
 	{
-		m_SetWindowCompositionAttribute(hWnd, data);
+		m_SetWindowCompositionAttribute(hwnd, data);
 	}
 }
 
@@ -246,12 +238,7 @@ bool DarkModeHelper::IsHighContrast()
 	return WI_IsFlagSet(highContrast.dwFlags, HCF_HIGHCONTRASTON);
 }
 
-HBRUSH DarkModeHelper::GetBackgroundBrush()
+HBRUSH DarkModeHelper::GetBackgroundBrush() const
 {
-	if (!m_backgroundBrush)
-	{
-		m_backgroundBrush.reset(CreateSolidBrush(BACKGROUND_COLOR));
-	}
-
 	return m_backgroundBrush.get();
 }

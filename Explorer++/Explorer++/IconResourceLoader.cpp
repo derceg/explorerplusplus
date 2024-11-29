@@ -8,7 +8,9 @@
 #include "IconMappings.h"
 #include "../Helper/ImageHelper.h"
 
-IconResourceLoader::IconResourceLoader(IconSet iconSet) : m_iconSet(iconSet)
+IconResourceLoader::IconResourceLoader(IconSet iconSet, const DarkModeHelper *darkModeHelper) :
+	m_iconSet(iconSet),
+	m_darkModeHelper(darkModeHelper)
 {
 }
 
@@ -54,7 +56,7 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 {
 	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
-	if (m_iconSet == +IconSet::Color || !DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	if (m_iconSet == +IconSet::Color || !m_darkModeHelper->IsDarkModeEnabled())
 	{
 		return bitmap;
 	}

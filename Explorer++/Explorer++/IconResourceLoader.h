@@ -9,6 +9,8 @@
 #include <wil/resource.h>
 #include <gdiplus.h>
 
+class DarkModeHelper;
+
 // Note that the values in this enumeration are used when saving/loading the icon set and should not
 // be changed.
 // clang-format off
@@ -22,7 +24,7 @@ BETTER_ENUM(IconSet, int,
 class IconResourceLoader
 {
 public:
-	IconResourceLoader(IconSet iconSet);
+	IconResourceLoader(IconSet iconSet, const DarkModeHelper *darkModeHelper);
 
 	wil::unique_hbitmap LoadBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight,
 		int dpi) const;
@@ -40,4 +42,5 @@ private:
 		int iconHeight) const;
 
 	const IconSet m_iconSet;
+	const DarkModeHelper *const m_darkModeHelper;
 };

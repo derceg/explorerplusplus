@@ -515,7 +515,7 @@ private:
 	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
 
 	// Dark mode
-	static bool ShouldEnableDarkMode(Theme theme);
+	bool ShouldEnableDarkMode(Theme theme) const;
 	void OnThemeUpdated(Theme theme);
 
 	/* Miscellaneous. */

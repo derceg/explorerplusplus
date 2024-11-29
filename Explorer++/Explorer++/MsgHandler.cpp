@@ -467,9 +467,7 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 
 	if (hwnd == m_hTabBacking)
 	{
-		auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-		if (!darkModeHelper.IsDarkModeEnabled())
+		if (!m_app->GetDarkModeHelper()->IsDarkModeEnabled())
 		{
 			return std::nullopt;
 		}
@@ -489,13 +487,13 @@ void Explorerplusplus::OnSettingChange(const WCHAR *systemParameter)
 	if (lstrcmp(systemParameter, L"ImmersiveColorSet") == 0
 		&& m_config->theme.get() == +Theme::System)
 	{
-		DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
+		m_app->GetDarkModeHelper()->EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	}
 }
 
 void Explorerplusplus::OnThemeUpdated(Theme theme)
 {
-	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(theme));
+	m_app->GetDarkModeHelper()->EnableForApp(ShouldEnableDarkMode(theme));
 }
 
 int Explorerplusplus::OnDestroy()

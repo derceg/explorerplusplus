@@ -18,15 +18,17 @@
 
 HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const IconResourceLoader *iconResourceLoader)
+	const IconResourceLoader *iconResourceLoader, const DarkModeHelper *darkModeHelper)
 {
-	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, iconResourceLoader);
+	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, iconResourceLoader,
+		darkModeHelper);
 }
 
 HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const IconResourceLoader *iconResourceLoader) :
+	const IconResourceLoader *iconResourceLoader, const DarkModeHelper *darkModeHelper) :
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
+	m_darkModeHelper(darkModeHelper),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
 	LOGFONT systemFont = GetDefaultSystemFontScaledToWindow(m_hwnd);
@@ -215,12 +217,11 @@ void HolderWindow::OnPrintClient(HDC hdc)
 
 void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 {
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
 	HBRUSH backgroundBrush;
 
-	if (darkModeHelper.IsDarkModeEnabled())
+	if (m_darkModeHelper->IsDarkModeEnabled())
 	{
-		backgroundBrush = darkModeHelper.GetBackgroundBrush();
+		backgroundBrush = m_darkModeHelper->GetBackgroundBrush();
 	}
 	else
 	{
@@ -233,7 +234,7 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 	auto selectFont = wil::SelectObject(ps.hdc, m_font);
 	SetBkMode(ps.hdc, TRANSPARENT);
 
-	if (darkModeHelper.IsDarkModeEnabled())
+	if (m_darkModeHelper->IsDarkModeEnabled())
 	{
 		SetTextColor(ps.hdc, DarkModeHelper::TEXT_COLOR);
 	}
