@@ -69,7 +69,7 @@ private:
 class SplitFileDialog : public ThemedDialog
 {
 public:
-	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
+	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
 		const IconResourceLoader *iconResourceLoader, const std::wstring &strFullFilename);
 	~SplitFileDialog();
 

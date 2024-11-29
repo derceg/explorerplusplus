@@ -13,17 +13,12 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
 #include <wil/resource.h>
 #include <vssym32.h>
 
 static const wchar_t DIALOG_CLASS_NAME[] = L"#32770";
-
-ThemeManager &ThemeManager::GetInstance()
-{
-	static ThemeManager themeManager;
-	return themeManager;
-}
 
 ThemeManager::ThemeManager()
 {
@@ -33,6 +28,8 @@ ThemeManager::ThemeManager()
 
 void ThemeManager::OnDarkModeStatusChanged()
 {
+	m_windowSubclasses.clear();
+
 	for (HWND hwnd : m_trackedTopLevelWindows)
 	{
 		ApplyThemeToWindowAndChildren(hwnd);
@@ -56,7 +53,14 @@ void ThemeManager::UntrackTopLevelWindow(HWND hwnd)
 void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 {
 	ApplyThemeToWindow(hwnd);
-	EnumChildWindows(hwnd, ProcessChildWindow, 0);
+	EnumChildWindows(
+		hwnd,
+		[](HWND hwnd, LPARAM lParam)
+		{
+			auto themeManager = reinterpret_cast<ThemeManager *>(lParam);
+			return themeManager->ProcessChildWindow(hwnd);
+		},
+		reinterpret_cast<LPARAM>(this));
 
 	// Tooltip windows won't be enumerated by EnumChildWindows(). They will, however, be enumerated
 	// by EnumThreadWindows(), which is why that's called here.
@@ -64,23 +68,26 @@ void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 	// be initialized during the call to EnumChildWindows() (since they won't necessarily exist
 	// initially). Those tooltip windows will then be processed as part of the call to
 	// EnumThreadWindows().
-	EnumThreadWindows(GetCurrentThreadId(), ProcessThreadWindow, 0);
+	EnumThreadWindows(
+		GetCurrentThreadId(),
+		[](HWND hwnd, LPARAM lParam)
+		{
+			auto themeManager = reinterpret_cast<ThemeManager *>(lParam);
+			return themeManager->ProcessThreadWindow(hwnd);
+		},
+		reinterpret_cast<LPARAM>(this));
 
 	RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE | RDW_FRAME);
 }
 
-BOOL CALLBACK ThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
+BOOL ThemeManager::ProcessChildWindow(HWND hwnd)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	ApplyThemeToWindow(hwnd);
 	return TRUE;
 }
 
-BOOL CALLBACK ThemeManager::ProcessThreadWindow(HWND hwnd, LPARAM lParam)
+BOOL ThemeManager::ProcessThreadWindow(HWND hwnd)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	WCHAR className[256];
 	auto res = GetClassName(hwnd, className, static_cast<int>(std::size(className)));
 
@@ -198,7 +205,8 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 		return;
 	}
 
-	SetWindowSubclass(hwnd, MainWindowSubclass, SUBCLASS_ID, 0);
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+		std::bind_front(&ThemeManager::MainWindowSubclass, this)));
 
 	auto mainMenu = GetMenu(hwnd);
 	int numItems = GetMenuItemCount(mainMenu);
@@ -248,11 +256,8 @@ void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		SetWindowSubclass(hwnd, DialogSubclass, SUBCLASS_ID, 0);
-	}
-	else
-	{
-		RemoveWindowSubclass(hwnd, DialogSubclass, SUBCLASS_ID);
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+			std::bind_front(&ThemeManager::DialogSubclass, this)));
 	}
 }
 
@@ -287,11 +292,8 @@ void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		SetWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID, 0);
-	}
-	else
-	{
-		RemoveWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID);
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+			std::bind_front(&ThemeManager::ListViewSubclass, this)));
 	}
 }
 
@@ -363,11 +365,8 @@ void ThemeManager::ApplyThemeToRebar(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
-		SetWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID, 0);
-	}
-	else
-	{
-		RemoveWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID);
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+			std::bind_front(&ThemeManager::RebarSubclass, this)));
 	}
 }
 
@@ -398,13 +397,14 @@ void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		// This may be called multiple times (if there's more than one toolbar in a particular
-		// window), but that's not an issue, as the subclass will only be installed once.
-		SetWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID, 0);
-	}
-	else
-	{
-		RemoveWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID);
+		// Note that the parent window may end up being subclassed multiple times. That shouldn't
+		// have any correctness issues, since when receiving the relevant drawing messages, one of
+		// the subclasses (it's not specified which) will perform the appropriate handling. It is
+		// inefficient generally, since each subclass will be invoked for other messages as well.
+		// That shouldn't be too much of an issue, since there's only a limited number of toolbars,
+		// so the number of extraneous subclasses won't be very high.
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
+			std::bind_front(&ThemeManager::ToolbarParentSubclass, this)));
 	}
 }
 
@@ -412,11 +412,8 @@ void ThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
-		SetWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID, 0);
-	}
-	else
-	{
-		RemoveWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID);
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+			std::bind_front(&ThemeManager::ComboBoxExSubclass, this)));
 	}
 }
 
@@ -449,11 +446,8 @@ void ThemeManager::ApplyThemeToButton(HWND hwnd, bool enableDarkMode)
 	{
 		if (enableDarkMode)
 		{
-			SetWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID, 0);
-		}
-		else
-		{
-			RemoveWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID);
+			m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+				std::bind_front(&ThemeManager::GroupBoxSubclass, this)));
 		}
 	}
 }
@@ -485,20 +479,14 @@ void ThemeManager::ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode)
 	{
 		if (enableDarkMode)
 		{
-			SetWindowSubclass(hwnd, ScrollBarSubclass, SUBCLASS_ID, 0);
-		}
-		else
-		{
-			RemoveWindowSubclass(hwnd, ScrollBarSubclass, SUBCLASS_ID);
+			m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+				std::bind_front(&ThemeManager::ScrollBarSubclass, this)));
 		}
 	}
 }
 
-LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	static wil::unique_htheme theme(OpenThemeData(hwnd, L"Menu"));
 	static wil::unique_hbrush hotBrush(CreateSolidBrush(DarkModeHelper::HOT_ITEM_HIGHLIGHT_COLOR));
 	static constexpr DWORD drawFlagsBase = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
@@ -739,13 +727,6 @@ LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wP
 		return defWindowProcResult;
 	}
 	break;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, MainWindowSubclass, subclassId);
-		assert(res);
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -788,11 +769,8 @@ bool ThemeManager::ShouldAlwaysShowAccessKeys()
 	return alwaysShow;
 }
 
-LRESULT CALLBACK ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_CTLCOLORDLG:
@@ -819,23 +797,13 @@ LRESULT CALLBACK ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam
 		}
 	}
 	break;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, DialogSubclass, subclassId);
-		assert(res);
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK ThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_NOTIFY:
@@ -847,13 +815,6 @@ LRESULT CALLBACK ThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM
 		case NM_CUSTOMDRAW:
 			return OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
 		}
-	}
-	break;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ToolbarParentSubclass, subclassId);
-		assert(res);
 	}
 	break;
 	}
@@ -990,11 +951,8 @@ LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 	return CDRF_DODEFAULT;
 }
 
-LRESULT CALLBACK ThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_CTLCOLOREDIT:
@@ -1003,13 +961,6 @@ LRESULT CALLBACK ThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wP
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 		return reinterpret_cast<LRESULT>(GetComboBoxExBackgroundBrush());
-	}
-	break;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ComboBoxExSubclass, subclassId);
-		assert(res);
 	}
 	break;
 	}
@@ -1029,11 +980,8 @@ HBRUSH ThemeManager::GetComboBoxExBackgroundBrush()
 	return backgroundBrush.get();
 }
 
-LRESULT CALLBACK ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_NOTIFY:
@@ -1056,23 +1004,13 @@ LRESULT CALLBACK ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wPar
 		break;
 		}
 		break;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ListViewSubclass, subclassId);
-		assert(res);
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK ThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_ERASEBKGND:
@@ -1086,23 +1024,13 @@ LRESULT CALLBACK ThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 		return 1;
 	}
 	break;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, RebarSubclass, subclassId);
-		assert(res);
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_PAINT:
@@ -1157,23 +1085,13 @@ LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wPar
 		EndPaint(hwnd, &ps);
 	}
 		return 0;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, GroupBoxSubclass, subclassId);
-		assert(res);
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK ThemeManager::ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT ThemeManager::ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_PAINT:
@@ -1210,13 +1128,6 @@ LRESULT CALLBACK ThemeManager::ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 		EndPaint(hwnd, &ps);
 	}
 		return 0;
-
-	case WM_NCDESTROY:
-	{
-		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ScrollBarSubclass, subclassId);
-		assert(res);
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

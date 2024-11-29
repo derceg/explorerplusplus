@@ -18,9 +18,9 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader) :
-	ThemedDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal),
+FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader) :
+	ThemedDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal, themeManager),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader)
 {

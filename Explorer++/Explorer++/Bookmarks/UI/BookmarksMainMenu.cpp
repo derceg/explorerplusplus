@@ -19,14 +19,15 @@
 
 BookmarksMainMenu::BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
+	ThemeManager *themeManager, BookmarkTree *bookmarkTree,
+	const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(iconResourceLoader, iconFetcher, coreInterface->GetResourceInstance()),
 	m_controller(bookmarkTree, browserWindow, coreInterface, iconResourceLoader,
-		coreInterface->GetMainWindow())
+		coreInterface->GetMainWindow(), themeManager)
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));

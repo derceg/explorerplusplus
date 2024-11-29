@@ -131,25 +131,26 @@ private:
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager)
 {
 	return new BookmarksToolbar(view, browserWindow, coreInterface, iconResourceLoader, iconFetcher,
-		bookmarkTree);
+		bookmarkTree, themeManager);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bookmarkTree(bookmarkTree),
+	m_themeManager(themeManager),
 	m_contextMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface,
-		iconResourceLoader),
+		iconResourceLoader, themeManager),
 	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface,
-		iconResourceLoader, iconFetcher, view->GetHWND())
+		iconResourceLoader, iconFetcher, view->GetHWND(), themeManager)
 {
 	Initialize(iconFetcher);
 }
@@ -384,7 +385,7 @@ void BookmarksToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int m
 void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type,
-		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_view->GetHWND(),
+		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_view->GetHWND(), m_themeManager,
 		m_coreInterface, m_iconResourceLoader);
 }
 

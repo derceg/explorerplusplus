@@ -60,8 +60,8 @@ public:
 		Application *existingApplication = nullptr;
 	};
 
-	ApplicationEditorDialog(HWND parent, HINSTANCE resourceInstance, ApplicationModel *model,
-		std::unique_ptr<EditDetails> editDetails);
+	ApplicationEditorDialog(HWND parent, HINSTANCE resourceInstance, ThemeManager *themeManager,
+		ApplicationModel *model, std::unique_ptr<EditDetails> editDetails);
 
 protected:
 	INT_PTR OnInitDialog() override;

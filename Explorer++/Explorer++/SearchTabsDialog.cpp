@@ -16,14 +16,15 @@
 #include <glog/logging.h>
 
 SearchTabsDialog *SearchTabsDialog::Create(HINSTANCE resourceInstance, HWND parent,
-	CoreInterface *coreInterface)
+	ThemeManager *themeManager, CoreInterface *coreInterface)
 {
-	return new SearchTabsDialog(resourceInstance, parent, coreInterface);
+	return new SearchTabsDialog(resourceInstance, parent, themeManager, coreInterface);
 }
 
 SearchTabsDialog::SearchTabsDialog(HINSTANCE resourceInstance, HWND parent,
-	CoreInterface *coreInterface) :
-	ThemedDialog(resourceInstance, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both),
+	ThemeManager *themeManager, CoreInterface *coreInterface) :
+	ThemedDialog(resourceInstance, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both,
+		themeManager),
 	m_coreInterface(coreInterface),
 	m_persistentSettings(&SearchTabsDialogPersistentSettings::GetInstance())
 {

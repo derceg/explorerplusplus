@@ -32,7 +32,7 @@ class SearchTabsDialog : public ThemedDialog
 {
 public:
 	static SearchTabsDialog *Create(HINSTANCE resourceInstance, HWND parent,
-		CoreInterface *coreInterface);
+		ThemeManager *themeManager, CoreInterface *coreInterface);
 
 private:
 	enum class ColumnType
@@ -62,7 +62,8 @@ private:
 	static inline const Column COLUMNS[] = { { ColumnType::TabName, 0.3f },
 		{ ColumnType::Path, 0.7f } };
 
-	SearchTabsDialog(HINSTANCE resourceInstance, HWND parent, CoreInterface *coreInterface);
+	SearchTabsDialog(HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager,
+		CoreInterface *coreInterface);
 
 	INT_PTR OnInitDialog() override;
 	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;

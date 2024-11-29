@@ -6,12 +6,14 @@
 
 #include "OptionsPage.h"
 
+class ThemeManager;
+
 class DefaultSettingsOptionsPage : public OptionsPage
 {
 public:
 	DefaultSettingsOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
 		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow);
+		HWND tooltipWindow, ThemeManager *themeManager);
 
 	void SaveSettings() override;
 
@@ -20,4 +22,6 @@ private:
 	void InitializeControls() override;
 
 	void OnCommand(WPARAM wParam, LPARAM lParam) override;
+
+	ThemeManager *const m_themeManager;
 };

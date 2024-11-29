@@ -10,7 +10,7 @@
 class AboutDialog : public ThemedDialog
 {
 public:
-	AboutDialog(HINSTANCE resourceInstance, HWND hParent);
+	AboutDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager);
 
 protected:
 	INT_PTR OnInitDialog() override;

@@ -9,8 +9,10 @@
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
-ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent) :
-	ThemedDialog(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
+ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent,
+	ThemeManager *themeManager) :
+	ThemedDialog(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None,
+		themeManager)
 {
 }
 

@@ -33,9 +33,10 @@ const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles"
 bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
 
 MergeFilesDialog::MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent,
-	const IconResourceLoader *iconResourceLoader, const std::wstring &strOutputDirectory,
-	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	ThemedDialog(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
+	ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
+	const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
+	BOOL bShowFriendlyDates) :
+	ThemedDialog(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both, themeManager),
 	m_iconResourceLoader(iconResourceLoader),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),

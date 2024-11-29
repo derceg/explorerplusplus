@@ -26,7 +26,8 @@
 
 OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent, App *app, Config *config,
 	CoreInterface *coreInterface) :
-	ThemedDialog(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both,
+		app->GetThemeManager()),
 	m_app(app),
 	m_config(config),
 	m_resourceInstance(resourceInstance),
@@ -140,7 +141,8 @@ void OptionsDialog::AddPages()
 	AddPage(std::make_unique<TabsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<DefaultSettingsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
+		GetThemeManager()));
 	AddPage(std::make_unique<AdvancedOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 }

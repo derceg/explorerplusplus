@@ -7,7 +7,8 @@
 class ScriptingDialog : public ThemedDialog
 {
 public:
-	ScriptingDialog(HINSTANCE resourceInstance, HWND hParent, PluginInterface *pluginInterface);
+	ScriptingDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+		PluginInterface *pluginInterface);
 
 protected:
 	INT_PTR OnInitDialog() override;

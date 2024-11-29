@@ -358,6 +358,11 @@ TabRestorer *App::GetTabRestorer()
 	return &m_tabRestorer;
 }
 
+ThemeManager *App::GetThemeManager()
+{
+	return &m_themeManager;
+}
+
 void App::OnWillRemoveBrowser()
 {
 	if (m_browserList.GetSize() == 1 && !m_exitStarted)

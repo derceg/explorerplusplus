@@ -16,6 +16,7 @@
 #include "ProcessManager.h"
 #include "Runtime.h"
 #include "TabRestorer.h"
+#include "ThemeManager.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -55,6 +56,7 @@ public:
 	HINSTANCE GetResourceInstance() const;
 	GlobalTabEventDispatcher *GetGlobalTabEventDispatcher();
 	TabRestorer *GetTabRestorer();
+	ThemeManager *GetThemeManager();
 
 	void TryExit();
 	void SessionEnding();
@@ -95,6 +97,7 @@ private:
 	ProcessManager m_processManager;
 	GlobalTabEventDispatcher m_globalTabEventDispatcher;
 	TabRestorer m_tabRestorer;
+	ThemeManager m_themeManager;
 
 	concurrencpp::timer m_saveSettingsTimer;
 

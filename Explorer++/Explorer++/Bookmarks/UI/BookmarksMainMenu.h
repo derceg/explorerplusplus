@@ -14,13 +14,15 @@ class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
 class IconResourceLoader;
+class ThemeManager;
 
 class BookmarksMainMenu
 {
 public:
 	BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
+		ThemeManager *themeManager, BookmarkTree *bookmarkTree,
+		const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(UINT menuItemId);

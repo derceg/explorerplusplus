@@ -20,8 +20,9 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetD
 const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
 SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
-	FolderColumns &folderColumns) :
-	ThemedDialog(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both),
+	ThemeManager *themeManager, FolderColumns &folderColumns) :
+	ThemedDialog(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both,
+		themeManager),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();

@@ -14,6 +14,7 @@
 
 class CoreInterface;
 struct MouseEvent;
+class ThemeManager;
 
 namespace Applications
 {
@@ -26,7 +27,7 @@ class ApplicationToolbar : private DropTargetInternal
 {
 public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
-		CoreInterface *coreInterface);
+		CoreInterface *coreInterface, ThemeManager *themeManager);
 
 	ApplicationToolbar(const ApplicationToolbar &) = delete;
 	ApplicationToolbar(ApplicationToolbar &&) = delete;
@@ -61,7 +62,7 @@ private:
 	};
 
 	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-		CoreInterface *coreInterface);
+		CoreInterface *coreInterface, ThemeManager *themeManager);
 
 	void Initialize();
 
@@ -95,6 +96,7 @@ private:
 	ApplicationModel *m_model;
 	ApplicationExecutorImpl m_applicationExecutor;
 	CoreInterface *m_coreInterface;
+	ThemeManager *const m_themeManager;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

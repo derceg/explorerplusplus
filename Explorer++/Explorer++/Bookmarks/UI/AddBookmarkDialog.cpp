@@ -16,10 +16,10 @@
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
-	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder, const IconResourceLoader *iconResourceLoader,
-	std::optional<std::wstring> customDialogTitle) :
-	ThemedDialog(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
+	ThemeManager *themeManager, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+	BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
+	const IconResourceLoader *iconResourceLoader, std::optional<std::wstring> customDialogTitle) :
+	ThemedDialog(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both, themeManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),

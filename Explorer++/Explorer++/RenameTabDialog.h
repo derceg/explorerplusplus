@@ -29,7 +29,7 @@ private:
 class RenameTabDialog : public ThemedDialog
 {
 public:
-	RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int tabId,
+	RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager, int tabId,
 		TabContainer *tabContainer);
 
 protected:

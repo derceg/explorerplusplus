@@ -30,9 +30,10 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
-	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this,
-		m_app->GetIconResourceLoader(), &m_iconFetcher, m_app->GetBookmarkTree(),
-		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
+	m_bookmarksMainMenu =
+		std::make_unique<BookmarksMainMenu>(this, this, m_app->GetIconResourceLoader(),
+			&m_iconFetcher, m_app->GetThemeManager(), m_app->GetBookmarkTree(),
+			BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 
 	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_app->GetResourceInstance(), this);
 
@@ -75,7 +76,8 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	InitializePlugins();
 
-	m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(m_hContainer);
+	m_themeWindowTracker =
+		std::make_unique<ThemeWindowTracker>(m_hContainer, m_app->GetThemeManager());
 
 	m_browserInitialized = true;
 	m_browserInitializedSignal();

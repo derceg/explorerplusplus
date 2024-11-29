@@ -9,12 +9,14 @@
 
 class ColorRule;
 class ColorRuleModel;
+class ThemeManager;
 class WindowSubclass;
 
 class ColorRuleListView
 {
 public:
-	ColorRuleListView(HWND listView, HINSTANCE resourceInstance, ColorRuleModel *model);
+	ColorRuleListView(HWND listView, HINSTANCE resourceInstance, ThemeManager *themeManager,
+		ColorRuleModel *model);
 
 	ColorRule *MaybeGetSelectedColorRule();
 
@@ -38,6 +40,7 @@ private:
 
 	HWND m_listView;
 	HINSTANCE m_resourceInstance;
+	ThemeManager *const m_themeManager;
 	ColorRuleModel *m_model;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

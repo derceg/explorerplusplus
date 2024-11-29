@@ -29,7 +29,7 @@
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-	const std::vector<Column> &initialColumns) :
+	ThemeManager *themeManager, const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceInstance(resourceInstance),
@@ -37,11 +37,12 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader),
+	m_themeManager(themeManager),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
 	m_bookmarkContextMenu(bookmarkTree, resourceInstance, browserWindow, coreInterface,
-		iconResourceLoader)
+		iconResourceLoader, themeManager)
 {
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP,
@@ -592,7 +593,8 @@ void BookmarkListView::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, m_hListView, m_coreInterface, m_iconResourceLoader);
+		m_currentBookmarkFolder, targetIndex, m_hListView, m_themeManager, m_coreInterface,
+		m_iconResourceLoader);
 
 	if (!bookmark)
 	{

@@ -87,8 +87,8 @@ public:
 		ColorRule *existingColorRule = nullptr;
 	};
 
-	ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent, ColorRuleModel *model,
-		std::unique_ptr<EditDetails> editDetails);
+	ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager,
+		ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails);
 
 protected:
 	INT_PTR OnInitDialog() override;

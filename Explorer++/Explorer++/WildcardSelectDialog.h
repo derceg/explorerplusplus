@@ -48,8 +48,8 @@ private:
 class WildcardSelectDialog : public ThemedDialog
 {
 public:
-	WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent, BOOL bSelect,
-		BrowserWindow *browserWindow);
+	WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+		BOOL bSelect, BrowserWindow *browserWindow);
 
 protected:
 	INT_PTR OnInitDialog() override;

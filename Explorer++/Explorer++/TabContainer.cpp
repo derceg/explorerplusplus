@@ -508,7 +508,7 @@ void TabContainer::OnRefreshAllTabs()
 void TabContainer::OnRenameTab(const Tab &tab)
 {
 	RenameTabDialog renameTabDialog(m_resourceInstance, m_coreInterface->GetMainWindow(),
-		tab.GetId(), this);
+		m_app->GetThemeManager(), tab.GetId(), this);
 	renameTabDialog.ShowModalDialog();
 }
 
@@ -615,7 +615,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 	PopupMenuView popupMenu;
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(),
 		this, m_app->GetTabRestorer(), m_bookmarkTree, m_coreInterface,
-		m_app->GetIconResourceLoader());
+		m_app->GetIconResourceLoader(), m_app->GetThemeManager());
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

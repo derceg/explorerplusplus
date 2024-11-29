@@ -43,8 +43,8 @@ private:
 class FilterDialog : public ThemedDialog
 {
 public:
-	FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader);
+	FilterDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader);
 
 protected:
 	INT_PTR OnInitDialog() override;

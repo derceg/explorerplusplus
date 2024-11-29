@@ -14,6 +14,7 @@ class IconResourceLoader;
 class MenuView;
 class TabContainer;
 class TabRestorer;
+class ThemeManager;
 
 class TabContainerBackgroundContextMenu : public MenuBase
 {
@@ -21,7 +22,7 @@ public:
 	TabContainerBackgroundContextMenu(MenuView *menuView,
 		const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
 		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader);
+		const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager);
 
 private:
 	void BuildMenu();
@@ -32,5 +33,6 @@ private:
 	BookmarkTree *const m_bookmarkTree;
 	CoreInterface *const m_coreInterface;
 	const IconResourceLoader *const m_iconResourceLoader;
+	ThemeManager *const m_themeManager;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

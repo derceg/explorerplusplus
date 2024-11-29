@@ -17,8 +17,8 @@
 // Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
 #pragma warning(default : 4062)
 
-AboutDialog::AboutDialog(HINSTANCE resourceInstance, HWND hParent) :
-	ThemedDialog(resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None)
+AboutDialog::AboutDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager) :
+	ThemedDialog(resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None, themeManager)
 {
 }
 
@@ -126,7 +126,8 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 		}
 		else if (pnmhdr->idFrom == IDC_THIRD_PARTY_CREDITS_LINK)
 		{
-			ThirdPartyCreditsDialog thirdPartyCreditsDialog(GetResourceInstance(), m_hDlg);
+			ThirdPartyCreditsDialog thirdPartyCreditsDialog(GetResourceInstance(), m_hDlg,
+				GetThemeManager());
 			thirdPartyCreditsDialog.ShowModalDialog();
 		}
 	}

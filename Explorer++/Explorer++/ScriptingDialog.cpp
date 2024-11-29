@@ -11,8 +11,8 @@
 #include <boost/algorithm/string.hpp>
 
 ScriptingDialog::ScriptingDialog(HINSTANCE resourceInstance, HWND hParent,
-	PluginInterface *pluginInterface) :
-	ThemedDialog(resourceInstance, IDD_SCRIPTING, hParent, DialogSizingType::Both),
+	ThemeManager *themeManager, PluginInterface *pluginInterface) :
+	ThemedDialog(resourceInstance, IDD_SCRIPTING, hParent, DialogSizingType::Both, themeManager),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);

@@ -15,6 +15,7 @@ class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
 class IconResourceLoader;
+class ThemeManager;
 
 // Although it's not necessary, this class is effectively designed to be held
 // for the lifetime of its parent class. Doing so is more efficient, as the
@@ -25,7 +26,8 @@ class BookmarkMenu
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher, HWND parentWindow);
+		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher, HWND parentWindow,
+		ThemeManager *themeManager);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

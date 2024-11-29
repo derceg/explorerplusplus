@@ -69,17 +69,18 @@ private:
 };
 
 ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
-	ApplicationModel *model, CoreInterface *coreInterface)
+	ApplicationModel *model, CoreInterface *coreInterface, ThemeManager *themeManager)
 {
-	return new ApplicationToolbar(view, model, coreInterface);
+	return new ApplicationToolbar(view, model, coreInterface, themeManager);
 }
 
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-	CoreInterface *coreInterface) :
+	CoreInterface *coreInterface, ThemeManager *themeManager) :
 	m_view(view),
 	m_model(model),
 	m_applicationExecutor(coreInterface),
-	m_coreInterface(coreInterface)
+	m_coreInterface(coreInterface),
+	m_themeManager(themeManager)
 {
 	Initialize();
 }
@@ -167,7 +168,7 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 
 	PopupMenuView popupMenu;
 	ApplicationContextMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(), m_model,
-		application, &m_applicationExecutor, m_coreInterface);
+		application, &m_applicationExecutor, m_coreInterface, m_themeManager);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 
@@ -198,7 +199,7 @@ void ApplicationToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int
 	case IDM_APPLICATION_CONTEXT_MENU_NEW:
 	{
 		ApplicationEditorDialog editorDialog(m_view->GetHWND(),
-			m_coreInterface->GetResourceInstance(), m_model,
+			m_coreInterface->GetResourceInstance(), m_themeManager, m_model,
 			ApplicationEditorDialog::EditDetails::AddNewApplication(
 				std::make_unique<Application>(L"", L"")));
 		editorDialog.ShowModalDialog();

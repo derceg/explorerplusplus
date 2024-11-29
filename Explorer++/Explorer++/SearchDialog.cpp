@@ -58,10 +58,10 @@ const TCHAR SearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("SortA
 const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
-SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
+SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
 	std::wstring_view searchDirectory, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	TabContainer *tabContainer, const IconResourceLoader *iconResourceLoader) :
-	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both, themeManager),
 	m_searchDirectory(searchDirectory),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),

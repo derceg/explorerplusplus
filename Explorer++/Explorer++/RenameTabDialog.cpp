@@ -10,9 +10,9 @@
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
-RenameTabDialog::RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int tabId,
-	TabContainer *tabContainer) :
-	ThemedDialog(resourceInstance, IDD_RENAMETAB, hParent, DialogSizingType::None),
+RenameTabDialog::RenameTabDialog(HINSTANCE resourceInstance, HWND hParent,
+	ThemeManager *themeManager, int tabId, TabContainer *tabContainer) :
+	ThemedDialog(resourceInstance, IDD_RENAMETAB, hParent, DialogSizingType::None, themeManager),
 	m_tabId(tabId),
 	m_tabContainer(tabContainer)
 {

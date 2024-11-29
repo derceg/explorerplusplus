@@ -12,6 +12,7 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconResourceLoader;
+class ThemeManager;
 
 enum class MenuType
 {
@@ -24,7 +25,7 @@ class BookmarkContextMenu
 public:
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader);
+		const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
 		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen,

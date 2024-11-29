@@ -6,12 +6,14 @@
 #include "ThemeWindowTracker.h"
 #include "ThemeManager.h"
 
-ThemeWindowTracker::ThemeWindowTracker(HWND hwnd) : m_hwnd(hwnd)
+ThemeWindowTracker::ThemeWindowTracker(HWND hwnd, ThemeManager *themeManager) :
+	m_hwnd(hwnd),
+	m_themeManager(themeManager)
 {
-	ThemeManager::GetInstance().TrackTopLevelWindow(m_hwnd);
+	m_themeManager->TrackTopLevelWindow(m_hwnd);
 }
 
 ThemeWindowTracker::~ThemeWindowTracker()
 {
-	ThemeManager::GetInstance().UntrackTopLevelWindow(m_hwnd);
+	m_themeManager->UntrackTopLevelWindow(m_hwnd);
 }
