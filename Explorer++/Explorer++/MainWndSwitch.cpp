@@ -210,10 +210,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		break;
 
-	case WM_SETTINGCHANGE:
-		OnSettingChange(reinterpret_cast<const WCHAR *>(lParam));
-		break;
-
 	// COM calls (such as IDropTarget::DragEnter) can result in a call being made to PeekMessage().
 	// That method will then dispatch non-queued messages, with WM_CLOSE being one such message.
 	// That's an issue, as it means if a WM_CLOSE message is in the message queue when a COM method

@@ -55,10 +55,10 @@ void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 	ApplyThemeToWindow(hwnd);
 	EnumChildWindows(
 		hwnd,
-		[](HWND hwnd, LPARAM lParam)
+		[](HWND childWindow, LPARAM lParam)
 		{
 			auto themeManager = reinterpret_cast<ThemeManager *>(lParam);
-			return themeManager->ProcessChildWindow(hwnd);
+			return themeManager->ProcessChildWindow(childWindow);
 		},
 		reinterpret_cast<LPARAM>(this));
 
@@ -70,10 +70,10 @@ void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 	// EnumThreadWindows().
 	EnumThreadWindows(
 		GetCurrentThreadId(),
-		[](HWND hwnd, LPARAM lParam)
+		[](HWND threadWindow, LPARAM lParam)
 		{
 			auto themeManager = reinterpret_cast<ThemeManager *>(lParam);
-			return themeManager->ProcessThreadWindow(hwnd);
+			return themeManager->ProcessThreadWindow(threadWindow);
 		},
 		reinterpret_cast<LPARAM>(this));
 

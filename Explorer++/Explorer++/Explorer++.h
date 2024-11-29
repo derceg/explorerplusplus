@@ -225,7 +225,6 @@ private:
 	void OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
-	void OnSettingChange(const WCHAR *systemParameter);
 	int OnDestroy();
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnFocusNextWindow(FocusChangeDirection direction);
@@ -513,10 +512,6 @@ private:
 	boost::signals2::connection AddGetMenuItemHelperTextObserver(
 		const GetMenuItemHelperTextSignal::slot_type &observer) override;
 	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
-
-	// Dark mode
-	bool ShouldEnableDarkMode(Theme theme) const;
-	void OnThemeUpdated(Theme theme);
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();

@@ -46,7 +46,7 @@ struct Config
 
 	LANGID language = LanguageHelper::DEFAULT_LANGUAGE;
 	IconSet iconSet = IconSet::Color;
-	ValueWrapper<Theme> theme = Theme::Light;
+	ValueWrapper<Theme> theme = +Theme::Light;
 	StartupMode startupMode = StartupMode::PreviousTabs;
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();

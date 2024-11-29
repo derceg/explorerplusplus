@@ -7,7 +7,6 @@
 #include "App.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
@@ -27,9 +26,6 @@
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
-	m_app->GetDarkModeHelper()->EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
-	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
-
 	m_bookmarksMainMenu =
 		std::make_unique<BookmarksMainMenu>(this, this, m_app->GetIconResourceLoader(),
 			&m_iconFetcher, m_app->GetThemeManager(), m_app->GetBookmarkTree(),
@@ -127,10 +123,4 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 			position++;
 		}
 	}
-}
-
-bool Explorerplusplus::ShouldEnableDarkMode(Theme theme) const
-{
-	return theme == +Theme::Dark
-		|| (theme == +Theme::System && !m_app->GetDarkModeHelper()->IsSystemAppModeLight());
 }

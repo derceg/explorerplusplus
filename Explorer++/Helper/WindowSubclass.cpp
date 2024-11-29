@@ -10,8 +10,12 @@ WindowSubclass::WindowSubclass(HWND hwnd, Subclass subclass) :
 	m_subclass(subclass),
 	m_subclassId(m_subclassIdCounter++)
 {
+	// This call should always succeed, so if it fails, it likely indicates a programming error. For
+	// example, the window handle could be invalid, or the caller could be invoking this method on a
+	// different thread to the thread the window was created on.
 	m_subclassInstalled =
 		SetWindowSubclass(hwnd, SubclassProcStub, m_subclassId, reinterpret_cast<DWORD_PTR>(this));
+	CHECK(m_subclassInstalled);
 }
 
 WindowSubclass::~WindowSubclass()

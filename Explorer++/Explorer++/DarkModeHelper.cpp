@@ -4,13 +4,17 @@
 
 #include "stdafx.h"
 #include "DarkModeHelper.h"
+#include "Config.h"
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/WindowSubclass.h"
 #include <detours/detours.h>
 #include <wil/common.h>
 
-DarkModeHelper::DarkModeHelper() : m_backgroundBrush(CreateSolidBrush(BACKGROUND_COLOR))
+DarkModeHelper::DarkModeHelper(const Config *config) :
+	m_config(config),
+	m_backgroundBrush(CreateSolidBrush(BACKGROUND_COLOR))
 {
 	auto RtlGetVersion = reinterpret_cast<RtlGetVersionType>(
 		GetProcAddress(GetModuleHandle(L"ntdll.dll"), "RtlGetVersion"));
@@ -65,7 +69,14 @@ DarkModeHelper::DarkModeHelper() : m_backgroundBrush(CreateSolidBrush(BACKGROUND
 	m_SetWindowCompositionAttribute = reinterpret_cast<SetWindowCompositionAttributeType>(
 		GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetWindowCompositionAttribute"));
 
+	CreateEventWindow();
+
+	m_connections.push_back(
+		m_config->theme.addObserver(std::bind(&DarkModeHelper::OnThemeUpdated, this)));
+
 	m_darkModeSupported = true;
+
+	UpdateAppDarkModeStatus();
 }
 
 bool DarkModeHelper::IsDarkModeSupported() const
@@ -78,8 +89,66 @@ bool DarkModeHelper::IsDarkModeEnabled() const
 	return m_darkModeEnabled;
 }
 
-void DarkModeHelper::EnableForApp(bool enable)
+void DarkModeHelper::CreateEventWindow()
 {
+	if (m_eventWindow)
+	{
+		return;
+	}
+
+	static constexpr wchar_t className[] = L"Explorer++EventWindowClass";
+
+	WNDCLASS windowClass = {};
+	windowClass.lpfnWndProc = DefWindowProc;
+	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	windowClass.lpszClassName = className;
+	windowClass.hInstance = GetModuleHandle(nullptr);
+	windowClass.style = 0;
+	auto atom = RegisterClass(&windowClass);
+	CHECK(atom);
+
+	m_eventWindow.reset(CreateWindow(className, L"", WS_DISABLED, CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, GetModuleHandle(nullptr), nullptr));
+	CHECK(m_eventWindow);
+
+	m_eventWindowSubclass = std::make_unique<WindowSubclass>(m_eventWindow.get(),
+		std::bind_front(&DarkModeHelper::EventWindowSubclass, this));
+}
+
+LRESULT DarkModeHelper::EventWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_SETTINGCHANGE:
+		OnSettingChange(reinterpret_cast<const wchar_t *>(lParam));
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void DarkModeHelper::OnSettingChange(const wchar_t *systemParameter)
+{
+	// The "ImmersiveColorSet" change notification will be sent when the user changes the dark mode
+	// setting in Windows (or one of the individual Windows mode/app mode settings). Changes to the
+	// Windows mode setting will be ignored, as the app mode setting is what's used to determine
+	// whether a light or dark theme is used.
+	if (lstrcmp(systemParameter, L"ImmersiveColorSet") == 0
+		&& m_config->theme.get() == +Theme::System)
+	{
+		UpdateAppDarkModeStatus();
+	}
+}
+
+void DarkModeHelper::OnThemeUpdated()
+{
+	UpdateAppDarkModeStatus();
+}
+
+void DarkModeHelper::UpdateAppDarkModeStatus()
+{
+	bool enable = ShouldEnableDarkMode();
+
 	if (!m_darkModeSupported || IsHighContrast() || enable == m_darkModeEnabled)
 	{
 		return;
@@ -129,6 +198,12 @@ void DarkModeHelper::EnableForApp(bool enable)
 	darkModeStatusChanged.m_signal(enable);
 }
 
+bool DarkModeHelper::ShouldEnableDarkMode() const
+{
+	return m_config->theme == +Theme::Dark
+		|| (m_config->theme == +Theme::System && !IsSystemAppModeLight());
+}
+
 void DarkModeHelper::AllowDarkModeForApp(bool allow)
 {
 	if (m_SetPreferredAppMode)
@@ -156,7 +231,7 @@ void DarkModeHelper::AllowDarkModeForWindow(HWND hwnd, bool allow)
 // set.
 // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=549713 for some further information about the
 // registry key used here.
-bool DarkModeHelper::IsSystemAppModeLight()
+bool DarkModeHelper::IsSystemAppModeLight() const
 {
 	bool lightMode = true;
 

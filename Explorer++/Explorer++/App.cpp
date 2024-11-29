@@ -42,6 +42,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
 	m_tabRestorer(&m_globalTabEventDispatcher, &m_browserList),
+	m_darkModeHelper(&m_config),
 	m_themeManager(&m_darkModeHelper),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
