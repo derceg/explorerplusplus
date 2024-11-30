@@ -47,9 +47,11 @@ public:
 	class EditDetails
 	{
 	private:
-		struct Private
+		struct Token
 		{
-			Private() = default;
+		private:
+			Token() = default;
+			friend EditDetails;
 		};
 
 	public:
@@ -59,14 +61,14 @@ public:
 			NewItem
 		};
 
-		EditDetails(Type type, Private) : type(type)
+		EditDetails(Type type, Token) : type(type)
 		{
 		}
 
 		static std::unique_ptr<EditDetails> AddNewColorRule(std::unique_ptr<ColorRule> colorRule,
 			std::optional<size_t> index = std::nullopt)
 		{
-			auto editDetails = std::make_unique<EditDetails>(Type::NewItem, Private());
+			auto editDetails = std::make_unique<EditDetails>(Type::NewItem, Token());
 			editDetails->newColorRule = std::move(colorRule);
 			editDetails->index = index;
 			return editDetails;
@@ -74,7 +76,7 @@ public:
 
 		static std::unique_ptr<EditDetails> EditColorRule(ColorRule *colorRule)
 		{
-			auto editDetails = std::make_unique<EditDetails>(Type::ExistingItem, Private());
+			auto editDetails = std::make_unique<EditDetails>(Type::ExistingItem, Token());
 			editDetails->existingColorRule = colorRule;
 			return editDetails;
 		}
