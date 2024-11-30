@@ -124,6 +124,10 @@ Bug fixes:
   application exited. Now, the clipboard is flushed when the tab
   is closed, which ensures the data will be retained, even once
   the application has exited.
+- When running the application at 150% DPI, bookmarks wouldn't
+  appear on the bookmarks toolbar, if the toolbar was initially
+  empty. The height of the toolbar is now updated when an item is
+  added, which fixes this issue.
 - Fixed an issue with handling the properties item on the
   background context menu.
 - Previously, listview groups were always sorted by name. Now,
