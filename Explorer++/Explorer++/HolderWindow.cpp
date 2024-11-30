@@ -9,7 +9,7 @@
 
 #include "stdafx.h"
 #include "HolderWindow.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "MainFontSetter.h"
 #include "SystemFontHelper.h"
 #include "ToolbarHelper.h"
@@ -18,17 +18,17 @@
 
 HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const IconResourceLoader *iconResourceLoader, const DarkModeHelper *darkModeHelper)
+	const IconResourceLoader *iconResourceLoader, const DarkModeManager *darkModeManager)
 {
 	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, iconResourceLoader,
-		darkModeHelper);
+		darkModeManager);
 }
 
 HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const IconResourceLoader *iconResourceLoader, const DarkModeHelper *darkModeHelper) :
+	const IconResourceLoader *iconResourceLoader, const DarkModeManager *darkModeManager) :
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
-	m_darkModeHelper(darkModeHelper),
+	m_darkModeManager(darkModeManager),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
 	LOGFONT systemFont = GetDefaultSystemFontScaledToWindow(m_hwnd);
@@ -219,9 +219,9 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 {
 	HBRUSH backgroundBrush;
 
-	if (m_darkModeHelper->IsDarkModeEnabled())
+	if (m_darkModeManager->IsDarkModeEnabled())
 	{
-		backgroundBrush = m_darkModeHelper->GetBackgroundBrush();
+		backgroundBrush = m_darkModeManager->GetBackgroundBrush();
 	}
 	else
 	{
@@ -234,9 +234,9 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 	auto selectFont = wil::SelectObject(ps.hdc, m_font);
 	SetBkMode(ps.hdc, TRANSPARENT);
 
-	if (m_darkModeHelper->IsDarkModeEnabled())
+	if (m_darkModeManager->IsDarkModeEnabled())
 	{
-		SetTextColor(ps.hdc, DarkModeHelper::TEXT_COLOR);
+		SetTextColor(ps.hdc, DarkModeManager::TEXT_COLOR);
 	}
 
 	RECT toolbarRect;

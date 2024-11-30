@@ -6,14 +6,14 @@
 
 #include "OptionsPage.h"
 
-class DarkModeHelper;
+class DarkModeManager;
 
 class AppearanceOptionsPage : public OptionsPage
 {
 public:
 	AppearanceOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
 		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow, const DarkModeHelper *darkModeHelper);
+		HWND tooltipWindow, const DarkModeManager *darkModeManager);
 
 	void SaveSettings() override;
 
@@ -23,5 +23,5 @@ private:
 
 	void OnCommand(WPARAM wParam, LPARAM lParam) override;
 
-	const DarkModeHelper *const m_darkModeHelper;
+	const DarkModeManager *const m_darkModeManager;
 };

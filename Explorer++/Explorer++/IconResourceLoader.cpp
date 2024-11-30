@@ -4,13 +4,13 @@
 
 #include "stdafx.h"
 #include "IconResourceLoader.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "IconMappings.h"
 #include "../Helper/ImageHelper.h"
 
-IconResourceLoader::IconResourceLoader(IconSet iconSet, const DarkModeHelper *darkModeHelper) :
+IconResourceLoader::IconResourceLoader(IconSet iconSet, const DarkModeManager *darkModeManager) :
 	m_iconSet(iconSet),
-	m_darkModeHelper(darkModeHelper)
+	m_darkModeManager(darkModeManager)
 {
 }
 
@@ -56,7 +56,7 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 {
 	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
-	if (m_iconSet == +IconSet::Color || !m_darkModeHelper->IsDarkModeEnabled())
+	if (m_iconSet == +IconSet::Color || !m_darkModeManager->IsDarkModeEnabled())
 	{
 		return bitmap;
 	}

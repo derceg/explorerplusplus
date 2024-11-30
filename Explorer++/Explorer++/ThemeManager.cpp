@@ -7,7 +7,7 @@
 #include "ThemeManager.h"
 // clang-format on
 #include "Explorer++.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "SystemFontHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -20,9 +20,9 @@
 
 static const wchar_t DIALOG_CLASS_NAME[] = L"#32770";
 
-ThemeManager::ThemeManager(DarkModeHelper *darkModeHelper) : m_darkModeHelper(darkModeHelper)
+ThemeManager::ThemeManager(DarkModeManager *darkModeManager) : m_darkModeManager(darkModeManager)
 {
-	m_connections.push_back(darkModeHelper->darkModeStatusChanged.AddObserver(
+	m_connections.push_back(darkModeManager->darkModeStatusChanged.AddObserver(
 		std::bind(&ThemeManager::OnDarkModeStatusChanged, this)));
 }
 
@@ -109,8 +109,8 @@ BOOL ThemeManager::ProcessThreadWindow(HWND hwnd)
 
 void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 {
-	bool enableDarkMode = m_darkModeHelper->IsDarkModeEnabled();
-	m_darkModeHelper->AllowDarkModeForWindow(hwnd, enableDarkMode);
+	bool enableDarkMode = m_darkModeManager->IsDarkModeEnabled();
+	m_darkModeManager->AllowDarkModeForWindow(hwnd, enableDarkMode);
 
 	// The maximum length of a class name is 256 characters (see the documentation for lpszClassName
 	// in https://learn.microsoft.com/en-au/windows/win32/api/winuser/ns-winuser-wndclassw).
@@ -193,16 +193,16 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 	// the menu bar, rather than providing a DC to paint into.
 	// 2. Visual styles can be turned off, so the current owner-drawing implementation wouldn't work
 	// in that scenario.
-	if (!m_darkModeHelper->IsDarkModeSupported())
+	if (!m_darkModeManager->IsDarkModeSupported())
 	{
 		return;
 	}
 
 	BOOL dark = enableDarkMode;
-	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	DarkModeManager::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeManager::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
 	};
-	m_darkModeHelper->SetWindowCompositionAttribute(hwnd, &compositionData);
+	m_darkModeManager->SetWindowCompositionAttribute(hwnd, &compositionData);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ThemeManager::MainWindowSubclass, this)));
@@ -248,10 +248,10 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 {
 	BOOL dark = enableDarkMode;
-	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	DarkModeManager::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeManager::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
 	};
-	m_darkModeHelper->SetWindowCompositionAttribute(hwnd, &compositionData);
+	m_darkModeManager->SetWindowCompositionAttribute(hwnd, &compositionData);
 
 	if (enableDarkMode)
 	{
@@ -276,8 +276,8 @@ void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		backgroundColor = DarkModeHelper::BACKGROUND_COLOR;
-		textColor = DarkModeHelper::TEXT_COLOR;
+		backgroundColor = DarkModeManager::BACKGROUND_COLOR;
+		textColor = DarkModeManager::TEXT_COLOR;
 	}
 	else
 	{
@@ -318,9 +318,9 @@ void ThemeManager::ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		backgroundColor = DarkModeHelper::BACKGROUND_COLOR;
-		textColor = DarkModeHelper::TEXT_COLOR;
-		insertMarkColor = DarkModeHelper::FOREGROUND_COLOR;
+		backgroundColor = DarkModeManager::BACKGROUND_COLOR;
+		textColor = DarkModeManager::TEXT_COLOR;
+		insertMarkColor = DarkModeManager::FOREGROUND_COLOR;
 	}
 	else
 	{
@@ -341,8 +341,8 @@ void ThemeManager::ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		backgroundColor = DarkModeHelper::BACKGROUND_COLOR;
-		textColor = DarkModeHelper::TEXT_COLOR;
+		backgroundColor = DarkModeManager::BACKGROUND_COLOR;
+		textColor = DarkModeManager::TEXT_COLOR;
 	}
 	else
 	{
@@ -375,7 +375,7 @@ void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		insertMarkColor = DarkModeHelper::FOREGROUND_COLOR;
+		insertMarkColor = DarkModeManager::FOREGROUND_COLOR;
 	}
 	else
 	{
@@ -487,7 +487,7 @@ void ThemeManager::ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode)
 LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static wil::unique_htheme theme(OpenThemeData(hwnd, L"Menu"));
-	static wil::unique_hbrush hotBrush(CreateSolidBrush(DarkModeHelper::HOT_ITEM_HIGHLIGHT_COLOR));
+	static wil::unique_hbrush hotBrush(CreateSolidBrush(DarkModeManager::HOT_ITEM_HIGHLIGHT_COLOR));
 	static constexpr DWORD drawFlagsBase = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
 	static bool alwaysShowAccessKeys = ShouldAlwaysShowAccessKeys();
 
@@ -581,7 +581,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			}
 		}
 
-		bool darkModeEnabled = m_darkModeHelper->IsDarkModeEnabled();
+		bool darkModeEnabled = m_darkModeManager->IsDarkModeEnabled();
 		bool selected = false;
 		bool selectionPartiallyTransparent = false;
 
@@ -657,11 +657,11 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			if (itemState == MBI_DISABLED || itemState == MBI_DISABLEDHOT
 				|| itemState == MBI_DISABLEDPUSHED)
 			{
-				textColor = DarkModeHelper::TEXT_COLOR_DISABLED;
+				textColor = DarkModeManager::TEXT_COLOR_DISABLED;
 			}
 			else
 			{
-				textColor = DarkModeHelper::TEXT_COLOR;
+				textColor = DarkModeManager::TEXT_COLOR;
 			}
 
 			options.crText = textColor;
@@ -699,7 +699,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	case WM_NCPAINT:
 	case WM_NCACTIVATE:
 	{
-		if (!m_darkModeHelper->IsDarkModeEnabled())
+		if (!m_darkModeManager->IsDarkModeEnabled())
 		{
 			break;
 		}
@@ -721,7 +721,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		OffsetRect(&menuBarBorderRect, -windowRect.left, -windowRect.top);
 
 		auto hdc = wil::GetWindowDC(hwnd);
-		FillRect(hdc.get(), &menuBarBorderRect, m_darkModeHelper->GetBackgroundBrush());
+		FillRect(hdc.get(), &menuBarBorderRect, m_darkModeManager->GetBackgroundBrush());
 
 		return defWindowProcResult;
 	}
@@ -735,13 +735,13 @@ HBRUSH ThemeManager::GetMenuBarBackgroundBrush(bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
-		return m_darkModeHelper->GetBackgroundBrush();
+		return m_darkModeManager->GetBackgroundBrush();
 	}
 	else
 	{
 		int systemColorIndex;
 
-		if (DarkModeHelper::IsHighContrast())
+		if (DarkModeManager::IsHighContrast())
 		{
 			systemColorIndex = COLOR_BTNFACE;
 		}
@@ -779,9 +779,9 @@ LRESULT ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 	case WM_CTLCOLORBTN:
 	{
 		auto hdc = reinterpret_cast<HDC>(wParam);
-		SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
-		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
-		return reinterpret_cast<LRESULT>(m_darkModeHelper->GetBackgroundBrush());
+		SetBkColor(hdc, DarkModeManager::BACKGROUND_COLOR);
+		SetTextColor(hdc, DarkModeManager::TEXT_COLOR);
+		return reinterpret_cast<LRESULT>(m_darkModeManager->GetBackgroundBrush());
 	}
 	break;
 
@@ -893,11 +893,11 @@ LRESULT ThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
 
 		if (IsWindowEnabled(customDraw->hdr.hwndFrom))
 		{
-			textColor = DarkModeHelper::TEXT_COLOR;
+			textColor = DarkModeManager::TEXT_COLOR;
 		}
 		else
 		{
-			textColor = DarkModeHelper::TEXT_COLOR_DISABLED;
+			textColor = DarkModeManager::TEXT_COLOR_DISABLED;
 		}
 
 		SetTextColor(customDraw->hdc, textColor);
@@ -942,8 +942,8 @@ LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-		customDraw->clrText = DarkModeHelper::TEXT_COLOR;
-		customDraw->clrHighlightHotTrack = DarkModeHelper::HOT_ITEM_HIGHLIGHT_COLOR;
+		customDraw->clrText = DarkModeManager::TEXT_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeManager::HOT_ITEM_HIGHLIGHT_COLOR;
 		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
 	}
 
@@ -958,7 +958,7 @@ LRESULT ThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	{
 		auto hdc = reinterpret_cast<HDC>(wParam);
 		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
+		SetTextColor(hdc, DarkModeManager::TEXT_COLOR);
 		return reinterpret_cast<LRESULT>(GetComboBoxExBackgroundBrush());
 	}
 	break;
@@ -996,7 +996,7 @@ LRESULT ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				return CDRF_NOTIFYITEMDRAW;
 
 			case CDDS_ITEMPREPAINT:
-				SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
+				SetTextColor(customDraw->hdc, DarkModeManager::TEXT_COLOR);
 				return CDRF_NEWFONT;
 			}
 		}
@@ -1018,7 +1018,7 @@ LRESULT ThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 		RECT rc;
 		GetClientRect(hwnd, &rc);
-		FillRect(hdc, &rc, m_darkModeHelper->GetBackgroundBrush());
+		FillRect(hdc, &rc, m_darkModeManager->GetBackgroundBrush());
 
 		return 1;
 	}
@@ -1044,7 +1044,7 @@ LRESULT ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		assert(!text.empty());
 
 		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
+		SetTextColor(hdc, DarkModeManager::TEXT_COLOR);
 
 		auto font = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0, 0));
 		wil::unique_select_object selectFont;

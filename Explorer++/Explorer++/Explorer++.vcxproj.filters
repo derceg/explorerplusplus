@@ -427,7 +427,7 @@
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp">
       <Filter>Bookmarks\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="DarkModeHelper.cpp">
+    <ClCompile Include="DarkModeManager.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
     <ClCompile Include="CrashHandlerHelper.cpp">
@@ -1176,7 +1176,7 @@
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h">
       <Filter>Bookmarks\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="DarkModeHelper.h">
+    <ClInclude Include="DarkModeManager.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="Navigator.h">

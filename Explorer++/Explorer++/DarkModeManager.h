@@ -17,7 +17,7 @@ class WindowSubclass;
 // This class allows dark mode to be enabled and disabled. An instance of this class is designed to
 // be held for the lifetime of the application. If dark mode is enabled when the instance is
 // destroyed, no attempt will be made to disable it.
-class DarkModeHelper
+class DarkModeManager
 {
 public:
 	enum PreferredAppMode
@@ -79,7 +79,7 @@ public:
 	// The color of the hot item (i.e. the item that's selected/under the mouse).
 	static constexpr COLORREF HOT_ITEM_HIGHLIGHT_COLOR = RGB(71, 71, 71);
 
-	DarkModeHelper(const Config *config);
+	DarkModeManager(const Config *config);
 
 	bool IsDarkModeSupported() const;
 	bool IsDarkModeEnabled() const;
@@ -91,7 +91,7 @@ public:
 
 	HBRUSH GetBackgroundBrush() const;
 
-	SignalWrapper<DarkModeHelper, void(bool darkModeEnabled)> darkModeStatusChanged;
+	SignalWrapper<DarkModeManager, void(bool darkModeEnabled)> darkModeStatusChanged;
 
 private:
 	static constexpr DWORD BUILD_NUMBER_1809 = 17763;

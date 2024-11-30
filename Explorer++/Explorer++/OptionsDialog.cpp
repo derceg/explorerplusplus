@@ -8,7 +8,7 @@
 #include "App.h"
 #include "AppearanceOptionsPage.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "DefaultSettingsOptionsPage.h"
 #include "FilesFoldersOptionsPage.h"
 #include "FontsOptionsPage.h"
@@ -132,7 +132,7 @@ void OptionsDialog::AddPages()
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
-		m_app->GetDarkModeHelper()));
+		m_app->GetDarkModeManager()));
 	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
@@ -277,7 +277,7 @@ INT_PTR OptionsDialog::OnCtlColorStatic(HWND hwnd, HDC hdc)
 
 	// In dark mode, the background color in the static control will be the same as the background
 	// color in the treeview, so there's no need to handle this message.
-	if (m_app->GetDarkModeHelper()->IsDarkModeEnabled())
+	if (m_app->GetDarkModeManager()->IsDarkModeEnabled())
 	{
 		// This will result in the default message handling being performed.
 		return FALSE;

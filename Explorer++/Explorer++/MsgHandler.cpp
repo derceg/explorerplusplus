@@ -9,7 +9,7 @@
 #include "BrowserTracker.h"
 #include "ColorRule.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "HolderWindow.h"
 #include "MainRebarStorage.h"
@@ -467,7 +467,7 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 
 	if (hwnd == m_hTabBacking)
 	{
-		if (!m_app->GetDarkModeHelper()->IsDarkModeEnabled())
+		if (!m_app->GetDarkModeManager()->IsDarkModeEnabled())
 		{
 			return std::nullopt;
 		}

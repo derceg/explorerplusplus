@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "AppearanceOptionsPage.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "MainResource.h"
 #include "ResourceManager.h"
 #include "../Helper/Controls.h"
@@ -16,10 +16,10 @@ std::wstring GetIconSetText(IconSet iconSet);
 
 AppearanceOptionsPage::AppearanceOptionsPage(HWND parent, HINSTANCE resourceInstance,
 	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow, const DarkModeHelper *darkModeHelper) :
+	HWND tooltipWindow, const DarkModeManager *darkModeManager) :
 	OptionsPage(IDD_OPTIONS_APPEARANCE, IDS_OPTIONS_APPEARANCE_TITLE, parent, resourceInstance,
 		config, coreInterface, settingChangedCallback, tooltipWindow),
-	m_darkModeHelper(darkModeHelper)
+	m_darkModeManager(darkModeManager)
 {
 }
 
@@ -54,7 +54,7 @@ void AppearanceOptionsPage::InitializeControls()
 	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_OPTIONS_THEME),
 		m_resourceInstance, IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
 
-	if (!m_darkModeHelper->IsDarkModeSupported())
+	if (!m_darkModeManager->IsDarkModeSupported())
 	{
 		EnableWindow(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME_LABEL), false);
 		EnableWindow(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), false);

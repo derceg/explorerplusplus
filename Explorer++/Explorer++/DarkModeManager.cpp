@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DarkModeHelper.h"
+#include "DarkModeManager.h"
 #include "Config.h"
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
@@ -12,7 +12,7 @@
 #include <detours/detours.h>
 #include <wil/common.h>
 
-DarkModeHelper::DarkModeHelper(const Config *config) :
+DarkModeManager::DarkModeManager(const Config *config) :
 	m_config(config),
 	m_backgroundBrush(CreateSolidBrush(BACKGROUND_COLOR))
 {
@@ -72,24 +72,24 @@ DarkModeHelper::DarkModeHelper(const Config *config) :
 	CreateEventWindow();
 
 	m_connections.push_back(
-		m_config->theme.addObserver(std::bind(&DarkModeHelper::OnThemeUpdated, this)));
+		m_config->theme.addObserver(std::bind(&DarkModeManager::OnThemeUpdated, this)));
 
 	m_darkModeSupported = true;
 
 	UpdateAppDarkModeStatus();
 }
 
-bool DarkModeHelper::IsDarkModeSupported() const
+bool DarkModeManager::IsDarkModeSupported() const
 {
 	return m_darkModeSupported;
 }
 
-bool DarkModeHelper::IsDarkModeEnabled() const
+bool DarkModeManager::IsDarkModeEnabled() const
 {
 	return m_darkModeEnabled;
 }
 
-void DarkModeHelper::CreateEventWindow()
+void DarkModeManager::CreateEventWindow()
 {
 	if (m_eventWindow)
 	{
@@ -112,10 +112,10 @@ void DarkModeHelper::CreateEventWindow()
 	CHECK(m_eventWindow);
 
 	m_eventWindowSubclass = std::make_unique<WindowSubclass>(m_eventWindow.get(),
-		std::bind_front(&DarkModeHelper::EventWindowSubclass, this));
+		std::bind_front(&DarkModeManager::EventWindowSubclass, this));
 }
 
-LRESULT DarkModeHelper::EventWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT DarkModeManager::EventWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -127,7 +127,7 @@ LRESULT DarkModeHelper::EventWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void DarkModeHelper::OnSettingChange(const wchar_t *systemParameter)
+void DarkModeManager::OnSettingChange(const wchar_t *systemParameter)
 {
 	// The "ImmersiveColorSet" change notification will be sent when the user changes the dark mode
 	// setting in Windows (or one of the individual Windows mode/app mode settings). Changes to the
@@ -140,12 +140,12 @@ void DarkModeHelper::OnSettingChange(const wchar_t *systemParameter)
 	}
 }
 
-void DarkModeHelper::OnThemeUpdated()
+void DarkModeManager::OnThemeUpdated()
 {
 	UpdateAppDarkModeStatus();
 }
 
-void DarkModeHelper::UpdateAppDarkModeStatus()
+void DarkModeManager::UpdateAppDarkModeStatus()
 {
 	bool enable = ShouldEnableDarkMode();
 
@@ -198,13 +198,13 @@ void DarkModeHelper::UpdateAppDarkModeStatus()
 	darkModeStatusChanged.m_signal(enable);
 }
 
-bool DarkModeHelper::ShouldEnableDarkMode() const
+bool DarkModeManager::ShouldEnableDarkMode() const
 {
 	return m_config->theme == +Theme::Dark
 		|| (m_config->theme == +Theme::System && !IsSystemAppModeLight());
 }
 
-void DarkModeHelper::AllowDarkModeForApp(bool allow)
+void DarkModeManager::AllowDarkModeForApp(bool allow)
 {
 	if (m_SetPreferredAppMode)
 	{
@@ -216,7 +216,7 @@ void DarkModeHelper::AllowDarkModeForApp(bool allow)
 	}
 }
 
-void DarkModeHelper::AllowDarkModeForWindow(HWND hwnd, bool allow)
+void DarkModeManager::AllowDarkModeForWindow(HWND hwnd, bool allow)
 {
 	if (m_AllowDarkModeForWindow)
 	{
@@ -231,7 +231,7 @@ void DarkModeHelper::AllowDarkModeForWindow(HWND hwnd, bool allow)
 // set.
 // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=549713 for some further information about the
 // registry key used here.
-bool DarkModeHelper::IsSystemAppModeLight() const
+bool DarkModeManager::IsSystemAppModeLight() const
 {
 	bool lightMode = true;
 
@@ -248,7 +248,7 @@ bool DarkModeHelper::IsSystemAppModeLight() const
 	return lightMode;
 }
 
-void DarkModeHelper::FlushMenuThemes()
+void DarkModeManager::FlushMenuThemes()
 {
 	if (m_FlushMenuThemes)
 	{
@@ -256,7 +256,7 @@ void DarkModeHelper::FlushMenuThemes()
 	}
 }
 
-void DarkModeHelper::RefreshImmersiveColorPolicyState()
+void DarkModeManager::RefreshImmersiveColorPolicyState()
 {
 	if (m_RefreshImmersiveColorPolicyState)
 	{
@@ -264,19 +264,19 @@ void DarkModeHelper::RefreshImmersiveColorPolicyState()
 	}
 }
 
-LONG DarkModeHelper::DetourOpenNcThemeData()
+LONG DarkModeManager::DetourOpenNcThemeData()
 {
 	return DetourTransaction(
 		[] { return DetourAttach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData); });
 }
 
-LONG DarkModeHelper::RestoreOpenNcThemeData()
+LONG DarkModeManager::RestoreOpenNcThemeData()
 {
 	return DetourTransaction(
 		[] { return DetourDetach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData); });
 }
 
-HTHEME WINAPI DarkModeHelper::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList)
+HTHEME WINAPI DarkModeManager::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList)
 {
 	// The "ItemsView" theme used to style listview controls in dark mode doesn't change the
 	// scrollbar colors. By changing the class here, the scrollbars in a listview control will
@@ -290,7 +290,7 @@ HTHEME WINAPI DarkModeHelper::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classLi
 	return m_OpenNcThemeData(hwnd, classList);
 }
 
-void DarkModeHelper::SetWindowCompositionAttribute(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *data)
+void DarkModeManager::SetWindowCompositionAttribute(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *data)
 {
 	if (m_SetWindowCompositionAttribute)
 	{
@@ -298,7 +298,7 @@ void DarkModeHelper::SetWindowCompositionAttribute(HWND hwnd, WINDOWCOMPOSITIONA
 	}
 }
 
-bool DarkModeHelper::IsHighContrast()
+bool DarkModeManager::IsHighContrast()
 {
 	HIGHCONTRAST highContrast = {};
 	highContrast.cbSize = sizeof(highContrast);
@@ -313,7 +313,7 @@ bool DarkModeHelper::IsHighContrast()
 	return WI_IsFlagSet(highContrast.dwFlags, HCF_HIGHCONTRASTON);
 }
 
-HBRUSH DarkModeHelper::GetBackgroundBrush() const
+HBRUSH DarkModeManager::GetBackgroundBrush() const
 {
 	return m_backgroundBrush.get();
 }

@@ -42,8 +42,8 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
 	m_tabRestorer(&m_globalTabEventDispatcher, &m_browserList),
-	m_darkModeHelper(&m_config),
-	m_themeManager(&m_darkModeHelper),
+	m_darkModeManager(&m_config),
+	m_themeManager(&m_darkModeManager),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
@@ -115,7 +115,7 @@ void App::SetUpSession()
 	}
 
 	m_iconResourceLoader =
-		std::make_unique<IconResourceLoader>(m_config.iconSet, &m_darkModeHelper);
+		std::make_unique<IconResourceLoader>(m_config.iconSet, &m_darkModeManager);
 	SetUpLanguageResourceInstance();
 
 	RestoreSession(windows);
@@ -361,9 +361,9 @@ TabRestorer *App::GetTabRestorer()
 	return &m_tabRestorer;
 }
 
-DarkModeHelper *App::GetDarkModeHelper()
+DarkModeManager *App::GetDarkModeManager()
 {
-	return &m_darkModeHelper;
+	return &m_darkModeManager;
 }
 
 ThemeManager *App::GetThemeManager()
