@@ -1524,6 +1524,7 @@
     <ClInclude Include="ValueWrapper.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="VersionHelper.h" />
+    <ClInclude Include="LayoutDefaults.h" />
     <ClInclude Include="ViewModeHelper.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="Win32ResourceLoader.h" />

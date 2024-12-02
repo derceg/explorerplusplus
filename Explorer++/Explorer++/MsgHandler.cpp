@@ -286,7 +286,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
-	m_config->treeViewWidth = std::clamp(m_config->treeViewWidth,
+	m_treeViewWidth = std::clamp(m_treeViewWidth,
 		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
 	m_config->displayWindowWidth = std::max(m_config->displayWindowWidth,
@@ -321,7 +321,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	if (m_config->showFolders.get())
 	{
-		indentLeft = m_config->treeViewWidth;
+		indentLeft = m_treeViewWidth;
 	}
 
 	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
@@ -404,7 +404,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		iHolderHeight = mainWindowHeight - indentBottom - iHolderTop;
 	}
 
-	iHolderWidth = m_config->treeViewWidth;
+	iHolderWidth = m_treeViewWidth;
 
 	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, iHolderTop, iHolderWidth, iHolderHeight,
 		SWP_NOZORDER);

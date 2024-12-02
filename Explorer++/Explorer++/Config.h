@@ -37,12 +37,12 @@ BETTER_ENUM(StartupMode, int,
 )
 // clang-format on
 
+// Holds application-wide configuration options. Options that are specific to a window or tab should
+// instead be stored in their associated class.
 struct Config
 {
 	static const UINT DEFAULT_DISPLAYWINDOW_WIDTH = 300;
 	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
-
-	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
 	LANGID language = LanguageHelper::DEFAULT_LANGUAGE;
 	IconSet iconSet = IconSet::Color;
@@ -72,7 +72,6 @@ struct Config
 	int displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
 	int displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 	bool displayWindowVertical = false;
-	int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;
 

@@ -11,6 +11,7 @@
 #include "CommandLine.h"
 #include "CoreInterface.h"
 #include "IconFetcherImpl.h"
+#include "LayoutDefaults.h"
 #include "Literals.h"
 #include "MainToolbarStorage.h"
 #include "PluginInterface.h"
@@ -571,6 +572,7 @@ private:
 	// Treeview
 	HolderWindow *m_treeViewHolder = nullptr;
 	ShellTreeView *m_shellTreeView = nullptr;
+	int m_treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 
 	std::unique_ptr<BrowserPane> m_browserPane;
 

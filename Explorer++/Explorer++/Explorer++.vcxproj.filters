@@ -1572,6 +1572,9 @@
     <ClInclude Include="GlobalTabEventDispatcher.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="LayoutDefaults.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

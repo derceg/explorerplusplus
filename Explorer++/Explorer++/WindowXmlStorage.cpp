@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "WindowXmlStorage.h"
+#include "LayoutDefaults.h"
 #include "MainRebarStorage.h"
 #include "MainRebarXmlStorage.h"
 #include "Storage.h"
@@ -54,6 +55,7 @@ const wchar_t SETTING_RIGHT[] = L"NormalPositionRight";
 const wchar_t SETTING_BOTTOM[] = L"NormalPositionBottom";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowCmd";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
+const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
 const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
@@ -167,10 +169,12 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 	rootNode->selectSingleNode(settingsQuery.get(), &settingsNode);
 
 	int selectedTab = 0;
+	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 
 	if (settingsNode)
 	{
 		GetIntSetting(settingsNode.get(), SETTING_SELECTED_TAB, selectedTab);
+		GetIntSetting(settingsNode.get(), SETTING_TREEVIEW_WIDTH, treeViewWidth);
 	}
 
 	auto mainRebarInfo = LoadMainRebarInfo(rootNode);
@@ -182,8 +186,13 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 		mainToolbarButtons = LoadMainToolbarButtons(settingsNode.get());
 	}
 
-	return WindowStorageData({ left, top, right, bottom }, NativeShowStateToShowState(showState),
-		tabs, selectedTab, mainRebarInfo, mainToolbarButtons);
+	return WindowStorageData{ .bounds = { left, top, right, bottom },
+		.showState = NativeShowStateToShowState(showState),
+		.tabs = tabs,
+		.selectedTab = selectedTab,
+		.mainRebarInfo = mainRebarInfo,
+		.mainToolbarButtons = mainToolbarButtons,
+		.treeViewWidth = treeViewWidth };
 }
 
 }
@@ -200,6 +209,7 @@ const wchar_t SETTING_WIDTH[] = L"Width";
 const wchar_t SETTING_HEIGHT[] = L"Height";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
+const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
 const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
@@ -282,6 +292,14 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		GetIntSetting(settingsNode.get(), V1::SETTING_SELECTED_TAB, selectedTab);
 	}
 
+	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_TREEVIEW_WIDTH, treeViewWidth);
+
+	if (hr != S_OK && settingsNode)
+	{
+		GetIntSetting(settingsNode.get(), V1::SETTING_TREEVIEW_WIDTH, treeViewWidth);
+	}
+
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
@@ -312,8 +330,13 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		mainToolbarButtons = V1::LoadMainToolbarButtons(settingsNode.get());
 	}
 
-	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab,
-		mainRebarInfo, mainToolbarButtons);
+	return WindowStorageData{ .bounds = { x, y, x + width, y + height },
+		.showState = showState,
+		.tabs = tabs,
+		.selectedTab = selectedTab,
+		.mainRebarInfo = mainRebarInfo,
+		.mainToolbarButtons = mainToolbarButtons,
+		.treeViewWidth = treeViewWidth };
 }
 
 std::vector<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowsNode)
@@ -372,6 +395,8 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 		XMLSettings::EncodeIntValue(window.showState));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_SELECTED_TAB,
 		XMLSettings::EncodeIntValue(window.selectedTab));
+	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_TREEVIEW_WIDTH,
+		XMLSettings::EncodeIntValue(window.treeViewWidth));
 
 	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
 	auto tabsNodeName = wil::make_bstr_nothrow(TABS_NODE_NAME);

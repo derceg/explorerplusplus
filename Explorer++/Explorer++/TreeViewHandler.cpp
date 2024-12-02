@@ -104,7 +104,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 void Explorerplusplus::OnTreeViewHolderResized(int newWidth)
 {
-	m_config->treeViewWidth = newWidth;
+	m_treeViewWidth = newWidth;
 
 	UpdateLayout();
 }

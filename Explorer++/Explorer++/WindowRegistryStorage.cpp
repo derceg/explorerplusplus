@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "WindowRegistryStorage.h"
+#include "LayoutDefaults.h"
 #include "MainRebarRegistryStorage.h"
 #include "MainRebarStorage.h"
 #include "Storage.h"
@@ -23,6 +24,7 @@ namespace V1
 
 const wchar_t SETTING_POSITION[] = L"Position";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
+const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
 const wchar_t SETTING_MAIN_TOOLBAR_BUTTONS[] = L"ToolbarState";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
@@ -72,14 +74,22 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 	int selectedTab = 0;
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_SELECTED_TAB, selectedTab);
 
+	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_TREEVIEW_WIDTH,
+		treeViewWidth);
+
 	auto mainRebarInfo = LoadMainRebarInfo(applicationKey);
 
 	auto mainToolbarButtons =
 		MainToolbarStorage::LoadFromRegistry(settingsKey, SETTING_MAIN_TOOLBAR_BUTTONS);
 
-	return WindowStorageData(placement.rcNormalPosition,
-		NativeShowStateToShowState(placement.showCmd), tabs, selectedTab, mainRebarInfo,
-		mainToolbarButtons);
+	return WindowStorageData{ .bounds = placement.rcNormalPosition,
+		.showState = NativeShowStateToShowState(placement.showCmd),
+		.tabs = tabs,
+		.selectedTab = selectedTab,
+		.mainRebarInfo = mainRebarInfo,
+		.mainToolbarButtons = mainToolbarButtons,
+		.treeViewWidth = treeViewWidth };
 }
 
 }
@@ -95,6 +105,7 @@ const wchar_t SETTING_WIDTH[] = L"Width";
 const wchar_t SETTING_HEIGHT[] = L"Height";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
+const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
 const wchar_t SETTING_MAIN_TOOLBAR_BUTTONS[] = L"MainToolbarButtons";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
@@ -169,6 +180,16 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 			selectedTab);
 	}
 
+	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	res = RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_TREEVIEW_WIDTH,
+		treeViewWidth);
+
+	if (res != ERROR_SUCCESS && settingsKey)
+	{
+		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(), V1::SETTING_TREEVIEW_WIDTH,
+			treeViewWidth);
+	}
+
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
 
 	if (wil::unique_hkey mainRebarKey; SUCCEEDED(wil::reg::open_unique_key_nothrow(windowKey,
@@ -190,8 +211,13 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 			V1::SETTING_MAIN_TOOLBAR_BUTTONS);
 	}
 
-	return WindowStorageData({ x, y, x + width, y + height }, showState, tabs, selectedTab,
-		mainRebarInfo, mainToolbarButtons);
+	return WindowStorageData{ .bounds = { x, y, x + width, y + height },
+		.showState = showState,
+		.tabs = tabs,
+		.selectedTab = selectedTab,
+		.mainRebarInfo = mainRebarInfo,
+		.mainToolbarButtons = mainToolbarButtons,
+		.treeViewWidth = treeViewWidth };
 }
 
 std::vector<WindowStorageData> Load(HKEY applicationKey, HKEY windowsKey)
@@ -231,6 +257,7 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	RegistrySettings::SaveDword(windowKey, SETTING_HEIGHT, GetRectHeight(&window.bounds));
 	RegistrySettings::SaveDword(windowKey, SETTING_SHOW_STATE, window.showState);
 	RegistrySettings::SaveDword(windowKey, SETTING_SELECTED_TAB, window.selectedTab);
+	RegistrySettings::SaveDword(windowKey, SETTING_TREEVIEW_WIDTH, window.treeViewWidth);
 
 	wil::unique_hkey tabsKey;
 	HRESULT hr = wil::reg::create_unique_key_nothrow(windowKey, TABS_SUB_KEY_PATH, tabsKey,

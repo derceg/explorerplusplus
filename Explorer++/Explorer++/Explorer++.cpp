@@ -64,6 +64,11 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 
 	m_iDWFolderSizeUniqueId = 0;
 
+	if (storageData)
+	{
+		m_treeViewWidth = storageData->treeViewWidth;
+	}
+
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hContainer,
 		std::bind_front(&Explorerplusplus::WindowProcedure, this)));
 
@@ -191,10 +196,13 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 
 	const auto *tabContainer = GetActivePane()->GetTabContainer();
 
-	return WindowStorageData(placement.rcNormalPosition,
-		NativeShowStateToShowState(placement.showCmd), tabContainer->GetStorageData(),
-		tabContainer->GetSelectedTabIndex(), GetMainRebarStorageInfo(),
-		m_mainToolbar->GetButtonsForStorage());
+	return { .bounds = placement.rcNormalPosition,
+		.showState = NativeShowStateToShowState(placement.showCmd),
+		.tabs = tabContainer->GetStorageData(),
+		.selectedTab = tabContainer->GetSelectedTabIndex(),
+		.mainRebarInfo = GetMainRebarStorageInfo(),
+		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
+		.treeViewWidth = m_treeViewWidth };
 }
 
 bool Explorerplusplus::IsActive() const

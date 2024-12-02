@@ -13,6 +13,7 @@
 	<Settings>
 		<Setting name="LastSelectedTab">1</Setting>
 		<Setting name="ToolbarState" Button0="Copy To" Button1="Move To" Button2="Up" />
+		<Setting name="TreeViewWidth">1014</Setting>
 	</Settings>
 	<Toolbars>
 		<Toolbar id="0" Style="768" Length="652"/>

@@ -34,8 +34,6 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.showApplicationToolbar);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"AlwaysOpenNewTab",
 		config.alwaysOpenNewTab);
-	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"TreeViewWidth",
-		config.treeViewWidth);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ShowFriendlyDates",
 		config.globalFolderSettings.showFriendlyDates);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ShowDisplayWindow",
@@ -233,7 +231,6 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		config.showApplicationToolbar.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowFullTitlePath", config.showFullTitlePath.get());
 	RegistrySettings::SaveDword(settingsKey, L"AlwaysOpenNewTab", config.alwaysOpenNewTab);
-	RegistrySettings::SaveDword(settingsKey, L"TreeViewWidth", config.treeViewWidth);
 	RegistrySettings::SaveDword(settingsKey, L"ShowFriendlyDates",
 		config.globalFolderSettings.showFriendlyDates);
 	RegistrySettings::SaveDword(settingsKey, L"ShowDisplayWindow", config.showDisplayWindow.get());

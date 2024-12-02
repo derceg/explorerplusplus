@@ -12,6 +12,7 @@
 	<Settings>
 		<Setting name="LastSelectedTab">2</Setting>
 		<Setting name="ToolbarState" Button0="Merge Files" Button1="Open Command Prompt" />
+		<Setting name="TreeViewWidth">117</Setting>
 	</Settings>
 	<Toolbars>
 		<Toolbar id="2" Style="769" Length="88"/>
