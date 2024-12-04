@@ -44,9 +44,6 @@ void XMLSettings::WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement 
 	auto bstr = wil::make_bstr_nothrow(szElementName);
 	pXMLDom->createElement(bstr.get(), &pParentNode);
 
-	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pParentNode.get());
-
 	/* This will form an attribute of the form:
 	name="AttributeName" */
 	bstr = wil::make_bstr_nothrow(L"name");
@@ -75,22 +72,6 @@ VARIANT XMLSettings::VariantString(const WCHAR *str)
 	V_VT(&var) = VT_BSTR;
 
 	return var;
-}
-
-/* Helper function to append a whitespace text node to a
-specified element. */
-void XMLSettings::AddWhiteSpaceToNode(IXMLDOMDocument *pDom, BSTR bstrWs, IXMLDOMNode *pNode)
-{
-	wil::com_ptr_nothrow<IXMLDOMText> pws;
-	HRESULT hr = pDom->createTextNode(bstrWs, &pws);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNode> pBuf;
-	pNode->appendChild(pws.get(), &pBuf);
 }
 
 /* Helper function to append a child to a parent node. */

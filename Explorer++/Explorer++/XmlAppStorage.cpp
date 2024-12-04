@@ -72,7 +72,7 @@ void XmlAppStorage::SaveWindows(const std::vector<WindowStorageData> &windows)
 
 void XmlAppStorage::SaveBookmarks(const BookmarkTree *bookmarkTree)
 {
-	BookmarkXmlStorage::Save(m_xmlDocument.get(), m_rootNode.get(), bookmarkTree, 1);
+	BookmarkXmlStorage::Save(m_xmlDocument.get(), m_rootNode.get(), bookmarkTree);
 }
 
 void XmlAppStorage::SaveColorRules(const ColorRuleModel *model)

@@ -45,7 +45,7 @@ TEST_F(BookmarkXmlStorageTest, V2Save)
 	auto xmlDocumentData = CreateXmlDocument();
 
 	BookmarkXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.rootNode.get(),
-		&referenceBookmarkTree, 1);
+		&referenceBookmarkTree);
 
 	BookmarkTree loadedBookmarkTree;
 	BookmarkXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedBookmarkTree);

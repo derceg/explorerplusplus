@@ -94,9 +94,6 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 		return;
 	}
 
-	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
-
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("DialogState"),
 		m_szSettingsKey.c_str());

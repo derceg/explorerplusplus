@@ -18,7 +18,6 @@ wil::com_ptr_nothrow<IXMLDOMDocument> CreateXmlDocument();
 void WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparentNode,
 	const TCHAR *szElementName, const TCHAR *szAttributeName, const TCHAR *szAttributeValue);
 VARIANT VariantString(const WCHAR *str);
-void AddWhiteSpaceToNode(IXMLDOMDocument *pDom, BSTR bstrWs, IXMLDOMNode *pNode);
 void AppendChildToParent(IXMLDOMNode *pChild, IXMLDOMNode *pParent);
 void AddAttributeToNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode,
 	const WCHAR *wszAttributeName, const WCHAR *wszAttributeValue);
