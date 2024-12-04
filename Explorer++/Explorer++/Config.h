@@ -41,9 +41,6 @@ BETTER_ENUM(StartupMode, int,
 // instead be stored in their associated class.
 struct Config
 {
-	static const UINT DEFAULT_DISPLAYWINDOW_WIDTH = 300;
-	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
-
 	LANGID language = LanguageHelper::DEFAULT_LANGUAGE;
 	IconSet iconSet = IconSet::Color;
 	ValueWrapper<Theme> theme = +Theme::Light;
@@ -69,8 +66,6 @@ struct Config
 	bool closeMainWindowOnTabClose = true;
 	bool confirmCloseTabs = false;
 	ValueWrapper<bool> synchronizeTreeview = true;
-	int displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
-	int displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 	bool displayWindowVertical = false;
 	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;

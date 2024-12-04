@@ -149,8 +149,6 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 		config.displayWindowTextColor = XMLSettings::ReadXMLColorData(node.get());
 	}
 
-	GetIntSetting(settingsNode, L"DisplayWindowWidth", config.displayWindowWidth);
-	GetIntSetting(settingsNode, L"DisplayWindowHeight", config.displayWindowHeight);
 	GetBoolSetting(settingsNode, L"DisplayWindowVertical", config.displayWindowVertical);
 	GetBoolSetting(settingsNode, L"DoubleClickTabClose", config.doubleClickTabClose);
 	GetBoolSetting(settingsNode, L"ExtendTabControl", config.extendTabControl);
@@ -332,10 +330,6 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 	XMLSettings::AddAttributeToNode(xmlDocument, displayTextColorNode.get(), L"b",
 		XMLSettings::EncodeIntValue(GetBValue(config.displayWindowTextColor.get())));
 
-	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"DisplayWindowWidth", XMLSettings::EncodeIntValue(config.displayWindowWidth));
-	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"DisplayWindowHeight", XMLSettings::EncodeIntValue(config.displayWindowHeight));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"DisplayWindowVertical", XMLSettings::EncodeBoolValue(config.displayWindowVertical));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,

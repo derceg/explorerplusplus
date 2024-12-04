@@ -8,5 +8,7 @@ namespace LayoutDefaults
 {
 
 inline constexpr UINT DEFAULT_TREEVIEW_WIDTH = 208;
+inline constexpr UINT DEFAULT_DISPLAY_WINDOW_WIDTH = 300;
+inline constexpr UINT DEFAULT_DISPLAY_WINDOW_HEIGHT = 90;
 
 }

@@ -30,6 +30,8 @@ struct WindowStorageData
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
 	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
 	int treeViewWidth;
+	int displayWindowWidth;
+	int displayWindowHeight;
 
 	// This is only used in tests.
 	bool operator==(const WindowStorageData &other) const;

@@ -2,21 +2,23 @@
 <!-- Preference file for Explorer++ -->
 <ExplorerPlusPlus>
 	<Windows>
-		<Window X="683" Y="790" Width="390" Height="1490" ShowState="0"/>
+		<Window X="683" Y="790" Width="390" Height="1490" ShowState="0" />
 	</Windows>
 	<Tabs>
-		<Tab Directory="c:\fake1"/>
-		<Tab Directory="c:\fake2"/>
-		<Tab Directory="c:\fake3"/>
+		<Tab Directory="c:\fake1" />
+		<Tab Directory="c:\fake2" />
+		<Tab Directory="c:\fake3" />
 	</Tabs>
 	<Settings>
 		<Setting name="LastSelectedTab">2</Setting>
 		<Setting name="ToolbarState" Button0="Merge Files" Button1="Open Command Prompt" />
 		<Setting name="TreeViewWidth">117</Setting>
+		<Setting name="DisplayWindowWidth">66</Setting>
+		<Setting name="DisplayWindowHeight">595</Setting>
 	</Settings>
 	<Toolbars>
-		<Toolbar id="2" Style="769" Length="88"/>
-		<Toolbar id="0" Style="768" Length="712"/>
-		<Toolbar id="1" Style="768" Length="1834"/>
+		<Toolbar id="2" Style="769" Length="88" />
+		<Toolbar id="0" Style="768" Length="712" />
+		<Toolbar id="1" Style="768" Length="1834" />
 	</Toolbars>
 </ExplorerPlusPlus>

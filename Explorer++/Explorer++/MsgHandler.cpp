@@ -289,9 +289,9 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	m_treeViewWidth = std::clamp(m_treeViewWidth,
 		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
-	m_config->displayWindowWidth = std::max(m_config->displayWindowWidth,
+	m_displayWindowWidth = std::max(m_displayWindowWidth,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_WIDTH));
-	m_config->displayWindowHeight = std::max(m_config->displayWindowHeight,
+	m_displayWindowHeight = std::max(m_displayWindowHeight,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
 	RECT rebarRect;
@@ -311,11 +311,11 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	{
 		if (m_config->displayWindowVertical)
 		{
-			indentRight += m_config->displayWindowWidth;
+			indentRight += m_displayWindowWidth;
 		}
 		else
 		{
-			indentBottom += m_config->displayWindowHeight;
+			indentBottom += m_displayWindowHeight;
 		}
 	}
 
@@ -417,13 +417,13 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	if (m_config->displayWindowVertical)
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, mainWindowWidth - indentRight,
-			iIndentRebar, m_config->displayWindowWidth,
-			mainWindowHeight - iIndentRebar - indentBottom, displayWindowShowFlags);
+			iIndentRebar, m_displayWindowWidth, mainWindowHeight - iIndentRebar - indentBottom,
+			displayWindowShowFlags);
 	}
 	else
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, 0, mainWindowHeight - indentBottom,
-			mainWindowWidth, m_config->displayWindowHeight, displayWindowShowFlags);
+			mainWindowWidth, m_displayWindowHeight, displayWindowShowFlags);
 	}
 
 	/* <---- ALL listview windows ----> */
@@ -565,11 +565,11 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical)
 	{
-		m_config->displayWindowWidth = LOWORD(wParam);
+		m_displayWindowWidth = LOWORD(wParam);
 	}
 	else
 	{
-		m_config->displayWindowHeight = HIWORD(wParam);
+		m_displayWindowHeight = HIWORD(wParam);
 	}
 
 	UpdateLayout();

@@ -7,16 +7,18 @@
 			NormalPositionRight="1606" NormalPositionBottom="798" />
 	</WindowPosition>
 	<Tabs>
-		<Tab Directory="c:\fake1"/>
-		<Tab Directory="c:\fake2"/>
+		<Tab Directory="c:\fake1" />
+		<Tab Directory="c:\fake2" />
 	</Tabs>
 	<Settings>
 		<Setting name="LastSelectedTab">1</Setting>
 		<Setting name="ToolbarState" Button0="Copy To" Button1="Move To" Button2="Up" />
 		<Setting name="TreeViewWidth">1014</Setting>
+		<Setting name="DisplayWindowWidth">212</Setting>
+		<Setting name="DisplayWindowHeight">340</Setting>
 	</Settings>
 	<Toolbars>
-		<Toolbar id="0" Style="768" Length="652"/>
-		<Toolbar id="1" Style="769" Length="839"/>
+		<Toolbar id="0" Style="768" Length="652" />
+		<Toolbar id="1" Style="769" Length="839" />
 	</Toolbars>
 </ExplorerPlusPlus>

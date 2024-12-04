@@ -67,6 +67,8 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	if (storageData)
 	{
 		m_treeViewWidth = storageData->treeViewWidth;
+		m_displayWindowWidth = storageData->displayWindowWidth;
+		m_displayWindowHeight = storageData->displayWindowHeight;
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hContainer,
@@ -202,7 +204,9 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		.selectedTab = tabContainer->GetSelectedTabIndex(),
 		.mainRebarInfo = GetMainRebarStorageInfo(),
 		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
-		.treeViewWidth = m_treeViewWidth };
+		.treeViewWidth = m_treeViewWidth,
+		.displayWindowWidth = m_displayWindowWidth,
+		.displayWindowHeight = m_displayWindowHeight };
 }
 
 bool Explorerplusplus::IsActive() const

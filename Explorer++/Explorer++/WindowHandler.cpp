@@ -48,11 +48,11 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	{
 		if (m_config->displayWindowVertical)
 		{
-			indentRight += m_config->displayWindowWidth;
+			indentRight += m_displayWindowWidth;
 		}
 		else
 		{
-			indentBottom += m_config->displayWindowHeight;
+			indentBottom += m_displayWindowHeight;
 		}
 	}
 

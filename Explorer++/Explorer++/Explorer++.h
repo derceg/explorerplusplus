@@ -554,7 +554,10 @@ private:
 
 	MainWindow *m_mainWindow = nullptr;
 	AddressBar *m_addressBar = nullptr;
+
 	DisplayWindow *m_displayWindow = nullptr;
+	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int m_displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
 	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
 	std::vector<wil::unique_hbitmap> m_mainMenuImages;

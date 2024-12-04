@@ -33,7 +33,9 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 				MainToolbarButton::Forward,
 				MainToolbarButton::Delete
 			}),
-			.treeViewWidth = 430
+			.treeViewWidth = 430,
+			.displayWindowWidth = 610,
+			.displayWindowHeight = 429
 		},
 		{
 			.bounds = { 212, 40, 400, 1073 },
@@ -52,7 +54,9 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 				MainToolbarButton::Separator,
 				MainToolbarButton::NewTab
 			}),
-			.treeViewWidth = 57
+			.treeViewWidth = 57,
+			.displayWindowWidth = 176,
+			.displayWindowHeight = 827
 		},
 		{
 			.bounds = { 1165, 2, 2071, 643 },
@@ -69,7 +73,9 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 				MainToolbarButton::Search,
 				MainToolbarButton::CloseTab
 			}),
-			.treeViewWidth = 844
+			.treeViewWidth = 844,
+			.displayWindowWidth = 140,
+			.displayWindowHeight = 211
 		}
 	};
 	// clang-format on
@@ -96,7 +102,9 @@ WindowStorageData BuildV2FallbackReferenceWindow(TestStorageType storageType)
 			MainToolbarButton::MergeFiles,
 			MainToolbarButton::OpenCommandPrompt
 		}),
-		.treeViewWidth = 117
+		.treeViewWidth = 117,
+		.displayWindowWidth = 66,
+		.displayWindowHeight = 595
 	};
 	// clang-format on
 }
@@ -121,7 +129,9 @@ WindowStorageData BuildV1ReferenceWindow(TestStorageType storageType)
 			MainToolbarButton::MoveTo,
 			MainToolbarButton::Up
 		}),
-		.treeViewWidth = 1014
+		.treeViewWidth = 1014,
+		.displayWindowWidth = 212,
+		.displayWindowHeight = 340
 	};
 	// clang-format on
 }

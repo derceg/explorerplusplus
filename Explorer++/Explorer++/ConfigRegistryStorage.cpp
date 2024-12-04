@@ -159,10 +159,6 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.globalFolderSettings.hideLinkExtension);
 	RegistrySettings::ReadBetterEnumValue(settingsKey, L"ViewModeGlobal",
 		config.defaultFolderSettings.viewMode);
-	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DisplayWindowWidth",
-		config.displayWindowWidth);
-	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DisplayWindowHeight",
-		config.displayWindowHeight);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DisplayWindowVertical",
 		config.displayWindowVertical);
 
@@ -315,8 +311,6 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"TVAutoExpandSelected",
 		config.treeViewAutoExpandSelected);
 
-	RegistrySettings::SaveDword(settingsKey, L"DisplayWindowWidth", config.displayWindowWidth);
-	RegistrySettings::SaveDword(settingsKey, L"DisplayWindowHeight", config.displayWindowHeight);
 	RegistrySettings::SaveDword(settingsKey, L"DisplayWindowVertical",
 		config.displayWindowVertical);
 

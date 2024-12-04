@@ -25,6 +25,8 @@ namespace V1
 const wchar_t SETTING_POSITION[] = L"Position";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
 const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_WIDTH[] = L"DisplayWindowWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_HEIGHT[] = L"DisplayWindowHeight";
 const wchar_t SETTING_MAIN_TOOLBAR_BUTTONS[] = L"ToolbarState";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
@@ -78,6 +80,14 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_TREEVIEW_WIDTH,
 		treeViewWidth);
 
+	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_DISPLAY_WINDOW_WIDTH,
+		displayWindowWidth);
+
+	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_DISPLAY_WINDOW_HEIGHT,
+		displayWindowHeight);
+
 	auto mainRebarInfo = LoadMainRebarInfo(applicationKey);
 
 	auto mainToolbarButtons =
@@ -89,7 +99,9 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarButtons = mainToolbarButtons,
-		.treeViewWidth = treeViewWidth };
+		.treeViewWidth = treeViewWidth,
+		.displayWindowWidth = displayWindowWidth,
+		.displayWindowHeight = displayWindowHeight };
 }
 
 }
@@ -106,6 +118,8 @@ const wchar_t SETTING_HEIGHT[] = L"Height";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
 const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_WIDTH[] = L"DisplayWindowWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_HEIGHT[] = L"DisplayWindowHeight";
 const wchar_t SETTING_MAIN_TOOLBAR_BUTTONS[] = L"MainToolbarButtons";
 
 const wchar_t TABS_SUB_KEY_PATH[] = L"Tabs";
@@ -190,6 +204,26 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 			treeViewWidth);
 	}
 
+	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	res = RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_DISPLAY_WINDOW_WIDTH,
+		displayWindowWidth);
+
+	if (res != ERROR_SUCCESS && settingsKey)
+	{
+		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(),
+			V1::SETTING_DISPLAY_WINDOW_WIDTH, displayWindowWidth);
+	}
+
+	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	res = RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_DISPLAY_WINDOW_HEIGHT,
+		displayWindowHeight);
+
+	if (res != ERROR_SUCCESS && settingsKey)
+	{
+		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(),
+			V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
+	}
+
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
 
 	if (wil::unique_hkey mainRebarKey; SUCCEEDED(wil::reg::open_unique_key_nothrow(windowKey,
@@ -217,7 +251,9 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarButtons = mainToolbarButtons,
-		.treeViewWidth = treeViewWidth };
+		.treeViewWidth = treeViewWidth,
+		.displayWindowWidth = displayWindowWidth,
+		.displayWindowHeight = displayWindowHeight };
 }
 
 std::vector<WindowStorageData> Load(HKEY applicationKey, HKEY windowsKey)
@@ -258,6 +294,9 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	RegistrySettings::SaveDword(windowKey, SETTING_SHOW_STATE, window.showState);
 	RegistrySettings::SaveDword(windowKey, SETTING_SELECTED_TAB, window.selectedTab);
 	RegistrySettings::SaveDword(windowKey, SETTING_TREEVIEW_WIDTH, window.treeViewWidth);
+	RegistrySettings::SaveDword(windowKey, SETTING_DISPLAY_WINDOW_WIDTH, window.displayWindowWidth);
+	RegistrySettings::SaveDword(windowKey, SETTING_DISPLAY_WINDOW_HEIGHT,
+		window.displayWindowHeight);
 
 	wil::unique_hkey tabsKey;
 	HRESULT hr = wil::reg::create_unique_key_nothrow(windowKey, TABS_SUB_KEY_PATH, tabsKey,

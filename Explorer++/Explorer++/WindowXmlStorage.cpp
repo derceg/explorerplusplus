@@ -56,6 +56,8 @@ const wchar_t SETTING_BOTTOM[] = L"NormalPositionBottom";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowCmd";
 const wchar_t SETTING_SELECTED_TAB[] = L"LastSelectedTab";
 const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_WIDTH[] = L"DisplayWindowWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_HEIGHT[] = L"DisplayWindowHeight";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
 const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
@@ -170,11 +172,15 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 
 	int selectedTab = 0;
 	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
 	if (settingsNode)
 	{
 		GetIntSetting(settingsNode.get(), SETTING_SELECTED_TAB, selectedTab);
 		GetIntSetting(settingsNode.get(), SETTING_TREEVIEW_WIDTH, treeViewWidth);
+		GetIntSetting(settingsNode.get(), SETTING_DISPLAY_WINDOW_WIDTH, displayWindowWidth);
+		GetIntSetting(settingsNode.get(), SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
 	}
 
 	auto mainRebarInfo = LoadMainRebarInfo(rootNode);
@@ -192,7 +198,9 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarButtons = mainToolbarButtons,
-		.treeViewWidth = treeViewWidth };
+		.treeViewWidth = treeViewWidth,
+		.displayWindowWidth = displayWindowWidth,
+		.displayWindowHeight = displayWindowHeight };
 }
 
 }
@@ -210,6 +218,8 @@ const wchar_t SETTING_HEIGHT[] = L"Height";
 const wchar_t SETTING_SHOW_STATE[] = L"ShowState";
 const wchar_t SETTING_SELECTED_TAB[] = L"SelectedTab";
 const wchar_t SETTING_TREEVIEW_WIDTH[] = L"TreeViewWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_WIDTH[] = L"DisplayWindowWidth";
+const wchar_t SETTING_DISPLAY_WINDOW_HEIGHT[] = L"DisplayWindowHeight";
 
 const wchar_t TABS_NODE_NAME[] = L"Tabs";
 const wchar_t MAIN_REBAR_NODE_NAME[] = L"Toolbars";
@@ -300,6 +310,24 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		GetIntSetting(settingsNode.get(), V1::SETTING_TREEVIEW_WIDTH, treeViewWidth);
 	}
 
+	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_DISPLAY_WINDOW_WIDTH,
+		displayWindowWidth);
+
+	if (hr != S_OK && settingsNode)
+	{
+		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_WIDTH, displayWindowWidth);
+	}
+
+	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_DISPLAY_WINDOW_HEIGHT,
+		displayWindowHeight);
+
+	if (hr != S_OK && settingsNode)
+	{
+		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
+	}
+
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
@@ -336,7 +364,9 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarButtons = mainToolbarButtons,
-		.treeViewWidth = treeViewWidth };
+		.treeViewWidth = treeViewWidth,
+		.displayWindowWidth = displayWindowWidth,
+		.displayWindowHeight = displayWindowHeight };
 }
 
 std::vector<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowsNode)
@@ -397,6 +427,10 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 		XMLSettings::EncodeIntValue(window.selectedTab));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_TREEVIEW_WIDTH,
 		XMLSettings::EncodeIntValue(window.treeViewWidth));
+	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_DISPLAY_WINDOW_WIDTH,
+		XMLSettings::EncodeIntValue(window.displayWindowWidth));
+	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_DISPLAY_WINDOW_HEIGHT,
+		XMLSettings::EncodeIntValue(window.displayWindowHeight));
 
 	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
 	auto tabsNodeName = wil::make_bstr_nothrow(TABS_NODE_NAME);
