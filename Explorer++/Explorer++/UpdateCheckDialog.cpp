@@ -129,7 +129,7 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 
 					versionRetrieved = true;
 				}
-				catch (std::out_of_range)
+				catch (const boost::bad_lexical_cast &)
 				{
 					/* VersionRetrieved won't be set, so an error
 					will be returned below. Nothing needs to be done
