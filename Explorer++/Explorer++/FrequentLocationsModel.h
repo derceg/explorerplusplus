@@ -14,7 +14,7 @@
 
 // Stores information about how often locations are visited. A sorted set of frequently visited
 // locations can be retrieved.
-class FrequentLocationsService
+class FrequentLocationsModel
 {
 public:
 	using LocationsChangedSignal = boost::signals2::signal<void()>;

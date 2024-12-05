@@ -1025,7 +1025,7 @@
     <ClCompile Include="DirectoryOperationsHelper.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
-    <ClCompile Include="FrequentLocationsService.cpp" />
+    <ClCompile Include="FrequentLocationsModel.cpp" />
     <ClCompile Include="GlobalHistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="GlobalTabEventDispatcher.cpp" />
@@ -1316,7 +1316,7 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
-    <ClInclude Include="FrequentLocationsService.h" />
+    <ClInclude Include="FrequentLocationsModel.h" />
     <ClInclude Include="GlobalHistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="GlobalTabEventDispatcher.h" />

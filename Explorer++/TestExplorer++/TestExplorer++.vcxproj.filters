@@ -177,7 +177,7 @@
       <Filter>History</Filter>
     </ClCompile>
     <ClCompile Include="ShellTestHelper.cpp" />
-    <ClCompile Include="FrequentLocationsServiceTest.cpp">
+    <ClCompile Include="FrequentLocationsModelTest.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
     <ClCompile Include="DragDropHelperTest.cpp">

@@ -613,7 +613,7 @@
     <ClCompile Include="TabParentItemsMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
-    <ClCompile Include="FrequentLocationsService.cpp">
+    <ClCompile Include="FrequentLocationsModel.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
     <ClCompile Include="LocationVisitInfo.cpp">
@@ -1395,7 +1395,7 @@
     <ClInclude Include="TabParentItemsMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
-    <ClInclude Include="FrequentLocationsService.h">
+    <ClInclude Include="FrequentLocationsModel.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
     <ClInclude Include="LocationVisitInfo.h">

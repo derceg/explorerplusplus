@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "FrequentLocationsService.h"
+#include "FrequentLocationsModel.h"
 #include "ShellTestHelper.h"
 #include "../Helper/StringHelper.h"
 #include <gtest/gtest.h>
@@ -54,20 +54,20 @@ void PrintTo(const LocationVisitInfo &locationInfo, std::ostream *os)
 	*os << ")";
 }
 
-TEST(FrequentLocationsServiceTest, DifferentLocations)
+TEST(FrequentLocationsModelTest, DifferentLocations)
 {
-	FrequentLocationsService frequentLocationService;
+	FrequentLocationsModel frequentLocationsModel;
 
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 
 	PidlAbsolute fake3 = CreateSimplePidlForTest(L"C:\\Fake3");
-	frequentLocationService.RegisterLocationVisit(fake3);
+	frequentLocationsModel.RegisterLocationVisit(fake3);
 
-	const auto &visits = frequentLocationService.GetVisits();
+	const auto &visits = frequentLocationsModel.GetVisits();
 
 	// Items with the same visit count are sorted by their last visit time, so more recent items
 	// should appear first.
@@ -75,93 +75,93 @@ TEST(FrequentLocationsServiceTest, DifferentLocations)
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsServiceTest, RepeatedVisits)
+TEST(FrequentLocationsModelTest, RepeatedVisits)
 {
-	FrequentLocationsService frequentLocationService;
+	FrequentLocationsModel frequentLocationsModel;
 
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationService.RegisterLocationVisit(fake1);
-	frequentLocationService.RegisterLocationVisit(fake1);
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	const auto &visits = frequentLocationService.GetVisits();
+	const auto &visits = frequentLocationsModel.GetVisits();
 
 	std::vector<LocationVisitInfo> expectedVisits = { { fake1, 3 }, { fake2, 1 } };
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsServiceTest, VisitCountOrderChanges)
+TEST(FrequentLocationsModelTest, VisitCountOrderChanges)
 {
-	FrequentLocationsService frequentLocationService;
+	FrequentLocationsModel frequentLocationsModel;
 
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationService.RegisterLocationVisit(fake2);
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	const auto &visits = frequentLocationService.GetVisits();
+	const auto &visits = frequentLocationsModel.GetVisits();
 
 	std::vector<LocationVisitInfo> expectedVisits = { { fake2, 2 }, { fake1, 1 } };
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 
-	frequentLocationService.RegisterLocationVisit(fake1);
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	expectedVisits = { { fake1, 3 }, { fake2, 2 } };
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 
-	frequentLocationService.RegisterLocationVisit(fake2);
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 
 	expectedVisits = { { fake2, 4 }, { fake1, 3 } };
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsServiceTest, VisitTimeOrderChanges)
+TEST(FrequentLocationsModelTest, VisitTimeOrderChanges)
 {
-	FrequentLocationsService frequentLocationService;
+	FrequentLocationsModel frequentLocationsModel;
 
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	frequentLocationService.RegisterLocationVisit(fake1);
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	const auto &visits = frequentLocationService.GetVisits();
+	const auto &visits = frequentLocationsModel.GetVisits();
 
 	// fake2 is the most recently visited item, so it should appear first.
 	std::vector<LocationVisitInfo> expectedVisits = { { fake2, 2 }, { fake1, 2 } };
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 
-	frequentLocationService.RegisterLocationVisit(fake2);
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	// fake1 is now the most recently visited item.
 	expectedVisits = { { fake1, 3 }, { fake2, 3 } };
 	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsServiceTest, LocationsChangedEvent)
+TEST(FrequentLocationsModelTest, LocationsChangedEvent)
 {
-	FrequentLocationsService frequentLocationService;
+	FrequentLocationsModel frequentLocationsModel;
 
 	MockFunction<void()> callback;
-	frequentLocationService.AddLocationsChangedObserver(callback.AsStdFunction());
+	frequentLocationsModel.AddLocationsChangedObserver(callback.AsStdFunction());
 	EXPECT_CALL(callback, Call()).Times(4);
 
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationService.RegisterLocationVisit(fake1);
-	frequentLocationService.RegisterLocationVisit(fake1);
-	frequentLocationService.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
+	frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationService.RegisterLocationVisit(fake2);
+	frequentLocationsModel.RegisterLocationVisit(fake2);
 }

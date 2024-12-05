@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "FrequentLocationsService.h"
+#include "FrequentLocationsModel.h"
 
-void FrequentLocationsService::RegisterLocationVisit(const PidlAbsolute &pidl)
+void FrequentLocationsModel::RegisterLocationVisit(const PidlAbsolute &pidl)
 {
 	auto &locationIndex = m_locationVisits.get<ByLocation>();
 	auto itr = locationIndex.find(pidl);
@@ -22,12 +22,12 @@ void FrequentLocationsService::RegisterLocationVisit(const PidlAbsolute &pidl)
 	m_locationsChangedSignal();
 }
 
-const FrequentLocationsService::ByVisitsIndex &FrequentLocationsService::GetVisits() const
+const FrequentLocationsModel::ByVisitsIndex &FrequentLocationsModel::GetVisits() const
 {
 	return m_locationVisits.get<ByVisits>();
 }
 
-boost::signals2::connection FrequentLocationsService::AddLocationsChangedObserver(
+boost::signals2::connection FrequentLocationsModel::AddLocationsChangedObserver(
 	const LocationsChangedSignal::slot_type &observer)
 {
 	return m_locationsChangedSignal.connect(observer);

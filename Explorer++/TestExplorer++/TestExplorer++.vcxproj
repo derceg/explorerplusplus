@@ -228,7 +228,7 @@
     <ClCompile Include="ExecutorTestHelper.cpp" />
     <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
-    <ClCompile Include="FrequentLocationsServiceTest.cpp" />
+    <ClCompile Include="FrequentLocationsModelTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
