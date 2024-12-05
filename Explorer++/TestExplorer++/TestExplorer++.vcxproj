@@ -234,7 +234,7 @@
     <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="GlobalHistoryMenuTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
-    <ClCompile Include="HistoryServiceTest.cpp" />
+    <ClCompile Include="HistoryModelTest.cpp" />
     <ClCompile Include="BrowserTrackerTest.cpp" />
     <ClCompile Include="LanguageHelperTest.cpp" />
     <ClCompile Include="MessageLoop.cpp" />

@@ -281,5 +281,5 @@ ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
 {
 	ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(shellBrowser,
-		m_app->GetHistoryService());
+		m_app->GetHistoryModel());
 }

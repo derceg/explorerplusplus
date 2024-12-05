@@ -6,24 +6,23 @@
 
 #include "ShellItemsMenu.h"
 
-class HistoryService;
+class HistoryModel;
 
 // Displays the set of global history entries.
 class GlobalHistoryMenu : public ShellItemsMenu
 {
 public:
 	GlobalHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		HistoryService *historyService, BrowserWindow *browserWindow,
-		ShellIconLoader *shellIconLoader);
+		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader);
 	GlobalHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		HistoryService *historyService, BrowserWindow *browserWindow,
-		ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId);
+		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
+		UINT menuStartId, UINT menuEndId);
 
 private:
 	void Initialize();
 	void OnHistoryChanged();
-	static std::vector<PidlAbsolute> GetHistoryItems(const HistoryService *historyService);
+	static std::vector<PidlAbsolute> GetHistoryItems(const HistoryModel *historyModel);
 
-	HistoryService *const m_historyService;
+	HistoryModel *const m_historyModel;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

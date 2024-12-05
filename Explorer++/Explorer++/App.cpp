@@ -371,9 +371,9 @@ ThemeManager *App::GetThemeManager()
 	return &m_themeManager;
 }
 
-HistoryService *App::GetHistoryService()
+HistoryModel *App::GetHistoryModel()
 {
-	return &m_historyService;
+	return &m_historyModel;
 }
 
 void App::OnWillRemoveBrowser()

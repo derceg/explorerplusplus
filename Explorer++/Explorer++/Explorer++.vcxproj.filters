@@ -559,7 +559,7 @@
     <ClCompile Include="BrowserCommandController.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryService.cpp">
+    <ClCompile Include="HistoryModel.cpp">
       <Filter>History</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowserHistoryHelper.cpp">
@@ -1326,7 +1326,7 @@
     <ClInclude Include="BrowserCommandController.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="HistoryService.h">
+    <ClInclude Include="HistoryModel.h">
       <Filter>History</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowserHistoryHelper.h">

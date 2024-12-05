@@ -4,43 +4,43 @@
 
 #include "stdafx.h"
 #include "GlobalHistoryMenu.h"
-#include "HistoryService.h"
+#include "HistoryModel.h"
 
 GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, HistoryService *historyService,
+	const AcceleratorManager *acceleratorManager, HistoryModel *historyModel,
 	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
-	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyService), browserWindow,
+	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
 		shellIconLoader),
-	m_historyService(historyService)
+	m_historyModel(historyModel)
 {
 	Initialize();
 }
 
 GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, HistoryService *historyService,
+	const AcceleratorManager *acceleratorManager, HistoryModel *historyModel,
 	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT menuStartId,
 	UINT menuEndId) :
-	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyService), browserWindow,
+	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
 		shellIconLoader, menuStartId, menuEndId),
-	m_historyService(historyService)
+	m_historyModel(historyModel)
 {
 	Initialize();
 }
 
 void GlobalHistoryMenu::Initialize()
 {
-	m_connections.push_back(m_historyService->AddHistoryChangedObserver(
+	m_connections.push_back(m_historyModel->AddHistoryChangedObserver(
 		std::bind_front(&GlobalHistoryMenu::OnHistoryChanged, this)));
 }
 
 void GlobalHistoryMenu::OnHistoryChanged()
 {
-	RebuildMenu(GetHistoryItems(m_historyService));
+	RebuildMenu(GetHistoryItems(m_historyModel));
 }
 
-std::vector<PidlAbsolute> GlobalHistoryMenu::GetHistoryItems(const HistoryService *historyService)
+std::vector<PidlAbsolute> GlobalHistoryMenu::GetHistoryItems(const HistoryModel *historyModel)
 {
-	const auto &history = historyService->GetHistoryItems();
+	const auto &history = historyModel->GetHistoryItems();
 	std::vector<PidlAbsolute> historyVector({ history.begin(), history.end() });
 	return historyVector;
 }

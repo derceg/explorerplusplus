@@ -111,7 +111,7 @@ void Explorerplusplus::InitializeMainMenu()
 
 	m_globalHistoryMenuView = std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_HISTORY);
 	m_globalHistoryMenu = std::make_unique<GlobalHistoryMenu>(m_globalHistoryMenuView.get(),
-		m_app->GetAcceleratorManager(), m_app->GetHistoryService(), this, &m_shellIconLoader,
+		m_app->GetAcceleratorManager(), m_app->GetHistoryModel(), this, &m_shellIconLoader,
 		MENU_GLOBAL_HISTORY_START_ID, MENU_GLOBAL_HISTORY_END_ID);
 
 	AddGetMenuItemHelperTextObserver(

@@ -3,10 +3,10 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "HistoryService.h"
+#include "HistoryModel.h"
 #include "../Helper/ShellHelper.h"
 
-void HistoryService::AddHistoryItem(const PidlAbsolute &pidl)
+void HistoryModel::AddHistoryItem(const PidlAbsolute &pidl)
 {
 	if (!m_historyItems.empty() && (pidl == m_historyItems.front()))
 	{
@@ -18,12 +18,12 @@ void HistoryService::AddHistoryItem(const PidlAbsolute &pidl)
 	m_historyChangedSignal();
 }
 
-const std::deque<PidlAbsolute> &HistoryService::GetHistoryItems() const
+const std::deque<PidlAbsolute> &HistoryModel::GetHistoryItems() const
 {
 	return m_historyItems;
 }
 
-boost::signals2::connection HistoryService::AddHistoryChangedObserver(
+boost::signals2::connection HistoryModel::AddHistoryChangedObserver(
 	const HistoryChangedSignal::slot_type &observer)
 {
 	return m_historyChangedSignal.connect(observer);

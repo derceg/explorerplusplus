@@ -3,27 +3,27 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "HistoryService.h"
+#include "HistoryModel.h"
 #include "ShellTestHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-TEST(HistoryServiceTest, RepeatedNavigation)
+TEST(HistoryModelTest, RepeatedNavigation)
 {
-	HistoryService historyService;
-	const auto &history = historyService.GetHistoryItems();
+	HistoryModel historyModel;
+	const auto &history = historyModel.GetHistoryItems();
 
 	PidlAbsolute pidl = CreateSimplePidlForTest(L"C:\\Fake");
-	historyService.AddHistoryItem(pidl);
+	historyModel.AddHistoryItem(pidl);
 	EXPECT_EQ(history.size(), 1U);
 
 	MockFunction<void()> callback;
-	historyService.AddHistoryChangedObserver(callback.AsStdFunction());
+	historyModel.AddHistoryChangedObserver(callback.AsStdFunction());
 	EXPECT_CALL(callback, Call()).Times(0);
 
 	// A repeated navigation to the most recent entry should be ignored.
-	historyService.AddHistoryItem(pidl);
+	historyModel.AddHistoryItem(pidl);
 	EXPECT_EQ(history.size(), 1U);
 }

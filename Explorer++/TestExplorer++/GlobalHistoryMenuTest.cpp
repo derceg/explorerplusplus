@@ -6,7 +6,7 @@
 #include "GlobalHistoryMenu.h"
 #include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
-#include "HistoryService.h"
+#include "HistoryModel.h"
 #include "PopupMenuView.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
@@ -19,7 +19,7 @@ class GlobalHistoryMenuTest : public Test
 {
 protected:
 	GlobalHistoryMenuTest() :
-		m_menu(&m_popupMenu, &m_acceleratorManager, &m_historyService, &m_browserWindow,
+		m_menu(&m_popupMenu, &m_acceleratorManager, &m_historyModel, &m_browserWindow,
 			&m_shellIconLoader)
 	{
 	}
@@ -63,14 +63,14 @@ private:
 	{
 		auto path = GetPathForItem(GetNameForItem(m_historyItemCount));
 		PidlAbsolute pidl = CreateSimplePidlForTest(path);
-		m_historyService.AddHistoryItem(pidl);
+		m_historyModel.AddHistoryItem(pidl);
 
 		m_historyItemCount++;
 	}
 
 	PopupMenuView m_popupMenu;
 	AcceleratorManager m_acceleratorManager;
-	HistoryService m_historyService;
+	HistoryModel m_historyModel;
 	BrowserWindowMock m_browserWindow;
 	ShellIconLoaderFake m_shellIconLoader;
 	GlobalHistoryMenu m_menu;

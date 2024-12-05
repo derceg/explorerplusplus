@@ -9,7 +9,7 @@
 #include <deque>
 
 // Stores global history (i.e. the history of navigations across all tabs).
-class HistoryService
+class HistoryModel
 {
 public:
 	using HistoryChangedSignal = boost::signals2::signal<void()>;

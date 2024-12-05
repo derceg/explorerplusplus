@@ -173,7 +173,7 @@
     <ClCompile Include="GlobalHistoryMenuTest.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryServiceTest.cpp">
+    <ClCompile Include="HistoryModelTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
     <ClCompile Include="ShellTestHelper.cpp" />
