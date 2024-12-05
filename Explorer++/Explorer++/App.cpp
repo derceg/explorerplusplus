@@ -371,6 +371,11 @@ ThemeManager *App::GetThemeManager()
 	return &m_themeManager;
 }
 
+HistoryService *App::GetHistoryService()
+{
+	return &m_historyService;
+}
+
 void App::OnWillRemoveBrowser()
 {
 	if (m_browserList.GetSize() == 1 && !m_exitStarted)

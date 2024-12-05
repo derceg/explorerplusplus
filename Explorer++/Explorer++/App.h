@@ -13,6 +13,7 @@
 #include "DarkModeManager.h"
 #include "FeatureList.h"
 #include "GlobalTabEventDispatcher.h"
+#include "HistoryService.h"
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
@@ -59,6 +60,7 @@ public:
 	TabRestorer *GetTabRestorer();
 	DarkModeManager *GetDarkModeManager();
 	ThemeManager *GetThemeManager();
+	HistoryService *GetHistoryService();
 
 	void TryExit();
 	void SessionEnding();
@@ -101,6 +103,7 @@ private:
 	TabRestorer m_tabRestorer;
 	DarkModeManager m_darkModeManager;
 	ThemeManager m_themeManager;
+	HistoryService m_historyService;
 
 	concurrencpp::timer m_saveSettingsTimer;
 

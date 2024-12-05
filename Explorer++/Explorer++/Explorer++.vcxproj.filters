@@ -565,9 +565,6 @@
     <ClCompile Include="ShellBrowserHistoryHelper.cpp">
       <Filter>History</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryServiceFactory.cpp">
-      <Filter>History</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -1333,9 +1330,6 @@
       <Filter>History</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowserHistoryHelper.h">
-      <Filter>History</Filter>
-    </ClInclude>
-    <ClInclude Include="HistoryServiceFactory.h">
       <Filter>History</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowserHelper.h">

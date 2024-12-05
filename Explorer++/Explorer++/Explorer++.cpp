@@ -11,7 +11,6 @@
 #include "BrowserTracker.h"
 #include "Config.h"
 #include "GlobalHistoryMenu.h"
-#include "HistoryServiceFactory.h"
 #include "MainFontSetter.h"
 #include "MainMenuSubMenuView.h"
 #include "MainRebarStorage.h"
@@ -282,5 +281,5 @@ ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
 {
 	ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(shellBrowser,
-		HistoryServiceFactory::GetInstance()->GetHistoryService());
+		m_app->GetHistoryService());
 }

@@ -9,7 +9,6 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "FeatureList.h"
 #include "GlobalHistoryMenu.h"
-#include "HistoryServiceFactory.h"
 #include "Icon.h"
 #include "MainMenuSubMenuView.h"
 #include "MainResource.h"
@@ -112,8 +111,8 @@ void Explorerplusplus::InitializeMainMenu()
 
 	m_globalHistoryMenuView = std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_HISTORY);
 	m_globalHistoryMenu = std::make_unique<GlobalHistoryMenu>(m_globalHistoryMenuView.get(),
-		m_app->GetAcceleratorManager(), HistoryServiceFactory::GetInstance()->GetHistoryService(),
-		this, &m_shellIconLoader, MENU_GLOBAL_HISTORY_START_ID, MENU_GLOBAL_HISTORY_END_ID);
+		m_app->GetAcceleratorManager(), m_app->GetHistoryService(), this, &m_shellIconLoader,
+		MENU_GLOBAL_HISTORY_START_ID, MENU_GLOBAL_HISTORY_END_ID);
 
 	AddGetMenuItemHelperTextObserver(
 		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
