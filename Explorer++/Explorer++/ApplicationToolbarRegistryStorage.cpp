@@ -17,11 +17,11 @@ namespace ApplicationToolbarRegistryStorage
 namespace
 {
 
-const TCHAR APPLICATION_TOOLBAR_KEY_PATH[] = _T("ApplicationToolbar");
+const wchar_t APPLICATION_TOOLBAR_KEY_PATH[] = L"ApplicationToolbar";
 
-const TCHAR SETTING_NAME[] = _T("Name");
-const TCHAR SETTING_COMMAND[] = _T("Command");
-const TCHAR SETTING_SHOW_NAME_ON_TOOLBAR[] = _T("ShowNameOnToolbar");
+const wchar_t SETTING_NAME[] = L"Name";
+const wchar_t SETTING_COMMAND[] = L"Command";
+const wchar_t SETTING_SHOW_NAME_ON_TOOLBAR[] = L"ShowNameOnToolbar";
 
 std::unique_ptr<Application> LoadApplication(HKEY key)
 {

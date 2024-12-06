@@ -7,7 +7,6 @@
 #include <windows.h>
 #include <memory>
 
-// DriveEnumerator
 outcome::std_result<std::set<std::wstring>> DriveEnumeratorImpl::GetDrives()
 {
 	DWORD size = GetLogicalDriveStrings(0, nullptr);
@@ -17,7 +16,7 @@ outcome::std_result<std::set<std::wstring>> DriveEnumeratorImpl::GetDrives()
 		return { GetLastError(), std::system_category() };
 	}
 
-	auto driveStrings = std::make_unique<TCHAR[]>(size);
+	auto driveStrings = std::make_unique<wchar_t[]>(size);
 	size = GetLogicalDriveStrings(size, driveStrings.get());
 
 	if (size == 0)
@@ -26,7 +25,7 @@ outcome::std_result<std::set<std::wstring>> DriveEnumeratorImpl::GetDrives()
 	}
 
 	std::set<std::wstring> drives;
-	TCHAR *currentDrive = driveStrings.get();
+	auto *currentDrive = driveStrings.get();
 
 	while (*currentDrive != '\0')
 	{

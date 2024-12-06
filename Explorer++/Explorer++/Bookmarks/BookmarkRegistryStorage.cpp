@@ -16,7 +16,7 @@ namespace
 namespace V2
 {
 
-const TCHAR bookmarksKeyPath[] = _T("Bookmarksv2");
+const wchar_t bookmarksKeyPath[] = L"Bookmarksv2";
 
 void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
@@ -38,7 +38,7 @@ void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
 namespace V1
 {
 
-const TCHAR bookmarksKeyPath[] = _T("Bookmarks");
+const wchar_t bookmarksKeyPath[] = L"Bookmarks";
 
 void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 

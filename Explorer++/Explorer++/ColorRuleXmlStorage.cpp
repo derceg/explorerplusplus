@@ -13,12 +13,12 @@ namespace ColorRuleXmlStorage
 namespace
 {
 
-const TCHAR COLOR_RULES_NODE_NAME[] = _T("ColorRules");
+const wchar_t COLOR_RULES_NODE_NAME[] = L"ColorRules";
 
-const TCHAR SETTING_DESCRIPTION[] = _T("name");
-const TCHAR SETTING_FILENAME_PATTERN[] = _T("FilenamePattern");
-const TCHAR SETTING_CASE_INSENSITIVE[] = _T("CaseInsensitive");
-const TCHAR SETTING_ATTRIBUTES[] = _T("Attributes");
+const wchar_t SETTING_DESCRIPTION[] = L"name";
+const wchar_t SETTING_FILENAME_PATTERN[] = L"FilenamePattern";
+const wchar_t SETTING_CASE_INSENSITIVE[] = L"CaseInsensitive";
+const wchar_t SETTING_ATTRIBUTES[] = L"Attributes";
 
 std::unique_ptr<ColorRule> LoadColorRule(IXMLDOMNode *parentNode)
 {

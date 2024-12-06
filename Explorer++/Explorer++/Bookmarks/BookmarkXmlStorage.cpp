@@ -16,7 +16,7 @@ namespace
 namespace V2
 {
 
-const TCHAR bookmarksKeyNodeName[] = _T("Bookmarksv2");
+const wchar_t bookmarksKeyNodeName[] = L"Bookmarksv2";
 
 void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
 void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
@@ -39,7 +39,7 @@ void SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 namespace V1
 {
 
-const TCHAR bookmarksKeyNodeName[] = _T("Bookmarks");
+const wchar_t bookmarksKeyNodeName[] = L"Bookmarks";
 
 void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
 void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,

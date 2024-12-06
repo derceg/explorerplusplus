@@ -184,7 +184,7 @@ UINT MenuView::GetItemIdForTesting(int index) const
 
 std::wstring MenuView::GetItemTextForTesting(UINT id) const
 {
-	TCHAR text[256];
+	wchar_t text[256];
 
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);

@@ -13,13 +13,13 @@ namespace ColorRuleRegistryStorage
 namespace
 {
 
-const TCHAR COLOR_RULES_KEY_PATH[] = _T("ColorRules");
+const wchar_t COLOR_RULES_KEY_PATH[] = L"ColorRules";
 
-const TCHAR SETTING_DESCRIPTION[] = _T("Description");
-const TCHAR SETTING_FILENAME_PATTERN[] = _T("FilenamePattern");
-const TCHAR SETTING_CASE_INSENSITIVE[] = _T("CaseInsensitive");
-const TCHAR SETTING_ATTRIBUTES[] = _T("Attributes");
-const TCHAR SETTING_COLOR[] = _T("Color");
+const wchar_t SETTING_DESCRIPTION[] = L"Description";
+const wchar_t SETTING_FILENAME_PATTERN[] = L"FilenamePattern";
+const wchar_t SETTING_CASE_INSENSITIVE[] = L"CaseInsensitive";
+const wchar_t SETTING_ATTRIBUTES[] = L"Attributes";
+const wchar_t SETTING_COLOR[] = L"Color";
 
 std::unique_ptr<ColorRule> LoadColorRule(HKEY key)
 {
