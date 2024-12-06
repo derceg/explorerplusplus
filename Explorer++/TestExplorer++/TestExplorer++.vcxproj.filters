@@ -298,6 +298,9 @@
     <ClCompile Include="TabRestorerTest.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="DriveEnumeratorImplTest.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

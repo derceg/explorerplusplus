@@ -219,6 +219,7 @@
     <ClCompile Include="DefaultColumnXmlStorageTest.cpp" />
     <ClCompile Include="DragDropTestHelper.cpp" />
     <ClCompile Include="DragDropHelperTest.cpp" />
+    <ClCompile Include="DriveEnumeratorImplTest.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />
     <ClCompile Include="AcceleratorParserTest.cpp" />
     <ClCompile Include="BookmarkClipboardTest.cpp" />
