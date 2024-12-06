@@ -127,12 +127,11 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 
 }
 
-void Load(IXMLDOMDocument *xmlDocument, ColorRuleModel *model)
+void Load(IXMLDOMNode *rootNode, ColorRuleModel *model)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> colorRulesNode;
-	auto queryString = wil::make_bstr_nothrow(
-		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(COLOR_RULES_NODE_NAME)).c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &colorRulesNode);
+	auto queryString = wil::make_bstr_nothrow(COLOR_RULES_NODE_NAME);
+	HRESULT hr = rootNode->selectSingleNode(queryString.get(), &colorRulesNode);
 
 	if (hr != S_OK)
 	{

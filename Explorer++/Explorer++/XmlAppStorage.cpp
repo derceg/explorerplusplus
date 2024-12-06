@@ -37,17 +37,17 @@ std::vector<WindowStorageData> XmlAppStorage::LoadWindows()
 
 void XmlAppStorage::LoadBookmarks(BookmarkTree *bookmarkTree)
 {
-	BookmarkXmlStorage::Load(m_xmlDocument.get(), bookmarkTree);
+	BookmarkXmlStorage::Load(m_rootNode.get(), bookmarkTree);
 }
 
 void XmlAppStorage::LoadColorRules(ColorRuleModel *model)
 {
-	ColorRuleXmlStorage::Load(m_xmlDocument.get(), model);
+	ColorRuleXmlStorage::Load(m_rootNode.get(), model);
 }
 
 void XmlAppStorage::LoadApplications(Applications::ApplicationModel *model)
 {
-	Applications::ApplicationToolbarXmlStorage::Load(m_xmlDocument.get(), model);
+	Applications::ApplicationToolbarXmlStorage::Load(m_rootNode.get(), model);
 }
 
 void XmlAppStorage::LoadDialogStates()
@@ -57,7 +57,7 @@ void XmlAppStorage::LoadDialogStates()
 
 void XmlAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
 {
-	DefaultColumnXmlStorage::Load(m_xmlDocument.get(), defaultColumns);
+	DefaultColumnXmlStorage::Load(m_rootNode.get(), defaultColumns);
 }
 
 void XmlAppStorage::SaveConfig(const Config &config)

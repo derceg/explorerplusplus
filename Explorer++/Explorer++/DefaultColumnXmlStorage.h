@@ -11,7 +11,7 @@ struct FolderColumns;
 namespace DefaultColumnXmlStorage
 {
 
-void Load(IXMLDOMDocument *xmlDocument, FolderColumns &defaultColumns);
+void Load(IXMLDOMNode *rootNode, FolderColumns &defaultColumns);
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const FolderColumns &defaultColumns);
 
 }

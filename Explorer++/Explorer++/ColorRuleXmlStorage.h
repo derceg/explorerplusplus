@@ -11,7 +11,7 @@ class ColorRuleModel;
 namespace ColorRuleXmlStorage
 {
 
-void Load(IXMLDOMDocument *xmlDocument, ColorRuleModel *model);
+void Load(IXMLDOMNode *rootNode, ColorRuleModel *model);
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const ColorRuleModel *model);
 
 }

@@ -54,12 +54,11 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, Bookmark
 namespace BookmarkXmlStorage
 {
 
-void Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
+void Load(IXMLDOMNode *rootNode, BookmarkTree *bookmarkTree)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> bookmarksNode;
-	auto queryString = wil::make_bstr_nothrow(
-		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(V2::bookmarksKeyNodeName)).c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &bookmarksNode);
+	auto queryString = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
+	HRESULT hr = rootNode->selectSingleNode(queryString.get(), &bookmarksNode);
 
 	if (hr == S_OK)
 	{
@@ -67,9 +66,8 @@ void Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
 		return;
 	}
 
-	queryString = wil::make_bstr_nothrow(
-		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(V1::bookmarksKeyNodeName)).c_str());
-	hr = xmlDocument->selectSingleNode(queryString.get(), &bookmarksNode);
+	queryString = wil::make_bstr_nothrow(V1::bookmarksKeyNodeName);
+	hr = rootNode->selectSingleNode(queryString.get(), &bookmarksNode);
 
 	if (hr == S_OK)
 	{

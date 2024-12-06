@@ -26,7 +26,7 @@ TEST_F(ColorRuleXmlStorageTest, Load)
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	ColorRuleModel loadedModel;
-	ColorRuleXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
+	ColorRuleXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }
@@ -42,7 +42,7 @@ TEST_F(ColorRuleXmlStorageTest, Save)
 		&referenceModel);
 
 	ColorRuleModel loadedModel;
-	ColorRuleXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
+	ColorRuleXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }

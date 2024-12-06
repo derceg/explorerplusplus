@@ -28,7 +28,7 @@ TEST_F(ApplicationToolbarXmlStorageTest, Load)
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	ApplicationModel loadedModel;
-	ApplicationToolbarXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
+	ApplicationToolbarXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }
@@ -44,7 +44,7 @@ TEST_F(ApplicationToolbarXmlStorageTest, Save)
 		xmlDocumentData.rootNode.get(), &referenceModel);
 
 	ApplicationModel loadedModel;
-	ApplicationToolbarXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
+	ApplicationToolbarXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }

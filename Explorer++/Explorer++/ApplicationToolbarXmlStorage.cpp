@@ -112,13 +112,11 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 
 }
 
-void Load(IXMLDOMDocument *xmlDocument, ApplicationModel *model)
+void Load(IXMLDOMNode *rootNode, ApplicationModel *model)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> applicationToolbarNode;
-	auto queryString = wil::make_bstr_nothrow(
-		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(APPLICATION_TOOLBAR_NODE_NAME))
-			.c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &applicationToolbarNode);
+	auto queryString = wil::make_bstr_nothrow(APPLICATION_TOOLBAR_NODE_NAME);
+	HRESULT hr = rootNode->selectSingleNode(queryString.get(), &applicationToolbarNode);
 
 	if (hr != S_OK)
 	{

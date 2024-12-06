@@ -17,14 +17,11 @@ const wchar_t DEFAULT_COLUMNS_NODE_NAME[] = L"DefaultColumns";
 namespace DefaultColumnXmlStorage
 {
 
-void Load(IXMLDOMDocument *xmlDocument, FolderColumns &defaultColumns)
+void Load(IXMLDOMNode *rootNode, FolderColumns &defaultColumns)
 {
-	using namespace std::string_literals;
-
 	wil::com_ptr_nothrow<IXMLDOMNode> defaultColumnsNode;
-	auto queryString =
-		wil::make_bstr_nothrow((L"/ExplorerPlusPlus/"s + DEFAULT_COLUMNS_NODE_NAME).c_str());
-	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &defaultColumnsNode);
+	auto queryString = wil::make_bstr_nothrow(DEFAULT_COLUMNS_NODE_NAME);
+	HRESULT hr = rootNode->selectSingleNode(queryString.get(), &defaultColumnsNode);
 
 	if (hr != S_OK)
 	{

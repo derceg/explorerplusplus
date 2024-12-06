@@ -23,7 +23,7 @@ protected:
 		auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 		BookmarkTree loadedBookmarkTree;
-		BookmarkXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedBookmarkTree);
+		BookmarkXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedBookmarkTree);
 
 		CompareBookmarkTrees(&loadedBookmarkTree, referenceBookmarkTree, compareGuids);
 	}
@@ -48,7 +48,7 @@ TEST_F(BookmarkXmlStorageTest, V2Save)
 		&referenceBookmarkTree);
 
 	BookmarkTree loadedBookmarkTree;
-	BookmarkXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedBookmarkTree);
+	BookmarkXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedBookmarkTree);
 
 	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree, true);
 }

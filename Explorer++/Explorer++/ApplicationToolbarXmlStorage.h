@@ -14,7 +14,7 @@ class ApplicationModel;
 namespace ApplicationToolbarXmlStorage
 {
 
-void Load(IXMLDOMDocument *xmlDocument, ApplicationModel *model);
+void Load(IXMLDOMNode *rootNode, ApplicationModel *model);
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const ApplicationModel *model);
 
 }

@@ -22,7 +22,7 @@ TEST_F(DefaultColumnXmlStorageTest, Load)
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	FolderColumns loadedColumns;
-	DefaultColumnXmlStorage::Load(xmlDocumentData.xmlDocument.get(), loadedColumns);
+	DefaultColumnXmlStorage::Load(xmlDocumentData.rootNode.get(), loadedColumns);
 
 	EXPECT_EQ(loadedColumns, referenceColumns);
 }
@@ -37,7 +37,7 @@ TEST_F(DefaultColumnXmlStorageTest, Save)
 		referenceColumns);
 
 	FolderColumns loadedColumns;
-	DefaultColumnXmlStorage::Load(xmlDocumentData.xmlDocument.get(), loadedColumns);
+	DefaultColumnXmlStorage::Load(xmlDocumentData.rootNode.get(), loadedColumns);
 
 	EXPECT_EQ(loadedColumns, referenceColumns);
 }
