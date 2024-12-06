@@ -82,9 +82,17 @@ int App::Run()
 {
 	SetUpSession();
 
+	// Internally, concurrencpp converts the duration to size_t, which triggers a warning in the
+	// 32-bit build. The conversion is fine, since the duration here is well below the point at
+	// which truncation would occur and it's not reasonable for the duration to ever be large enough
+	// for truncation to occur.
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4244) // 'argument': conversion from '_Rep' to 'size_t', possible loss of data
 	const auto saveFrequency = 30s;
 	m_saveSettingsTimer = m_runtime.GetTimerQueue()->make_timer(saveFrequency, saveFrequency,
 		m_runtime.GetUiThreadExecutor(), std::bind_front(&App::SaveSettings, this));
+#pragma warning(pop)
 
 	MSG msg;
 
