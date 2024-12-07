@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "RegistrySettings.h"
+#include "ShellHelper.h"
 
 namespace RegistrySettings
 {
@@ -35,7 +36,7 @@ LSTATUS ReadDword(HKEY key, const std::wstring &subKey, const std::wstring &valu
 	DWORD &output)
 {
 	DWORD value;
-	DWORD size = sizeof(DWORD);
+	DWORD size = sizeof(value);
 
 	LSTATUS res = RegGetValue(key, subKey.c_str(), valueName.c_str(), RRF_RT_REG_DWORD, nullptr,
 		&value, &size);
@@ -67,6 +68,36 @@ void ReadDword(HKEY key, const std::wstring &valueName,
 	}
 
 	successCallback(value);
+}
+
+LSTATUS SaveQword(HKEY key, const std::wstring &valueName, uint64_t value)
+{
+	return RegSetValueEx(key, valueName.c_str(), 0, REG_QWORD,
+		reinterpret_cast<const BYTE *>(&value), sizeof(value));
+}
+
+LSTATUS ReadQword(HKEY key, const std::wstring &subKey, const std::wstring &valueName,
+	uint64_t &output)
+{
+	uint64_t value;
+	DWORD size = sizeof(value);
+
+	LSTATUS res = RegGetValue(key, subKey.c_str(), valueName.c_str(), RRF_RT_REG_QWORD, nullptr,
+		&value, &size);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	output = value;
+
+	return res;
+}
+
+LSTATUS ReadQword(HKEY key, const std::wstring &valueName, uint64_t &output)
+{
+	return ReadQword(key, L"", valueName, output);
 }
 
 LSTATUS SaveString(HKEY key, const std::wstring &valueName, const std::wstring &value)
@@ -201,6 +232,46 @@ LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWO
 	}
 
 	return res;
+}
+
+LSTATUS SavePidl(HKEY key, const std::wstring &valueName, PCIDLIST_ABSOLUTE pidl)
+{
+	return RegistrySettings::SaveBinaryValue(key, valueName, reinterpret_cast<const BYTE *>(pidl),
+		ILGetSize(pidl));
+}
+
+LSTATUS ReadPidl(HKEY key, const std::wstring &valueName, PidlAbsolute &outputPidl)
+{
+	DWORD size = 0;
+	auto res = RegistrySettings::ReadBinaryValueSize(key, valueName, size);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	unique_pidl_absolute pidl(static_cast<PIDLIST_ABSOLUTE>(CoTaskMemAlloc(size)));
+
+	if (!pidl)
+	{
+		return ERROR_OUTOFMEMORY;
+	}
+
+	res = RegistrySettings::ReadBinaryValue(key, valueName, pidl.get(), size);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	if (!IDListContainerIsConsistent(pidl.get(), size))
+	{
+		return ERROR_INVALID_DATA;
+	}
+
+	outputPidl = pidl.get();
+
+	return ERROR_SUCCESS;
 }
 
 }

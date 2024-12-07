@@ -5,17 +5,11 @@
 #include "stdafx.h"
 #include "LocationVisitInfo.h"
 
-LocationVisitInfo::LocationVisitInfo(const PidlAbsolute &pidl) :
-	m_pidl(pidl),
-	m_numVisits(1),
-	m_lastVisitTime(Clock::now())
-{
-}
-
-LocationVisitInfo::LocationVisitInfo(const PidlAbsolute &pidl, int numVisits) :
+LocationVisitInfo::LocationVisitInfo(const PidlAbsolute &pidl, int numVisits,
+	const Clock::time_point &lastVisitTime) :
 	m_pidl(pidl),
 	m_numVisits((std::max)(numVisits, 1)),
-	m_lastVisitTime(Clock::now())
+	m_lastVisitTime(lastVisitTime)
 {
 }
 

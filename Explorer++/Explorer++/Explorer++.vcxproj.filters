@@ -757,6 +757,12 @@
     <ClCompile Include="GlobalTabEventDispatcher.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="FrequentLocationsRegistryStorage.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="FrequentLocationsXmlStorage.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1568,6 +1574,15 @@
     </ClInclude>
     <ClInclude Include="LayoutDefaults.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FrequentLocationsRegistryStorage.h">
+      <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="FrequentLocationsXmlStorage.h">
+      <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="FrequentLocationsStorageHelper.h">
+      <Filter>Frequent Locations</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

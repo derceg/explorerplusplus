@@ -42,38 +42,6 @@ const wchar_t SETTING_TAB_LOCKED[] = L"Locked";
 const wchar_t SETTING_TAB_ADDRESS_LOCKED[] = L"AddressLocked";
 const wchar_t SETTING_TAB_CUSTOM_NAME[] = L"CustomName";
 
-unique_pidl_absolute MaybeLoadPidl(HKEY key, const std::wstring &valueName)
-{
-	DWORD size = 0;
-	auto res = RegistrySettings::ReadBinaryValueSize(key, valueName, size);
-
-	if (res != ERROR_SUCCESS)
-	{
-		return nullptr;
-	}
-
-	unique_pidl_absolute pidl(static_cast<PIDLIST_ABSOLUTE>(CoTaskMemAlloc(size)));
-
-	if (!pidl)
-	{
-		return nullptr;
-	}
-
-	res = RegistrySettings::ReadBinaryValue(key, valueName, pidl.get(), size);
-
-	if (res != ERROR_SUCCESS)
-	{
-		return nullptr;
-	}
-
-	if (!IDListContainerIsConsistent(pidl.get(), size))
-	{
-		return nullptr;
-	}
-
-	return pidl;
-}
-
 void LoadBooleanSortDirection(HKEY key, const std::wstring &valueName, SortDirection &output)
 {
 	DWORD sortAscending;
@@ -171,25 +139,20 @@ TabSettings LoadTabSettings(HKEY key)
 
 std::optional<TabStorageData> LoadTabInfo(HKEY key)
 {
-	auto pidl = MaybeLoadPidl(key, SETTING_DIRECTORY_PIDL);
+	PidlAbsolute pidl;
+	auto res = RegistrySettings::ReadPidl(key, SETTING_DIRECTORY_PIDL, pidl);
 
-	if (!pidl)
+	if (res != ERROR_SUCCESS)
 	{
 		return std::nullopt;
 	}
 
 	TabStorageData tabStorageData;
-	tabStorageData.pidl = pidl.get();
+	tabStorageData.pidl = pidl;
 	tabStorageData.folderSettings = LoadFolderSettings(key);
 	tabStorageData.columns = LoadColumns(key);
 	tabStorageData.tabSettings = LoadTabSettings(key);
 	return tabStorageData;
-}
-
-LSTATUS SavePidl(HKEY key, const std::wstring &valueName, PCIDLIST_ABSOLUTE pidl)
-{
-	return RegistrySettings::SaveBinaryValue(key, valueName, reinterpret_cast<const BYTE *>(pidl),
-		ILGetSize(pidl));
 }
 
 void SaveFolderSettings(HKEY key, const FolderSettings &folderSettings)
@@ -240,7 +203,7 @@ void SaveTabSettings(HKEY key, const TabSettings &tabSettings)
 
 void SaveTabInfo(HKEY key, const TabStorageData &tab)
 {
-	auto res = SavePidl(key, SETTING_DIRECTORY_PIDL, tab.pidl.Raw());
+	auto res = RegistrySettings::SavePidl(key, SETTING_DIRECTORY_PIDL, tab.pidl.Raw());
 
 	if (res != ERROR_SUCCESS)
 	{

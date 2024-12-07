@@ -6,6 +6,7 @@
 
 #include <wil/resource.h>
 #include <ShlObj.h>
+#include <string>
 #include <type_traits>
 
 // The accessor class here simply stops PidlBase from being accessed directly (since PidlBase is
@@ -142,3 +143,6 @@ PidlOutParamType<T> PidlOutParam(T &p)
 {
 	return PidlOutParamType<T>(p);
 }
+
+std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl);
+PidlAbsolute DecodePidlFromBase64(const std::string &encodedPidl);

@@ -5,6 +5,13 @@
 #include "stdafx.h"
 #include "FrequentLocationsModel.h"
 
+void FrequentLocationsModel::SetLocationVisits(const std::vector<LocationVisitInfo> &locationVisits)
+{
+	m_locationVisits.clear();
+	m_locationVisits.insert(locationVisits.begin(), locationVisits.end());
+	m_locationsChangedSignal();
+}
+
 void FrequentLocationsModel::RegisterLocationVisit(const PidlAbsolute &pidl)
 {
 	auto &locationIndex = m_locationVisits.get<ByLocation>();

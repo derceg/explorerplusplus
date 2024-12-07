@@ -230,6 +230,9 @@
     <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
     <ClCompile Include="FrequentLocationsModelTest.cpp" />
+    <ClCompile Include="FrequentLocationsRegistryStorageTest.cpp" />
+    <ClCompile Include="FrequentLocationsStorageTestHelper.cpp" />
+    <ClCompile Include="FrequentLocationsXmlStorageTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
@@ -332,6 +335,7 @@
     <ClInclude Include="DragDropTestHelper.h" />
     <ClInclude Include="ExecutorTestHelper.h" />
     <ClInclude Include="ExecutorTestBase.h" />
+    <ClInclude Include="FrequentLocationsStorageTestHelper.h" />
     <ClInclude Include="GeneratorTestHelper.h" />
     <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="IconFetcherMock.h" />

@@ -61,6 +61,7 @@ public:
 
 	using ByVisitsIndex = LocationVisits::index<ByVisits>::type;
 
+	void SetLocationVisits(const std::vector<LocationVisitInfo> &locationVisits);
 	void RegisterLocationVisit(const PidlAbsolute &pidl);
 	const ByVisitsIndex &GetVisits() const;
 	boost::signals2::connection AddLocationsChangedObserver(

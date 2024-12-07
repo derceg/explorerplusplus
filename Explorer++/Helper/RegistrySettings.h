@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BetterEnumsWrapper.h"
+#include "PidlHelper.h"
 #include <windows.h>
 #include <functional>
 #include <list>
@@ -20,6 +21,10 @@ LSTATUS ReadDword(HKEY key, const std::wstring &subKey, const std::wstring &valu
 LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output);
 void ReadDword(HKEY key, const std::wstring &valueName,
 	std::function<void(DWORD value)> successCallback);
+LSTATUS SaveQword(HKEY key, const std::wstring &valueName, uint64_t value);
+LSTATUS ReadQword(HKEY key, const std::wstring &subKey, const std::wstring &valueName,
+	uint64_t &output);
+LSTATUS ReadQword(HKEY key, const std::wstring &valueName, uint64_t &output);
 LSTATUS SaveString(HKEY key, const std::wstring &valueName, const std::wstring &value);
 LSTATUS ReadString(HKEY key, const std::wstring &valueName, std::wstring &output);
 LSTATUS SaveStringList(HKEY key, const std::wstring &baseValueName,
@@ -31,6 +36,8 @@ bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputD
 LSTATUS SaveBinaryValue(HKEY key, const std::wstring &valueName, const BYTE *data, DWORD length);
 LSTATUS ReadBinaryValueSize(HKEY key, const std::wstring &valueName, DWORD &length);
 LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWORD length);
+LSTATUS SavePidl(HKEY key, const std::wstring &valueName, PCIDLIST_ABSOLUTE pidl);
+LSTATUS ReadPidl(HKEY key, const std::wstring &valueName, PidlAbsolute &outputPidl);
 
 template <typename T>
 	requires std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>
@@ -77,6 +84,20 @@ LSTATUS Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &o
 {
 	DWORD value;
 	auto res = ReadDword(key, valueName, value);
+
+	if (res == ERROR_SUCCESS)
+	{
+		output = value;
+	}
+
+	return res;
+}
+
+template <typename T>
+LSTATUS Read64BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &output)
+{
+	uint64_t value;
+	auto res = ReadQword(key, valueName, value);
 
 	if (res == ERROR_SUCCESS)
 	{

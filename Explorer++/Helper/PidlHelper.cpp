@@ -4,8 +4,10 @@
 
 #include "stdafx.h"
 #include "PidlHelper.h"
+#include "Helper.h"
 #include "ShellHelper.h"
 #include <boost/container_hash/hash.hpp>
+#include <cppcodec/base64_rfc4648.hpp>
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2)
 {
@@ -57,4 +59,46 @@ std::size_t hash_value(const PidlAbsolute &pidl)
 	HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingPath);
 	DCHECK(SUCCEEDED(hr));
 	return hasher(parsingPath);
+}
+
+std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl)
+{
+	return cppcodec::base64_rfc4648::encode(reinterpret_cast<const char *>(pidl), ILGetSize(pidl));
+}
+
+PidlAbsolute DecodePidlFromBase64(const std::string &encodedPidl)
+{
+	std::vector<uint8_t> decodedContent;
+
+	try
+	{
+		decodedContent = cppcodec::base64_rfc4648::decode(encodedPidl);
+	}
+	catch (const cppcodec::parse_error &)
+	{
+		return {};
+	}
+
+	auto size = decodedContent.size();
+
+	if (size == 0)
+	{
+		return {};
+	}
+
+	unique_pidl_absolute pidl(static_cast<PIDLIST_ABSOLUTE>(CoTaskMemAlloc(size)));
+
+	if (!pidl)
+	{
+		return {};
+	}
+
+	std::memcpy(pidl.get(), decodedContent.data(), size);
+
+	if (!IDListContainerIsConsistent(pidl.get(), CheckedNumericCast<UINT>(size)))
+	{
+		return {};
+	}
+
+	return pidl.get();
 }

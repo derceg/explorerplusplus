@@ -23,6 +23,7 @@
     "cereal",
     "cli11",
     "concurrencpp",
+    "cppcodec",
     "cppwinrt",
     "detours",
     "fmt",

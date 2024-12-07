@@ -1026,6 +1026,8 @@
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="FrequentLocationsModel.cpp" />
+    <ClCompile Include="FrequentLocationsRegistryStorage.cpp" />
+    <ClCompile Include="FrequentLocationsXmlStorage.cpp" />
     <ClCompile Include="GlobalHistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="GlobalTabEventDispatcher.cpp" />
@@ -1316,6 +1318,9 @@
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="FrequentLocationsModel.h" />
+    <ClInclude Include="FrequentLocationsRegistryStorage.h" />
+    <ClInclude Include="FrequentLocationsStorageHelper.h" />
+    <ClInclude Include="FrequentLocationsXmlStorage.h" />
     <ClInclude Include="GlobalHistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="GlobalTabEventDispatcher.h" />
