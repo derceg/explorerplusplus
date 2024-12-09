@@ -3,32 +3,27 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ShellBrowserHistoryHelper.h"
+#include "HistoryShellBrowserHelper.h"
 #include "HistoryModel.h"
-#include "IconFetcherMock.h"
-#include "ShellBrowserFake.h"
-#include "TabNavigationMock.h"
-#include "../Helper/ShellHelper.h"
+#include "ShellBrowserHelperTestBase.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-class ShellBrowserHistoryHelperTest : public Test
+class HistoryShellBrowserHelperTest : public ShellBrowserHelperTestBase<HistoryShellBrowserHelper>
 {
 protected:
 	void NavigateInNewTab(const std::wstring &path, PidlAbsolute *outputPidl)
 	{
-		ShellBrowserFake shellBrowser(&m_tabNavigation, &m_iconFetcher);
-		ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(&shellBrowser, &m_historyModel);
+		auto shellBrowser = CreateTab(&m_historyModel);
 		ASSERT_HRESULT_SUCCEEDED(
-			shellBrowser.NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl));
+			shellBrowser->NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl));
 	}
 
-	TabNavigationMock m_tabNavigation;
-	IconFetcherMock m_iconFetcher;
 	HistoryModel m_historyModel;
 };
-TEST_F(ShellBrowserHistoryHelperTest, NavigationInDifferentTabs)
+
+TEST_F(HistoryShellBrowserHelperTest, NavigationInDifferentTabs)
 {
 	const auto &history = m_historyModel.GetHistoryItems();
 	EXPECT_EQ(history.size(), 0U);

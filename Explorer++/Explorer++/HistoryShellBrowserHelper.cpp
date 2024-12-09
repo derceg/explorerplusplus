@@ -3,10 +3,10 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowserHistoryHelper.h"
+#include "HistoryShellBrowserHelper.h"
 #include "HistoryModel.h"
 
-ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowser *shellBrowser,
+HistoryShellBrowserHelper::HistoryShellBrowserHelper(ShellBrowser *shellBrowser,
 	HistoryModel *historyModel) :
 	ShellBrowserHelper(shellBrowser),
 	m_historyModel(historyModel)
@@ -14,10 +14,10 @@ ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowser *shellBrowser,
 	// There's no need to explicitly remove this observer, since this object is tied to the
 	// lifetime of the shellBrowser instance.
 	shellBrowser->AddNavigationCommittedObserver(
-		std::bind_front(&ShellBrowserHistoryHelper::OnNavigationCommitted, this));
+		std::bind_front(&HistoryShellBrowserHelper::OnNavigationCommitted, this));
 }
 
-void ShellBrowserHistoryHelper::OnNavigationCommitted(const NavigateParams &navigateParams)
+void HistoryShellBrowserHelper::OnNavigationCommitted(const NavigateParams &navigateParams)
 {
 	m_historyModel->AddHistoryItem(navigateParams.pidl);
 }

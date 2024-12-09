@@ -228,6 +228,7 @@
     <ClCompile Include="CachedIconsTest.cpp" />
     <ClCompile Include="ExecutorTestHelper.cpp" />
     <ClCompile Include="ExecutorTestBase.cpp" />
+    <ClCompile Include="FakeSystemClock.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
     <ClCompile Include="FrequentLocationsModelTest.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorageTest.cpp" />
@@ -247,6 +248,7 @@
     <ClCompile Include="RuntimeHelperTest.cpp" />
     <ClCompile Include="RuntimeTest.cpp" />
     <ClCompile Include="RuntimeTestHelper.cpp" />
+    <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
@@ -263,7 +265,7 @@
     <ClCompile Include="MainToolbarStorageTest.cpp" />
     <ClCompile Include="ResourceHelperTest.cpp" />
     <ClCompile Include="ServiceProviderTest.cpp" />
-    <ClCompile Include="ShellBrowserHistoryHelperTest.cpp" />
+    <ClCompile Include="HistoryShellBrowserHelperTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="MovableModelTest.cpp" />
     <ClCompile Include="OneShotTimerTest.cpp" />
@@ -335,6 +337,7 @@
     <ClInclude Include="DragDropTestHelper.h" />
     <ClInclude Include="ExecutorTestHelper.h" />
     <ClInclude Include="ExecutorTestBase.h" />
+    <ClInclude Include="FakeSystemClock.h" />
     <ClInclude Include="FrequentLocationsStorageTestHelper.h" />
     <ClInclude Include="GeneratorTestHelper.h" />
     <ClInclude Include="ImageTestHelper.h" />
@@ -345,6 +348,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
+    <ClInclude Include="ShellBrowserHelperTestBase.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />

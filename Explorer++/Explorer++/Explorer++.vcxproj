@@ -1044,6 +1044,7 @@
     <ClCompile Include="RegistryAppStorageFactory.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
+    <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="TestHelper.cpp" />
@@ -1069,7 +1070,7 @@
     <ClCompile Include="OneShotTimerManager.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
     <ClCompile Include="MainRebarRegistryStorage.cpp" />
-    <ClCompile Include="ShellBrowserHistoryHelper.cpp" />
+    <ClCompile Include="HistoryShellBrowserHelper.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp" />
     <ClCompile Include="ShellEnumerator.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
@@ -1337,6 +1338,7 @@
     <ClInclude Include="RegistryAppStorageFactory.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="RuntimeHelper.h" />
+    <ClInclude Include="FrequentLocationsShellBrowserHelper.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
     <ClInclude Include="Storage.h" />
@@ -1369,7 +1371,7 @@
     <ClInclude Include="OneShotTimerManager.h" />
     <ClInclude Include="PopupMenuView.h" />
     <ClInclude Include="MainRebarRegistryStorage.h" />
-    <ClInclude Include="ShellBrowserHistoryHelper.h" />
+    <ClInclude Include="HistoryShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />

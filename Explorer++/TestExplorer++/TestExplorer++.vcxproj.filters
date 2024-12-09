@@ -117,7 +117,7 @@
     <ClCompile Include="ShellBrowserFake.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowserHistoryHelperTest.cpp">
+    <ClCompile Include="HistoryShellBrowserHelperTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
     <ClCompile Include="MainRebarRegistryStorageTest.cpp">
@@ -309,6 +309,12 @@
     </ClCompile>
     <ClCompile Include="FrequentLocationsStorageTestHelper.cpp">
       <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="FakeSystemClock.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -506,6 +512,12 @@
     </ClInclude>
     <ClInclude Include="FrequentLocationsStorageTestHelper.h">
       <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowserHelperTestBase.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="FakeSystemClock.h">
+      <Filter>Helper\Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

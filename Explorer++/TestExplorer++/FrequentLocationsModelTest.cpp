@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "FrequentLocationsModel.h"
+#include "FakeSystemClock.h"
 #include "FrequentLocationsStorageTestHelper.h"
 #include "ShellTestHelper.h"
 #include "../Helper/StringHelper.h"
@@ -35,20 +36,6 @@ SystemClock::TimePoint BuildTimePoint(int year, int month, int day, int hour, in
 	BuildTimePoint(year, month, day, hour, minute, timePoint);
 	return timePoint;
 }
-
-// A fake clock that increments the time by 1 second (starting from the system_clock epoch) every
-// time Now() is called.
-class FakeSystemClock : public SystemClock
-{
-public:
-	TimePoint Now() override
-	{
-		return TimePoint(m_secondsSinceEpoch++);
-	}
-
-private:
-	std::chrono::seconds m_secondsSinceEpoch = 0s;
-};
 
 }
 

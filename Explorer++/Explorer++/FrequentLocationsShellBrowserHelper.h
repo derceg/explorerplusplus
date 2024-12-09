@@ -6,15 +6,16 @@
 
 #include "ShellBrowser/ShellBrowserHelper.h"
 
-class HistoryModel;
+class FrequentLocationsModel;
 
-class ShellBrowserHistoryHelper : public ShellBrowserHelper<ShellBrowserHistoryHelper>
+class FrequentLocationsShellBrowserHelper :
+	public ShellBrowserHelper<FrequentLocationsShellBrowserHelper>
 {
 public:
-	ShellBrowserHistoryHelper(ShellBrowser *shellBrowser, HistoryModel *historyModel);
+	FrequentLocationsShellBrowserHelper(ShellBrowser *shellBrowser, FrequentLocationsModel *model);
 
 private:
 	void OnNavigationCommitted(const NavigateParams &navigateParams);
 
-	HistoryModel *const m_historyModel;
+	FrequentLocationsModel *const m_model;
 };

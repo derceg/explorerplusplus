@@ -562,7 +562,7 @@
     <ClCompile Include="HistoryModel.cpp">
       <Filter>History</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowserHistoryHelper.cpp">
+    <ClCompile Include="HistoryShellBrowserHelper.cpp">
       <Filter>History</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp">
@@ -761,6 +761,9 @@
       <Filter>Frequent Locations</Filter>
     </ClCompile>
     <ClCompile Include="FrequentLocationsXmlStorage.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1335,7 +1338,7 @@
     <ClInclude Include="HistoryModel.h">
       <Filter>History</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowserHistoryHelper.h">
+    <ClInclude Include="HistoryShellBrowserHelper.h">
       <Filter>History</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowserHelper.h">
@@ -1582,6 +1585,9 @@
       <Filter>Frequent Locations</Filter>
     </ClInclude>
     <ClInclude Include="FrequentLocationsStorageHelper.h">
+      <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="FrequentLocationsShellBrowserHelper.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
   </ItemGroup>
