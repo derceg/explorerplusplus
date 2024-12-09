@@ -8,7 +8,7 @@
 LocationVisitInfo::LocationVisitInfo(const PidlAbsolute &pidl, int numVisits,
 	const Clock::time_point &lastVisitTime) :
 	m_pidl(pidl),
-	m_numVisits((std::max)(numVisits, 1)),
+	m_numVisits(std::max(numVisits, 1)),
 	m_lastVisitTime(lastVisitTime)
 {
 }

@@ -204,7 +204,7 @@ bool DropHandler::CopyPngData(IDataObject *dataObject, std::list<std::wstring> &
 	// dataSize is cast to a DWORD in the WriteFile() call below. It's not expected that an image
 	// would ever be larger than the size that can be represented in a DWORD (4GB), but if it is,
 	// the method should fail here, rather than blindly writing some of the data out.
-	if (dataSize == 0 || dataSize > (std::numeric_limits<DWORD>::max)())
+	if (dataSize == 0 || dataSize > std::numeric_limits<DWORD>::max())
 	{
 		return false;
 	}

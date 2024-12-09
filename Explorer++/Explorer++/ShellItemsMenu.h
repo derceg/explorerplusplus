@@ -19,7 +19,7 @@ public:
 	ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
 		ShellIconLoader *shellIconLoader, UINT menuStartId = 1,
-		UINT menuEndId = (std::numeric_limits<UINT>::max)());
+		UINT menuEndId = std::numeric_limits<UINT>::max());
 
 	void RebuildMenu(const std::vector<PidlAbsolute> &pidls);
 

@@ -319,7 +319,7 @@ int HolderWindow::CalculateCaptionSectionHeight()
 
 	auto verticalPadding =
 		DpiCompatibility::GetInstance().ScaleValue(m_hwnd, CAPTION_SECTION_VERTICAL_PADDING);
-	return (std::max)(textSize.cy, rc.bottom) + (verticalPadding * 2);
+	return std::max(textSize.cy, rc.bottom) + (verticalPadding * 2);
 }
 
 void HolderWindow::OnLButtonDown(const POINT &pt)
@@ -351,7 +351,7 @@ int HolderWindow::OnMouseMove(const POINT &pt)
 		RECT clientRect;
 		GetClientRect(m_hwnd, &clientRect);
 
-		int newWidth = (std::max)(pt.x + m_resizeDistanceToEdge.value(), 0L);
+		int newWidth = std::max(pt.x + m_resizeDistanceToEdge.value(), 0L);
 
 		if (m_resizedCallback)
 		{
