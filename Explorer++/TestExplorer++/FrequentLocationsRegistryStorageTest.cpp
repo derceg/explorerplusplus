@@ -7,20 +7,23 @@
 #include "FrequentLocationsModel.h"
 #include "FrequentLocationsStorageTestHelper.h"
 #include "RegistryStorageTestHelper.h"
+#include "../Helper/SystemClockImpl.h"
 #include <gtest/gtest.h>
 
 class FrequentLocationsRegistryStorageTest : public RegistryStorageTest
 {
+protected:
+	SystemClockImpl m_systemClock;
 };
 
 TEST_F(FrequentLocationsRegistryStorageTest, Load)
 {
-	FrequentLocationsModel referenceModel;
+	FrequentLocationsModel referenceModel(&m_systemClock);
 	FrequentLocationsStorageTestHelper::BuildReferenceModel(&referenceModel);
 
 	ImportRegistryResource(L"frequent-locations.reg");
 
-	FrequentLocationsModel loadedModel;
+	FrequentLocationsModel loadedModel(&m_systemClock);
 	FrequentLocationsRegistryStorage::Load(m_applicationTestKey.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
@@ -28,12 +31,12 @@ TEST_F(FrequentLocationsRegistryStorageTest, Load)
 
 TEST_F(FrequentLocationsRegistryStorageTest, Save)
 {
-	FrequentLocationsModel referenceModel;
+	FrequentLocationsModel referenceModel(&m_systemClock);
 	FrequentLocationsStorageTestHelper::BuildReferenceModel(&referenceModel);
 
 	FrequentLocationsRegistryStorage::Save(m_applicationTestKey.get(), &referenceModel);
 
-	FrequentLocationsModel loadedModel;
+	FrequentLocationsModel loadedModel(&m_systemClock);
 	FrequentLocationsRegistryStorage::Load(m_applicationTestKey.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);

@@ -88,7 +88,7 @@ std::optional<LocationVisitInfo> LoadFrequentLocation(IXMLDOMNode *frequentLocat
 	}
 
 	return LocationVisitInfo{ pidl, numVisits,
-		LocationVisitInfo::Clock::time_point(
+		SystemClock::TimePoint(
 			FrequentLocationsStorageHelper::StorageDurationType(timeSinceEpoch)) };
 }
 

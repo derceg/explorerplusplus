@@ -16,6 +16,6 @@ namespace FrequentLocationsStorageTestHelper
 
 void BuildReferenceModel(FrequentLocationsModel *frequentLocationsModel);
 LocationVisitInfo BuildFrequentLocation(const std::wstring &location, int numVisits,
-	const LocationVisitInfo::Clock::time_point &lastVisitTime);
+	const SystemClock::TimePoint &lastVisitTime);
 
 }

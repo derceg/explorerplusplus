@@ -657,6 +657,7 @@
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
+    <ClCompile Include="SystemClockImpl.cpp" />
     <ClCompile Include="UniqueResources.cpp" />
     <ClCompile Include="ShellContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
@@ -744,6 +745,8 @@
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
+    <ClInclude Include="SystemClock.h" />
+    <ClInclude Include="SystemClockImpl.h" />
     <ClInclude Include="UniqueResources.h" />
     <ClInclude Include="ShellContextMenu.h" />
     <ClInclude Include="FileOperations.h" />

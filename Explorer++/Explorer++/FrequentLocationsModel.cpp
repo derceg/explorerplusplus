@@ -5,6 +5,11 @@
 #include "stdafx.h"
 #include "FrequentLocationsModel.h"
 
+FrequentLocationsModel::FrequentLocationsModel(SystemClock *systemClock) :
+	m_systemClock(systemClock)
+{
+}
+
 void FrequentLocationsModel::SetLocationVisits(const std::vector<LocationVisitInfo> &locationVisits)
 {
 	m_locationVisits.clear();
@@ -19,11 +24,12 @@ void FrequentLocationsModel::RegisterLocationVisit(const PidlAbsolute &pidl)
 
 	if (itr == locationIndex.end())
 	{
-		locationIndex.emplace(pidl);
+		locationIndex.emplace(pidl, 1, m_systemClock->Now());
 	}
 	else
 	{
-		locationIndex.modify(itr, [](auto &locationInfo) { locationInfo.AddVisit(); });
+		locationIndex.modify(itr,
+			[this](auto &locationInfo) { locationInfo.AddVisit(m_systemClock->Now()); });
 	}
 
 	m_locationsChangedSignal();

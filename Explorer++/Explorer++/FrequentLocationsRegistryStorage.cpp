@@ -50,7 +50,7 @@ std::optional<LocationVisitInfo> LoadFrequentLocation(HKEY frequentLocationsKey)
 	}
 
 	return LocationVisitInfo{ pidl, numVisits,
-		LocationVisitInfo::Clock::time_point(
+		SystemClock::TimePoint(
 			FrequentLocationsStorageHelper::StorageDurationType(timeSinceEpoch)) };
 };
 

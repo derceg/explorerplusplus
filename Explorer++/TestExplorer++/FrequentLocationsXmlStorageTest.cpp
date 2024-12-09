@@ -8,21 +8,24 @@
 #include "FrequentLocationsStorageTestHelper.h"
 #include "ResourceTestHelper.h"
 #include "XmlStorageTestHelper.h"
+#include "../Helper/SystemClockImpl.h"
 #include <gtest/gtest.h>
 
 class FrequentLocationsXmlStorageTest : public XmlStorageTest
 {
+protected:
+	SystemClockImpl m_systemClock;
 };
 
 TEST_F(FrequentLocationsXmlStorageTest, Load)
 {
-	FrequentLocationsModel referenceModel;
+	FrequentLocationsModel referenceModel(&m_systemClock);
 	FrequentLocationsStorageTestHelper::BuildReferenceModel(&referenceModel);
 
 	std::wstring xmlFilePath = GetResourcePath(L"frequent-locations-config.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
-	FrequentLocationsModel loadedModel;
+	FrequentLocationsModel loadedModel(&m_systemClock);
 	FrequentLocationsXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
@@ -30,7 +33,7 @@ TEST_F(FrequentLocationsXmlStorageTest, Load)
 
 TEST_F(FrequentLocationsXmlStorageTest, Save)
 {
-	FrequentLocationsModel referenceModel;
+	FrequentLocationsModel referenceModel(&m_systemClock);
 	FrequentLocationsStorageTestHelper::BuildReferenceModel(&referenceModel);
 
 	auto xmlDocumentData = CreateXmlDocument();
@@ -38,7 +41,7 @@ TEST_F(FrequentLocationsXmlStorageTest, Save)
 	FrequentLocationsXmlStorage::Save(xmlDocumentData.xmlDocument.get(),
 		xmlDocumentData.rootNode.get(), &referenceModel);
 
-	FrequentLocationsModel loadedModel;
+	FrequentLocationsModel loadedModel(&m_systemClock);
 	FrequentLocationsXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);

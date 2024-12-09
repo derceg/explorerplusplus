@@ -172,6 +172,9 @@
     <ClCompile Include="Console.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="SystemClockImpl.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -367,6 +370,12 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemClock.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemClockImpl.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>

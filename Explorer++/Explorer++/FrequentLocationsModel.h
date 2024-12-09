@@ -40,14 +40,14 @@ public:
 				boost::multi_index::composite_key<
 					LocationVisitInfo,
 					boost::multi_index::const_mem_fun<LocationVisitInfo, int, &LocationVisitInfo::GetNumVisits>,
-					boost::multi_index::const_mem_fun<LocationVisitInfo, LocationVisitInfo::Clock::time_point,
+					boost::multi_index::const_mem_fun<LocationVisitInfo, SystemClock::TimePoint,
 						&LocationVisitInfo::GetLastVisitTime>
 				>,
 				// Items are sorted in descending order of visit count (i.e. most visited first) and
 				// descending order of last visit time (i.e. most recently visited items first).
 				boost::multi_index::composite_key_compare<
 					std::greater<int>,
-					std::greater<LocationVisitInfo::Clock::time_point>
+					std::greater<SystemClock::TimePoint>
 				>
 			>,
 			// A non-sorted index of visits, based on the pidl.
@@ -61,6 +61,8 @@ public:
 
 	using ByVisitsIndex = LocationVisits::index<ByVisits>::type;
 
+	FrequentLocationsModel(SystemClock *systemClock);
+
 	void SetLocationVisits(const std::vector<LocationVisitInfo> &locationVisits);
 	void RegisterLocationVisit(const PidlAbsolute &pidl);
 	const ByVisitsIndex &GetVisits() const;
@@ -68,6 +70,7 @@ public:
 		const LocationsChangedSignal::slot_type &observer);
 
 private:
+	SystemClock *const m_systemClock;
 	LocationVisits m_locationVisits;
 	LocationsChangedSignal m_locationsChangedSignal;
 };

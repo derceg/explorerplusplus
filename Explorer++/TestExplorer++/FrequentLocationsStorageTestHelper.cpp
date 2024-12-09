@@ -20,16 +20,13 @@ void BuildReferenceModel(FrequentLocationsModel *frequentLocationsModel)
 	using namespace std::chrono_literals;
 
 	frequentLocationsModel->SetLocationVisits(
-		{ BuildFrequentLocation(L"c:\\fake1", 20,
-			  LocationVisitInfo::Clock::time_point(1733488834758531us)),
-			BuildFrequentLocation(L"c:\\fake2", 3,
-				LocationVisitInfo::Clock::time_point(1732110119269690us)),
-			BuildFrequentLocation(L"c:\\fake3", 65,
-				LocationVisitInfo::Clock::time_point(1717940540499464us)) });
+		{ BuildFrequentLocation(L"c:\\fake1", 20, SystemClock::TimePoint(1733488834758531us)),
+			BuildFrequentLocation(L"c:\\fake2", 3, SystemClock::TimePoint(1732110119269690us)),
+			BuildFrequentLocation(L"c:\\fake3", 65, SystemClock::TimePoint(1717940540499464us)) });
 }
 
 LocationVisitInfo BuildFrequentLocation(const std::wstring &location, int numVisits,
-	const LocationVisitInfo::Clock::time_point &lastVisitTime)
+	const SystemClock::TimePoint &lastVisitTime)
 {
 	return { CreateSimplePidlForTest(location, nullptr, ShellItemType::Folder), numVisits,
 		lastVisitTime };

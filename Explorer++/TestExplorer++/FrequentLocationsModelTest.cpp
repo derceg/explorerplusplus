@@ -9,13 +9,14 @@
 #include "../Helper/StringHelper.h"
 #include <gtest/gtest.h>
 
+using namespace std::chrono_literals;
 using namespace testing;
 
 namespace
 {
 
 void BuildTimePoint(int year, int month, int day, int hour, int minute,
-	std::chrono::system_clock::time_point &output)
+	SystemClock::TimePoint &output)
 {
 	std::tm tm = { .tm_min = minute,
 		.tm_hour = hour,
@@ -25,24 +26,30 @@ void BuildTimePoint(int year, int month, int day, int hour, int minute,
 	auto time = std::mktime(&tm);
 	ASSERT_NE(time, -1);
 
-	output = std::chrono::system_clock::from_time_t(time);
+	output = SystemClock::Clock::from_time_t(time);
 }
 
-std::chrono::system_clock::time_point BuildTimePoint(int year, int month, int day, int hour,
-	int minute)
+SystemClock::TimePoint BuildTimePoint(int year, int month, int day, int hour, int minute)
 {
-	std::chrono::system_clock::time_point timePoint;
+	SystemClock::TimePoint timePoint;
 	BuildTimePoint(year, month, day, hour, minute, timePoint);
 	return timePoint;
 }
 
-}
-
-MATCHER(MatchLocationAndVisits, "")
+// A fake clock that increments the time by 1 second (starting from the system_clock epoch) every
+// time Now() is called.
+class FakeSystemClock : public SystemClock
 {
-	// The last visit time is ignored here.
-	return std::get<0>(arg).GetLocation() == std::get<1>(arg).GetLocation()
-		&& std::get<0>(arg).GetNumVisits() == std::get<1>(arg).GetNumVisits();
+public:
+	TimePoint Now() override
+	{
+		return TimePoint(m_secondsSinceEpoch++);
+	}
+
+private:
+	std::chrono::seconds m_secondsSinceEpoch = 0s;
+};
+
 }
 
 HRESULT PrintPath(const LocationVisitInfo &locationInfo, std::ostream *os)
@@ -79,130 +86,135 @@ void PrintTo(const LocationVisitInfo &locationInfo, std::ostream *os)
 	}
 
 	*os << ", " << locationInfo.GetNumVisits();
+	*os << ", " << locationInfo.GetLastVisitTime();
 	*os << ")";
 }
 
-TEST(FrequentLocationsModelTest, DifferentLocations)
+class FrequentLocationsModelTest : public Test
 {
-	FrequentLocationsModel frequentLocationsModel;
+protected:
+	FrequentLocationsModelTest() : m_frequentLocationsModel(&m_systemClock)
+	{
+	}
 
+	FakeSystemClock m_systemClock;
+	FrequentLocationsModel m_frequentLocationsModel;
+};
+
+TEST_F(FrequentLocationsModelTest, DifferentLocations)
+{
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 
 	PidlAbsolute fake3 = CreateSimplePidlForTest(L"C:\\Fake3");
-	frequentLocationsModel.RegisterLocationVisit(fake3);
+	m_frequentLocationsModel.RegisterLocationVisit(fake3);
 
-	const auto &visits = frequentLocationsModel.GetVisits();
+	const auto &visits = m_frequentLocationsModel.GetVisits();
 
 	// Items with the same visit count are sorted by their last visit time, so more recent items
 	// should appear first.
-	std::vector<LocationVisitInfo> expectedVisits = { { fake3, 1 }, { fake2, 1 }, { fake1, 1 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	std::vector<LocationVisitInfo> expectedVisits = { { fake3, 1, SystemClock::TimePoint(2s) },
+		{ fake2, 1, SystemClock::TimePoint(1s) }, { fake1, 1, SystemClock::TimePoint(0s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsModelTest, RepeatedVisits)
+TEST_F(FrequentLocationsModelTest, RepeatedVisits)
 {
-	FrequentLocationsModel frequentLocationsModel;
-
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationsModel.RegisterLocationVisit(fake1);
-	frequentLocationsModel.RegisterLocationVisit(fake1);
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	const auto &visits = frequentLocationsModel.GetVisits();
+	const auto &visits = m_frequentLocationsModel.GetVisits();
 
-	std::vector<LocationVisitInfo> expectedVisits = { { fake1, 3 }, { fake2, 1 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	std::vector<LocationVisitInfo> expectedVisits = { { fake1, 3, SystemClock::TimePoint(2s) },
+		{ fake2, 1, SystemClock::TimePoint(3s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsModelTest, VisitCountOrderChanges)
+TEST_F(FrequentLocationsModelTest, VisitCountOrderChanges)
 {
-	FrequentLocationsModel frequentLocationsModel;
-
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationsModel.RegisterLocationVisit(fake2);
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	const auto &visits = frequentLocationsModel.GetVisits();
+	const auto &visits = m_frequentLocationsModel.GetVisits();
 
-	std::vector<LocationVisitInfo> expectedVisits = { { fake2, 2 }, { fake1, 1 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	std::vector<LocationVisitInfo> expectedVisits = { { fake2, 2, SystemClock::TimePoint(2s) },
+		{ fake1, 1, SystemClock::TimePoint(0s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 
-	frequentLocationsModel.RegisterLocationVisit(fake1);
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
-	expectedVisits = { { fake1, 3 }, { fake2, 2 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	expectedVisits = { { fake1, 3, SystemClock::TimePoint(4s) },
+		{ fake2, 2, SystemClock::TimePoint(2s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 
-	frequentLocationsModel.RegisterLocationVisit(fake2);
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	expectedVisits = { { fake2, 4 }, { fake1, 3 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	expectedVisits = { { fake2, 4, SystemClock::TimePoint(6s) },
+		{ fake1, 3, SystemClock::TimePoint(4s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsModelTest, VisitTimeOrderChanges)
+TEST_F(FrequentLocationsModelTest, VisitTimeOrderChanges)
 {
-	FrequentLocationsModel frequentLocationsModel;
-
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	frequentLocationsModel.RegisterLocationVisit(fake1);
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 
-	const auto &visits = frequentLocationsModel.GetVisits();
+	const auto &visits = m_frequentLocationsModel.GetVisits();
 
 	// fake2 is the most recently visited item, so it should appear first.
-	std::vector<LocationVisitInfo> expectedVisits = { { fake2, 2 }, { fake1, 2 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	std::vector<LocationVisitInfo> expectedVisits = { { fake2, 2, SystemClock::TimePoint(3s) },
+		{ fake1, 2, SystemClock::TimePoint(2s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 
-	frequentLocationsModel.RegisterLocationVisit(fake2);
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	// fake1 is now the most recently visited item.
-	expectedVisits = { { fake1, 3 }, { fake2, 3 } };
-	EXPECT_THAT(visits, Pointwise(MatchLocationAndVisits(), expectedVisits));
+	expectedVisits = { { fake1, 3, SystemClock::TimePoint(5s) },
+		{ fake2, 3, SystemClock::TimePoint(4s) } };
+	EXPECT_THAT(visits, ElementsAreArray(expectedVisits));
 }
 
-TEST(FrequentLocationsModelTest, LocationsChangedEvent)
+TEST_F(FrequentLocationsModelTest, LocationsChangedEvent)
 {
-	FrequentLocationsModel frequentLocationsModel;
-
 	MockFunction<void()> callback;
-	frequentLocationsModel.AddLocationsChangedObserver(callback.AsStdFunction());
+	m_frequentLocationsModel.AddLocationsChangedObserver(callback.AsStdFunction());
 	EXPECT_CALL(callback, Call()).Times(4);
 
 	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	frequentLocationsModel.RegisterLocationVisit(fake1);
-	frequentLocationsModel.RegisterLocationVisit(fake1);
-	frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	m_frequentLocationsModel.RegisterLocationVisit(fake1);
 
 	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	frequentLocationsModel.RegisterLocationVisit(fake2);
+	m_frequentLocationsModel.RegisterLocationVisit(fake2);
 }
 
-TEST(FrequentLocationsModelTest, SetLocationVisits)
+TEST_F(FrequentLocationsModelTest, SetLocationVisits)
 {
-	FrequentLocationsModel frequentLocationsModel;
-
 	MockFunction<void()> callback;
-	frequentLocationsModel.AddLocationsChangedObserver(callback.AsStdFunction());
+	m_frequentLocationsModel.AddLocationsChangedObserver(callback.AsStdFunction());
 	EXPECT_CALL(callback, Call());
-
-	using namespace std::chrono_literals;
 
 	auto location1 = FrequentLocationsStorageTestHelper::BuildFrequentLocation(L"c:\\fake1", 4,
 		BuildTimePoint(2024, 12, 7, 13, 4));
@@ -211,9 +223,9 @@ TEST(FrequentLocationsModelTest, SetLocationVisits)
 	auto location3 = FrequentLocationsStorageTestHelper::BuildFrequentLocation(L"c:\\fake3", 19,
 		BuildTimePoint(2023, 8, 10, 3, 9));
 
-	frequentLocationsModel.SetLocationVisits({ location1, location2, location3 });
+	m_frequentLocationsModel.SetLocationVisits({ location1, location2, location3 });
 
 	// Once the locations have been added, they should be sorted in descending order of their visit
 	// counts.
-	EXPECT_THAT(frequentLocationsModel.GetVisits(), ElementsAre(location2, location3, location1));
+	EXPECT_THAT(m_frequentLocationsModel.GetVisits(), ElementsAre(location2, location3, location1));
 }

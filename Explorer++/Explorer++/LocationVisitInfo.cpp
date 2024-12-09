@@ -6,17 +6,17 @@
 #include "LocationVisitInfo.h"
 
 LocationVisitInfo::LocationVisitInfo(const PidlAbsolute &pidl, int numVisits,
-	const Clock::time_point &lastVisitTime) :
+	const SystemClock::TimePoint &lastVisitTime) :
 	m_pidl(pidl),
 	m_numVisits(std::max(numVisits, 1)),
 	m_lastVisitTime(lastVisitTime)
 {
 }
 
-void LocationVisitInfo::AddVisit()
+void LocationVisitInfo::AddVisit(const SystemClock::TimePoint &currentTime)
 {
 	m_numVisits++;
-	m_lastVisitTime = Clock::now();
+	m_lastVisitTime = currentTime;
 }
 
 PidlAbsolute LocationVisitInfo::GetLocation() const
@@ -29,7 +29,7 @@ int LocationVisitInfo::GetNumVisits() const
 	return m_numVisits;
 }
 
-LocationVisitInfo::Clock::time_point LocationVisitInfo::GetLastVisitTime() const
+SystemClock::TimePoint LocationVisitInfo::GetLastVisitTime() const
 {
 	return m_lastVisitTime;
 }
