@@ -604,9 +604,6 @@
     <ClCompile Include="MainMenuSubMenuView.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalHistoryMenu.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
     <ClCompile Include="TabParentItemsMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
@@ -765,6 +762,9 @@
     </ClCompile>
     <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp">
       <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryMenu.cpp">
+      <Filter>History\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1392,9 +1392,6 @@
     <ClInclude Include="MainMenuSubMenuView.h">
       <Filter>Core\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalHistoryMenu.h">
-      <Filter>Core\UI</Filter>
-    </ClInclude>
     <ClInclude Include="TabParentItemsMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
@@ -1590,6 +1587,9 @@
     <ClInclude Include="FrequentLocationsShellBrowserHelper.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
+    <ClInclude Include="HistoryMenu.h">
+      <Filter>History\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1766,6 +1766,9 @@
     </Filter>
     <Filter Include="Config">
       <UniqueIdentifier>{a4cf8f14-9fa6-451d-8143-121d7958af7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="History\UI">
+      <UniqueIdentifier>{089b2f1b-a85c-4670-921d-73646d9f258c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

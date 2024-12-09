@@ -3,12 +3,11 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "GlobalHistoryMenu.h"
+#include "HistoryMenu.h"
 #include "HistoryModel.h"
 
-GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, HistoryModel *historyModel,
-	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
+HistoryMenu::HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
 	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
 		shellIconLoader),
 	m_historyModel(historyModel)
@@ -16,10 +15,9 @@ GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
 	Initialize();
 }
 
-GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, HistoryModel *historyModel,
-	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT menuStartId,
-	UINT menuEndId) :
+HistoryMenu::HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
+	UINT menuStartId, UINT menuEndId) :
 	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
 		shellIconLoader, menuStartId, menuEndId),
 	m_historyModel(historyModel)
@@ -27,18 +25,18 @@ GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
 	Initialize();
 }
 
-void GlobalHistoryMenu::Initialize()
+void HistoryMenu::Initialize()
 {
 	m_connections.push_back(m_historyModel->AddHistoryChangedObserver(
-		std::bind_front(&GlobalHistoryMenu::OnHistoryChanged, this)));
+		std::bind_front(&HistoryMenu::OnHistoryChanged, this)));
 }
 
-void GlobalHistoryMenu::OnHistoryChanged()
+void HistoryMenu::OnHistoryChanged()
 {
 	RebuildMenu(GetHistoryItems(m_historyModel));
 }
 
-std::vector<PidlAbsolute> GlobalHistoryMenu::GetHistoryItems(const HistoryModel *historyModel)
+std::vector<PidlAbsolute> HistoryMenu::GetHistoryItems(const HistoryModel *historyModel)
 {
 	const auto &history = historyModel->GetHistoryItems();
 	std::vector<PidlAbsolute> historyVector({ history.begin(), history.end() });

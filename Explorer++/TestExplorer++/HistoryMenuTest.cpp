@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "GlobalHistoryMenu.h"
+#include "HistoryMenu.h"
 #include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
 #include "HistoryModel.h"
@@ -15,10 +15,10 @@
 
 using namespace testing;
 
-class GlobalHistoryMenuTest : public Test
+class HistoryMenuTest : public Test
 {
 protected:
-	GlobalHistoryMenuTest() :
+	HistoryMenuTest() :
 		m_menu(&m_popupMenu, &m_acceleratorManager, &m_historyModel, &m_browserWindow,
 			&m_shellIconLoader)
 	{
@@ -73,17 +73,17 @@ private:
 	HistoryModel m_historyModel;
 	BrowserWindowMock m_browserWindow;
 	ShellIconLoaderFake m_shellIconLoader;
-	GlobalHistoryMenu m_menu;
+	HistoryMenu m_menu;
 	size_t m_historyItemCount = 0;
 };
 
-TEST_F(GlobalHistoryMenuTest, CheckItems)
+TEST_F(HistoryMenuTest, CheckItems)
 {
 	AddHistoryItems(3);
 	CheckItemDetails();
 }
 
-TEST_F(GlobalHistoryMenuTest, UpdateHistory)
+TEST_F(HistoryMenuTest, UpdateHistory)
 {
 	AddHistoryItems(3);
 

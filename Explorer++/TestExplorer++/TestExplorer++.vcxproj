@@ -237,7 +237,7 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
-    <ClCompile Include="GlobalHistoryMenuTest.cpp" />
+    <ClCompile Include="HistoryMenuTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryModelTest.cpp" />
     <ClCompile Include="BrowserTrackerTest.cpp" />

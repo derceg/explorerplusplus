@@ -48,7 +48,7 @@ class CachedIcons;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
-class GlobalHistoryMenu;
+class HistoryMenu;
 class HolderWindow;
 __interface IDirectoryMonitor;
 class ILoadSave;
@@ -566,8 +566,8 @@ private:
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
 	bool m_mainMenuShowing = false;
 	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
-	std::unique_ptr<MainMenuSubMenuView> m_globalHistoryMenuView;
-	std::unique_ptr<GlobalHistoryMenu> m_globalHistoryMenu;
+	std::unique_ptr<MainMenuSubMenuView> m_historyMenuView;
+	std::unique_ptr<HistoryMenu> m_historyMenu;
 
 	FocusChangedSignal m_focusChangedSignal;
 	bool m_browserClosing = false;

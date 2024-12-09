@@ -11,7 +11,7 @@
 #include "BrowserTracker.h"
 #include "Config.h"
 #include "FrequentLocationsShellBrowserHelper.h"
-#include "GlobalHistoryMenu.h"
+#include "HistoryMenu.h"
 #include "HistoryShellBrowserHelper.h"
 #include "MainFontSetter.h"
 #include "MainMenuSubMenuView.h"

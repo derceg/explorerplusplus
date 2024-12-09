@@ -9,12 +9,12 @@
 class HistoryModel;
 
 // Displays the set of global history entries.
-class GlobalHistoryMenu : public ShellItemsMenu
+class HistoryMenu : public ShellItemsMenu
 {
 public:
-	GlobalHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader);
-	GlobalHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
 		UINT menuStartId, UINT menuEndId);
 

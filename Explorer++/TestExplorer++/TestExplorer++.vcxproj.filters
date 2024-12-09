@@ -170,9 +170,6 @@
     <ClCompile Include="PopupMenuViewTest.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalHistoryMenuTest.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
     <ClCompile Include="HistoryModelTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
@@ -316,6 +313,9 @@
     <ClCompile Include="FakeSystemClock.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryMenuTest.cpp">
+      <Filter>History\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -419,6 +419,9 @@
     </Filter>
     <Filter Include="Config">
       <UniqueIdentifier>{1980882f-109e-4b79-a547-fea9e4850a36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="History\UI">
+      <UniqueIdentifier>{46628916-124c-461d-bc7d-7635eca44dd9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
