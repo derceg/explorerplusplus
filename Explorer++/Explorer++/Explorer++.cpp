@@ -10,6 +10,7 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "BrowserTracker.h"
 #include "Config.h"
+#include "FrequentLocationsShellBrowserHelper.h"
 #include "GlobalHistoryMenu.h"
 #include "HistoryShellBrowserHelper.h"
 #include "MainFontSetter.h"
@@ -282,4 +283,6 @@ void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
 {
 	HistoryShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser,
 		m_app->GetHistoryModel());
+	FrequentLocationsShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser,
+		m_app->GetFrequentLocationsModel());
 }

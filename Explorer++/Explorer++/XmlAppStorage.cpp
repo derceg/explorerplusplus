@@ -10,6 +10,7 @@
 #include "ConfigXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
+#include "FrequentLocationsXmlStorage.h"
 #include "MainRebarStorage.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
@@ -60,6 +61,11 @@ void XmlAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
 	DefaultColumnXmlStorage::Load(m_rootNode.get(), defaultColumns);
 }
 
+void XmlAppStorage::LoadFrequentLocations(FrequentLocationsModel *frequentLocationsModel)
+{
+	FrequentLocationsXmlStorage::Load(m_rootNode.get(), frequentLocationsModel);
+}
+
 void XmlAppStorage::SaveConfig(const Config &config)
 {
 	ConfigXmlStorage::Save(m_xmlDocument.get(), m_rootNode.get(), config);
@@ -93,6 +99,12 @@ void XmlAppStorage::SaveDialogStates()
 void XmlAppStorage::SaveDefaultColumns(const FolderColumns &defaultColumns)
 {
 	DefaultColumnXmlStorage::Save(m_xmlDocument.get(), m_rootNode.get(), defaultColumns);
+}
+
+void XmlAppStorage::SaveFrequentLocations(const FrequentLocationsModel *frequentLocationsModel)
+{
+	FrequentLocationsXmlStorage::Save(m_xmlDocument.get(), m_rootNode.get(),
+		frequentLocationsModel);
 }
 
 void XmlAppStorage::Commit()

@@ -12,6 +12,7 @@
 #include "Config.h"
 #include "DarkModeManager.h"
 #include "FeatureList.h"
+#include "FrequentLocationsModel.h"
 #include "GlobalTabEventDispatcher.h"
 #include "HistoryModel.h"
 #include "ModelessDialogList.h"
@@ -20,6 +21,7 @@
 #include "TabRestorer.h"
 #include "ThemeManager.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/SystemClockImpl.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
@@ -61,6 +63,7 @@ public:
 	DarkModeManager *GetDarkModeManager();
 	ThemeManager *GetThemeManager();
 	HistoryModel *GetHistoryModel();
+	FrequentLocationsModel *GetFrequentLocationsModel();
 
 	void TryExit();
 	void SessionEnding();
@@ -104,6 +107,8 @@ private:
 	DarkModeManager m_darkModeManager;
 	ThemeManager m_themeManager;
 	HistoryModel m_historyModel;
+	SystemClockImpl m_systemClock;
+	FrequentLocationsModel m_frequentLocationsModel;
 
 	concurrencpp::timer m_saveSettingsTimer;
 

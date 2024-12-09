@@ -44,6 +44,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_tabRestorer(&m_globalTabEventDispatcher, &m_browserList),
 	m_darkModeManager(&m_config),
 	m_themeManager(&m_darkModeManager),
+	m_frequentLocationsModel(&m_systemClock),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
@@ -158,6 +159,7 @@ void App::LoadSettings(std::vector<WindowStorageData> &windows)
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
 	appStorage->LoadDefaultColumns(m_config.globalFolderSettings.folderColumns);
+	appStorage->LoadFrequentLocations(&m_frequentLocationsModel);
 
 	ValidateColumns(m_config.globalFolderSettings.folderColumns);
 }
@@ -203,6 +205,7 @@ void App::SaveSettings()
 	appStorage->SaveApplications(&m_applicationModel);
 	appStorage->SaveDialogStates();
 	appStorage->SaveDefaultColumns(m_config.globalFolderSettings.folderColumns);
+	appStorage->SaveFrequentLocations(&m_frequentLocationsModel);
 
 	appStorage->Commit();
 }
@@ -382,6 +385,11 @@ ThemeManager *App::GetThemeManager()
 HistoryModel *App::GetHistoryModel()
 {
 	return &m_historyModel;
+}
+
+FrequentLocationsModel *App::GetFrequentLocationsModel()
+{
+	return &m_frequentLocationsModel;
 }
 
 void App::OnWillRemoveBrowser()

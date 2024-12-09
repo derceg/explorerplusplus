@@ -10,6 +10,7 @@
 #include "ConfigRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
+#include "FrequentLocationsRegistryStorage.h"
 #include "MainRebarStorage.h"
 #include "TabStorage.h"
 #include "WindowRegistryStorage.h"
@@ -55,6 +56,11 @@ void RegistryAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
 	DefaultColumnRegistryStorage::Load(m_applicationKey.get(), defaultColumns);
 }
 
+void RegistryAppStorage::LoadFrequentLocations(FrequentLocationsModel *frequentLocationsModel)
+{
+	FrequentLocationsRegistryStorage::Load(m_applicationKey.get(), frequentLocationsModel);
+}
+
 void RegistryAppStorage::SaveConfig(const Config &config)
 {
 	ConfigRegistryStorage::Save(m_applicationKey.get(), config);
@@ -88,6 +94,11 @@ void RegistryAppStorage::SaveDialogStates()
 void RegistryAppStorage::SaveDefaultColumns(const FolderColumns &defaultColumns)
 {
 	DefaultColumnRegistryStorage::Save(m_applicationKey.get(), defaultColumns);
+}
+
+void RegistryAppStorage::SaveFrequentLocations(const FrequentLocationsModel *frequentLocationsModel)
+{
+	FrequentLocationsRegistryStorage::Save(m_applicationKey.get(), frequentLocationsModel);
 }
 
 void RegistryAppStorage::Commit()
