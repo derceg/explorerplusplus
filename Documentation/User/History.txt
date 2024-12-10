@@ -31,6 +31,9 @@ New features:
 - A global history menu is now available at Go > History. That
   menu will display a list of all history items, with more recent
   items appearing first.
+- A frequent locations menu is now available at Go > Frequent
+  Locations. This menu will display a list of frequently accessed
+  folders, with folders accessed more frequently appearing first.
 - When navigating to a history entry, the file selection will now
   be restored.
 - When being used as the default file manager, Explorer++ now

@@ -316,6 +316,9 @@
     <ClCompile Include="HistoryMenuTest.cpp">
       <Filter>History\UI</Filter>
     </ClCompile>
+    <ClCompile Include="FrequentLocationsMenuTest.cpp">
+      <Filter>Frequent Locations\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -422,6 +425,9 @@
     </Filter>
     <Filter Include="History\UI">
       <UniqueIdentifier>{46628916-124c-461d-bc7d-7635eca44dd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frequent Locations\UI">
+      <UniqueIdentifier>{8f212825-3607-46ff-93d5-923ccbadd20e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

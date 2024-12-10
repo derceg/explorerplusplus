@@ -10,6 +10,7 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "BrowserTracker.h"
 #include "Config.h"
+#include "FrequentLocationsMenu.h"
 #include "FrequentLocationsShellBrowserHelper.h"
 #include "HistoryMenu.h"
 #include "HistoryShellBrowserHelper.h"

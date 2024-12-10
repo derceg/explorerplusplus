@@ -48,6 +48,7 @@ class CachedIcons;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
+class FrequentLocationsMenu;
 class HistoryMenu;
 class HolderWindow;
 __interface IDirectoryMonitor;
@@ -568,6 +569,8 @@ private:
 	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
 	std::unique_ptr<MainMenuSubMenuView> m_historyMenuView;
 	std::unique_ptr<HistoryMenu> m_historyMenu;
+	std::unique_ptr<MainMenuSubMenuView> m_frequentLocationsMenuView;
+	std::unique_ptr<FrequentLocationsMenu> m_frequentLocationsMenu;
 
 	FocusChangedSignal m_focusChangedSignal;
 	bool m_browserClosing = false;

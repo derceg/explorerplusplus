@@ -1025,6 +1025,7 @@
     <ClCompile Include="DirectoryOperationsHelper.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
+    <ClCompile Include="FrequentLocationsMenu.cpp" />
     <ClCompile Include="FrequentLocationsModel.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorage.cpp" />
     <ClCompile Include="FrequentLocationsXmlStorage.cpp" />
@@ -1318,6 +1319,7 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
+    <ClInclude Include="FrequentLocationsMenu.h" />
     <ClInclude Include="FrequentLocationsModel.h" />
     <ClInclude Include="FrequentLocationsRegistryStorage.h" />
     <ClInclude Include="FrequentLocationsStorageHelper.h" />

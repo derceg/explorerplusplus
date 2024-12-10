@@ -44,9 +44,9 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 			continue;
 		}
 
-		auto id = generateId();
+		auto id = m_idCounter++;
 
-		if (!id)
+		if (m_idCounter >= m_endId)
 		{
 			// There are only a fixed number of accelerator items
 			// available. As accelerators can't be removed, if there are
@@ -58,28 +58,18 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 		ACCEL newAccel;
 		newAccel.fVirt = command.accelerator->modifiers;
 		newAccel.key = command.accelerator->key;
-		newAccel.cmd = static_cast<WORD>(*id);
+		newAccel.cmd = static_cast<WORD>(id);
 		accelerators.push_back(newAccel);
 
 		PluginCommand pluginCommand;
 		pluginCommand.pluginId = pluginId;
 		pluginCommand.name = command.name;
-		registeredCommands.insert(std::make_pair(*id, pluginCommand));
+		registeredCommands.insert(std::make_pair(id, pluginCommand));
 	}
 
 	m_acceleratorManager->SetAccelerators(accelerators);
 
 	m_registeredCommands.insert(registeredCommands.begin(), registeredCommands.end());
-}
-
-std::optional<int> Plugins::PluginCommandManager::generateId()
-{
-	if (m_idCounter >= m_endId)
-	{
-		return std::nullopt;
-	}
-
-	return m_idCounter++;
 }
 
 boost::signals2::connection Plugins::PluginCommandManager::AddCommandInvokedObserver(

@@ -8,6 +8,7 @@
 #include "App.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "FeatureList.h"
+#include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
 #include "Icon.h"
 #include "MainMenuSubMenuView.h"
@@ -113,6 +114,13 @@ void Explorerplusplus::InitializeMainMenu()
 	m_historyMenu = std::make_unique<HistoryMenu>(m_historyMenuView.get(),
 		m_app->GetAcceleratorManager(), m_app->GetHistoryModel(), this, &m_shellIconLoader,
 		MENU_HISTORY_START_ID, MENU_HISTORY_END_ID);
+
+	m_frequentLocationsMenuView =
+		std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_FREQUENT_LOCATIONS);
+	m_frequentLocationsMenu =
+		std::make_unique<FrequentLocationsMenu>(m_frequentLocationsMenuView.get(),
+			m_app->GetAcceleratorManager(), m_app->GetFrequentLocationsModel(), this,
+			&m_shellIconLoader, MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID);
 
 	AddGetMenuItemHelperTextObserver(
 		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
@@ -324,6 +332,13 @@ void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
 			m_historyMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
 			return;
 		}
+		else if (*menuItemId >= MENU_FREQUENT_LOCATIONS_START_ID
+			&& *menuItemId < MENU_FREQUENT_LOCATIONS_END_ID)
+		{
+			m_frequentLocationsMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown,
+				isShiftKeyDown);
+			return;
+		}
 	}
 
 	m_mainMenuItemMiddleClickedSignal(pt, isCtrlKeyDown, isShiftKeyDown);
@@ -362,6 +377,10 @@ std::optional<std::wstring> Explorerplusplus::MaybeGetMenuItemHelperText(HMENU m
 		else if (id >= MENU_HISTORY_START_ID && id < MENU_HISTORY_END_ID)
 		{
 			return m_historyMenuView->GetHelpTextForItem(id);
+		}
+		else if (id >= MENU_FREQUENT_LOCATIONS_START_ID && id < MENU_FREQUENT_LOCATIONS_END_ID)
+		{
+			return m_frequentLocationsMenuView->GetHelpTextForItem(id);
 		}
 	}
 

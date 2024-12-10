@@ -830,6 +830,7 @@
 #define IDM_GO_HISTORY                  40550
 #define IDM_EDIT_PASTE_SYMBOLIC_LINK    40551
 #define IDM_FILE_NEW_WINDOW             40552
+#define IDM_GO_FREQUENT_LOCATIONS       40553
 #define IDM_SORTBY_NAME                 50000
 #define IDM_SORTBY_SIZE                 50001
 #define IDM_SORTBY_TYPE                 50002
@@ -977,7 +978,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        402
-#define _APS_NEXT_COMMAND_VALUE         40553
+#define _APS_NEXT_COMMAND_VALUE         40554
 #define _APS_NEXT_CONTROL_VALUE         1374
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

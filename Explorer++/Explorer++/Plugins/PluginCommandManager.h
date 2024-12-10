@@ -44,8 +44,6 @@ private:
 
 	std::unordered_map<int, PluginCommand> m_registeredCommands;
 
-	std::optional<int> generateId();
-
 	CommandInvokedSignal m_commandInvokedSignal;
 };
 

@@ -273,7 +273,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int i
 LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id,
 	UINT notificationCode)
 {
-	if (notificationCode == 0 && id >= MENU_BOOKMARK_START_ID && id <= MENU_BOOKMARK_END_ID)
+	if (notificationCode == 0 && id >= MENU_BOOKMARK_START_ID && id < MENU_BOOKMARK_END_ID)
 	{
 		m_bookmarksMainMenu->OnMenuItemClicked(id);
 		return 0;
@@ -298,6 +298,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	else if (notificationCode == 0 && id >= MENU_HISTORY_START_ID && id < MENU_HISTORY_END_ID)
 	{
 		m_historyMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+		return 0;
+	}
+	else if (notificationCode == 0 && id >= MENU_FREQUENT_LOCATIONS_START_ID
+		&& id < MENU_FREQUENT_LOCATIONS_END_ID)
+	{
+		m_frequentLocationsMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 		return 0;
 	}
 

@@ -766,6 +766,9 @@
     <ClCompile Include="HistoryMenu.cpp">
       <Filter>History\UI</Filter>
     </ClCompile>
+    <ClCompile Include="FrequentLocationsMenu.cpp">
+      <Filter>Frequent Locations\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1590,6 +1593,9 @@
     <ClInclude Include="HistoryMenu.h">
       <Filter>History\UI</Filter>
     </ClInclude>
+    <ClInclude Include="FrequentLocationsMenu.h">
+      <Filter>Frequent Locations\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1769,6 +1775,9 @@
     </Filter>
     <Filter Include="History\UI">
       <UniqueIdentifier>{089b2f1b-a85c-4670-921d-73646d9f258c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frequent Locations\UI">
+      <UniqueIdentifier>{91c75423-0926-4746-bd18-667ffd1ceddb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

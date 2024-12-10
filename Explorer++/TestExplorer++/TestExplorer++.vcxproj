@@ -230,6 +230,7 @@
     <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="FakeSystemClock.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
+    <ClCompile Include="FrequentLocationsMenuTest.cpp" />
     <ClCompile Include="FrequentLocationsModelTest.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorageTest.cpp" />
     <ClCompile Include="FrequentLocationsStorageTestHelper.cpp" />
