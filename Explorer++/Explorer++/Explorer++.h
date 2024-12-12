@@ -59,6 +59,8 @@ class MainFontSetter;
 class MainMenuSubMenuView;
 class MainToolbar;
 class MainWindow;
+class MenuBase;
+class MenuView;
 struct NavigateParams;
 struct RebarBandStorageInfo;
 class ShellBrowserImpl;
@@ -202,6 +204,12 @@ private:
 	{
 		Decrease,
 		Increase
+	};
+
+	struct MainMenuSubMenu
+	{
+		std::unique_ptr<MainMenuSubMenuView> view;
+		std::unique_ptr<MenuBase> menu;
 	};
 
 	Explorerplusplus(App *app, const WindowStorageData *storageData);
@@ -499,12 +507,15 @@ private:
 	void AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId);
 	void AddGoMenuItem(HMENU goMenu, UINT id, const std::wstring &path);
 	void AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl);
+	void AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
+		std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator);
 	boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) override;
 	wil::unique_hmenu BuildViewsMenu() override;
 	void AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition);
 	void OnInitMenu(HMENU menu);
 	void OnExitMenuLoop(bool shortcutMenu);
+	bool MaybeHandleMainMenuItemSelection(UINT id);
 	boost::signals2::connection AddMainMenuItemMiddleClickedObserver(
 		const MainMenuItemMiddleClickedSignal::slot_type &observer) override;
 	void OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
@@ -514,6 +525,7 @@ private:
 	boost::signals2::connection AddGetMenuItemHelperTextObserver(
 		const GetMenuItemHelperTextSignal::slot_type &observer) override;
 	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
+	MainMenuSubMenu *MaybeGetMainMenuSubMenuFromId(UINT id);
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
@@ -567,10 +579,7 @@ private:
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
 	bool m_mainMenuShowing = false;
 	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
-	std::unique_ptr<MainMenuSubMenuView> m_historyMenuView;
-	std::unique_ptr<HistoryMenu> m_historyMenu;
-	std::unique_ptr<MainMenuSubMenuView> m_frequentLocationsMenuView;
-	std::unique_ptr<FrequentLocationsMenu> m_frequentLocationsMenu;
+	std::vector<MainMenuSubMenu> m_mainMenuSubMenus;
 
 	FocusChangedSignal m_focusChangedSignal;
 	bool m_browserClosing = false;
@@ -585,8 +594,6 @@ private:
 	/* Tabs. */
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
-	std::unique_ptr<MainMenuSubMenuView> m_tabRestorerMenuView;
-	std::unique_ptr<TabRestorerMenu> m_tabRestorerMenu;
 	TabsInitializedSignal m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal m_toolbarContextMenuSignal;

@@ -16,11 +16,29 @@ class MenuView;
 class MenuBase
 {
 public:
-	MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager);
+	struct IdRange
+	{
+		UINT startId;
+		UINT endId;
 
+		IdRange(UINT startId, UINT endId) : startId(startId), endId(endId)
+		{
+		}
+
+		// This is only used in tests.
+		bool operator==(const IdRange &) const = default;
+	};
+
+	MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		UINT startId = DEFAULT_START_ID, UINT endId = DEFAULT_END_ID);
 	virtual ~MenuBase() = default;
 
+	const IdRange &GetIdRange() const;
+
 protected:
+	static constexpr UINT DEFAULT_START_ID = 1;
+	static constexpr UINT DEFAULT_END_ID = std::numeric_limits<UINT>::max();
+
 	std::optional<std::wstring> GetAcceleratorTextForId(UINT id) const;
 
 	MenuView *const m_menuView;
@@ -29,5 +47,6 @@ private:
 	void OnViewDestroyed();
 
 	const AcceleratorManager *const m_acceleratorManager;
+	const IdRange m_idRange;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

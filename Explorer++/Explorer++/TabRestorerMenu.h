@@ -16,8 +16,8 @@ class TabRestorerMenu : public MenuBase, private boost::noncopyable
 {
 public:
 	TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT menuStartId,
-		UINT menuEndId);
+		TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT startId = DEFAULT_START_ID,
+		UINT endId = DEFAULT_END_ID);
 
 private:
 	static const int MAX_MENU_ITEMS = 10;
@@ -33,8 +33,6 @@ private:
 
 	TabRestorer *const m_tabRestorer;
 	ShellIconLoader *const m_shellIconLoader;
-	const UINT m_menuStartId;
-	const UINT m_menuEndId;
 	UINT m_idCounter;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

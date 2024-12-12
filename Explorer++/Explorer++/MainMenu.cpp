@@ -97,11 +97,13 @@ void Explorerplusplus::InitializeMainMenu()
 
 	SetMenu(m_hContainer, mainMenu);
 
-	m_tabRestorerMenuView =
-		std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_FILE_REOPEN_RECENT_TAB);
-	m_tabRestorerMenu = std::make_unique<TabRestorerMenu>(m_tabRestorerMenuView.get(),
-		m_app->GetAcceleratorManager(), m_app->GetTabRestorer(), &m_shellIconLoader,
-		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
+	AddMainMenuSubmenu(mainMenu, IDM_FILE_REOPEN_RECENT_TAB,
+		[this](MenuView *menuView)
+		{
+			return std::make_unique<TabRestorerMenu>(menuView, m_app->GetAcceleratorManager(),
+				m_app->GetTabRestorer(), &m_shellIconLoader, MENU_RECENT_TABS_START_ID,
+				MENU_RECENT_TABS_END_ID);
+		});
 
 	AddViewModesToMenu(mainMenu, IDM_VIEW_PLACEHOLDER, FALSE);
 	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
@@ -110,22 +112,34 @@ void Explorerplusplus::InitializeMainMenu()
 
 	InitializeGoMenu(mainMenu);
 
-	m_historyMenuView = std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_HISTORY);
-	m_historyMenu = std::make_unique<HistoryMenu>(m_historyMenuView.get(),
-		m_app->GetAcceleratorManager(), m_app->GetHistoryModel(), this, &m_shellIconLoader,
-		MENU_HISTORY_START_ID, MENU_HISTORY_END_ID);
+	AddMainMenuSubmenu(mainMenu, IDM_GO_HISTORY,
+		[this](MenuView *menuView)
+		{
+			return std::make_unique<HistoryMenu>(menuView, m_app->GetAcceleratorManager(),
+				m_app->GetHistoryModel(), this, &m_shellIconLoader, MENU_HISTORY_START_ID,
+				MENU_HISTORY_END_ID);
+		});
 
-	m_frequentLocationsMenuView =
-		std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_FREQUENT_LOCATIONS);
-	m_frequentLocationsMenu =
-		std::make_unique<FrequentLocationsMenu>(m_frequentLocationsMenuView.get(),
-			m_app->GetAcceleratorManager(), m_app->GetFrequentLocationsModel(), this,
-			&m_shellIconLoader, MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID);
+	AddMainMenuSubmenu(mainMenu, IDM_GO_FREQUENT_LOCATIONS,
+		[this](MenuView *menuView)
+		{
+			return std::make_unique<FrequentLocationsMenu>(menuView, m_app->GetAcceleratorManager(),
+				m_app->GetFrequentLocationsModel(), this, &m_shellIconLoader,
+				MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID);
+		});
 
 	AddGetMenuItemHelperTextObserver(
 		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
 
 	UpdateMenuAcceleratorStrings(mainMenu, m_app->GetAcceleratorManager());
+}
+
+void Explorerplusplus::AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
+	std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator)
+{
+	auto view = std::make_unique<MainMenuSubMenuView>(mainMenu, subMenuItemId);
+	auto menu = menuCreator(view.get());
+	m_mainMenuSubMenus.emplace_back(std::move(view), std::move(menu));
 }
 
 void Explorerplusplus::SetMainMenuImages()
@@ -304,6 +318,20 @@ void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
 	}
 }
 
+bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)
+{
+	auto *subMenu = MaybeGetMainMenuSubMenuFromId(id);
+
+	if (!subMenu)
+	{
+		return false;
+	}
+
+	subMenu->view->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+
+	return true;
+}
+
 boost::signals2::connection Explorerplusplus::AddMainMenuItemMiddleClickedObserver(
 	const MainMenuItemMiddleClickedSignal::slot_type &observer)
 {
@@ -322,21 +350,9 @@ void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
 
 	if (menuItemId)
 	{
-		if (*menuItemId >= MENU_RECENT_TABS_START_ID && *menuItemId < MENU_RECENT_TABS_END_ID)
+		if (auto *subMenu = MaybeGetMainMenuSubMenuFromId(*menuItemId))
 		{
-			m_tabRestorerMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
-			return;
-		}
-		else if (*menuItemId >= MENU_HISTORY_START_ID && *menuItemId < MENU_HISTORY_END_ID)
-		{
-			m_historyMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
-			return;
-		}
-		else if (*menuItemId >= MENU_FREQUENT_LOCATIONS_START_ID
-			&& *menuItemId < MENU_FREQUENT_LOCATIONS_END_ID)
-		{
-			m_frequentLocationsMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown,
-				isShiftKeyDown);
+			subMenu->view->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
 			return;
 		}
 	}
@@ -370,19 +386,27 @@ std::optional<std::wstring> Explorerplusplus::MaybeGetMenuItemHelperText(HMENU m
 {
 	if (MenuHelper::IsPartOfMenu(GetMenu(m_hContainer), menu))
 	{
-		if (id >= MENU_RECENT_TABS_START_ID && id < MENU_RECENT_TABS_END_ID)
+		if (auto *subMenu = MaybeGetMainMenuSubMenuFromId(id))
 		{
-			return m_tabRestorerMenuView->GetHelpTextForItem(id);
-		}
-		else if (id >= MENU_HISTORY_START_ID && id < MENU_HISTORY_END_ID)
-		{
-			return m_historyMenuView->GetHelpTextForItem(id);
-		}
-		else if (id >= MENU_FREQUENT_LOCATIONS_START_ID && id < MENU_FREQUENT_LOCATIONS_END_ID)
-		{
-			return m_frequentLocationsMenuView->GetHelpTextForItem(id);
+			return subMenu->view->GetHelpTextForItem(id);
 		}
 	}
 
 	return std::nullopt;
+}
+
+Explorerplusplus::MainMenuSubMenu *Explorerplusplus::MaybeGetMainMenuSubMenuFromId(UINT id)
+{
+	auto submenu = std::ranges::find_if(m_mainMenuSubMenus,
+		[id](const auto &submenu) {
+			return id >= submenu.menu->GetIdRange().startId
+				&& id < submenu.menu->GetIdRange().endId;
+		});
+
+	if (submenu == m_mainMenuSubMenus.end())
+	{
+		return nullptr;
+	}
+
+	return &*submenu;
 }

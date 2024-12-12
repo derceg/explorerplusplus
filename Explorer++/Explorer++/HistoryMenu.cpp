@@ -7,25 +7,11 @@
 #include "HistoryModel.h"
 
 HistoryMenu::HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
-	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
-		shellIconLoader),
-	m_historyModel(historyModel)
-{
-	Initialize();
-}
-
-HistoryMenu::HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
-	UINT menuStartId, UINT menuEndId) :
+	UINT startId, UINT endId) :
 	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
-		shellIconLoader, menuStartId, menuEndId),
+		shellIconLoader, startId, endId),
 	m_historyModel(historyModel)
-{
-	Initialize();
-}
-
-void HistoryMenu::Initialize()
 {
 	m_connections.push_back(m_historyModel->AddHistoryChangedObserver(
 		std::bind_front(&HistoryMenu::OnHistoryChanged, this)));

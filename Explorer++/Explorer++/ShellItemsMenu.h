@@ -18,8 +18,8 @@ class ShellItemsMenu : public MenuBase
 public:
 	ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
-		ShellIconLoader *shellIconLoader, UINT menuStartId = 1,
-		UINT menuEndId = std::numeric_limits<UINT>::max());
+		ShellIconLoader *shellIconLoader, UINT startId = DEFAULT_START_ID,
+		UINT endId = DEFAULT_END_ID);
 
 	void RebuildMenu(const std::vector<PidlAbsolute> &pidls);
 
@@ -33,8 +33,6 @@ private:
 
 	BrowserWindow *const m_browserWindow;
 	ShellIconLoader *const m_shellIconLoader;
-	const UINT m_menuStartId;
-	const UINT m_menuEndId;
 	UINT m_idCounter;
 	std::unordered_map<UINT, PidlAbsolute> m_idPidlMap;
 

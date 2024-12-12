@@ -13,13 +13,10 @@
 
 ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
-	ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId) :
-	MenuBase(menuView, acceleratorManager),
+	ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
+	MenuBase(menuView, acceleratorManager, startId, endId),
 	m_browserWindow(browserWindow),
-	m_shellIconLoader(shellIconLoader),
-	m_menuStartId(menuStartId),
-	m_menuEndId(menuEndId),
-	m_idCounter(menuStartId)
+	m_shellIconLoader(shellIconLoader)
 {
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(
 		std::bind_front(&ShellItemsMenu::OnMenuItemSelected, this)));
@@ -32,7 +29,7 @@ ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acc
 void ShellItemsMenu::RebuildMenu(const std::vector<PidlAbsolute> &pidls)
 {
 	m_menuView->ClearMenu();
-	m_idCounter = m_menuStartId;
+	m_idCounter = GetIdRange().startId;
 	m_idPidlMap.clear();
 
 	for (const auto &pidl : pidls)
@@ -55,7 +52,7 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 
 	auto id = m_idCounter++;
 
-	if (id >= m_menuEndId)
+	if (id >= GetIdRange().endId)
 	{
 		return;
 	}

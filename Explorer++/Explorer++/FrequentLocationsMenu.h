@@ -15,15 +15,12 @@ class FrequentLocationsMenu : public ShellItemsMenu
 public:
 	FrequentLocationsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		FrequentLocationsModel *frequentLocationsModel, BrowserWindow *browserWindow,
-		ShellIconLoader *shellIconLoader);
-	FrequentLocationsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		FrequentLocationsModel *frequentLocationsModel, BrowserWindow *browserWindow,
-		ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId);
+		ShellIconLoader *shellIconLoader, UINT startId = DEFAULT_START_ID,
+		UINT endId = DEFAULT_END_ID);
 
 private:
 	static constexpr int MAX_MENU_ITEMS = 10;
 
-	void Initialize();
 	void OnLocationsChanged();
 	static std::vector<PidlAbsolute> GetLocations(
 		const FrequentLocationsModel *frequentLocationsModel);

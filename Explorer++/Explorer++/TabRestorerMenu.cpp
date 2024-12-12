@@ -15,13 +15,10 @@
 #include <ranges>
 
 TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId) :
-	MenuBase(menuView, acceleratorManager),
+	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
+	MenuBase(menuView, acceleratorManager, startId, endId),
 	m_tabRestorer(tabRestorer),
-	m_shellIconLoader(shellIconLoader),
-	m_menuStartId(menuStartId),
-	m_menuEndId(menuEndId),
-	m_idCounter(menuStartId)
+	m_shellIconLoader(shellIconLoader)
 {
 	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
 		std::bind_front(&TabRestorerMenu::OnRestoreItemsChanged, this)));
@@ -36,7 +33,7 @@ TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *a
 void TabRestorerMenu::RebuildMenu()
 {
 	m_menuView->ClearMenu();
-	m_idCounter = m_menuStartId;
+	m_idCounter = GetIdRange().startId;
 	m_menuItemMappings.clear();
 
 	if (m_tabRestorer->IsEmpty())
@@ -60,7 +57,7 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 {
 	UINT id = m_idCounter++;
 
-	if (id >= m_menuEndId)
+	if (id >= GetIdRange().endId)
 	{
 		return;
 	}

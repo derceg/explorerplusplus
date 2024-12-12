@@ -13,13 +13,10 @@ class HistoryMenu : public ShellItemsMenu
 {
 public:
 	HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader);
-	HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
-		UINT menuStartId, UINT menuEndId);
+		UINT startId = DEFAULT_START_ID, UINT endId = DEFAULT_END_ID);
 
 private:
-	void Initialize();
 	void OnHistoryChanged();
 	static std::vector<PidlAbsolute> GetHistoryItems(const HistoryModel *historyModel);
 

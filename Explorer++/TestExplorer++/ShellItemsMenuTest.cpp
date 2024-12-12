@@ -73,6 +73,14 @@ protected:
 		}
 	}
 
+	void CheckIdRange(UINT startId, UINT endId, UINT expectedStartId, UINT expectedEndId)
+	{
+		PopupMenuView popupMenu;
+		auto pidls = BuildPidlCollection(1);
+		auto menu = BuildMenu(&popupMenu, pidls, startId, endId);
+		EXPECT_EQ(menu->GetIdRange(), MenuBase::IdRange(expectedStartId, expectedEndId));
+	}
+
 	AcceleratorManager m_acceleratorManager;
 	BrowserWindowMock m_browserWindow;
 	ShellIconLoaderFake m_shellIconLoader;
@@ -97,6 +105,22 @@ TEST_F(ShellItemsMenuTest, MaxItems)
 	// items were passed in, only the first item should be added to the menu.
 	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 1);
 	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(0)), GetNameForItem(0));
+}
+
+TEST_F(ShellItemsMenuTest, GetIdRange)
+{
+	CheckIdRange(20, 100, 20, 100);
+
+	// 0 isn't a valid start ID, so the final ID range should start from 1.
+	CheckIdRange(0, 46, 1, 46);
+
+	// 0 isn't a valid end ID either, so the end ID should be set to the start ID.
+	CheckIdRange(11, 0, 11, 11);
+
+	CheckIdRange(0, 0, 1, 1);
+
+	// The end ID should always be greater or equal to the start ID.
+	CheckIdRange(200, 148, 200, 200);
 }
 
 TEST_F(ShellItemsMenuTest, RebuildMenu)

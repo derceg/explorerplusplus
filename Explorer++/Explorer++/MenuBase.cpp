@@ -8,12 +8,19 @@
 #include "AcceleratorManager.h"
 #include "MenuView.h"
 
-MenuBase::MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager) :
+MenuBase::MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager, UINT startId,
+	UINT endId) :
 	m_menuView(menuView),
-	m_acceleratorManager(acceleratorManager)
+	m_acceleratorManager(acceleratorManager),
+	m_idRange(std::max(startId, 1u), std::max({ endId, startId, 1u }))
 {
 	m_connections.push_back(
 		menuView->AddViewDestroyedObserver(std::bind_front(&MenuBase::OnViewDestroyed, this)));
+}
+
+const MenuBase::IdRange &MenuBase::GetIdRange() const
+{
+	return m_idRange;
 }
 
 std::optional<std::wstring> MenuBase::GetAcceleratorTextForId(UINT id) const

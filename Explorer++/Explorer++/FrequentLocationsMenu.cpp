@@ -9,26 +9,10 @@
 
 FrequentLocationsMenu::FrequentLocationsMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, FrequentLocationsModel *frequentLocationsModel,
-	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
+	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
 	ShellItemsMenu(menuView, acceleratorManager, GetLocations(frequentLocationsModel),
-		browserWindow, shellIconLoader),
+		browserWindow, shellIconLoader, startId, endId),
 	m_frequentLocationsModel(frequentLocationsModel)
-{
-	Initialize();
-}
-
-FrequentLocationsMenu::FrequentLocationsMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, FrequentLocationsModel *frequentLocationsModel,
-	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT menuStartId,
-	UINT menuEndId) :
-	ShellItemsMenu(menuView, acceleratorManager, GetLocations(frequentLocationsModel),
-		browserWindow, shellIconLoader, menuStartId, menuEndId),
-	m_frequentLocationsModel(frequentLocationsModel)
-{
-	Initialize();
-}
-
-void FrequentLocationsMenu::Initialize()
 {
 	m_connections.push_back(m_frequentLocationsModel->AddLocationsChangedObserver(
 		std::bind_front(&FrequentLocationsMenu::OnLocationsChanged, this)));

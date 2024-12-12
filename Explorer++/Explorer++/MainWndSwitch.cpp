@@ -278,12 +278,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		m_bookmarksMainMenu->OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (notificationCode == 0 && id >= MENU_RECENT_TABS_START_ID
-		&& id < MENU_RECENT_TABS_END_ID)
-	{
-		m_tabRestorerMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
-		return 0;
-	}
 	else if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)
 	{
 		m_pluginMenuManager.OnMenuItemClicked(id);
@@ -295,15 +289,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		m_pluginCommandManager.onAcceleratorPressed(id);
 		return 0;
 	}
-	else if (notificationCode == 0 && id >= MENU_HISTORY_START_ID && id < MENU_HISTORY_END_ID)
+	else if (notificationCode == 0 && MaybeHandleMainMenuItemSelection(id))
 	{
-		m_historyMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
-		return 0;
-	}
-	else if (notificationCode == 0 && id >= MENU_FREQUENT_LOCATIONS_START_ID
-		&& id < MENU_FREQUENT_LOCATIONS_END_ID)
-	{
-		m_frequentLocationsMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 		return 0;
 	}
 
