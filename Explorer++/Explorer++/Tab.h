@@ -72,7 +72,7 @@ public:
 	// BOOL	bUsingDefaultColumns;
 
 private:
-	static int idCounter;
+	static inline int idCounter = 1;
 	const int m_id;
 
 	std::shared_ptr<ShellBrowser> m_shellBrowser;

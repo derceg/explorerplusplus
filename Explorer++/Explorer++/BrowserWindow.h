@@ -21,6 +21,7 @@ public:
 
 	virtual ~BrowserWindow() = default;
 
+	virtual int GetId() const = 0;
 	virtual boost::signals2::connection AddBrowserInitializedObserver(
 		const BrowserInitializedSignal::slot_type &observer) = 0;
 	virtual BrowserCommandController *GetCommandController() = 0;

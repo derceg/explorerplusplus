@@ -18,8 +18,15 @@ using namespace testing;
 class BrowserWindowFake : public BrowserWindow
 {
 public:
-	BrowserWindowFake(BrowserList *browserList) : m_browserTracker(browserList, this)
+	BrowserWindowFake(BrowserList *browserList) :
+		m_id(idCounter++),
+		m_browserTracker(browserList, this)
 	{
+	}
+
+	int GetId() const override
+	{
+		return m_id;
 	}
 
 	boost::signals2::connection AddBrowserInitializedObserver(
@@ -100,6 +107,8 @@ public:
 	}
 
 private:
+	static inline int idCounter = 1;
+	const int m_id;
 	BrowserTracker m_browserTracker;
 };
 

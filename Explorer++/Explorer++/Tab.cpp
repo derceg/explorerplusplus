@@ -13,8 +13,6 @@
 #include "TabStorage.h"
 #include <wil/resource.h>
 
-int Tab::idCounter = 1;
-
 // Note the use of std::dynamic_pointer_cast below. There are a number of places where the caller
 // needs to be able to retrieve the ShellBrowser implementation class (ShellBrowserImpl), so that's
 // something this class has to provide.
