@@ -838,6 +838,9 @@ void Explorerplusplus::OnNewWindow()
 	WindowStorageData initialData = {};
 	initialData.bounds = bounds;
 	initialData.showState = NativeShowStateToShowState(placement.showCmd);
+	initialData.treeViewWidth = m_treeViewWidth;
+	initialData.displayWindowWidth = m_displayWindowWidth;
+	initialData.displayWindowHeight = m_displayWindowHeight;
 
 	Explorerplusplus::Create(m_app, &initialData);
 }
