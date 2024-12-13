@@ -319,6 +319,9 @@
     <ClCompile Include="FrequentLocationsMenuTest.cpp">
       <Filter>Frequent Locations\UI</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserWindowMock.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

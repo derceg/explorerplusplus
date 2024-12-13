@@ -196,6 +196,7 @@
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="BrowserCommandControllerTest.cpp" />
     <ClCompile Include="BrowserListTest.cpp" />
+    <ClCompile Include="BrowserWindowMock.cpp" />
     <ClCompile Include="ClipboardTest.cpp" />
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
     <ClCompile Include="ColorRulesStorageTestHelper.cpp" />

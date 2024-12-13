@@ -39,6 +39,19 @@ concurrencpp::generator<BrowserWindow *> BrowserList::GetList() const
 	}
 }
 
+BrowserWindow *BrowserList::MaybeGetById(int id) const
+{
+	auto &idIndex = m_browsers.get<ById>();
+	auto itr = idIndex.find(id);
+
+	if (itr == idIndex.end())
+	{
+		return nullptr;
+	}
+
+	return itr->GetBrowser();
+}
+
 BrowserWindow *BrowserList::GetLastActive() const
 {
 	if (m_browsers.empty())
@@ -90,4 +103,10 @@ BrowserList::BrowserData::Clock::time_point BrowserList::BrowserData::GetLastAct
 void BrowserList::BrowserData::UpdateLastActiveTime()
 {
 	m_lastActiveTime = Clock::now();
+}
+
+BrowserList::BrowserIdExtractor::result_type BrowserList::BrowserIdExtractor::operator()(
+	const BrowserData &browserData) const
+{
+	return browserData.GetBrowser()->GetId();
 }

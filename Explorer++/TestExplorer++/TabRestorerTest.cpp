@@ -27,6 +27,11 @@ protected:
 			&m_browser);
 	}
 
+	Tab BuildTab(BrowserWindow *browser)
+	{
+		return Tab(std::make_shared<ShellBrowserFake>(&m_tabNavigation, &m_iconFetcher), browser);
+	}
+
 	GlobalTabEventDispatcher m_dispatcher;
 	BrowserList m_browserList;
 	TabRestorer m_tabRestorer;
@@ -98,6 +103,43 @@ TEST_F(TabRestorerTest, RestoreTabById)
 	m_tabRestorer.RestoreTabById(tab2.GetId());
 
 	EXPECT_EQ(m_tabRestorer.GetClosedTabs().size(), 0u);
+}
+
+TEST_F(TabRestorerTest, BrowserUsedForRestore)
+{
+	BrowserWindowMock browser1;
+	m_browserList.AddBrowser(&browser1);
+
+	BrowserWindowMock browser2;
+	m_browserList.AddBrowser(&browser2);
+
+	auto tab1 = BuildTab(&browser1);
+	m_dispatcher.NotifyPreRemoval(tab1, 0);
+
+	auto tab2 = BuildTab(&browser1);
+	m_dispatcher.NotifyPreRemoval(tab2, 0);
+
+	MockFunction<void(int)> check;
+	{
+		InSequence seq;
+
+		// At this point, browser1 still exists, so tab2 should preferentially be restored into it.
+		EXPECT_CALL(browser1, CreateTabFromPreservedTab(m_tabRestorer.GetTabById(tab2.GetId())));
+
+		EXPECT_CALL(check, Call(1));
+
+		// At this point, browser1 has been removed, so tab1 should instead be restored into the
+		// last active browser.
+		EXPECT_CALL(browser2, CreateTabFromPreservedTab(m_tabRestorer.GetTabById(tab1.GetId())));
+	}
+
+	m_tabRestorer.RestoreLastTab();
+
+	m_browserList.RemoveBrowser(&browser1);
+
+	check.Call(1);
+
+	m_tabRestorer.RestoreLastTab();
 }
 
 TEST_F(TabRestorerTest, ItemsChanged)

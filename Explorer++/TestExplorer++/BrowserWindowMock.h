@@ -13,6 +13,8 @@
 class BrowserWindowMock : public BrowserWindow
 {
 public:
+	BrowserWindowMock();
+
 	// BrowserWindow
 	MOCK_METHOD(int, GetId, (), (const, override));
 	MOCK_METHOD(boost::signals2::connection, AddBrowserInitializedObserver,
@@ -20,7 +22,7 @@ public:
 	MOCK_METHOD(BrowserCommandController *, GetCommandController, (), (override));
 	MOCK_METHOD(BrowserPane *, GetActivePane, (), (const, override));
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
-	MOCK_METHOD(void, CreateTabFromPreservedTab, (PreservedTab * tab), (override));
+	MOCK_METHOD(void, CreateTabFromPreservedTab, (const PreservedTab *tab), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
@@ -35,4 +37,8 @@ public:
 		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(void, OpenItem,
 		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
+
+private:
+	static inline int idCounter = 1;
+	const int m_id;
 };

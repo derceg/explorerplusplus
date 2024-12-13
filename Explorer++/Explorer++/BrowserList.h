@@ -25,6 +25,7 @@ public:
 	void RemoveBrowser(BrowserWindow *browser);
 
 	concurrencpp::generator<BrowserWindow *> GetList() const;
+	BrowserWindow *MaybeGetById(int id) const;
 	BrowserWindow *GetLastActive() const;
 	void SetLastActive(BrowserWindow *browser);
 	size_t GetSize() const;
@@ -56,8 +57,18 @@ private:
 	{
 	};
 
+	struct ById
+	{
+	};
+
 	struct ByActiveTime
 	{
+	};
+
+	struct BrowserIdExtractor
+	{
+		using result_type = int;
+		result_type operator()(const BrowserData &browserData) const;
 	};
 
 	// clang-format off
@@ -67,6 +78,11 @@ private:
 			boost::multi_index::hashed_unique<
 				boost::multi_index::tag<ByBrowser>,
 				boost::multi_index::const_mem_fun<BrowserData, BrowserWindow *, &BrowserData::GetBrowser>
+			>,
+			// A non-sorted index of browsers, based on their unique ID.
+			boost::multi_index::hashed_unique<
+				boost::multi_index::tag<ById>,
+				BrowserIdExtractor
 			>,
 			// An index of browsers, sorted in descending order of the last active time (i.e. most
 			// recently activated first).

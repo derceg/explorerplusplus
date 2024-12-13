@@ -860,7 +860,20 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 
 	Tab &tab = *item.first->second;
 
-	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
+	int finalIndex;
+
+	if (preservedTab.browserId == m_browser->GetId())
+	{
+		finalIndex = preservedTab.index;
+	}
+	else
+	{
+		// This tab is being restored from a different browser, so its index isn't relevant and it
+		// should simply be added to the end of the current set of tabs.
+		finalIndex = static_cast<int>(m_tabs.size()) - 1;
+	}
+
+	TabSettings tabSettings(_index = finalIndex, _selected = true);
 
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 	auto navigateParams =

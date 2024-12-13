@@ -4,12 +4,14 @@
 
 #include "stdafx.h"
 #include "PreservedTab.h"
+#include "BrowserWindow.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 
 PreservedTab::PreservedTab(const Tab &tab, int index) :
 	id(tab.GetId()),
+	browserId(tab.GetBrowser()->GetId()),
 	index(index),
 	history(CopyHistoryEntries(tab)),
 	currentEntry(tab.GetShellBrowser()->GetNavigationController()->GetCurrentIndex()),

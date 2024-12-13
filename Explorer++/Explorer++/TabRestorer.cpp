@@ -78,18 +78,18 @@ void TabRestorer::RestoreTabById(int id)
 	m_itemsChangedSignal();
 }
 
-void TabRestorer::RestoreTabIntoBrowser(PreservedTab *tab)
+void TabRestorer::RestoreTabIntoBrowser(const PreservedTab *tab)
 {
-	// TODO: Should attempt to find the original browser, instead of always restoring to the last
-	// active browser.
-	auto *lastActiveBrowser = m_browserList->GetLastActive();
+	auto *originalBrowser = m_browserList->MaybeGetById(tab->browserId);
+	auto *targetBrowser = originalBrowser ? originalBrowser : m_browserList->GetLastActive();
 
-	if (!lastActiveBrowser)
+	if (!targetBrowser)
 	{
 		return;
 	}
 
-	lastActiveBrowser->CreateTabFromPreservedTab(tab);
+	targetBrowser->CreateTabFromPreservedTab(tab);
+	targetBrowser->Activate();
 }
 
 boost::signals2::connection TabRestorer::AddItemsChangedObserver(

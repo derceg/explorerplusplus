@@ -112,7 +112,7 @@ public:
 	BrowserPane *GetActivePane() const override;
 	BrowserCommandController *GetCommandController() override;
 	void FocusActiveTab() override;
-	void CreateTabFromPreservedTab(PreservedTab *tab) override;
+	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
 
 	// Note that there is also GetActiveShellBrowserImpl() declared below. There are some places
 	// where this method can be used, as the calling code only uses methods from the ShellBrowser

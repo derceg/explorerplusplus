@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	void CreateTabFromPreservedTab(PreservedTab *tab) override
+	void CreateTabFromPreservedTab(const PreservedTab *tab) override
 	{
 		UNREFERENCED_PARAMETER(tab);
 	}

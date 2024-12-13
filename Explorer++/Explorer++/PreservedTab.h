@@ -16,6 +16,7 @@ struct PreservedTab : private boost::noncopyable
 	~PreservedTab();
 
 	int id;
+	int browserId;
 	int index;
 
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> history;

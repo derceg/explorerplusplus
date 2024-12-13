@@ -181,7 +181,7 @@ boost::signals2::connection Explorerplusplus::AddBrowserInitializedObserver(
 	return m_browserInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::CreateTabFromPreservedTab(PreservedTab *tab)
+void Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
 	GetActivePane()->GetTabContainer()->CreateNewTab(*tab);
 }

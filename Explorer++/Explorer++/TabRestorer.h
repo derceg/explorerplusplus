@@ -31,7 +31,7 @@ public:
 
 private:
 	void OnTabPreRemoval(const Tab &tab, int index);
-	void RestoreTabIntoBrowser(PreservedTab *tab);
+	void RestoreTabIntoBrowser(const PreservedTab *tab);
 
 	const BrowserList *const m_browserList;
 
