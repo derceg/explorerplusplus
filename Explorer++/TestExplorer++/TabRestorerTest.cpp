@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "TabRestorer.h"
 #include "BrowserList.h"
+#include "BrowserWindowMock.h"
 #include "GlobalTabEventDispatcher.h"
 #include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
@@ -22,7 +23,8 @@ protected:
 
 	Tab BuildTab()
 	{
-		return Tab(std::make_shared<ShellBrowserFake>(&m_tabNavigation, &m_iconFetcher));
+		return Tab(std::make_shared<ShellBrowserFake>(&m_tabNavigation, &m_iconFetcher),
+			&m_browser);
 	}
 
 	GlobalTabEventDispatcher m_dispatcher;
@@ -31,6 +33,7 @@ protected:
 
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
+	BrowserWindowMock m_browser;
 };
 
 TEST_F(TabRestorerTest, InitialState)

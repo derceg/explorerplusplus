@@ -29,10 +29,11 @@
 // If the ShellBrowser interface expands to cover all the necessary functionality, or
 // ShellBrowserImpl is simplified enough to make it usable in tests, the casting here can be
 // removed.
-Tab::Tab(std::shared_ptr<ShellBrowser> shellBrowser) :
+Tab::Tab(std::shared_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser) :
 	m_id(idCounter++),
 	m_shellBrowser(shellBrowser),
 	m_shellBrowserImpl(std::dynamic_pointer_cast<ShellBrowserImpl>(shellBrowser)),
+	m_browser(browser),
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked)
 {
@@ -43,10 +44,12 @@ Tab::Tab(std::shared_ptr<ShellBrowser> shellBrowser) :
 	}
 }
 
-Tab::Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser) :
+Tab::Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser,
+	BrowserWindow *browser) :
 	m_id(idCounter++),
 	m_shellBrowser(shellBrowser),
 	m_shellBrowserImpl(std::dynamic_pointer_cast<ShellBrowserImpl>(shellBrowser)),
+	m_browser(browser),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
 	m_lockState(preservedTab.lockState)
@@ -75,6 +78,11 @@ ShellBrowserImpl *Tab::GetShellBrowserImpl() const
 std::weak_ptr<ShellBrowserImpl> Tab::GetShellBrowserImplWeak() const
 {
 	return std::weak_ptr<ShellBrowserImpl>(m_shellBrowserImpl);
+}
+
+BrowserWindow *Tab::GetBrowser() const
+{
+	return m_browser;
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

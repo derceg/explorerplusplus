@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "Tab.h"
+#include "BrowserWindowMock.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -23,10 +24,11 @@ public:
 class TabTest : public Test
 {
 protected:
-	TabTest() : m_tab(nullptr), m_observer(&m_tab)
+	TabTest() : m_tab(nullptr, &m_browser), m_observer(&m_tab)
 	{
 	}
 
+	BrowserWindowMock m_browser;
 	Tab m_tab;
 	TabObserverMock m_observer;
 };
@@ -67,4 +69,9 @@ TEST_F(TabTest, Update)
 
 	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::LockState));
 	m_tab.SetLockState(Tab::LockState::NotLocked);
+}
+
+TEST_F(TabTest, GetBrowser)
+{
+	EXPECT_EQ(m_tab.GetBrowser(), &m_browser);
 }

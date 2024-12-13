@@ -8,6 +8,7 @@
 #include <boost/signals2.hpp>
 #include <memory>
 
+class BrowserWindow;
 class CoreInterface;
 class FileActionHandler;
 struct FolderColumns;
@@ -43,14 +44,17 @@ public:
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)>
 		TabUpdatedSignal;
 
-	Tab(std::shared_ptr<ShellBrowser> shellBrowser);
-	Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser);
+	Tab(std::shared_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser);
+	Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser,
+		BrowserWindow *browser);
 
 	int GetId() const;
 
 	ShellBrowser *GetShellBrowser() const;
 	ShellBrowserImpl *GetShellBrowserImpl() const;
 	std::weak_ptr<ShellBrowserImpl> GetShellBrowserImplWeak() const;
+
+	BrowserWindow *GetBrowser() const;
 
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
@@ -77,6 +81,8 @@ private:
 
 	std::shared_ptr<ShellBrowser> m_shellBrowser;
 	std::shared_ptr<ShellBrowserImpl> m_shellBrowserImpl;
+
+	BrowserWindow *m_browser = nullptr;
 
 	bool m_useCustomName;
 	std::wstring m_customName;
