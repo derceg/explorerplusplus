@@ -94,6 +94,8 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 Explorerplusplus::~Explorerplusplus()
 {
 	m_pDirMon->Release();
+
+	*m_destroyed = true;
 }
 
 HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)

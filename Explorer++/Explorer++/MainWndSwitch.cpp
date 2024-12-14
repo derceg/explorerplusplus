@@ -1453,7 +1453,10 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		return 0;
 
 	case RBN_HEIGHTCHANGE:
-		UpdateLayout();
+		// This message can be dispatched within the middle of an existing layout operation (if the
+		// height of the rebar is updated). To avoid making re-entrant layout calls, the layout
+		// update will be scheduled, instead of being immediately invoked.
+		ScheduleUpdateLayout();
 		break;
 
 	case RBN_CHEVRONPUSHED:

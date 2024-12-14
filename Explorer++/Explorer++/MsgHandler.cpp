@@ -284,6 +284,15 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		return;
 	}
 
+#if DCHECK_IS_ON()
+	// When updating the size of a control below (e.g. the main rebar control), it's possible that
+	// another layout may be requested. That layout, however, shouldn't occur in the middle of an
+	// existing layout operation, but should instead be scheduled to run at a future point.
+	DCHECK(!m_performingLayout);
+	m_performingLayout = true;
+	auto resetPerformingLayout = wil::scope_exit([this]() { m_performingLayout = false; });
+#endif
+
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
 	m_treeViewWidth = std::clamp(m_treeViewWidth,
@@ -294,12 +303,11 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	m_displayWindowHeight = std::max(m_displayWindowHeight,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
-	RECT rebarRect;
-	GetClientRect(m_hMainRebar, &rebarRect);
-	SetWindowPos(m_hMainRebar, nullptr, 0, 0, mainWindowWidth, GetRectHeight(&rebarRect),
+	auto rebarHeight = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBARHEIGHT, 0, 0));
+	SetWindowPos(m_hMainRebar, nullptr, 0, 0, mainWindowWidth, rebarHeight,
 		SWP_NOZORDER | SWP_NOMOVE);
 
-	iIndentRebar += GetRectHeight(&rebarRect);
+	iIndentRebar += rebarHeight;
 
 	if (m_config->showStatusBar)
 	{

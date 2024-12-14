@@ -4,11 +4,13 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Config.h"
 #include "HolderWindow.h"
 #include "IconResourceLoader.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
+#include "Runtime.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
@@ -93,6 +95,29 @@ void Explorerplusplus::ToggleFolders()
 {
 	m_config->showFolders = !m_config->showFolders.get();
 	lShowWindow(m_treeViewHolder->GetHWND(), m_config->showFolders.get());
+	UpdateLayout();
+}
+
+concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout()
+{
+	if (!m_browserInitialized || m_browserClosing)
+	{
+		co_return;
+	}
+
+	auto destroyed = m_destroyed;
+
+	// This function is designed to be called from the UI thread and the call here will also resume
+	// on the UI thread. Rather than immediately resuming, however, this call will result in a
+	// message being posted. Therefore, this function will only resume once the message has been
+	// processed.
+	co_await concurrencpp::resume_on(m_app->GetRuntime()->GetUiThreadExecutor());
+
+	if (*destroyed)
+	{
+		co_return;
+	}
+
 	UpdateLayout();
 }
 

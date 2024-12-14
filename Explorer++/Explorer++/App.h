@@ -47,6 +47,7 @@ public:
 	const CommandLine::Settings *GetCommandLineSettings() const;
 	bool GetSavePreferencesToXmlFile() const;
 	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
+	Runtime *GetRuntime();
 	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
 	Config *GetConfig();

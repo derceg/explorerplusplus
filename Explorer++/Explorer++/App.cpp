@@ -307,6 +307,11 @@ void App::SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile)
 	m_savePreferencesToXmlFile = savePreferencesToXmlFile;
 }
 
+Runtime *App::GetRuntime()
+{
+	return &m_runtime;
+}
+
 FeatureList *App::GetFeatureList()
 {
 	return &m_featureList;

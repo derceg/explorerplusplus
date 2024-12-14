@@ -31,6 +31,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ShellContextMenu.h"
 #include <boost/signals2.hpp>
+#include <concurrencpp/concurrencpp.h>
 #include <wil/resource.h>
 #include <optional>
 
@@ -400,6 +401,7 @@ private:
 	void UpdateWindowStates(const Tab &tab);
 	void SetListViewInitialPosition(HWND hListView) override;
 	void ToggleFolders();
+	concurrencpp::null_result ScheduleUpdateLayout();
 	void UpdateLayout();
 	void OnTreeViewHolderResized(int newWidth);
 	void ToggleDualPane();
@@ -565,6 +567,10 @@ private:
 	bool m_bShowTabBar;
 	ULONG m_SHChangeNotifyID;
 
+#if DCHECK_IS_ON()
+	bool m_performingLayout = false;
+#endif
+
 	/* Initialization. */
 	bool m_browserInitialized = false;
 	BrowserInitializedSignal m_browserInitializedSignal;
@@ -668,4 +674,6 @@ private:
 	// Status bar
 	StatusBar *m_pStatusBar = nullptr;
 	std::unique_ptr<MainFontSetter> m_statusBarFontSetter;
+
+	std::shared_ptr<bool> m_destroyed = std::make_shared<bool>(false);
 };
