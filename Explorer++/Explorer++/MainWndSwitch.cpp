@@ -1448,10 +1448,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		}
 		break;
 
-	case RBN_BEGINDRAG:
-		SendMessage(m_hMainRebar, RB_DRAGMOVE, 0, -1);
-		return 0;
-
 	case RBN_HEIGHTCHANGE:
 		// This message can be dispatched within the middle of an existing layout operation (if the
 		// height of the rebar is updated). To avoid making re-entrant layout calls, the layout
