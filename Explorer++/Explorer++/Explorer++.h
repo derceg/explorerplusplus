@@ -17,6 +17,7 @@
 #include "PluginInterface.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
+#include "RebarView.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowserEmbedder.h"
 #include "ShellBrowser/SortModes.h"
@@ -58,6 +59,7 @@ class LoadSaveRegistry;
 class LoadSaveXML;
 class MainFontSetter;
 class MainMenuSubMenuView;
+class MainRebarView;
 class MainToolbar;
 class MainWindow;
 class MenuBase;
@@ -182,18 +184,6 @@ private:
 	{
 		void *pContainer;
 		int uId;
-	};
-
-	struct InternalRebarBandInfo
-	{
-		UINT id;
-		HWND child;
-		UINT height;
-		bool newLine;
-		bool useChevron;
-		bool showBand;
-		UINT length;
-		std::optional<UINT> idealLength;
 	};
 
 	enum class FocusChangeDirection
@@ -356,15 +346,13 @@ private:
 
 	// Main rebar
 	void CreateMainRebarAndChildren(const WindowStorageData *storageData);
-	std::vector<InternalRebarBandInfo> InitializeMainRebarBands(
-		const WindowStorageData *storageData);
-	InternalRebarBandInfo InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
-	InternalRebarBandInfo InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
-	void UpdateMainRebarBandsFromLoadedInfo(std::vector<InternalRebarBandInfo> &mainRebarBands,
+	std::vector<RebarView::Band> InitializeMainRebarBands(const WindowStorageData *storageData);
+	RebarView::Band InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
+	RebarView::Band InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
+	void UpdateMainRebarBandsFromLoadedInfo(std::vector<RebarView::Band> &mainRebarBands,
 		const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
-	void UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo,
+	void UpdateMainRebarBandFromLoadedInfo(RebarView::Band &band,
 		const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
-	void InsertMainRebarBand(const InternalRebarBandInfo &internalBandInfo);
 	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void CreateFolderControls();
 	void CreateAddressBar();
@@ -380,9 +368,6 @@ private:
 	boost::signals2::connection AddToolbarContextMenuSelectedObserver(
 		const ToolbarContextMenuSelectedSignal::slot_type &observer) override;
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
-	std::vector<RebarBandStorageInfo> GetMainRebarStorageInfo() const;
-	void ShowMainRebarBand(HWND toolbar, bool show);
-	void OnLockToolbarsUpdated(bool lock);
 
 	/* Main toolbar private message handlers. */
 	void OnToolbarRClick(HWND sourceWindow);
@@ -554,7 +539,6 @@ private:
 	BrowserCommandController m_commandController;
 
 	HWND m_hStatusBar;
-	HWND m_hMainRebar;
 	HWND m_hTabBacking;
 
 	HWND m_hTabWindowToolbar;
@@ -657,6 +641,7 @@ private:
 	FileActionHandler m_FileActionHandler;
 
 	// Main rebar
+	MainRebarView *m_mainRebarView = nullptr;
 	std::vector<boost::signals2::scoped_connection> m_rebarConnections;
 
 	/* Toolbars. */

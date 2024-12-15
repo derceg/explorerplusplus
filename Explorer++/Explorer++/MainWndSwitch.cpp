@@ -22,6 +22,7 @@
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "MainMenuSubMenuView.h"
+#include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
@@ -1478,7 +1479,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		POINT ptMenu;
 		ptMenu.x = pnmrc->rc.left;
 		ptMenu.y = pnmrc->rc.bottom;
-		ClientToScreen(m_hMainRebar, &ptMenu);
+		ClientToScreen(m_mainRebarView->GetHWND(), &ptMenu);
 
 		if (pnmrc->wID == REBAR_BAND_ID_BOOKMARKS_TOOLBAR)
 		{
@@ -1601,7 +1602,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		UINT uFlags = TPM_LEFTALIGN | TPM_RETURNCMD;
 		int iCmd;
 
-		iCmd = TrackPopupMenu(hMenu, uFlags, ptMenu.x, ptMenu.y, 0, m_hMainRebar, nullptr);
+		iCmd = TrackPopupMenu(hMenu, uFlags, ptMenu.x, ptMenu.y, 0, m_mainRebarView->GetHWND(),
+			nullptr);
 
 		if (iCmd != 0)
 		{

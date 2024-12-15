@@ -17,6 +17,7 @@
 #include "MainFontSetter.h"
 #include "MainMenuSubMenuView.h"
 #include "MainRebarStorage.h"
+#include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MenuRanges.h"
@@ -57,7 +58,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 {
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
-	m_hMainRebar = nullptr;
 	m_hStatusBar = nullptr;
 	m_hTabBacking = nullptr;
 	m_hTabWindowToolbar = nullptr;
@@ -206,7 +206,7 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		.showState = NativeShowStateToShowState(placement.showCmd),
 		.tabs = tabContainer->GetStorageData(),
 		.selectedTab = tabContainer->GetSelectedTabIndex(),
-		.mainRebarInfo = GetMainRebarStorageInfo(),
+		.mainRebarInfo = m_mainRebarView->GetStorageData(),
 		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
 		.treeViewWidth = m_treeViewWidth,
 		.displayWindowWidth = m_displayWindowWidth,

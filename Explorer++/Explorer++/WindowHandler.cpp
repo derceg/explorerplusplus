@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "HolderWindow.h"
 #include "IconResourceLoader.h"
+#include "MainRebarView.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
 #include "Runtime.h"
@@ -34,9 +35,9 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	mainWindowWidth = GetRectWidth(&rc);
 	mainWindowHeight = GetRectHeight(&rc);
 
-	if (m_hMainRebar)
+	if (m_mainRebarView)
 	{
-		GetWindowRect(m_hMainRebar, &rc);
+		GetWindowRect(m_mainRebarView->GetHWND(), &rc);
 		indentRebar += GetRectHeight(&rc);
 	}
 

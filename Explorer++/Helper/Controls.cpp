@@ -283,55 +283,6 @@ void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 	}
 }
 
-// This function should be called when the size of a control contained within a rebar changes. For
-// example, adding or removing buttons from a toolbar will change the toolbar's ideal width (i.e.
-// the width needed to show every button). Changing a control's font can change both its ideal width
-// and its height.
-// Setting the ideal width for a band is important, since when a band is unlocked, clicking the
-// gripper will resize the band to its ideal size, which should match the size of the content in the
-// control.
-// Setting the height is also important, since otherwise, the band may end up being too small or too
-// large.
-void UpdateRebarBandSize(HWND rebar, HWND child, int idealWidth, int height)
-{
-	UINT numBands = static_cast<UINT>(SendMessage(rebar, RB_GETBANDCOUNT, 0, 0));
-
-	REBARBANDINFO bandInfo;
-	std::optional<int> childIndex;
-
-	for (UINT i = 0; i < numBands; i++)
-	{
-		bandInfo = {};
-		bandInfo.cbSize = sizeof(bandInfo);
-		bandInfo.fMask = RBBIM_CHILD | RBBIM_CHILDSIZE;
-		auto res = SendMessage(rebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
-
-		if (res == 0)
-		{
-			DCHECK(false);
-			continue;
-		}
-
-		if (bandInfo.hwndChild == child)
-		{
-			childIndex = i;
-			break;
-		}
-	}
-
-	if (!childIndex)
-	{
-		DCHECK(false);
-		return;
-	}
-
-	bandInfo.fMask = RBBIM_IDEALSIZE | RBBIM_CHILDSIZE;
-	bandInfo.cxIdeal = idealWidth;
-	bandInfo.cyMinChild = height;
-	auto res = SendMessage(rebar, RB_SETBANDINFO, *childIndex, reinterpret_cast<LPARAM>(&bandInfo));
-	DCHECK(res);
-}
-
 SIZE GetCheckboxSize(HWND hwnd)
 {
 	return GetButtonSize(hwnd, BP_CHECKBOX, CBS_UNCHECKEDNORMAL, DEFAULT_CHECKBOX_WIDTH,

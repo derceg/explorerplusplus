@@ -769,6 +769,12 @@
     <ClCompile Include="FrequentLocationsMenu.cpp">
       <Filter>Frequent Locations\UI</Filter>
     </ClCompile>
+    <ClCompile Include="RebarView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRebarView.cpp">
+      <Filter>Main Rebar\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1596,6 +1602,12 @@
     <ClInclude Include="FrequentLocationsMenu.h">
       <Filter>Frequent Locations\UI</Filter>
     </ClInclude>
+    <ClInclude Include="RebarView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRebarView.h">
+      <Filter>Main Rebar\UI\Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1778,6 +1790,12 @@
     </Filter>
     <Filter Include="Frequent Locations\UI">
       <UniqueIdentifier>{91c75423-0926-4746-bd18-667ffd1ceddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Rebar\UI">
+      <UniqueIdentifier>{878bb444-5ecc-4170-9fe4-62875342246a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Rebar\UI\Views">
+      <UniqueIdentifier>{6b9698dd-16c2-45e2-adc7-7ff73f1e2604}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

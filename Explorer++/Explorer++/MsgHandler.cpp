@@ -13,6 +13,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "HolderWindow.h"
 #include "MainRebarStorage.h"
+#include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "Plugins/PluginManager.h"
@@ -303,8 +304,8 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	m_displayWindowHeight = std::max(m_displayWindowHeight,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
-	auto rebarHeight = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBARHEIGHT, 0, 0));
-	SetWindowPos(m_hMainRebar, nullptr, 0, 0, mainWindowWidth, rebarHeight,
+	auto rebarHeight = m_mainRebarView->GetHeight();
+	SetWindowPos(m_mainRebarView->GetHWND(), nullptr, 0, 0, mainWindowWidth, rebarHeight,
 		SWP_NOZORDER | SWP_NOMOVE);
 
 	iIndentRebar += rebarHeight;
