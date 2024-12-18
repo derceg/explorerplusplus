@@ -892,7 +892,7 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 	}
 	else
 	{
-		folderSettingsFinal = m_coreInterface->GetConfig()->defaultFolderSettings;
+		folderSettingsFinal = m_app->GetConfig()->defaultFolderSettings;
 	}
 
 	auto shellBrowser = ShellBrowserImpl::CreateNew(m_coreInterface->GetMainWindow(), m_embedder,

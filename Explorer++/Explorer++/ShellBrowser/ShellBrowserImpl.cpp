@@ -77,9 +77,9 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_app(app),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
-	m_fontSetter(GetHWND(), coreInterface->GetConfig()),
+	m_fontSetter(GetHWND(), app->GetConfig()),
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(GetHWND(), LVM_GETTOOLTIPS, 0, 0)),
-		coreInterface->GetConfig()),
+		app->GetConfig()),
 	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_columnResultIDCounter(0),
@@ -92,14 +92,13 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_infoTipResultIDCounter(0),
 	m_resourceInstance(coreInterface->GetResourceInstance()),
 	m_acceleratorManager(coreInterface->GetAcceleratorManager()),
-	m_config(coreInterface->GetConfig()),
+	m_config(app->GetConfig()),
 	m_folderSettings(folderSettings),
 	m_shellChangeWatcher(GetHWND(),
 		std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotifications, this)),
 	m_shellWindowRegistered(false),
-	m_folderColumns(initialColumns
-			? *initialColumns
-			: coreInterface->GetConfig()->globalFolderSettings.folderColumns),
+	m_folderColumns(
+		initialColumns ? *initialColumns : app->GetConfig()->globalFolderSettings.folderColumns),
 	m_draggedDataObject(nullptr)
 {
 	InitializeListView();

@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "App.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "Config.h"
@@ -57,9 +58,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 	m_app(app),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_config(coreInterface->GetConfig()),
+	m_config(app->GetConfig()),
 	m_fileActionHandler(fileActionHandler),
-	m_fontSetter(GetHWND(), coreInterface->GetConfig()),
+	m_fontSetter(GetHWND(), app->GetConfig()),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_iconResultIDCounter(0),
