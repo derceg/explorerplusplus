@@ -386,7 +386,6 @@ private:
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
-	void SetListViewInitialPosition(HWND hListView) override;
 	void ToggleFolders();
 	void OnTreeViewHolderResized(int newWidth);
 	void ToggleDualPane();

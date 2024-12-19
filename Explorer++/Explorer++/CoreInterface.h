@@ -98,8 +98,6 @@ public:
 	virtual void ShowTabBar() = 0;
 	virtual void HideTabBar() = 0;
 
-	virtual void SetListViewInitialPosition(HWND hListView) = 0;
-
 	virtual void FocusChanged() = 0;
 
 	virtual boost::signals2::connection AddTabsInitializedObserver(

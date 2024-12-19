@@ -67,6 +67,10 @@ void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
 	/* TODO: This subclass needs to be removed. */
 	SetWindowSubclass(tab.GetShellBrowserImpl()->GetListView(), ListViewProcStub, 0,
 		reinterpret_cast<DWORD_PTR>(this));
+
+	// A tab has been created, so this call is needed in order to set the size and position of the
+	// tab's listview control.
+	UpdateLayout();
 }
 
 boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(

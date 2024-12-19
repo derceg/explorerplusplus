@@ -165,7 +165,7 @@ HWND ShellBrowserImpl::CreateListView(HWND parent)
 	// return NULL. The actual view mode set here doesn't matter, since it will be updated when
 	// navigating to a folder.
 	return ::CreateListView(parent,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_EDITLABELS
+		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_EDITLABELS
 			| LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP
 			| LVS_ALIGNTOP);
 }

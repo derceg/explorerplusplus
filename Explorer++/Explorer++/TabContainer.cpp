@@ -945,13 +945,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	the folder). */
 	index = InsertNewTab(index, tab.GetId(), navigateParams.pidl, tabSettings.name);
 
-	// Note that for the listview window to be shown, it has to have a non-zero
-	// size. If the size is zero at the point it's shown, it will instead remain
-	// hidden, even if it's later resized. Currently, if the tab is selected,
-	// the listview is shown during the OnTabSelected() call below. Therefore,
-	// the listview needs to have a non-zero size before that point.
-	m_coreInterface->SetListViewInitialPosition(tab.GetShellBrowserImpl()->GetListView());
-
 	bool selected = false;
 
 	if (tabSettings.selected)
