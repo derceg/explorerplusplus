@@ -52,6 +52,7 @@ void BookmarksMainMenu::OnMainMenuPreShow(HMENU mainMenu)
 {
 	std::vector<wil::unique_hbitmap> menuImages;
 	BookmarkMenuBuilder::MenuInfo menuInfo;
+	menuInfo.nextMenuId = m_menuIdRange.startId;
 	auto bookmarksMenu = BuildMainBookmarksMenu(menuImages, menuInfo);
 
 	MENUITEMINFO mii;

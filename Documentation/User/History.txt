@@ -131,6 +131,9 @@ Bug fixes:
   appear on the bookmarks toolbar, if the toolbar was initially
   empty. The height of the toolbar is now updated when an item is
   added, which fixes this issue.
+- If the only bookmarks that appeared in the "Bookmarks" menu
+  were under the "Other Bookmarks" folder, the menu wouldn't be
+  built correctly.
 - Fixed an issue with handling the properties item on the
   background context menu.
 - Previously, listview groups were always sorted by name. Now,
