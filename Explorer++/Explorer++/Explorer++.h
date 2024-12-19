@@ -224,7 +224,9 @@ private:
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize(const WindowStorageData *storageData);
 	bool OnActivate(int activationState, bool minimized);
-	void OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight);
+	void OnSize(UINT state);
+	concurrencpp::null_result ScheduleUpdateLayout();
+	void UpdateLayout();
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	int OnDestroy();
@@ -386,8 +388,6 @@ private:
 	void UpdateWindowStates(const Tab &tab);
 	void SetListViewInitialPosition(HWND hListView) override;
 	void ToggleFolders();
-	concurrencpp::null_result ScheduleUpdateLayout();
-	void UpdateLayout();
 	void OnTreeViewHolderResized(int newWidth);
 	void ToggleDualPane();
 

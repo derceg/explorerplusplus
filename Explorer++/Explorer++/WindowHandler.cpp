@@ -99,36 +99,6 @@ void Explorerplusplus::ToggleFolders()
 	UpdateLayout();
 }
 
-concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout()
-{
-	if (!m_browserInitialized || m_browserClosing)
-	{
-		co_return;
-	}
-
-	auto destroyed = m_destroyed;
-
-	// This function is designed to be called from the UI thread and the call here will also resume
-	// on the UI thread. Rather than immediately resuming, however, this call will result in a
-	// message being posted. Therefore, this function will only resume once the message has been
-	// processed.
-	co_await concurrencpp::resume_on(m_app->GetRuntime()->GetUiThreadExecutor());
-
-	if (*destroyed)
-	{
-		co_return;
-	}
-
-	UpdateLayout();
-}
-
-void Explorerplusplus::UpdateLayout()
-{
-	RECT rc;
-	GetClientRect(m_hContainer, &rc);
-	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
-}
-
 void Explorerplusplus::ToggleDualPane()
 {
 	m_config->dualPane = !m_config->dualPane;

@@ -197,7 +197,9 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	case WM_NOTIFY:
 		return NotifyHandler(hwnd, msg, wParam, lParam);
 
-		HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+	case WM_SIZE:
+		OnSize(static_cast<UINT>(wParam));
+		return 0;
 
 	case WM_DPICHANGED:
 		OnDpiChanged(reinterpret_cast<RECT *>(lParam));

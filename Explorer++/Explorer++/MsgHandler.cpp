@@ -257,31 +257,44 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
 }
 
-void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight)
+void Explorerplusplus::OnSize(UINT state)
 {
-	UNREFERENCED_PARAMETER(hwnd);
-
-	RECT rc;
-	UINT uFlags;
-	int indentBottom = 0;
-	int indentTop = 0;
-	int indentRight = 0;
-	int indentLeft = 0;
-	int iIndentRebar = 0;
-	int iHolderWidth;
-	int iHolderHeight;
-	int iHolderTop;
-	int iTabBackingWidth;
-	int iTabBackingLeft;
-
-	if (!m_browserInitialized || m_browserClosing)
-	{
-		return;
-	}
-
 	if (state == SIZE_MINIMIZED)
 	{
 		// There's no need to update the layout when the window is being minimized.
+		return;
+	}
+
+	UpdateLayout();
+}
+
+concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout()
+{
+	if (!m_browserInitialized || m_browserClosing)
+	{
+		co_return;
+	}
+
+	auto destroyed = m_destroyed;
+
+	// This function is designed to be called from the UI thread and the call here will also resume
+	// on the UI thread. Rather than immediately resuming, however, this call will result in a
+	// message being posted. Therefore, this function will only resume once the message has been
+	// processed.
+	co_await concurrencpp::resume_on(m_app->GetRuntime()->GetUiThreadExecutor());
+
+	if (*destroyed)
+	{
+		co_return;
+	}
+
+	UpdateLayout();
+}
+
+void Explorerplusplus::UpdateLayout()
+{
+	if (!m_browserInitialized || m_browserClosing)
+	{
 		return;
 	}
 
@@ -293,6 +306,17 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	m_performingLayout = true;
 	auto resetPerformingLayout = wil::scope_exit([this]() { m_performingLayout = false; });
 #endif
+
+	RECT mainWindowRect;
+	GetClientRect(m_hContainer, &mainWindowRect);
+
+	int mainWindowWidth = GetRectWidth(&mainWindowRect);
+	int mainWindowHeight = GetRectHeight(&mainWindowRect);
+
+	int indentBottom = 0;
+	int indentTop = 0;
+	int indentRight = 0;
+	int indentLeft = 0;
 
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
@@ -308,12 +332,13 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	SetWindowPos(m_mainRebarView->GetHWND(), nullptr, 0, 0, mainWindowWidth, rebarHeight,
 		SWP_NOZORDER | SWP_NOMOVE);
 
-	iIndentRebar += rebarHeight;
+	int indentRebar = rebarHeight;
 
 	if (m_config->showStatusBar)
 	{
-		GetWindowRect(m_hStatusBar, &rc);
-		indentBottom += GetRectHeight(&rc);
+		RECT statusBarRect;
+		GetWindowRect(m_hStatusBar, &statusBarRect);
+		indentBottom += GetRectHeight(&statusBarRect);
 	}
 
 	if (m_config->showDisplayWindow.get())
@@ -339,7 +364,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	TabCtrl_AdjustRect(GetActivePane()->GetTabContainer()->GetHWND(), true, &displayRect);
 	int tabWindowHeight = std::abs(displayRect.top);
 
-	indentTop = iIndentRebar;
+	indentTop = indentRebar;
 
 	if (m_bShowTabBar)
 	{
@@ -351,37 +376,40 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	/* <---- Tab control + backing ----> */
 
+	int tabBackingLeft;
+	int tabBackingWidth;
+
 	if (m_config->extendTabControl.get())
 	{
-		iTabBackingLeft = 0;
-		iTabBackingWidth = mainWindowWidth;
+		tabBackingLeft = 0;
+		tabBackingWidth = mainWindowWidth;
 	}
 	else
 	{
-		iTabBackingLeft = indentLeft;
-		iTabBackingWidth = mainWindowWidth - indentLeft - indentRight;
+		tabBackingLeft = indentLeft;
+		tabBackingWidth = mainWindowWidth - indentLeft - indentRight;
 	}
 
-	uFlags = (m_bShowTabBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
+	UINT showFlags = (m_bShowTabBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
 
-	int iTabTop;
+	int tabTop;
 
 	if (!m_config->showTabBarAtBottom.get())
 	{
-		iTabTop = iIndentRebar;
+		tabTop = indentRebar;
 	}
 	else
 	{
-		iTabTop = mainWindowHeight - indentBottom - tabWindowHeight;
+		tabTop = mainWindowHeight - indentBottom - tabWindowHeight;
 	}
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
-	SetWindowPos(m_hTabBacking, nullptr, iTabBackingLeft, iTabTop, iTabBackingWidth,
-		tabWindowHeight, uFlags);
+	SetWindowPos(m_hTabBacking, nullptr, tabBackingLeft, tabTop, tabBackingWidth, tabWindowHeight,
+		showFlags);
 
-	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0,
-		iTabBackingWidth - 25, tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
+	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0, tabBackingWidth - 25,
+		tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	/* Tab close button. */
 	int scaledCloseToolbarXOffset =
@@ -390,32 +418,34 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	RECT tabToolbarRect;
 	GetClientRect(m_hTabWindowToolbar, &tabToolbarRect);
 	SetWindowPos(m_hTabWindowToolbar, nullptr,
-		iTabBackingWidth - GetRectWidth(&tabToolbarRect) - scaledCloseToolbarXOffset,
+		tabBackingWidth - GetRectWidth(&tabToolbarRect) - scaledCloseToolbarXOffset,
 		(tabWindowHeight - GetRectHeight(&tabToolbarRect)) / 2, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+
+	int holderTop;
 
 	if (m_config->extendTabControl.get() && !m_config->showTabBarAtBottom.get())
 	{
-		iHolderTop = indentTop;
+		holderTop = indentTop;
 	}
 	else
 	{
-		iHolderTop = iIndentRebar;
+		holderTop = indentRebar;
 	}
 
 	/* <---- Holder window + child windows ----> */
 
+	int holderHeight;
+
 	if (m_config->extendTabControl.get() && m_config->showTabBarAtBottom.get() && m_bShowTabBar)
 	{
-		iHolderHeight = mainWindowHeight - indentBottom - iHolderTop - tabWindowHeight;
+		holderHeight = mainWindowHeight - indentBottom - holderTop - tabWindowHeight;
 	}
 	else
 	{
-		iHolderHeight = mainWindowHeight - indentBottom - iHolderTop;
+		holderHeight = mainWindowHeight - indentBottom - holderTop;
 	}
 
-	iHolderWidth = m_treeViewWidth;
-
-	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, iHolderTop, iHolderWidth, iHolderHeight,
+	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, holderTop, m_treeViewWidth, holderHeight,
 		SWP_NOZORDER);
 
 	/* <---- Display window ----> */
@@ -426,7 +456,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	if (m_config->displayWindowVertical)
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, mainWindowWidth - indentRight,
-			iIndentRebar, m_displayWindowWidth, mainWindowHeight - iIndentRebar - indentBottom,
+			indentRebar, m_displayWindowWidth, mainWindowHeight - indentRebar - indentBottom,
 			displayWindowShowFlags);
 	}
 	else
@@ -439,11 +469,11 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	for (auto &tab : GetActivePane()->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
-		uFlags = SWP_NOZORDER;
+		showFlags = SWP_NOZORDER;
 
 		if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 		{
-			uFlags |= SWP_SHOWWINDOW;
+			showFlags |= SWP_SHOWWINDOW;
 		}
 
 		int width = mainWindowWidth - indentLeft - indentRight;
@@ -455,7 +485,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		}
 
 		SetWindowPos(tab->GetShellBrowserImpl()->GetListView(), NULL, indentLeft, indentTop, width,
-			height, uFlags);
+			height, showFlags);
 	}
 
 	/* <---- Status bar ----> */
