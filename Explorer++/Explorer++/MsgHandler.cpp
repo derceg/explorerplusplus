@@ -869,11 +869,6 @@ void Explorerplusplus::OnNewWindow()
 	RECT bounds = placement.rcNormalPosition;
 	OffsetRect(&bounds, windowOffsetInPixels, windowOffsetInPixels);
 
-	if (!IsRectVisible(&bounds))
-	{
-		bounds = placement.rcNormalPosition;
-	}
-
 	WindowStorageData initialData = {};
 	initialData.bounds = bounds;
 	initialData.showState = NativeShowStateToShowState(placement.showCmd);

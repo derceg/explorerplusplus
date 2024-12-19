@@ -144,10 +144,6 @@ Bug fixes:
 - If a filtered item is renamed, it will now be shown again if it
   no longer needs to be filtered. Previously, the item would
   remain hidden until filtering was disabled.
-- When starting the application, the previous window position
-  will only be used if it's visible. If the saved position is
-  off-screen (e.g. because the monitor configuration has
-  changed), the default position will be used instead.
 - A saved dialog position will now only be used if the saved
   position is visible on screen.
 - When renaming an item, the item is updated immediately if the

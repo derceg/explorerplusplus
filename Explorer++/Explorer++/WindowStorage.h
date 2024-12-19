@@ -23,7 +23,10 @@ BETTER_ENUM(WindowShowState, int,
 
 struct WindowStorageData
 {
+	// The size and position of the window, with the position being in workspace coordinates (i.e.
+	// those returned by GetWindowPlacement()).
 	RECT bounds;
+
 	WindowShowState showState;
 	std::vector<TabStorageData> tabs;
 	int selectedTab;

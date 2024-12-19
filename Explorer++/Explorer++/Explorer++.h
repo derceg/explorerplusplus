@@ -208,7 +208,6 @@ private:
 
 	static HWND CreateMainWindow(const WindowStorageData *storageData);
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
-	static RECT GetValidatedMainWindowBounds(const RECT *requestedBounds);
 	static RECT GetDefaultMainWindowBounds();
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

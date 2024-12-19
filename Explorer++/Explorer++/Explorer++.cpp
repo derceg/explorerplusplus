@@ -110,21 +110,19 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 		mainWindowClassRegistered = true;
 	}
 
-	RECT finalBounds;
-
-	if (storageData)
-	{
-		finalBounds = GetValidatedMainWindowBounds(&storageData->bounds);
-	}
-	else
-	{
-		finalBounds = GetDefaultMainWindowBounds();
-	}
-
-	HWND hwnd = CreateWindow(WINDOW_CLASS_NAME, App::APP_NAME, WS_OVERLAPPEDWINDOW,
-		finalBounds.left, finalBounds.top, GetRectWidth(&finalBounds), GetRectHeight(&finalBounds),
-		nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hwnd = CreateWindow(WINDOW_CLASS_NAME, App::APP_NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, GetModuleHandle(nullptr),
+		nullptr);
 	CHECK(hwnd);
+
+	WINDOWPLACEMENT placement = {};
+	placement.length = sizeof(placement);
+	BOOL res = GetWindowPlacement(hwnd, &placement);
+	CHECK(res);
+
+	placement.showCmd = SW_HIDE;
+	placement.rcNormalPosition = storageData ? storageData->bounds : GetDefaultMainWindowBounds();
+	SetWindowPlacement(hwnd, &placement);
 
 	return hwnd;
 }
@@ -147,18 +145,6 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 	windowClass.lpszMenuName = nullptr;
 	windowClass.lpszClassName = WINDOW_CLASS_NAME;
 	return RegisterClassEx(&windowClass);
-}
-
-RECT Explorerplusplus::GetValidatedMainWindowBounds(const RECT *requestedBounds)
-{
-	// When shown in its normal size, the window should at least be on screen somewhere, even if
-	// it's not completely visible.
-	if (!IsRectVisible(requestedBounds))
-	{
-		return GetDefaultMainWindowBounds();
-	}
-
-	return *requestedBounds;
 }
 
 RECT Explorerplusplus::GetDefaultMainWindowBounds()
