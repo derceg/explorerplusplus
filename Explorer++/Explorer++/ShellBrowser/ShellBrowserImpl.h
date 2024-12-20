@@ -289,18 +289,22 @@ private:
 
 	struct ListViewGroup
 	{
+	public:
 		int id;
 		std::wstring name;
 		int relativeSortPosition;
 		int numItems;
 
-		ListViewGroup(int id, const GroupInfo &groupInfo) :
-			id(id),
+		ListViewGroup(const GroupInfo &groupInfo) :
+			id(idCounter++),
 			name(groupInfo.name),
 			relativeSortPosition(groupInfo.relativeSortPosition),
 			numItems(0)
 		{
 		}
+
+	private:
+		static inline int idCounter = 0;
 	};
 
 	enum class GroupByDateType
@@ -309,6 +313,19 @@ private:
 		Modified,
 		Accessed
 	};
+
+	// clang-format off
+	using ListViewGroupSet = boost::multi_index_container<ListViewGroup,
+		boost::multi_index::indexed_by<
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<ListViewGroup, int, &ListViewGroup::id>
+			>,
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<ListViewGroup, std::wstring, &ListViewGroup::name>
+			>
+		>
+	>;
+	// clang-format on
 
 	struct DirectoryState
 	{
@@ -349,6 +366,8 @@ private:
 		HIMAGELIST thumbnailsShellImageList = nullptr;
 		wil::unique_himagelist thumbnailsImageList;
 
+		ListViewGroupSet groups;
+
 		// These items are queued from the main thread and run on the main thread. The advantage of
 		// this is that it allows tasks that need to run, but can't immediately run (e.g. because
 		// running the task in the middle of something else is going to cause issues) to be run at a
@@ -368,19 +387,6 @@ private:
 		{
 		}
 	};
-
-	// clang-format off
-	using ListViewGroupSet = boost::multi_index_container<ListViewGroup,
-		boost::multi_index::indexed_by<
-			boost::multi_index::hashed_unique<
-				boost::multi_index::member<ListViewGroup, int, &ListViewGroup::id>
-			>,
-			boost::multi_index::hashed_unique<
-				boost::multi_index::member<ListViewGroup, std::wstring, &ListViewGroup::name>
-			>
-		>
-	>;
-	// clang-format on
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
@@ -741,7 +747,4 @@ private:
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
 	IDataObject *m_draggedDataObject;
-
-	ListViewGroupSet m_listViewGroups;
-	int m_groupIdCounter;
 };

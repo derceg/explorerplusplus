@@ -21,6 +21,7 @@
 #include <iphlpapi.h>
 #include <propkey.h>
 #include <cassert>
+#include <format>
 
 namespace
 {
@@ -46,6 +47,8 @@ void ShellBrowserImpl::SetShowInGroups(bool showInGroups)
 	if (!showInGroups)
 	{
 		ListView_EnableGroupView(m_hListView, false);
+		ListView_RemoveAllGroups(m_hListView);
+		m_directoryState.groups.clear();
 	}
 	else
 	{
@@ -133,9 +136,8 @@ int ShellBrowserImpl::GroupRelativePositionComparison(const ListViewGroup &group
 
 const ShellBrowserImpl::ListViewGroup ShellBrowserImpl::GetListViewGroupById(int groupId)
 {
-	auto itr = m_listViewGroups.get<0>().find(groupId);
-	CHECK(itr != m_listViewGroups.get<0>().end());
-
+	auto itr = m_directoryState.groups.get<0>().find(groupId);
+	CHECK(itr != m_directoryState.groups.get<0>().end());
 	return *itr;
 }
 
@@ -308,20 +310,11 @@ int ShellBrowserImpl::DetermineItemGroup(int iItemInternal)
 
 int ShellBrowserImpl::GetOrCreateListViewGroup(const GroupInfo &groupInfo)
 {
-	auto &groupNameIndex = m_listViewGroups.get<1>();
-	auto itr = groupNameIndex.find(groupInfo.name);
-
-	if (itr != groupNameIndex.end())
-	{
-		return itr->id;
-	}
-
-	int groupId = m_groupIdCounter++;
-
-	ListViewGroup listViewGroup(groupId, groupInfo);
-	m_listViewGroups.insert(listViewGroup);
-
-	return groupId;
+	// Note that this will return an existing group, if a group already exists with the specified
+	// name.
+	auto &groupNameIndex = m_directoryState.groups.get<1>();
+	auto [group, inserted] = groupNameIndex.emplace(groupInfo);
+	return group->id;
 }
 
 /* TODO: These groups have changed as of Windows Vista.*/
@@ -832,14 +825,13 @@ void ShellBrowserImpl::MoveItemsIntoGroups()
 	int i = 0;
 
 	ListView_RemoveAllGroups(m_hListView);
+	m_directoryState.groups.clear();
+
 	ListView_EnableGroupView(m_hListView, true);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
-
-	m_listViewGroups.clear();
-	m_groupIdCounter = 0;
 
 	for (i = 0; i < nItems; i++)
 	{
@@ -929,18 +921,18 @@ void ShellBrowserImpl::UpdateGroupHeader(const ListViewGroup &listViewGroup)
 
 std::wstring ShellBrowserImpl::GenerateGroupHeader(const ListViewGroup &listViewGroup)
 {
-	return listViewGroup.name + L" (" + std::to_wstring(listViewGroup.numItems) + L")";
+	return std::format(L"{} ({})", listViewGroup.name, listViewGroup.numItems);
 }
 
 void ShellBrowserImpl::OnItemRemovedFromGroup(int groupId)
 {
-	auto &groupIdIndex = m_listViewGroups.get<0>();
+	auto &groupIdIndex = m_directoryState.groups.get<0>();
 	auto itr = groupIdIndex.find(groupId);
 	CHECK(itr != groupIdIndex.end());
 
 	auto updatedGroup = *itr;
 	updatedGroup.numItems--;
-	m_listViewGroups.replace(itr, updatedGroup);
+	m_directoryState.groups.replace(itr, updatedGroup);
 
 	if (updatedGroup.numItems == 0)
 	{
@@ -954,13 +946,13 @@ void ShellBrowserImpl::OnItemRemovedFromGroup(int groupId)
 
 void ShellBrowserImpl::OnItemAddedToGroup(int groupId)
 {
-	auto &groupIdIndex = m_listViewGroups.get<0>();
+	auto &groupIdIndex = m_directoryState.groups.get<0>();
 	auto itr = groupIdIndex.find(groupId);
 	CHECK(itr != groupIdIndex.end());
 
 	auto updatedGroup = *itr;
 	updatedGroup.numItems++;
-	m_listViewGroups.replace(itr, updatedGroup);
+	m_directoryState.groups.replace(itr, updatedGroup);
 
 	UpdateGroupHeader(updatedGroup);
 }

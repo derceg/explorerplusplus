@@ -86,6 +86,8 @@ void ShellBrowserImpl::ResetFolderState()
 	ListView_SetImageList(m_hListView, nullptr, LVSIL_SMALL);
 	ListView_SetImageList(m_hListView, nullptr, LVSIL_NORMAL);
 
+	ListView_RemoveAllGroups(m_hListView);
+
 	m_directoryState = DirectoryState();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
@@ -668,8 +670,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 		}
 
 		auto selectItr = std::find_if(m_directoryState.filesToSelect.begin(),
-			m_directoryState.filesToSelect.end(),
-			[&itemInfo](const auto &pidl)
+			m_directoryState.filesToSelect.end(), [&itemInfo](const auto &pidl)
 			{ return ArePidlsEquivalent(pidl.Raw(), itemInfo.pidlComplete.get()); });
 
 		if (selectItr != m_directoryState.filesToSelect.end())
