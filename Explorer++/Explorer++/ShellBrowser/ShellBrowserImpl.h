@@ -207,7 +207,6 @@ private:
 		std::wstring parsingName;
 		std::wstring displayName;
 		std::wstring editingName;
-		int iIcon;
 
 		/* These are only used for drives. They are
 		needed for when a drive is removed from the
@@ -220,7 +219,7 @@ private:
 		when items need to be rearranged). */
 		int iRelativeSort;
 
-		ItemInfo_t() : wfd({}), isFindDataValid(false), iIcon(0), bDrive(FALSE)
+		ItemInfo_t() : wfd({}), isFindDataValid(false), bDrive(FALSE)
 		{
 		}
 	};
