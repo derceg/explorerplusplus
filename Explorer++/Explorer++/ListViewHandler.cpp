@@ -300,6 +300,26 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 	}
 }
 
+void Explorerplusplus::OnListViewClick(const NMITEMACTIVATE *eventInfo)
+{
+	if (!m_config->globalFolderSettings.oneClickActivate.get())
+	{
+		return;
+	}
+
+	LVHITTESTINFO htInfo = {};
+	htInfo.pt = eventInfo->ptAction;
+	ListView_HitTest(m_hActiveListView, &htInfo);
+
+	if (WI_IsFlagSet(htInfo.flags, LVHT_ONITEMSTATEICON) && m_config->checkBoxSelection.get())
+	{
+		// In this case, the click was on the checkbox, so it should be ignored.
+		return;
+	}
+
+	OnListViewDoubleClick(eventInfo);
+}
+
 void Explorerplusplus::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
 {
 	// Note that while it's stated in the documentation for both NM_CLICK and NM_DBLCLK that "The

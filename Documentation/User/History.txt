@@ -149,6 +149,11 @@ Bug fixes:
   remain hidden until filtering was disabled.
 - A saved dialog position will now only be used if the saved
   position is visible on screen.
+- When the single-click to open option and checkbox option are
+  both enabled, clicking on a checkbox would previously result in
+  the associated item being opened. Now, clicking on a checkbox
+  will consistently result in the selection state being toggled.
+  See #499.
 - When renaming an item, the item is updated immediately if the
   rename succeeds. Previously, the item details would be updated
   a short time later. That meant that renaming an item, then
