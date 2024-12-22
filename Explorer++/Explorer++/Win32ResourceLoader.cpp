@@ -11,7 +11,7 @@ Win32ResourceLoader::Win32ResourceLoader(HINSTANCE resourceInstance) :
 {
 }
 
-std::wstring Win32ResourceLoader::LoadString(UINT stringId)
+std::wstring Win32ResourceLoader::LoadString(UINT stringId) const
 {
 	// TODO: The implementation for ResourceHelper::LoadString should be moved into this method,
 	// once all calls to it have been migrated to this method.

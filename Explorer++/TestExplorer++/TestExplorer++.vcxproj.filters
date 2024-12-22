@@ -322,6 +322,12 @@
     <ClCompile Include="BrowserWindowMock.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="TabRestorerMenuTest.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupMenuViewTestHelper.cpp">
+      <Filter>Core\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -432,6 +438,9 @@
     <Filter Include="Frequent Locations\UI">
       <UniqueIdentifier>{8f212825-3607-46ff-93d5-923ccbadd20e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tabs\UI">
+      <UniqueIdentifier>{9fe87dea-7e4f-4630-b9f2-ba3b33711d06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -530,6 +539,9 @@
     </ClInclude>
     <ClInclude Include="FakeSystemClock.h">
       <Filter>Helper\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupMenuViewTestHelper.h">
+      <Filter>Core\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

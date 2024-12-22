@@ -250,9 +250,6 @@
     <ClCompile Include="TabRestorer.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="TabRestorerMenu.cpp">
-      <Filter>Tabs</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -775,6 +772,9 @@
     <ClCompile Include="MainRebarView.cpp">
       <Filter>Main Rebar\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="TabRestorerMenu.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -994,9 +994,6 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="TabRestorer.h">
-      <Filter>Tabs</Filter>
-    </ClInclude>
-    <ClInclude Include="TabRestorerMenu.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\PreservedFolderState.h">
@@ -1608,6 +1605,9 @@
     <ClInclude Include="MainRebarView.h">
       <Filter>Main Rebar\UI\Views</Filter>
     </ClInclude>
+    <ClInclude Include="TabRestorerMenu.h">
+      <Filter>Tabs\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1796,6 +1796,9 @@
     </Filter>
     <Filter Include="Main Rebar\UI\Views">
       <UniqueIdentifier>{6b9698dd-16c2-45e2-adc7-7ff73f1e2604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tabs\UI">
+      <UniqueIdentifier>{94f99105-33a7-45aa-a32a-631ee5fb2b06}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

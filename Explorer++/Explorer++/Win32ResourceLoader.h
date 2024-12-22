@@ -12,7 +12,7 @@ class Win32ResourceLoader : public ResourceLoader
 public:
 	Win32ResourceLoader(HINSTANCE resourceInstance);
 
-	std::wstring LoadString(UINT stringId) override;
+	std::wstring LoadString(UINT stringId) const override;
 
 private:
 	const HINSTANCE m_resourceInstance;

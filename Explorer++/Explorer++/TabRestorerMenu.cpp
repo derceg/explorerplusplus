@@ -7,7 +7,7 @@
 #include "AcceleratorManager.h"
 #include "MainResource.h"
 #include "MenuView.h"
-#include "ResourceManager.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "TabRestorer.h"
 #include "../Helper/ImageHelper.h"
@@ -15,10 +15,12 @@
 #include <ranges>
 
 TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
+	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader,
+	const ResourceLoader *resourceLoader, UINT startId, UINT endId) :
 	MenuBase(menuView, acceleratorManager, startId, endId),
 	m_tabRestorer(tabRestorer),
-	m_shellIconLoader(shellIconLoader)
+	m_shellIconLoader(shellIconLoader),
+	m_resourceLoader(resourceLoader)
 {
 	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
 		std::bind_front(&TabRestorerMenu::OnRestoreItemsChanged, this)));
@@ -39,7 +41,7 @@ void TabRestorerMenu::RebuildMenu()
 	if (m_tabRestorer->IsEmpty())
 	{
 		auto id = m_idCounter++;
-		m_menuView->AppendItem(id, Resources::LoadString(IDS_NO_RECENT_TABS));
+		m_menuView->AppendItem(id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
 		m_menuView->EnableItem(id, false);
 		return;
 	}

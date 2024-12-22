@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 struct PreservedTab;
+class ResourceLoader;
 class ShellIconLoader;
 class TabRestorer;
 
@@ -16,7 +17,8 @@ class TabRestorerMenu : public MenuBase, private boost::noncopyable
 {
 public:
 	TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT startId = DEFAULT_START_ID,
+		TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader,
+		const ResourceLoader *resourceLoader, UINT startId = DEFAULT_START_ID,
 		UINT endId = DEFAULT_END_ID);
 
 private:
@@ -33,6 +35,7 @@ private:
 
 	TabRestorer *const m_tabRestorer;
 	ShellIconLoader *const m_shellIconLoader;
+	const ResourceLoader *const m_resourceLoader;
 	UINT m_idCounter;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

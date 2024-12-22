@@ -13,5 +13,5 @@ class ResourceLoader
 public:
 	virtual ~ResourceLoader() = default;
 
-	virtual std::wstring LoadString(UINT stringId) = 0;
+	virtual std::wstring LoadString(UINT stringId) const = 0;
 };

@@ -246,11 +246,13 @@
     <ClCompile Include="LanguageHelperTest.cpp" />
     <ClCompile Include="MessageLoop.cpp" />
     <ClCompile Include="ModelessDialogListTest.cpp" />
+    <ClCompile Include="PopupMenuViewTestHelper.cpp" />
     <ClCompile Include="ProcessManagerTest.cpp" />
     <ClCompile Include="RuntimeHelperTest.cpp" />
     <ClCompile Include="RuntimeTest.cpp" />
     <ClCompile Include="RuntimeTestHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp" />
+    <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
@@ -348,6 +350,7 @@
     <ClInclude Include="MessageLoop.h" />
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PopupMenuViewTestHelper.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
     <ClInclude Include="ShellBrowserHelperTestBase.h" />
