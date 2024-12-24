@@ -77,11 +77,6 @@ void RebarView::AddBand(const Band &band)
 		WI_SetFlag(bandInfo.fStyle, RBBS_USECHEVRON);
 	}
 
-	if (!band.show)
-	{
-		WI_SetFlag(bandInfo.fStyle, RBBS_HIDDEN);
-	}
-
 	if (band.idealLength)
 	{
 		WI_SetFlag(bandInfo.fMask, RBBIM_IDEALSIZE);
@@ -90,6 +85,23 @@ void RebarView::AddBand(const Band &band)
 
 	auto res = SendMessage(m_hwnd, RB_INSERTBAND, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(&bandInfo));
+	DCHECK(res);
+
+	// Although the RBBS_HIDDEN style can be set on a band in order to hide it, the problem with
+	// that is that the child window will be left visible (though with 0 size). Although that's not
+	// typically an issue, it is a problem in certain situations.
+	// For example, GetNextDlgTabItem() (which can be used to find the next window that should
+	// receive focus) will filter out windows that aren't visible. A window that's visible, but has
+	// 0 size, will still be returned as a target by GetNextDlgTabItem(). In situations like that,
+	// it's important that the window isn't actually visible.
+	// Calling RB_SHOWBAND on the band will ensure that both the RBBS_HIDDEN style is set and the
+	// window is hidden.
+	// Note that it wouldn't be enough to simply have the window passed to this function be hidden
+	// by default, as the call to RB_INSERTBAND above will cause the window to be shown (regardless
+	// of whether or not the RBBS_HIDDEN style is set).
+	auto numBands = static_cast<UINT>(SendMessage(m_hwnd, RB_GETBANDCOUNT, 0, 0));
+	DCHECK_GT(numBands, 0u);
+	res = SendMessage(m_hwnd, RB_SHOWBAND, numBands - 1, band.show);
 	DCHECK(res);
 }
 
