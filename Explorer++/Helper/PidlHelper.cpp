@@ -4,10 +4,10 @@
 
 #include "stdafx.h"
 #include "PidlHelper.h"
+#include "Base64Wrapper.h"
 #include "Helper.h"
 #include "ShellHelper.h"
 #include <boost/container_hash/hash.hpp>
-#include <cppcodec/base64_rfc4648.hpp>
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2)
 {

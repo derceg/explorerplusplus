@@ -378,6 +378,9 @@
     <ClInclude Include="SystemClockImpl.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="Base64Wrapper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
