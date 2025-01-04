@@ -76,3 +76,11 @@ TEST_F(ComStaThreadPoolExecutorTest, CheckComInitialized)
 			EXPECT_EQ(hr, S_FALSE);
 		});
 }
+
+TEST_F(ComStaThreadPoolExecutorTest, ShutdownRequested)
+{
+	EXPECT_FALSE(m_executor->shutdown_requested());
+
+	m_executor->shutdown();
+	EXPECT_TRUE(m_executor->shutdown_requested());
+}
