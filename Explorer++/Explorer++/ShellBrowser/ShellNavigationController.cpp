@@ -264,6 +264,11 @@ void ShellNavigationController::SetNavigationMode(NavigationMode navigationMode)
 	m_navigationMode = navigationMode;
 }
 
+NavigationMode ShellNavigationController::GetNavigationMode() const
+{
+	return m_navigationMode;
+}
+
 HistoryEntry *ShellNavigationController::GetEntryById(int id)
 {
 	for (int i = 0; i < GetNumHistoryEntries(); i++)

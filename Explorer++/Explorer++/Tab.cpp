@@ -94,15 +94,10 @@ std::wstring Tab::GetName() const
 		return m_customName;
 	}
 
-	if (!m_shellBrowserImpl)
-	{
-		return {};
-	}
-
-	auto pidlDirectory = m_shellBrowserImpl->GetDirectoryIdl();
+	auto *entry = m_shellBrowser->GetNavigationController()->GetCurrentEntry();
 
 	std::wstring name;
-	HRESULT hr = GetDisplayName(pidlDirectory.get(), SHGDN_INFOLDER, name);
+	HRESULT hr = GetDisplayName(entry->GetPidl().Raw(), SHGDN_INFOLDER, name);
 
 	if (FAILED(hr))
 	{
@@ -152,13 +147,10 @@ void Tab::SetLockState(LockState lockState)
 
 	m_lockState = lockState;
 
-	if (m_shellBrowserImpl)
-	{
-		NavigationMode navigationMode = (lockState == LockState::AddressLocked)
-			? NavigationMode::ForceNewTab
-			: NavigationMode::Normal;
-		m_shellBrowserImpl->GetNavigationController()->SetNavigationMode(navigationMode);
-	}
+	NavigationMode navigationMode = (lockState == LockState::AddressLocked)
+		? NavigationMode::ForceNewTab
+		: NavigationMode::Normal;
+	m_shellBrowser->GetNavigationController()->SetNavigationMode(navigationMode);
 
 	m_tabUpdatedSignal(*this, PropertyType::LockState);
 }

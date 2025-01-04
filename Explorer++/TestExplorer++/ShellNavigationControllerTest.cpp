@@ -252,11 +252,13 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	auto *navigationController = GetNavigationController();
+	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::Normal);
 
 	HRESULT hr = navigationController->Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	navigationController->SetNavigationMode(NavigationMode::ForceNewTab);
+	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::ForceNewTab);
 
 	// Although the navigation mode has been set, the navigation is to the same directory, which is
 	// treated as an implicit refresh and should always proceed in the same tab.

@@ -45,6 +45,7 @@ public:
 	HRESULT Navigate(NavigateParams &navigateParams);
 
 	void SetNavigationMode(NavigationMode navigationMode);
+	NavigationMode GetNavigationMode() const;
 
 	HistoryEntry *GetEntryById(int id);
 
