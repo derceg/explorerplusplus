@@ -13,6 +13,105 @@
 namespace
 {
 
+// The language ID that's saved is based on the language in the version block for the specified DLL.
+// Previously, the language specified there didn't necessarily match the language specified in the
+// main resource file for the language.
+// As the mapping specified in GetCodeForLanguage() below assumes that the language ID that's
+// provided matches the ID in the main resource file for the language, this function will update a
+// saved language value from the previous (and incorrect) value that was retrieved from the version
+// block, to the language ID that's currently expected.
+LANGID UpdateSavedLanguageCode(LANGID language)
+{
+	switch (language)
+	{
+	case MAKELANGID(LANG_CATALAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_CATALAN, SUBLANG_CATALAN_CATALAN);
+		break;
+
+	case MAKELANGID(LANG_CZECH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_CZECH, SUBLANG_CZECH_CZECH_REPUBLIC);
+		break;
+
+	case MAKELANGID(LANG_DANISH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_DANISH, SUBLANG_DANISH_DENMARK);
+		break;
+
+	case MAKELANGID(LANG_GERMAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
+		break;
+
+	case MAKELANGID(LANG_SPANISH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_SPANISH, SUBLANG_SPANISH);
+		break;
+
+	case MAKELANGID(LANG_PERSIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_PERSIAN, SUBLANG_PERSIAN_IRAN);
+		break;
+
+	case MAKELANGID(LANG_FRENCH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_FRENCH, SUBLANG_FRENCH);
+		break;
+
+	case MAKELANGID(LANG_HUNGARIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_HUNGARIAN, SUBLANG_HUNGARIAN_HUNGARY);
+		break;
+
+	case MAKELANGID(LANG_ITALIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_ITALIAN, SUBLANG_ITALIAN);
+		break;
+
+	case MAKELANGID(LANG_JAPANESE, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN);
+		break;
+
+	case MAKELANGID(LANG_KOREAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN);
+		break;
+
+	case MAKELANGID(LANG_DUTCH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_DUTCH, SUBLANG_DUTCH);
+		break;
+
+	case MAKELANGID(LANG_NORWEGIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_NORWEGIAN, SUBLANG_NORWEGIAN_BOKMAL);
+		break;
+
+	case MAKELANGID(LANG_POLISH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_POLISH, SUBLANG_POLISH_POLAND);
+		break;
+
+	case MAKELANGID(LANG_PORTUGUESE, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_PORTUGUESE, SUBLANG_PORTUGUESE);
+		break;
+
+	case MAKELANGID(LANG_ROMANIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_ROMANIAN, SUBLANG_ROMANIAN_ROMANIA);
+		break;
+
+	case MAKELANGID(LANG_RUSSIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_RUSSIAN, SUBLANG_RUSSIAN_RUSSIA);
+		break;
+
+	case MAKELANGID(LANG_SINHALESE, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_SINHALESE, SUBLANG_SINHALESE_SRI_LANKA);
+		break;
+
+	case MAKELANGID(LANG_SWEDISH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_SWEDISH, SUBLANG_SWEDISH);
+		break;
+
+	case MAKELANGID(LANG_TURKISH, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_TURKISH, SUBLANG_TURKISH_TURKEY);
+		break;
+
+	case MAKELANGID(LANG_UKRAINIAN, SUBLANG_NEUTRAL):
+		language = MAKELANGID(LANG_UKRAINIAN, SUBLANG_UKRAINIAN_UKRAINE);
+		break;
+	}
+
+	return language;
+}
+
 // The language DLLs use the following naming scheme:
 //
 // Explorer++{language_code}.dll
@@ -79,7 +178,7 @@ std::optional<std::wstring> GetCodeForLanguage(LANGID language)
 	case MAKELANGID(LANG_DUTCH, SUBLANG_DUTCH):
 		return L"NL";
 
-	case MAKELANGID(LANG_NORWEGIAN, SUBLANG_DEFAULT):
+	case MAKELANGID(LANG_NORWEGIAN, SUBLANG_NORWEGIAN_BOKMAL):
 		return L"NO";
 
 	case MAKELANGID(LANG_POLISH, SUBLANG_POLISH_POLAND):
@@ -112,10 +211,10 @@ std::optional<std::wstring> GetCodeForLanguage(LANGID language)
 	case MAKELANGID(LANG_VIETNAMESE, SUBLANG_VIETNAMESE_VIETNAM):
 		return L"VI";
 
-	case MAKELANGID(LANG_CHINESE_SIMPLIFIED, SUBLANG_CHINESE_SIMPLIFIED):
+	case MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED):
 		return L"ZH_CN";
 
-	case MAKELANGID(LANG_CHINESE_TRADITIONAL, SUBLANG_CHINESE_TRADITIONAL):
+	case MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL):
 		return L"ZH_TW";
 	}
 
@@ -167,8 +266,10 @@ std::variant<LanguageInfo, LoadError> MaybeLoadTranslationDll(
 	}
 	else
 	{
-		languageCode = GetCodeForLanguage(config->language);
-		desiredLanguage = config->language;
+		auto language = UpdateSavedLanguageCode(config->language);
+
+		languageCode = GetCodeForLanguage(language);
+		desiredLanguage = language;
 	}
 
 	if (!languageCode)
