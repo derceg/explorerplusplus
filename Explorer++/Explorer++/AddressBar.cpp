@@ -300,8 +300,8 @@ void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
 	COMBOBOXEXITEM cbItem;
 	cbItem.mask = CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_INDENT;
 	cbItem.iItem = -1;
-	cbItem.iImage = (iconIndex & 0x0FFF);
-	cbItem.iSelectedImage = (iconIndex & 0x0FFF);
+	cbItem.iImage = iconIndex;
+	cbItem.iSelectedImage = iconIndex;
 	cbItem.iIndent = 1;
 
 	if (text)

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/ShellHelper.h"
 #include <boost/core/noncopyable.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <shtypes.h>
@@ -18,7 +19,7 @@ class AsyncIconFetcher : private boost::noncopyable
 public:
 	AsyncIconFetcher(const Runtime *runtime, std::shared_ptr<CachedIcons> cachedIcons);
 
-	[[nodiscard]] concurrencpp::lazy_result<std::optional<int>> GetIconIndexAsync(
+	[[nodiscard]] concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
 		PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken);
 	int GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const;
 

@@ -118,14 +118,21 @@ std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInst
 
 int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex)
 {
+	// Note that the return values below are CHECK'd. Although both functions can fail due to
+	// allocation failures, the images being copied are small, so it's very unlikely that any
+	// allocations will fail. And if they do, the application probably isn't going to run very well
+	// anyway.
+	// That then means that failures are more likely due to programming errors - for example, a
+	// sourceIconIndex that's invalid. Catching issues like that here is better than letting
+	// execution continue. Doing that would make any potential issues harder to notice and more
+	// likely to be silently ignored.
 	wil::unique_hicon icon(ImageList_GetIcon(source, sourceIconIndex, ILD_NORMAL));
+	CHECK(icon);
 
-	if (!icon)
-	{
-		return -1;
-	}
+	int index = ImageList_AddIcon(destination, icon.get());
+	CHECK_NE(index, -1);
 
-	return ImageList_AddIcon(destination, icon.get());
+	return index;
 }
 
 wil::unique_hbitmap GdiplusBitmapToBitmap(Gdiplus::Bitmap *gdiplusBitmap)

@@ -400,22 +400,9 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 
 		if (cachedIconIndex)
 		{
-			// The icon retrieval method specifies the
-			// SHGFI_OVERLAYINDEX value. That means that cached icons
-			// will have an overlay index stored in the upper eight bits
-			// of the icon value. While setting the icon and
-			// stateMask/state values in one go with ListView_SetItem()
-			// works, there's no direct way to specify the
-			// stateMask/state values here.
-			// If you don't mask out the upper eight bits here, no icon
-			// will be shown. You can call ListView_SetItem() at this
-			// point, but that seemingly doesn't repaint the item
-			// correctly (you have to call ListView_Update() to force
-			// the item to be redrawn).
-			// Rather than doing that, only the icon is set here. Any
-			// overlay will be added by the icon retrieval task
-			// (scheduled below).
-			plvItem->iImage = (*cachedIconIndex & 0x0FFF);
+			// Note that only the icon is set here. Any overlay will be added by the icon retrieval
+			// task (scheduled below).
+			plvItem->iImage = *cachedIconIndex;
 		}
 		else
 		{
@@ -431,13 +418,14 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 		}
 
 		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.get(),
-			[this, internalIndex](int iconIndex) { ProcessIconResult(internalIndex, iconIndex); });
+			[this, internalIndex](int iconIndex, int overlayIndex)
+			{ ProcessIconResult(internalIndex, iconIndex, overlayIndex); });
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-void ShellBrowserImpl::ProcessIconResult(int internalIndex, int iconIndex)
+void ShellBrowserImpl::ProcessIconResult(int internalIndex, int iconIndex, int overlayIndex)
 {
 	auto index = LocateItemByInternalIndex(internalIndex);
 
@@ -452,7 +440,7 @@ void ShellBrowserImpl::ProcessIconResult(int internalIndex, int iconIndex)
 	lvItem.iSubItem = 0;
 	lvItem.iImage = iconIndex;
 	lvItem.stateMask = LVIS_OVERLAYMASK;
-	lvItem.state = INDEXTOOVERLAYMASK(iconIndex >> 24);
+	lvItem.state = INDEXTOOVERLAYMASK(overlayIndex);
 	ListView_SetItem(m_hListView, &lvItem);
 }
 

@@ -594,7 +594,7 @@ private:
 	std::optional<int> GetItemGroupId(int index);
 
 	/* Listview icons. */
-	void ProcessIconResult(int internalIndex, int iconIndex);
+	void ProcessIconResult(int internalIndex, int iconIndex, int overlayIndex);
 
 	/* Thumbnails view. */
 	void QueueThumbnailTask(int internalIndex);

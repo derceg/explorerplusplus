@@ -1405,3 +1405,10 @@ HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrieva
 
 	return S_OK;
 }
+
+ShellIconInfo ExtractShellIconParts(int iconIndexAndOverlay)
+{
+	// The operations below are only valid if an int is 4 bytes.
+	static_assert(sizeof(int) == 4);
+	return { iconIndexAndOverlay & 0x00FFFFFF, (iconIndexAndOverlay >> 24) & 0xFF };
+}

@@ -48,6 +48,7 @@ private:
 	struct IconResult
 	{
 		int iconIndex;
+		int overlayIndex;
 		std::wstring path;
 	};
 
@@ -59,7 +60,7 @@ private:
 
 	LRESULT OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	static std::optional<int> FindIconAsync(PCIDLIST_ABSOLUTE pidl);
+	static std::optional<ShellIconInfo> FindIconAsync(PCIDLIST_ABSOLUTE pidl);
 	void ProcessIconResult(int iconResultId);
 
 	const HWND m_hwnd;

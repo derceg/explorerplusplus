@@ -460,8 +460,8 @@ void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 
 		if (cachedIconIndex)
 		{
-			ptvItem->iImage = (*cachedIconIndex & 0x0FFF);
-			ptvItem->iSelectedImage = (*cachedIconIndex & 0x0FFF);
+			ptvItem->iImage = *cachedIconIndex;
+			ptvItem->iSelectedImage = *cachedIconIndex;
 		}
 		else
 		{
@@ -532,10 +532,13 @@ std::optional<ShellTreeView::IconResult> ShellTreeView::FindIconAsync(HWND treeV
 
 	PostMessage(treeView, WM_APP_ICON_RESULT_READY, iconResultId, 0);
 
+	auto iconInfo = ExtractShellIconParts(shfi.iIcon);
+
 	IconResult result;
 	result.nodeId = nodeId;
 	result.treeItem = treeItem;
-	result.iconIndex = shfi.iIcon;
+	result.iconIndex = iconInfo.iconIndex;
+	result.overlayIndex = iconInfo.overlayIndex;
 	return result;
 }
 
@@ -581,7 +584,7 @@ void ShellTreeView::ProcessIconResult(int iconResultId)
 	tvItem.iImage = result->iconIndex;
 	tvItem.iSelectedImage = result->iconIndex;
 	tvItem.stateMask = TVIS_OVERLAYMASK;
-	tvItem.state = INDEXTOOVERLAYMASK(result->iconIndex >> 24);
+	tvItem.state = INDEXTOOVERLAYMASK(result->overlayIndex);
 	TreeView_SetItem(m_hTreeView, &tvItem);
 }
 

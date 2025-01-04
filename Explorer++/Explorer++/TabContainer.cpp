@@ -754,8 +754,10 @@ void TabContainer::SetTabIcon(const Tab &tab)
 
 		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
 			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowserImpl()->GetUniqueFolderId()](
-				int iconIndex)
+				int iconIndex, int overlayIndex)
 			{
+				UNREFERENCED_PARAMETER(overlayIndex);
+
 				auto tab = GetTabOptional(tabId);
 
 				if (!tab)
@@ -783,11 +785,7 @@ void TabContainer::SetTabIconFromSystemImageList(const Tab &tab, int systemIconI
 
 	int index = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
-
-	if (index != -1)
-	{
-		SetTabIconFromImageList(tab, index);
-	}
+	SetTabIconFromImageList(tab, index);
 }
 
 void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)

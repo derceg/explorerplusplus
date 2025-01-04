@@ -17,7 +17,7 @@ enum class DefaultIconType
 class IconFetcher
 {
 public:
-	using Callback = std::function<void(int iconIndex)>;
+	using Callback = std::function<void(int iconIndex, int overlayIndex)>;
 
 	virtual ~IconFetcher() = default;
 

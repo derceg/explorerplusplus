@@ -63,15 +63,16 @@ void IconFetcherImpl::QueueIconTask(std::wstring_view path, Callback callback)
 				return std::nullopt;
 			}
 
-			auto iconIndex = FindIconAsync(pidl.get());
+			auto iconInfo = FindIconAsync(pidl.get());
 
-			if (!iconIndex)
+			if (!iconInfo)
 			{
 				return std::nullopt;
 			}
 
 			IconResult result;
-			result.iconIndex = *iconIndex;
+			result.iconIndex = iconInfo->iconIndex;
+			result.overlayIndex = iconInfo->overlayIndex;
 			result.path = copiedPath;
 
 			PostMessage(m_hwnd, WM_APP_ICON_RESULT_READY, iconResultID, 0);
@@ -113,15 +114,16 @@ void IconFetcherImpl::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 				finalPidl = basicItemInfo.pidl.get();
 			}
 
-			auto iconIndex = FindIconAsync(finalPidl);
+			auto iconInfo = FindIconAsync(finalPidl);
 
-			if (!iconIndex)
+			if (!iconInfo)
 			{
 				return std::nullopt;
 			}
 
 			IconResult result;
-			result.iconIndex = *iconIndex;
+			result.iconIndex = iconInfo->iconIndex;
+			result.overlayIndex = iconInfo->overlayIndex;
 
 			std::wstring filePath;
 			hr = GetDisplayName(finalPidl, SHGDN_FORPARSING, filePath);
@@ -142,7 +144,7 @@ void IconFetcherImpl::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 	m_iconResults.insert({ iconResultID, std::move(futureResult) });
 }
 
-std::optional<int> IconFetcherImpl::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
+std::optional<ShellIconInfo> IconFetcherImpl::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
 {
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else
 	// icon overlays won't be applied.
@@ -157,7 +159,7 @@ std::optional<int> IconFetcherImpl::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
 
 	DestroyIcon(shfi.hIcon);
 
-	return shfi.iIcon;
+	return ExtractShellIconParts(shfi.iIcon);
 }
 
 void IconFetcherImpl::ProcessIconResult(int iconResultId)
@@ -183,7 +185,7 @@ void IconFetcherImpl::ProcessIconResult(int iconResultId)
 		m_cachedIcons->AddOrUpdateIcon(result->path, result->iconIndex);
 	}
 
-	futureResult.callback(result->iconIndex);
+	futureResult.callback(result->iconIndex, result->overlayIndex);
 }
 
 void IconFetcherImpl::ClearQueue()

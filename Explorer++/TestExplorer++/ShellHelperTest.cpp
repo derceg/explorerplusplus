@@ -283,3 +283,23 @@ TEST(GetDisplayName, ParsingName)
 
 	EXPECT_THAT(parsingName, StrCaseEq(pidlPath));
 }
+
+class ExtractShellIconPartsTest : public Test
+{
+protected:
+	void CheckExtraction(int iconIndex, int overlayIndex)
+	{
+		static_assert(sizeof(int) == 4);
+		auto iconInfo = ExtractShellIconParts(iconIndex | (overlayIndex << 24));
+		EXPECT_EQ(iconInfo.iconIndex, iconIndex);
+		EXPECT_EQ(iconInfo.overlayIndex, overlayIndex);
+	}
+};
+
+TEST_F(ExtractShellIconPartsTest, Extract)
+{
+	CheckExtraction(2, 0);
+	CheckExtraction(53, 0);
+	CheckExtraction(3, 1);
+	CheckExtraction(21, 5);
+}

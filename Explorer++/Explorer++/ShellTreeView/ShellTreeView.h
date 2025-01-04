@@ -94,6 +94,7 @@ private:
 		int nodeId;
 		HTREEITEM treeItem;
 		int iconIndex;
+		int overlayIndex;
 	};
 
 	struct SubfoldersResult

@@ -102,8 +102,10 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 		// TODO: It would probably be better to do this somewhere else, since
 		// this class is focused on navigation.
 		m_iconFetcher->QueueIconTask(navigateParams.pidl.Raw(),
-			[this, entryIndex, entryId](int iconIndex)
+			[this, entryIndex, entryId](int iconIndex, int overlayIndex)
 			{
+				UNREFERENCED_PARAMETER(overlayIndex);
+
 				auto *entry = GetEntryAtIndex(entryIndex);
 
 				if (!entry || entry->GetId() != entryId)

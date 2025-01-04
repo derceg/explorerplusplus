@@ -266,8 +266,10 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pi
 	MenuHelper::AddStringItem(goMenu, id, folderName);
 
 	m_iconFetcher.QueueIconTask(pidl,
-		[this, goMenu, id](int iconIndex)
+		[this, goMenu, id](int iconIndex, int overlayIndex)
 		{
+			UNREFERENCED_PARAMETER(overlayIndex);
+
 			// Accessing the Explorerplusplus instance here should always be safe. This callback is
 			// run on the main thread and will either run before the instance is destroyed, or not
 			// at all. It's not feasible for the callback to run while the destruction of the

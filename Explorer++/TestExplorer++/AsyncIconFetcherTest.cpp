@@ -59,12 +59,12 @@ TEST_F(AsyncIconFetcherTest, GetIconIndexAsync)
 	std::stop_source stopSource;
 
 	auto awaitableResult = m_iconFetcher.GetIconIndexAsync(pidl.Raw(), stopSource.get_token());
-	auto iconIndex = PumpMessagesUntilCoroutineFinished(&m_runtime, std::move(awaitableResult));
-	EXPECT_NE(iconIndex, std::nullopt);
+	auto iconInfo = PumpMessagesUntilCoroutineFinished(&m_runtime, std::move(awaitableResult));
+	ASSERT_NE(iconInfo, std::nullopt);
 
 	// Once an icon has been found, the cache should be updated.
 	auto cachedIconIndex = m_cachedIcons->MaybeGetIconIndex(path);
-	EXPECT_EQ(cachedIconIndex, iconIndex);
+	EXPECT_EQ(cachedIconIndex, iconInfo->iconIndex);
 }
 
 TEST_F(AsyncIconFetcherTest, GetIconIndexAsyncStop)
@@ -76,8 +76,8 @@ TEST_F(AsyncIconFetcherTest, GetIconIndexAsyncStop)
 	auto awaitableResult = m_iconFetcher.GetIconIndexAsync(pidl.Raw(), stopSource.get_token());
 
 	stopSource.request_stop();
-	auto iconIndex = PumpMessagesUntilCoroutineFinished(&m_runtime, std::move(awaitableResult));
-	EXPECT_EQ(iconIndex, std::nullopt);
+	auto iconInfo = PumpMessagesUntilCoroutineFinished(&m_runtime, std::move(awaitableResult));
+	EXPECT_EQ(iconInfo, std::nullopt);
 
 	// Since the request was stopped before it completed, the cache shouldn't have been updated.
 	auto cachedIconIndex = m_cachedIcons->MaybeGetIconIndex(path);

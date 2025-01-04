@@ -32,8 +32,10 @@ void ShellIconLoaderImpl::QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl,
 	// call will retrieve the updated icon. Even if the caller doesn't use the updated icon, doing
 	// this is still useful, since the updated icon will be cached.
 	m_iconFetcher->QueueIconTask(pidl,
-		[systemImageList = m_systemImageList, updateCallback](int iconIndex)
+		[systemImageList = m_systemImageList, updateCallback](int iconIndex, int overlayIndex)
 		{
+			UNREFERENCED_PARAMETER(overlayIndex);
+
 			wil::unique_hbitmap bitmap;
 			HRESULT hr =
 				ImageHelper::ImageListIconToPBGRABitmap(systemImageList.get(), iconIndex, bitmap);

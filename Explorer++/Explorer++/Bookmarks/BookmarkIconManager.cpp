@@ -72,22 +72,24 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark,
 	else
 	{
 		m_iconFetcher->QueueIconTask(bookmark->GetLocation(),
-			[this, callback, destroyed = m_destroyed](int systemIconIndex)
+			[this, callback, destroyed = m_destroyed](int iconIndex, int overlayIndex)
 			{
+				UNREFERENCED_PARAMETER(overlayIndex);
+
 				if (*destroyed || !callback)
 				{
 					return;
 				}
 
-				if (systemIconIndex == m_defaultFolderIconSystemImageListIndex)
+				if (iconIndex == m_defaultFolderIconSystemImageListIndex)
 				{
 					// Bookmarks use the standard folder icon by default, so if that's the icon
 					// they're actually using, nothing else needs to happen.
 					return;
 				}
 
-				int iconIndex = AddSystemIconToImageList(systemIconIndex);
-				callback(iconIndex);
+				int copiedIconIndex = AddSystemIconToImageList(iconIndex);
+				callback(copiedIconIndex);
 			});
 	}
 
@@ -105,8 +107,6 @@ int BookmarkIconManager::AddSystemIconToImageList(int systemIconIndex)
 		return m_defaultFolderIconIndex;
 	}
 
-	int iconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
+	return ImageHelper::CopyImageListIcon(m_imageList.get(),
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
-
-	return iconIndex;
 }

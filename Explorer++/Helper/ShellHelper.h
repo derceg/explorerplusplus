@@ -76,6 +76,12 @@ struct ContextMenuHandler
 	IUnknown *pUnknown;
 };
 
+struct ShellIconInfo
+{
+	int iconIndex;
+	int overlayIndex;
+};
+
 using unique_pidl_absolute = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>>;
 using unique_pidl_relative = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_RELATIVE>>;
 using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMID_CHILD>>;
@@ -156,3 +162,8 @@ HRESULT ParseDisplayNameForNavigation(const std::wstring &itemPath, unique_pidl_
 
 HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl);
 HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl);
+
+// When the SHGFI_OVERLAYINDEX flag is used with SHGetFileInfo(), the overlay index will be returned
+// in the upper 8 bits of the SHFILEINFO::iIcon member. This function will split the iIcon value
+// back out into it's constituent parts - the icon index and overlay index.
+ShellIconInfo ExtractShellIconParts(int iconIndexAndOverlay);

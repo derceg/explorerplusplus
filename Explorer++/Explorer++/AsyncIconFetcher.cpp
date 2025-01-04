@@ -18,7 +18,7 @@ AsyncIconFetcher::AsyncIconFetcher(const Runtime *runtime,
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
 }
 
-concurrencpp::lazy_result<std::optional<int>> AsyncIconFetcher::GetIconIndexAsync(
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcher::GetIconIndexAsync(
 	PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken)
 {
 	co_await ResumeOnComStaThread(m_runtime);
@@ -58,12 +58,14 @@ concurrencpp::lazy_result<std::optional<int>> AsyncIconFetcher::GetIconIndexAsyn
 	std::wstring itemPath;
 	hr = GetDisplayName(finalPidl, SHGDN_FORPARSING, itemPath);
 
+	auto iconInfo = ExtractShellIconParts(shfi.iIcon);
+
 	if (SUCCEEDED(hr))
 	{
-		m_cachedIcons->AddOrUpdateIcon(itemPath, shfi.iIcon);
+		m_cachedIcons->AddOrUpdateIcon(itemPath, iconInfo.iconIndex);
 	}
 
-	co_return shfi.iIcon;
+	co_return iconInfo;
 }
 
 int AsyncIconFetcher::GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const
