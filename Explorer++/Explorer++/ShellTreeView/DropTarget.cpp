@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "App.h"
 #include "ShellTreeNode.h"
 #include "../Helper/DpiCompatibility.h"
 
@@ -74,20 +75,32 @@ void ShellTreeView::UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt)
 
 void ShellTreeView::UpdateUiForTargetItem(HTREEITEM targetItem)
 {
+	using namespace std::chrono_literals;
+
 	if (targetItem)
 	{
 		TreeView_Select(m_hTreeView, targetItem, TVGN_DROPHILITE);
 
 		if (m_dropExpandItem != targetItem)
 		{
-			SetTimer(m_hTreeView, DROP_EXPAND_TIMER_ID, DROP_EXPAND_TIMER_TIMEOUT, nullptr);
+			// Note that although the provided executor outlives this class, the timer will be
+			// cancelled when it's destroyed (i.e. when this class is destroyed). So, it's not
+			// possible for the timer to fire after this class has been destroyed and the callback
+			// below is safe.
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4244) // 'argument': conversion from '_Rep' to 'size_t', possible loss of data
+			m_dropExpandTimer = m_app->GetRuntime()->GetTimerQueue()->make_one_shot_timer(800ms,
+				m_app->GetRuntime()->GetUiThreadExecutor(),
+				std::bind_front(&ShellTreeView::OnDropExpandTimer, this));
+#pragma warning(pop)
 		}
 	}
 	else
 	{
 		TreeView_Select(m_hTreeView, nullptr, TVGN_DROPHILITE);
 
-		KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
+		m_dropExpandTimer.cancel();
 	}
 
 	m_dropExpandItem = targetItem;
@@ -138,8 +151,6 @@ void ShellTreeView::OnDropExpandTimer()
 {
 	CHECK(m_dropExpandItem);
 	TreeView_Expand(m_hTreeView, m_dropExpandItem, TVE_EXPAND);
-
-	KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
 }
 
 void ShellTreeView::ResetDropUiState()
@@ -147,5 +158,5 @@ void ShellTreeView::ResetDropUiState()
 	TreeView_Select(m_hTreeView, nullptr, TVGN_DROPHILITE);
 
 	m_dropExpandItem = nullptr;
-	KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
+	m_dropExpandTimer.cancel();
 }

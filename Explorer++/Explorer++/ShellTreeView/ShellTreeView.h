@@ -15,6 +15,7 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/signals2.hpp>
+#include <concurrencpp/concurrencpp.h>
 #include <wil/com.h>
 #include <optional>
 
@@ -63,12 +64,6 @@ public:
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
-
-	static const UINT DROP_EXPAND_TIMER_ID = 1;
-	static const UINT DROP_EXPAND_TIMER_TIMEOUT = 800;
-
-	static const UINT SELECTION_CHANGED_TIMER_ID = 2;
-	static const UINT SELECTION_CHANGED_TIMEOUT = 500;
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
@@ -263,10 +258,12 @@ private:
 	HTREEITEM m_middleButtonItem;
 
 	std::optional<NMTREEVIEW> m_selectionChangedEventInfo;
+	concurrencpp::timer m_selectionChangedTimer;
 
 	/* Drag and drop. */
 	UINT m_getDragImageMessage;
 	HTREEITEM m_dropExpandItem;
+	concurrencpp::timer m_dropExpandTimer;
 	BOOL m_bDragCancelled;
 	BOOL m_bDragAllowed;
 	bool m_performingDrag = false;

@@ -177,17 +177,6 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		m_coreInterface->FocusChanged();
 		break;
 
-	case WM_TIMER:
-		if (wParam == DROP_EXPAND_TIMER_ID)
-		{
-			OnDropExpandTimer();
-		}
-		else if (wParam == SELECTION_CHANGED_TIMER_ID)
-		{
-			OnSelectionChangedTimer();
-		}
-		break;
-
 	case WM_RBUTTONDOWN:
 		if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
 		{
@@ -670,6 +659,8 @@ void ShellTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 
 void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
 {
+	using namespace std::chrono_literals;
+
 	if (!m_browserInitialized)
 	{
 		// This class will select an item initially (to ensure that there's always a selected item).
@@ -681,7 +672,7 @@ void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
 		return;
 	}
 
-	KillTimer(m_hTreeView, SELECTION_CHANGED_TIMER_ID);
+	m_selectionChangedTimer.cancel();
 	m_selectionChangedEventInfo.reset();
 
 	if (eventInfo->action == TVC_BYKEYBOARD && m_config->treeViewDelayEnabled)
@@ -691,7 +682,13 @@ void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
 		// This makes it possible to navigate in the treeview using the keyboard, without triggering
 		// a stream of navigations (in the case where a key is being held down and the selection is
 		// continuously changing).
-		SetTimer(m_hTreeView, SELECTION_CHANGED_TIMER_ID, SELECTION_CHANGED_TIMEOUT, nullptr);
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4244) // 'argument': conversion from '_Rep' to 'size_t', possible loss of data
+		m_selectionChangedTimer = m_app->GetRuntime()->GetTimerQueue()->make_one_shot_timer(500ms,
+			m_app->GetRuntime()->GetUiThreadExecutor(),
+			std::bind_front(&ShellTreeView::OnSelectionChangedTimer, this));
+#pragma warning(pop)
 	}
 	else
 	{
@@ -701,12 +698,6 @@ void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
 
 void ShellTreeView::OnSelectionChangedTimer()
 {
-	// It's important that the timer be killed here, before the navigation has started. Otherwise,
-	// what can happen is that if access to the folder is denied, a dialog will be shown and the
-	// message loop will run. That will then cause the timer to fire again, which will start another
-	// navigation, ad infinitum.
-	KillTimer(m_hTreeView, SELECTION_CHANGED_TIMER_ID);
-
 	CHECK(m_selectionChangedEventInfo);
 	HandleSelectionChanged(&*m_selectionChangedEventInfo);
 	m_selectionChangedEventInfo.reset();
