@@ -17,10 +17,6 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
-const TCHAR CustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
-
-static constexpr COLORREF DEFAULT_INITIAL_COLOR = RGB(0, 94, 138);
-
 CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
 CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent,

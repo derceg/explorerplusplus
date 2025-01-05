@@ -159,6 +159,8 @@ private:
 	// When changing the font size, it will be decreased/increased by this amount.
 	static const int FONT_SIZE_CHANGE_DELTA = 1_pt;
 
+	static constexpr wchar_t PLUGIN_FOLDER_NAME[] = L"plugins";
+
 	struct DirectoryAltered
 	{
 		int iIndex;

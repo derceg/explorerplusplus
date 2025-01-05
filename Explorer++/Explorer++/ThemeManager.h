@@ -34,6 +34,8 @@ private:
 	// This is the same background color as used in the Explorer address bar.
 	static constexpr COLORREF COMBO_BOX_EX_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	static constexpr wchar_t DIALOG_CLASS_NAME[] = L"#32770";
+
 	void OnDarkModeStatusChanged();
 
 	void ApplyThemeToWindow(HWND hwnd);

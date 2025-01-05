@@ -22,7 +22,7 @@ public:
 private:
 	friend CustomizeColorsDialog;
 
-	static const TCHAR SETTINGS_KEY[];
+	static constexpr wchar_t SETTINGS_KEY[] = L"CustomizeColors";
 
 	CustomizeColorsDialogPersistentSettings();
 
@@ -46,6 +46,8 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	static constexpr COLORREF DEFAULT_INITIAL_COLOR = RGB(0, 94, 138);
+
 	enum class MovementDirection
 	{
 		Up,

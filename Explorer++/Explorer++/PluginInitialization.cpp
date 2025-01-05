@@ -12,8 +12,6 @@
 #include "../Helper/ProcessHelper.h"
 #include <filesystem>
 
-static const std::wstring PLUGIN_FOLDER_NAME = L"plugins";
-
 void Explorerplusplus::InitializePlugins()
 {
 	if (!m_app->GetFeatureList()->IsEnabled(Feature::Plugins))

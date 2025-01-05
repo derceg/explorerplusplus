@@ -18,8 +18,6 @@
 #include <wil/resource.h>
 #include <vssym32.h>
 
-static const wchar_t DIALOG_CLASS_NAME[] = L"#32770";
-
 ThemeManager::ThemeManager(DarkModeManager *darkModeManager) : m_darkModeManager(darkModeManager)
 {
 	m_connections.push_back(darkModeManager->darkModeStatusChanged.AddObserver(
