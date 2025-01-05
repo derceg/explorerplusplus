@@ -19,6 +19,16 @@
 #include <propkey.h>
 #include <wininet.h>
 
+namespace
+{
+
+// This will be returned in cases where retrieving a display name fails. I'm not aware of any
+// situations where that can legitimately occur, but if it does ever happen, something needs to be
+// displayed.
+constexpr wchar_t DISPLAY_NAME_FALLBACK[] = L"(Unknown)";
+
+}
+
 enum class LinkTargetRetrievalType
 {
 	DontResolve,
@@ -52,6 +62,21 @@ HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstrin
 	}
 
 	return hr;
+}
+
+std::wstring GetDisplayNameWithFallback(PCIDLIST_ABSOLUTE pidl, DWORD flags)
+{
+	std::wstring name;
+	HRESULT hr = GetDisplayName(pidl, flags, name);
+
+	if (FAILED(hr))
+	{
+		DCHECK(false);
+
+		return DISPLAY_NAME_FALLBACK;
+	}
+
+	return name;
 }
 
 HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output)
@@ -591,6 +616,20 @@ std::wstring ConvertBstrToString(BSTR str)
 	}
 
 	return { str, SysStringLen(str) };
+}
+
+std::wstring GetFolderPathForDisplayWithFallback(PCIDLIST_ABSOLUTE pidl)
+{
+	auto path = GetFolderPathForDisplay(pidl);
+
+	if (!path)
+	{
+		DCHECK(false);
+
+		return DISPLAY_NAME_FALLBACK;
+	}
+
+	return *path;
 }
 
 // Returns either the parsing path for the specified item, or its in

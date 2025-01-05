@@ -40,16 +40,6 @@ void ShellItemsMenu::RebuildMenu(const std::vector<PidlAbsolute> &pidls)
 
 void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 {
-	std::wstring name;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
-
-	if (FAILED(hr))
-	{
-		DCHECK(false);
-
-		name = L"(Unknown)";
-	}
-
 	auto id = m_idCounter++;
 
 	if (id >= GetIdRange().endId)
@@ -57,14 +47,8 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	std::wstring displayPath;
-
-	if (auto optionalDisplayPath = GetFolderPathForDisplay(pidl))
-	{
-		displayPath = *optionalDisplayPath;
-	}
-
-	m_menuView->AppendItem(id, name, ShellIconModel(m_shellIconLoader, pidl), displayPath);
+	m_menuView->AppendItem(id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
+		ShellIconModel(m_shellIconLoader, pidl), GetFolderPathForDisplayWithFallback(pidl));
 
 	auto [itr, didInsert] = m_idPidlMap.insert({ id, pidl });
 	DCHECK(didInsert);

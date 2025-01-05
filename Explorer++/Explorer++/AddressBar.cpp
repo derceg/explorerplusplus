@@ -275,7 +275,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 
 	auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
 
-	auto fullPathForDisplay = entry->GetFullPathForDisplay();
+	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(entry->GetPidl().Raw());
 
 	auto cachedIconIndex = entry->GetSystemIconIndex();
 	int iconIndex;

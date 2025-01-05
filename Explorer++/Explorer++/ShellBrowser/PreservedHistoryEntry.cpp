@@ -9,8 +9,6 @@
 PreservedHistoryEntry::PreservedHistoryEntry(const HistoryEntry &entry) :
 	id(entry.GetId()),
 	pidl(entry.GetPidl()),
-	displayName(entry.GetDisplayName()),
-	fullPathForDisplay(entry.GetFullPathForDisplay()),
 	systemIconIndex(entry.GetSystemIconIndex())
 {
 }

@@ -90,6 +90,7 @@ using unique_shell_window_cookie = wil::unique_com_token<IShellWindows, long,
 	decltype(&IShellWindows::Revoke), &IShellWindows::Revoke>;
 
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output);
+std::wstring GetDisplayNameWithFallback(PCIDLIST_ABSOLUTE pidl, DWORD flags);
 HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output);
 HRESULT GetDisplayName(IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags,
 	std::wstring &output);
@@ -108,6 +109,7 @@ HRESULT ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BO
 BOOL GetBooleanVariant(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
 	const SHCOLUMNID *column, BOOL defaultValue);
 std::wstring ConvertBstrToString(BSTR str);
+std::wstring GetFolderPathForDisplayWithFallback(PCIDLIST_ABSOLUTE pidl);
 std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 bool IsPathGUID(const std::wstring &path);
 BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);

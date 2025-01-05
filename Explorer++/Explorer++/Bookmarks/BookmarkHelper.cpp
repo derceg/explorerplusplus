@@ -144,9 +144,10 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HINSTANCE resou
 	for (auto tabRef : coreInterface->GetTabContainer()->GetAllTabsInOrder())
 	{
 		auto &tab = tabRef.get();
-		auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
-		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-			tab.GetShellBrowserImpl()->GetDirectory());
+		auto *entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
+		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt,
+			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
+			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_FORPARSING));
 
 		bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(bookmark), index);
 
@@ -164,11 +165,12 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	if (type == BookmarkItem::Type::Bookmark)
 	{
 		const Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
-		auto entry =
+		auto *entry =
 			selectedTab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
 
-		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-			selectedTab.GetShellBrowserImpl()->GetDirectory());
+		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
+			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
+			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_FORPARSING));
 	}
 	else
 	{

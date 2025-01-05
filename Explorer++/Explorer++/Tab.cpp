@@ -95,16 +95,7 @@ std::wstring Tab::GetName() const
 	}
 
 	auto *entry = m_shellBrowser->GetNavigationController()->GetCurrentEntry();
-
-	std::wstring name;
-	HRESULT hr = GetDisplayName(entry->GetPidl().Raw(), SHGDN_INFOLDER, name);
-
-	if (FAILED(hr))
-	{
-		return L"(Unknown)";
-	}
-
-	return name;
+	return GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER);
 }
 
 bool Tab::GetUseCustomName() const

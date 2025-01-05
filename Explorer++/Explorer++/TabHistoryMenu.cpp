@@ -58,7 +58,7 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 {
 	auto id = m_idCounter++;
 
-	m_menuView->AppendItem(id, entry->GetDisplayName(),
+	m_menuView->AppendItem(id, GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
 		ShellIconModel(m_shellIconLoader, entry->GetPidl().Raw()));
 }
 

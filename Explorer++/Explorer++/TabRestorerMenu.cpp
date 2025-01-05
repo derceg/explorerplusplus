@@ -64,9 +64,10 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 		return;
 	}
 
-	auto currentEntry = closedTab->history.at(closedTab->currentEntry).get();
+	auto *currentEntry = closedTab->history.at(closedTab->currentEntry).get();
 
-	std::wstring menuText = currentEntry->displayName;
+	auto menuText = GetDisplayNameWithFallback(currentEntry->pidl.Raw(), SHGDN_INFOLDER);
+	auto helpText = GetFolderPathForDisplayWithFallback(currentEntry->pidl.Raw());
 
 	std::optional<std::wstring> acceleratorText;
 
@@ -76,8 +77,7 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 	}
 
 	m_menuView->AppendItem(id, menuText,
-		ShellIconModel(m_shellIconLoader, currentEntry->pidl.Raw()),
-		currentEntry->fullPathForDisplay, acceleratorText);
+		ShellIconModel(m_shellIconLoader, currentEntry->pidl.Raw()), helpText, acceleratorText);
 
 	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
 	DCHECK(didInsert);

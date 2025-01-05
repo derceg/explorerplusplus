@@ -436,24 +436,7 @@ protected:
 private:
 	std::unique_ptr<PreservedHistoryEntry> CreatePreservedHistoryEntry(const std::wstring &path)
 	{
-		PidlAbsolute pidl = CreateSimplePidlForTest(path.c_str());
-
-		std::wstring displayName;
-		HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_INFOLDER, displayName);
-
-		if (FAILED(hr))
-		{
-			return nullptr;
-		}
-
-		auto fullPathForDisplay = GetFolderPathForDisplay(pidl.Raw());
-
-		if (!fullPathForDisplay)
-		{
-			return nullptr;
-		}
-
-		HistoryEntry entry(pidl.Raw(), displayName, *fullPathForDisplay);
+		HistoryEntry entry(CreateSimplePidlForTest(path));
 		return std::make_unique<PreservedHistoryEntry>(entry);
 	}
 };
@@ -493,7 +476,5 @@ TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 		auto entry = navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
 		EXPECT_EQ(entry->GetPidl(), m_preservedEntries[i]->pidl);
-		EXPECT_EQ(entry->GetDisplayName(), m_preservedEntries[i]->displayName);
-		EXPECT_EQ(entry->GetFullPathForDisplay(), m_preservedEntries[i]->fullPathForDisplay);
 	}
 }

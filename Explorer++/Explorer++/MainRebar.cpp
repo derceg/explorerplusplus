@@ -427,9 +427,10 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 
 		hSubMenu = CreateMenu();
 
-		for (auto &entry : history)
+		for (auto *entry : history)
 		{
-			std::wstring displayName = entry->GetDisplayName();
+			std::wstring displayName =
+				GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER);
 
 			MENUITEMINFO mii;
 			mii.cbSize = sizeof(mii);

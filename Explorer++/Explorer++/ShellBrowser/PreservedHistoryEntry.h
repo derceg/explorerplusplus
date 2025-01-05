@@ -18,7 +18,5 @@ public:
 	const int id;
 
 	PidlAbsolute pidl;
-	std::wstring displayName;
-	std::wstring fullPathForDisplay;
 	std::optional<int> systemIconIndex;
 };

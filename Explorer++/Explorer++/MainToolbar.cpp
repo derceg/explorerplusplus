@@ -592,7 +592,8 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			std::wstring infoTipTemplate =
 				ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_BACK);
 			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
-				fmt::arg(L"folder_name", entry->GetDisplayName()));
+				fmt::arg(L"folder_name",
+					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
 		}
 	}
@@ -605,7 +606,8 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			std::wstring infoTipTemplate =
 				ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_FORWARD);
 			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
-				fmt::arg(L"folder_name", entry->GetDisplayName()));
+				fmt::arg(L"folder_name",
+					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
 		}
 	}

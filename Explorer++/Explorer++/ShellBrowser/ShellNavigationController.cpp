@@ -82,7 +82,7 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 	if (historyEntryType == HistoryEntryType::AddEntry
 		|| historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
-		auto entry = BuildEntry(navigateParams);
+		auto entry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw());
 		int entryId = entry->GetId();
 		int entryIndex;
 
@@ -116,34 +116,6 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 				entry->SetSystemIconIndex(iconIndex);
 			});
 	}
-}
-
-std::unique_ptr<HistoryEntry> ShellNavigationController::BuildEntry(
-	const NavigateParams &navigateParams)
-{
-	std::wstring displayName;
-	HRESULT hr = GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, displayName);
-
-	if (FAILED(hr))
-	{
-		// It's not expected that this would happen, so it would be useful to have some
-		// indication if the call above ever does fail.
-		DCHECK(false);
-
-		displayName = L"(Unknown)";
-	}
-
-	auto fullPathForDisplay = GetFolderPathForDisplay(navigateParams.pidl.Raw());
-
-	if (!fullPathForDisplay)
-	{
-		DCHECK(false);
-
-		fullPathForDisplay = L"(Unknown)";
-	}
-
-	return std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(), displayName,
-		*fullPathForDisplay);
 }
 
 HRESULT ShellNavigationController::GoToOffset(int offset)

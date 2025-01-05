@@ -59,7 +59,6 @@ private:
 	HRESULT GetFailureValue() override;
 
 	void OnNavigationCommitted(const NavigateParams &navigateParams);
-	std::unique_ptr<HistoryEntry> BuildEntry(const NavigateParams &navigateParams);
 
 	ShellNavigator *m_navigator;
 
