@@ -328,6 +328,9 @@
     <ClCompile Include="PopupMenuViewTestHelper.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="XMLSettingsTest.cpp">
+      <Filter>Helper\Settings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

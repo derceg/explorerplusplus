@@ -62,22 +62,9 @@ std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::BuildForSave(
 		return nullptr;
 	}
 
-	auto tag = wil::make_bstr_failfast(L"xml");
-	auto attribute = wil::make_bstr_failfast(L"version='1.0'");
-	wil::com_ptr_nothrow<IXMLDOMProcessingInstruction> processingInstruction;
-	HRESULT hr = xmlDocument->createProcessingInstruction(tag.get(), attribute.get(),
-		&processingInstruction);
-
-	if (hr != S_OK)
-	{
-		return nullptr;
-	}
-
-	XMLSettings::AppendChildToParent(processingInstruction.get(), xmlDocument.get());
-
 	wil::com_ptr_nothrow<IXMLDOMComment> comment;
 	auto commentText = wil::make_bstr_failfast(L" Preference file for Explorer++ ");
-	hr = xmlDocument->createComment(commentText.get(), &comment);
+	HRESULT hr = xmlDocument->createComment(commentText.get(), &comment);
 
 	if (hr != S_OK)
 	{

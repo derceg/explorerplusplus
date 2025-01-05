@@ -15,6 +15,7 @@ namespace XMLSettings
 {
 
 wil::com_ptr_nothrow<IXMLDOMDocument> CreateXmlDocument();
+HRESULT FormatXmlDocument(IXMLDOMDocument *xmlDocument);
 void WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparentNode,
 	const std::wstring &elementName, const std::wstring &attributeName,
 	const std::wstring &attributeValue);

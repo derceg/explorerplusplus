@@ -15,6 +15,7 @@
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include "WindowXmlStorage.h"
+#include "../Helper/XMLSettings.h"
 
 XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument,
 	wil::com_ptr_nothrow<IXMLDOMNode> rootNode, const std::wstring &configFilePath,
@@ -110,6 +111,14 @@ void XmlAppStorage::SaveFrequentLocations(const FrequentLocationsModel *frequent
 void XmlAppStorage::Commit()
 {
 	if (m_operationType != Storage::OperationType::Save)
+	{
+		DCHECK(false);
+		return;
+	}
+
+	HRESULT hr = XMLSettings::FormatXmlDocument(m_xmlDocument.get());
+
+	if (FAILED(hr))
 	{
 		DCHECK(false);
 		return;

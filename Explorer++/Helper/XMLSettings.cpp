@@ -15,6 +15,7 @@
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <comdef.h>
+#include <propvarutil.h>
 
 namespace
 {
@@ -44,6 +45,41 @@ wil::com_ptr_nothrow<IXMLDOMDocument> CreateXmlDocument()
 	xmlDocument->put_preserveWhiteSpace(VARIANT_TRUE);
 
 	return xmlDocument;
+}
+
+HRESULT FormatXmlDocument(IXMLDOMDocument *xmlDocument)
+{
+	wil::com_ptr_nothrow<IMXWriter> mxWriter;
+	RETURN_IF_FAILED(CoCreateInstance(CLSID_MXXMLWriter30, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&mxWriter)));
+
+	RETURN_IF_FAILED(mxWriter->put_omitXMLDeclaration(VARIANT_FALSE));
+	RETURN_IF_FAILED(mxWriter->put_standalone(VARIANT_TRUE));
+	RETURN_IF_FAILED(mxWriter->put_indent(VARIANT_TRUE));
+	RETURN_IF_FAILED(mxWriter->put_encoding(wil::make_bstr_failfast(L"UTF-8").get()));
+
+	wil::com_ptr_nothrow<ISAXXMLReader> saxReader;
+	RETURN_IF_FAILED(CoCreateInstance(CLSID_SAXXMLReader30, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&saxReader)));
+
+	wil::com_ptr_nothrow<ISAXContentHandler> saxContentHandler;
+	RETURN_IF_FAILED(mxWriter->QueryInterface(IID_PPV_ARGS(&saxContentHandler)));
+	RETURN_IF_FAILED(saxReader->putContentHandler(saxContentHandler.get()));
+
+	// This is needed to ensure that comments are included in the output.
+	wil::unique_variant handler;
+	InitVariantFromUnknown(mxWriter.get(), &handler);
+	RETURN_IF_FAILED(
+		saxReader->putProperty(L"http://xml.org/sax/properties/lexical-handler", handler));
+
+	// The provided document will be used as both the input and output document.
+	wil::unique_variant document;
+	InitVariantFromUnknown(xmlDocument, &document);
+	RETURN_IF_FAILED(mxWriter->put_output(document));
+
+	RETURN_IF_FAILED(saxReader->parse(document));
+
+	return S_OK;
 }
 
 void WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparentNode,
