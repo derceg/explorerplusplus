@@ -4,40 +4,24 @@
 
 #pragma once
 
-#include "SignalWrapper.h"
 #include "../Helper/PidlHelper.h"
 #include <boost/core/noncopyable.hpp>
-#include <optional>
 #include <vector>
-
-struct PreservedHistoryEntry;
 
 class HistoryEntry : private boost::noncopyable
 {
 public:
-	enum class PropertyType
-	{
-		SystemIconIndex
-	};
-
-	HistoryEntry(const PidlAbsolute &pidl, std::optional<int> systemIconIndex = std::nullopt);
-	HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry);
+	HistoryEntry(const PidlAbsolute &pidl);
 
 	int GetId() const;
-	PidlAbsolute GetPidl() const;
-	std::optional<int> GetSystemIconIndex() const;
-	void SetSystemIconIndex(int iconIndex);
-	std::vector<PidlAbsolute> GetSelectedItems() const;
+	const PidlAbsolute &GetPidl() const;
+	const std::vector<PidlAbsolute> &GetSelectedItems() const;
 	void SetSelectedItems(const std::vector<PidlAbsolute> &pidls);
 
-	SignalWrapper<HistoryEntry, void(const HistoryEntry &entry, PropertyType propertyType)>
-		historyEntryUpdatedSignal;
-
 private:
-	static int idCounter;
+	static inline int idCounter = 0;
 	const int m_id;
 
-	PidlAbsolute m_pidl;
-	std::optional<int> m_systemIconIndex;
+	const PidlAbsolute m_pidl;
 	std::vector<PidlAbsolute> m_selectedItems;
 };

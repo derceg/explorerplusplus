@@ -331,6 +331,12 @@
     <ClCompile Include="XMLSettingsTest.cpp">
       <Filter>Helper\Settings</Filter>
     </ClCompile>
+    <ClCompile Include="ScopedStopSourceTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="WeakPtrFactoryTest.cpp">
+      <Filter>Helper\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -444,6 +450,9 @@
     <Filter Include="Tabs\UI">
       <UniqueIdentifier>{9fe87dea-7e4f-4630-b9f2-ba3b33711d06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helper\Memory">
+      <UniqueIdentifier>{b1564aac-148a-409b-ad02-26644ee30151}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -476,9 +485,6 @@
     </ClInclude>
     <ClInclude Include="MovableModelHelper.h">
       <Filter>Storage</Filter>
-    </ClInclude>
-    <ClInclude Include="IconFetcherMock.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TabNavigationMock.h">
       <Filter>Core</Filter>
@@ -546,6 +552,7 @@
     <ClInclude Include="PopupMenuViewTestHelper.h">
       <Filter>Core\UI\Views</Filter>
     </ClInclude>
+    <ClInclude Include="GTestHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

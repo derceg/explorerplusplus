@@ -20,7 +20,6 @@
 #include "Runtime.h"
 #include "TabRestorer.h"
 #include "ThemeManager.h"
-#include "../Helper/CachedIcons.h"
 #include "../Helper/SystemClockImpl.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -28,6 +27,8 @@
 #include <memory>
 #include <vector>
 
+class AsyncIconFetcher;
+class CachedIcons;
 class ColorRuleModel;
 class IconResourceLoader;
 struct WindowStorageData;
@@ -52,6 +53,7 @@ public:
 	AcceleratorManager *GetAcceleratorManager();
 	Config *GetConfig();
 	CachedIcons *GetCachedIcons();
+	std::shared_ptr<AsyncIconFetcher> GetIconFetcher();
 	BrowserList *GetBrowserList();
 	ModelessDialogList *GetModelessDialogList();
 	BookmarkTree *GetBookmarkTree();
@@ -94,7 +96,8 @@ private:
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
-	CachedIcons m_cachedIcons;
+	std::shared_ptr<CachedIcons> m_cachedIcons;
+	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;
 	BrowserList m_browserList;
 	ModelessDialogList m_modelessDialogList;
 	BookmarkTree m_bookmarkTree;

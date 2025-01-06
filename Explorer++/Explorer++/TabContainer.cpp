@@ -875,7 +875,7 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 	auto navigateParams =
-		NavigateParams::Normal(entry->pidl.Raw(), HistoryEntryType::ReplaceCurrentEntry);
+		NavigateParams::Normal(entry->GetPidl().Raw(), HistoryEntryType::ReplaceCurrentEntry);
 	return SetUpNewTab(tab, navigateParams, tabSettings);
 }
 

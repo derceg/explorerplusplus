@@ -252,6 +252,7 @@
     <ClCompile Include="RuntimeTest.cpp" />
     <ClCompile Include="RuntimeTestHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp" />
+    <ClCompile Include="ScopedStopSourceTest.cpp" />
     <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
@@ -315,6 +316,7 @@
     <ClCompile Include="VersionHelperTest.cpp" />
     <ClCompile Include="VersionTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
+    <ClCompile Include="WeakPtrFactoryTest.cpp" />
     <ClCompile Include="WindowRegistryStorageTest.cpp" />
     <ClCompile Include="WindowStorageTestHelper.cpp" />
     <ClCompile Include="WindowXmlStorageTest.cpp" />
@@ -345,8 +347,8 @@
     <ClInclude Include="FakeSystemClock.h" />
     <ClInclude Include="FrequentLocationsStorageTestHelper.h" />
     <ClInclude Include="GeneratorTestHelper.h" />
+    <ClInclude Include="GTestHelper.h" />
     <ClInclude Include="ImageTestHelper.h" />
-    <ClInclude Include="IconFetcherMock.h" />
     <ClInclude Include="MainRebarStorageTestHelper.h" />
     <ClInclude Include="MessageLoop.h" />
     <ClInclude Include="MovableModelHelper.h" />

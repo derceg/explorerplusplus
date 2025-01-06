@@ -657,6 +657,7 @@
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
+    <ClCompile Include="ScopedStopSource.cpp" />
     <ClCompile Include="SystemClockImpl.cpp" />
     <ClCompile Include="UniqueResources.cpp" />
     <ClCompile Include="ShellContextMenu.cpp" />
@@ -746,6 +747,7 @@
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
+    <ClInclude Include="ScopedStopSource.h" />
     <ClInclude Include="SystemClock.h" />
     <ClInclude Include="SystemClockImpl.h" />
     <ClInclude Include="UniqueResources.h" />
@@ -785,6 +787,9 @@
     <ClInclude Include="TimeHelper.h" />
     <ClInclude Include="UniqueThreadId.h" />
     <ClInclude Include="UniqueVariableSizeStruct.h" />
+    <ClInclude Include="WeakPtr.h" />
+    <ClInclude Include="WeakPtrFactory.h" />
+    <ClInclude Include="WeakState.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="WindowSubclass.h" />
     <ClInclude Include="WinRTBaseWrapper.h" />

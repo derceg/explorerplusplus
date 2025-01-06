@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "App.h"
 #include "Explorer++.h"
+#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
@@ -26,6 +27,7 @@
 #include "WindowStorage.h"
 #include "XmlAppStorage.h"
 #include "XmlAppStorageFactory.h"
+#include "../Helper/CachedIcons.h"
 #include "../Helper/Helper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
@@ -37,7 +39,8 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_runtime(std::make_unique<UIThreadExecutor>(), std::make_unique<ComStaThreadPoolExecutor>(1)),
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
-	m_cachedIcons(MAX_CACHED_ICONS),
+	m_cachedIcons(std::make_shared<CachedIcons>(MAX_CACHED_ICONS)),
+	m_iconFetcher(std::make_shared<AsyncIconFetcher>(&m_runtime, m_cachedIcons)),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
@@ -329,7 +332,12 @@ Config *App::GetConfig()
 
 CachedIcons *App::GetCachedIcons()
 {
-	return &m_cachedIcons;
+	return m_cachedIcons.get();
+}
+
+std::shared_ptr<AsyncIconFetcher> App::GetIconFetcher()
+{
+	return m_iconFetcher;
 }
 
 BrowserList *App::GetBrowserList()

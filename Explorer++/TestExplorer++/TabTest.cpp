@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "Tab.h"
 #include "BrowserWindowMock.h"
-#include "IconFetcherMock.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
@@ -29,14 +28,13 @@ class TabTest : public Test
 {
 protected:
 	TabTest() :
-		m_shellBrowser(std::make_shared<ShellBrowserFake>(&m_tabNavigation, &m_iconFetcher)),
+		m_shellBrowser(std::make_shared<ShellBrowserFake>(&m_tabNavigation)),
 		m_tab(m_shellBrowser, &m_browser),
 		m_observer(&m_tab)
 	{
 	}
 
 	TabNavigationMock m_tabNavigation;
-	IconFetcherMock m_iconFetcher;
 	std::shared_ptr<ShellBrowserFake> m_shellBrowser;
 	BrowserWindowMock m_browser;
 	Tab m_tab;

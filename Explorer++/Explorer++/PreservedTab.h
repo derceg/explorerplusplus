@@ -8,7 +8,7 @@
 #include "Tab.h"
 #include <boost/core/noncopyable.hpp>
 
-struct PreservedHistoryEntry;
+class PreservedHistoryEntry;
 
 struct PreservedTab : private boost::noncopyable
 {

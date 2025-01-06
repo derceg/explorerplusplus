@@ -10,9 +10,8 @@
 #include <boost/signals2.hpp>
 #include <vector>
 
-class IconFetcher;
 struct NavigateParams;
-struct PreservedHistoryEntry;
+class PreservedHistoryEntry;
 class ShellNavigator;
 class TabNavigationInterface;
 
@@ -27,10 +26,8 @@ class ShellNavigationController :
 	private boost::noncopyable
 {
 public:
+	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation);
 	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
-		IconFetcher *iconFetcher);
-	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
-		IconFetcher *iconFetcher,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
@@ -64,8 +61,6 @@ private:
 
 	TabNavigationInterface *m_tabNavigation;
 	NavigationMode m_navigationMode = NavigationMode::Normal;
-
-	IconFetcher *m_iconFetcher;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

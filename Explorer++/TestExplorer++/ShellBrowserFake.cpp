@@ -9,17 +9,16 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
 
-ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,
+ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
-		iconFetcher, preservedEntries, currentEntry);
+		preservedEntries, currentEntry);
 }
 
-ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher)
+ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation)
 {
-	m_navigationController =
-		std::make_unique<ShellNavigationController>(this, tabNavigation, iconFetcher);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation);
 }
 
 ShellBrowserFake::~ShellBrowserFake() = default;

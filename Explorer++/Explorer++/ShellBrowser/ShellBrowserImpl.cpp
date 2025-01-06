@@ -63,8 +63,8 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
-		m_iconFetcher.get(), history, currentEntry);
+	m_navigationController =
+		std::make_unique<ShellNavigationController>(this, tabNavigation, history, currentEntry);
 }
 
 ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
@@ -103,8 +103,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
-	m_navigationController =
-		std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
+	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation);
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 

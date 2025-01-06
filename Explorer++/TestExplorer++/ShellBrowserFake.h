@@ -7,18 +7,17 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/PidlHelper.h"
 
-class IconFetcher;
-struct PreservedHistoryEntry;
+class PreservedHistoryEntry;
 class ShellNavigationController;
 class TabNavigationInterface;
 
 class ShellBrowserFake : public ShellBrowser
 {
 public:
-	ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,
+	ShellBrowserFake(TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
-	ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher);
+	ShellBrowserFake(TabNavigationInterface *tabNavigation);
 	~ShellBrowserFake();
 
 	HRESULT NavigateToPath(const std::wstring &path,

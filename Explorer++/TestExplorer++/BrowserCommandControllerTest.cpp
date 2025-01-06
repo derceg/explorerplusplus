@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "BrowserCommandController.h"
-#include "IconFetcherMock.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
@@ -19,13 +18,12 @@ class BrowserCommandControllerTest : public Test
 {
 protected:
 	BrowserCommandControllerTest() :
-		m_shellBrowser(&m_tabNavigation, &m_iconFetcher),
+		m_shellBrowser(&m_tabNavigation),
 		m_commandController(&m_shellBrowser)
 	{
 	}
 
 	TabNavigationMock m_tabNavigation;
-	IconFetcherMock m_iconFetcher;
 	ShellBrowserFake m_shellBrowser;
 	BrowserCommandController m_commandController;
 };

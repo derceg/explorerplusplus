@@ -45,7 +45,7 @@ class CoreInterface;
 class FileActionHandler;
 class IconFetcher;
 struct PreservedFolderState;
-struct PreservedHistoryEntry;
+class PreservedHistoryEntry;
 class ShellBrowserEmbedder;
 class ShellNavigationController;
 class TabNavigationInterface;

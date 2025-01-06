@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
@@ -19,11 +18,10 @@ protected:
 	template <typename... Args>
 	std::unique_ptr<ShellBrowserFake> CreateTab(Args &&...args)
 	{
-		auto shellBrowser = std::make_unique<ShellBrowserFake>(&m_tabNavigation, &m_iconFetcher);
+		auto shellBrowser = std::make_unique<ShellBrowserFake>(&m_tabNavigation);
 		Helper::CreateAndAttachToShellBrowser(shellBrowser.get(), std::forward<Args>(args)...);
 		return shellBrowser;
 	}
 
 	TabNavigationMock m_tabNavigation;
-	IconFetcherMock m_iconFetcher;
 };

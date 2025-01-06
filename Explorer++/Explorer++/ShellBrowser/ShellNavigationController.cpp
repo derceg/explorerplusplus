@@ -4,27 +4,25 @@
 
 #include "stdafx.h"
 #include "ShellNavigationController.h"
-#include "IconFetcher.h"
+#include "PreservedHistoryEntry.h"
 #include "ShellNavigator.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/ShellHelper.h"
 
 ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
-	TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher) :
+	TabNavigationInterface *tabNavigation) :
 	m_navigator(navigator),
-	m_tabNavigation(tabNavigation),
-	m_iconFetcher(iconFetcher)
+	m_tabNavigation(tabNavigation)
 {
 	Initialize();
 }
 
 ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
-	TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,
+	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	NavigationController(CopyPreservedHistoryEntries(preservedEntries), currentEntry),
 	m_navigator(navigator),
-	m_tabNavigation(tabNavigation),
-	m_iconFetcher(iconFetcher)
+	m_tabNavigation(tabNavigation)
 {
 	Initialize();
 }
@@ -43,7 +41,7 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 
 	for (const auto &preservedEntry : preservedEntries)
 	{
-		auto entry = std::make_unique<HistoryEntry>(*preservedEntry);
+		auto entry = std::make_unique<HistoryEntry>(preservedEntry->GetPidl());
 		entries.push_back(std::move(entry));
 	}
 
@@ -83,12 +81,10 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 		|| historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
 		auto entry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw());
-		int entryId = entry->GetId();
-		int entryIndex;
 
 		if (historyEntryType == HistoryEntryType::AddEntry)
 		{
-			entryIndex = AddEntry(std::move(entry));
+			AddEntry(std::move(entry));
 		}
 		else
 		{
@@ -96,25 +92,8 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 			auto *currentEntry = GetCurrentEntry();
 			entry->SetSelectedItems(currentEntry->GetSelectedItems());
 
-			entryIndex = ReplaceCurrentEntry(std::move(entry));
+			ReplaceCurrentEntry(std::move(entry));
 		}
-
-		// TODO: It would probably be better to do this somewhere else, since
-		// this class is focused on navigation.
-		m_iconFetcher->QueueIconTask(navigateParams.pidl.Raw(),
-			[this, entryIndex, entryId](int iconIndex, int overlayIndex)
-			{
-				UNREFERENCED_PARAMETER(overlayIndex);
-
-				auto *entry = GetEntryAtIndex(entryIndex);
-
-				if (!entry || entry->GetId() != entryId)
-				{
-					return;
-				}
-
-				entry->SetSystemIconIndex(iconIndex);
-			});
 	}
 }
 

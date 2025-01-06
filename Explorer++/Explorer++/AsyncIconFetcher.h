@@ -22,11 +22,10 @@ public:
 	[[nodiscard]] concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
 		PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken);
 	int GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const;
-
-private:
 	std::optional<int> MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const;
 	int GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const;
 
+private:
 	const Runtime *const m_runtime;
 	const std::shared_ptr<CachedIcons> m_cachedIcons;
 	int m_defaultFileIconIndex;

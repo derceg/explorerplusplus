@@ -32,7 +32,7 @@ std::vector<std::unique_ptr<PreservedHistoryEntry>> PreservedTab::CopyHistoryEnt
 		 i++)
 	{
 		auto entry = std::make_unique<PreservedHistoryEntry>(
-			*tab.GetShellBrowser()->GetNavigationController()->GetEntryAtIndex(i));
+			tab.GetShellBrowser()->GetNavigationController()->GetEntryAtIndex(i)->GetPidl());
 		history.push_back(std::move(entry));
 	}
 

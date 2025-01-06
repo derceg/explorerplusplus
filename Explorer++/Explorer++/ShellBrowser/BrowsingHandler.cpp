@@ -548,8 +548,7 @@ void ShellBrowserImpl::OnEnumerationCompleted(std::vector<ShellBrowserImpl::Item
 	CHECK(currentEntry);
 	DCHECK(currentEntry->GetPidl() == navigateParams.pidl);
 
-	auto selectedItems = currentEntry->GetSelectedItems();
-	SelectItems(selectedItems);
+	SelectItems(currentEntry->GetSelectedItems());
 
 	if (navigateParams.navigationType == NavigationType::Up)
 	{

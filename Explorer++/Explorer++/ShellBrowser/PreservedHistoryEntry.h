@@ -5,18 +5,14 @@
 #pragma once
 
 #include "../Helper/PidlHelper.h"
-#include <boost/core/noncopyable.hpp>
-#include <optional>
 
-class HistoryEntry;
-
-struct PreservedHistoryEntry : private boost::noncopyable
+class PreservedHistoryEntry
 {
 public:
-	PreservedHistoryEntry(const HistoryEntry &entry);
+	PreservedHistoryEntry(const PidlAbsolute &pidl);
 
-	const int id;
+	const PidlAbsolute &GetPidl() const;
 
-	PidlAbsolute pidl;
-	std::optional<int> systemIconIndex;
+private:
+	const PidlAbsolute m_pidl;
 };

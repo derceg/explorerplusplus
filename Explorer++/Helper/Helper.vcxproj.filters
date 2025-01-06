@@ -175,6 +175,9 @@
     <ClCompile Include="SystemClockImpl.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="ScopedStopSource.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -381,6 +384,18 @@
     <ClInclude Include="Base64Wrapper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="ScopedStopSource.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="WeakPtrFactory.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="WeakPtr.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="WeakState.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
@@ -412,6 +427,9 @@
     </Filter>
     <Filter Include="COM">
       <UniqueIdentifier>{a80deb2e-55fa-460e-b05b-036fb27a4988}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{9ca19408-c4a1-49a1-9672-ec8017ecabc5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

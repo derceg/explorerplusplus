@@ -4,38 +4,40 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
+#include "App.h"
+#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "NavigationHelper.h"
+#include "RuntimeHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
-#include "../Helper/DataExchangeHelper.h"
-#include "../Helper/DataObjectImpl.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/DropSourceImpl.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 #include <wil/com.h>
 #include <wil/common.h>
-#include <wil/resource.h>
 
-AddressBar *AddressBar::Create(HWND parent, BrowserWindow *browserWindow,
+AddressBar *AddressBar::Create(HWND parent, App *app, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface)
 {
-	return new AddressBar(parent, browserWindow, coreInterface);
+	return new AddressBar(parent, app, browserWindow, coreInterface);
 }
 
-AddressBar::AddressBar(HWND parent, BrowserWindow *browserWindow, CoreInterface *coreInterface) :
+AddressBar::AddressBar(HWND parent, App *app, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface) :
 	BaseWindow(CreateAddressBar(parent)),
+	m_app(app),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_fontSetter(m_hwnd, coreInterface->GetConfig())
+	m_fontSetter(m_hwnd, app->GetConfig()),
+	m_weakPtrFactory(this)
 {
 	Initialize(parent);
 }
@@ -49,8 +51,6 @@ HWND AddressBar::CreateAddressBar(HWND parent)
 
 void AddressBar::Initialize(HWND parent)
 {
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
-
 	HIMAGELIST smallIcons;
 	Shell_GetImageLists(nullptr, &smallIcons);
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
@@ -265,19 +265,13 @@ void AddressBar::OnNavigationCommitted(const Tab &tab, const NavigateParams &nav
 
 void AddressBar::UpdateTextAndIcon(const Tab &tab)
 {
-	// At this point, the text and icon in the address bar are being updated
-	// because the current folder has changed (e.g. because another tab has been
-	// selected). Therefore, any icon updates for the last history entry can be
-	// ignored. If that history entry becomes the current one again (e.g.
-	// because the original tab is re-selected), the listener can be set back up
-	// (if necessary).
-	m_historyEntryUpdatedConnection.disconnect();
+	// Resetting this here ensures that any previous icon requests that are still ongoing will be
+	// ignored once they complete.
+	m_scopedStopSource = std::make_unique<ScopedStopSource>();
 
 	auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
 
-	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(entry->GetPidl().Raw());
-
-	auto cachedIconIndex = entry->GetSystemIconIndex();
+	auto cachedIconIndex = m_app->GetIconFetcher()->MaybeGetCachedIconIndex(entry->GetPidl().Raw());
 	int iconIndex;
 
 	if (cachedIconIndex)
@@ -286,13 +280,35 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	}
 	else
 	{
-		iconIndex = m_defaultFolderIconIndex;
+		iconIndex = m_app->GetIconFetcher()->GetDefaultIconIndex(entry->GetPidl().Raw());
 
-		m_historyEntryUpdatedConnection = entry->historyEntryUpdatedSignal.AddObserver(
-			std::bind_front(&AddressBar::OnHistoryEntryUpdated, this));
+		RetrieveUpdatedIcon(m_weakPtrFactory.GetWeakPtr(), entry->GetPidl(),
+			m_app->GetIconFetcher(), m_app->GetRuntime(), m_scopedStopSource->GetToken());
 	}
 
+	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(entry->GetPidl().Raw());
 	UpdateTextAndIconInUI(&fullPathForDisplay, iconIndex);
+}
+
+concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
+	PidlAbsolute pidl, std::shared_ptr<AsyncIconFetcher> iconFetcher, Runtime *runtime,
+	std::stop_token stopToken)
+{
+	auto iconInfo = co_await iconFetcher->GetIconIndexAsync(pidl.Raw(), stopToken);
+
+	if (!iconInfo)
+	{
+		co_return;
+	}
+
+	co_await ResumeOnUiThread(runtime);
+
+	if (stopToken.stop_requested() || !self)
+	{
+		co_return;
+	}
+
+	self->UpdateTextAndIconInUI(nullptr, iconInfo->iconIndex);
 }
 
 void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
@@ -318,20 +334,6 @@ void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
 void AddressBar::RevertTextInUI()
 {
 	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(m_currentText.c_str()));
-}
-
-void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry,
-	HistoryEntry::PropertyType propertyType)
-{
-	switch (propertyType)
-	{
-	case HistoryEntry::PropertyType::SystemIconIndex:
-		if (entry.GetSystemIconIndex())
-		{
-			UpdateTextAndIconInUI(nullptr, *entry.GetSystemIconIndex());
-		}
-		break;
-	}
 }
 
 void AddressBar::OnFontOrDpiUpdated()

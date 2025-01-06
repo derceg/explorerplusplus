@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
-#include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
@@ -19,7 +18,7 @@ using namespace testing;
 class ShellNavigationControllerTest : public Test
 {
 protected:
-	ShellNavigationControllerTest() : m_shellBrowser(&m_tabNavigation, &m_iconFetcher)
+	ShellNavigationControllerTest() : m_shellBrowser(&m_tabNavigation)
 	{
 	}
 
@@ -29,7 +28,6 @@ protected:
 	}
 
 	TabNavigationMock m_tabNavigation;
-	IconFetcherMock m_iconFetcher;
 	ShellBrowserFake m_shellBrowser;
 };
 
@@ -412,14 +410,16 @@ class ShellNavigationControllerPreservedTest : public Test
 protected:
 	void SetUp(int currentEntry)
 	{
-		auto preservedEntry = CreatePreservedHistoryEntry(L"C:\\Fake1");
+		auto preservedEntry =
+			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake1"));
 		m_preservedEntries.push_back(std::move(preservedEntry));
 
-		preservedEntry = CreatePreservedHistoryEntry(L"C:\\Fake2");
+		preservedEntry =
+			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake2"));
 		m_preservedEntries.push_back(std::move(preservedEntry));
 
-		m_shellBrowser = std::make_unique<ShellBrowserFake>(&m_tabNavigation, &m_iconFetcher,
-			m_preservedEntries, currentEntry);
+		m_shellBrowser =
+			std::make_unique<ShellBrowserFake>(&m_tabNavigation, m_preservedEntries, currentEntry);
 	}
 
 	ShellNavigationController *GetNavigationController() const
@@ -428,17 +428,9 @@ protected:
 	}
 
 	TabNavigationMock m_tabNavigation;
-	IconFetcherMock m_iconFetcher;
 	std::unique_ptr<ShellBrowserFake> m_shellBrowser;
 
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> m_preservedEntries;
-
-private:
-	std::unique_ptr<PreservedHistoryEntry> CreatePreservedHistoryEntry(const std::wstring &path)
-	{
-		HistoryEntry entry(CreateSimplePidlForTest(path));
-		return std::make_unique<PreservedHistoryEntry>(entry);
-	}
 };
 
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
@@ -475,6 +467,6 @@ TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 	{
 		auto entry = navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
-		EXPECT_EQ(entry->GetPidl(), m_preservedEntries[i]->pidl);
+		EXPECT_EQ(entry->GetPidl(), m_preservedEntries[i]->GetPidl());
 	}
 }

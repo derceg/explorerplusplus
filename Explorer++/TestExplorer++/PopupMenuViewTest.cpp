@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "PopupMenuView.h"
+#include "GTestHelper.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
 #include <gtest/gtest.h>
@@ -103,7 +104,7 @@ TEST_F(PopupMenuViewDeathTest, RetrieveHelpTextAfterClearingMenu)
 
 	// The menu was cleared, so attempting to retrieve the help text for the previously inserted
 	// item should fail.
-	EXPECT_DEATH(m_popupMenu.GetHelpTextForItem(itemId), "");
+	EXPECT_CHECK_DEATH(m_popupMenu.GetHelpTextForItem(itemId));
 }
 
 class PopupMenuViewIconTest : public Test
