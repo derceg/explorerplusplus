@@ -13,6 +13,7 @@
 #include "IconFetcherImpl.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "ShellEnumerator.h"
 #include "MassRenameDialog.h"
 #include "PreservedFolderState.h"
 #include "ServiceProvider.h"
@@ -231,6 +232,58 @@ void ShellBrowserImpl::InitializeListView()
 	}
 }
 
+HIMAGELIST ShellBrowserImpl::GetIconsList(int margin)
+{
+	wil::com_ptr_nothrow<IImageList> pImageList;
+	SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
+	HIMAGELIST hIconsList = reinterpret_cast<HIMAGELIST>(pImageList.get());
+	if (margin <= 0)
+		return hIconsList;
+
+	// The approach to add margin is to build a copy of the icons list containing the same icons
+	// but including the margin.
+
+	/* It is required to previously call SHGetFileInfo() for each file in current directory
+	in order to load all the icons in the list pointed by pImageList.
+	Otherwise the current directory could contain some new icon, not previously seen and so missing
+	in the image list. This is because the list is not initially complete,
+	it goes growing whenever new icons are required with SHGetFileInfo(,,,,SHGFI_SYSICONINDEX). */
+	std::vector<ItemInfo_t> items;
+	EnumerateFolder(m_directoryState.pidlDirectory.get(),
+		m_hOwner, m_folderSettings.showHidden, items);
+	SHFILEINFO sfi;
+	for (const auto &item : items)
+		SHGetFileInfo((LPCTSTR) item.pidlComplete.get(), 0, &sfi, sizeof(sfi),
+			SHGFI_PIDL | SHGFI_SYSICONINDEX);
+
+	HDC hdc, hdcBacking;
+	HBITMAP hBackingBitmap, hBackingBitmapOld;
+	HICON hIcon;
+	int iIconWidth, iIconHeight, numItems;
+	ImageList_GetIconSize(hIconsList, &iIconWidth, &iIconHeight);
+	numItems = ImageList_GetImageCount(hIconsList);
+	HIMAGELIST hNewIconsList =
+		ImageList_Create(iIconWidth + margin * 2, iIconWidth + margin * 2, ILC_COLOR32, numItems, 0);
+	hdc = GetDC(m_hListView);
+	for (int i = 0; i < numItems; i++)
+	{
+		hIcon = ImageList_GetIcon(hIconsList, i, ILD_NORMAL);
+		hdcBacking = CreateCompatibleDC(hdc);
+		hBackingBitmap = CreateCompatibleBitmap(hdc, iIconWidth + margin * 2, iIconHeight + margin * 2);
+		hBackingBitmapOld = (HBITMAP) SelectObject(hdcBacking, hBackingBitmap);
+
+		DrawIconEx(hdcBacking, margin * 2, margin, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
+		DestroyIcon(hIcon);
+		SelectObject(hdcBacking, hBackingBitmapOld);
+		DeleteDC(hdcBacking);
+
+		ImageList_Add(hNewIconsList, hBackingBitmap, nullptr);
+		DeleteObject(hBackingBitmap);
+	}
+	ReleaseDC(m_hListView, hdc);
+	return hNewIconsList;
+}
+
 bool ShellBrowserImpl::GetAutoArrange() const
 {
 	return m_folderSettings.autoArrange;
@@ -329,10 +382,9 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	case ViewMode::List:
 	case ViewMode::Details:
 	{
-		wil::com_ptr_nothrow<IImageList> pImageList;
-		SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
-			LVSIL_SMALL);
+		int margin = 1; // It would be interesting to include in the "Window" options.
+		HIMAGELIST hIconsList = GetIconsList(margin);
+		ListView_SetImageList(m_hListView, hIconsList, LVSIL_SMALL);
 	}
 	break;
 	}
