@@ -100,6 +100,7 @@ Explorerplusplus::~Explorerplusplus()
 
 HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 {
+	bool isFirstInstance = IsFirstInstance();
 	static bool mainWindowClassRegistered = false;
 
 	if (!mainWindowClassRegistered)
@@ -121,10 +122,17 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 	CHECK(res);
 
 	placement.showCmd = SW_HIDE;
-	placement.rcNormalPosition = storageData ? storageData->bounds : GetDefaultMainWindowBounds();
+	placement.rcNormalPosition =
+		storageData && isFirstInstance ? storageData->bounds : GetDefaultMainWindowBounds();
 	SetWindowPlacement(hwnd, &placement);
 
 	return hwnd;
+}
+
+bool Explorerplusplus::IsFirstInstance()
+{
+	HWND hPrev = FindWindow(WINDOW_CLASS_NAME, nullptr);
+	return (hPrev == nullptr);
 }
 
 ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
