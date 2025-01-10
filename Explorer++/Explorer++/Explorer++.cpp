@@ -54,7 +54,8 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 		ACCELERATOR_PLUGIN_END_ID),
 	m_config(app->GetConfig()),
 	m_iconFetcher(m_hContainer, m_app->GetCachedIcons()),
-	m_shellIconLoader(&m_iconFetcher)
+	m_shellIconLoader(&m_iconFetcher),
+	m_weakPtrFactory(this)
 {
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
@@ -94,8 +95,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 Explorerplusplus::~Explorerplusplus()
 {
 	m_pDirMon->Release();
-
-	*m_destroyed = true;
 }
 
 HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)

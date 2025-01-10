@@ -268,27 +268,21 @@ void Explorerplusplus::OnSize(UINT state)
 	UpdateLayout();
 }
 
-concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout()
+concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
+	Runtime *runtime)
 {
-	if (!m_browserInitialized || m_browserClosing)
-	{
-		co_return;
-	}
-
-	auto destroyed = m_destroyed;
-
 	// This function is designed to be called from the UI thread and the call here will also resume
 	// on the UI thread. Rather than immediately resuming, however, this call will result in a
 	// message being posted. Therefore, this function will only resume once the message has been
 	// processed.
-	co_await concurrencpp::resume_on(m_app->GetRuntime()->GetUiThreadExecutor());
+	co_await concurrencpp::resume_on(runtime->GetUiThreadExecutor());
 
-	if (*destroyed)
+	if (!self)
 	{
 		co_return;
 	}
 
-	UpdateLayout();
+	self->UpdateLayout();
 }
 
 void Explorerplusplus::UpdateLayout()

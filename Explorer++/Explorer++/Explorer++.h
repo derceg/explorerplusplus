@@ -31,6 +31,8 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ShellContextMenu.h"
+#include "../Helper/WeakPtr.h"
+#include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <wil/resource.h>
@@ -66,6 +68,7 @@ class MenuBase;
 class MenuView;
 struct NavigateParams;
 struct RebarBandStorageInfo;
+class Runtime;
 class ShellBrowserImpl;
 class ShellTreeView;
 class TabContainer;
@@ -226,7 +229,8 @@ private:
 	void Initialize(const WindowStorageData *storageData);
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
-	concurrencpp::null_result ScheduleUpdateLayout();
+	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
+		Runtime *runtime);
 	void UpdateLayout();
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
@@ -661,5 +665,5 @@ private:
 	StatusBar *m_pStatusBar = nullptr;
 	std::unique_ptr<MainFontSetter> m_statusBarFontSetter;
 
-	std::shared_ptr<bool> m_destroyed = std::make_shared<bool>(false);
+	WeakPtrFactory<Explorerplusplus> m_weakPtrFactory;
 };
