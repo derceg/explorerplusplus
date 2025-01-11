@@ -19,6 +19,8 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/WeakPtr.h"
+#include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 #include <wil/com.h>
@@ -32,14 +34,9 @@ public:
 		ToolbarButton(clickedCallback),
 		m_bookmarkItem(bookmarkItem),
 		m_bookmarkIconManager(bookmarkIconManager),
-		m_destroyed(std::make_shared<bool>(false))
+		m_weakPtrFactory(this)
 	{
 		DCHECK(bookmarkItem->IsBookmark());
-	}
-
-	~BookmarksToolbarBookmarkButton()
-	{
-		*m_destroyed = true;
 	}
 
 	std::wstring GetText() const override
@@ -60,16 +57,14 @@ public:
 		}
 
 		m_iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem,
-			[this, destroyed = m_destroyed](int iconIndex)
+			[self = m_weakPtrFactory.GetWeakPtr()](int iconIndex)
 			{
-				// This method is called on the main thread, so it's safe to access the shared
-				// destroyed variable here.
-				if (*destroyed)
+				if (!self)
 				{
 					return;
 				}
 
-				OnIconLoaded(iconIndex);
+				self->OnIconLoaded(iconIndex);
 			});
 
 		return *m_iconIndex;
@@ -94,7 +89,7 @@ private:
 	// Stores the cached icon index.
 	mutable std::optional<int> m_iconIndex;
 
-	std::shared_ptr<bool> m_destroyed;
+	WeakPtrFactory<BookmarksToolbarBookmarkButton> m_weakPtrFactory;
 };
 
 class BookmarksToolbarFolderButton : public ToolbarMenuButton

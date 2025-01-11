@@ -8,14 +8,14 @@
 #include "Icon.h"
 #include "IconFetcher.h"
 #include "IconResourceLoader.h"
-#include "../Helper/CachedIcons.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WeakPtr.h"
 
 BookmarkIconManager::BookmarkIconManager(const IconResourceLoader *iconResourceLoader,
 	IconFetcher *iconFetcher, int iconWidth, int iconHeight) :
 	m_iconFetcher(iconFetcher),
-	m_destroyed(std::make_shared<bool>(false))
+	m_weakPtrFactory(this)
 {
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
 
@@ -29,11 +29,6 @@ BookmarkIconManager::BookmarkIconManager(const IconResourceLoader *iconResourceL
 	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
 		m_defaultFolderIconSystemImageListIndex);
-}
-
-BookmarkIconManager::~BookmarkIconManager()
-{
-	*m_destroyed = true;
 }
 
 HIMAGELIST BookmarkIconManager::GetImageList()
@@ -72,23 +67,23 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark,
 	else
 	{
 		m_iconFetcher->QueueIconTask(bookmark->GetLocation(),
-			[this, callback, destroyed = m_destroyed](int iconIndex, int overlayIndex)
+			[callback, self = m_weakPtrFactory.GetWeakPtr()](int iconIndex, int overlayIndex)
 			{
 				UNREFERENCED_PARAMETER(overlayIndex);
 
-				if (*destroyed || !callback)
+				if (!self || !callback)
 				{
 					return;
 				}
 
-				if (iconIndex == m_defaultFolderIconSystemImageListIndex)
+				if (iconIndex == self->m_defaultFolderIconSystemImageListIndex)
 				{
 					// Bookmarks use the standard folder icon by default, so if that's the icon
 					// they're actually using, nothing else needs to happen.
 					return;
 				}
 
-				int copiedIconIndex = AddSystemIconToImageList(iconIndex);
+				int copiedIconIndex = self->AddSystemIconToImageList(iconIndex);
 				callback(copiedIconIndex);
 			});
 	}
