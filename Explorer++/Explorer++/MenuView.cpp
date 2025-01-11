@@ -5,16 +5,15 @@
 #include "stdafx.h"
 #include "MenuView.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/WeakPtr.h"
 
-MenuView::MenuView() : m_destroyed(std::make_shared<bool>(false))
+MenuView::MenuView() : m_weakPtrFactory(this)
 {
 }
 
 MenuView::~MenuView()
 {
 	m_viewDestroyedSignal();
-
-	*m_destroyed = true;
 }
 
 void MenuView::AppendItem(UINT id, const std::wstring &text, const ShellIconModel &shellIcon,
@@ -40,16 +39,16 @@ void MenuView::AppendItem(UINT id, const std::wstring &text, const ShellIconMode
 	int iconCallbackId = m_iconCallbackIdCounter++;
 
 	auto bitmap = shellIcon.GetBitmap(ShellIconSize::Small,
-		[this, id, iconCallbackId, destroyed = m_destroyed](wil::unique_hbitmap updatedIcon)
+		[id, iconCallbackId, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedIcon)
 		{
-			if (*destroyed)
+			if (!self)
 			{
 				// The icon can be returned after the menu has been closed. In that case, there's
 				// nothing that needs to be done.
 				return;
 			}
 
-			OnUpdatedIconRetrieved(id, iconCallbackId, std::move(updatedIcon));
+			self->OnUpdatedIconRetrieved(id, iconCallbackId, std::move(updatedIcon));
 		});
 
 	auto [itrIconCallback, didInsertIconCallback] = m_pendingIconCallbackIds.insert(iconCallbackId);

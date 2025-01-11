@@ -5,9 +5,9 @@
 #pragma once
 
 #include "ShellIconModel.h"
+#include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
-#include <memory>
 #include <set>
 #include <unordered_map>
 
@@ -61,5 +61,5 @@ private:
 	ItemMiddleClickedSignal m_itemMiddleClickedSignal;
 	ViewDestroyedSignal m_viewDestroyedSignal;
 
-	std::shared_ptr<bool> m_destroyed;
+	WeakPtrFactory<MenuView> m_weakPtrFactory;
 };
