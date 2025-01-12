@@ -251,7 +251,7 @@ void ColorRuleEditorDialog::OnChangeColor()
 	}
 }
 
-LRESULT CALLBACK ColorRuleEditorDialog::StaticColorControlProc(HWND hwnd, UINT msg, WPARAM wParam,
+LRESULT ColorRuleEditorDialog::StaticColorControlProc(HWND hwnd, UINT msg, WPARAM wParam,
 	LPARAM lParam)
 {
 	switch (msg)

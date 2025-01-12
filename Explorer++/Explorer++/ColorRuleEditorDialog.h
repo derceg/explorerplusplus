@@ -100,7 +100,7 @@ protected:
 	void SaveState() override;
 
 private:
-	LRESULT CALLBACK StaticColorControlProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT StaticColorControlProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnChangeColor();
 
