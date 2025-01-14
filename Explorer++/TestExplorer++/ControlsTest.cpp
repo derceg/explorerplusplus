@@ -17,52 +17,50 @@ protected:
 		// never visible and only needs to respond to the non-queued messages that will be directly
 		// and indirectly sent here. Those messages (sent by SendMessage) will cause the window
 		// procedure to be directly invoked, without the need for a message loop.
-		m_comboBox = CreateWindow(WC_COMBOBOX, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
-			GetModuleHandle(nullptr), nullptr);
+		m_comboBox.reset(CreateWindow(WC_COMBOBOX, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
+			GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_comboBox, nullptr);
 
 		std::vector<ComboBoxItem> items = { { 0, L"Keyboard" }, { 1, L"Mouse" },
 			{ 2, L"Monitor" } };
-		AddItemsToComboBox(m_comboBox, items, 0);
+		AddItemsToComboBox(m_comboBox.get(), items, 0);
 
-		int numItems = ComboBox_GetCount(m_comboBox);
+		int numItems = ComboBox_GetCount(m_comboBox.get());
 		ASSERT_EQ(static_cast<size_t>(numItems), items.size());
 	}
 
-	void TearDown() override
+	void PerformSuccessTest(const std::wstring &text)
 	{
-		auto res = DestroyWindow(m_comboBox);
-		ASSERT_TRUE(res);
+		PerformTest(text, true);
 	}
 
-	static bool StringComparator(const std::wstring &input, const std::wstring &test)
+	void PerformFailureTest(const std::wstring &text)
 	{
-		return boost::icontains(input, test);
+		PerformTest(text, false);
 	}
 
-	HWND m_comboBox = nullptr;
+private:
+	void PerformTest(const std::wstring &text, bool shouldSucceed)
+	{
+		bool containsText = DoesComboBoxContainText(m_comboBox.get(), text,
+			[](const std::wstring &input, const std::wstring &test)
+			{ return boost::icontains(input, test); });
+		EXPECT_EQ(containsText, shouldSucceed);
+	}
+
+	wil::unique_hwnd m_comboBox;
 };
 
 TEST_F(DoesComboBoxContainTextTest, Match)
 {
-	bool containsText = DoesComboBoxContainText(m_comboBox, L"board", StringComparator);
-	EXPECT_TRUE(containsText);
-
-	containsText = DoesComboBoxContainText(m_comboBox, L"OUS", StringComparator);
-	EXPECT_TRUE(containsText);
-
-	containsText = DoesComboBoxContainText(m_comboBox, L"monit", StringComparator);
-	EXPECT_TRUE(containsText);
+	PerformSuccessTest(L"board");
+	PerformSuccessTest(L"OUS");
+	PerformSuccessTest(L"monit");
 }
 
 TEST_F(DoesComboBoxContainTextTest, NoMatch)
 {
-	bool containsText = DoesComboBoxContainText(m_comboBox, L"drive", StringComparator);
-	EXPECT_FALSE(containsText);
-
-	containsText = DoesComboBoxContainText(m_comboBox, L"case", StringComparator);
-	EXPECT_FALSE(containsText);
-
-	containsText = DoesComboBoxContainText(m_comboBox, L"keys", StringComparator);
-	EXPECT_FALSE(containsText);
+	PerformFailureTest(L"drive");
+	PerformFailureTest(L"case");
+	PerformFailureTest(L"keys");
 }

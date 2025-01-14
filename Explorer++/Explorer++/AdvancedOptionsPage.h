@@ -17,9 +17,6 @@ public:
 
 	void SaveSettings() override;
 
-	bool DoesPageContainText(const std::wstring &text,
-		StringComparatorFunc stringComparator) override;
-
 private:
 	enum class AdvancedOptionId
 	{

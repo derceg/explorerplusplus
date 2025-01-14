@@ -25,11 +25,9 @@ public:
 	void InitializeDialog();
 	HWND GetDialog() const;
 	std::wstring GetTitle() const;
+	bool DoesPageContainText(const std::wstring &text, StringComparatorFunc stringComparator);
 
 	virtual void SaveSettings() = 0;
-
-	virtual bool DoesPageContainText(const std::wstring &text,
-		StringComparatorFunc stringComparator);
 
 protected:
 	Config *const m_config;

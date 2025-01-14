@@ -26,6 +26,74 @@ BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask,
 	return ListView_GetItem(hListView, pLVItem);
 }
 
+bool DoesHeaderContainText(HWND listView, const std::wstring &text,
+	StringComparatorFunc stringComparator)
+{
+	HWND header = ListView_GetHeader(listView);
+	int numColumns = Header_GetItemCount(header);
+
+	for (int i = 0; i < numColumns; i++)
+	{
+		wchar_t columnText[260];
+
+		LVCOLUMN lvColumn = {};
+		lvColumn.mask = LVCF_TEXT;
+		lvColumn.pszText = columnText;
+		lvColumn.cchTextMax = std::size(columnText);
+		auto res = ListView_GetColumn(listView, i, &lvColumn);
+
+		if (!res)
+		{
+			DCHECK(false);
+			continue;
+		}
+
+		if (stringComparator(columnText, text))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool DoesItemRowContainText(HWND listView, int item, const std::wstring &text,
+	StringComparatorFunc stringComparator)
+{
+	HWND header = ListView_GetHeader(listView);
+	int numColumns = Header_GetItemCount(header);
+
+	for (int i = 0; i < numColumns; i++)
+	{
+		auto itemColumnText = ListViewHelper::GetItemText(listView, item, i);
+
+		if (stringComparator(itemColumnText, text))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool DoAnyItemsContainText(HWND listView, const std::wstring &text,
+	StringComparatorFunc stringComparator)
+{
+	int numItems = ListView_GetItemCount(listView);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		bool containsText = DoesItemRowContainText(listView, i, text, stringComparator);
+
+		if (containsText)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 }
 
 namespace ListViewHelper
@@ -428,6 +496,46 @@ std::optional<int> GetLastSelectedItemIndex(HWND listView)
 	}
 
 	return lastItemIndex;
+}
+
+std::wstring GetItemText(HWND listView, int item, int subItem)
+{
+	std::wstring text;
+	text.resize(260);
+
+	while (true)
+	{
+		LVITEM lvItem = {};
+		lvItem.iSubItem = subItem;
+		lvItem.pszText = text.data();
+		lvItem.cchTextMax = static_cast<int>(text.size());
+		auto length = static_cast<int>(
+			SendMessage(listView, LVM_GETITEMTEXT, item, reinterpret_cast<LPARAM>(&lvItem)));
+
+		if (static_cast<size_t>(length) < (text.size() - 1))
+		{
+			text.resize(length);
+			break;
+		}
+	}
+
+	return text;
+}
+
+bool DoesListViewContainText(HWND listView, const std::wstring &text,
+	StringComparatorFunc stringComparator)
+{
+	if (DoesHeaderContainText(listView, text, stringComparator))
+	{
+		return true;
+	}
+
+	if (DoAnyItemsContainText(listView, text, stringComparator))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 }

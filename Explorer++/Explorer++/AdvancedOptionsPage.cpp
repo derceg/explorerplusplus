@@ -337,14 +337,3 @@ void AdvancedOptionsPage::SaveSettings()
 		}
 	}
 }
-
-bool AdvancedOptionsPage::DoesPageContainText(const std::wstring &text,
-	StringComparatorFunc stringComparator)
-{
-	auto itr = std::find_if(m_advancedOptions.begin(), m_advancedOptions.end(),
-		[&text, stringComparator](const auto &option) {
-			return stringComparator(option.name, text)
-				|| stringComparator(option.description, text);
-		});
-	return itr != m_advancedOptions.end();
-}

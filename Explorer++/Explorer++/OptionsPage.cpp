@@ -6,6 +6,7 @@
 #include "OptionsPage.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <memory>
@@ -165,6 +166,11 @@ BOOL CALLBACK OptionsPage::CheckChildWindowForTextMatch(HWND hwnd, LPARAM lParam
 	else if (lstrcmp(className, WC_COMBOBOX) == 0)
 	{
 		matchFound = DoesComboBoxContainText(hwnd, searchData->text, searchData->stringComparator);
+	}
+	else if (lstrcmp(className, WC_LISTVIEW) == 0)
+	{
+		matchFound = ListViewHelper::DoesListViewContainText(hwnd, searchData->text,
+			searchData->stringComparator);
 	}
 
 	if (matchFound)
