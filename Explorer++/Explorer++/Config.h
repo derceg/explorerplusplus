@@ -28,12 +28,12 @@ BETTER_ENUM(InfoTipType, int,
 )
 // clang-format on
 
-// These values are used to save/load configuration data and should not be
-// changed.
+// These values are used to save/load configuration data. Existing values shouldn't be changed.
 // clang-format off
 BETTER_ENUM(StartupMode, int,
 	PreviousTabs = 1,
-	DefaultFolder = 2
+	DefaultFolder = 2,
+	CustomFolders = 3
 )
 // clang-format on
 
@@ -44,7 +44,6 @@ struct Config
 	LANGID language = LanguageHelper::DEFAULT_LANGUAGE;
 	IconSet iconSet = IconSet::Color;
 	ValueWrapper<Theme> theme = +Theme::Light;
-	StartupMode startupMode = StartupMode::PreviousTabs;
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	bool dualPane = false;
@@ -77,6 +76,10 @@ struct Config
 	InfoTipType infoTipType = InfoTipType::System;
 
 	ValueWrapper<std::optional<CustomFont>> mainFont;
+
+	// Startup
+	StartupMode startupMode = StartupMode::PreviousTabs;
+	std::vector<std::wstring> startupFolders; // Only relevant for StartupMode::CustomFolders.
 
 	// Main window
 	ValueWrapper<bool> showFullTitlePath = false;

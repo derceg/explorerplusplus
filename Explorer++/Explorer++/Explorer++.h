@@ -213,7 +213,6 @@ private:
 
 	static HWND CreateMainWindow(const WindowStorageData *storageData);
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
-	static RECT GetDefaultMainWindowBounds();
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -325,7 +324,7 @@ private:
 	void ShowTabBar() override;
 	void HideTabBar() override;
 	void CreateInitialTabs(const WindowStorageData *storageData);
-	void RestorePreviousTabs(const WindowStorageData &storageData);
+	void CreateTabsFromStorageData(const WindowStorageData &storageData);
 	void CreateCommandLineTabs();
 	void OnTabListViewSelectionChanged(const Tab &tab);
 

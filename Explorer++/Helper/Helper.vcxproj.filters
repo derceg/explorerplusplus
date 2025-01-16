@@ -178,6 +178,9 @@
     <ClCompile Include="ScopedStopSource.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="ScopedRedrawDisabler.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -395,6 +398,9 @@
     </ClInclude>
     <ClInclude Include="WeakState.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedRedrawDisabler.h">
+      <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

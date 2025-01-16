@@ -9,7 +9,10 @@
 #include <MsXml2.h>
 #include <gdiplus.h>
 #include <objbase.h>
+#include <functional>
 #include <list>
+#include <optional>
+#include <vector>
 
 namespace XMLSettings
 {
@@ -61,6 +64,56 @@ void LoadBetterEnumValue(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &
 	}
 
 	output = T::_from_integral(value);
+}
+
+template <class T>
+std::vector<T> ReadItemList(IXMLDOMNode *node, const std::wstring &childNodeName,
+	std::function<std::optional<T>(IXMLDOMNode *childNode)> loadItem)
+{
+	wil::com_ptr_nothrow<IXMLDOMNodeList> childNodes;
+	HRESULT hr =
+		node->selectNodes(wil::make_bstr_failfast(childNodeName.c_str()).get(), &childNodes);
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
+	std::vector<T> items;
+
+	while (childNodes->nextNode(&childNode) == S_OK)
+	{
+		auto item = loadItem(childNode.get());
+
+		if (item)
+		{
+			items.push_back(*item);
+		}
+	}
+
+	return items;
+}
+
+template <class T>
+void SaveItemList(IXMLDOMDocument *xmlDocument, IXMLDOMElement *node, const std::vector<T> &items,
+	const std::wstring &childNodeName,
+	std::function<void(IXMLDOMDocument *xmlDocument, IXMLDOMElement *childNode, const T &item)>
+		saveItem)
+{
+	for (const auto &item : items)
+	{
+		wil::com_ptr_nothrow<IXMLDOMElement> childNode;
+		HRESULT hr = xmlDocument->createElement(
+			wil::make_bstr_failfast(childNodeName.c_str()).get(), &childNode);
+
+		if (hr == S_OK)
+		{
+			saveItem(xmlDocument, childNode.get(), item);
+
+			XMLSettings::AppendChildToParent(childNode.get(), node);
+		}
+	}
 }
 
 }

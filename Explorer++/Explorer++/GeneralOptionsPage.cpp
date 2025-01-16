@@ -40,12 +40,6 @@ GeneralOptionsPage::GeneralOptionsPage(HWND parent, HINSTANCE resourceInstance, 
 std::unique_ptr<ResizableDialogHelper> GeneralOptionsPage::InitializeResizeDialogHelper()
 {
 	std::vector<ResizableDialogControl> controls;
-	controls.emplace_back(GetDlgItem(GetDialog(), IDC_GROUP_STARTUP), MovingType::None,
-		SizingType::Horizontal);
-	controls.emplace_back(GetDlgItem(GetDialog(), IDC_STARTUP_PREVIOUSTABS), MovingType::None,
-		SizingType::Horizontal);
-	controls.emplace_back(GetDlgItem(GetDialog(), IDC_STARTUP_DEFAULTFOLDER), MovingType::None,
-		SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_GROUP_DEFAULT_FILE_MANAGER), MovingType::None,
 		SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTION_REPLACEEXPLORER_NONE),
@@ -75,27 +69,6 @@ std::unique_ptr<ResizableDialogHelper> GeneralOptionsPage::InitializeResizeDialo
 
 void GeneralOptionsPage::InitializeControls()
 {
-	HWND hButton;
-	HWND hEdit;
-	int nIDButton;
-
-	switch (m_config->startupMode)
-	{
-	case StartupMode::PreviousTabs:
-		nIDButton = IDC_STARTUP_PREVIOUSTABS;
-		break;
-
-	case StartupMode::DefaultFolder:
-		nIDButton = IDC_STARTUP_DEFAULTFOLDER;
-		break;
-
-	default:
-		nIDButton = IDC_STARTUP_PREVIOUSTABS;
-		m_config->startupMode = StartupMode::PreviousTabs;
-		break;
-	}
-	CheckDlgButton(GetDialog(), nIDButton, BST_CHECKED);
-
 	CheckRadioButton(GetDialog(), IDC_OPTION_REPLACEEXPLORER_NONE, IDC_OPTION_REPLACEEXPLORER_ALL,
 		REPLACE_EXPLORER_ENUM_CONTROL_ID_MAPPINGS.at(m_config->replaceExplorerMode));
 
@@ -108,10 +81,10 @@ void GeneralOptionsPage::InitializeControls()
 	m_newTabDirectoryIcon =
 		m_app->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 
-	hButton = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_BUTTON);
+	HWND hButton = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_BUTTON);
 	SendMessage(hButton, BM_SETIMAGE, IMAGE_ICON, (LPARAM) m_newTabDirectoryIcon.get());
 
-	hEdit = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_EDIT);
+	HWND hEdit = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_EDIT);
 	SetNewTabDirectory(hEdit, m_config->defaultTabDirectory.c_str());
 
 	AddLanguages();
@@ -255,14 +228,6 @@ void GeneralOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		switch (LOWORD(wParam))
 		{
-		case IDC_STARTUP_PREVIOUSTABS:
-		case IDC_STARTUP_DEFAULTFOLDER:
-			if (IsDlgButtonChecked(GetDialog(), LOWORD(wParam)) == BST_CHECKED)
-			{
-				m_settingChangedCallback();
-			}
-			break;
-
 		case IDC_OPTION_REPLACEEXPLORER_NONE:
 		case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
 		case IDC_OPTION_REPLACEEXPLORER_ALL:
@@ -342,15 +307,6 @@ void GeneralOptionsPage::BrowseFolderCallback(HWND hwnd, UINT msg, LPARAM lParam
 void GeneralOptionsPage::SaveSettings()
 {
 	ReplaceExplorerMode replaceExplorerMode = ReplaceExplorerMode::None;
-
-	if (IsDlgButtonChecked(GetDialog(), IDC_STARTUP_PREVIOUSTABS) == BST_CHECKED)
-	{
-		m_config->startupMode = StartupMode::PreviousTabs;
-	}
-	else if (IsDlgButtonChecked(GetDialog(), IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
-	{
-		m_config->startupMode = StartupMode::DefaultFolder;
-	}
 
 	if (IsDlgButtonChecked(GetDialog(), IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
 	{

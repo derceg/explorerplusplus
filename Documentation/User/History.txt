@@ -20,6 +20,11 @@ New features:
   the default.
 - A Fluent UI icon set has been added. This icon set can be
   selected from Tools > Options > Appearance > Icon set.
+- It's now possible to select a set of folders that should be
+  opened on startup. The list of folders can be set by selecting
+  Tools > Options > On Startup > Open a set of folders, and then
+  adding folders to the associated list. When Explorer++ starts,
+  each of the folders that have been added will be opened.
 - The way in which command line paths are handled has been
   updated. The change means that relative paths like ".." should
   now be correctly handled and a wider range of paths should be

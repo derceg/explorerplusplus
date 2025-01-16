@@ -249,7 +249,31 @@ void App::SetUpLanguageResourceInstance()
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
 {
-	// At the moment, only a single window is supported.
+	if (m_config.startupMode == +StartupMode::PreviousTabs)
+	{
+		RestorePreviousWindows(windows);
+	}
+	else if (m_config.startupMode == +StartupMode::CustomFolders)
+	{
+		CreateStartupFolders();
+	}
+
+	if (m_browserList.IsEmpty())
+	{
+		// This path can be taken in a few different situations:
+		//
+		// - If m_config.startupMode is StartupMode::PreviousTabs and the list of windows is empty.
+		// - If m_config.startupMode is StartupMode::CustomFolders and the list of startup folders
+		//   is empty.
+		// - If m_config.startupMode is StartupMode::DefaultFolder.
+		//
+		// In each case, a default window should be created.
+		Explorerplusplus::Create(this);
+	}
+}
+
+void App::RestorePreviousWindows(const std::vector<WindowStorageData> &windows)
+{
 	for (const auto &window : windows)
 	{
 		Explorerplusplus::Create(this, &window);
@@ -260,12 +284,26 @@ void App::RestoreSession(const std::vector<WindowStorageData> &windows)
 			break;
 		}
 	}
+}
 
-	if (m_browserList.IsEmpty())
+void App::CreateStartupFolders()
+{
+	if (m_config.startupFolders.empty())
 	{
-		// No windows were loaded from the previous session, so create the default window.
-		Explorerplusplus::Create(this);
+		return;
 	}
+
+	std::vector<TabStorageData> tabs;
+
+	for (const auto &startupFolder : m_config.startupFolders)
+	{
+		tabs.push_back({ .directory = startupFolder });
+	}
+
+	WindowStorageData initialData;
+	initialData.tabs = tabs;
+	initialData.selectedTab = 0;
+	Explorerplusplus::Create(this, &initialData);
 }
 
 bool App::IsModelessDialogMessage(MSG *msg)

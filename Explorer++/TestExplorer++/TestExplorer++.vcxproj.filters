@@ -340,6 +340,18 @@
     <ClCompile Include="ListViewHelperTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="StartupFoldersRegistryStorageTest.cpp">
+      <Filter>Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="StartupFoldersStorageTestHelper.cpp">
+      <Filter>Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="StartupFoldersXmlStorageTest.cpp">
+      <Filter>Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedRedrawDisablerTest.cpp">
+      <Filter>Helper\Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -456,6 +468,9 @@
     <Filter Include="Helper\Memory">
       <UniqueIdentifier>{b1564aac-148a-409b-ad02-26644ee30151}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Startup">
+      <UniqueIdentifier>{968bad65-061e-4000-b384-22aac11db15a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -556,10 +571,16 @@
       <Filter>Core\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="GTestHelper.h" />
+    <ClInclude Include="StartupFoldersStorageTestHelper.h">
+      <Filter>Startup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="compatibility.manifest" />
   </ItemGroup>
 </Project>

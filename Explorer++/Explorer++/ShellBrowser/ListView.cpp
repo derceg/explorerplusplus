@@ -1341,12 +1341,12 @@ void ShellBrowserImpl::OnColorRulesUpdated()
 
 void ShellBrowserImpl::OnFullRowSelectUpdated(BOOL newValue)
 {
-	ListViewHelper::AddRemoveExtendedStyle(m_hListView, LVS_EX_FULLROWSELECT, newValue);
+	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_FULLROWSELECT, newValue);
 }
 
 void ShellBrowserImpl::OnCheckBoxSelectionUpdated(BOOL newValue)
 {
-	ListViewHelper::AddRemoveExtendedStyle(m_hListView, LVS_EX_CHECKBOXES, newValue);
+	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_CHECKBOXES, newValue);
 }
 
 void ShellBrowserImpl::OnShowGridlinesUpdated(BOOL newValue)

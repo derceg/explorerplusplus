@@ -412,7 +412,7 @@ void MergeFilesDialog::OnMove(bool bUp)
 
 		std::iter_swap(itrSelected, itrSwap);
 
-		ListViewHelper::SwapItems(hListView, iSelected, iSwap, FALSE);
+		ListViewHelper::SwapItems(hListView, iSelected, iSwap);
 	}
 }
 

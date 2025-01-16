@@ -5,26 +5,11 @@
 #include "stdafx.h"
 #include "ListViewHelper.h"
 #include "Macros.h"
+#include "ScopedRedrawDisabler.h"
+#include <wil/common.h>
 
 namespace
 {
-
-BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask, int iItem,
-	int iSubItem, TCHAR *pszText, int cchMax)
-{
-	pLVItem->mask = mask;
-	pLVItem->stateMask = stateMask;
-	pLVItem->iItem = iItem;
-	pLVItem->iSubItem = iSubItem;
-
-	if (mask & LVIF_TEXT)
-	{
-		pLVItem->pszText = pszText;
-		pLVItem->cchTextMax = cchMax;
-	}
-
-	return ListView_GetItem(hListView, pLVItem);
-}
 
 bool DoesHeaderContainText(HWND listView, const std::wstring &text,
 	StringComparatorFunc stringComparator)
@@ -128,9 +113,8 @@ void SelectAllItems(HWND hListView, BOOL bSelect)
 		uNewState = 0;
 	}
 
-	SendMessage(hListView, WM_SETREDRAW, FALSE, 0);
+	ScopedRedrawDisabler redrawDisabler(hListView);
 	ListView_SetItemState(hListView, -1, uNewState, LVIS_SELECTED);
-	SendMessage(hListView, WM_SETREDRAW, TRUE, 0);
 }
 
 int InvertSelection(HWND hListView)
@@ -139,7 +123,7 @@ int InvertSelection(HWND hListView)
 
 	int nSelected = 0;
 
-	SendMessage(hListView, WM_SETREDRAW, FALSE, 0);
+	ScopedRedrawDisabler redrawDisabler(hListView);
 
 	for (int i = 0; i < nTotalItems; i++)
 	{
@@ -153,8 +137,6 @@ int InvertSelection(HWND hListView)
 			nSelected++;
 		}
 	}
-
-	SendMessage(hListView, WM_SETREDRAW, TRUE, 0);
 
 	return nSelected;
 }
@@ -279,75 +261,74 @@ void ActivateOneClickSelect(HWND hListView, BOOL bActivate, UINT uHoverTime)
 	}
 }
 
-void AddRemoveExtendedStyle(HWND hListView, DWORD dwStyle, BOOL bAdd)
+void AddRemoveExtendedStyles(HWND listView, DWORD styles, bool add)
 {
-	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	auto extendedStyle = ListView_GetExtendedListViewStyle(listView);
 
-	if (bAdd)
+	if (add)
 	{
-		if ((dwExtendedStyle & dwStyle) != dwStyle)
-		{
-			dwExtendedStyle |= dwStyle;
-		}
+		WI_SetAllFlags(extendedStyle, styles);
 	}
 	else
 	{
-		if ((dwExtendedStyle & dwStyle) == dwStyle)
-		{
-			dwExtendedStyle &= ~dwStyle;
-		}
+		WI_ClearAllFlags(extendedStyle, styles);
 	}
 
-	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
+	ListView_SetExtendedListViewStyle(listView, extendedStyle);
 }
 
-BOOL SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
+void SwapItems(HWND listView, int item1, int item2)
 {
-	UINT mask = LVIF_IMAGE | LVIF_INDENT | LVIF_STATE | LVIF_TEXT;
-	UINT stateMask = static_cast<UINT>(-1);
+	UINT mask = LVIF_IMAGE | LVIF_INDENT | LVIF_STATE | LVIF_PARAM;
+	auto stateMask = static_cast<UINT>(-1);
 
-	if (bSwapLPARAM)
+	LVITEM lvItem1 = {};
+	lvItem1.mask = mask;
+	lvItem1.stateMask = stateMask;
+	lvItem1.iItem = item1;
+	lvItem1.iSubItem = 0;
+	auto res = ListView_GetItem(listView, &lvItem1);
+
+	if (!res)
 	{
-		mask |= LVIF_PARAM;
+		DCHECK(false);
+		return;
 	}
 
-	LVITEM lvItem1;
-	TCHAR szText1[512];
-	BOOL bRet1 = GetListViewItem(hListView, &lvItem1, mask, stateMask, iItem1, 0, szText1,
-		SIZEOF_ARRAY(szText1));
+	LVITEM lvItem2 = {};
+	lvItem2.mask = mask;
+	lvItem2.stateMask = stateMask;
+	lvItem2.iItem = item2;
+	lvItem2.iSubItem = 0;
+	res = ListView_GetItem(listView, &lvItem2);
 
-	LVITEM lvItem2;
-	TCHAR szText2[512];
-	BOOL bRet2 = GetListViewItem(hListView, &lvItem2, mask, stateMask, iItem2, 0, szText2,
-		SIZEOF_ARRAY(szText2));
-
-	if (!bRet1 || !bRet2)
+	if (!res)
 	{
-		return FALSE;
+		DCHECK(false);
+		return;
 	}
 
-	lvItem1.iItem = iItem2;
-	ListView_SetItem(hListView, &lvItem1);
+	ScopedRedrawDisabler redrawDisabler(listView);
 
-	lvItem2.iItem = iItem1;
-	ListView_SetItem(hListView, &lvItem2);
+	lvItem1.iItem = item2;
+	res = ListView_SetItem(listView, &lvItem1);
+	DCHECK(res);
 
-	HWND hHeader = ListView_GetHeader(hListView);
-	int nColumns = Header_GetItemCount(hHeader);
+	lvItem2.iItem = item1;
+	res = ListView_SetItem(listView, &lvItem2);
+	DCHECK(res);
 
-	for (int i = 1; i < nColumns; i++)
+	HWND header = ListView_GetHeader(listView);
+	int numColumns = Header_GetItemCount(header);
+
+	for (int i = 0; i < numColumns; i++)
 	{
-		TCHAR szColumn1[512];
-		ListView_GetItemText(hListView, iItem1, i, szColumn1, SIZEOF_ARRAY(szColumn1));
+		auto item1ColumnText = GetItemText(listView, item1, i);
+		auto item2ColumnText = GetItemText(listView, item2, i);
 
-		TCHAR szColumn2[512];
-		ListView_GetItemText(hListView, iItem2, i, szColumn2, SIZEOF_ARRAY(szColumn2));
-
-		ListView_SetItemText(hListView, iItem1, i, szColumn2);
-		ListView_SetItemText(hListView, iItem2, i, szColumn1);
+		ListView_SetItemText(listView, item1, i, item2ColumnText.data());
+		ListView_SetItemText(listView, item2, i, item1ColumnText.data());
 	}
-
-	return TRUE;
 }
 
 void PositionInsertMark(HWND hListView, const POINT *ppt)
@@ -536,6 +517,19 @@ bool DoesListViewContainText(HWND listView, const std::wstring &text,
 	}
 
 	return false;
+}
+
+std::set<int> GetSelectedItems(HWND listView)
+{
+	std::set<int> selectedItems;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(listView, index, LVNI_SELECTED)) != -1)
+	{
+		selectedItems.insert(index);
+	}
+
+	return selectedItems;
 }
 
 }

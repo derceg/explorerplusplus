@@ -253,7 +253,11 @@
     <ClCompile Include="RuntimeTest.cpp" />
     <ClCompile Include="RuntimeTestHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp" />
+    <ClCompile Include="ScopedRedrawDisablerTest.cpp" />
     <ClCompile Include="ScopedStopSourceTest.cpp" />
+    <ClCompile Include="StartupFoldersRegistryStorageTest.cpp" />
+    <ClCompile Include="StartupFoldersStorageTestHelper.cpp" />
+    <ClCompile Include="StartupFoldersXmlStorageTest.cpp" />
     <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
@@ -360,6 +364,7 @@
     <ClInclude Include="ShellBrowserHelperTestBase.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />
+    <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />
@@ -371,6 +376,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="compatibility.manifest" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

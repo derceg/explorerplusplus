@@ -6,6 +6,7 @@
 #include "ConfigXmlStorage.h"
 #include "Config.h"
 #include "CustomFontStorage.h"
+#include "StartupFoldersXmlStorage.h"
 #include "Storage.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
@@ -24,6 +25,9 @@ concept WrappedIntegralSetting = requires(T t) {
 };
 
 constexpr wchar_t SETTING_NODE_NAME[] = L"Setting";
+
+constexpr wchar_t MAIN_FONT_NODE_NAME[] = L"MainFont";
+constexpr wchar_t STARTUP_FOLDERS_NODE_NAME[] = L"StartupFolders";
 
 HRESULT GetSettingNode(IXMLDOMNode *settingsNode, const std::wstring &settingName,
 	IXMLDOMNode **outputNode)
@@ -248,7 +252,7 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"GoUpOnDoubleClick", config.goUpOnDoubleClick);
 
 	if (wil::com_ptr_nothrow<IXMLDOMNode> node;
-		GetSettingNode(settingsNode, L"MainFont", &node) == S_OK)
+		GetSettingNode(settingsNode, MAIN_FONT_NODE_NAME, &node) == S_OK)
 	{
 		auto mainFont = CustomFontStorage::LoadFromXml(node.get());
 
@@ -256,6 +260,12 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 		{
 			config.mainFont = *mainFont;
 		}
+	}
+
+	if (wil::com_ptr_nothrow<IXMLDOMNode> node;
+		GetSettingNode(settingsNode, STARTUP_FOLDERS_NODE_NAME, &node) == S_OK)
+	{
+		config.startupFolders = StartupFoldersXmlStorage::Load(node.get());
 	}
 }
 
@@ -469,9 +479,14 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 	{
 		wil::com_ptr_nothrow<IXMLDOMElement> mainFontNode;
 		XMLSettings::CreateElementNode(xmlDocument, &mainFontNode, settingsNode, SETTING_NODE_NAME,
-			L"MainFont");
+			MAIN_FONT_NODE_NAME);
 		CustomFontStorage::SaveToXml(xmlDocument, mainFontNode.get(), *mainFont);
 	}
+
+	wil::com_ptr_nothrow<IXMLDOMElement> startupFoldersNode;
+	XMLSettings::CreateElementNode(xmlDocument, &startupFoldersNode, settingsNode,
+		SETTING_NODE_NAME, STARTUP_FOLDERS_NODE_NAME);
+	StartupFoldersXmlStorage::Save(xmlDocument, startupFoldersNode.get(), config.startupFolders);
 }
 
 }

@@ -863,7 +863,7 @@ void Explorerplusplus::OnNewWindow()
 	RECT bounds = placement.rcNormalPosition;
 	OffsetRect(&bounds, windowOffsetInPixels, windowOffsetInPixels);
 
-	WindowStorageData initialData = {};
+	WindowStorageData initialData;
 	initialData.bounds = bounds;
 	initialData.showState = NativeShowStateToShowState(placement.showCmd);
 	initialData.treeViewWidth = m_treeViewWidth;

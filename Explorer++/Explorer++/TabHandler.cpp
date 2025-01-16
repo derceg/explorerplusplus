@@ -132,9 +132,9 @@ void Explorerplusplus::OnNewTab()
 
 void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
 {
-	if (m_config->startupMode == +StartupMode::PreviousTabs && storageData)
+	if (storageData)
 	{
-		RestorePreviousTabs(*storageData);
+		CreateTabsFromStorageData(*storageData);
 	}
 
 	CreateCommandLineTabs();
@@ -150,7 +150,7 @@ void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
 	}
 }
 
-void Explorerplusplus::RestorePreviousTabs(const WindowStorageData &storageData)
+void Explorerplusplus::CreateTabsFromStorageData(const WindowStorageData &storageData)
 {
 	int index = 0;
 

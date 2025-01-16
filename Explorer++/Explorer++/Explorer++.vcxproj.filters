@@ -17,46 +17,46 @@
       <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="AboutDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="DestroyFilesDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="DisplayColoursDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="FilterDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="MassRenameDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="MergeFilesDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="RenameTabDialog.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="SelectColumnsDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="SetDefaultColumnsDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="SetFileAttributesDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="SplitFileDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="UpdateCheckDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="WildcardSelectDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="SearchDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="EventSwitcher.cpp">
       <Filter>Core</Filter>
@@ -146,7 +146,7 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ScriptingDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Plugins\LuaPlugin.cpp">
       <Filter>Plugins</Filter>
@@ -347,7 +347,7 @@
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="ThirdPartyCreditsDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\Filtering.cpp">
       <Filter>ShellBrowser</Filter>
@@ -464,37 +464,37 @@
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="OptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="GeneralOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="AppearanceOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="DefaultSettingsOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="FilesFoldersOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="TabsOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="WindowOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="AdvancedOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="OptionsDialog.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="Theme.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="SearchTabsDialog.cpp">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="ThemeManager.cpp">
       <Filter>Dark Mode Support</Filter>
@@ -509,7 +509,7 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="FontsOptionsPage.cpp">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClCompile>
     <ClCompile Include="FontHelper.cpp">
       <Filter>Core</Filter>
@@ -775,6 +775,18 @@
     <ClCompile Include="TabRestorerMenu.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
+    <ClCompile Include="StartupOptionsPage.cpp">
+      <Filter>Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutDefaults.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="StartupFoldersRegistryStorage.cpp">
+      <Filter>Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="StartupFoldersXmlStorage.cpp">
+      <Filter>Startup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -784,13 +796,13 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="AboutDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="DestroyFilesDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="DisplayColoursDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="Explorer++.h">
       <Filter>Core</Filter>
@@ -799,43 +811,43 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FilterDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="IDropFilesCallback.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="MassRenameDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="MergeFilesDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="DefaultColumns.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="SearchDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="SelectColumnsDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="RenameTabDialog.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="SetDefaultColumnsDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="SetFileAttributesDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="SplitFileDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="UpdateCheckDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="WildcardSelectDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Core</Filter>
@@ -871,7 +883,7 @@
       <Filter>Main Toolbar</Filter>
     </ClInclude>
     <ClInclude Include="ScriptingDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="Plugins\LuaPlugin.h">
       <Filter>Plugins</Filter>
@@ -1099,7 +1111,7 @@
       <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="ThirdPartyCreditsDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="Explorer++VersionInfo.h">
       <Filter>Resource Files</Filter>
@@ -1234,37 +1246,37 @@
       <Filter>ShellTreeView</Filter>
     </ClInclude>
     <ClInclude Include="OptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="GeneralOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="AppearanceOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="DefaultSettingsOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="FilesFoldersOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="TabsOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="WindowOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="AdvancedOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="OptionsDialog.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="Theme.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="SearchTabsDialog.h">
-      <Filter>General Dialogs</Filter>
+      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ThemeManager.h">
       <Filter>Dark Mode Support</Filter>
@@ -1282,7 +1294,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FontsOptionsPage.h">
-      <Filter>General Dialogs\Options</Filter>
+      <Filter>Dialogs\Options</Filter>
     </ClInclude>
     <ClInclude Include="FontHelper.h">
       <Filter>Core</Filter>
@@ -1608,6 +1620,15 @@
     <ClInclude Include="TabRestorerMenu.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
+    <ClInclude Include="StartupOptionsPage.h">
+      <Filter>Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="StartupFoldersRegistryStorage.h">
+      <Filter>Startup</Filter>
+    </ClInclude>
+    <ClInclude Include="StartupFoldersXmlStorage.h">
+      <Filter>Startup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1661,9 +1682,6 @@
     </Filter>
     <Filter Include="Dialog Support">
       <UniqueIdentifier>{de7aee89-b700-43b0-b0ee-0f3e1c0e0414}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="General Dialogs">
-      <UniqueIdentifier>{c4dacd32-7f5f-4214-bcd4-9e9e1c4f4cc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Drives Toolbar">
       <UniqueIdentifier>{e52be830-f885-4f05-a86a-121c31f6bb3d}</UniqueIdentifier>
@@ -1737,9 +1755,6 @@
     <Filter Include="Color Rules\UI">
       <UniqueIdentifier>{75d9a3fc-5fa8-45b6-a300-6e1d711ec008}</UniqueIdentifier>
     </Filter>
-    <Filter Include="General Dialogs\Options">
-      <UniqueIdentifier>{2904c500-a16e-431c-a86d-9c687bb0bb42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\UI">
       <UniqueIdentifier>{f7610d99-baa5-4d9f-be3e-708c8822cda3}</UniqueIdentifier>
     </Filter>
@@ -1799,6 +1814,15 @@
     </Filter>
     <Filter Include="Tabs\UI">
       <UniqueIdentifier>{94f99105-33a7-45aa-a32a-631ee5fb2b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Startup">
+      <UniqueIdentifier>{a169b6f4-c126-4868-a377-3767c7c38436}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{c4dacd32-7f5f-4214-bcd4-9e9e1c4f4cc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Options">
+      <UniqueIdentifier>{2904c500-a16e-431c-a86d-9c687bb0bb42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "LayoutDefaults.h"
 #include "MainToolbarStorage.h"
 #include "../Helper/BetterEnumsWrapper.h"
 #include <optional>
@@ -25,16 +26,16 @@ struct WindowStorageData
 {
 	// The size and position of the window, with the position being in workspace coordinates (i.e.
 	// those returned by GetWindowPlacement()).
-	RECT bounds;
+	RECT bounds = LayoutDefaults::GetDefaultMainWindowBounds();
 
-	WindowShowState showState;
+	WindowShowState showState = WindowShowState::Normal;
 	std::vector<TabStorageData> tabs;
-	int selectedTab;
+	int selectedTab = 0;
 	std::vector<RebarBandStorageInfo> mainRebarInfo;
 	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
-	int treeViewWidth;
-	int displayWindowWidth;
-	int displayWindowHeight;
+	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
 	// This is only used in tests.
 	bool operator==(const WindowStorageData &other) const;

@@ -657,6 +657,7 @@
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
+    <ClCompile Include="ScopedRedrawDisabler.cpp" />
     <ClCompile Include="ScopedStopSource.cpp" />
     <ClCompile Include="SystemClockImpl.cpp" />
     <ClCompile Include="UniqueResources.cpp" />
@@ -747,6 +748,7 @@
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
+    <ClInclude Include="ScopedRedrawDisabler.h" />
     <ClInclude Include="ScopedStopSource.h" />
     <ClInclude Include="SystemClock.h" />
     <ClInclude Include="SystemClockImpl.h" />

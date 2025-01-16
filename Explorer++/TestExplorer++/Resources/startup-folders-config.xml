@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+    <StartupFolders>
+        <StartupFolder Path="h:\projects" />
+        <StartupFolder Path="d:\documents\2020" />
+        <StartupFolder Path="c:\users\public" />
+        <StartupFolder Path="c:\program files\common files" />
+        <StartupFolder Path="e:\" />
+    </StartupFolders>
+</ExplorerPlusPlus>

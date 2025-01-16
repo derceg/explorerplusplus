@@ -330,7 +330,7 @@ void SelectColumnsDialog::OnMoveColumn(MoveDirection direction)
 		return;
 	}
 
-	ListViewHelper::SwapItems(listView, selectedItemIndex, newIndex, TRUE);
+	ListViewHelper::SwapItems(listView, selectedItemIndex, newIndex);
 	ListView_EnsureVisible(listView, newIndex, false);
 
 	m_bColumnsSwapped = TRUE;

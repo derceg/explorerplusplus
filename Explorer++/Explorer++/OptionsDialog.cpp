@@ -17,6 +17,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "StartupOptionsPage.h"
 #include "TabsOptionsPage.h"
 #include "WindowOptionsPage.h"
 #include "../Helper/DpiCompatibility.h"
@@ -130,6 +131,9 @@ void OptionsDialog::AddPages()
 {
 	AddPage(std::make_unique<GeneralOptionsPage>(m_hDlg, GetResourceInstance(), m_app, m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<StartupOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
+		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
+		m_app->GetDarkModeManager(), GetThemeManager()));
 	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
 		m_app->GetDarkModeManager()));

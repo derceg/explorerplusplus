@@ -348,11 +348,11 @@ void SetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if (bUp)
 		{
-			ListViewHelper::SwapItems(hListView, iSelected, iSelected - 1, TRUE);
+			ListViewHelper::SwapItems(hListView, iSelected, iSelected - 1);
 		}
 		else
 		{
-			ListViewHelper::SwapItems(hListView, iSelected, iSelected + 1, TRUE);
+			ListViewHelper::SwapItems(hListView, iSelected, iSelected + 1);
 		}
 
 		SetFocus(hListView);

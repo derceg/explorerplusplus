@@ -6,6 +6,7 @@
 #include "ConfigRegistryStorage.h"
 #include "Config.h"
 #include "CustomFontStorage.h"
+#include "StartupFoldersRegistryStorage.h"
 #include "Storage.h"
 #include "../Helper/RegistrySettings.h"
 #include <wil/registry.h>
@@ -14,6 +15,7 @@ namespace
 {
 
 constexpr wchar_t MAIN_FONT_KEY_NAME[] = L"MainFont";
+constexpr wchar_t STARTUP_FOLDERS_KEY_NAME[] = L"StartupFolders";
 
 void LoadFromKey(HKEY settingsKey, Config &config)
 {
@@ -210,6 +212,15 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 			config.mainFont = *mainFont;
 		}
 	}
+
+	wil::unique_hkey startupFoldersKey;
+	hr = wil::reg::open_unique_key_nothrow(settingsKey, STARTUP_FOLDERS_KEY_NAME, startupFoldersKey,
+		wil::reg::key_access::read);
+
+	if (SUCCEEDED(hr))
+	{
+		config.startupFolders = StartupFoldersRegistryStorage::Load(startupFoldersKey.get());
+	}
 }
 
 void SaveToKey(HKEY settingsKey, const Config &config)
@@ -339,6 +350,15 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		{
 			CustomFontStorage::SaveToRegistry(mainFontKey.get(), *mainFont);
 		}
+	}
+
+	wil::unique_hkey startupFoldersKey;
+	HRESULT hr = wil::reg::create_unique_key_nothrow(settingsKey, STARTUP_FOLDERS_KEY_NAME,
+		startupFoldersKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		StartupFoldersRegistryStorage::Save(startupFoldersKey.get(), config.startupFolders);
 	}
 }
 

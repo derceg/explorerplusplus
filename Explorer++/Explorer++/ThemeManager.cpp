@@ -260,6 +260,8 @@ void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 
 void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 {
+	DWORD extendedStyle = ListView_GetExtendedListViewStyle(hwnd);
+
 	if (enableDarkMode)
 	{
 		SetWindowTheme(hwnd, L"ItemsView", nullptr);
@@ -267,6 +269,13 @@ void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 	else
 	{
 		SetWindowTheme(hwnd, L"Explorer", nullptr);
+	}
+
+	if (WI_IsFlagSet(extendedStyle, LVS_EX_TRANSPARENTBKGND))
+	{
+		// Setting the window theme above will clear the LVS_EX_TRANSPARENTBKGND style. So, if that
+		// style was set, it will be restored here.
+		ListView_SetExtendedListViewStyle(hwnd, extendedStyle);
 	}
 
 	COLORREF backgroundColor;

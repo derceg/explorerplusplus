@@ -82,6 +82,8 @@ private:
 	void SaveSettings();
 	void SetUpLanguageResourceInstance();
 	void RestoreSession(const std::vector<WindowStorageData> &windows);
+	void RestorePreviousWindows(const std::vector<WindowStorageData> &windows);
+	void CreateStartupFolders();
 	bool IsModelessDialogMessage(MSG *msg);
 	bool MaybeTranslateAccelerator(MSG *msg);
 

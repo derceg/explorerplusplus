@@ -8,13 +8,15 @@
 #include <gtest/gtest.h>
 #include <CommCtrl.h>
 
-class ListViewHelperTest : public testing::Test
+using namespace testing;
+
+class ListViewHelperTest : public Test
 {
 protected:
 	static constexpr int NUM_COLUMNS = 2;
-	static inline const std::array<std::wstring, NUM_COLUMNS> COLUMNS = { L"header 1",
-		L"header 2" };
-	static inline const auto ITEMS = std::to_array<std::array<std::wstring, NUM_COLUMNS>>(
+	using RowData = std::array<const wchar_t *, NUM_COLUMNS>;
+	static constexpr RowData COLUMNS = { L"header 1", L"header 2" };
+	static constexpr auto ITEMS = std::to_array<RowData>(
 		{ { L"first", L"column01" }, { L"second", L"column11" }, { L"third", L"column21" } });
 
 	void SetUp() override
@@ -25,6 +27,21 @@ protected:
 
 		AddColumns();
 		AddItems();
+	}
+
+	// Checks that the text data contained within the listview (in each row and column) matches the
+	// provided data.
+	void CheckListViewItemData(const std::array<RowData, ITEMS.size()> &expectedItemData)
+	{
+		for (size_t i = 0; i < expectedItemData.size(); i++)
+		{
+			for (size_t j = 0; j < expectedItemData[i].size(); j++)
+			{
+				EXPECT_EQ(ListViewHelper::GetItemText(m_listView.get(), static_cast<int>(i),
+							  static_cast<int>(j)),
+					expectedItemData[i][j]);
+			}
+		}
 	}
 
 	wil::unique_hwnd m_listView;
@@ -59,35 +76,70 @@ private:
 		}
 	}
 
-	void AddItem(int index, const std::array<std::wstring, NUM_COLUMNS> &itemColumnValues)
+	void AddItem(int index, const RowData &itemRowData)
 	{
 		LVITEM lvItem = {};
 		lvItem.mask = LVIF_TEXT;
 		lvItem.iItem = index;
 		lvItem.iSubItem = 0;
-		lvItem.pszText = const_cast<wchar_t *>(itemColumnValues[0].c_str());
+		lvItem.pszText = const_cast<wchar_t *>(itemRowData[0]);
 		int finalIndex = ListView_InsertItem(m_listView.get(), &lvItem);
 		ASSERT_EQ(finalIndex, index);
 
 		for (int i = 1; i < NUM_COLUMNS; i++)
 		{
-			ListView_SetItemText(m_listView.get(), index, i,
-				const_cast<wchar_t *>(itemColumnValues[i].c_str()));
+			ListView_SetItemText(m_listView.get(), index, i, const_cast<wchar_t *>(itemRowData[i]));
 		}
 	}
 };
 
 TEST_F(ListViewHelperTest, GetItemText)
 {
-	for (size_t i = 0; i < ITEMS.size(); i++)
-	{
-		for (size_t j = 0; j < ITEMS[i].size(); j++)
-		{
-			EXPECT_EQ(ListViewHelper::GetItemText(m_listView.get(), static_cast<int>(i),
-						  static_cast<int>(j)),
-				ITEMS[i][j]);
-		}
-	}
+	CheckListViewItemData(ITEMS);
+}
+
+TEST_F(ListViewHelperTest, AddRemoveExtendedStyles)
+{
+	constexpr DWORD style = LVS_EX_CHECKBOXES;
+
+	DWORD extendedStyle = ListView_GetExtendedListViewStyle(m_listView.get());
+	DWORD originalExtendedStyle = extendedStyle;
+	ASSERT_FALSE(WI_IsFlagSet(extendedStyle, style));
+
+	ListViewHelper::AddRemoveExtendedStyles(m_listView.get(), style, true);
+	extendedStyle = ListView_GetExtendedListViewStyle(m_listView.get());
+	EXPECT_TRUE(WI_IsFlagSet(extendedStyle, style));
+
+	ListViewHelper::AddRemoveExtendedStyles(m_listView.get(), style, false);
+	extendedStyle = ListView_GetExtendedListViewStyle(m_listView.get());
+	EXPECT_FALSE(WI_IsFlagSet(extendedStyle, style));
+	EXPECT_EQ(extendedStyle, originalExtendedStyle);
+}
+
+TEST_F(ListViewHelperTest, SwapItems)
+{
+	ListViewHelper::SelectItem(m_listView.get(), 2, true);
+	ListViewHelper::SwapItems(m_listView.get(), 0, 2);
+
+	auto updatedItems = ITEMS;
+	std::swap(updatedItems[0], updatedItems[2]);
+	CheckListViewItemData(updatedItems);
+
+	// Item 2 was selected, then swapped with item 0. So item 0 should now be selected.
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(0));
+}
+
+TEST_F(ListViewHelperTest, GetSelectedItems)
+{
+	ListViewHelper::SelectItem(m_listView.get(), 1, true);
+	ListViewHelper::SelectItem(m_listView.get(), 2, true);
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(1, 2));
+
+	ListViewHelper::SelectItem(m_listView.get(), 2, false);
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(1));
+
+	ListViewHelper::SelectItem(m_listView.get(), 0, true);
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(0, 1));
 }
 
 class DoesListViewContainTextTest : public ListViewHelperTest

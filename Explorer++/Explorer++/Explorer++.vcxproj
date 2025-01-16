@@ -1033,6 +1033,7 @@
     <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="GlobalTabEventDispatcher.cpp" />
     <ClCompile Include="LanguageHelper.cpp" />
+    <ClCompile Include="LayoutDefaults.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
     <ClCompile Include="MainMenuSubMenuView.cpp" />
     <ClCompile Include="BrowserList.cpp" />
@@ -1049,6 +1050,9 @@
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
+    <ClCompile Include="StartupFoldersRegistryStorage.cpp" />
+    <ClCompile Include="StartupFoldersXmlStorage.cpp" />
+    <ClCompile Include="StartupOptionsPage.cpp" />
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="UIThreadExecutor.cpp" />
@@ -1347,6 +1351,9 @@
     <ClInclude Include="FrequentLocationsShellBrowserHelper.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
+    <ClInclude Include="StartupFoldersRegistryStorage.h" />
+    <ClInclude Include="StartupFoldersXmlStorage.h" />
+    <ClInclude Include="StartupOptionsPage.h" />
     <ClInclude Include="Storage.h" />
     <ClInclude Include="TestHelper.h" />
     <ClInclude Include="UIThreadExecutor.h" />

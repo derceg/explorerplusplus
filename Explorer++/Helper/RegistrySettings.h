@@ -6,11 +6,14 @@
 
 #include "BetterEnumsWrapper.h"
 #include "PidlHelper.h"
+#include <wil/registry.h>
 #include <windows.h>
 #include <functional>
 #include <list>
+#include <optional>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace RegistrySettings
 {
@@ -126,6 +129,50 @@ LSTATUS ReadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
 	output = T::_from_integral(value);
 
 	return ERROR_SUCCESS;
+}
+
+template <class T>
+std::vector<T> ReadItemList(HKEY key, std::function<std::optional<T>(HKEY childKey)> loadItem)
+{
+	std::vector<T> items;
+	wil::unique_hkey childKey;
+	int index = 0;
+
+	while (
+		SUCCEEDED(wil::reg::open_unique_key_nothrow(key, std::to_wstring(index).c_str(), childKey)))
+	{
+		auto item = loadItem(childKey.get());
+
+		if (item)
+		{
+			items.push_back(*item);
+		}
+
+		index++;
+	}
+
+	return items;
+}
+
+template <class T>
+void SaveItemList(HKEY key, const std::vector<T> &items,
+	std::function<void(HKEY childKey, const T &item)> saveItem)
+{
+	size_t index = 0;
+
+	for (const auto &item : items)
+	{
+		wil::unique_hkey childKey;
+		HRESULT hr = wil::reg::create_unique_key_nothrow(key, std::to_wstring(index).c_str(),
+			childKey, wil::reg::key_access::readwrite);
+
+		if (SUCCEEDED(hr))
+		{
+			saveItem(childKey.get(), item);
+
+			index++;
+		}
+	}
 }
 
 }
