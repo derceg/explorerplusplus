@@ -111,6 +111,7 @@ public:
 	int GetNumTabs() const;
 	int MoveTab(const Tab &tab, int newIndex);
 	void DuplicateTab(const Tab &tab);
+	void MoveTabToNewWindow(const Tab &tab);
 	bool CloseTab(const Tab &tab);
 
 	// Eventually, this should be removed.

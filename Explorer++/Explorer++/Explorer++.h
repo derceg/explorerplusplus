@@ -212,6 +212,7 @@ private:
 	Explorerplusplus(App *app, const WindowStorageData *storageData);
 
 	static HWND CreateMainWindow(const WindowStorageData *storageData);
+	static bool IsFirstInstance();
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
 	static RECT GetDefaultMainWindowBounds();
 

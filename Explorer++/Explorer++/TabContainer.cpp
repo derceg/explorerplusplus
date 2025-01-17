@@ -440,6 +440,10 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 		DuplicateTab(tab);
 		break;
 
+	case IDM_TAB_MOVETABNEWWINDOW:
+		MoveTabToNewWindow(tab);
+		break;
+
 	case IDM_TAB_OPENPARENTINNEWTAB:
 		OnOpenParentInNewTab(tab);
 		break;
@@ -1335,6 +1339,13 @@ void TabContainer::DuplicateTab(const Tab &tab)
 	auto navigateParams =
 		NavigateParams::Normal(tab.GetShellBrowserImpl()->GetDirectoryIdl().get());
 	CreateNewTab(navigateParams, {}, &folderSettings, &folderColumns);
+}
+
+void TabContainer::MoveTabToNewWindow(const Tab &tab)
+{
+	tab.GetBrowser()->OpenItem(tab.GetShellBrowserImpl()->GetDirectoryIdl().get(), 
+		OpenFolderDisposition::NewWindow);
+	CloseTab(tab);
 }
 
 int TabContainer::GetDropTargetItem(const POINT &pt)
