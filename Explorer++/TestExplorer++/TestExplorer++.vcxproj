@@ -325,6 +325,7 @@
     <ClCompile Include="WindowHelperTest.cpp" />
     <ClCompile Include="WindowRegistryStorageTest.cpp" />
     <ClCompile Include="WindowStorageTestHelper.cpp" />
+    <ClCompile Include="WindowSubclassTest.cpp" />
     <ClCompile Include="WindowXmlStorageTest.cpp" />
     <ClCompile Include="XMLSettingsTest.cpp" />
     <ClCompile Include="XmlStorageTestHelper.cpp" />
