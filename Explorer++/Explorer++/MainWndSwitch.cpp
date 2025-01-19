@@ -38,7 +38,6 @@
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 
@@ -166,9 +165,9 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 				FormatSizeString(pDWFolderSizeCompletion->liFolderSize.QuadPart, displayFormat);
 
 			LoadString(m_app->GetResourceInstance(), IDS_GENERAL_TOTALSIZE, szTotalSize,
-				SIZEOF_ARRAY(szTotalSize));
+				std::size(szTotalSize));
 
-			StringCchPrintf(szSizeString, SIZEOF_ARRAY(szSizeString), _T("%s: %s"), szTotalSize,
+			StringCchPrintf(szSizeString, std::size(szSizeString), _T("%s: %s"), szTotalSize,
 				folderSizeText.c_str());
 
 			/* TODO: The line index should be stored in some other (variable) way. */
@@ -1539,8 +1538,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						if (IS_INTRESOURCE(tbButton.iString))
 						{
 							SendMessage(hToolbar, TB_GETSTRING,
-								MAKEWPARAM(SIZEOF_ARRAY(szText), tbButton.iString),
-								(LPARAM) szText);
+								MAKEWPARAM(std::size(szText), tbButton.iString), (LPARAM) szText);
 						}
 						else
 						{

@@ -17,7 +17,6 @@
 #include "TabStorage.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>

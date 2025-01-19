@@ -8,7 +8,6 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -76,7 +75,7 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 	{
 		TCHAR szFullFilename[MAX_PATH];
 
-		StringCchCopy(szFullFilename, SIZEOF_ARRAY(szFullFilename), strFullFilename.c_str());
+		StringCchCopy(szFullFilename, std::size(szFullFilename), strFullFilename.c_str());
 
 		/* TODO: Perform in background thread. */
 		SHFILEINFO shfi;
@@ -100,7 +99,7 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		ListView_SetItemText(hListView, iItem, 2, fileSizeText.data());
 
 		TCHAR szDateModified[32];
-		CreateFileTimeString(&wfad.ftLastWriteTime, szDateModified, SIZEOF_ARRAY(szDateModified),
+		CreateFileTimeString(&wfad.ftLastWriteTime, szDateModified, std::size(szDateModified),
 			m_bShowFriendlyDates);
 		ListView_SetItemText(hListView, iItem, 3, szDateModified);
 

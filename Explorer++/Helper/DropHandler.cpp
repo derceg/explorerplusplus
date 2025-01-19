@@ -7,7 +7,6 @@
 #include "DataExchangeHelper.h"
 #include "GdiplusHelper.h"
 #include "Helper.h"
-#include "Macros.h"
 #include <glog/logging.h>
 #include <wil/resource.h>
 #include <chrono>
@@ -166,7 +165,7 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 			TCHAR szFullFileName[MAX_PATH];
 
 			hr = CopyTextToFile(m_destDirectory.c_str(), pText, szFullFileName,
-				SIZEOF_ARRAY(szFullFileName));
+				std::size(szFullFileName));
 
 			if (hr == S_OK)
 			{

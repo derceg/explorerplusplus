@@ -27,7 +27,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"

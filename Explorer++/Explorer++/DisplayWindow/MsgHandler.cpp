@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Config.h"
 #include "DisplayWindow.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <algorithm>
@@ -199,8 +198,8 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 				size.cx = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 				size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 
-				hr = pExtractImage->GetLocation(szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size,
-					32, &dwFlags);
+				hr = pExtractImage->GetLocation(szImage, std::size(szImage), &dwPriority, &size, 32,
+					&dwFlags);
 
 				if (SUCCEEDED(hr))
 				{
@@ -224,8 +223,8 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 							* ((double) bm.bmWidth / (double) bm.bmHeight));
 						m_iImageWidth = size.cx;
 						m_iImageHeight = size.cy;
-						pExtractImage->GetLocation(szImage, SIZEOF_ARRAY(szImage), &dwPriority,
-							&size, 32, &dwFlags);
+						pExtractImage->GetLocation(szImage, std::size(szImage), &dwPriority, &size,
+							32, &dwFlags);
 						hr = pExtractImage->Extract(&m_hbmThumbnail);
 
 						if (SUCCEEDED(hr))

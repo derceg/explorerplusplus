@@ -10,7 +10,6 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/filtered.hpp>

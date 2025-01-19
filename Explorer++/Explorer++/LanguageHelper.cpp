@@ -7,7 +7,6 @@
 #include "CommandLine.h"
 #include "Config.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 
 namespace
@@ -224,8 +223,7 @@ std::optional<std::wstring> GetCodeForLanguage(LANGID language)
 bool VerifyLanguageVersion(const std::wstring &languageDllPath)
 {
 	wchar_t currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath,
-		SIZEOF_ARRAY(currentProcessPath));
+	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
 
 	DWORD processVersionLs;
 	DWORD processVersionMs;
@@ -278,8 +276,7 @@ std::variant<LanguageInfo, LoadError> MaybeLoadTranslationDll(
 	}
 
 	wchar_t currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath,
-		SIZEOF_ARRAY(currentProcessPath));
+	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
 
 	std::filesystem::path languageDllPath(currentProcessPath);
 	languageDllPath.replace_filename(std::format(L"Explorer++{}.dll", *languageCode));

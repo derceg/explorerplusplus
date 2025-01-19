@@ -15,7 +15,6 @@
 #include "Tab.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 

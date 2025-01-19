@@ -7,7 +7,6 @@
 #include "DragDropHelper.h"
 #include "DriveInfo.h"
 #include "Helper.h"
-#include "Macros.h"
 #include "ShellHelper.h"
 #include "StringHelper.h"
 #include <wil/com.h>
@@ -477,7 +476,7 @@ HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLink
 				pShellLink->Resolve(hwnd, fFlags);
 
 				TCHAR szResolvedPathInternal[MAX_PATH];
-				pShellLink->GetPath(szResolvedPathInternal, SIZEOF_ARRAY(szResolvedPathInternal),
+				pShellLink->GetPath(szResolvedPathInternal, std::size(szResolvedPathInternal),
 					nullptr, SLGP_UNCPRIORITY);
 
 				StringCchCopy(szResolvedPath, nBufferSize, szResolvedPathInternal);

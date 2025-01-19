@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/resource.h>
 

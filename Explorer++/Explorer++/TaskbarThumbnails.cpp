@@ -131,7 +131,7 @@ void TaskbarThumbnails::SetUpObservers()
 void TaskbarThumbnails::SetupJumplistTasks()
 {
 	TCHAR szCurrentProcess[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, SIZEOF_ARRAY(szCurrentProcess));
+	GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, std::size(szCurrentProcess));
 
 	std::wstring name = ResourceHelper::LoadString(m_instance, IDS_TASKS_NEWTAB);
 

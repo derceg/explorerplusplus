@@ -8,7 +8,6 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -264,8 +263,7 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 	{
 		TCHAR szText[64];
 		LoadString(GetResourceInstance(),
-			ShellBrowserImpl::LookupColumnNameStringIndex(column.type), szText,
-			SIZEOF_ARRAY(szText));
+			ShellBrowserImpl::LookupColumnNameStringIndex(column.type), szText, std::size(szText));
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
@@ -333,7 +331,7 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,
-			SIZEOF_ARRAY(szColumnDescription));
+			std::size(szColumnDescription));
 		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
 	}
 }

@@ -51,8 +51,7 @@ void InitializeCrashHandler()
 LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 {
 	TCHAR currentProcess[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcess,
-		static_cast<DWORD>(std::size(currentProcess)));
+	GetProcessImageName(GetCurrentProcessId(), currentProcess, std::size(currentProcess));
 
 	// Event names are global in the system. Therefore, the event name used for signaling should be
 	// unique.

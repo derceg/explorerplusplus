@@ -167,7 +167,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 		ListView_SetItemText(hListView, iItem, 2, fileSizeText.data());
 
 		TCHAR szDateModified[32];
-		CreateFileTimeString(&wfad.ftLastWriteTime, szDateModified, SIZEOF_ARRAY(szDateModified),
+		CreateFileTimeString(&wfad.ftLastWriteTime, szDateModified, std::size(szDateModified),
 			m_bShowFriendlyDates);
 		ListView_SetItemText(hListView, iItem, 3, szDateModified);
 

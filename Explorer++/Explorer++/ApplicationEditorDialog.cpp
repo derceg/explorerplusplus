@@ -8,7 +8,6 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
 namespace Applications
@@ -106,7 +105,7 @@ void ApplicationEditorDialog::OnChooseFile()
 {
 	/* TODO: Text needs to be localized. */
 	const TCHAR *filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
-	TCHAR fullFileName[MAX_PATH] = EMPTY_STRING;
+	TCHAR fullFileName[MAX_PATH] = L"";
 
 	OPENFILENAME ofn;
 	ofn.lStructSize = sizeof(ofn);
@@ -116,7 +115,7 @@ void ApplicationEditorDialog::OnChooseFile()
 	ofn.nMaxCustFilter = 0;
 	ofn.nFilterIndex = 0;
 	ofn.lpstrFile = fullFileName;
-	ofn.nMaxFile = SIZEOF_ARRAY(fullFileName);
+	ofn.nMaxFile = std::size(fullFileName);
 	ofn.lpstrFileTitle = nullptr;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = nullptr;

@@ -19,7 +19,6 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/locale.hpp>
@@ -144,7 +143,7 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		case EN_CHANGE:
 		{
 			TCHAR szNamePattern[MAX_PATH];
-			GetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, szNamePattern, SIZEOF_ARRAY(szNamePattern));
+			GetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, szNamePattern, std::size(szNamePattern));
 
 			HWND hListView = GetDlgItem(m_hDlg, IDC_MASSRENAME_FILELISTVIEW);
 
@@ -248,7 +247,7 @@ void MassRenameDialog::OnOk()
 {
 	TCHAR szNamePattern[MAX_PATH];
 
-	GetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, szNamePattern, SIZEOF_ARRAY(szNamePattern));
+	GetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, szNamePattern, std::size(szNamePattern));
 
 	if (lstrlen(szNamePattern) == 0)
 	{

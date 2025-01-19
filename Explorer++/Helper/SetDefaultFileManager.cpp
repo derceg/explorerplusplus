@@ -116,8 +116,8 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	TCHAR command[512];
 	TCHAR executable[MAX_PATH];
 
-	GetProcessImageName(GetCurrentProcessId(), executable, SIZEOF_ARRAY(executable));
-	StringCchPrintf(command, SIZEOF_ARRAY(command), _T("\"%s\" \"%%1\""), executable);
+	GetProcessImageName(GetCurrentProcessId(), executable, std::size(executable));
+	StringCchPrintf(command, std::size(command), _T("\"%s\" \"%%1\""), executable);
 
 	res = RegistrySettings::SaveString(commandKey.get(), L"", command);
 

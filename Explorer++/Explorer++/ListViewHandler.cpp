@@ -26,7 +26,6 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
@@ -385,7 +384,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 		TCHAR szBuffer[1024];
 
-		DWORD dwBufferSize = SIZEOF_ARRAY(szBuffer);
+		DWORD dwBufferSize = std::size(szBuffer);
 		auto *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
 		DWORD dwRet = WNetGetUniversalName(fullFilename.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
 			reinterpret_cast<LPVOID>(puni), &dwBufferSize);
@@ -443,7 +442,7 @@ void Explorerplusplus::OnListViewPaste()
 		 Files are copied asynchronously, so a change of directory
 		 will cause the destination directory to change in the
 		 middle of the copy operation. */
-		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination),
+		StringCchCopy(szDestination, std::size(szDestination),
 			selectedTab.GetShellBrowserImpl()->GetDirectory().c_str());
 
 		/* Also, the string must be double NULL terminated. */

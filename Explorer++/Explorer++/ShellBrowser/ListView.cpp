@@ -21,6 +21,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 #include <wil/common.h>

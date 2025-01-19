@@ -12,7 +12,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
@@ -140,7 +139,7 @@ void MainWindow::UpdateWindowText()
 	if (m_config->showUserNameInTitleBar.get())
 	{
 		TCHAR owner[512];
-		GetProcessOwner(GetCurrentProcessId(), owner, SIZEOF_ARRAY(owner));
+		GetProcessOwner(GetCurrentProcessId(), owner, std::size(owner));
 
 		title += owner;
 	}

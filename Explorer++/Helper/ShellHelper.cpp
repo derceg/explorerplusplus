@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ShellHelper.h"
 #include "Helper.h"
-#include "Macros.h"
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
 #include "StringHelper.h"
@@ -173,8 +172,7 @@ BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters,
 	LaunchCurrentProcessFlags flags)
 {
 	TCHAR currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath,
-		static_cast<DWORD>(std::size(currentProcessPath)));
+	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
 
 	std::wstring verb;
 
@@ -812,7 +810,7 @@ std::optional<std::wstring> MaybeExtractPathFromFileUrl(const std::wstring &url)
 	}
 
 	TCHAR path[MAX_PATH];
-	DWORD size = SIZEOF_ARRAY(path);
+	DWORD size = std::size(path);
 	HRESULT hr = PathCreateFromUrl(url.c_str(), path, &size, 0);
 
 	if (FAILED(hr))

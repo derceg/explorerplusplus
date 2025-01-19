@@ -8,7 +8,6 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/RichEditHelper.h"
 #include <glog/logging.h>
@@ -66,7 +65,7 @@ void AdvancedOptionsPage::InitializeControls()
 	ListView_SetColumnWidth(listView, 1, LVSCW_AUTOSIZE_USEHEADER);
 
 	int orderArray[] = { 1, 0 };
-	ListView_SetColumnOrderArray(listView, SIZEOF_ARRAY(orderArray), orderArray);
+	ListView_SetColumnOrderArray(listView, std::size(orderArray), orderArray);
 
 	m_advancedOptions = InitializeAdvancedOptions();
 
@@ -321,7 +320,7 @@ void AdvancedOptionsPage::SaveSettings()
 	for (int i = 0; i < numItems; i++)
 	{
 		TCHAR text[256];
-		ListView_GetItemText(listView, i, 0, text, SIZEOF_ARRAY(text));
+		ListView_GetItemText(listView, i, 0, text, std::size(text));
 
 		auto &option = m_advancedOptions[i];
 

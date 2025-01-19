@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "../Helper/StringHelper.h"
-#include "../Helper/Macros.h"
 #include <gtest/gtest.h>
 #include <tchar.h>
 
@@ -74,7 +73,7 @@ TEST(ReplaceCharacter, Simple)
 TEST(ReplaceCharacterWithString, NoMatches)
 {
 	TCHAR outputText[64];
-	ReplaceCharacterWithString(L"Hello world", outputText, SIZEOF_ARRAY(outputText), 'z',
+	ReplaceCharacterWithString(L"Hello world", outputText, std::size(outputText), 'z',
 		L"replacement");
 	EXPECT_STREQ(outputText, L"Hello world");
 }
@@ -82,7 +81,7 @@ TEST(ReplaceCharacterWithString, NoMatches)
 TEST(ReplaceCharacterWithString, Simple)
 {
 	TCHAR outputText[64];
-	ReplaceCharacterWithString(L"Hello world", outputText, SIZEOF_ARRAY(outputText), 'o',
+	ReplaceCharacterWithString(L"Hello world", outputText, std::size(outputText), 'o',
 		L"replacement");
 	EXPECT_STREQ(outputText, L"Hellreplacement wreplacementrld");
 }

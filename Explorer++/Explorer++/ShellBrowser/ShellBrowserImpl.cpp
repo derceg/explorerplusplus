@@ -28,7 +28,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
 #include <list>
@@ -982,7 +981,7 @@ void ShellBrowserImpl::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 
 				/* Build a string that will form the drive name. */
 				chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-				StringCchPrintf(szDrive, SIZEOF_ARRAY(szDrive), _T("%c:\\"), chDrive);
+				StringCchPrintf(szDrive, std::size(szDrive), _T("%c:\\"), chDrive);
 
 				if (pdbv->dbcv_flags & DBTF_MEDIA)
 				{
@@ -1018,7 +1017,7 @@ void ShellBrowserImpl::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 
 				/* Build a string that will form the drive name. */
 				chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-				StringCchPrintf(szDrive, SIZEOF_ARRAY(szDrive), _T("%c:\\"), chDrive);
+				StringCchPrintf(szDrive, std::size(szDrive), _T("%c:\\"), chDrive);
 
 				/* The device was removed from the system.
 				Remove it from the listview (only if the drive

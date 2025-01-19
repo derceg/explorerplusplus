@@ -15,7 +15,6 @@
 #include "ResourceHelper.h"
 #include "Version.h"
 #include "VersionHelper.h"
-#include "../Helper/Macros.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fmt/format.h>
@@ -69,7 +68,7 @@ DWORD WINAPI UpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 {
 	TCHAR tempPath[MAX_PATH];
-	DWORD pathRes = GetTempPath(SIZEOF_ARRAY(tempPath), tempPath);
+	DWORD pathRes = GetTempPath(std::size(tempPath), tempPath);
 
 	if (pathRes == 0)
 	{

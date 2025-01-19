@@ -37,7 +37,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"

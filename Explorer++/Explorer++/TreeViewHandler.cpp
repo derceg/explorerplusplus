@@ -12,7 +12,6 @@
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "../Helper/BulkClipboardWriter.h"
-#include "../Helper/Macros.h"
 
 void Explorerplusplus::CreateFolderControls()
 {

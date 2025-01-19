@@ -10,7 +10,6 @@
 #include "stdafx.h"
 #include "XMLSettings.h"
 #include "Helper.h"
-#include "Macros.h"
 #include <boost/lexical_cast.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
@@ -149,7 +148,7 @@ void AddStringListToNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode,
 
 	for (const auto &str : strList)
 	{
-		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("%s%d"), baseKeyName.c_str(), i++);
+		StringCchPrintf(szNode, std::size(szNode), _T("%s%d"), baseKeyName.c_str(), i++);
 		AddAttributeToNode(pXMLDom, pParentNode, szNode, str.c_str());
 	}
 }

@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "ResourceTestHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include <tchar.h>
 #include <windows.h>
@@ -15,7 +14,7 @@ const TCHAR g_resourcesFileName[] = L"Resources";
 std::filesystem::path GetResourcesDirectoryPath()
 {
 	TCHAR processImageName[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
+	GetProcessImageName(GetCurrentProcessId(), processImageName, std::size(processImageName));
 
 	std::filesystem::path path(processImageName);
 	return path.parent_path() / g_resourcesFileName;

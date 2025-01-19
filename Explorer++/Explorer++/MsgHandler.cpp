@@ -238,7 +238,7 @@ void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, path);
 
 	TCHAR szParameters[512];
-	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), path.c_str());
+	StringCchPrintf(szParameters, std::size(szParameters), _T("\"%s\""), path.c_str());
 
 	LaunchCurrentProcess(m_hContainer, szParameters);
 }
@@ -749,7 +749,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 		for (int i = 0; i < nActiveColumns; i++)
 		{
 			TCHAR szText[64];
-			ListView_GetItemText(m_hActiveListView, iItem, i, szText, SIZEOF_ARRAY(szText));
+			ListView_GetItemText(m_hActiveListView, iItem, i, szText, std::size(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 		}
@@ -817,7 +817,7 @@ void Explorerplusplus::OnAssocChanged()
 		dwShellIconSize = _wtoi(shellIconSize.c_str());
 
 		/* Increment the value by one, and save it back to the registry. */
-		StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("%d"), dwShellIconSize + 1);
+		StringCchPrintf(szTemp, std::size(szTemp), _T("%d"), dwShellIconSize + 1);
 		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), szTemp);
 
 		if (fileIconInit != nullptr)
@@ -878,7 +878,7 @@ void Explorerplusplus::OnCloneWindow()
 	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 
 	TCHAR szQuotedCurrentDirectory[MAX_PATH];
-	StringCchPrintf(szQuotedCurrentDirectory, SIZEOF_ARRAY(szQuotedCurrentDirectory), _T("\"%s\""),
+	StringCchPrintf(szQuotedCurrentDirectory, std::size(szQuotedCurrentDirectory), _T("\"%s\""),
 		currentDirectory.c_str());
 
 	LaunchCurrentProcess(m_hContainer, szQuotedCurrentDirectory);

@@ -92,7 +92,7 @@ void WildcardSelectDialog::OnOk()
 {
 	TCHAR szPattern[512];
 
-	GetDlgItemText(m_hDlg, IDC_SELECTGROUP_COMBOBOX, szPattern, SIZEOF_ARRAY(szPattern));
+	GetDlgItemText(m_hDlg, IDC_SELECTGROUP_COMBOBOX, szPattern, std::size(szPattern));
 
 	if (lstrcmp(szPattern, EMPTY_STRING) != 0)
 	{

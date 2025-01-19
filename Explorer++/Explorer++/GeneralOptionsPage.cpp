@@ -13,7 +13,6 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -141,9 +140,9 @@ void GeneralOptionsPage::AddLanguages()
 	always be the first item. */
 	SendMessage(hLanguageComboBox, CB_ADDSTRING, 0, (LPARAM) _T("English"));
 
-	GetProcessImageName(GetCurrentProcessId(), szImageDirectory, SIZEOF_ARRAY(szImageDirectory));
+	GetProcessImageName(GetCurrentProcessId(), szImageDirectory, std::size(szImageDirectory));
 	PathRemoveFileSpec(szImageDirectory);
-	StringCchCopy(szNamePattern, SIZEOF_ARRAY(szNamePattern), szImageDirectory);
+	StringCchCopy(szNamePattern, std::size(szNamePattern), szImageDirectory);
 	PathAppend(szNamePattern, L"Explorer++*.dll");
 
 	hFindFile = FindFirstFile(szNamePattern, &wfd);
@@ -178,7 +177,7 @@ BOOL GeneralOptionsPage::AddLanguageToComboBox(HWND hComboBox, const TCHAR *szIm
 	const TCHAR *szFileName, WORD *pdwLanguage)
 {
 	TCHAR szFullFileName[MAX_PATH];
-	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), szImageDirectory);
+	StringCchCopy(szFullFileName, std::size(szFullFileName), szImageDirectory);
 	PathAppend(szFullFileName, szFileName);
 
 	BOOL bSuccess = FALSE;
@@ -190,7 +189,7 @@ BOOL GeneralOptionsPage::AddLanguageToComboBox(HWND hComboBox, const TCHAR *szIm
 		TCHAR szLanguageName[32];
 
 		int iRet = GetLocaleInfo(wLanguage, LOCALE_SNATIVELANGNAME, szLanguageName,
-			SIZEOF_ARRAY(szLanguageName));
+			std::size(szLanguageName));
 
 		if (iRet != 0)
 		{
@@ -248,7 +247,7 @@ void GeneralOptionsPage::OnNewTabDirectoryButtonPressed()
 		ResourceHelper::LoadString(m_resourceInstance, IDS_DEFAULTSETTINGS_NEWTAB);
 
 	TCHAR szNewTabDir[MAX_PATH];
-	GetDlgItemText(GetDialog(), IDC_DEFAULT_NEWTABDIR_EDIT, szNewTabDir, SIZEOF_ARRAY(szNewTabDir));
+	GetDlgItemText(GetDialog(), IDC_DEFAULT_NEWTABDIR_EDIT, szNewTabDir, std::size(szNewTabDir));
 
 	std::wstring virtualParsingPath;
 	HRESULT hr = DecodeFriendlyPath(szNewTabDir, virtualParsingPath);

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Helper.h"
-#include "Macros.h"
 #include "ShellHelper.h"
 #include "TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -60,11 +59,11 @@ BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, 
 
 	TCHAR dateBuffer[512];
 	int iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime, nullptr,
-		dateBuffer, SIZEOF_ARRAY(dateBuffer));
+		dateBuffer, std::size(dateBuffer));
 
 	TCHAR timeBuffer[512];
 	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime, nullptr,
-		timeBuffer, SIZEOF_ARRAY(timeBuffer));
+		timeBuffer, std::size(timeBuffer));
 
 	if ((iReturn1 != 0) && (iReturn2 != 0))
 	{
@@ -116,7 +115,7 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *sz
 
 	TCHAR timeComponent[512];
 	int timeFormatted = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
-		nullptr, timeComponent, SIZEOF_ARRAY(timeComponent));
+		nullptr, timeComponent, std::size(timeComponent));
 
 	if (timeFormatted == 0)
 	{
@@ -258,9 +257,9 @@ BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
 	BOOL success = FALSE;
 
 	TCHAR accountName[512];
-	DWORD accountNameLength = SIZEOF_ARRAY(accountName);
+	DWORD accountNameLength = std::size(accountName);
 	TCHAR domainName[512];
-	DWORD domainNameLength = SIZEOF_ARRAY(domainName);
+	DWORD domainNameLength = std::size(domainName);
 	SID_NAME_USE eUse;
 	BOOL bRet = LookupAccountSid(nullptr, sid, accountName, &accountNameLength, domainName,
 		&domainNameLength, &eUse);
@@ -465,7 +464,7 @@ BOOL IsImage(const TCHAR *szFileName)
 
 	ext++;
 
-	for (i = 0; i < SIZEOF_ARRAY(IMAGE_EXTS); i++)
+	for (i = 0; i < std::size(IMAGE_EXTS); i++)
 	{
 		if (lstrcmpi(ext, IMAGE_EXTS[i]) == 0)
 		{
@@ -581,9 +580,8 @@ BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 		if ((plcp[i].wLanguage & 0xFF) == (userLangId & 0xFF) || plcp[i].wLanguage == 0)
 		{
 			TCHAR szSubBlock[64];
-			StringCchPrintf(szSubBlock, SIZEOF_ARRAY(szSubBlock),
-				_T("\\StringFileInfo\\%04X%04X\\%s"), plcp[i].wLanguage, plcp[i].wCodePage,
-				szVersionInfo);
+			StringCchPrintf(szSubBlock, std::size(szSubBlock), _T("\\StringFileInfo\\%04X%04X\\%s"),
+				plcp[i].wLanguage, plcp[i].wCodePage, szVersionInfo);
 
 			TCHAR *szBuffer;
 			UINT uLen;
@@ -792,7 +790,7 @@ std::wstring CreateGUID()
 	CoCreateGuid(&guid);
 
 	TCHAR guidString[128];
-	StringFromGUID2(guid, guidString, SIZEOF_ARRAY(guidString));
+	StringFromGUID2(guid, guidString, std::size(guidString));
 
 	std::wstring finalValue = guidString;
 	finalValue = finalValue.substr(1, finalValue.length() - 2);

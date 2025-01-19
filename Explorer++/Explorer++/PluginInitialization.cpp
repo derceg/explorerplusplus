@@ -8,7 +8,6 @@
 #include "App.h"
 #include "FeatureList.h"
 #include "Plugins/PluginManager.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include <filesystem>
 
@@ -20,7 +19,7 @@ void Explorerplusplus::InitializePlugins()
 	}
 
 	TCHAR processImageName[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
+	GetProcessImageName(GetCurrentProcessId(), processImageName, std::size(processImageName));
 
 	std::filesystem::path processDirectoryPath(processImageName);
 	processDirectoryPath.remove_filename();

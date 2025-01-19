@@ -9,7 +9,6 @@
 #include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <list>
 
@@ -307,8 +306,7 @@ void ShellBrowserImpl::AddItem(PCIDLIST_ABSOLUTE pidl)
 		int sortedPosition = DetermineItemSortedPosition(*itemId);
 
 		auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
-			m_directoryState.awaitingAddList.end(),
-			[itemId](const AwaitingAdd_t &awaitingItem)
+			m_directoryState.awaitingAddList.end(), [itemId](const AwaitingAdd_t &awaitingItem)
 			{ return *itemId == awaitingItem.iItemInternal; });
 
 		// The item was added successfully above, so should be in the list of awaiting

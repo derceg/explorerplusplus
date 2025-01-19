@@ -13,7 +13,6 @@
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 

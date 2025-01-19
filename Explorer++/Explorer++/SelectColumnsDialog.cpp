@@ -11,7 +11,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include <algorithm>
 #include <functional>
 
@@ -99,11 +98,11 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 
 	TCHAR column1Text[64];
 	LoadString(GetResourceInstance(), ShellBrowserImpl::LookupColumnNameStringIndex(column1.type),
-		column1Text, SIZEOF_ARRAY(column1Text));
+		column1Text, std::size(column1Text));
 
 	TCHAR column2Text[64];
 	LoadString(GetResourceInstance(), ShellBrowserImpl::LookupColumnNameStringIndex(column2.type),
-		column2Text, SIZEOF_ARRAY(column2Text));
+		column2Text, std::size(column2Text));
 
 	int ret = StrCmpLogicalW(column1Text, column2Text);
 
@@ -298,7 +297,7 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,
-			SIZEOF_ARRAY(szColumnDescription));
+			std::size(szColumnDescription));
 		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
 	}
 }

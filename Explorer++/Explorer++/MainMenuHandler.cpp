@@ -29,7 +29,6 @@
 #include "WildcardSelectDialog.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
@@ -177,13 +176,13 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 {
 	TCHAR fileName[MAX_PATH];
 	LoadString(m_app->GetResourceInstance(), IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName,
-		SIZEOF_ARRAY(fileName));
-	StringCchCat(fileName, SIZEOF_ARRAY(fileName), _T(".txt"));
+		std::size(fileName));
+	StringCchCat(fileName, std::size(fileName), _T(".txt"));
 
 	std::wstring directory = m_pActiveShellBrowser->GetDirectory();
 
 	BOOL bSaveNameRetrieved =
-		GetFileNameFromUser(m_hContainer, fileName, SIZEOF_ARRAY(fileName), directory.c_str());
+		GetFileNameFromUser(m_hContainer, fileName, std::size(fileName), directory.c_str());
 
 	if (bSaveNameRetrieved)
 	{
@@ -239,7 +238,7 @@ void Explorerplusplus::OnResolveLink()
 		std::wstring shortcutFileName = m_pActiveShellBrowser->GetItemFullName(iItem);
 
 		hr = FileOperations::ResolveLink(m_hContainer, 0, shortcutFileName.c_str(), szFullFileName,
-			SIZEOF_ARRAY(szFullFileName));
+			std::size(szFullFileName));
 
 		if (hr == S_OK)
 		{

@@ -23,7 +23,6 @@
 #include "SplitFileDialog.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
-#include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 #include <wil/resource.h>
@@ -103,8 +102,7 @@ void LoadDialogStatesFromXML(IXMLDOMDocument *xmlDocument)
 	}
 
 	TCHAR tempNodeSelector[64];
-	StringCchPrintf(tempNodeSelector, SIZEOF_ARRAY(tempNodeSelector), _T("//%s/*"),
-		DIALOGS_XML_KEY);
+	StringCchPrintf(tempNodeSelector, std::size(tempNodeSelector), _T("//%s/*"), DIALOGS_XML_KEY);
 	auto bstr = wil::make_bstr_nothrow(tempNodeSelector);
 
 	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;

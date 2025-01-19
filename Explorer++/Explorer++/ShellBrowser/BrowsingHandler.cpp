@@ -16,7 +16,6 @@
 #include "ViewModes.h"
 #include "WebBrowserApp.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
@@ -437,7 +436,7 @@ std::optional<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformation
 	if (PathIsRoot(parsingName.c_str()))
 	{
 		itemInfo.bDrive = TRUE;
-		StringCchCopy(itemInfo.szDrive, SIZEOF_ARRAY(itemInfo.szDrive), parsingName.c_str());
+		StringCchCopy(itemInfo.szDrive, std::size(itemInfo.szDrive), parsingName.c_str());
 	}
 	else
 	{
@@ -459,7 +458,7 @@ std::optional<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformation
 	}
 	else
 	{
-		StringCchCopy(itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName),
+		StringCchCopy(itemInfo.wfd.cFileName, std::size(itemInfo.wfd.cFileName),
 			displayName.c_str());
 
 		if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
@@ -484,7 +483,7 @@ HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellF
 
 	wil::com_ptr_nothrow<IPropertyStore> store;
 	PROPERTYKEY keys[] = { PKEY_FindData };
-	hr = factory->GetPropertyStoreForKeys(keys, SIZEOF_ARRAY(keys), GPS_FASTPROPERTIESONLY,
+	hr = factory->GetPropertyStoreForKeys(keys, std::size(keys), GPS_FASTPROPERTIESONLY,
 		IID_PPV_ARGS(&store));
 
 	if (FAILED(hr))

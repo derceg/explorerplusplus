@@ -6,7 +6,6 @@
 #include "AcceleratorHelper.h"
 #include "AcceleratorManager.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <format>
@@ -54,7 +53,7 @@ void UpdateMenuItemAcceleratorString(HMENU menu, UINT id,
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_STRING;
 	mii.dwTypeData = menuText;
-	mii.cch = SIZEOF_ARRAY(menuText);
+	mii.cch = std::size(menuText);
 	BOOL ret = GetMenuItemInfo(menu, id, false, &mii);
 
 	if (!ret)
@@ -158,7 +157,7 @@ std::optional<std::wstring> VirtualKeyToString(UINT key)
 	LONG lParamValue = scanCode << 16;
 
 	TCHAR keyString[32];
-	int ret = GetKeyNameText(lParamValue, keyString, SIZEOF_ARRAY(keyString));
+	int ret = GetKeyNameText(lParamValue, keyString, std::size(keyString));
 
 	if (ret == 0)
 	{

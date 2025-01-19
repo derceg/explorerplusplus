@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "iDirectoryMonitor.h"
-#include "Macros.h"
 #include <list>
 
 DWORD WINAPI Thread_DirModifiedInternal(LPVOID Container);
@@ -343,7 +342,7 @@ void CALLBACK DirectoryMonitor::CompletionRoutine(DWORD dwErrorCode, DWORD Numbe
 			}
 
 			/* FileNameLength is size in bytes NOT characters. */
-			StringCchCopyN(szFileName, SIZEOF_ARRAY(szFileName), pfni->FileName,
+			StringCchCopyN(szFileName, std::size(szFileName), pfni->FileName,
 				pfni->FileNameLength / sizeof(TCHAR));
 			pDirInfo->m_OnDirectoryAltered(szFileName, pfni->Action, pDirInfo->m_pData);
 

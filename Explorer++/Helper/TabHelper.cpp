@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "TabHelper.h"
-#include "Macros.h"
 
 BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 {
@@ -12,7 +11,7 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	TCHAR szText1[512];
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
 	tcItem.pszText = szText1;
-	tcItem.cchTextMax = SIZEOF_ARRAY(szText1);
+	tcItem.cchTextMax = std::size(szText1);
 	BOOL bRet = TabCtrl_GetItem(hTabCtrl, iItem1, &tcItem);
 
 	if (!bRet)
@@ -28,7 +27,7 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	TCHAR szText2[512];
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
 	tcItem.pszText = szText2;
-	tcItem.cchTextMax = SIZEOF_ARRAY(szText2);
+	tcItem.cchTextMax = std::size(szText2);
 
 	bRet = TabCtrl_GetItem(hTabCtrl, iItem2, &tcItem);
 
@@ -78,7 +77,7 @@ int TabCtrl_MoveItem(HWND tabCtrl, int currentIndex, int newIndex)
 	TCHAR szText[512];
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
 	tcItem.pszText = szText;
-	tcItem.cchTextMax = SIZEOF_ARRAY(szText);
+	tcItem.cchTextMax = std::size(szText);
 	BOOL res = TabCtrl_GetItem(tabCtrl, currentIndex, &tcItem);
 
 	if (!res)
