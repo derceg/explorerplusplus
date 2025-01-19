@@ -249,55 +249,27 @@ void SaveTabSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 		customName.c_str());
 }
 
-void SaveTabInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabsNode, const TabStorageData &tab)
+void SaveTabInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode, const TabStorageData &tab)
 {
-	wil::com_ptr_nothrow<IXMLDOMElement> tabNode;
-	XMLSettings::CreateElementNode(xmlDocument, &tabNode, tabsNode, TAB_NODE_NAME, L"");
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_DIRECTORY, tab.directory.c_str());
 
-	XMLSettings::AddAttributeToNode(xmlDocument, tabNode.get(), SETTING_DIRECTORY,
-		tab.directory.c_str());
-
-	SaveFolderSettings(xmlDocument, tabNode.get(), tab.folderSettings);
-	SaveColumns(xmlDocument, tabNode.get(), tab.columns);
-	SaveTabSettings(xmlDocument, tabNode.get(), tab.tabSettings);
+	SaveFolderSettings(xmlDocument, tabNode, tab.folderSettings);
+	SaveColumns(xmlDocument, tabNode, tab.columns);
+	SaveTabSettings(xmlDocument, tabNode, tab.tabSettings);
 }
 
 }
 
 std::vector<TabStorageData> Load(IXMLDOMNode *tabsNode)
 {
-	auto queryString = wil::make_bstr_nothrow((L"./"s + TAB_NODE_NAME).c_str());
-	wil::com_ptr_nothrow<IXMLDOMNodeList> childNodes;
-	HRESULT hr = tabsNode->selectNodes(queryString.get(), &childNodes);
-
-	if (FAILED(hr))
-	{
-		return {};
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
-	std::vector<TabStorageData> tabs;
-
-	while (childNodes->nextNode(&childNode) == S_OK)
-	{
-		auto tab = LoadTabInfo(childNode.get());
-
-		if (tab)
-		{
-			tabs.push_back(*tab);
-		}
-	}
-
-	return tabs;
+	return XMLSettings::ReadItemList<TabStorageData>(tabsNode, TAB_NODE_NAME, LoadTabInfo);
 }
 
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabsNode,
 	const std::vector<TabStorageData> &tabs)
 {
-	for (const auto &tab : tabs)
-	{
-		SaveTabInfo(xmlDocument, tabsNode, tab);
-	}
+	XMLSettings::SaveItemList<TabStorageData>(xmlDocument, tabsNode, tabs, TAB_NODE_NAME,
+		SaveTabInfo);
 }
 
 }

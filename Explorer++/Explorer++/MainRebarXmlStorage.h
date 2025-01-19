@@ -13,7 +13,7 @@ namespace MainRebarXmlStorage
 {
 
 std::vector<RebarBandStorageInfo> Load(IXMLDOMNode *mainRebarNode);
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *mainRebarNode,
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *mainRebarNode,
 	const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
 
 }

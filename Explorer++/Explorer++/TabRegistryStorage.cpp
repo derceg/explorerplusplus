@@ -219,43 +219,12 @@ void SaveTabInfo(HKEY key, const TabStorageData &tab)
 
 std::vector<TabStorageData> Load(HKEY tabsKey)
 {
-	std::vector<TabStorageData> tabs;
-	wil::unique_hkey childKey;
-	int index = 0;
-
-	while (SUCCEEDED(
-		wil::reg::open_unique_key_nothrow(tabsKey, std::to_wstring(index).c_str(), childKey)))
-	{
-		auto tab = LoadTabInfo(childKey.get());
-
-		if (tab)
-		{
-			tabs.push_back(*tab);
-		}
-
-		index++;
-	}
-
-	return tabs;
+	return RegistrySettings::ReadItemList<TabStorageData>(tabsKey, LoadTabInfo);
 }
 
 void Save(HKEY tabsKey, const std::vector<TabStorageData> &tabs)
 {
-	size_t index = 0;
-
-	for (const auto &tab : tabs)
-	{
-		wil::unique_hkey childKey;
-		HRESULT hr = wil::reg::create_unique_key_nothrow(tabsKey, std::to_wstring(index).c_str(),
-			childKey, wil::reg::key_access::readwrite);
-
-		if (SUCCEEDED(hr))
-		{
-			SaveTabInfo(childKey.get(), tab);
-
-			index++;
-		}
-	}
+	RegistrySettings::SaveItemList<TabStorageData>(tabsKey, tabs, SaveTabInfo);
 }
 
 }

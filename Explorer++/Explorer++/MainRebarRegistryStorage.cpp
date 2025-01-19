@@ -64,43 +64,13 @@ namespace MainRebarRegistryStorage
 
 std::vector<RebarBandStorageInfo> Load(HKEY mainRebarKey)
 {
-	std::vector<RebarBandStorageInfo> rebarStorageInfo;
-	wil::unique_hkey childKey;
-	size_t index = 0;
-
-	while (SUCCEEDED(
-		wil::reg::open_unique_key_nothrow(mainRebarKey, std::to_wstring(index).c_str(), childKey)))
-	{
-		auto bandInfo = LoadRebarBandInfo(childKey.get());
-
-		if (bandInfo)
-		{
-			rebarStorageInfo.push_back(*bandInfo);
-		}
-
-		index++;
-	}
-
-	return rebarStorageInfo;
+	return RegistrySettings::ReadItemList<RebarBandStorageInfo>(mainRebarKey, LoadRebarBandInfo);
 }
 
 void Save(HKEY mainRebarKey, const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
-	size_t index = 0;
-
-	for (const auto &bandInfo : rebarStorageInfo)
-	{
-		wil::unique_hkey childKey;
-		HRESULT hr = wil::reg::create_unique_key_nothrow(mainRebarKey,
-			std::to_wstring(index).c_str(), childKey, wil::reg::key_access::readwrite);
-
-		if (SUCCEEDED(hr))
-		{
-			SaveRebarBandInfo(childKey.get(), bandInfo);
-
-			index++;
-		}
-	}
+	RegistrySettings::SaveItemList<RebarBandStorageInfo>(mainRebarKey, rebarStorageInfo,
+		SaveRebarBandInfo);
 }
 
 }

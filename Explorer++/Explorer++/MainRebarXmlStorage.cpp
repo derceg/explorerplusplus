@@ -58,26 +58,15 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 	return bandInfo;
 }
 
-void SaveRebarBandInfo(IXMLDOMDocument *xmlDocument, IXMLDOMNode *mainRebarNode,
+void SaveRebarBandInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *toolbarNode,
 	const RebarBandStorageInfo &bandInfo)
 {
-	wil::com_ptr_nothrow<IXMLDOMElement> toolbarNode;
-	auto toolbarNodeName = wil::make_bstr_nothrow(TOOLBAR_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(toolbarNodeName.get(), &toolbarNode);
-
-	if (hr != S_OK)
-	{
-		return;
-	}
-
-	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode.get(), SETTING_ID,
+	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode, SETTING_ID,
 		XMLSettings::EncodeIntValue(bandInfo.id));
-	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode.get(), SETTING_STYLE,
+	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode, SETTING_STYLE,
 		XMLSettings::EncodeIntValue(bandInfo.style));
-	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode.get(), SETTING_LENGTH,
+	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode, SETTING_LENGTH,
 		XMLSettings::EncodeIntValue(bandInfo.length));
-
-	XMLSettings::AppendChildToParent(toolbarNode.get(), mainRebarNode);
 }
 
 }
@@ -87,39 +76,15 @@ namespace MainRebarXmlStorage
 
 std::vector<RebarBandStorageInfo> Load(IXMLDOMNode *mainRebarNode)
 {
-	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
-	auto queryString = wil::make_bstr_nothrow(TOOLBAR_NODE_NAME);
-
-	wil::com_ptr_nothrow<IXMLDOMNodeList> childNodes;
-	HRESULT hr = mainRebarNode->selectNodes(queryString.get(), &childNodes);
-
-	if (FAILED(hr))
-	{
-		return {};
-	}
-
-	std::vector<RebarBandStorageInfo> rebarStorageInfo;
-
-	while (childNodes->nextNode(&childNode) == S_OK)
-	{
-		auto bandInfo = LoadRebarBandInfo(childNode.get());
-
-		if (bandInfo)
-		{
-			rebarStorageInfo.push_back(*bandInfo);
-		}
-	}
-
-	return rebarStorageInfo;
+	return XMLSettings::ReadItemList<RebarBandStorageInfo>(mainRebarNode, TOOLBAR_NODE_NAME,
+		LoadRebarBandInfo);
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *mainRebarNode,
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *mainRebarNode,
 	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
-	for (const auto &bandStorageInfo : rebarStorageInfo)
-	{
-		SaveRebarBandInfo(xmlDocument, mainRebarNode, bandStorageInfo);
-	}
+	XMLSettings::SaveItemList<RebarBandStorageInfo>(xmlDocument, mainRebarNode, rebarStorageInfo,
+		TOOLBAR_NODE_NAME, SaveRebarBandInfo);
 }
 
 }
