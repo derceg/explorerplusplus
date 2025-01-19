@@ -981,7 +981,7 @@ void Search::StartSearching()
 	m_iFoldersFound = 0;
 	m_iFilesFound = 0;
 
-	if (lstrcmp(m_szSearchPattern, EMPTY_STRING) != 0 && m_bUseRegularExpressions)
+	if (lstrlen(m_szSearchPattern) != 0 && m_bUseRegularExpressions)
 	{
 		try
 		{
@@ -1068,7 +1068,7 @@ void Search::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 				BOOL bMatchAttributes = FALSE;
 
 				/* Only match against the filename if it's not empty. */
-				if (lstrcmp(m_szSearchPattern, EMPTY_STRING) != 0)
+				if (lstrlen(m_szSearchPattern) != 0)
 				{
 					if (m_bUseRegularExpressions)
 					{

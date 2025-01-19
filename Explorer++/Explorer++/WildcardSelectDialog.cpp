@@ -12,7 +12,6 @@
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -91,10 +90,9 @@ INT_PTR WildcardSelectDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 void WildcardSelectDialog::OnOk()
 {
 	TCHAR szPattern[512];
-
 	GetDlgItemText(m_hDlg, IDC_SELECTGROUP_COMBOBOX, szPattern, std::size(szPattern));
 
-	if (lstrcmp(szPattern, EMPTY_STRING) != 0)
+	if (lstrlen(szPattern) != 0)
 	{
 		SelectItems(szPattern);
 

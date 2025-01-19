@@ -453,7 +453,7 @@ LRESULT ShellBrowserImpl::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
 		QueueInfoTipTask(internalIndex, getInfoTip->pszText);
 	}
 
-	StringCchCopy(getInfoTip->pszText, getInfoTip->cchTextMax, EMPTY_STRING);
+	StringCchCopy(getInfoTip->pszText, getInfoTip->cchTextMax, L"");
 
 	return 0;
 }

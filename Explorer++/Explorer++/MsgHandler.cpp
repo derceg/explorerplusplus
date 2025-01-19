@@ -34,7 +34,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/RegistrySettings.h"
@@ -89,7 +88,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		}
 		else
 		{
-			OpenFileItem(pidlItem, EMPTY_STRING);
+			OpenFileItem(pidlItem, L"");
 		}
 	}
 	else if (WI_IsFlagSet(attributes, SFGAO_FOLDER))

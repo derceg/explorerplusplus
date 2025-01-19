@@ -21,7 +21,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
-#include "../Helper/Macros.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
@@ -579,7 +578,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 {
 	auto *ptbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
-	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, EMPTY_STRING);
+	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, L"");
 
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 

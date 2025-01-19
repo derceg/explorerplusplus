@@ -11,7 +11,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
@@ -177,11 +176,11 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
 	the folder is being loaded. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, 0, (LPARAM) loadingText.c_str());
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0, reinterpret_cast<LPARAM>(loadingText.c_str()));
 
 	/* Clear the text in all other parts of the status bar. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, 1, (LPARAM) EMPTY_STRING);
-	SendMessage(m_hStatusBar, SB_SETTEXT, 2, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1, reinterpret_cast<LPARAM>(L""));
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
 }
 
 void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab,

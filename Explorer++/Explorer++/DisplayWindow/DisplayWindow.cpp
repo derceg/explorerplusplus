@@ -22,7 +22,6 @@
 #include "DisplayWindow.h"
 #include "Config.h"
 #include "MainResource.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowSubclass.h"
 
 DisplayWindow *DisplayWindow::Create(HWND parent, const Config *config)
@@ -79,9 +78,8 @@ HWND DisplayWindow::CreateDisplayWindow(HWND parent)
 		classRegistered = true;
 	}
 
-	HWND displayWindow =
-		CreateWindow(WINDOW_NAME, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0, 0, 0, 0,
-			parent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND displayWindow = CreateWindow(WINDOW_NAME, L"", WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0,
+		0, 0, 0, parent, nullptr, GetModuleHandle(nullptr), nullptr);
 	CHECK(displayWindow);
 
 	return displayWindow;

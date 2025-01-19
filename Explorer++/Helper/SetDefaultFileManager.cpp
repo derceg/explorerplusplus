@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "SetDefaultFileManager.h"
 #include "Helper.h"
-#include "Macros.h"
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
 #include <wil/resource.h>
@@ -148,14 +147,14 @@ LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &ap
 LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 	DefaultFileManager::ReplaceExplorerMode replacementType, const std::wstring &applicationKeyName)
 {
-	const TCHAR *shellKeyPath = nullptr;
-	const TCHAR *defaultValue = nullptr;
+	std::wstring shellKeyPath;
+	std::wstring defaultValue;
 
 	switch (replacementType)
 	{
 	case DefaultFileManager::ReplaceExplorerMode::All:
 		shellKeyPath = KEY_FOLDER_SHELL;
-		defaultValue = EMPTY_STRING;
+		defaultValue = L"";
 		break;
 
 	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
@@ -167,7 +166,7 @@ LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 
 	// Remove the shell default value.
 	wil::unique_hkey shellKey;
-	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, shellKeyPath, 0, KEY_WRITE, &shellKey);
+	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, shellKeyPath.c_str(), 0, KEY_WRITE, &shellKey);
 
 	if (res != ERROR_SUCCESS)
 	{

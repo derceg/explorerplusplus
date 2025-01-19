@@ -17,7 +17,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
@@ -90,8 +89,8 @@ wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHe
 
 void ManageBookmarksDialog::CreateToolbar()
 {
-	m_toolbarParent = CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS,
-		0, 0, 0, 0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
+	m_toolbarParent = CreateWindow(WC_STATIC, L"", WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0, 0, 0,
+		0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_hToolbar = ::CreateToolbar(m_toolbarParent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

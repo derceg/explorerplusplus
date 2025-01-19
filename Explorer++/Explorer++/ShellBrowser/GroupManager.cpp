@@ -769,7 +769,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemNetwor
 	can be removed. */
 	UNREFERENCED_PARAMETER(itemInfo);
 
-	TCHAR szStatus[32] = EMPTY_STRING;
+	TCHAR szStatus[32] = L"";
 	IP_ADAPTER_ADDRESSES *pAdapterAddresses = nullptr;
 	UINT uStatusID = 0;
 	ULONG ulOutBufLen = 0;

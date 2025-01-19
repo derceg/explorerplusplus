@@ -15,11 +15,10 @@
 #include "TabBacking.h"
 #include "TabContainer.h"
 #include "ToolbarHelper.h"
-#include "../Helper/Macros.h"
 
 void Explorerplusplus::CreateTabBacking()
 {
-	m_hTabBacking = CreateWindow(WC_STATIC, EMPTY_STRING,
+	m_hTabBacking = CreateWindow(WC_STATIC, L"",
 		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | SS_NOTIFY, 0, 0, 0, 0,
 		m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
 

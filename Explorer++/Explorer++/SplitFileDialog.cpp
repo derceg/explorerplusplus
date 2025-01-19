@@ -209,7 +209,7 @@ INT_PTR SplitFileDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 				/* If an error is currently been shown, and it is
 				for the control this notification is been sent for,
 				hide the error message. */
-				SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, EMPTY_STRING);
+				SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, L"");
 
 				m_CurrentError = ErrorType::None;
 			}

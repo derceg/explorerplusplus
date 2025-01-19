@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Controls.h"
 #include "DpiCompatibility.h"
-#include "Macros.h"
 #include "WindowHelper.h"
 #include <glog/logging.h>
 #include <VSStyle.h>
@@ -23,7 +22,7 @@ constexpr int DEFAULT_RADIO_BUTTON_HEIGHT = 13;
 
 HWND CreateListView(HWND hParent, DWORD dwStyle)
 {
-	HWND hListView = CreateWindow(WC_LISTVIEW, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent, nullptr,
+	HWND hListView = CreateWindow(WC_LISTVIEW, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,
 		GetModuleHandle(nullptr), nullptr);
 
 	if (hListView != nullptr)
@@ -39,7 +38,7 @@ HWND CreateListView(HWND hParent, DWORD dwStyle)
 
 HWND CreateTreeView(HWND hParent, DWORD dwStyle)
 {
-	HWND hTreeView = CreateWindow(WC_TREEVIEW, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent, nullptr,
+	HWND hTreeView = CreateWindow(WC_TREEVIEW, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,
 		GetModuleHandle(nullptr), nullptr);
 
 	if (hTreeView != nullptr)
@@ -59,16 +58,16 @@ HWND CreateTreeView(HWND hParent, DWORD dwStyle)
 
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle)
 {
-	HWND hStatusBar = CreateWindow(STATUSCLASSNAME, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent,
-		nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hStatusBar = CreateWindow(STATUSCLASSNAME, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 
 	return hStatusBar;
 }
 
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
 {
-	HWND hToolbar = CreateWindow(TOOLBARCLASSNAME, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent,
-		nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hToolbar = CreateWindow(TOOLBARCLASSNAME, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 
 	if (hToolbar != nullptr)
 	{
@@ -81,16 +80,16 @@ HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
 
 HWND CreateComboBox(HWND parent, DWORD dwStyle)
 {
-	HWND hComboBox = CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX, EMPTY_STRING, dwStyle, 0, 0, 0,
-		200, parent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hComboBox = CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX, L"", dwStyle, 0, 0, 0, 200,
+		parent, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	return hComboBox;
 }
 
 HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 {
-	HWND hTabControl = CreateWindowEx(0, WC_TABCONTROL, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent,
-		nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hTabControl = CreateWindowEx(0, WC_TABCONTROL, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 
 	return hTabControl;
 }

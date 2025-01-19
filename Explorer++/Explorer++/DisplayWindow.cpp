@@ -39,7 +39,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 {
 	/* Clear out any previous data shown in the display window. */
 	DisplayWindow_ClearTextBuffer(m_displayWindow->GetHWND());
-	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), EMPTY_STRING, FALSE);
+	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), L"", FALSE);
 
 	std::wstring currentDirectory = tab.GetShellBrowserImpl()->GetDirectory();
 	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
@@ -312,7 +312,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 			}
 			else
 			{
-				DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), EMPTY_STRING, FALSE);
+				DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), L"", FALSE);
 			}
 		}
 		else
@@ -359,13 +359,13 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 {
-	TCHAR szNumSelected[64] = EMPTY_STRING;
-	TCHAR szTotalSize[64] = EMPTY_STRING;
+	TCHAR szNumSelected[64] = L"";
+	TCHAR szTotalSize[64] = L"";
 	TCHAR szMore[64];
 	TCHAR szTotalSizeString[64];
 	int nSelected;
 
-	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), EMPTY_STRING, FALSE);
+	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), L"", FALSE);
 
 	nSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 

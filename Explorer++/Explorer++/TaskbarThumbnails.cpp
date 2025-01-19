@@ -16,7 +16,6 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -192,8 +191,8 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 	ptp->taskbarThumbnails = this;
 	ptp->iTabId = iTabId;
 
-	HWND hTabProxy = CreateWindow(proxyClassName.c_str(), EMPTY_STRING, WS_OVERLAPPEDWINDOW, 0, 0,
-		0, 0, nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
+	HWND hTabProxy = CreateWindow(proxyClassName.c_str(), L"", WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
+		nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
 
 	if (!hTabProxy)
 	{
@@ -203,7 +202,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 	BOOL bValue = TRUE;
 	DwmSetWindowAttribute(hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue, sizeof(BOOL));
 	DwmSetWindowAttribute(hTabProxy, DWMWA_HAS_ICONIC_BITMAP, &bValue, sizeof(BOOL));
-	RegisterTab(hTabProxy, EMPTY_STRING, bSwitchToNewTab);
+	RegisterTab(hTabProxy, L"", bSwitchToNewTab);
 
 	TabProxyInfo tpi;
 	tpi.hProxy = hTabProxy;

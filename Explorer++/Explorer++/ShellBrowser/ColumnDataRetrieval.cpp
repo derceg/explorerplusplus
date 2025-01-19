@@ -179,7 +179,7 @@ std::wstring GetColumnText(ColumnType columnType, const BasicItemInfo_t &basicIt
 		break;
 	}
 
-	return EMPTY_STRING;
+	return L"";
 }
 
 std::wstring GetNameColumnText(const BasicItemInfo_t &itemInfo,
@@ -240,7 +240,7 @@ std::wstring GetTypeColumnText(const BasicItemInfo_t &itemInfo)
 
 	if (res == 0)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return shfi.szTypeName;
@@ -274,7 +274,7 @@ std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo,
 		}
 		else
 		{
-			return EMPTY_STRING;
+			return L"";
 		}
 	}
 
@@ -335,7 +335,7 @@ std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType timeTyp
 
 	if (!bRet)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return fileTime;
@@ -349,7 +349,7 @@ std::wstring GetRealSizeColumnText(const BasicItemInfo_t &itemInfo,
 
 	if (!res)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
@@ -429,7 +429,7 @@ std::wstring GetOwnerColumnText(const BasicItemInfo_t &itemInfo)
 
 	if (!ret)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return owner;
@@ -447,7 +447,7 @@ std::wstring GetItemDetailsColumnText(const BasicItemInfo_t &itemInfo, const SHC
 		return szDetail;
 	}
 
-	return EMPTY_STRING;
+	return L"";
 }
 
 HRESULT GetItemDetails(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail,
@@ -515,7 +515,7 @@ std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoTy
 
 	if (!versionInfoObtained)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return versionInfo;
@@ -529,7 +529,7 @@ std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo)
 
 	if (FAILED(hr))
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return resolvedLinkPath;
@@ -541,7 +541,7 @@ std::wstring GetHardLinksColumnText(const BasicItemInfo_t &itemInfo)
 
 	if (numHardLinks == -1)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	TCHAR numHardLinksString[32];
@@ -559,14 +559,14 @@ std::wstring GetExtensionColumnText(const BasicItemInfo_t &itemInfo)
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	TCHAR *extension = PathFindExtension(itemInfo.wfd.cFileName);
 
 	if (*extension != '.')
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return extension + 1;
@@ -580,7 +580,7 @@ std::wstring GetImageColumnText(const BasicItemInfo_t &itemInfo, PROPID Property
 
 	if (!res)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return imageProperty;
@@ -595,7 +595,7 @@ std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 
 	if (!isRoot)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	TCHAR fileSystemName[MAX_PATH];
@@ -604,7 +604,7 @@ std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 
 	if (!res)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	return fileSystemName;
@@ -626,7 +626,7 @@ std::wstring GetControlPanelCommentsColumnText(const BasicItemInfo_t &itemInfo)
 std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo,
 	PrinterInformationType printerInformationType)
 {
-	TCHAR printerInformation[256] = EMPTY_STRING;
+	TCHAR printerInformation[256] = L"";
 	TCHAR szStatus[256];
 
 	TCHAR itemDisplayName[MAX_PATH];
@@ -820,7 +820,7 @@ std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo,
 
 	if (!SUCCEEDED(hr))
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	TCHAR szOutput[512];
@@ -994,7 +994,7 @@ std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool Total
 
 	if (!res)
 	{
-		return EMPTY_STRING;
+		return L"";
 	}
 
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
