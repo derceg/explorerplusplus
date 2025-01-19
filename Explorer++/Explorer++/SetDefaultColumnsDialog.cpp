@@ -280,7 +280,7 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 		iItem++;
 	}
 
-	ListViewHelper::SelectItem(hListView, 0, TRUE);
+	ListViewHelper::SelectItem(hListView, 0, true);
 }
 
 std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType folderType)

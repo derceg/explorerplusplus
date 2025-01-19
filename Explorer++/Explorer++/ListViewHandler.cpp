@@ -482,12 +482,12 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 		if (bSimilarTypes)
 		{
-			ListViewHelper::SelectItem(ListView, i, TRUE);
+			ListViewHelper::SelectItem(ListView, i, true);
 			nSimilar++;
 		}
 		else
 		{
-			ListViewHelper::SelectItem(ListView, i, FALSE);
+			ListViewHelper::SelectItem(ListView, i, false);
 		}
 	}
 

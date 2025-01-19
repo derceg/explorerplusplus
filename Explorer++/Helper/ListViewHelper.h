@@ -12,13 +12,12 @@
 namespace ListViewHelper
 {
 
-void SelectItem(HWND hListView, int iItem, BOOL bSelect);
-void SelectAllItems(HWND hListView, BOOL bSelect);
-int InvertSelection(HWND hListView);
-void FocusItem(HWND hListView, int iItem, BOOL bFocus);
-void SetGridlines(HWND hListView, BOOL bEnableGridlines);
-BOOL SetAutoArrange(HWND hListView, BOOL bAutoArrange);
-void ActivateOneClickSelect(HWND hListView, BOOL bActivate, UINT uHoverTime);
+void SelectItem(HWND listView, int item, bool select);
+void SelectAllItems(HWND listView, bool select);
+void InvertSelection(HWND listView);
+void FocusItem(HWND listView, int item, bool focus);
+void SetAutoArrange(HWND listView, bool autoArrange);
+void ActivateOneClickSelect(HWND listView, bool activate, UINT hoverTime);
 void AddRemoveExtendedStyles(HWND listView, DWORD styles, bool add);
 void SwapItems(HWND listView, int item1, int item2);
 void PositionInsertMark(HWND hListView, const POINT *ppt);

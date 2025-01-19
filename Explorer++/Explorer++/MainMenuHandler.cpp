@@ -207,7 +207,7 @@ void Explorerplusplus::OnCreateNewFolder()
 	sink->SetPostNewItemObserver(
 		[this](PIDLIST_ABSOLUTE pidl)
 		{
-			ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
+			ListViewHelper::SelectAllItems(m_hActiveListView, false);
 			SetFocus(m_hActiveListView);
 
 			m_pActiveShellBrowser->QueueRename(pidl);

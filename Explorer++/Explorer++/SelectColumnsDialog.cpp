@@ -65,7 +65,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	ListView_SetColumnWidth(hListView, 0, LVSCW_AUTOSIZE);
 
-	ListViewHelper::SelectItem(hListView, 0, TRUE);
+	ListViewHelper::SelectItem(hListView, 0, true);
 	SetFocus(hListView);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);

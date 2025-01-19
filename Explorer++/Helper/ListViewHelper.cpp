@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "ListViewHelper.h"
-#include "Macros.h"
 #include "ScopedRedrawDisabler.h"
+#include "WindowHelper.h"
 #include <wil/common.h>
 
 namespace
@@ -84,180 +84,57 @@ bool DoAnyItemsContainText(HWND listView, const std::wstring &text,
 namespace ListViewHelper
 {
 
-void SelectItem(HWND hListView, int iItem, BOOL bSelect)
+void SelectItem(HWND listView, int item, bool select)
 {
-	UINT uNewState;
-
-	if (bSelect)
-	{
-		uNewState = LVIS_SELECTED;
-	}
-	else
-	{
-		uNewState = 0;
-	}
-
-	ListView_SetItemState(hListView, iItem, uNewState, LVIS_SELECTED);
+	UINT updatedState = select ? LVIS_SELECTED : 0;
+	ListView_SetItemState(listView, item, updatedState, LVIS_SELECTED);
 }
 
-void SelectAllItems(HWND hListView, BOOL bSelect)
+void SelectAllItems(HWND listView, bool select)
 {
-	UINT uNewState;
-
-	if (bSelect)
-	{
-		uNewState = LVIS_SELECTED;
-	}
-	else
-	{
-		uNewState = 0;
-	}
-
-	ScopedRedrawDisabler redrawDisabler(hListView);
-	ListView_SetItemState(hListView, -1, uNewState, LVIS_SELECTED);
+	ScopedRedrawDisabler redrawDisabler(listView);
+	UINT updatedState = select ? LVIS_SELECTED : 0;
+	ListView_SetItemState(listView, -1, updatedState, LVIS_SELECTED);
 }
 
-int InvertSelection(HWND hListView)
+void InvertSelection(HWND listView)
 {
-	int nTotalItems = ListView_GetItemCount(hListView);
+	int numItems = ListView_GetItemCount(listView);
 
-	int nSelected = 0;
+	ScopedRedrawDisabler redrawDisabler(listView);
 
-	ScopedRedrawDisabler redrawDisabler(hListView);
-
-	for (int i = 0; i < nTotalItems; i++)
+	for (int i = 0; i < numItems; i++)
 	{
-		if (ListView_GetItemState(hListView, i, LVIS_SELECTED) == LVIS_SELECTED)
+		if (ListView_GetItemState(listView, i, LVIS_SELECTED) == LVIS_SELECTED)
 		{
-			SelectItem(hListView, i, FALSE);
+			SelectItem(listView, i, false);
 		}
 		else
 		{
-			SelectItem(hListView, i, TRUE);
-			nSelected++;
+			SelectItem(listView, i, true);
 		}
 	}
-
-	return nSelected;
 }
 
-void FocusItem(HWND hListView, int iItem, BOOL bFocus)
+void FocusItem(HWND listView, int item, bool focus)
 {
-	UINT uNewState;
-
-	if (bFocus)
-	{
-		uNewState = LVIS_FOCUSED;
-	}
-	else
-	{
-		uNewState = 0;
-	}
-
-	ListView_SetItemState(hListView, iItem, uNewState, LVIS_FOCUSED);
+	UINT updatedState = focus ? LVIS_FOCUSED : 0;
+	ListView_SetItemState(listView, item, updatedState, LVIS_FOCUSED);
 }
 
-void SetGridlines(HWND hListView, BOOL bEnableGridlines)
+void SetAutoArrange(HWND listView, bool autoArrange)
 {
-	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
-
-	if (bEnableGridlines)
-	{
-		if ((dwExtendedStyle & LVS_EX_GRIDLINES) != LVS_EX_GRIDLINES)
-		{
-			dwExtendedStyle |= LVS_EX_GRIDLINES;
-		}
-	}
-	else
-	{
-		if ((dwExtendedStyle & LVS_EX_GRIDLINES) == LVS_EX_GRIDLINES)
-		{
-			dwExtendedStyle &= ~LVS_EX_GRIDLINES;
-		}
-	}
-
-	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
+	AddWindowStyles(listView, LVS_AUTOARRANGE, autoArrange);
 }
 
-BOOL SetAutoArrange(HWND hListView, BOOL bAutoArrange)
+void ActivateOneClickSelect(HWND listView, bool activate, UINT hoverTime)
 {
-	LONG_PTR lStyle = GetWindowLongPtr(hListView, GWL_STYLE);
+	AddRemoveExtendedStyles(listView,
+		LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT, activate);
 
-	if (lStyle == 0)
+	if (activate)
 	{
-		return FALSE;
-	}
-
-	if (bAutoArrange)
-	{
-		if ((lStyle & LVS_AUTOARRANGE) != LVS_AUTOARRANGE)
-		{
-			lStyle |= LVS_AUTOARRANGE;
-		}
-	}
-	else
-	{
-		if ((lStyle & LVS_AUTOARRANGE) == LVS_AUTOARRANGE)
-		{
-			lStyle &= ~LVS_AUTOARRANGE;
-		}
-	}
-
-	SetLastError(0);
-	LONG_PTR lRet = SetWindowLongPtr(hListView, GWL_STYLE, lStyle);
-
-	if (lRet == 0 && GetLastError() != 0)
-	{
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-void ActivateOneClickSelect(HWND hListView, BOOL bActivate, UINT uHoverTime)
-{
-	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
-
-	/* The three styles below are used to control one-click
-	selection. */
-	if (bActivate)
-	{
-		if ((dwExtendedStyle & LVS_EX_TRACKSELECT) != LVS_EX_TRACKSELECT)
-		{
-			dwExtendedStyle |= LVS_EX_TRACKSELECT;
-		}
-
-		if ((dwExtendedStyle & LVS_EX_ONECLICKACTIVATE) != LVS_EX_ONECLICKACTIVATE)
-		{
-			dwExtendedStyle |= LVS_EX_ONECLICKACTIVATE;
-		}
-
-		if ((dwExtendedStyle & LVS_EX_UNDERLINEHOT) != LVS_EX_UNDERLINEHOT)
-		{
-			dwExtendedStyle |= LVS_EX_UNDERLINEHOT;
-		}
-
-		ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
-		ListView_SetHoverTime(hListView, uHoverTime);
-	}
-	else
-	{
-		if ((dwExtendedStyle & LVS_EX_TRACKSELECT) == LVS_EX_TRACKSELECT)
-		{
-			dwExtendedStyle &= ~LVS_EX_TRACKSELECT;
-		}
-
-		if ((dwExtendedStyle & LVS_EX_ONECLICKACTIVATE) == LVS_EX_ONECLICKACTIVATE)
-		{
-			dwExtendedStyle &= ~LVS_EX_ONECLICKACTIVATE;
-		}
-
-		if ((dwExtendedStyle & LVS_EX_UNDERLINEHOT) == LVS_EX_UNDERLINEHOT)
-		{
-			dwExtendedStyle &= ~LVS_EX_UNDERLINEHOT;
-		}
-
-		ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
+		ListView_SetHoverTime(listView, hoverTime);
 	}
 }
 

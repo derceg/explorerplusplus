@@ -335,7 +335,7 @@ INT_PTR StartupOptionsPage::OnListViewKeyDown(const NMLVKEYDOWN *keyDown)
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			ListViewHelper::SelectAllItems(GetDlgItem(GetDialog(), IDC_STARTUP_CUSTOM_FOLDERS_LIST),
-				TRUE);
+				true);
 			return TRUE;
 		}
 		break;

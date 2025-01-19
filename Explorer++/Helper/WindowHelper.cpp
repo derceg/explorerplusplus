@@ -75,12 +75,10 @@ std::wstring GetWindowString(HWND hwnd)
 	std::wstring text;
 	text.resize(textLength);
 
-	GetWindowText(hwnd, text.data(), textLength);
+	int copiedTextLength = GetWindowText(hwnd, text.data(), textLength);
 
-	// GetWindowText will copy the entire string, along with the terminating NULL. If the buffer
-	// weren't reduced in size here, the terminating NULL would then end up as part of the actual
-	// string, which is undesirable.
-	text.resize(textLength - 1);
+	// The returned string shouldn't include the terminating NULL character.
+	text.resize(copiedTextLength);
 
 	return text;
 }
@@ -101,37 +99,28 @@ BOOL lShowWindow(HWND hwnd, BOOL bShowWindow)
 	return ShowWindow(hwnd, windowShowState);
 }
 
-BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
+void AddWindowStyles(HWND hwnd, LONG_PTR styles, bool add)
 {
-	LONG_PTR fCurrentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
+	LONG_PTR currentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
 
-	if (fCurrentStyle == 0)
+	if (currentStyle == 0)
 	{
-		return FALSE;
+		DCHECK(false);
+		return;
 	}
 
-	if (bAdd)
+	if (add)
 	{
-		/* Only add the style if it isn't already present. */
-		if ((fCurrentStyle & fStyle) != fStyle)
-		{
-			fCurrentStyle |= fStyle;
-		}
+		WI_SetAllFlags(currentStyle, styles);
 	}
 	else
 	{
-		/* Only remove the style if it is present. */
-		if ((fCurrentStyle & fStyle) == fStyle)
-		{
-			fCurrentStyle &= ~static_cast<LONG_PTR>(fStyle);
-		}
+		WI_ClearAllFlags(currentStyle, styles);
 	}
 
-	/* See the documentation for SetWindowLongPtr
-	for an explanation of why this is necessary. */
 	SetLastError(0);
-	LONG_PTR lRet = SetWindowLongPtr(hwnd, GWL_STYLE, fCurrentStyle);
-	return (lRet == 0) && (GetLastError() != 0);
+	LONG_PTR res = SetWindowLongPtr(hwnd, GWL_STYLE, currentStyle);
+	DCHECK(!(res == 0 && GetLastError() != 0));
 }
 
 int GetRectHeight(const RECT *rc)

@@ -192,7 +192,8 @@ void ShellBrowserImpl::InitializeListView()
 	ListView_SetExtendedListViewStyle(m_hListView, dwExtendedStyle);
 
 	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines.get());
+	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_GRIDLINES,
+		m_config->globalFolderSettings.showGridlines.get());
 
 	m_connections.push_back(m_config->globalFolderSettings.showGridlines.addObserver(
 		std::bind_front(&ShellBrowserImpl::OnShowGridlinesUpdated, this)));
@@ -590,7 +591,7 @@ unique_pidl_absolute ShellBrowserImpl::GetDirectoryIdl() const
 
 void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 {
-	ListViewHelper::SelectAllItems(m_hListView, FALSE);
+	ListViewHelper::SelectAllItems(m_hListView, false);
 
 	int smallestIndex = INT_MAX;
 
@@ -604,7 +605,7 @@ void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 			continue;
 		}
 
-		ListViewHelper::SelectItem(m_hListView, *index, TRUE);
+		ListViewHelper::SelectItem(m_hListView, *index, true);
 
 		if (*index < smallestIndex)
 		{
@@ -614,7 +615,7 @@ void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 
 	if (smallestIndex != INT_MAX)
 	{
-		ListViewHelper::FocusItem(m_hListView, smallestIndex, TRUE);
+		ListViewHelper::FocusItem(m_hListView, smallestIndex, true);
 		ListView_EnsureVisible(m_hListView, smallestIndex, FALSE);
 	}
 }

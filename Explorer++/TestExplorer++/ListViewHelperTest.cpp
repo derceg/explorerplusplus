@@ -142,6 +142,37 @@ TEST_F(ListViewHelperTest, GetSelectedItems)
 	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(0, 1));
 }
 
+TEST_F(ListViewHelperTest, SelectAllItems)
+{
+	ListViewHelper::SelectAllItems(m_listView.get(), true);
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(0, 1, 2));
+
+	ListViewHelper::SelectAllItems(m_listView.get(), false);
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), IsEmpty());
+}
+
+TEST_F(ListViewHelperTest, InvertSelection)
+{
+	ListViewHelper::SelectItem(m_listView.get(), 1, true);
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(1));
+
+	ListViewHelper::InvertSelection(m_listView.get());
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(0, 2));
+
+	ListViewHelper::InvertSelection(m_listView.get());
+	EXPECT_THAT(ListViewHelper::GetSelectedItems(m_listView.get()), ElementsAre(1));
+}
+
+TEST_F(ListViewHelperTest, FocusItem)
+{
+	ListViewHelper::FocusItem(m_listView.get(), 1, true);
+	EXPECT_EQ(ListView_GetItemState(m_listView.get(), 1, LVIS_FOCUSED),
+		static_cast<UINT>(LVIS_FOCUSED));
+
+	ListViewHelper::FocusItem(m_listView.get(), 1, false);
+	EXPECT_EQ(ListView_GetItemState(m_listView.get(), 1, LVIS_FOCUSED), 0u);
+}
+
 class DoesListViewContainTextTest : public ListViewHelperTest
 {
 protected:

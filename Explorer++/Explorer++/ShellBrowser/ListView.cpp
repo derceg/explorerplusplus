@@ -306,9 +306,9 @@ void ShellBrowserImpl::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, 
 		if (itemAtPoint != -1
 			&& ListView_GetItemState(m_hListView, itemAtPoint, LVIS_SELECTED) != LVIS_SELECTED)
 		{
-			ListViewHelper::SelectAllItems(m_hListView, FALSE);
-			ListViewHelper::FocusItem(m_hListView, itemAtPoint, TRUE);
-			ListViewHelper::SelectItem(m_hListView, itemAtPoint, TRUE);
+			ListViewHelper::SelectAllItems(m_hListView, false);
+			ListViewHelper::FocusItem(m_hListView, itemAtPoint, true);
+			ListViewHelper::SelectItem(m_hListView, itemAtPoint, true);
 		}
 	}
 }
@@ -679,7 +679,7 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'A':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			ListViewHelper::SelectAllItems(m_hListView, TRUE);
+			ListViewHelper::SelectAllItems(m_hListView, true);
 			SetFocus(m_hListView);
 		}
 		break;
@@ -1351,7 +1351,7 @@ void ShellBrowserImpl::OnCheckBoxSelectionUpdated(BOOL newValue)
 
 void ShellBrowserImpl::OnShowGridlinesUpdated(BOOL newValue)
 {
-	ListViewHelper::SetGridlines(m_hListView, newValue);
+	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_GRIDLINES, newValue);
 }
 
 void ShellBrowserImpl::OnOneClickActivateUpdated(BOOL newValue)

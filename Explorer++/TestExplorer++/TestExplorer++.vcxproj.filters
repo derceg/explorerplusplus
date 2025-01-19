@@ -352,6 +352,9 @@
     <ClCompile Include="ScopedRedrawDisablerTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="WindowHelperTest.cpp">
+      <Filter>Helper\Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

@@ -421,7 +421,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_EDIT_SELECTALL:
-		ListViewHelper::SelectAllItems(m_hActiveListView, TRUE);
+		ListViewHelper::SelectAllItems(m_hActiveListView, true);
 		SetFocus(m_hActiveListView);
 		break;
 
@@ -436,7 +436,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_EDIT_SELECTNONE:
-		ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
+		ListViewHelper::SelectAllItems(m_hActiveListView, false);
 		SetFocus(m_hActiveListView);
 		break;
 

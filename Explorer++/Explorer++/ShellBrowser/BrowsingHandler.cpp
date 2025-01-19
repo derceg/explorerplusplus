@@ -585,7 +585,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, FALSE);
+		ListViewHelper::SetAutoArrange(m_hListView, false);
 	}
 
 	int nAdded = 0;
@@ -674,13 +674,13 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 		if (selectItr != m_directoryState.filesToSelect.end())
 		{
-			ListViewHelper::SelectItem(m_hListView, iItemIndex, TRUE);
+			ListViewHelper::SelectItem(m_hListView, iItemIndex, true);
 
 			int selectedCount = ListView_GetSelectedCount(m_hListView);
 
 			if (selectedCount == 1)
 			{
-				ListViewHelper::FocusItem(m_hListView, iItemIndex, TRUE);
+				ListViewHelper::FocusItem(m_hListView, iItemIndex, true);
 				ListView_EnsureVisible(m_hListView, iItemIndex, FALSE);
 			}
 
@@ -707,7 +707,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, TRUE);
+		ListViewHelper::SetAutoArrange(m_hListView, true);
 	}
 
 	m_directoryState.numItems = nPrevItems + nAdded;

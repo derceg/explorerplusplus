@@ -133,7 +133,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 	off, move the items, and the turn it back on. */
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, FALSE);
+		ListViewHelper::SetAutoArrange(m_hListView, false);
 	}
 
 	for (const auto &pidl : m_draggedItems)
@@ -346,7 +346,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, TRUE);
+		ListViewHelper::SetAutoArrange(m_hListView, true);
 	}
 
 	m_performingDrag = false;
