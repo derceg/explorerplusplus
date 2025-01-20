@@ -11,7 +11,6 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -318,7 +317,7 @@ void MergeFilesDialog::OnOk()
 
 		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, 0, 0);
 
-		GetDlgItemText(m_hDlg, IDOK, m_szOk, SIZEOF_ARRAY(m_szOk));
+		GetDlgItemText(m_hDlg, IDOK, m_szOk, static_cast<int>(std::size(m_szOk)));
 
 		auto cancelText = ResourceHelper::LoadString(GetResourceInstance(), IDS_CANCEL);
 		SetDlgItemText(m_hDlg, IDOK, cancelText.c_str());

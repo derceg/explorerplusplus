@@ -10,7 +10,6 @@
 #include "ResourceHelper.h"
 #include "SortModes.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -366,7 +365,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemSizeGr
 	int currentIndex = 0;
 
 	while (fileSize.QuadPart > sizeGroups[currentIndex].upperLimit
-		&& currentIndex < (SIZEOF_ARRAY(sizeGroups) - 1))
+		&& currentIndex < (std::size(sizeGroups) - 1))
 	{
 		currentIndex++;
 	}
@@ -402,7 +401,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemTotalS
 	SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative, SHGDN_FORPARSING, &str);
-	StrRetToBuf(&str, pidlRelative, szItem, SIZEOF_ARRAY(szItem));
+	StrRetToBuf(&str, pidlRelative, szItem, std::size(szItem));
 
 	bRoot = PathIsRoot(szItem);
 
@@ -412,7 +411,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemTotalS
 
 		pShellFolder->Release();
 
-		i = SIZEOF_ARRAY(sizeGroups) - 1;
+		i = std::size(sizeGroups) - 1;
 
 		while (nTotalBytes.QuadPart < totalSizeGroupLimits[i].QuadPart && i > 0)
 		{
@@ -596,7 +595,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemSummar
 {
 	TCHAR szDetail[512];
 	HRESULT hr =
-		GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail), globalFolderSettings);
+		GetItemDetails(itemInfo, pscid, szDetail, std::size(szDetail), globalFolderSettings);
 
 	if (SUCCEEDED(hr) && lstrlen(szDetail) > 0)
 	{
@@ -625,7 +624,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemFreeSp
 	SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative, SHGDN_FORPARSING, &str);
-	StrRetToBuf(&str, pidlRelative, szItem, SIZEOF_ARRAY(szItem));
+	StrRetToBuf(&str, pidlRelative, szItem, std::size(szItem));
 
 	pShellFolder->Release();
 
@@ -643,7 +642,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemFreeSp
 
 		/* Divide by 10 to remove the one's digit, then multiply
 		by 10 so that only the ten's digit rmains. */
-		StringCchPrintf(szFreeSpace, SIZEOF_ARRAY(szFreeSpace), _T("%I64d%% free"),
+		StringCchPrintf(szFreeSpace, std::size(szFreeSpace), _T("%I64d%% free"),
 			(((nFreeBytes.QuadPart * lDiv1.QuadPart) / nTotalBytes.QuadPart) / lDiv2.QuadPart)
 				* lDiv2.QuadPart);
 	}
@@ -750,7 +749,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemFileSy
 
 	TCHAR fileSystemName[MAX_PATH];
 	BOOL res = GetVolumeInformation(fullPath.c_str(), nullptr, 0, nullptr, nullptr, nullptr,
-		fileSystemName, SIZEOF_ARRAY(fileSystemName));
+		fileSystemName, std::size(fileSystemName));
 
 	if (!res)
 	{
@@ -812,7 +811,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemNetwor
 			break;
 	}*/
 
-	LoadString(m_resourceInstance, uStatusID, szStatus, SIZEOF_ARRAY(szStatus));
+	LoadString(m_resourceInstance, uStatusID, szStatus, std::size(szStatus));
 
 	return GroupInfo(szStatus);
 }

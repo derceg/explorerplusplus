@@ -11,7 +11,6 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <wil/com.h>
@@ -314,18 +313,18 @@ std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType timeTyp
 	switch (timeType)
 	{
 	case TimeType::Modified:
-		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastWriteTime, fileTime, SIZEOF_ARRAY(fileTime),
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastWriteTime, fileTime, std::size(fileTime),
 			globalFolderSettings.showFriendlyDates);
 		break;
 
 	case TimeType::Created:
-		bRet = CreateFileTimeString(&itemInfo.wfd.ftCreationTime, fileTime, SIZEOF_ARRAY(fileTime),
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftCreationTime, fileTime, std::size(fileTime),
 			globalFolderSettings.showFriendlyDates);
 		break;
 
 	case TimeType::Accessed:
-		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastAccessTime, fileTime,
-			SIZEOF_ARRAY(fileTime), globalFolderSettings.showFriendlyDates);
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastAccessTime, fileTime, std::size(fileTime),
+			globalFolderSettings.showFriendlyDates);
 		break;
 
 	default:
@@ -365,7 +364,7 @@ bool GetRealSizeColumnRawData(const BasicItemInfo_t &itemInfo, ULARGE_INTEGER &R
 	}
 
 	TCHAR root[MAX_PATH];
-	StringCchCopy(root, SIZEOF_ARRAY(root), itemInfo.getFullPath().c_str());
+	StringCchCopy(root, std::size(root), itemInfo.getFullPath().c_str());
 	PathStripToRoot(root);
 
 	DWORD dwClusterSize;
@@ -425,7 +424,7 @@ std::wstring GetShortNameColumnText(const BasicItemInfo_t &itemInfo)
 std::wstring GetOwnerColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR owner[512];
-	BOOL ret = GetFileOwner(itemInfo.getFullPath().c_str(), owner, SIZEOF_ARRAY(owner));
+	BOOL ret = GetFileOwner(itemInfo.getFullPath().c_str(), owner, std::size(owner));
 
 	if (!ret)
 	{
@@ -440,7 +439,7 @@ std::wstring GetItemDetailsColumnText(const BasicItemInfo_t &itemInfo, const SHC
 {
 	TCHAR szDetail[512];
 	HRESULT hr =
-		GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail), globalFolderSettings);
+		GetItemDetails(itemInfo, pscid, szDetail, std::size(szDetail), globalFolderSettings);
 
 	if (SUCCEEDED(hr))
 	{
@@ -511,7 +510,7 @@ std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoTy
 
 	TCHAR versionInfo[512];
 	BOOL versionInfoObtained = GetVersionInfoString(itemInfo.getFullPath().c_str(),
-		versionInfoName.c_str(), versionInfo, SIZEOF_ARRAY(versionInfo));
+		versionInfoName.c_str(), versionInfo, std::size(versionInfo));
 
 	if (!versionInfoObtained)
 	{
@@ -525,7 +524,7 @@ std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR resolvedLinkPath[MAX_PATH];
 	HRESULT hr = FileOperations::ResolveLink(nullptr, SLR_NO_UI, itemInfo.getFullPath().c_str(),
-		resolvedLinkPath, SIZEOF_ARRAY(resolvedLinkPath));
+		resolvedLinkPath, std::size(resolvedLinkPath));
 
 	if (FAILED(hr))
 	{
@@ -545,7 +544,7 @@ std::wstring GetHardLinksColumnText(const BasicItemInfo_t &itemInfo)
 	}
 
 	TCHAR numHardLinksString[32];
-	StringCchPrintf(numHardLinksString, SIZEOF_ARRAY(numHardLinksString), _T("%ld"), numHardLinks);
+	StringCchPrintf(numHardLinksString, std::size(numHardLinksString), _T("%ld"), numHardLinks);
 
 	return numHardLinksString;
 }
@@ -576,7 +575,7 @@ std::wstring GetImageColumnText(const BasicItemInfo_t &itemInfo, PROPID Property
 {
 	TCHAR imageProperty[512];
 	BOOL res = ReadImageProperty(itemInfo.getFullPath().c_str(), PropertyID, imageProperty,
-		SIZEOF_ARRAY(imageProperty));
+		std::size(imageProperty));
 
 	if (!res)
 	{
@@ -600,7 +599,7 @@ std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 
 	TCHAR fileSystemName[MAX_PATH];
 	BOOL res = GetVolumeInformation(fullFileName.c_str(), nullptr, 0, nullptr, nullptr, nullptr,
-		fileSystemName, SIZEOF_ARRAY(fileSystemName));
+		fileSystemName, std::size(fileSystemName));
 
 	if (!res)
 	{
@@ -630,7 +629,7 @@ std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo,
 	TCHAR szStatus[256];
 
 	TCHAR itemDisplayName[MAX_PATH];
-	StringCchCopy(itemDisplayName, SIZEOF_ARRAY(itemDisplayName), itemInfo.szDisplayName);
+	StringCchCopy(itemDisplayName, std::size(itemDisplayName), itemInfo.szDisplayName);
 
 	HANDLE hPrinter;
 	BOOL res = OpenPrinter(itemDisplayName, &hPrinter, nullptr);
@@ -649,33 +648,33 @@ std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo,
 			switch (printerInformationType)
 			{
 			case PrinterInformationType::NumJobs:
-				StringCchPrintf(printerInformation, SIZEOF_ARRAY(printerInformation), _T("%d"),
+				StringCchPrintf(printerInformation, std::size(printerInformation), _T("%d"),
 					printerInfo2->cJobs);
 				break;
 
 			case PrinterInformationType::Status:
 				res = GetPrinterStatusDescription(printerInfo2->Status, szStatus,
-					SIZEOF_ARRAY(szStatus));
+					std::size(szStatus));
 
 				if (res)
 				{
-					StringCchCopyEx(printerInformation, SIZEOF_ARRAY(printerInformation), szStatus,
+					StringCchCopyEx(printerInformation, std::size(printerInformation), szStatus,
 						nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				}
 				break;
 
 			case PrinterInformationType::Comments:
-				StringCchCopyEx(printerInformation, SIZEOF_ARRAY(printerInformation),
+				StringCchCopyEx(printerInformation, std::size(printerInformation),
 					printerInfo2->pComment, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				break;
 
 			case PrinterInformationType::Location:
-				StringCchCopyEx(printerInformation, SIZEOF_ARRAY(printerInformation),
+				StringCchCopyEx(printerInformation, std::size(printerInformation),
 					printerInfo2->pLocation, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				break;
 
 			case PrinterInformationType::Model:
-				StringCchCopyEx(printerInformation, SIZEOF_ARRAY(printerInformation),
+				StringCchCopyEx(printerInformation, std::size(printerInformation),
 					printerInfo2->pDriverName, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				break;
 
@@ -833,11 +832,11 @@ std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo,
 
 		if (bitRate > 1000)
 		{
-			StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), _T("%d kbps"), bitRate / 1000);
+			StringCchPrintf(szOutput, std::size(szOutput), _T("%d kbps"), bitRate / 1000);
 		}
 		else
 		{
-			StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), _T("%d bps"), bitRate);
+			StringCchPrintf(szOutput, std::size(szOutput), _T("%d bps"), bitRate);
 		}
 	}
 	break;

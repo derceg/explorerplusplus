@@ -21,7 +21,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 #include <wil/common.h>
@@ -528,7 +527,7 @@ std::optional<ShellBrowserImpl::InfoTipResult> ShellBrowserImpl::GetInfoTipAsync
 		TCHAR fileModificationText[256];
 		BOOL fileTimeResult =
 			CreateFileTimeString(&basicItemInfo.wfd.ftLastWriteTime, fileModificationText,
-				SIZEOF_ARRAY(fileModificationText), config.globalFolderSettings.showFriendlyDates);
+				std::size(fileModificationText), config.globalFolderSettings.showFriendlyDates);
 
 		if (!fileTimeResult)
 		{

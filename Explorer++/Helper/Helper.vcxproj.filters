@@ -264,9 +264,6 @@
     <ClInclude Include="DialogSettings.h">
       <Filter>Dialog Support</Filter>
     </ClInclude>
-    <ClInclude Include="Macros.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
     <ClInclude Include="MenuHelper.h">
       <Filter>Control Support</Filter>
     </ClInclude>

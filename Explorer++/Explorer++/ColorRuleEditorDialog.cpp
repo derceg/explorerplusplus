@@ -8,7 +8,6 @@
 #include "ColorRuleModel.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -276,7 +275,7 @@ LRESULT ColorRuleEditorDialog::StaticColorControlProc(HWND hwnd, UINT msg, WPARA
 ColorRuleEditorDialogPersistentSettings::ColorRuleEditorDialogPersistentSettings() :
 	DialogSettings(SETTINGS_KEY)
 {
-	for (int i = 0; i < SIZEOF_ARRAY(m_customColors); i++)
+	for (size_t i = 0; i < std::size(m_customColors); i++)
 	{
 		m_customColors[i] = RGB(255, 255, 255);
 	}
@@ -306,15 +305,15 @@ void ColorRuleEditorDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocume
 {
 	TCHAR szNode[32];
 
-	for (int i = 0; i < SIZEOF_ARRAY(m_customColors); i++)
+	for (size_t i = 0; i < std::size(m_customColors); i++)
 	{
-		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("r%d"), i);
+		StringCchPrintf(szNode, std::size(szNode), _T("r%d"), i);
 		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
 			XMLSettings::EncodeIntValue(GetRValue(m_customColors[i])));
-		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("g%d"), i);
+		StringCchPrintf(szNode, std::size(szNode), _T("g%d"), i);
 		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
 			XMLSettings::EncodeIntValue(GetGValue(m_customColors[i])));
-		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("b%d"), i);
+		StringCchPrintf(szNode, std::size(szNode), _T("b%d"), i);
 		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
 			XMLSettings::EncodeIntValue(GetBValue(m_customColors[i])));
 	}

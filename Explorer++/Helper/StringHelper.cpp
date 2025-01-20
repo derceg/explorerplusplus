@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "StringHelper.h"
-#include "Macros.h"
 #include <codecvt>
 
 BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString,
@@ -61,7 +60,7 @@ std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat
 			sizeIndex++;
 		}
 
-		if (sizeIndex > (SIZEOF_ARRAY(SIZE_STRINGS) - 1))
+		if (sizeIndex > (std::size(SIZE_STRINGS) - 1))
 		{
 			return {};
 		}
@@ -214,11 +213,11 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 			{
 				TCHAR szCharacter1[1];
 				LCMapString(LOCALE_USER_DEFAULT, LCMAP_LOWERCASE, szWildcard, 1, szCharacter1,
-					SIZEOF_ARRAY(szCharacter1));
+					std::size(szCharacter1));
 
 				TCHAR szCharacter2[1];
 				LCMapString(LOCALE_USER_DEFAULT, LCMAP_LOWERCASE, szString, 1, szCharacter2,
-					SIZEOF_ARRAY(szCharacter2));
+					std::size(szCharacter2));
 
 				bCurrentMatch = (szCharacter1[0] == szCharacter2[0]);
 			}
@@ -269,14 +268,14 @@ void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput, UINT
 	{
 		if (szBaseString[i] == chToReplace)
 		{
-			StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString), &szBaseString[iBase], i - iBase);
-			StringCchCat(szNewString, SIZEOF_ARRAY(szNewString), szReplacement);
+			StringCchCatN(szNewString, std::size(szNewString), &szBaseString[iBase], i - iBase);
+			StringCchCat(szNewString, std::size(szNewString), szReplacement);
 
 			iBase = i + 1;
 		}
 	}
 
-	StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString), &szBaseString[iBase], i - iBase);
+	StringCchCatN(szNewString, std::size(szNewString), &szBaseString[iBase], i - iBase);
 
 	StringCchCopy(szOutput, cchMax, szNewString);
 }

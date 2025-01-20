@@ -17,7 +17,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
@@ -217,7 +216,7 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		auto title = ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCHDIALOG_TITLE);
 
-		GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szDirectory, SIZEOF_ARRAY(szDirectory));
+		GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szDirectory, std::size(szDirectory));
 
 		bi.hwndOwner = m_hDlg;
 		bi.pidlRoot = nullptr;
@@ -294,9 +293,9 @@ void SearchDialog::StartSearching()
 
 	/* Get the directory and name, and remove leading and
 	trailing whitespace. */
-	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szBaseDirectory, SIZEOF_ARRAY(szBaseDirectory));
+	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szBaseDirectory, std::size(szBaseDirectory));
 	PathRemoveBlanks(szBaseDirectory);
-	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPattern, SIZEOF_ARRAY(szSearchPattern));
+	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPattern, std::size(szSearchPattern));
 	PathRemoveBlanks(szSearchPattern);
 
 	BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg, IDC_CHECK_SEARCHSUBFOLDERS) == BST_CHECKED;
@@ -314,7 +313,7 @@ void SearchDialog::StartSearching()
 		{
 			TCHAR szTemp[MAX_PATH];
 
-			StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("*%s*"), szSearchPattern);
+			StringCchPrintf(szTemp, std::size(szTemp), _T("*%s*"), szSearchPattern);
 			StringCchCopy(szSearchPattern, std::size(szSearchPattern), szTemp);
 		}
 	}
@@ -374,7 +373,8 @@ void SearchDialog::StartSearching()
 		SaveEntry(IDC_COMBO_NAME, m_persistentSettings->m_searchPatterns);
 	}
 
-	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton, SIZEOF_ARRAY(m_szSearchButton));
+	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton,
+		static_cast<int>(std::size(m_szSearchButton)));
 
 	auto stopText = ResourceHelper::LoadString(GetResourceInstance(), IDS_STOP);
 	SetDlgItemText(m_hDlg, IDSEARCH, stopText.c_str());
@@ -390,7 +390,7 @@ void SearchDialog::StartSearching()
 void SearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring> &buffer)
 {
 	TCHAR entry[MAX_PATH];
-	GetDlgItemText(m_hDlg, comboBoxId, entry, SIZEOF_ARRAY(entry));
+	GetDlgItemText(m_hDlg, comboBoxId, entry, std::size(entry));
 
 	std::wstring strEntry(entry);
 	auto itr = std::find_if(buffer.begin(), buffer.end(),
@@ -805,8 +805,8 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			TCHAR szTemp[128];
 			LoadString(GetResourceInstance(), IDS_SEARCH_FINISHED_MESSAGE, szTemp,
-				SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, iFoldersFound, iFilesFound);
+				std::size(szTemp));
+			StringCchPrintf(szStatus, std::size(szStatus), szTemp, iFoldersFound, iFilesFound);
 			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szStatus);
 		}
 		else
@@ -835,8 +835,8 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		pszDirectory = reinterpret_cast<TCHAR *>(wParam);
 
 		TCHAR szTemp[64];
-		LoadString(GetResourceInstance(), IDS_SEARCHING, szTemp, SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, pszDirectory);
+		LoadString(GetResourceInstance(), IDS_SEARCHING, szTemp, std::size(szTemp));
+		StringCchPrintf(szStatus, std::size(szStatus), szTemp, pszDirectory);
 		SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szStatus);
 	}
 	break;

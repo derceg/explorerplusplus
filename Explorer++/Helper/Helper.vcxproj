@@ -766,7 +766,6 @@
     <ClInclude Include="EnumFormatEtcImpl.h" />
     <ClInclude Include="ImageHelper.h" />
     <ClInclude Include="ListViewHelper.h" />
-    <ClInclude Include="Macros.h" />
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />
     <ClInclude Include="MovableModel.h" />
