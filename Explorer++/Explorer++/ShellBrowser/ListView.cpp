@@ -129,10 +129,6 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
 		break;
-
-	case WM_APP_PENDING_TASK_AVAILABLE:
-		OnPendingTaskAvailableMessage();
-		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);

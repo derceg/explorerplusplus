@@ -76,6 +76,8 @@ private:
 	// various components in the application.
 	static constexpr int MAX_CACHED_ICONS = 1000;
 
+	static constexpr int MIN_COM_STA_THREADPOOL_SIZE = 5;
+
 	void OnBrowserRemoved();
 	void SetUpSession();
 	void LoadSettings(std::vector<WindowStorageData> &windows);

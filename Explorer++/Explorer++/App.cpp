@@ -36,7 +36,9 @@ using namespace std::chrono_literals;
 
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
-	m_runtime(std::make_unique<UIThreadExecutor>(), std::make_unique<ComStaThreadPoolExecutor>(1)),
+	m_runtime(std::make_unique<UIThreadExecutor>(),
+		std::make_unique<ComStaThreadPoolExecutor>(std::max(
+			static_cast<int>(std::thread::hardware_concurrency()), MIN_COM_STA_THREADPOOL_SIZE))),
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(std::make_shared<CachedIcons>(MAX_CACHED_ICONS)),

@@ -1356,33 +1356,6 @@ void ShellBrowserImpl::OnInternalPaste(const ClipboardOperations::PastedItems &p
 	SelectItems(pidls);
 }
 
-void ShellBrowserImpl::AddTaskToPendingWorkQueue(PendingWorkQueueTask task)
-{
-	m_directoryState.pendingWorkQueue.push_back(task);
-
-	PostMessage(m_hListView, WM_APP_PENDING_TASK_AVAILABLE, 0, 0);
-}
-
-void ShellBrowserImpl::OnPendingTaskAvailableMessage()
-{
-	int originalFolderId = m_uniqueFolderId;
-
-	for (auto task : m_directoryState.pendingWorkQueue)
-	{
-		task();
-
-		if (m_uniqueFolderId != originalFolderId)
-		{
-			// The task navigated to a different folder. At this point, m_directoryState has been
-			// invalidated, so it's not safe to continue and there's nothing else that needs to be
-			// done.
-			return;
-		}
-	}
-
-	m_directoryState.pendingWorkQueue.clear();
-}
-
 void ShellBrowserImpl::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 {
 	m_helpers.push_back(std::move(helper));

@@ -169,3 +169,9 @@ HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_ab
 // in the upper 8 bits of the SHFILEINFO::iIcon member. This function will split the iIcon value
 // back out into it's constituent parts - the icon index and overlay index.
 ShellIconInfo ExtractShellIconParts(int iconIndexAndOverlay);
+
+// Traverses up from the current item, to find the first item that exists (which might be the item
+// itself).
+PidlAbsolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl);
+
+bool DoesItemExist(PCIDLIST_ABSOLUTE pidl);

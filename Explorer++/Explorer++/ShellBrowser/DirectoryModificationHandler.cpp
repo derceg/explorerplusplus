@@ -4,8 +4,11 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "App.h"
 #include "Config.h"
 #include "ItemData.h"
+#include "Runtime.h"
+#include "RuntimeHelper.h"
 #include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
@@ -83,8 +86,8 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		}
 		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
 		{
-			AddTaskToPendingWorkQueue([this, simplePidlUpdated = PidlAbsolute(change.pidl2.get())]()
-				{ OnCurrentDirectoryRenamed(simplePidlUpdated.Raw()); });
+			OnCurrentDirectoryRenamed(weak_from_this(), change.pidl2.get(), m_app->GetRuntime(),
+				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
 
@@ -100,19 +103,19 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		{
 			// It's not safe to perform an immediate refresh here, since doing so would clear
 			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
-			// through. A pending task is created instead, which will be processed via the message
-			// loop.
-			AddTaskToPendingWorkQueue(
-				std::bind_front(&ShellBrowserImpl::RefreshDirectoryAfterUpdate, this));
+			// through. Therefore, the function below will perform the refresh asynchronously.
+			RefreshDirectoryAfterUpdate(weak_from_this(), m_app->GetRuntime(),
+				m_directoryState.scopedStopSource->GetToken());
 		}
 		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.get(), false))
 		{
 			// A parent folder has been updated. It's possible this folder may no longer exist (e.g.
 			// because a parent was renamed or removed). A navigation to a parent item may be
 			// required. It's also possible an unrelated item was updated, in which case no action
-			// will be taken by the task below.
-			AddTaskToPendingWorkQueue(std::bind_front(
-				&ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary, this));
+			// will be taken by the function below.
+			NavigateUpToClosestExistingItemIfNecessary(weak_from_this(),
+				m_directoryState.pidlDirectory.get(), m_app->GetRuntime(),
+				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
 
@@ -133,8 +136,9 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 			// The current folder has been deleted, either directly, or by deleting one of its
 			// parents. That makes it necessary to navigate to another folder. For similarity with
 			// Explorer, a navigation to a parent will occur.
-			AddTaskToPendingWorkQueue(std::bind_front(
-				&ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary, this));
+			NavigateUpToClosestExistingItemIfNecessary(weak_from_this(),
+				m_directoryState.pidlDirectory.get(), m_app->GetRuntime(),
+				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
 	}
@@ -522,90 +526,104 @@ void ShellBrowserImpl::InvalidateIconForItem(int itemIndex)
 	ListView_SetItem(m_hListView, &lvItem);
 }
 
-void ShellBrowserImpl::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated)
+concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(
+	std::weak_ptr<ShellBrowserImpl> weakSelf, PidlAbsolute simplePidlUpdated, Runtime *runtime,
+	std::stop_token stopToken)
 {
-	PidlAbsolute fullPidlUpdated;
-	HRESULT hr = UpdatePidl(simplePidlUpdated, fullPidlUpdated);
+	co_await ResumeOnComStaThread(runtime);
 
-	if (SUCCEEDED(hr))
+	PidlAbsolute fullPidlUpdated;
+	HRESULT hr = UpdatePidl(simplePidlUpdated.Raw(), fullPidlUpdated);
+
+	if (FAILED(hr))
 	{
-		NavigateParams params =
-			NavigateParams::Normal(fullPidlUpdated.Raw(), HistoryEntryType::ReplaceCurrentEntry);
-		params.overrideNavigationMode = true;
-		m_navigationController->Navigate(params);
+		co_return;
 	}
+
+	co_await ResumeOnUiThread(runtime);
+
+	if (stopToken.stop_requested())
+	{
+		co_return;
+	}
+
+	auto self = weakSelf.lock();
+
+	if (!self)
+	{
+		// The stop_token should be invalidated when this class is destroyed, so this branch
+		// shouldn't be taken.
+		DCHECK(false);
+		co_return;
+	}
+
+	NavigateParams params =
+		NavigateParams::Normal(fullPidlUpdated.Raw(), HistoryEntryType::ReplaceCurrentEntry);
+	params.overrideNavigationMode = true;
+	self->m_navigationController->Navigate(params);
 }
 
-void ShellBrowserImpl::RefreshDirectoryAfterUpdate()
+concurrencpp::null_result ShellBrowserImpl::RefreshDirectoryAfterUpdate(
+	std::weak_ptr<ShellBrowserImpl> weakSelf, Runtime *runtime, std::stop_token stopToken)
 {
-	m_navigationController->Refresh();
+	co_await concurrencpp::resume_on(runtime->GetUiThreadExecutor());
+
+	if (stopToken.stop_requested())
+	{
+		co_return;
+	}
+
+	auto self = weakSelf.lock();
+
+	if (!self)
+	{
+		DCHECK(false);
+		co_return;
+	}
+
+	self->m_navigationController->Refresh();
 }
 
 // Navigates to the closest ancestor of this item that exists. If this item itself exists, no
 // navigation will occur.
-void ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary()
+concurrencpp::null_result ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary(
+	std::weak_ptr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
+	std::stop_token stopToken)
 {
-	auto closestExistingItemPidl = GetClosestExistingItem(m_directoryState.pidlDirectory.get());
+	co_await ResumeOnComStaThread(runtime);
 
-	if (!closestExistingItemPidl)
+	auto closestExistingItemPidl = GetClosestExistingItem(currentDirectory.Raw());
+
+	if (!closestExistingItemPidl.HasValue())
 	{
-		assert(false);
-		return;
+		DCHECK(false);
+		co_return;
 	}
 
-	if (ArePidlsEquivalent(closestExistingItemPidl.get(), m_directoryState.pidlDirectory.get()))
+	if (ArePidlsEquivalent(closestExistingItemPidl.Raw(), currentDirectory.Raw()))
 	{
 		// The current directory still exists, so there's no need to do anything.
-		return;
+		co_return;
+	}
+
+	co_await ResumeOnUiThread(runtime);
+
+	if (stopToken.stop_requested())
+	{
+		co_return;
+	}
+
+	auto self = weakSelf.lock();
+
+	if (!self)
+	{
+		DCHECK(false);
+		co_return;
 	}
 
 	// The current directory no longer exists, so the navigation here needs to proceed in this tab,
 	// regardless of whether or not the tab is locked.
-	NavigateParams params = NavigateParams::Normal(closestExistingItemPidl.get());
+	NavigateParams params = NavigateParams::Normal(closestExistingItemPidl.Raw());
 	params.overrideNavigationMode = true;
-	m_navigationController->Navigate(params);
-}
-
-// Traverses up from the current item, to find the first item that exists (which might be the item
-// itself).
-unique_pidl_absolute ShellBrowserImpl::GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl)
-{
-	unique_pidl_absolute currentPidl(ILCloneFull(pidl));
-
-	do
-	{
-		if (DoesItemExist(currentPidl.get()))
-		{
-			return currentPidl;
-		}
-	} while (ILRemoveLastID(currentPidl.get()));
-
-	// This point shouldn't be reached, as there should always be a parent that exists (e.g. the
-	// root folder always exists), so the above loop should always find an existing item.
-	assert(false);
-
-	return nullptr;
-}
-
-bool ShellBrowserImpl::DoesItemExist(PCIDLIST_ABSOLUTE pidl)
-{
-	wil::com_ptr_nothrow<IShellItem> shellItem;
-	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	SFGAOF attributes = SFGAO_VALIDATE;
-	hr = shellItem->GetAttributes(attributes, &attributes);
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	// SFGAO_VALIDATE is never returned in the output attributes, so provided the call above
-	// succeeded, the item exists.
-	return true;
+	self->m_navigationController->Navigate(params);
 }

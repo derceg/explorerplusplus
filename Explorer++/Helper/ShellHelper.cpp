@@ -1449,3 +1449,45 @@ ShellIconInfo ExtractShellIconParts(int iconIndexAndOverlay)
 	static_assert(sizeof(int) == 4);
 	return { iconIndexAndOverlay & 0x00FFFFFF, (iconIndexAndOverlay >> 24) & 0xFF };
 }
+
+PidlAbsolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl)
+{
+	PidlAbsolute currentPidl = pidl;
+
+	do
+	{
+		if (DoesItemExist(currentPidl.Raw()))
+		{
+			return currentPidl;
+		}
+	} while (ILRemoveLastID(currentPidl.Raw()));
+
+	// This point shouldn't be reached, as there should always be a parent that exists (e.g. the
+	// root folder always exists), so the above loop should always find an existing item.
+	DCHECK(false);
+
+	return nullptr;
+}
+
+bool DoesItemExist(PCIDLIST_ABSOLUTE pidl)
+{
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	SFGAOF attributes = SFGAO_VALIDATE;
+	hr = shellItem->GetAttributes(attributes, &attributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	// SFGAO_VALIDATE is never returned in the output attributes, so provided the call above
+	// succeeded, the item exists.
+	return true;
+}

@@ -15,6 +15,7 @@
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
+#include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
@@ -24,12 +25,15 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/signals2.hpp>
+#include <concurrencpp/concurrencpp.h>
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <thumbcache.h>
 #include <future>
 #include <list>
+#include <memory>
 #include <optional>
+#include <stop_token>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -46,6 +50,7 @@ class FileActionHandler;
 class IconFetcher;
 struct PreservedFolderState;
 class PreservedHistoryEntry;
+class Runtime;
 class ShellBrowserEmbedder;
 class ShellNavigationController;
 class TabNavigationInterface;
@@ -196,8 +201,6 @@ public:
 	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
 
 private:
-	using PendingWorkQueueTask = std::function<void()>;
-
 	struct ItemInfo_t
 	{
 		unique_pidl_absolute pidlComplete;
@@ -367,13 +370,7 @@ private:
 
 		ListViewGroupSet groups;
 
-		// These items are queued from the main thread and run on the main thread. The advantage of
-		// this is that it allows tasks that need to run, but can't immediately run (e.g. because
-		// running the task in the middle of something else is going to cause issues) to be run at a
-		// later point, through the message loop.
-		// Only tasks that are relevant to the current directory should be added here, since the
-		// items are cleared on directory changes.
-		std::vector<PendingWorkQueueTask> pendingWorkQueue;
+		std::unique_ptr<ScopedStopSource> scopedStopSource;
 
 		DirectoryState() :
 			virtualFolder(false),
@@ -382,7 +379,8 @@ private:
 			numFilesSelected(0),
 			numFoldersSelected(0),
 			totalDirSize(0),
-			fileSelectionSize(0)
+			fileSelectionSize(0),
+			scopedStopSource(std::make_unique<ScopedStopSource>())
 		{
 		}
 	};
@@ -390,7 +388,6 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
-	static const UINT WM_APP_PENDING_TASK_AVAILABLE = WM_APP + 153;
 
 	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
 		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
@@ -535,15 +532,14 @@ private:
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
-	void OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated);
-	void RefreshDirectoryAfterUpdate();
-	void NavigateUpToClosestExistingItemIfNecessary();
-	unique_pidl_absolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl);
-	bool DoesItemExist(PCIDLIST_ABSOLUTE pidl);
-
-	// Tasks
-	void AddTaskToPendingWorkQueue(PendingWorkQueueTask task);
-	void OnPendingTaskAvailableMessage();
+	static concurrencpp::null_result OnCurrentDirectoryRenamed(
+		std::weak_ptr<ShellBrowserImpl> weakSelf, PidlAbsolute simplePidlUpdated, Runtime *runtime,
+		std::stop_token stopToken);
+	static concurrencpp::null_result RefreshDirectoryAfterUpdate(
+		std::weak_ptr<ShellBrowserImpl> weakSelf, Runtime *runtime, std::stop_token stopToken);
+	static concurrencpp::null_result NavigateUpToClosestExistingItemIfNecessary(
+		std::weak_ptr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
+		std::stop_token stopToken);
 
 	/* Filtering support. */
 	void UpdateFiltering();
