@@ -85,22 +85,48 @@ LRESULT UIThreadExecutor::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 void UIThreadExecutor::OnTaskQueued()
 {
-	std::queue<concurrencpp::task> localQueue;
+	if (m_runningTask)
+	{
+		// Task nesting isn't allowed, since it can cause subtle reentrancy issues. For example, if
+		// nesting was allowed, the following situation would be possible:
+		//
+		// 1. Two tasks are submitted.
+		// 2. Task 1 is run.
+		// 3. Task 1 starts a nested message loop (e.g. by showing a dialog).
+		// 4. The nested message loop results in this method being invoked, leading to task 2
+		//    running in the middle of task 1.
+		//
+		// To avoid issues like that, only one task can be run at a time.
+		//
+		// Note that the loop below will process all tasks in the queue, so the early return here
+		// doesn't matter - all remaining tasks will be run when control returns to the outer loop.
+		return;
+	}
 
-	std::unique_lock<std::mutex> lock(m_mutex);
-	std::swap(localQueue, m_queue);
-	lock.unlock();
-
-	while (!localQueue.empty())
+	while (auto task = GetNextTask())
 	{
 		if (m_shutdownRequested)
 		{
 			return;
 		}
 
-		auto task = std::move(localQueue.front());
-		localQueue.pop();
-
+		m_runningTask = true;
 		task();
+		m_runningTask = false;
 	}
+}
+
+concurrencpp::task UIThreadExecutor::GetNextTask()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+
+	if (m_queue.empty())
+	{
+		return {};
+	}
+
+	auto task = std::move(m_queue.front());
+	m_queue.pop();
+
+	return task;
 }

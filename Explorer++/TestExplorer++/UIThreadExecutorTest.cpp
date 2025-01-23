@@ -50,6 +50,39 @@ TEST_F(UIThreadExecutorTest, BulkSubmit)
 	messageLoop.RunUntilIdle();
 }
 
+TEST_F(UIThreadExecutorTest, NestedTasks)
+{
+	MockFunction<void(int)> check;
+	{
+		InSequence seq;
+
+		// The first task should fully complete before the second task runs, so the calls it makes
+		// should take place before the call the second task makes.
+		EXPECT_CALL(check, Call(1));
+		EXPECT_CALL(check, Call(2));
+		EXPECT_CALL(check, Call(3));
+	}
+
+	m_executor->submit(
+		[this, &check]()
+		{
+			check.Call(1);
+
+			m_executor->submit([&check] { check.Call(3); });
+
+			// Run a nested message loop by pumping messages. This shouldn't result in the second
+			// task being immediately run; instead, the second task should start only once this task
+			// has finished.
+			MessageLoop messageLoop;
+			messageLoop.RunUntilIdle();
+
+			check.Call(2);
+		});
+
+	MessageLoop messageLoop;
+	messageLoop.RunUntilIdle();
+}
+
 TEST_F(UIThreadExecutorTest, ShutdownRequested)
 {
 	EXPECT_FALSE(m_executor->shutdown_requested());

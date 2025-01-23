@@ -30,10 +30,12 @@ private:
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnTaskQueued();
+	concurrencpp::task GetNextTask();
 
 	wil::unique_hwnd m_hwnd;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::mutex m_mutex;
 	std::queue<concurrencpp::task> m_queue;
+	bool m_runningTask = false;
 	std::atomic_bool m_shutdownRequested = false;
 };
