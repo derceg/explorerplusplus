@@ -13,7 +13,6 @@
 #include <filesystem>
 #include <list>
 #include <sstream>
-#include <atlbase.h>
 
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
@@ -46,7 +45,8 @@ HRESULT FileOperations::RenameFile(IShellItem *item, const std::wstring &newName
 	return hr;
 }
 
-HRESULT FileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent)
+HRESULT FileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls,
+	bool permanent, bool silent)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo{};
 	auto hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -55,15 +55,15 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &p
 		return hr;
 	}
 
-	wil::com_ptr_nothrow<IFileOperationProgressSink> pSink{};
-	hr = CreateFileOperationProgressSink(pidls, &pSink);
-	if (FAILED(hr) || !pSink)
+	wil::com_ptr_nothrow<IFileOperationProgressSink> sink{};
+	hr = CreateFileOperationProgressSink(pidls, &sink);
+	if (FAILED(hr) || !sink)
 	{
 		return hr;
 	}
 
 	DWORD cookie{};
-	hr = fo->Advise(pSink.get(), &cookie);
+	hr = fo->Advise(sink.get(), &cookie);
 	if (FAILED(hr))
 	{
 		return hr;
@@ -111,7 +111,7 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &p
 	}
 
 	wil::com_ptr_nothrow<IUnknown> unknown;
-	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void**>(&unknown));
+	hr = shellItemArray->QueryInterface(IID_PPV_ARGS(&unknown));
 
 	if (FAILED(hr))
 	{
@@ -674,34 +674,34 @@ void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 
 HRESULT FileOperations::Undelete(const PCIDLIST_ABSOLUTE &pidl)
 {
-	wil::com_ptr_nothrow<IShellFolder> pDesktop{};
+	wil::com_ptr_nothrow<IShellFolder> pDesktop;
 	HRESULT hr = SHGetDesktopFolder(&pDesktop);
-	if (FAILED(hr) || !pDesktop)
-		return hr;
+	RETURN_IF_FAILED(SHGetDesktopFolder(&pDesktop));
 
-	CComHeapPtr<ITEMIDLIST_ABSOLUTE> pidlbin{};
-	hr = SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, NULL, &pidlbin);
-	if (FAILED(hr) || !pidlbin)
+	PidlAbsolute pidlBin;
+	hr = SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, nullptr, PidlOutParam(pidlBin));
+	if (FAILED(hr) || !pidlBin.Raw())
 		return hr;
 
 	wil::com_ptr_nothrow<IShellFolder> pShellFolder{};
-	hr = pDesktop->BindToObject(pidlbin, nullptr, IID_PPV_ARGS(&pShellFolder));
+	hr = pDesktop->BindToObject(pidlBin.Raw(), nullptr, IID_PPV_ARGS(&pShellFolder));
 	if (FAILED(hr) || !pShellFolder)
 		return hr;
 
-	wil::com_ptr_nothrow<IEnumIDList> pEnum{};
-	hr = pShellFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum);
-	if (FAILED(hr) || !pEnum)
+	wil::com_ptr_nothrow<IEnumIDList> enumerator{};
+	hr = pShellFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumerator);
+	if (FAILED(hr) || !enumerator)
 		return hr;
 
-	ULONG fetched{};
-	for (PITEMID_CHILD pidChild{}; pEnum->Next(1, &pidChild, &fetched) == S_OK; pidChild = nullptr)
+	ULONG numFetched = 1;
+	unique_pidl_child pidlItem;
+	while (S_OK == enumerator->Next(1, wil::out_param(pidlItem), &numFetched) && (1 == numFetched))
 	{
 		const auto pidlRelative = ILFindLastID(static_cast<PCUIDLIST_RELATIVE>(pidl));
-		hr = pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlRelative, pidChild);
+		hr = pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlRelative, pidlItem.get());
 		if (0 == static_cast<short>(HRESULT_CODE(hr)))
 		{
-			hr = PerformUndeleting(pShellFolder, pidChild);
+			hr = PerformUndeleting(pShellFolder, pidlItem.get());
 			break;
 		}
 	}
@@ -709,15 +709,17 @@ HRESULT FileOperations::Undelete(const PCIDLIST_ABSOLUTE &pidl)
 	return hr;
 }
 
-HRESULT FileOperations::PerformUndeleting(wil::com_ptr_nothrow<IShellFolder>& shellFolder, const PITEMID_CHILD &pidChild)
+HRESULT FileOperations::PerformUndeleting(wil::com_ptr_nothrow<IShellFolder> &shellFolder,
+	const PITEMID_CHILD &pidChild)
 {
-	PITEMID_CHILD* item = static_cast<PITEMID_CHILD*>(CoTaskMemAlloc(sizeof(PITEMID_CHILD)));
+	PITEMID_CHILD *item = static_cast<PITEMID_CHILD *>(CoTaskMemAlloc(sizeof(PITEMID_CHILD)));
 	SecureZeroMemory(item, sizeof(PITEMID_CHILD));
 	item[0] = pidChild;
 
 	wil::com_ptr_nothrow<IContextMenu> pContextMenu{};
-	HRESULT hr = shellFolder->GetUIObjectOf(nullptr, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(item),
-		__uuidof(IContextMenu), nullptr, reinterpret_cast<void **>(&pContextMenu));
+	HRESULT hr =
+		shellFolder->GetUIObjectOf(nullptr, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(item),
+			__uuidof(IContextMenu), nullptr, reinterpret_cast<void **>(&pContextMenu));
 	if (SUCCEEDED(hr) && pContextMenu)
 		hr = InvokeVerb(pContextMenu.get(), "undelete");
 

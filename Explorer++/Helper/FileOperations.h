@@ -125,7 +125,8 @@ HRESULT ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR 
 
 BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl);
 HRESULT Undelete(const PCIDLIST_ABSOLUTE &pidl);
-HRESULT PerformUndeleting(wil::com_ptr_nothrow<IShellFolder>& shellFolder, const PITEMID_CHILD &pidChild);
+HRESULT PerformUndeleting(wil::com_ptr_nothrow<IShellFolder> &shellFolder,
+	const PITEMID_CHILD &pidChild);
 HRESULT InvokeVerb(IContextMenu *pContextMenu, PCSTR pszVerb);
 };
 
