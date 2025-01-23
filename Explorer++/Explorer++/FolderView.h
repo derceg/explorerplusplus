@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
+#include "../Helper/WeakPtr.h"
 #include "../Helper/WinRTBaseWrapper.h"
-#include <wil/com.h>
 #include <ShlObj.h>
-#include <memory>
 
 class ShellBrowserImpl;
 
@@ -18,7 +16,7 @@ class FolderView :
 	public winrt::implements<FolderView, IFolderView2, IShellFolderView, winrt::non_agile>
 {
 public:
-	FolderView(std::weak_ptr<ShellBrowserImpl> shellBrowserWeak);
+	FolderView(WeakPtr<ShellBrowserImpl> shellBrowserWeak);
 
 	// IFolderView2
 	IFACEMETHODIMP SetGroupBy(REFPROPERTYKEY key, BOOL ascending);
@@ -98,8 +96,8 @@ public:
 	IFACEMETHODIMP SetAutomationObject(IDispatch *dispatch);
 
 private:
-	std::weak_ptr<ShellBrowserImpl> m_shellBrowserWeak;
-	int m_initialFolderId;
+	const WeakPtr<ShellBrowserImpl> m_shellBrowserWeak;
+	const int m_initialFolderId;
 };
 
 namespace winrt

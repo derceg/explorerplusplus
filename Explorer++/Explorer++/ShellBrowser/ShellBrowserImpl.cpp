@@ -34,26 +34,6 @@
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
-std::shared_ptr<ShellBrowserImpl> ShellBrowserImpl::CreateNew(HWND hOwner,
-	ShellBrowserEmbedder *embedder, App *app, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
-{
-	return std::shared_ptr<ShellBrowserImpl>(new ShellBrowserImpl(hOwner, embedder, app,
-		coreInterface, tabNavigation, fileActionHandler, folderSettings, initialColumns));
-}
-
-std::shared_ptr<ShellBrowserImpl> ShellBrowserImpl::CreateFromPreserved(HWND hOwner,
-	ShellBrowserEmbedder *embedder, App *app, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-	const PreservedFolderState &preservedFolderState)
-{
-	return std::shared_ptr<ShellBrowserImpl>(
-		new ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
-			history, currentEntry, preservedFolderState));
-}
-
 ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler,
@@ -98,7 +78,8 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_shellWindowRegistered(false),
 	m_folderColumns(
 		initialColumns ? *initialColumns : app->GetConfig()->globalFolderSettings.folderColumns),
-	m_draggedDataObject(nullptr)
+	m_draggedDataObject(nullptr),
+	m_weakPtrFactory(this)
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
@@ -1319,7 +1300,7 @@ void ShellBrowserImpl::PasteShortcut()
 {
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto folderView = winrt::make<FolderView>(weak_from_this());
+	auto folderView = winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr());
 	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
 	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.get(), {}, m_hListView,
@@ -1359,4 +1340,9 @@ void ShellBrowserImpl::OnInternalPaste(const ClipboardOperations::PastedItems &p
 void ShellBrowserImpl::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 {
 	m_helpers.push_back(std::move(helper));
+}
+
+WeakPtr<ShellBrowserImpl> ShellBrowserImpl::GetWeakPtr()
+{
+	return m_weakPtrFactory.GetWeakPtr();
 }

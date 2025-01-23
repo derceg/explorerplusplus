@@ -250,10 +250,11 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
 	winrt::com_ptr<IFolderView2> folderView =
-		winrt::make<FolderView>(selectedTab.GetShellBrowserImplWeak());
+		winrt::make<FolderView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr());
 	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
-	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserImplWeak(), this, false);
+	auto shellView =
+		winrt::make<ShellView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
@@ -428,7 +429,7 @@ void Explorerplusplus::OnListViewPaste()
 	{
 		auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-		auto folderView = winrt::make<FolderView>(selectedTab.GetShellBrowserImplWeak());
+		auto folderView = winrt::make<FolderView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr());
 		serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
 		ExecuteActionFromContextMenu(directory.get(), {},

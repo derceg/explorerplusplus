@@ -849,10 +849,10 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 
 Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 {
-	auto shellBrowser = ShellBrowserImpl::CreateFromPreserved(m_coreInterface->GetMainWindow(),
+	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
 		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
 		preservedTab.history, preservedTab.currentEntry, preservedTab.preservedFolderState);
-	auto tabTemp = std::make_unique<Tab>(preservedTab, shellBrowser, m_browser);
+	auto tabTemp = std::make_unique<Tab>(preservedTab, std::move(shellBrowser), m_browser);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;
@@ -892,10 +892,10 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 		folderSettingsFinal = m_app->GetConfig()->defaultFolderSettings;
 	}
 
-	auto shellBrowser = ShellBrowserImpl::CreateNew(m_coreInterface->GetMainWindow(), m_embedder,
-		m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler, folderSettingsFinal,
-		initialColumns);
-	auto tabTemp = std::make_unique<Tab>(shellBrowser, m_browser);
+	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
+		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
+		folderSettingsFinal, initialColumns);
+	auto tabTemp = std::make_unique<Tab>(std::move(shellBrowser), m_browser);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;

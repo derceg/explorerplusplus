@@ -44,15 +44,14 @@ public:
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)>
 		TabUpdatedSignal;
 
-	Tab(std::shared_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser);
-	Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser,
+	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser);
+	Tab(const PreservedTab &preservedTab, std::unique_ptr<ShellBrowser> shellBrowser,
 		BrowserWindow *browser);
 
 	int GetId() const;
 
 	ShellBrowser *GetShellBrowser() const;
 	ShellBrowserImpl *GetShellBrowserImpl() const;
-	std::weak_ptr<ShellBrowserImpl> GetShellBrowserImplWeak() const;
 
 	BrowserWindow *GetBrowser() const;
 
@@ -79,10 +78,10 @@ private:
 	static inline int idCounter = 1;
 	const int m_id;
 
-	std::shared_ptr<ShellBrowser> m_shellBrowser;
-	std::shared_ptr<ShellBrowserImpl> m_shellBrowserImpl;
+	const std::unique_ptr<ShellBrowser> m_shellBrowser;
+	ShellBrowserImpl *const m_shellBrowserImpl;
 
-	BrowserWindow *m_browser = nullptr;
+	BrowserWindow *const m_browser;
 
 	bool m_useCustomName;
 	std::wstring m_customName;

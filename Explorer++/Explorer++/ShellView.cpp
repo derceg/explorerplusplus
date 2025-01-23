@@ -7,7 +7,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabNavigationInterface.h"
 
-ShellView::ShellView(std::weak_ptr<ShellBrowserImpl> shellBrowserWeak,
+ShellView::ShellView(WeakPtr<ShellBrowserImpl> shellBrowserWeak,
 	TabNavigationInterface *tabNavigation, bool switchToTabOnSelect) :
 	m_shellBrowserWeak(shellBrowserWeak),
 	m_tabNavigation(tabNavigation),
@@ -83,9 +83,7 @@ IFACEMETHODIMP ShellView::SaveViewState()
 
 IFACEMETHODIMP ShellView::SelectItem(PCUITEMID_CHILD pidlItem, SVSIF flags)
 {
-	auto shellBrowser = m_shellBrowserWeak.lock();
-
-	if (!shellBrowser)
+	if (!m_shellBrowserWeak)
 	{
 		return E_FAIL;
 	}
@@ -93,20 +91,20 @@ IFACEMETHODIMP ShellView::SelectItem(PCUITEMID_CHILD pidlItem, SVSIF flags)
 	if (flags == SVSI_EDIT)
 	{
 		auto pidlComplete =
-			unique_pidl_absolute(ILCombine(shellBrowser->GetDirectoryIdl().get(), pidlItem));
-		shellBrowser->QueueRename(pidlComplete.get());
+			unique_pidl_absolute(ILCombine(m_shellBrowserWeak->GetDirectoryIdl().get(), pidlItem));
+		m_shellBrowserWeak->QueueRename(pidlComplete.get());
 		return S_OK;
 	}
 	else if (WI_IsFlagSet(flags, SVSI_SELECT))
 	{
 		if (m_switchToTabOnSelect)
 		{
-			m_tabNavigation->SelectTabById(shellBrowser->GetId());
+			m_tabNavigation->SelectTabById(m_shellBrowserWeak->GetId());
 		}
 
 		auto pidlComplete =
-			unique_pidl_absolute(ILCombine(shellBrowser->GetDirectoryIdl().get(), pidlItem));
-		shellBrowser->SelectItems({ pidlComplete.get() });
+			unique_pidl_absolute(ILCombine(m_shellBrowserWeak->GetDirectoryIdl().get(), pidlItem));
+		m_shellBrowserWeak->SelectItems({ pidlComplete.get() });
 
 		return S_OK;
 	}

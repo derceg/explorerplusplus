@@ -22,12 +22,12 @@ protected:
 
 	Tab BuildTab()
 	{
-		return Tab(std::make_shared<ShellBrowserFake>(&m_tabNavigation), &m_browser);
+		return Tab(std::make_unique<ShellBrowserFake>(&m_tabNavigation), &m_browser);
 	}
 
 	Tab BuildTab(BrowserWindow *browser)
 	{
-		return Tab(std::make_shared<ShellBrowserFake>(&m_tabNavigation), browser);
+		return Tab(std::make_unique<ShellBrowserFake>(&m_tabNavigation), browser);
 	}
 
 	GlobalTabEventDispatcher m_dispatcher;

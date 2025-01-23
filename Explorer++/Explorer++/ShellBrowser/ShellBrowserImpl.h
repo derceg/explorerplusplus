@@ -18,6 +18,8 @@
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WeakPtr.h"
+#include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/core/noncopyable.hpp>
@@ -65,21 +67,18 @@ typedef struct
 class ShellBrowserImpl :
 	public ShellBrowser,
 	public ShellDropTargetWindow<int>,
-	public std::enable_shared_from_this<ShellBrowserImpl>,
 	private boost::noncopyable
 {
 public:
-	static std::shared_ptr<ShellBrowserImpl> CreateNew(HWND hOwner, ShellBrowserEmbedder *embedder,
-		App *app, CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
-
-	static std::shared_ptr<ShellBrowserImpl> CreateFromPreserved(HWND hOwner,
-		ShellBrowserEmbedder *embedder, App *app, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-
+	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
@@ -103,6 +102,8 @@ public:
 	boost::signals2::connection AddNavigationFailedObserver(
 		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
+
+	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
 	/* Get/Set current state. */
 	unique_pidl_absolute GetDirectoryIdl() const;
@@ -389,16 +390,6 @@ private:
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
-	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
-		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler,
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-		const PreservedFolderState &preservedFolderState);
-	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
-		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
-
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
 	int GenerateUniqueItemId();
@@ -532,13 +523,12 @@ private:
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
-	static concurrencpp::null_result OnCurrentDirectoryRenamed(
-		std::weak_ptr<ShellBrowserImpl> weakSelf, PidlAbsolute simplePidlUpdated, Runtime *runtime,
-		std::stop_token stopToken);
-	static concurrencpp::null_result RefreshDirectoryAfterUpdate(
-		std::weak_ptr<ShellBrowserImpl> weakSelf, Runtime *runtime, std::stop_token stopToken);
+	static concurrencpp::null_result OnCurrentDirectoryRenamed(WeakPtr<ShellBrowserImpl> weakSelf,
+		PidlAbsolute simplePidlUpdated, Runtime *runtime, std::stop_token stopToken);
+	static concurrencpp::null_result RefreshDirectoryAfterUpdate(WeakPtr<ShellBrowserImpl> weakSelf,
+		Runtime *runtime, std::stop_token stopToken);
 	static concurrencpp::null_result NavigateUpToClosestExistingItemIfNecessary(
-		std::weak_ptr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
+		WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
 		std::stop_token stopToken);
 
 	/* Filtering support. */
@@ -742,4 +732,6 @@ private:
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
 	IDataObject *m_draggedDataObject;
+
+	WeakPtrFactory<ShellBrowserImpl> m_weakPtrFactory;
 };

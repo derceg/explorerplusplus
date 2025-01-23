@@ -6,13 +6,10 @@
 #include "FolderView.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 
-FolderView::FolderView(std::weak_ptr<ShellBrowserImpl> shellBrowserWeak) :
-	m_shellBrowserWeak(shellBrowserWeak)
+FolderView::FolderView(WeakPtr<ShellBrowserImpl> shellBrowserWeak) :
+	m_shellBrowserWeak(shellBrowserWeak),
+	m_initialFolderId(shellBrowserWeak->GetUniqueFolderId())
 {
-	auto shellBrowser = m_shellBrowserWeak.lock();
-	assert(shellBrowser);
-
-	m_initialFolderId = shellBrowser->GetUniqueFolderId();
 }
 
 // IFolderView2
@@ -195,9 +192,9 @@ IFACEMETHODIMP FolderView::GetGroupSubsetCount(UINT *numVisibleRows)
 
 IFACEMETHODIMP FolderView::SetRedraw(BOOL redrawOn)
 {
-	if (auto shellBrowser = m_shellBrowserWeak.lock())
+	if (m_shellBrowserWeak)
 	{
-		SendMessage(shellBrowser->GetListView(), WM_SETREDRAW, redrawOn, 0);
+		SendMessage(m_shellBrowserWeak->GetListView(), WM_SETREDRAW, redrawOn, 0);
 	}
 
 	return S_OK;
@@ -232,14 +229,12 @@ IFACEMETHODIMP FolderView::SetCurrentViewMode(UINT viewMode)
 // background context menu for a directory) to be set up correctly.
 IFACEMETHODIMP FolderView::GetFolder(REFIID riid, void **ppv)
 {
-	auto shellBrowser = m_shellBrowserWeak.lock();
-
-	if (!shellBrowser)
+	if (!m_shellBrowserWeak)
 	{
 		return E_FAIL;
 	}
 
-	auto directory = shellBrowser->GetDirectoryIdl();
+	auto directory = m_shellBrowserWeak->GetDirectoryIdl();
 
 	if (riid == IID_IShellItemArray)
 	{
@@ -340,11 +335,9 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD
 	UNREFERENCED_PARAMETER(pts);
 	UNREFERENCED_PARAMETER(flags);
 
-	auto shellBrowser = m_shellBrowserWeak.lock();
-
 	// If the hosting tab was closed or navigated to a different folder, the request to select items
 	// should be ignored.
-	if (!shellBrowser || shellBrowser->GetUniqueFolderId() != m_initialFolderId)
+	if (!m_shellBrowserWeak || m_shellBrowserWeak->GetUniqueFolderId() != m_initialFolderId)
 	{
 		return E_FAIL;
 	}
@@ -355,11 +348,12 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD
 
 		for (UINT i = 0; i < numItems; i++)
 		{
-			unique_pidl_absolute pidl(ILCombine(shellBrowser->GetDirectoryIdl().get(), items[i]));
+			unique_pidl_absolute pidl(
+				ILCombine(m_shellBrowserWeak->GetDirectoryIdl().get(), items[i]));
 			pidls.emplace_back(pidl.get());
 		}
 
-		shellBrowser->SelectItems(pidls);
+		m_shellBrowserWeak->SelectItems(pidls);
 
 		return S_OK;
 	}

@@ -27,18 +27,21 @@ public:
 class TabTest : public Test
 {
 protected:
-	TabTest() :
-		m_shellBrowser(std::make_shared<ShellBrowserFake>(&m_tabNavigation)),
-		m_tab(m_shellBrowser, &m_browser),
-		m_observer(&m_tab)
+	TabTest()
 	{
+		auto shellBrowser = std::make_unique<ShellBrowserFake>(&m_tabNavigation);
+		m_shellBrowser = shellBrowser.get();
+
+		m_tab = std::make_unique<Tab>(std::move(shellBrowser), &m_browser);
+
+		m_observer = std::make_unique<TabObserverMock>(m_tab.get());
 	}
 
 	TabNavigationMock m_tabNavigation;
-	std::shared_ptr<ShellBrowserFake> m_shellBrowser;
+	ShellBrowserFake *m_shellBrowser = nullptr;
 	BrowserWindowMock m_browser;
-	Tab m_tab;
-	TabObserverMock m_observer;
+	std::unique_ptr<Tab> m_tab;
+	std::unique_ptr<TabObserverMock> m_observer;
 };
 
 TEST_F(TabTest, CustomName)
@@ -46,17 +49,17 @@ TEST_F(TabTest, CustomName)
 	std::wstring folderName = L"fake";
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser->NavigateToPath(L"c:\\" + folderName));
 
-	EXPECT_FALSE(m_tab.GetUseCustomName());
-	EXPECT_EQ(m_tab.GetName(), folderName);
+	EXPECT_FALSE(m_tab->GetUseCustomName());
+	EXPECT_EQ(m_tab->GetName(), folderName);
 
 	std::wstring customName = L"Name";
-	m_tab.SetCustomName(customName);
-	EXPECT_TRUE(m_tab.GetUseCustomName());
-	EXPECT_EQ(m_tab.GetName(), customName);
+	m_tab->SetCustomName(customName);
+	EXPECT_TRUE(m_tab->GetUseCustomName());
+	EXPECT_EQ(m_tab->GetName(), customName);
 
-	m_tab.ClearCustomName();
-	EXPECT_FALSE(m_tab.GetUseCustomName());
-	EXPECT_EQ(m_tab.GetName(), folderName);
+	m_tab->ClearCustomName();
+	EXPECT_FALSE(m_tab->GetUseCustomName());
+	EXPECT_EQ(m_tab->GetName(), folderName);
 }
 
 TEST_F(TabTest, EmptyName)
@@ -65,9 +68,9 @@ TEST_F(TabTest, EmptyName)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser->NavigateToPath(L"c:\\" + folderName));
 
 	// An empty string isn't counted as a valid name and should be ignored.
-	m_tab.SetCustomName(L"");
-	EXPECT_FALSE(m_tab.GetUseCustomName());
-	EXPECT_EQ(m_tab.GetName(), folderName);
+	m_tab->SetCustomName(L"");
+	EXPECT_FALSE(m_tab->GetUseCustomName());
+	EXPECT_EQ(m_tab->GetName(), folderName);
 }
 
 TEST_F(TabTest, LockState)
@@ -75,34 +78,34 @@ TEST_F(TabTest, LockState)
 	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationMode(),
 		NavigationMode::Normal);
 
-	m_tab.SetLockState(Tab::LockState::Locked);
+	m_tab->SetLockState(Tab::LockState::Locked);
 	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationMode(),
 		NavigationMode::Normal);
 
-	m_tab.SetLockState(Tab::LockState::AddressLocked);
+	m_tab->SetLockState(Tab::LockState::AddressLocked);
 	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationMode(),
 		NavigationMode::ForceNewTab);
 }
 
 TEST_F(TabTest, Update)
 {
-	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::Name));
-	m_tab.SetCustomName(L"Name");
+	EXPECT_CALL(*m_observer, OnTabUpdated(Ref(*m_tab), Tab::PropertyType::Name));
+	m_tab->SetCustomName(L"Name");
 
-	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::Name));
-	m_tab.ClearCustomName();
+	EXPECT_CALL(*m_observer, OnTabUpdated(Ref(*m_tab), Tab::PropertyType::Name));
+	m_tab->ClearCustomName();
 
-	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::LockState));
-	m_tab.SetLockState(Tab::LockState::Locked);
+	EXPECT_CALL(*m_observer, OnTabUpdated(Ref(*m_tab), Tab::PropertyType::LockState));
+	m_tab->SetLockState(Tab::LockState::Locked);
 
-	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::LockState));
-	m_tab.SetLockState(Tab::LockState::AddressLocked);
+	EXPECT_CALL(*m_observer, OnTabUpdated(Ref(*m_tab), Tab::PropertyType::LockState));
+	m_tab->SetLockState(Tab::LockState::AddressLocked);
 
-	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::LockState));
-	m_tab.SetLockState(Tab::LockState::NotLocked);
+	EXPECT_CALL(*m_observer, OnTabUpdated(Ref(*m_tab), Tab::PropertyType::LockState));
+	m_tab->SetLockState(Tab::LockState::NotLocked);
 }
 
 TEST_F(TabTest, GetBrowser)
 {
-	EXPECT_EQ(m_tab.GetBrowser(), &m_browser);
+	EXPECT_EQ(m_tab->GetBrowser(), &m_browser);
 }
