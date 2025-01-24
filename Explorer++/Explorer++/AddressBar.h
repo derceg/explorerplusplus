@@ -33,6 +33,15 @@ public:
 	SignalWrapper<AddressBar, void()> sizeUpdatedSignal;
 
 private:
+	enum class IconUpdateType
+	{
+		// Indicates that the icon will be fetched only if there is no cached icon available.
+		FetchIfNotCached,
+
+		// Always fetches the icon, regardless of whether a cached icon is available or not.
+		AlwaysFetch
+	};
+
 	AddressBar(HWND parent, App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface);
 	~AddressBar() = default;
 
@@ -48,7 +57,9 @@ private:
 	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
-	void UpdateTextAndIcon(const Tab &tab);
+	void OnDirectoryPropertiesChanged(const Tab &tab);
+	void UpdateTextAndIcon(const Tab &tab,
+		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);
 	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
 		PidlAbsolute pidl, std::shared_ptr<AsyncIconFetcher> iconFetcher, Runtime *runtime,
 		std::stop_token stopToken);

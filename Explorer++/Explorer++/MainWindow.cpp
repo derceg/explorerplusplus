@@ -41,6 +41,9 @@ MainWindow::MainWindow(HWND hwnd, const Config *config, HINSTANCE resourceInstan
 			m_connections.push_back(
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&MainWindow::OnNavigationCommitted, this)));
+			m_connections.push_back(
+				m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
+					std::bind_front(&MainWindow::OnDirectoryPropertiesChanged, this)));
 		});
 
 	m_connections.push_back(m_config->showFullTitlePath.addObserver(
@@ -77,6 +80,14 @@ void MainWindow::OnNavigationCommitted(const Tab &tab, const NavigateParams &nav
 {
 	UNREFERENCED_PARAMETER(navigateParams);
 
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
+	{
+		UpdateWindowText();
+	}
+}
+
+void MainWindow::OnDirectoryPropertiesChanged(const Tab &tab)
+{
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateWindowText();

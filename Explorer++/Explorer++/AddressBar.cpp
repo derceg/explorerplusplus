@@ -78,6 +78,9 @@ void AddressBar::Initialize(HWND parent)
 			m_connections.push_back(
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&AddressBar::OnNavigationCommitted, this)));
+			m_connections.push_back(
+				m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
+					std::bind_front(&AddressBar::OnDirectoryPropertiesChanged, this)));
 		});
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&AddressBar::OnFontOrDpiUpdated, this));
@@ -263,7 +266,17 @@ void AddressBar::OnNavigationCommitted(const Tab &tab, const NavigateParams &nav
 	}
 }
 
-void AddressBar::UpdateTextAndIcon(const Tab &tab)
+void AddressBar::OnDirectoryPropertiesChanged(const Tab &tab)
+{
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
+	{
+		// Since the directory properties have changed, it's possible that the icon has changed.
+		// Therefore, the updated icon should always be retrieved.
+		UpdateTextAndIcon(tab, IconUpdateType::AlwaysFetch);
+	}
+}
+
+void AddressBar::UpdateTextAndIcon(const Tab &tab, IconUpdateType iconUpdateType)
 {
 	// Resetting this here ensures that any previous icon requests that are still ongoing will be
 	// ignored once they complete.
@@ -281,7 +294,10 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	else
 	{
 		iconIndex = m_app->GetIconFetcher()->GetDefaultIconIndex(entry->GetPidl().Raw());
+	}
 
+	if (iconUpdateType == IconUpdateType::AlwaysFetch || !cachedIconIndex)
+	{
 		RetrieveUpdatedIcon(m_weakPtrFactory.GetWeakPtr(), entry->GetPidl(),
 			m_app->GetIconFetcher(), m_app->GetRuntime(), m_scopedStopSource->GetToken());
 	}

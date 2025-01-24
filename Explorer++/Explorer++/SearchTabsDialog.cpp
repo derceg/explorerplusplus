@@ -40,6 +40,9 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	m_connections.push_back(
 		m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 			std::bind(&SearchTabsDialog::OnTabsChanged, this)));
+	m_connections.push_back(
+		m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
+			std::bind(&SearchTabsDialog::OnTabsChanged, this)));
 	m_connections.push_back(m_coreInterface->GetTabContainer()->tabUpdatedSignal.AddObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
 	m_connections.push_back(m_coreInterface->GetTabContainer()->tabMovedSignal.AddObserver(

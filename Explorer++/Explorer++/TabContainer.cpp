@@ -113,6 +113,8 @@ void TabContainer::Initialize(HWND parent)
 		tabCreatedSignal.AddObserver(std::bind_front(&TabContainer::OnTabCreated, this)));
 	m_connections.push_back(tabNavigationCommittedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnNavigationCommitted, this)));
+	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
+		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this)));
 	m_connections.push_back(
 		tabSelectedSignal.AddObserver(std::bind_front(&TabContainer::OnTabSelected, this)));
 	m_connections.push_back(
@@ -702,6 +704,12 @@ void TabContainer::OnNavigationCommitted(const Tab &tab, const NavigateParams &n
 	SetTabIcon(tab);
 }
 
+void TabContainer::OnDirectoryPropertiesChanged(const Tab &tab)
+{
+	UpdateTabNameInWindow(tab);
+	SetTabIcon(tab);
+}
+
 void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 {
 	switch (propertyType)
@@ -979,8 +987,11 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationFailedSignal.m_signal(tab, navigateParams); });
 
-	tab.GetShellBrowserImpl()->directoryModified.AddObserver(
-		[this, &tab]() { tabDirectoryModifiedSignal.m_signal(tab); });
+	tab.GetShellBrowserImpl()->directoryContentsChanged.AddObserver(
+		[this, &tab]() { tabDirectoryContentsChangedSignal.m_signal(tab); });
+
+	tab.GetShellBrowserImpl()->directoryPropertiesChanged.AddObserver(
+		[this, &tab]() { tabDirectoryPropertiesChangedSignal.m_signal(tab); });
 
 	tab.GetShellBrowserImpl()->listViewSelectionChanged.AddObserver(
 		[this, &tab]() { tabListViewSelectionChangedSignal.m_signal(tab); });

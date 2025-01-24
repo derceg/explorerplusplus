@@ -61,7 +61,7 @@ void ShellBrowserImpl::ProcessShellChangeNotifications(
 
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
-	directoryModified.m_signal();
+	directoryContentsChanged.m_signal();
 }
 
 void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotification &change)
@@ -95,6 +95,16 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
 			OnItemModified(change.pidl1.get());
+		}
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
+		{
+			// This can be triggered in the following sorts of situations:
+			//
+			// - If the icon for the folder is changed.
+			// - If the folder is virtual (e.g. the recycle bin) and the name is changed.
+			OnDirectoryPropertiesChanged(m_weakPtrFactory.GetWeakPtr(),
+				m_directoryState.pidlDirectory.get(), m_app->GetRuntime(),
+				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
 
@@ -210,7 +220,7 @@ void ShellBrowserImpl::DirectoryAltered()
 
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
-	directoryModified.m_signal();
+	directoryContentsChanged.m_signal();
 
 	m_AlteredList.clear();
 
@@ -547,18 +557,42 @@ concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(
 		co_return;
 	}
 
-	if (!weakSelf)
-	{
-		// The stop_token should be invalidated when this class is destroyed, so this branch
-		// shouldn't be taken.
-		DCHECK(false);
-		co_return;
-	}
-
+	// The stop_token should be invalidated when this class is destroyed, so weakSelf should always
+	// be valid here (a CHECK will be triggered if not).
 	NavigateParams params =
 		NavigateParams::Normal(fullPidlUpdated.Raw(), HistoryEntryType::ReplaceCurrentEntry);
 	params.overrideNavigationMode = true;
 	weakSelf->m_navigationController->Navigate(params);
+}
+
+concurrencpp::null_result ShellBrowserImpl::OnDirectoryPropertiesChanged(
+	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
+	std::stop_token stopToken)
+{
+	co_await ResumeOnComStaThread(runtime);
+
+	PidlAbsolute updatedPidl;
+	HRESULT hr = UpdatePidl(currentDirectory.Raw(), updatedPidl);
+
+	if (FAILED(hr))
+	{
+		co_return;
+	}
+
+	co_await ResumeOnUiThread(runtime);
+
+	if (stopToken.stop_requested())
+	{
+		co_return;
+	}
+
+	// TODO: Should possibly also update the current navigation entry.
+
+	// The parsing path isn't updated, since it should remain the same. Item renames can result in
+	// this function being triggered, but only if the item is virtual. In that case, the parsing
+	// path isn't going to change.
+	weakSelf->m_directoryState.pidlDirectory.reset(ILCloneFull(updatedPidl.Raw()));
+	weakSelf->directoryPropertiesChanged.m_signal();
 }
 
 concurrencpp::null_result ShellBrowserImpl::RefreshDirectoryAfterUpdate(
@@ -568,12 +602,6 @@ concurrencpp::null_result ShellBrowserImpl::RefreshDirectoryAfterUpdate(
 
 	if (stopToken.stop_requested())
 	{
-		co_return;
-	}
-
-	if (!weakSelf)
-	{
-		DCHECK(false);
 		co_return;
 	}
 
@@ -606,12 +634,6 @@ concurrencpp::null_result ShellBrowserImpl::NavigateUpToClosestExistingItemIfNec
 
 	if (stopToken.stop_requested())
 	{
-		co_return;
-	}
-
-	if (!weakSelf)
-	{
-		DCHECK(false);
 		co_return;
 	}
 

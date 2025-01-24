@@ -197,7 +197,14 @@ public:
 	void AutoSizeColumns();
 
 	// Signals
-	SignalWrapper<ShellBrowserImpl, void()> directoryModified;
+
+	// Signaled when the contents of the directory change (e.g. when an item is added).
+	SignalWrapper<ShellBrowserImpl, void()> directoryContentsChanged;
+
+	// Signaled when the properties of the directory itself change. For example, when the icon for
+	// the directory changes, or the directory is renamed (if the directory is virtual).
+	SignalWrapper<ShellBrowserImpl, void()> directoryPropertiesChanged;
+
 	SignalWrapper<ShellBrowserImpl, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
 
@@ -525,6 +532,9 @@ private:
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 	static concurrencpp::null_result OnCurrentDirectoryRenamed(WeakPtr<ShellBrowserImpl> weakSelf,
 		PidlAbsolute simplePidlUpdated, Runtime *runtime, std::stop_token stopToken);
+	static concurrencpp::null_result OnDirectoryPropertiesChanged(
+		WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
+		std::stop_token stopToken);
 	static concurrencpp::null_result RefreshDirectoryAfterUpdate(WeakPtr<ShellBrowserImpl> weakSelf,
 		Runtime *runtime, std::stop_token stopToken);
 	static concurrencpp::null_result NavigateUpToClosestExistingItemIfNecessary(

@@ -765,7 +765,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	clipboardWriter.WriteText(strColumnInfo);
 }
 
-void Explorerplusplus::OnDirectoryModified(const Tab &tab)
+void Explorerplusplus::OnDirectoryContentsChanged(const Tab &tab)
 {
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{

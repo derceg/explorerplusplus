@@ -139,7 +139,8 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabSelectedSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryModifiedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryContentsChangedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryPropertiesChangedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChangedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChangedSignal;
 
@@ -220,6 +221,7 @@ private:
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
 
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);

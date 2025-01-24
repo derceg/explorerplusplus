@@ -83,6 +83,10 @@ New features:
 - It's now possible to delete a folder that's open in Explorer++.
   In that situation, the associated tab will navigate to the
   parent folder.
+- When a folder is opened in a tab and the folder icon changes,
+  or the folder name changes (if the folder is virtual), that
+  change will now be reflected in the UI. For example, the
+  address bar will show the updated name and icon.
 - A --select command line option has been added that will open a
   directory and select the file specified. See #208.
 - Paths separated by forward slashes are now accepted. See #382.
