@@ -148,7 +148,7 @@ HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
 
 	PrepareToChangeFolders();
 
-	m_directoryState.pidlDirectory.reset(ILCloneFull(navigateParams.pidl.Raw()));
+	m_directoryState.pidlDirectory = navigateParams.pidl;
 	m_directoryState.directory = parsingPath;
 	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 	m_uniqueFolderId++;
@@ -559,7 +559,7 @@ void ShellBrowserImpl::OnEnumerationCompleted(std::vector<ShellBrowserImpl::Item
 		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
 			&& m_directoryState.virtualFolder))
 	{
-		StartDirectoryMonitoring(m_directoryState.pidlDirectory.get());
+		StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
 	}
 
 	m_bFolderVisited = TRUE;
@@ -661,9 +661,9 @@ void ShellBrowserImpl::InsertAwaitingItems()
 			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
 		}
 
-		if (m_directoryState.queuedRenameItem
+		if (m_directoryState.queuedRenameItem.HasValue()
 			&& ArePidlsEquivalent(itemInfo.pidlComplete.get(),
-				m_directoryState.queuedRenameItem.get()))
+				m_directoryState.queuedRenameItem.Raw()))
 		{
 			itemToRename = iItemIndex;
 		}
@@ -716,7 +716,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 	if (itemToRename)
 	{
-		m_directoryState.queuedRenameItem.reset();
+		m_directoryState.queuedRenameItem.Reset();
 		ListView_EditLabel(m_hListView, *itemToRename);
 	}
 }

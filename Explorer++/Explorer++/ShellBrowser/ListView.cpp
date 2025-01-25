@@ -1263,7 +1263,7 @@ BOOL ShellBrowserImpl::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	// singular name for shell items. The display name of a shell item (e.g. the drive label) can
 	// change, even if the parsing name remains the same. Comparing the parsing names will show that
 	// they're equivalent. It's easier just to update the item, regardless.
-	unique_pidl_absolute pidlNew(ILCombine(m_directoryState.pidlDirectory.get(), newChild.get()));
+	unique_pidl_absolute pidlNew(ILCombine(m_directoryState.pidlDirectory.Raw(), newChild.get()));
 	UpdateItem(item.pidlComplete.get(), pidlNew.get());
 
 	// The text will be set by UpdateItem. It's not safe to return true here, since items can sorted

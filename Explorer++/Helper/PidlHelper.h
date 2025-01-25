@@ -82,6 +82,11 @@ private:
 			return m_pidl.get();
 		}
 
+		void Reset()
+		{
+			m_pidl.reset();
+		}
+
 	private:
 		wil::unique_cotaskmem_ptr<IDListType> m_pidl;
 	};

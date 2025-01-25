@@ -71,7 +71,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 	case SHCNE_DRIVEADD:
 	case SHCNE_MKDIR:
 	case SHCNE_CREATE:
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE))
 		{
 			OnItemAdded(change.pidl1.get());
 		}
@@ -79,12 +79,12 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 
 	case SHCNE_RENAMEFOLDER:
 	case SHCNE_RENAMEITEM:
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE)
-			&& ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl2.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE)
+			&& ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl2.get(), TRUE))
 		{
 			OnItemRenamed(change.pidl1.get(), change.pidl2.get());
 		}
-		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
 		{
 			OnCurrentDirectoryRenamed(m_weakPtrFactory.GetWeakPtr(), change.pidl2.get(),
 				m_app->GetRuntime(), m_directoryState.scopedStopSource->GetToken());
@@ -92,24 +92,24 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		break;
 
 	case SHCNE_UPDATEITEM:
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE))
 		{
 			OnItemModified(change.pidl1.get());
 		}
-		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
 		{
 			// This can be triggered in the following sorts of situations:
 			//
 			// - If the icon for the folder is changed.
 			// - If the folder is virtual (e.g. the recycle bin) and the name is changed.
 			OnDirectoryPropertiesChanged(m_weakPtrFactory.GetWeakPtr(),
-				m_directoryState.pidlDirectory.get(), m_app->GetRuntime(),
+				m_directoryState.pidlDirectory, m_app->GetRuntime(),
 				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
 
 	case SHCNE_UPDATEDIR:
-		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
+		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
 		{
 			// It's not safe to perform an immediate refresh here, since doing so would clear
 			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
@@ -117,14 +117,14 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 			RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime(),
 				m_directoryState.scopedStopSource->GetToken());
 		}
-		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.get(), false))
+		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.Raw(), false))
 		{
 			// A parent folder has been updated. It's possible this folder may no longer exist (e.g.
 			// because a parent was renamed or removed). A navigation to a parent item may be
 			// required. It's also possible an unrelated item was updated, in which case no action
 			// will be taken by the function below.
 			NavigateUpToClosestExistingItemIfNecessary(m_weakPtrFactory.GetWeakPtr(),
-				m_directoryState.pidlDirectory.get(), m_app->GetRuntime(),
+				m_directoryState.pidlDirectory, m_app->GetRuntime(),
 				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
@@ -136,18 +136,18 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		// that directory. However, if the user has just changed directories, a notification could
 		// still come in for the previous directory. Therefore, it's important to verify that the
 		// item is actually a child of the current directory.
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE))
 		{
 			OnItemRemoved(change.pidl1.get());
 		}
-		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get())
-			|| ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.get(), false))
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get())
+			|| ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.Raw(), false))
 		{
 			// The current folder has been deleted, either directly, or by deleting one of its
 			// parents. That makes it necessary to navigate to another folder. For similarity with
 			// Explorer, a navigation to a parent will occur.
 			NavigateUpToClosestExistingItemIfNecessary(m_weakPtrFactory.GetWeakPtr(),
-				m_directoryState.pidlDirectory.get(), m_app->GetRuntime(),
+				m_directoryState.pidlDirectory, m_app->GetRuntime(),
 				m_directoryState.scopedStopSource->GetToken());
 		}
 		break;
@@ -175,7 +175,7 @@ void ShellBrowserImpl::DirectoryAltered()
 		}
 
 		wil::com_ptr_nothrow<IShellFolder> parent;
-		HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.get(), nullptr,
+		HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.Raw(), nullptr,
 			IID_PPV_ARGS(&parent));
 
 		if (FAILED(hr))
@@ -305,7 +305,7 @@ void ShellBrowserImpl::AddItem(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	auto itemId = AddItemInternal(shellFolder.get(), m_directoryState.pidlDirectory.get(),
+	auto itemId = AddItemInternal(shellFolder.get(), m_directoryState.pidlDirectory.Raw(),
 		pidlChild, -1, FALSE);
 
 	if (!itemId)
@@ -400,7 +400,7 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 	}
 
 	auto itemInfo =
-		GetItemInformation(shellFolder.get(), m_directoryState.pidlDirectory.get(), pidlChild);
+		GetItemInformation(shellFolder.get(), m_directoryState.pidlDirectory.Raw(), pidlChild);
 
 	if (!itemInfo)
 	{
@@ -591,7 +591,7 @@ concurrencpp::null_result ShellBrowserImpl::OnDirectoryPropertiesChanged(
 	// The parsing path isn't updated, since it should remain the same. Item renames can result in
 	// this function being triggered, but only if the item is virtual. In that case, the parsing
 	// path isn't going to change.
-	weakSelf->m_directoryState.pidlDirectory.reset(ILCloneFull(updatedPidl.Raw()));
+	weakSelf->m_directoryState.pidlDirectory = updatedPidl;
 	weakSelf->directoryPropertiesChanged.m_signal();
 }
 

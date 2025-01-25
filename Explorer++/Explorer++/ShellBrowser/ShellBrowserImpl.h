@@ -339,7 +339,7 @@ private:
 
 	struct DirectoryState
 	{
-		unique_pidl_absolute pidlDirectory;
+		PidlAbsolute pidlDirectory;
 		std::wstring directory;
 		bool virtualFolder;
 		int itemIDCounter;
@@ -360,7 +360,7 @@ private:
 		// the "New" menu). However, it can take time for the directory change notification to be
 		// processed. This field keeps track of an item that needs to be put into rename mode, once
 		// it has been added.
-		unique_pidl_absolute queuedRenameItem;
+		PidlAbsolute queuedRenameItem;
 
 		int numItems;
 		int numFilesSelected;

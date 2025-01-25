@@ -136,6 +136,16 @@ TEST(PidlAbsolute, TakeOwnership)
 	EXPECT_EQ(pidl.Raw(), rawPidl);
 }
 
+TEST(PidlAbsolute, Reset)
+{
+	unique_pidl_absolute ownedPidl(SHSimpleIDListFromPath(L"C:\\"));
+	PidlAbsolute pidl(ownedPidl.get());
+
+	pidl.Reset();
+	EXPECT_FALSE(pidl.HasValue());
+	EXPECT_EQ(pidl.Raw(), nullptr);
+}
+
 TEST(PidlAbsoluteEquality, Same)
 {
 	TestPidlEquality(L"c:\\", L"c:\\", true);

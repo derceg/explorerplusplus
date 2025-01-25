@@ -563,7 +563,7 @@ std::wstring ShellBrowserImpl::GetDirectory() const
 
 unique_pidl_absolute ShellBrowserImpl::GetDirectoryIdl() const
 {
-	unique_pidl_absolute pidlDirectory(ILCloneFull(m_directoryState.pidlDirectory.get()));
+	unique_pidl_absolute pidlDirectory(ILCloneFull(m_directoryState.pidlDirectory.Raw()));
 	return pidlDirectory;
 }
 
@@ -705,7 +705,7 @@ BOOL ShellBrowserImpl::CanCreate() const
 	if (SUCCEEDED(hr))
 	{
 		bCanCreate = !InVirtualFolder()
-			|| ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), pidl.get());
+			|| ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), pidl.get());
 	}
 
 	return bCanCreate;
@@ -917,7 +917,7 @@ void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 		}
 	}
 
-	m_directoryState.queuedRenameItem.reset(ILCloneFull(pidlItem));
+	m_directoryState.queuedRenameItem = pidlItem;
 }
 
 void ShellBrowserImpl::OnDeviceChange(UINT eventType, LONG_PTR eventData)
@@ -1301,7 +1301,7 @@ void ShellBrowserImpl::PasteShortcut()
 	auto folderView = winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr());
 	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
-	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.get(), {}, m_hListView,
+	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.Raw(), {}, m_hListView,
 		L"pastelink", 0, serviceProvider.get());
 }
 

@@ -61,7 +61,7 @@ unique_pidl_absolute ShellBrowserImpl::GetPidlForTargetItem(int targetItem)
 		return unique_pidl_absolute(ILCloneFull(item.pidlComplete.get()));
 	}
 
-	return unique_pidl_absolute(ILCloneFull(m_directoryState.pidlDirectory.get()));
+	return unique_pidl_absolute(ILCloneFull(m_directoryState.pidlDirectory.Raw()));
 }
 
 IUnknown *ShellBrowserImpl::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
@@ -69,7 +69,7 @@ IUnknown *ShellBrowserImpl::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPid
 	// It's important to restrict this to the current folder. Otherwise, there can be situations
 	// where an item is dropped in a subfolder, and an item with the same name is selected in the
 	// parent folder (which is a bug that affects Windows Explorer).
-	if (!ArePidlsEquivalent(targetItemPidl, m_directoryState.pidlDirectory.get()))
+	if (!ArePidlsEquivalent(targetItemPidl, m_directoryState.pidlDirectory.Raw()))
 	{
 		return nullptr;
 	}
