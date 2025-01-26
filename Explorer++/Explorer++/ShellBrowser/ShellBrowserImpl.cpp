@@ -648,7 +648,7 @@ std::optional<int> ShellBrowserImpl::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl)
 std::optional<int> ShellBrowserImpl::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
 {
 	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(), [pidl](const auto &pair)
-		{ return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get()); });
+		{ return ArePidlsEquivalent(pidl, pair.second.pidlComplete.Raw()); });
 
 	if (itr == m_itemInfoMap.end())
 	{
@@ -680,12 +680,12 @@ WIN32_FIND_DATA ShellBrowserImpl::GetItemFileFindData(int index) const
 
 unique_pidl_absolute ShellBrowserImpl::GetItemCompleteIdl(int index) const
 {
-	return unique_pidl_absolute(ILCloneFull(GetItemByIndex(index).pidlComplete.get()));
+	return unique_pidl_absolute(ILCloneFull(GetItemByIndex(index).pidlComplete.Raw()));
 }
 
 unique_pidl_child ShellBrowserImpl::GetItemChildIdl(int index) const
 {
-	return unique_pidl_child(ILCloneChild(GetItemByIndex(index).pridl.get()));
+	return unique_pidl_child(ILCloneChild(GetItemByIndex(index).pridl.Raw()));
 }
 
 bool ShellBrowserImpl::InVirtualFolder() const
@@ -910,7 +910,7 @@ void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	{
 		const auto &item = GetItemByIndex(i);
 
-		if (ArePidlsEquivalent(pidlItem, item.pidlComplete.get()))
+		if (ArePidlsEquivalent(pidlItem, item.pidlComplete.Raw()))
 		{
 			ListView_EditLabel(m_hListView, i);
 			return;
@@ -1050,7 +1050,7 @@ void ShellBrowserImpl::UpdateDriveIcon(const TCHAR *szDrive)
 			ListView_GetItem(m_hListView, &lvItem);
 
 			if (ArePidlsEquivalent(pidlDrive.get(),
-					m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
+					m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.Raw()))
 			{
 				iItem = i;
 				iItemInternal = (int) lvItem.lParam;
@@ -1115,8 +1115,8 @@ BasicItemInfo_t ShellBrowserImpl::getBasicItemInfo(int internalIndex) const
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
 
 	BasicItemInfo_t basicItemInfo;
-	basicItemInfo.pidlComplete.reset(ILCloneFull(itemInfo.pidlComplete.get()));
-	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
+	basicItemInfo.pidlComplete.reset(ILCloneFull(itemInfo.pidlComplete.Raw()));
+	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.Raw()));
 	basicItemInfo.wfd = itemInfo.wfd;
 	basicItemInfo.isFindDataValid = itemInfo.isFindDataValid;
 	StringCchCopy(basicItemInfo.szDisplayName, std::size(basicItemInfo.szDisplayName),
@@ -1144,7 +1144,7 @@ void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
 	{
 		auto &itemInfo = GetItemByIndex(item);
-		pidls.push_back(itemInfo.pidlComplete.get());
+		pidls.push_back(itemInfo.pidlComplete.Raw());
 	}
 
 	if (pidls.empty())

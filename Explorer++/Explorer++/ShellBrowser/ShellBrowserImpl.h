@@ -211,8 +211,8 @@ public:
 private:
 	struct ItemInfo_t
 	{
-		unique_pidl_absolute pidlComplete;
-		unique_pidl_child pridl;
+		PidlAbsolute pidlComplete;
+		PidlChild pridl;
 		WIN32_FIND_DATA wfd;
 		bool isFindDataValid;
 		std::wstring parsingName;
@@ -596,7 +596,7 @@ private:
 	/* Thumbnails view. */
 	void QueueThumbnailTask(int internalIndex);
 	std::optional<int> GetCachedThumbnailIndex(const ItemInfo_t &itemInfo);
-	static wil::unique_hbitmap GetThumbnail(PIDLIST_ABSOLUTE pidl, UINT thumbnailSize,
+	static wil::unique_hbitmap GetThumbnail(PCIDLIST_ABSOLUTE pidl, UINT thumbnailSize,
 		WTS_FLAGS flags);
 	void ProcessThumbnailResult(int thumbnailResultId);
 	void SetupThumbnailsView(int shellImageListType);

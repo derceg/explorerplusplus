@@ -282,7 +282,7 @@ void ShellBrowserImpl::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 		switchToNewTab = !switchToNewTab;
 	}
 
-	auto navigateParams = NavigateParams::Normal(itemInfo.pidlComplete.get());
+	auto navigateParams = NavigateParams::Normal(itemInfo.pidlComplete.Raw());
 	m_tabNavigation->CreateNewTab(navigateParams, switchToNewTab);
 }
 
@@ -413,7 +413,7 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 			}
 		}
 
-		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.get(),
+		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.Raw(),
 			[this, internalIndex](int iconIndex, int overlayIndex)
 			{ ProcessIconResult(internalIndex, iconIndex, overlayIndex); });
 	}
@@ -1006,7 +1006,7 @@ HRESULT ShellBrowserImpl::GetListViewSelectionAttributes(SFGAOF *attributes) con
 HRESULT ShellBrowserImpl::GetListViewItemAttributes(int item, SFGAOF *attributes) const
 {
 	const auto &itemInfo = GetItemByIndex(item);
-	return GetItemAttributes(itemInfo.pidlComplete.get(), attributes);
+	return GetItemAttributes(itemInfo.pidlComplete.Raw(), attributes);
 }
 
 std::vector<PidlAbsolute> ShellBrowserImpl::GetSelectedItemPidls() const
@@ -1017,7 +1017,7 @@ std::vector<PidlAbsolute> ShellBrowserImpl::GetSelectedItemPidls() const
 	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
 	{
 		const auto &item = GetItemByIndex(index);
-		selectedItemPidls.push_back(item.pidlComplete.get());
+		selectedItemPidls.push_back(item.pidlComplete);
 	}
 
 	return selectedItemPidls;
@@ -1095,7 +1095,7 @@ BOOL ShellBrowserImpl::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 	const auto &item = GetItemByIndex(dispInfo->item.iItem);
 
 	SFGAOF attributes = SFGAO_CANRENAME;
-	HRESULT hr = GetItemAttributes(item.pidlComplete.get(), &attributes);
+	HRESULT hr = GetItemAttributes(item.pidlComplete.Raw(), &attributes);
 
 	if (FAILED(hr) || WI_IsFlagClear(attributes, SFGAO_CANRENAME))
 	{
@@ -1207,7 +1207,7 @@ BOOL ShellBrowserImpl::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
-	HRESULT hr = SHBindToParent(item.pidlComplete.get(), IID_PPV_ARGS(&parent), &child);
+	HRESULT hr = SHBindToParent(item.pidlComplete.Raw(), IID_PPV_ARGS(&parent), &child);
 
 	if (FAILED(hr))
 	{
@@ -1264,7 +1264,7 @@ BOOL ShellBrowserImpl::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	// change, even if the parsing name remains the same. Comparing the parsing names will show that
 	// they're equivalent. It's easier just to update the item, regardless.
 	unique_pidl_absolute pidlNew(ILCombine(m_directoryState.pidlDirectory.Raw(), newChild.get()));
-	UpdateItem(item.pidlComplete.get(), pidlNew.get());
+	UpdateItem(item.pidlComplete.Raw(), pidlNew.get());
 
 	// The text will be set by UpdateItem. It's not safe to return true here, since items can sorted
 	// by UpdateItem, which can result in the index of this item being changed.

@@ -376,10 +376,8 @@ std::optional<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformation
 {
 	ItemInfo_t itemInfo;
 
-	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
-
-	itemInfo.pidlComplete.reset(ILCloneFull(pidlItem.get()));
-	itemInfo.pridl.reset(ILCloneChild(pidlChild));
+	itemInfo.pidlComplete.TakeOwnership(ILCombine(pidlDirectory, pidlChild));
+	itemInfo.pridl = pidlChild;
 
 	std::wstring parsingName;
 	HRESULT hr = GetDisplayName(shellFolder, pidlChild, SHGDN_FORPARSING, parsingName);
@@ -668,7 +666,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 		}
 
 		if (m_directoryState.queuedRenameItem.HasValue()
-			&& ArePidlsEquivalent(itemInfo.pidlComplete.get(),
+			&& ArePidlsEquivalent(itemInfo.pidlComplete.Raw(),
 				m_directoryState.queuedRenameItem.Raw()))
 		{
 			itemToRename = iItemIndex;
@@ -676,7 +674,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 		auto selectItr = std::find_if(m_directoryState.filesToSelect.begin(),
 			m_directoryState.filesToSelect.end(), [&itemInfo](const auto &pidl)
-			{ return ArePidlsEquivalent(pidl.Raw(), itemInfo.pidlComplete.get()); });
+			{ return ArePidlsEquivalent(pidl.Raw(), itemInfo.pidlComplete.Raw()); });
 
 		if (selectItr != m_directoryState.filesToSelect.end())
 		{

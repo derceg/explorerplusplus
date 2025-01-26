@@ -43,7 +43,7 @@ int ShellBrowserImpl::GetDropTargetItem(const POINT &pt)
 	// drop an item on an executable). But if the file can't accept the drop, then the drop target
 	// should revert to the parent.
 	if (WI_IsFlagClear(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY)
-		&& !GetDropTargetForPidl(item.pidlComplete.get()))
+		&& !GetDropTargetForPidl(item.pidlComplete.Raw()))
 	{
 		return -1;
 	}
@@ -58,7 +58,7 @@ unique_pidl_absolute ShellBrowserImpl::GetPidlForTargetItem(int targetItem)
 	if (targetItem != -1)
 	{
 		auto &item = GetItemByIndex(targetItem);
-		return unique_pidl_absolute(ILCloneFull(item.pidlComplete.get()));
+		return unique_pidl_absolute(ILCloneFull(item.pidlComplete.Raw()));
 	}
 
 	return unique_pidl_absolute(ILCloneFull(m_directoryState.pidlDirectory.Raw()));

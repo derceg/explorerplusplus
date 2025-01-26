@@ -91,7 +91,7 @@ void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
 
 std::optional<int> ShellBrowserImpl::GetCachedThumbnailIndex(const ItemInfo_t &itemInfo)
 {
-	auto bitmap = GetThumbnail(itemInfo.pidlComplete.get(), m_thumbnailItemWidth,
+	auto bitmap = GetThumbnail(itemInfo.pidlComplete.Raw(), m_thumbnailItemWidth,
 		WTS_INCACHEONLY | WTS_SCALETOREQUESTEDSIZE);
 
 	if (!bitmap)
@@ -102,7 +102,7 @@ std::optional<int> ShellBrowserImpl::GetCachedThumbnailIndex(const ItemInfo_t &i
 	return GetExtractedThumbnail(bitmap.get());
 }
 
-wil::unique_hbitmap ShellBrowserImpl::GetThumbnail(PIDLIST_ABSOLUTE pidl, UINT thumbnailSize,
+wil::unique_hbitmap ShellBrowserImpl::GetThumbnail(PCIDLIST_ABSOLUTE pidl, UINT thumbnailSize,
 	WTS_FLAGS flags)
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
@@ -254,7 +254,7 @@ void ShellBrowserImpl::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIn
 	int iIconWidth;
 	int iIconHeight;
 
-	SHGetFileInfo((LPCTSTR) m_itemInfoMap.at(iInternalIndex).pidlComplete.get(), 0, &shfi,
+	SHGetFileInfo((LPCTSTR) m_itemInfoMap.at(iInternalIndex).pidlComplete.Raw(), 0, &shfi,
 		sizeof(shfi), SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
 	hIcon = ImageList_GetIcon(m_directoryState.thumbnailsShellImageList, shfi.iIcon, ILD_NORMAL);
