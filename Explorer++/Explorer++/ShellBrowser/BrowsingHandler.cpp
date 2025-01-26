@@ -45,6 +45,95 @@ HRESULT ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
 	return hr;
 }
 
+HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
+	std::vector<ShellBrowserImpl::ItemInfo_t> &items)
+{
+	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
+	// symlinks and virtual link objects aren't, so they will be handled here.
+	// Navigating to the target pidl is important for folders like the quick access folder. Although
+	// navigating directly to a recent/pinned folder works as expected, directory monitoring doesn't
+	// work. Presumably, that's because directory change notifications are only generated for the
+	// original (target) directory. To have things work correctly, the navigation needs to proceed
+	// to the original folder instead.
+	// Note that this call simply retrieves the target item, but doesn't attempt to resolve it. That
+	// matches the behavior of Explorer. For example, if a symlink to a directory is created and the
+	// target directory is then removed, Explorer will try to navigate to the target, without
+	// attempting to resolve the link.
+	unique_pidl_absolute targetPidl;
+	HRESULT hr = MaybeGetLinkTarget(navigateParams.pidl.Raw(), targetPidl);
+
+	if (SUCCEEDED(hr))
+	{
+		navigateParams.pidl = targetPidl.get();
+	}
+
+	RETURN_IF_FAILED(
+		EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items));
+
+	CommitNavigation(navigateParams);
+
+	return S_OK;
+}
+
+HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
+	bool showHidden, std::vector<ShellBrowserImpl::ItemInfo_t> &items)
+{
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
+
+	ShellEnumerator::Flags flags = ShellEnumerator::Flags::Standard;
+
+	if (showHidden)
+	{
+		WI_SetFlag(flags, ShellEnumerator::Flags::IncludeHidden);
+	}
+
+	ShellEnumerator enumerator;
+	std::vector<PidlChild> outputPidls;
+	RETURN_IF_FAILED(enumerator.EnumerateDirectory(shellFolder.get(), owner, flags, outputPidls));
+
+	for (const auto &pidl : outputPidls)
+	{
+		auto item = GetItemInformation(shellFolder.get(), pidlDirectory, pidl.Raw());
+
+		if (item)
+		{
+			items.push_back(std::move(*item));
+		}
+	}
+
+	return S_OK;
+}
+
+void ShellBrowserImpl::CommitNavigation(const NavigateParams &navigateParams)
+{
+	PrepareToChangeFolders();
+
+	bool isVirtualFolder = false;
+	SFGAOF attributes = SFGAO_FILESYSTEM;
+	HRESULT hr = GetItemAttributes(navigateParams.pidl.Raw(), &attributes);
+	DCHECK(SUCCEEDED(hr));
+
+	if (SUCCEEDED(hr))
+	{
+		isVirtualFolder = WI_IsFlagClear(attributes, SFGAO_FILESYSTEM);
+	}
+
+	m_directoryState.pidlDirectory = navigateParams.pidl;
+	m_directoryState.directory =
+		GetDisplayNameWithFallback(navigateParams.pidl.Raw(), SHGDN_FORPARSING);
+	m_directoryState.virtualFolder = isVirtualFolder;
+	m_uniqueFolderId++;
+
+	SetActiveColumnSet();
+	VerifySortMode();
+	SetViewModeInternal(m_folderSettings.viewMode);
+
+	NotifyShellOfNavigation(navigateParams.pidl.Raw());
+
+	m_navigationCommittedSignal(navigateParams);
+}
+
 void ShellBrowserImpl::PrepareToChangeFolders()
 {
 	if (m_bFolderVisited)
@@ -80,6 +169,19 @@ void ShellBrowserImpl::ClearPendingResults()
 	m_infoTipResults.clear();
 }
 
+void ShellBrowserImpl::StoreCurrentlySelectedItems()
+{
+	auto *entry = m_navigationController->GetCurrentEntry();
+
+	if (!entry)
+	{
+		return;
+	}
+
+	auto selectedItems = GetSelectedItemPidls();
+	entry->SetSelectedItems(selectedItems);
+}
+
 void ShellBrowserImpl::ResetFolderState()
 {
 	ListView_SetImageList(m_hListView, nullptr, LVSIL_SMALL);
@@ -96,102 +198,6 @@ void ShellBrowserImpl::ResetFolderState()
 	m_itemInfoMap.clear();
 
 	m_renamedItemOldPidl.reset();
-}
-
-void ShellBrowserImpl::StoreCurrentlySelectedItems()
-{
-	auto *entry = m_navigationController->GetCurrentEntry();
-
-	if (!entry)
-	{
-		return;
-	}
-
-	auto selectedItems = GetSelectedItemPidls();
-	entry->SetSelectedItems(selectedItems);
-}
-
-HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
-	std::vector<ShellBrowserImpl::ItemInfo_t> &items)
-{
-	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
-	// symlinks and virtual link objects aren't, so they will be handled here.
-	// Navigating to the target pidl is important for folders like the quick access folder. Although
-	// navigating directly to a recent/pinned folder works as expected, directory monitoring doesn't
-	// work. Presumably, that's because directory change notifications are only generated for the
-	// original (target) directory. To have things work correctly, the navigation needs to proceed
-	// to the original folder instead.
-	// Note that this call simply retrieves the target item, but doesn't attempt to resolve it. That
-	// matches the behavior of Explorer. For example, if a symlink to a directory is created and the
-	// target directory is then removed, Explorer will try to navigate to the target, without
-	// attempting to resolve the link.
-	unique_pidl_absolute targetPidl;
-	HRESULT hr = MaybeGetLinkTarget(navigateParams.pidl.Raw(), targetPidl);
-
-	if (SUCCEEDED(hr))
-	{
-		navigateParams.pidl = targetPidl.get();
-	}
-
-	wil::com_ptr_nothrow<IShellFolder> parent;
-	PCITEMID_CHILD child;
-	RETURN_IF_FAILED(SHBindToParent(navigateParams.pidl.Raw(), IID_PPV_ARGS(&parent), &child));
-
-	SFGAOF attr = SFGAO_FILESYSTEM;
-	RETURN_IF_FAILED(parent->GetAttributesOf(1, &child, &attr));
-
-	std::wstring parsingPath;
-	RETURN_IF_FAILED(GetDisplayName(parent.get(), child, SHGDN_FORPARSING, parsingPath));
-
-	RETURN_IF_FAILED(
-		EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items));
-
-	PrepareToChangeFolders();
-
-	m_directoryState.pidlDirectory = navigateParams.pidl;
-	m_directoryState.directory = parsingPath;
-	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
-	m_uniqueFolderId++;
-
-	SetActiveColumnSet();
-	VerifySortMode();
-	SetViewModeInternal(m_folderSettings.viewMode);
-
-	NotifyShellOfNavigation(navigateParams.pidl.Raw());
-
-	m_navigationCommittedSignal(navigateParams);
-
-	return S_OK;
-}
-
-HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
-	bool showHidden, std::vector<ShellBrowserImpl::ItemInfo_t> &items)
-{
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
-
-	ShellEnumerator::Flags flags = ShellEnumerator::Flags::Standard;
-
-	if (showHidden)
-	{
-		WI_SetFlag(flags, ShellEnumerator::Flags::IncludeHidden);
-	}
-
-	ShellEnumerator enumerator;
-	std::vector<PidlChild> outputPidls;
-	RETURN_IF_FAILED(enumerator.EnumerateDirectory(shellFolder.get(), owner, flags, outputPidls));
-
-	for (const auto &pidl : outputPidls)
-	{
-		auto item = GetItemInformation(shellFolder.get(), pidlDirectory, pidl.Raw());
-
-		if (item)
-		{
-			items.push_back(std::move(*item));
-		}
-	}
-
-	return S_OK;
 }
 
 void ShellBrowserImpl::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)

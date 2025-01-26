@@ -409,10 +409,11 @@ private:
 		std::vector<ItemInfo_t> &items);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
+	void CommitNavigation(const NavigateParams &navigateParams);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
-	void ResetFolderState();
 	void StoreCurrentlySelectedItems();
+	void ResetFolderState();
 	void OnEnumerationCompleted(std::vector<ItemInfo_t> &&items,
 		const NavigateParams &navigateParams);
 	void InsertAwaitingItems();
