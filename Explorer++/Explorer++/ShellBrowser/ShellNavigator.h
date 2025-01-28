@@ -91,6 +91,9 @@ public:
 		return params;
 	}
 
+	// This is only used in tests.
+	bool operator==(const NavigateParams &) const = default;
+
 private:
 	NavigateParams() = default;
 };

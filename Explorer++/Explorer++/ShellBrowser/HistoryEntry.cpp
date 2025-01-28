@@ -5,7 +5,10 @@
 #include "stdafx.h"
 #include "HistoryEntry.h"
 
-HistoryEntry::HistoryEntry(const PidlAbsolute &pidl) : m_id(idCounter++), m_pidl(pidl)
+HistoryEntry::HistoryEntry(const PidlAbsolute &pidl, InitialNavigationType type) :
+	m_id(idCounter++),
+	m_pidl(pidl),
+	m_type(type)
 {
 }
 
@@ -17,6 +20,16 @@ int HistoryEntry::GetId() const
 const PidlAbsolute &HistoryEntry::GetPidl() const
 {
 	return m_pidl;
+}
+
+bool HistoryEntry::IsInitialEntry() const
+{
+	return m_type == InitialNavigationType::Initial;
+}
+
+HistoryEntry::InitialNavigationType HistoryEntry::GetInitialNavigationType() const
+{
+	return m_type;
 }
 
 const std::vector<PidlAbsolute> &HistoryEntry::GetSelectedItems() const

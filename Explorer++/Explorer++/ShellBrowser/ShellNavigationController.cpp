@@ -29,6 +29,9 @@ ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
 
 void ShellNavigationController::Initialize()
 {
+	m_connections.emplace_back(m_navigator->AddNavigationStartedObserver(
+		std::bind_front(&ShellNavigationController::OnNavigationStarted, this),
+		boost::signals2::at_front));
 	m_connections.emplace_back(m_navigator->AddNavigationCommittedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
 		boost::signals2::at_front));
@@ -48,15 +51,34 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
+void ShellNavigationController::OnNavigationStarted(const NavigateParams &navigateParams)
+{
+	if (!GetCurrentEntry())
+	{
+		// There is no current entry, so this is the very first navigation. An initial entry should
+		// be added.
+		AddEntry(std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(),
+			HistoryEntry::InitialNavigationType::Initial));
+	}
+}
+
 void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams)
 {
 	auto historyEntryType = navigateParams.historyEntryType;
 
-	// If there is no current history entry (i.e. because this is the first navigation), one should
-	// be added, regardless of the requested history entry type.
-	if (!GetCurrentEntry())
+	// An initial entry should always be added when a navigation starts, so there should always be a
+	// current entry at this point.
+	auto *currentEntry = GetCurrentEntry();
+	CHECK(currentEntry);
+
+	// If the current entry is the initial entry, it should be replaced, regardless of the requested
+	// history entry type.
+	if (currentEntry->IsInitialEntry())
 	{
-		historyEntryType = HistoryEntryType::AddEntry;
+		// If the current entry is the initial entry, that should be the only entry.
+		DCHECK_EQ(GetNumHistoryEntries(), 1);
+
+		historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 	}
 
 	// If navigating to a history entry, the current index will be set here. It's important this is
@@ -70,7 +92,8 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 			auto index = GetIndexOfEntry(entry);
 			SetCurrentIndex(*index);
 		}
-		else if (historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
+		else if (historyEntryType == HistoryEntryType::ReplaceCurrentEntry
+			&& !currentEntry->IsInitialEntry())
 		{
 			// The history entry can't be replaced if it doesn't exist, so add a new entry instead.
 			historyEntryType = HistoryEntryType::AddEntry;
@@ -89,7 +112,6 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 		else
 		{
 			// When an entry is replaced, the set of selected items should be retained.
-			auto *currentEntry = GetCurrentEntry();
 			entry->SetSelectedItems(currentEntry->GetSelectedItems());
 
 			ReplaceCurrentEntry(std::move(entry));

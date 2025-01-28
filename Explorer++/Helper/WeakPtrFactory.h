@@ -37,6 +37,13 @@ public:
 		return WeakPtr<T>(m_state);
 	}
 
+	void InvalidateWeakPtrs()
+	{
+		auto *ptr = m_state->Get();
+		m_state->Invalidate();
+		m_state = std::make_shared<WeakState<T>>(ptr);
+	}
+
 private:
-	const std::shared_ptr<WeakState<T>> m_state;
+	std::shared_ptr<WeakState<T>> m_state;
 };

@@ -25,6 +25,11 @@ public:
 		return m_weakPtrFactory.GetWeakPtr();
 	}
 
+	void InvalidateWeakPtrs()
+	{
+		m_weakPtrFactory.InvalidateWeakPtrs();
+	}
+
 	void IncrementCounter()
 	{
 		m_counter++;
@@ -96,6 +101,20 @@ TEST(WeakPtrFactoryTest, WeakPtrCopy)
 	EXPECT_EQ(weakPtrCopy.Get(), nullptr);
 }
 
+TEST(WeakPtrFactoryTest, InvalidateWeakPtrs)
+{
+	auto weakFactoryOwner = std::make_unique<WeakFactoryOwner>();
+	auto weakPtr1 = weakFactoryOwner->GetWeakPtr();
+
+	weakFactoryOwner->InvalidateWeakPtrs();
+
+	EXPECT_EQ(weakPtr1.Get(), nullptr);
+
+	// Should be able to create new WeakPtrs after invalidating existing pointers.
+	auto weakPtr2 = weakFactoryOwner->GetWeakPtr();
+	EXPECT_EQ(weakPtr2.Get(), weakFactoryOwner.get());
+}
+
 TEST(WeakPtrFactoryDeathTest, UseAfterInvalidation)
 {
 	auto weakFactoryOwner = std::make_unique<WeakFactoryOwner>();
@@ -162,4 +181,13 @@ TEST(WeakPtrFactoryDeathTest, BoolConversionOnDifferentThread)
 	auto weakPtr = weakFactoryOwner->GetWeakPtr();
 
 	EXPECT_CHECK_DEATH({ std::jthread thread([weakPtr]() { static_cast<bool>(weakPtr); }); });
+}
+
+TEST(WeakPtrFactoryDeathTest, InvalidateWeakPtrsOnDifferentThread)
+{
+	auto weakFactoryOwner = std::make_unique<WeakFactoryOwner>();
+
+	EXPECT_CHECK_DEATH({
+		std::jthread thread([&weakFactoryOwner]() { weakFactoryOwner->InvalidateWeakPtrs(); });
+	});
 }

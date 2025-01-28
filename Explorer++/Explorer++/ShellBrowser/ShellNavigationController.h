@@ -55,6 +55,7 @@ private:
 	HRESULT Navigate(const HistoryEntry *entry) override;
 	HRESULT GetFailureValue() override;
 
+	void OnNavigationStarted(const NavigateParams &navigateParams);
 	void OnNavigationCommitted(const NavigateParams &navigateParams);
 
 	ShellNavigator *m_navigator;

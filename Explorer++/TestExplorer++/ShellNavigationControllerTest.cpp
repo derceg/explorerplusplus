@@ -244,7 +244,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	MockFunction<void(const NavigateParams &navigateParams)> navigationStartedCallback;
 	m_shellBrowser.AddNavigationStartedObserver(navigationStartedCallback.AsStdFunction());
 
-	EXPECT_CALL(navigationStartedCallback, Call(Ref(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
 
 	// By default, all navigations should proceed in the current tab.
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
@@ -258,9 +258,15 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	navigationController->SetNavigationMode(NavigationMode::ForceNewTab);
 	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::ForceNewTab);
 
-	// Although the navigation mode has been set, the navigation is to the same directory, which is
-	// treated as an implicit refresh and should always proceed in the same tab.
-	EXPECT_CALL(navigationStartedCallback, Call(Ref(params)));
+	// The navigation is to the same directory, which is treated as an implicit refresh, so the
+	// following fields are expected to be set.
+	auto expectedParams = params;
+	expectedParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
+	expectedParams.overrideNavigationMode = true;
+
+	// Although the navigation mode has been set, the navigation is an implicit refresh and should
+	// always proceed in the same tab.
+	EXPECT_CALL(navigationStartedCallback, Call(Eq(expectedParams)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	hr = navigationController->Navigate(params);
@@ -282,7 +288,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 
 	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
 	// the tab, even though a navigation mode was applied above.
-	EXPECT_CALL(navigationStartedCallback, Call(Ref(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	hr = navigationController->Navigate(params);
@@ -302,7 +308,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 
 	// The first navigation in a tab should always take place within that tab, regardless of the
 	// navigation mode in effect.
-	EXPECT_CALL(navigationStartedCallback, Call(Ref(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	HRESULT hr = navigationController->Navigate(params);
@@ -312,7 +318,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 	auto params2 = NavigateParams::Normal(pidl2.Raw());
 
 	// Subsequent navigations should then open in a new tab when necessary.
-	EXPECT_CALL(navigationStartedCallback, Call(Ref(params2))).Times(0);
+	EXPECT_CALL(navigationStartedCallback, Call(Eq(params2))).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params2), _));
 
 	hr = navigationController->Navigate(params2);
@@ -403,6 +409,45 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 	auto entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
 	EXPECT_EQ(entry->GetPidl(), pidl);
+}
+
+TEST_F(ShellNavigationControllerTest, InitialNavigation)
+{
+	m_shellBrowser.SetNavigationMode(ShellBrowserFake::NavigationMode::Async);
+
+	PidlAbsolute pidl;
+	ASSERT_HRESULT_SUCCEEDED(
+		m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl));
+
+	auto *navigationController = GetNavigationController();
+
+	// An initial entry should be added, regardless of the history entry type requested.
+	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
+	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
+
+	auto entry = navigationController->GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_EQ(entry->GetInitialNavigationType(), HistoryEntry::InitialNavigationType::Initial);
+	EXPECT_TRUE(entry->IsInitialEntry());
+	EXPECT_EQ(entry->GetPidl(), pidl);
+	int originalEntryId = entry->GetId();
+
+	auto *request = m_shellBrowser.GetLastAsyncNavigationRequest();
+	ASSERT_NE(request, nullptr);
+
+	// This should result in the initial entry being replaced. There should still only be a single
+	// entry.
+	request->Complete();
+	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
+	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
+
+	auto updatedEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(updatedEntry, nullptr);
+	EXPECT_NE(updatedEntry->GetId(), originalEntryId);
+	EXPECT_EQ(updatedEntry->GetInitialNavigationType(),
+		HistoryEntry::InitialNavigationType::NonInitial);
+	EXPECT_FALSE(updatedEntry->IsInitialEntry());
+	EXPECT_EQ(updatedEntry->GetPidl(), pidl);
 }
 
 class ShellNavigationControllerPreservedTest : public Test
