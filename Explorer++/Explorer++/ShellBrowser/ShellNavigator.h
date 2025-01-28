@@ -108,15 +108,25 @@ public:
 	virtual ~ShellNavigator() = default;
 
 	virtual HRESULT Navigate(NavigateParams &navigateParams) = 0;
+
+	// Triggered when a navigation is initiated.
 	virtual boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
+
+	// Triggered when the enumeration for a directory successfully finishes. At this point, the
+	// enumerated items haven't yet been displayed.
 	virtual boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
+
+	// Triggered when the enumerated items for a directory have been inserted into the view.
+	// Indicates that the navigation has fully completed.
 	virtual boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
+
+	// Triggered when the enumeration for a navigation fails.
 	virtual boost::signals2::connection AddNavigationFailedObserver(
 		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
