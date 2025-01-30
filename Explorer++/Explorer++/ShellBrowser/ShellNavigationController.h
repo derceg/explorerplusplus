@@ -22,7 +22,7 @@ enum class NavigationMode
 };
 
 class ShellNavigationController :
-	public NavigationController<HistoryEntry, HRESULT>,
+	public NavigationController<HistoryEntry>,
 	private boost::noncopyable
 {
 public:
@@ -31,15 +31,13 @@ public:
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
-	HRESULT GoToOffset(int offset) override;
-
 	[[nodiscard]] bool CanGoUp() const;
-	HRESULT GoUp();
+	void GoUp();
 
-	HRESULT Refresh();
+	void Refresh();
 
-	HRESULT Navigate(const std::wstring &path);
-	HRESULT Navigate(NavigateParams &navigateParams);
+	void Navigate(const std::wstring &path);
+	void Navigate(NavigateParams &navigateParams);
 
 	void SetNavigationMode(NavigationMode navigationMode);
 	NavigationMode GetNavigationMode() const;
@@ -52,8 +50,7 @@ private:
 	static std::vector<std::unique_ptr<HistoryEntry>> CopyPreservedHistoryEntries(
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries);
 
-	HRESULT Navigate(const HistoryEntry *entry) override;
-	HRESULT GetFailureValue() override;
+	void Navigate(const HistoryEntry *entry) override;
 
 	void OnNavigationStarted(const NavigateParams &navigateParams);
 	void OnNavigationCommitted(const NavigateParams &navigateParams);

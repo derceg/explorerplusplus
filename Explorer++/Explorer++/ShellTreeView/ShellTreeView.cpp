@@ -715,16 +715,13 @@ void ShellTreeView::HandleSelectionChanged(const NMTREEVIEW *eventInfo)
 	}
 
 	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
-	HRESULT hr = shellBrowser->GetNavigationController()->Navigate(navigateParams);
+	shellBrowser->GetNavigationController()->Navigate(navigateParams);
 
-	if (SUCCEEDED(hr))
+	// The folder will only be expanded if the user explicitly selected it.
+	if (m_config->treeViewAutoExpandSelected
+		&& (eventInfo->action == TVC_BYMOUSE || eventInfo->action == TVC_BYKEYBOARD))
 	{
-		// The folder will only be expanded if the user explicitly selected it.
-		if (m_config->treeViewAutoExpandSelected
-			&& (eventInfo->action == TVC_BYMOUSE || eventInfo->action == TVC_BYKEYBOARD))
-		{
-			TreeView_Expand(m_hTreeView, eventInfo->itemNew.hItem, TVE_EXPAND);
-		}
+		TreeView_Expand(m_hTreeView, eventInfo->itemNew.hItem, TVE_EXPAND);
 	}
 }
 

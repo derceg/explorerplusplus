@@ -30,9 +30,9 @@ protected:
 
 TEST_F(BrowserCommandControllerTest, Back)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	m_commandController.ExecuteCommand(IDM_GO_BACK);
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 1);
@@ -40,9 +40,9 @@ TEST_F(BrowserCommandControllerTest, Back)
 
 TEST_F(BrowserCommandControllerTest, Forward)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	m_shellBrowser.GetNavigationController()->GoBack();
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 1);
@@ -53,7 +53,7 @@ TEST_F(BrowserCommandControllerTest, Forward)
 
 TEST_F(BrowserCommandControllerTest, Up)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake");
 
 	m_commandController.ExecuteCommand(IDM_GO_UP);
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetNumHistoryEntries(), 2);

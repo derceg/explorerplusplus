@@ -413,7 +413,7 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 
 	m_directoryState.totalDirSize += newFileSize.QuadPart - oldFileSize.QuadPart;
 
-	m_itemInfoMap[*internalIndex] = std::move(*itemInfo);
+	m_itemInfoMap[*internalIndex] = *itemInfo;
 	const ItemInfo_t &updatedItemInfo = m_itemInfoMap[*internalIndex];
 
 	auto itemIndex = LocateItemByInternalIndex(*internalIndex);

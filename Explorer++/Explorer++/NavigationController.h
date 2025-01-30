@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-template <typename HistoryEntryType, typename BrowseFolderReturnType>
+template <typename HistoryEntryType>
 class NavigationController
 {
 public:
@@ -22,6 +22,8 @@ public:
 		m_currentEntry(currentEntry)
 	{
 	}
+
+	virtual ~NavigationController() = default;
 
 	int GetNumHistoryEntries() const
 	{
@@ -127,39 +129,30 @@ public:
 		return history;
 	}
 
-	BrowseFolderReturnType GoBack()
+	void GoBack()
 	{
-		return GoToOffset(-1);
+		GoToOffset(-1);
 	}
 
-	BrowseFolderReturnType GoForward()
+	void GoForward()
 	{
-		return GoToOffset(1);
+		GoToOffset(1);
 	}
 
-	virtual BrowseFolderReturnType GoToOffset(int offset)
+	void GoToOffset(int offset)
 	{
 		auto entry = GetEntry(offset);
 
 		if (!entry)
 		{
-			return GetFailureValue();
+			return;
 		}
 
-		auto res = Navigate(entry);
-
-		if (res != GetFailureValue())
-		{
-			int index = m_currentEntry + offset;
-			m_currentEntry = index;
-		}
-
-		return res;
+		Navigate(entry);
 	}
 
 protected:
-	virtual BrowseFolderReturnType Navigate(const HistoryEntryType *entry) = 0;
-	virtual BrowseFolderReturnType GetFailureValue() = 0;
+	virtual void Navigate(const HistoryEntryType *entry) = 0;
 
 	int AddEntry(std::unique_ptr<HistoryEntryType> entry)
 	{

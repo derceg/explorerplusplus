@@ -85,8 +85,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
-	m_bFolderVisited = FALSE;
-
 	m_performingDrag = false;
 	m_nCurrentColumns = 0;
 	m_pActiveColumns = nullptr;

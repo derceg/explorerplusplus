@@ -89,7 +89,7 @@ public:
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
 	// ShellNavigator
-	HRESULT Navigate(NavigateParams &navigateParams) override;
+	void Navigate(NavigateParams &navigateParams) override;
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
@@ -404,23 +404,26 @@ private:
 	void VerifySortMode();
 
 	/* Browsing support. */
+	void OnNavigationStarted(const NavigateParams &navigateParams);
 	HRESULT PerformEnumeration(NavigateParams &navigateParams, std::vector<ItemInfo_t> &items);
 	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
 		std::vector<ItemInfo_t> &items);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	void CommitNavigation(const NavigateParams &navigateParams);
+	void ChangeFolders(const NavigateParams &navigateParams);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void StoreCurrentlySelectedItems();
 	void ResetFolderState();
-	void OnEnumerationCompleted(std::vector<ItemInfo_t> &&items,
+	void OnEnumerationCompleted(const std::vector<ItemInfo_t> &items,
 		const NavigateParams &navigateParams);
 	void InsertAwaitingItems();
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
+	void OnEnumerationFailed(const NavigateParams &navigateParams);
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
-	int AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition);
+	int AddItemInternal(int itemIndex, const ItemInfo_t &itemInfo, BOOL setPosition);
 	static HRESULT ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
 		PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
 	void SetViewModeInternal(ViewMode viewMode);
@@ -687,7 +690,7 @@ private:
 	/* Internal state. */
 	const HINSTANCE m_resourceInstance;
 	AcceleratorManager *const m_acceleratorManager;
-	BOOL m_bFolderVisited;
+	bool m_folderVisited = false;
 	std::optional<int> m_dirMonitorId;
 	int m_iFolderIcon;
 	int m_iFileIcon;

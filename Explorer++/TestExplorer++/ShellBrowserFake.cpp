@@ -74,19 +74,17 @@ ShellBrowserFake::~ShellBrowserFake() = default;
 // Although the ShellNavigationController can navigate to a path (by transforming it into a pidl),
 // it requires that the path exist. This function will transform the path into a simple pidl, which
 // doesn't require the path to exist.
-HRESULT ShellBrowserFake::NavigateToPath(const std::wstring &path, HistoryEntryType addHistoryType,
+void ShellBrowserFake::NavigateToPath(const std::wstring &path, HistoryEntryType addHistoryType,
 	PidlAbsolute *outputPidl)
 {
 	PidlAbsolute pidl = CreateSimplePidlForTest(path);
 	auto navigateParams = NavigateParams::Normal(pidl.Raw(), addHistoryType);
-	HRESULT hr = m_navigationController->Navigate(navigateParams);
+	m_navigationController->Navigate(navigateParams);
 
 	if (outputPidl)
 	{
 		*outputPidl = pidl;
 	}
-
-	return hr;
 }
 
 void ShellBrowserFake::SetNavigationMode(NavigationMode navigationMode)
@@ -120,7 +118,7 @@ void ShellBrowserFake::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 	m_helpers.push_back(std::move(helper));
 }
 
-HRESULT ShellBrowserFake::Navigate(NavigateParams &navigateParams)
+void ShellBrowserFake::Navigate(NavigateParams &navigateParams)
 {
 	std::unique_ptr<NavigationRequest> ownedRequest;
 	NavigationRequest *request = nullptr;
@@ -138,8 +136,6 @@ HRESULT ShellBrowserFake::Navigate(NavigateParams &navigateParams)
 
 	SetUpNavigationRequestListeners(request);
 	request->Start();
-
-	return S_OK;
 }
 
 void ShellBrowserFake::SetUpNavigationRequestListeners(NavigationRequest *request)

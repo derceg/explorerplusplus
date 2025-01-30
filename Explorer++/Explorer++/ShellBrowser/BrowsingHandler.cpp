@@ -23,30 +23,50 @@
 #include <propvarutil.h>
 #include <list>
 
-HRESULT ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
+void ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
 	auto resetCursor = wil::scope_exit([] { SetCursor(LoadCursor(nullptr, IDC_ARROW)); });
 
-	m_navigationStartedSignal(navigateParams);
+	OnNavigationStarted(navigateParams);
 
 	std::vector<ItemInfo_t> items;
 	HRESULT hr = PerformEnumeration(navigateParams, items);
 
-	if (FAILED(hr))
+	auto *currentEntry = m_navigationController->GetCurrentEntry();
+	CHECK(currentEntry);
+
+	// Typically, when a navigation fails, nothing will happen. The original folder will continue to
+	// be shown. However, when the initial navigation fails, there is no original folder, so the
+	// only reasonable choice is to commit the failed navigation, regardless.
+	if (FAILED(hr) && !currentEntry->IsInitialEntry())
 	{
-		m_navigationFailedSignal(navigateParams);
-		return hr;
+		OnEnumerationFailed(navigateParams);
+		return;
 	}
 
-	OnEnumerationCompleted(std::move(items), navigateParams);
+	OnEnumerationCompleted(items, navigateParams);
+}
 
-	return hr;
+void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
+{
+	if (!m_folderVisited)
+	{
+		// This is the first navigation. As this class always represents a folder, it's necessary to
+		// immediately switch to the folder for the initial navigation. Normally, this is only done
+		// once the navigation commits.
+		// Note that this path can be taken both when a new tab is created and the initial
+		// navigation occurs, as well as when a tab is restored and a navigation to the current
+		// entry occurs.
+		ChangeFolders(navigateParams);
+	}
+
+	m_navigationStartedSignal(navigateParams);
 }
 
 HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
-	std::vector<ShellBrowserImpl::ItemInfo_t> &items)
+	std::vector<ItemInfo_t> &items)
 {
 	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
 	// symlinks and virtual link objects aren't, so they will be handled here.
@@ -70,13 +90,11 @@ HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
 	RETURN_IF_FAILED(
 		EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items));
 
-	CommitNavigation(navigateParams);
-
 	return S_OK;
 }
 
 HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
-	bool showHidden, std::vector<ShellBrowserImpl::ItemInfo_t> &items)
+	bool showHidden, std::vector<ItemInfo_t> &items)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
@@ -98,7 +116,7 @@ HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND 
 
 		if (item)
 		{
-			items.push_back(std::move(*item));
+			items.push_back(*item);
 		}
 	}
 
@@ -106,6 +124,15 @@ HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND 
 }
 
 void ShellBrowserImpl::CommitNavigation(const NavigateParams &navigateParams)
+{
+	ChangeFolders(navigateParams);
+
+	NotifyShellOfNavigation(navigateParams.pidl.Raw());
+
+	m_navigationCommittedSignal(navigateParams);
+}
+
+void ShellBrowserImpl::ChangeFolders(const NavigateParams &navigateParams)
 {
 	PrepareToChangeFolders();
 
@@ -129,14 +156,12 @@ void ShellBrowserImpl::CommitNavigation(const NavigateParams &navigateParams)
 	VerifySortMode();
 	SetViewModeInternal(m_folderSettings.viewMode);
 
-	NotifyShellOfNavigation(navigateParams.pidl.Raw());
-
-	m_navigationCommittedSignal(navigateParams);
+	m_folderVisited = true;
 }
 
 void ShellBrowserImpl::PrepareToChangeFolders()
 {
-	if (m_bFolderVisited)
+	if (m_folderVisited)
 	{
 		SaveColumnWidths();
 	}
@@ -149,7 +174,7 @@ void ShellBrowserImpl::PrepareToChangeFolders()
 
 	ListView_DeleteAllItems(m_hListView);
 
-	if (m_bFolderVisited)
+	if (m_folderVisited)
 	{
 		ResetFolderState();
 	}
@@ -342,13 +367,13 @@ std::optional<int> ShellBrowserImpl::AddItemInternal(IShellFolder *shellFolder,
 		return std::nullopt;
 	}
 
-	return AddItemInternal(itemIndex, std::move(*itemInfo), setPosition);
+	return AddItemInternal(itemIndex, *itemInfo, setPosition);
 }
 
-int ShellBrowserImpl::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition)
+int ShellBrowserImpl::AddItemInternal(int itemIndex, const ItemInfo_t &itemInfo, BOOL setPosition)
 {
 	int itemId = GenerateUniqueItemId();
-	m_itemInfoMap.insert({ itemId, std::move(itemInfo) });
+	m_itemInfoMap.insert({ itemId, itemInfo });
 
 	AwaitingAdd_t awaitingAdd;
 
@@ -472,7 +497,7 @@ std::optional<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformation
 		}
 	}
 
-	return std::move(itemInfo);
+	return itemInfo;
 }
 
 HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
@@ -522,12 +547,14 @@ HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellF
 	return hr;
 }
 
-void ShellBrowserImpl::OnEnumerationCompleted(std::vector<ShellBrowserImpl::ItemInfo_t> &&items,
+void ShellBrowserImpl::OnEnumerationCompleted(const std::vector<ItemInfo_t> &items,
 	const NavigateParams &navigateParams)
 {
+	CommitNavigation(navigateParams);
+
 	for (auto &item : items)
 	{
-		AddItemInternal(-1, std::move(item), FALSE);
+		AddItemInternal(-1, item, FALSE);
 	}
 
 	/* Stop the list view from redrawing itself each time is inserted.
@@ -565,8 +592,6 @@ void ShellBrowserImpl::OnEnumerationCompleted(std::vector<ShellBrowserImpl::Item
 	{
 		StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
 	}
-
-	m_bFolderVisited = TRUE;
 
 	m_navigationCompletedSignal(navigateParams);
 }
@@ -743,6 +768,11 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	}
 
 	return bFilenameFiltered || bHideSystemFile;
+}
+
+void ShellBrowserImpl::OnEnumerationFailed(const NavigateParams &navigateParams)
+{
+	m_navigationFailedSignal(navigateParams);
 }
 
 void ShellBrowserImpl::RemoveItem(int iItemInternal)

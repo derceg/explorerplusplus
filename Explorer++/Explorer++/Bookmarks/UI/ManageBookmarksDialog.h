@@ -87,7 +87,7 @@ private:
 	LRESULT CALLBACK ToolbarParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder);
-	void OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry);
+	void OnListViewNavigation(BookmarkItem *bookmarkFolder, const BookmarkHistoryEntry *entry);
 
 	void UpdateToolbarState();
 

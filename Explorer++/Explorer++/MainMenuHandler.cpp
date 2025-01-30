@@ -275,23 +275,15 @@ void Explorerplusplus::OnResolveLink()
 	}
 }
 
-HRESULT Explorerplusplus::OnGoToOffset(int offset)
+void Explorerplusplus::OnGoToOffset(int offset)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	return selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
+	selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
 }
 
-HRESULT Explorerplusplus::OnGoHome()
+void Explorerplusplus::OnGoHome()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	HRESULT hr = selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
+	selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
 		m_config->defaultTabDirectory);
-
-	if (FAILED(hr))
-	{
-		hr = selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
-			m_config->defaultTabDirectoryStatic);
-	}
-
-	return hr;
 }

@@ -284,8 +284,8 @@ private:
 	void OnCheckForUpdates();
 	void OnAbout();
 
-	HRESULT OnGoToOffset(int offset);
-	HRESULT OnGoHome();
+	void OnGoToOffset(int offset);
+	void OnGoHome();
 
 	int HighlightSimilarFiles(HWND ListView) const;
 

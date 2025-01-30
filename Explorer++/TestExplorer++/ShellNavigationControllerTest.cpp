@@ -36,13 +36,12 @@ TEST_F(ShellNavigationControllerTest, Refresh)
 	auto *navigationController = GetNavigationController();
 
 	// Shouldn't be able to refresh when no navigation has occurred yet.
-	HRESULT hr = navigationController->Refresh();
-	ASSERT_HRESULT_FAILED(hr);
+	navigationController->Refresh();
+	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 0);
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake");
 
-	hr = navigationController->Refresh();
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Refresh();
 
 	// Refreshing shouldn't result in a history entry being added.
 	EXPECT_FALSE(navigationController->CanGoBack());
@@ -52,8 +51,8 @@ TEST_F(ShellNavigationControllerTest, Refresh)
 
 TEST_F(ShellNavigationControllerTest, NavigateToSameFolder)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake");
 
 	auto *navigationController = GetNavigationController();
 
@@ -66,7 +65,7 @@ TEST_F(ShellNavigationControllerTest, NavigateToSameFolder)
 
 TEST_F(ShellNavigationControllerTest, BackForward)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
 
 	auto *navigationController = GetNavigationController();
 
@@ -74,40 +73,40 @@ TEST_F(ShellNavigationControllerTest, BackForward)
 	EXPECT_FALSE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
 
 	EXPECT_TRUE(navigationController->CanGoBack());
 	EXPECT_FALSE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 
-	ASSERT_HRESULT_SUCCEEDED(navigationController->GoBack());
+	navigationController->GoBack();
 
 	EXPECT_FALSE(navigationController->CanGoBack());
 	EXPECT_TRUE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
 
-	ASSERT_HRESULT_SUCCEEDED(navigationController->GoForward());
+	navigationController->GoForward();
 
 	EXPECT_TRUE(navigationController->CanGoBack());
 	EXPECT_FALSE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	EXPECT_TRUE(navigationController->CanGoBack());
 	EXPECT_FALSE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 3);
 
 	// Go back to the first entry.
-	ASSERT_HRESULT_SUCCEEDED(navigationController->GoToOffset(-2));
+	navigationController->GoToOffset(-2);
 
 	EXPECT_FALSE(navigationController->CanGoBack());
 	EXPECT_TRUE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 3);
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake4"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake4");
 
 	// Performing a new navigation should have cleared the forward history.
 	EXPECT_TRUE(navigationController->CanGoBack());
@@ -117,7 +116,7 @@ TEST_F(ShellNavigationControllerTest, BackForward)
 
 TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
 
 	auto *navigationController = GetNavigationController();
 
@@ -127,7 +126,7 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 	history = navigationController->GetForwardHistory();
 	EXPECT_TRUE(history.empty());
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
 
 	history = navigationController->GetBackHistory();
 	EXPECT_EQ(history.size(), 1U);
@@ -135,7 +134,7 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 	history = navigationController->GetForwardHistory();
 	EXPECT_TRUE(history.empty());
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	history = navigationController->GetBackHistory();
 	EXPECT_EQ(history.size(), 2U);
@@ -143,7 +142,7 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 	history = navigationController->GetForwardHistory();
 	EXPECT_TRUE(history.empty());
 
-	ASSERT_HRESULT_SUCCEEDED(navigationController->GoBack());
+	navigationController->GoBack();
 
 	history = navigationController->GetBackHistory();
 	EXPECT_EQ(history.size(), 1U);
@@ -158,13 +157,11 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	PidlAbsolute pidlFolder = CreateSimplePidlForTest(L"C:\\Fake");
 	auto navigateParamsFolder = NavigateParams::Normal(pidlFolder.Raw());
-	HRESULT hr = navigationController->Navigate(navigateParamsFolder);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(navigateParamsFolder);
 
 	EXPECT_TRUE(navigationController->CanGoUp());
 
-	hr = navigationController->GoUp();
-	EXPECT_HRESULT_SUCCEEDED(hr);
+	navigationController->GoUp();
 
 	auto entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
@@ -174,18 +171,17 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	// The desktop folder is the root of the shell namespace.
 	PidlAbsolute pidlDesktop;
-	hr = SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr,
+	HRESULT hr = SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr,
 		PidlOutParam(pidlDesktop));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	auto navigateParamsDesktop = NavigateParams::Normal(pidlDesktop.Raw());
-	hr = navigationController->Navigate(navigateParamsDesktop);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(navigateParamsDesktop);
 
 	EXPECT_FALSE(navigationController->CanGoUp());
 
-	hr = navigationController->GoUp();
-	EXPECT_HRESULT_FAILED(hr);
+	// This should have no effect.
+	navigationController->GoUp();
 
 	entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
@@ -204,8 +200,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
-	HRESULT hr = navigationController->Navigate(navigateParams1);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(navigateParams1);
 
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
 
@@ -218,8 +213,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
-	hr = navigationController->Navigate(navigateParams2);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(navigateParams2);
 
 	entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
@@ -252,8 +246,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	auto *navigationController = GetNavigationController();
 	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::Normal);
 
-	HRESULT hr = navigationController->Navigate(params);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(params);
 
 	navigationController->SetNavigationMode(NavigationMode::ForceNewTab);
 	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::ForceNewTab);
@@ -269,8 +262,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	EXPECT_CALL(navigationStartedCallback, Call(Eq(expectedParams)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
-	hr = navigationController->Navigate(params);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(params);
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
 	params = NavigateParams::Normal(pidl2.Raw());
@@ -279,8 +271,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	EXPECT_CALL(navigationStartedCallback, Call(_)).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params), _));
 
-	hr = navigationController->Navigate(params);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(params);
 
 	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"C:\\Fake3");
 	params = NavigateParams::Normal(pidl3.Raw());
@@ -291,8 +282,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
-	hr = navigationController->Navigate(params);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(params);
 }
 
 TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
@@ -311,8 +301,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
-	HRESULT hr = navigationController->Navigate(params);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(params);
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
 	auto params2 = NavigateParams::Normal(pidl2.Raw());
@@ -321,18 +310,15 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 	EXPECT_CALL(navigationStartedCallback, Call(Eq(params2))).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params2), _));
 
-	hr = navigationController->Navigate(params2);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	navigationController->Navigate(params2);
 }
 
 TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 {
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake1", HistoryEntryType::AddEntry));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1", HistoryEntryType::AddEntry);
 
 	PidlAbsolute pidl2;
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::ReplaceCurrentEntry, &pidl2));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::ReplaceCurrentEntry, &pidl2);
 
 	auto *navigationController = GetNavigationController();
 
@@ -346,8 +332,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 	EXPECT_EQ(entry->GetPidl(), pidl2);
 
 	PidlAbsolute pidl3;
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake3", HistoryEntryType::AddEntry, &pidl3));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3", HistoryEntryType::AddEntry, &pidl3);
 
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
@@ -356,7 +341,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 	ASSERT_NE(entry, nullptr);
 	EXPECT_EQ(entry->GetPidl(), pidl3);
 
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake4", HistoryEntryType::None));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake4", HistoryEntryType::None);
 
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
@@ -370,10 +355,8 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 
 TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
 {
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake1", HistoryEntryType::AddEntry));
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::AddEntry));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1", HistoryEntryType::AddEntry);
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::AddEntry);
 
 	auto *navigationController = GetNavigationController();
 
@@ -383,7 +366,7 @@ TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
 
 	auto params = NavigateParams::History(entry);
 	params.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
-	ASSERT_HRESULT_SUCCEEDED(navigationController->Navigate(params));
+	navigationController->Navigate(params);
 
 	auto *updatedEntry = navigationController->GetEntryAtIndex(0);
 	ASSERT_NE(updatedEntry, nullptr);
@@ -396,8 +379,7 @@ TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
 TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 {
 	PidlAbsolute pidl;
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl);
 
 	auto *navigationController = GetNavigationController();
 
@@ -416,8 +398,7 @@ TEST_F(ShellNavigationControllerTest, InitialNavigation)
 	m_shellBrowser.SetNavigationMode(ShellBrowserFake::NavigationMode::Async);
 
 	PidlAbsolute pidl;
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl);
 
 	auto *navigationController = GetNavigationController();
 

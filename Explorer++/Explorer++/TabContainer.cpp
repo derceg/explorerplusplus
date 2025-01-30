@@ -999,20 +999,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	tab.GetShellBrowserImpl()->columnsChanged.AddObserver(
 		[this, &tab]() { tabColumnsChangedSignal.m_signal(tab); });
 
-	HRESULT hr = tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
-
-	if (FAILED(hr))
-	{
-		hr = tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
-			m_config->defaultTabDirectory);
-
-		if (FAILED(hr))
-		{
-			// The computer folder should always exist, so this call shouldn't fail.
-			tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
-				m_config->defaultTabDirectoryStatic);
-		}
-	}
+	tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
 
 	// There's no need to manually disconnect this. Either it will be
 	// disconnected when the tab is closed and the tab object (and

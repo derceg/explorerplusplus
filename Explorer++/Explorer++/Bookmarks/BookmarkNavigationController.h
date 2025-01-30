@@ -23,19 +23,18 @@ private:
 };
 
 class BookmarkNavigationController :
-	public NavigationController<BookmarkHistoryEntry, bool>,
+	public NavigationController<BookmarkHistoryEntry>,
 	private boost::noncopyable
 {
 public:
 	BookmarkNavigationController(BookmarkTree *bookmarkTree, BookmarkNavigatorInterface *navigator);
 
-	bool Navigate(BookmarkItem *bookmarkFolder, bool addHistoryEntry = true);
+	void Navigate(BookmarkItem *bookmarkFolder, const BookmarkHistoryEntry *entry = nullptr);
 
 private:
-	bool Navigate(const BookmarkHistoryEntry *entry) override;
-	bool GetFailureValue() override;
+	void Navigate(const BookmarkHistoryEntry *entry) override;
 
-	void OnNavigationCompleted(BookmarkItem *bookmarkFolder, bool addHistoryEntry);
+	void OnNavigationCompleted(BookmarkItem *bookmarkFolder, const BookmarkHistoryEntry *entry);
 
 	BookmarkTree *m_bookmarkTree;
 	BookmarkNavigatorInterface *m_navigator;

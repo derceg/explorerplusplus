@@ -119,18 +119,6 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 	}
 }
 
-HRESULT ShellNavigationController::GoToOffset(int offset)
-{
-	auto entry = GetEntry(offset);
-
-	if (!entry)
-	{
-		return E_FAIL;
-	}
-
-	return Navigate(entry);
-}
-
 bool ShellNavigationController::CanGoUp() const
 {
 	auto *currentEntry = GetCurrentEntry();
@@ -143,13 +131,13 @@ bool ShellNavigationController::CanGoUp() const
 	return !IsNamespaceRoot(currentEntry->GetPidl().Raw());
 }
 
-HRESULT ShellNavigationController::GoUp()
+void ShellNavigationController::GoUp()
 {
 	auto *currentEntry = GetCurrentEntry();
 
 	if (!currentEntry)
 	{
-		return E_FAIL;
+		return;
 	}
 
 	unique_pidl_absolute pidlParent;
@@ -157,42 +145,47 @@ HRESULT ShellNavigationController::GoUp()
 
 	if (FAILED(hr))
 	{
-		return hr;
+		return;
 	}
 
 	auto navigateParams = NavigateParams::Up(pidlParent.get(), currentEntry->GetPidl().Raw());
-	return Navigate(navigateParams);
+	Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::Refresh()
+void ShellNavigationController::Refresh()
 {
 	auto *currentEntry = GetCurrentEntry();
 
 	if (!currentEntry)
 	{
-		return E_FAIL;
+		return;
 	}
 
 	auto navigateParams = NavigateParams::History(currentEntry);
-	return Navigate(navigateParams);
+	Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::Navigate(const HistoryEntry *entry)
+void ShellNavigationController::Navigate(const HistoryEntry *entry)
 {
 	auto navigateParams = NavigateParams::History(entry);
-	return Navigate(navigateParams);
+	Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::Navigate(const std::wstring &path)
+void ShellNavigationController::Navigate(const std::wstring &path)
 {
 	unique_pidl_absolute pidlDirectory;
-	RETURN_IF_FAILED(ParseDisplayNameForNavigation(path.c_str(), pidlDirectory));
+	HRESULT hr = ParseDisplayNameForNavigation(path.c_str(), pidlDirectory);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
 
 	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
-	return Navigate(navigateParams);
+	Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
+void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 {
 	auto currentEntry = GetCurrentEntry();
 	HistoryEntry *targetEntry = nullptr;
@@ -221,15 +214,10 @@ HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 		&& !navigateParams.overrideNavigationMode)
 	{
 		m_tabNavigation->CreateNewTab(navigateParams, true);
-		return S_OK;
+		return;
 	}
 
-	return m_navigator->Navigate(navigateParams);
-}
-
-HRESULT ShellNavigationController::GetFailureValue()
-{
-	return E_FAIL;
+	m_navigator->Navigate(navigateParams);
 }
 
 void ShellNavigationController::SetNavigationMode(NavigationMode navigationMode)

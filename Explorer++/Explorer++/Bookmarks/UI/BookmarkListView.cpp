@@ -248,7 +248,8 @@ LRESULT BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
+void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
+	const BookmarkHistoryEntry *entry)
 {
 	DCHECK(bookmarkFolder->IsFolder());
 
@@ -265,7 +266,7 @@ void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bo
 		position++;
 	}
 
-	m_navigationCompletedSignal(bookmarkFolder, addHistoryEntry);
+	m_navigationCompletedSignal(bookmarkFolder, entry);
 }
 
 boost::signals2::connection BookmarkListView::AddNavigationCompletedObserver(
@@ -484,7 +485,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 
 	if (bookmarkItem->IsFolder())
 	{
-		NavigateToBookmarkFolder(bookmarkItem, true);
+		NavigateToBookmarkFolder(bookmarkItem);
 	}
 	else
 	{
@@ -847,7 +848,7 @@ void BookmarkListView::OnEnterPressed()
 
 	if (bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder())
 	{
-		NavigateToBookmarkFolder(bookmarkItems[0], true);
+		NavigateToBookmarkFolder(bookmarkItems[0]);
 	}
 	else
 	{

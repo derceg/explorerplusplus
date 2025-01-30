@@ -87,7 +87,7 @@ public:
 	ShellBrowserFake(TabNavigationInterface *tabNavigation);
 	~ShellBrowserFake();
 
-	HRESULT NavigateToPath(const std::wstring &path,
+	void NavigateToPath(const std::wstring &path,
 		HistoryEntryType addHistoryType = HistoryEntryType::AddEntry,
 		PidlAbsolute *outputPidl = nullptr);
 	void SetNavigationMode(NavigationMode navigationMode);
@@ -99,7 +99,7 @@ public:
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
 	// ShellNavigator
-	HRESULT Navigate(NavigateParams &navigateParams) override;
+	void Navigate(NavigateParams &navigateParams) override;
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;

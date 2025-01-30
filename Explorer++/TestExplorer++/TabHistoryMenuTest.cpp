@@ -34,9 +34,9 @@ protected:
 
 TEST_F(TabHistoryMenuTest, BackHistory)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
@@ -49,13 +49,13 @@ TEST_F(TabHistoryMenuTest, BackHistory)
 
 TEST_F(TabHistoryMenuTest, ForwardHistory)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	// Go back to Fake1.
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
+	m_shellBrowser.GetNavigationController()->GoBack();
+	m_shellBrowser.GetNavigationController()->GoBack();
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
@@ -68,9 +68,9 @@ TEST_F(TabHistoryMenuTest, ForwardHistory)
 
 TEST_F(TabHistoryMenuTest, BackSelection)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
@@ -85,10 +85,9 @@ TEST_F(TabHistoryMenuTest, BackSelection)
 TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 {
 	PidlAbsolute fake2;
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::AddEntry, &fake2));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::AddEntry, &fake2);
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
@@ -106,13 +105,13 @@ TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 
 TEST_F(TabHistoryMenuTest, ForwardSelection)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	// Go back to Fake1.
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
+	m_shellBrowser.GetNavigationController()->GoBack();
+	m_shellBrowser.GetNavigationController()->GoBack();
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
@@ -127,14 +126,13 @@ TEST_F(TabHistoryMenuTest, ForwardSelection)
 TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 {
 	PidlAbsolute fake3;
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake3", HistoryEntryType::AddEntry, &fake3));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3", HistoryEntryType::AddEntry, &fake3);
 
 	// Go back to Fake1.
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
+	m_shellBrowser.GetNavigationController()->GoBack();
+	m_shellBrowser.GetNavigationController()->GoBack();
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
@@ -151,22 +149,22 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 
 TEST_F(TabHistoryMenuTest, InvalidSelection)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
 	// Go back to Fake2.
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
+	m_shellBrowser.GetNavigationController()->GoBack();
 
 	PopupMenuView popupMenu;
 	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go back to Fake1.
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
+	m_shellBrowser.GetNavigationController()->GoBack();
 
 	// This will erase the forward history (i.e. Fake2 and Fake3).
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake4"));
+	m_shellBrowser.NavigateToPath(L"C:\\Fake4");
 
 	popupMenu.SelectItem(popupMenu.GetItemIdForTesting(0), false, false);
 

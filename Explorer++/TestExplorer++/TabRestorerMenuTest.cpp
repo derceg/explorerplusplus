@@ -37,7 +37,7 @@ protected:
 	void NavigateTab(Tab &tab, const PidlAbsolute &pidl)
 	{
 		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		ASSERT_HRESULT_SUCCEEDED(tab.GetShellBrowser()->Navigate(navigateParams));
+		tab.GetShellBrowser()->Navigate(navigateParams);
 	}
 
 	PopupMenuView m_popupMenu;

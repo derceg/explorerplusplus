@@ -47,7 +47,7 @@ protected:
 TEST_F(TabTest, CustomName)
 {
 	std::wstring folderName = L"fake";
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser->NavigateToPath(L"c:\\" + folderName));
+	m_shellBrowser->NavigateToPath(L"c:\\" + folderName);
 
 	EXPECT_FALSE(m_tab->GetUseCustomName());
 	EXPECT_EQ(m_tab->GetName(), folderName);
@@ -65,7 +65,7 @@ TEST_F(TabTest, CustomName)
 TEST_F(TabTest, EmptyName)
 {
 	std::wstring folderName = L"fake";
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser->NavigateToPath(L"c:\\" + folderName));
+	m_shellBrowser->NavigateToPath(L"c:\\" + folderName);
 
 	// An empty string isn't counted as a valid name and should be ignored.
 	m_tab->SetCustomName(L"");

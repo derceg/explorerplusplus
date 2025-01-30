@@ -729,9 +729,10 @@ void ManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFol
 	m_navigationController->Navigate(bookmarkFolder);
 }
 
-void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
+void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder,
+	const BookmarkHistoryEntry *entry)
 {
-	UNREFERENCED_PARAMETER(addHistoryEntry);
+	UNREFERENCED_PARAMETER(entry);
 
 	m_currentBookmarkFolder = bookmarkFolder;
 	m_bookmarkTreeView->SelectFolder(bookmarkFolder->GetGUID());

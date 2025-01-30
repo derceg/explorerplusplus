@@ -17,39 +17,40 @@ BookmarkNavigationController::BookmarkNavigationController(BookmarkTree *bookmar
 		boost::signals2::at_front));
 }
 
-bool BookmarkNavigationController::Navigate(const BookmarkHistoryEntry *entry)
+void BookmarkNavigationController::Navigate(const BookmarkHistoryEntry *entry)
 {
 	auto bookmarkFolder = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, entry->getGuid());
 
 	if (!bookmarkFolder)
 	{
-		// This is valid. The folder might simply have been deleted since it was
-		// last navigated to.
-		return false;
+		// This is valid. The folder might simply have been deleted since the original navigation
+		// occurred.
+		return;
 	}
 
-	Navigate(bookmarkFolder);
-	return true;
+	Navigate(bookmarkFolder, entry);
 }
 
-bool BookmarkNavigationController::Navigate(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
+void BookmarkNavigationController::Navigate(BookmarkItem *bookmarkFolder,
+	const BookmarkHistoryEntry *entry)
 {
-	m_navigator->NavigateToBookmarkFolder(bookmarkFolder, addHistoryEntry);
-	return true;
-}
-
-bool BookmarkNavigationController::GetFailureValue()
-{
-	return false;
+	m_navigator->NavigateToBookmarkFolder(bookmarkFolder, entry);
 }
 
 void BookmarkNavigationController::OnNavigationCompleted(BookmarkItem *bookmarkFolder,
-	bool addHistoryEntry)
+	const BookmarkHistoryEntry *entry)
 {
-	if (addHistoryEntry)
+	if (entry)
 	{
-		auto entry = std::make_unique<BookmarkHistoryEntry>(bookmarkFolder->GetGUID());
-		AddEntry(std::move(entry));
+		// Navigation is synchronous, so when navigating to a history entry, the entry should always
+		// exist at this point.
+		auto index = GetIndexOfEntry(entry);
+		CHECK(index);
+		SetCurrentIndex(*index);
+	}
+	else
+	{
+		AddEntry(std::make_unique<BookmarkHistoryEntry>(bookmarkFolder->GetGUID()));
 	}
 }
 

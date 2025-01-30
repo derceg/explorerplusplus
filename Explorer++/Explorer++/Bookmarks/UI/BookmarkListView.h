@@ -38,7 +38,8 @@ public:
 		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
 		ThemeManager *themeManager, const std::vector<Column> &initialColumns);
 
-	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry) override;
+	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
+		const BookmarkHistoryEntry *entry = nullptr) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;

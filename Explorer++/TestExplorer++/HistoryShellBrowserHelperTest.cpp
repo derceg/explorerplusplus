@@ -16,8 +16,7 @@ protected:
 	void NavigateInNewTab(const std::wstring &path, PidlAbsolute *outputPidl)
 	{
 		auto shellBrowser = CreateTab(&m_historyModel);
-		ASSERT_HRESULT_SUCCEEDED(
-			shellBrowser->NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl));
+		shellBrowser->NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl);
 	}
 
 	HistoryModel m_historyModel;
