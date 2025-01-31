@@ -26,27 +26,15 @@
 void ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
-
 	auto resetCursor = wil::scope_exit([] { SetCursor(LoadCursor(nullptr, IDC_ARROW)); });
 
+	StartNavigation(navigateParams);
+}
+
+void ShellBrowserImpl::StartNavigation(NavigateParams &navigateParams)
+{
 	OnNavigationStarted(navigateParams);
-
-	std::vector<ItemInfo_t> items;
-	HRESULT hr = PerformEnumeration(navigateParams, items);
-
-	auto *currentEntry = m_navigationController->GetCurrentEntry();
-	CHECK(currentEntry);
-
-	// Typically, when a navigation fails, nothing will happen. The original folder will continue to
-	// be shown. However, when the initial navigation fails, there is no original folder, so the
-	// only reasonable choice is to commit the failed navigation, regardless.
-	if (FAILED(hr) && !currentEntry->IsInitialEntry())
-	{
-		OnEnumerationFailed(navigateParams);
-		return;
-	}
-
-	OnEnumerationCompleted(items, navigateParams);
+	PerformEnumeration(navigateParams);
 }
 
 void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
@@ -65,8 +53,7 @@ void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
 	m_navigationStartedSignal(navigateParams);
 }
 
-HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
-	std::vector<ItemInfo_t> &items)
+void ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams)
 {
 	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
 	// symlinks and virtual link objects aren't, so they will be handled here.
@@ -87,10 +74,16 @@ HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
 		navigateParams.pidl = targetPidl.get();
 	}
 
-	RETURN_IF_FAILED(
-		EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items));
+	std::vector<ItemInfo_t> items;
+	hr = EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items);
 
-	return S_OK;
+	if (FAILED(hr))
+	{
+		OnEnumerationFailed(navigateParams);
+		return;
+	}
+
+	OnEnumerationCompleted(items, navigateParams);
 }
 
 HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
@@ -772,6 +765,18 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 
 void ShellBrowserImpl::OnEnumerationFailed(const NavigateParams &navigateParams)
 {
+	auto *currentEntry = m_navigationController->GetCurrentEntry();
+	CHECK(currentEntry);
+
+	if (currentEntry->IsInitialEntry())
+	{
+		// Typically, when a navigation fails, nothing will happen. The original folder will
+		// continue to be shown. However, when the initial navigation fails, there is no original
+		// folder, so the only reasonable choice is to commit the failed navigation, regardless.
+		OnEnumerationCompleted({}, navigateParams);
+		return;
+	}
+
 	m_navigationFailedSignal(navigateParams);
 }
 

@@ -404,8 +404,9 @@ private:
 	void VerifySortMode();
 
 	/* Browsing support. */
+	void StartNavigation(NavigateParams &navigateParams);
 	void OnNavigationStarted(const NavigateParams &navigateParams);
-	HRESULT PerformEnumeration(NavigateParams &navigateParams, std::vector<ItemInfo_t> &items);
+	void PerformEnumeration(NavigateParams &navigateParams);
 	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
 		std::vector<ItemInfo_t> &items);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
