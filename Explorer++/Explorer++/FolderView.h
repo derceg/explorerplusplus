@@ -97,7 +97,6 @@ public:
 
 private:
 	const WeakPtr<ShellBrowserImpl> m_shellBrowserWeak;
-	const int m_initialFolderId;
 };
 
 namespace winrt

@@ -87,7 +87,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
 		{
 			OnCurrentDirectoryRenamed(m_weakPtrFactory.GetWeakPtr(), change.pidl2.get(),
-				m_app->GetRuntime(), m_directoryState.scopedStopSource->GetToken());
+				m_app->GetRuntime());
 		}
 		break;
 
@@ -103,8 +103,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 			// - If the icon for the folder is changed.
 			// - If the folder is virtual (e.g. the recycle bin) and the name is changed.
 			OnDirectoryPropertiesChanged(m_weakPtrFactory.GetWeakPtr(),
-				m_directoryState.pidlDirectory, m_app->GetRuntime(),
-				m_directoryState.scopedStopSource->GetToken());
+				m_directoryState.pidlDirectory, m_app->GetRuntime());
 		}
 		break;
 
@@ -114,8 +113,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 			// It's not safe to perform an immediate refresh here, since doing so would clear
 			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
 			// through. Therefore, the function below will perform the refresh asynchronously.
-			RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime(),
-				m_directoryState.scopedStopSource->GetToken());
+			RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime());
 		}
 		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.Raw(), false))
 		{
@@ -124,8 +122,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 			// required. It's also possible an unrelated item was updated, in which case no action
 			// will be taken by the function below.
 			NavigateUpToClosestExistingItemIfNecessary(m_weakPtrFactory.GetWeakPtr(),
-				m_directoryState.pidlDirectory, m_app->GetRuntime(),
-				m_directoryState.scopedStopSource->GetToken());
+				m_directoryState.pidlDirectory, m_app->GetRuntime());
 		}
 		break;
 
@@ -147,8 +144,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 			// parents. That makes it necessary to navigate to another folder. For similarity with
 			// Explorer, a navigation to a parent will occur.
 			NavigateUpToClosestExistingItemIfNecessary(m_weakPtrFactory.GetWeakPtr(),
-				m_directoryState.pidlDirectory, m_app->GetRuntime(),
-				m_directoryState.scopedStopSource->GetToken());
+				m_directoryState.pidlDirectory, m_app->GetRuntime());
 		}
 		break;
 	}
@@ -537,8 +533,7 @@ void ShellBrowserImpl::InvalidateIconForItem(int itemIndex)
 }
 
 concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(
-	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute simplePidlUpdated, Runtime *runtime,
-	std::stop_token stopToken)
+	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute simplePidlUpdated, Runtime *runtime)
 {
 	co_await ResumeOnComStaThread(runtime);
 
@@ -552,13 +547,12 @@ concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(
 
 	co_await ResumeOnUiThread(runtime);
 
-	if (stopToken.stop_requested())
+	if (!weakSelf)
 	{
+		// The folder has changed, or the tab has been closed.
 		co_return;
 	}
 
-	// The stop_token should be invalidated when this class is destroyed, so weakSelf should always
-	// be valid here (a CHECK will be triggered if not).
 	NavigateParams params =
 		NavigateParams::Normal(fullPidlUpdated.Raw(), HistoryEntryType::ReplaceCurrentEntry);
 	params.overrideNavigationMode = true;
@@ -566,8 +560,7 @@ concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(
 }
 
 concurrencpp::null_result ShellBrowserImpl::OnDirectoryPropertiesChanged(
-	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
-	std::stop_token stopToken)
+	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime)
 {
 	co_await ResumeOnComStaThread(runtime);
 
@@ -581,7 +574,7 @@ concurrencpp::null_result ShellBrowserImpl::OnDirectoryPropertiesChanged(
 
 	co_await ResumeOnUiThread(runtime);
 
-	if (stopToken.stop_requested())
+	if (!weakSelf)
 	{
 		co_return;
 	}
@@ -596,11 +589,11 @@ concurrencpp::null_result ShellBrowserImpl::OnDirectoryPropertiesChanged(
 }
 
 concurrencpp::null_result ShellBrowserImpl::RefreshDirectoryAfterUpdate(
-	WeakPtr<ShellBrowserImpl> weakSelf, Runtime *runtime, std::stop_token stopToken)
+	WeakPtr<ShellBrowserImpl> weakSelf, Runtime *runtime)
 {
 	co_await concurrencpp::resume_on(runtime->GetUiThreadExecutor());
 
-	if (stopToken.stop_requested())
+	if (!weakSelf)
 	{
 		co_return;
 	}
@@ -611,8 +604,7 @@ concurrencpp::null_result ShellBrowserImpl::RefreshDirectoryAfterUpdate(
 // Navigates to the closest ancestor of this item that exists. If this item itself exists, no
 // navigation will occur.
 concurrencpp::null_result ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary(
-	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
-	std::stop_token stopToken)
+	WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime)
 {
 	co_await ResumeOnComStaThread(runtime);
 
@@ -632,7 +624,7 @@ concurrencpp::null_result ShellBrowserImpl::NavigateUpToClosestExistingItemIfNec
 
 	co_await ResumeOnUiThread(runtime);
 
-	if (stopToken.stop_requested())
+	if (!weakSelf)
 	{
 		co_return;
 	}

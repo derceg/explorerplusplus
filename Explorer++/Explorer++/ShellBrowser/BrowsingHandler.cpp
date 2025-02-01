@@ -171,6 +171,9 @@ void ShellBrowserImpl::PrepareToChangeFolders()
 	{
 		ResetFolderState();
 	}
+
+	// The folder is about to change, so any previous WeakPtrs are no longer needed.
+	m_weakPtrFactory.InvalidateWeakPtrs();
 }
 
 void ShellBrowserImpl::ClearPendingResults()

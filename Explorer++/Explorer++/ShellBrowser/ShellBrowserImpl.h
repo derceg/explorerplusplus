@@ -378,8 +378,6 @@ private:
 
 		ListViewGroupSet groups;
 
-		std::unique_ptr<ScopedStopSource> scopedStopSource;
-
 		DirectoryState() :
 			virtualFolder(false),
 			itemIDCounter(0),
@@ -387,8 +385,7 @@ private:
 			numFilesSelected(0),
 			numFoldersSelected(0),
 			totalDirSize(0),
-			fileSelectionSize(0),
-			scopedStopSource(std::make_unique<ScopedStopSource>())
+			fileSelectionSize(0)
 		{
 		}
 	};
@@ -536,15 +533,13 @@ private:
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 	static concurrencpp::null_result OnCurrentDirectoryRenamed(WeakPtr<ShellBrowserImpl> weakSelf,
-		PidlAbsolute simplePidlUpdated, Runtime *runtime, std::stop_token stopToken);
+		PidlAbsolute simplePidlUpdated, Runtime *runtime);
 	static concurrencpp::null_result OnDirectoryPropertiesChanged(
-		WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
-		std::stop_token stopToken);
+		WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime);
 	static concurrencpp::null_result RefreshDirectoryAfterUpdate(WeakPtr<ShellBrowserImpl> weakSelf,
-		Runtime *runtime, std::stop_token stopToken);
+		Runtime *runtime);
 	static concurrencpp::null_result NavigateUpToClosestExistingItemIfNecessary(
-		WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime,
-		std::stop_token stopToken);
+		WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute currentDirectory, Runtime *runtime);
 
 	/* Filtering support. */
 	void UpdateFiltering();

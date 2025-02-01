@@ -7,8 +7,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 
 FolderView::FolderView(WeakPtr<ShellBrowserImpl> shellBrowserWeak) :
-	m_shellBrowserWeak(shellBrowserWeak),
-	m_initialFolderId(shellBrowserWeak->GetUniqueFolderId())
+	m_shellBrowserWeak(shellBrowserWeak)
 {
 }
 
@@ -337,7 +336,7 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD
 
 	// If the hosting tab was closed or navigated to a different folder, the request to select items
 	// should be ignored.
-	if (!m_shellBrowserWeak || m_shellBrowserWeak->GetUniqueFolderId() != m_initialFolderId)
+	if (!m_shellBrowserWeak)
 	{
 		return E_FAIL;
 	}
