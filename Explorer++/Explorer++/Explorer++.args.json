@@ -21,6 +21,10 @@
         {
           "Id": "a4e3f345-13d9-4044-9cb3-32eacd9bcbed",
           "Command": "--enable-features MultipleWindowsPerSession"
+        },
+        {
+          "Id": "a3d4aea1-cdd0-4dd0-8a6f-76fee56013b5",
+          "Command": "--enable-features BackgroundThreadEnumeration"
         }
       ]
     },

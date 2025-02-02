@@ -16,6 +16,10 @@ BETTER_ENUM(Feature, int,
 
 	// When enabled, the application will allow multiple windows to be created and restored in each
 	// session, rather than just a single window.
-	MultipleWindowsPerSession
+	MultipleWindowsPerSession,
+
+	// When enabled, directory enumeration will be performed on a background thread, rather than the
+	// main thread.
+	BackgroundThreadEnumeration
 )
 // clang-format on

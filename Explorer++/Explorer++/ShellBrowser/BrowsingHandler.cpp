@@ -4,12 +4,15 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "App.h"
 #include "Config.h"
 #include "DocumentServiceProvider.h"
+#include "FeatureList.h"
 #include "HistoryEntry.h"
 #include "IconFetcher.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "RuntimeHelper.h"
 #include "ShellEnumerator.h"
 #include "ShellNavigationController.h"
 #include "ShellView.h"
@@ -28,33 +31,27 @@ void ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 	auto resetCursor = wil::scope_exit([] { SetCursor(LoadCursor(nullptr, IDC_ARROW)); });
 
-	StartNavigation(navigateParams);
+	StartNavigation(m_weakPtrFactory.GetWeakPtr(), navigateParams);
 }
 
-void ShellBrowserImpl::StartNavigation(NavigateParams &navigateParams)
+concurrencpp::null_result ShellBrowserImpl::StartNavigation(WeakPtr<ShellBrowserImpl> weakSelf,
+	NavigateParams navigateParams)
 {
-	OnNavigationStarted(navigateParams);
-	PerformEnumeration(navigateParams);
-}
+	weakSelf->OnNavigationStarted(navigateParams);
 
-void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
-{
-	if (!m_folderVisited)
+	// It's not safe to access this object once the coroutine here has switched to a different
+	// thread, making it necessary to retrieve these values up front.
+	Runtime *runtime = weakSelf->m_app->GetRuntime();
+	HWND owner = weakSelf->m_hOwner;
+	bool includeHiddenItems = weakSelf->m_folderSettings.showHidden;
+	bool isAsync =
+		weakSelf->m_app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration);
+
+	if (isAsync)
 	{
-		// This is the first navigation. As this class always represents a folder, it's necessary to
-		// immediately switch to the folder for the initial navigation. Normally, this is only done
-		// once the navigation commits.
-		// Note that this path can be taken both when a new tab is created and the initial
-		// navigation occurs, as well as when a tab is restored and a navigation to the current
-		// entry occurs.
-		ChangeFolders(navigateParams);
+		co_await ResumeOnComStaThread(runtime);
 	}
 
-	m_navigationStartedSignal(navigateParams);
-}
-
-void ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams)
-{
 	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
 	// symlinks and virtual link objects aren't, so they will be handled here.
 	// Navigating to the target pidl is important for folders like the quick access folder. Although
@@ -74,16 +71,49 @@ void ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams)
 		navigateParams.pidl = targetPidl.get();
 	}
 
+	// Note that if this coroutine operates asynchronously, the `owner` window handle passed in here
+	// could be invalidated at any time (since its lifetime is completely managed on the main
+	// thread). Unfortunately, there doesn't seem to be any way to deal with that. If the handle is
+	// invalid at the point where the enumerator needs to show UI, the enumeration will simply fail
+	// silently. While that behavior isn't an issue, there's still the general problem that window
+	// handles can be reused, so the window handle could end up referring to a completely different
+	// window.
 	std::vector<ItemInfo_t> items;
-	hr = EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items);
+	hr = EnumerateFolder(navigateParams.pidl.Raw(), owner, includeHiddenItems, items);
+
+	if (isAsync)
+	{
+		co_await ResumeOnUiThread(runtime);
+	}
+
+	if (!weakSelf)
+	{
+		co_return;
+	}
 
 	if (FAILED(hr))
 	{
-		OnEnumerationFailed(navigateParams);
-		return;
+		weakSelf->OnEnumerationFailed(navigateParams);
+		co_return;
 	}
 
-	OnEnumerationCompleted(items, navigateParams);
+	weakSelf->OnEnumerationCompleted(items, navigateParams);
+}
+
+void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
+{
+	if (!m_folderVisited)
+	{
+		// This is the first navigation. As this class always represents a folder, it's necessary to
+		// immediately switch to the folder for the initial navigation. Normally, this is only done
+		// once the navigation commits.
+		// Note that this path can be taken both when a new tab is created and the initial
+		// navigation occurs, as well as when a tab is restored and a navigation to the current
+		// entry occurs.
+		ChangeFolders(navigateParams);
+	}
+
+	m_navigationStartedSignal(navigateParams);
 }
 
 HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
@@ -170,10 +200,10 @@ void ShellBrowserImpl::PrepareToChangeFolders()
 	if (m_folderVisited)
 	{
 		ResetFolderState();
-	}
 
-	// The folder is about to change, so any previous WeakPtrs are no longer needed.
-	m_weakPtrFactory.InvalidateWeakPtrs();
+		// The folder is about to change, so any previous WeakPtrs are no longer needed.
+		m_weakPtrFactory.InvalidateWeakPtrs();
+	}
 }
 
 void ShellBrowserImpl::ClearPendingResults()
