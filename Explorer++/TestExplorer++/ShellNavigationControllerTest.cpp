@@ -114,6 +114,43 @@ TEST_F(ShellNavigationControllerTest, BackForward)
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 }
 
+TEST_F(ShellNavigationControllerTest, BackForwardItemSelection)
+{
+	m_shellBrowser.NavigateToPath(L"C:\\Fake1");
+
+	auto *navigationController = GetNavigationController();
+
+	auto *currentEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(currentEntry, nullptr);
+
+	std::vector<PidlAbsolute> selectedItems1 = { CreateSimplePidlForTest(L"C:\\Fake1\\item1"),
+		CreateSimplePidlForTest(L"C:\\Fake1\\item2") };
+	currentEntry->SetSelectedItems(selectedItems1);
+	EXPECT_EQ(currentEntry->GetSelectedItems(), selectedItems1);
+
+	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
+
+	currentEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(currentEntry, nullptr);
+
+	std::vector<PidlAbsolute> selectedItems2 = { CreateSimplePidlForTest(L"C:\\Fake2\\item1"),
+		CreateSimplePidlForTest(L"C:\\Fake2\\item2") };
+	currentEntry->SetSelectedItems(selectedItems2);
+	EXPECT_EQ(currentEntry->GetSelectedItems(), selectedItems2);
+
+	navigationController->GoBack();
+
+	currentEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(currentEntry, nullptr);
+	EXPECT_EQ(currentEntry->GetSelectedItems(), selectedItems1);
+
+	navigationController->GoForward();
+
+	currentEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(currentEntry, nullptr);
+	EXPECT_EQ(currentEntry->GetSelectedItems(), selectedItems2);
+}
+
 TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 {
 	m_shellBrowser.NavigateToPath(L"C:\\Fake1");

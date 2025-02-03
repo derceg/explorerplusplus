@@ -91,6 +91,9 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 		{
 			auto index = GetIndexOfEntry(entry);
 			SetCurrentIndex(*index);
+
+			// The current entry has changed, so retrieve it again here.
+			currentEntry = GetCurrentEntry();
 		}
 		else if (historyEntryType == HistoryEntryType::ReplaceCurrentEntry
 			&& !currentEntry->IsInitialEntry())
