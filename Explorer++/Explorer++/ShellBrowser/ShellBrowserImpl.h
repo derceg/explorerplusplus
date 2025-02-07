@@ -399,6 +399,7 @@ private:
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
+	HIMAGELIST GetIconsList(int margin);
 	int GenerateUniqueItemId();
 	void MarkItemAsCut(int item, bool cut);
 	void VerifySortMode();
