@@ -210,11 +210,11 @@ void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 		&& currentEntry->GetPidl() == navigateParams.pidl)
 	{
 		navigateParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
-		navigateParams.overrideNavigationMode = true;
+		navigateParams.overrideNavigationTargetMode = true;
 	}
 
-	if (m_navigationMode == NavigationMode::ForceNewTab && currentEntry
-		&& !navigateParams.overrideNavigationMode)
+	if (m_navigationTargetMode == NavigationTargetMode::ForceNewTab && currentEntry
+		&& !navigateParams.overrideNavigationTargetMode)
 	{
 		m_tabNavigation->CreateNewTab(navigateParams, true);
 		return;
@@ -223,14 +223,14 @@ void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	m_navigator->Navigate(navigateParams);
 }
 
-void ShellNavigationController::SetNavigationMode(NavigationMode navigationMode)
+void ShellNavigationController::SetNavigationTargetMode(NavigationTargetMode navigationTargetMode)
 {
-	m_navigationMode = navigationMode;
+	m_navigationTargetMode = navigationTargetMode;
 }
 
-NavigationMode ShellNavigationController::GetNavigationMode() const
+NavigationTargetMode ShellNavigationController::GetNavigationTargetMode() const
 {
-	return m_navigationMode;
+	return m_navigationTargetMode;
 }
 
 HistoryEntry *ShellNavigationController::GetEntryById(int id)

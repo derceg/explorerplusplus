@@ -75,16 +75,16 @@ TEST_F(TabTest, EmptyName)
 
 TEST_F(TabTest, LockState)
 {
-	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationMode(),
-		NavigationMode::Normal);
+	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationTargetMode(),
+		NavigationTargetMode::Normal);
 
 	m_tab->SetLockState(Tab::LockState::Locked);
-	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationMode(),
-		NavigationMode::Normal);
+	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationTargetMode(),
+		NavigationTargetMode::Normal);
 
 	m_tab->SetLockState(Tab::LockState::AddressLocked);
-	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationMode(),
-		NavigationMode::ForceNewTab);
+	EXPECT_EQ(m_shellBrowser->GetNavigationController()->GetNavigationTargetMode(),
+		NavigationTargetMode::ForceNewTab);
 }
 
 TEST_F(TabTest, Update)

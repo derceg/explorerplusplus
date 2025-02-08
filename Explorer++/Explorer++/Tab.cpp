@@ -133,10 +133,10 @@ void Tab::SetLockState(LockState lockState)
 
 	m_lockState = lockState;
 
-	NavigationMode navigationMode = (lockState == LockState::AddressLocked)
-		? NavigationMode::ForceNewTab
-		: NavigationMode::Normal;
-	m_shellBrowser->GetNavigationController()->SetNavigationMode(navigationMode);
+	auto navigationTargetMode = (lockState == LockState::AddressLocked)
+		? NavigationTargetMode::ForceNewTab
+		: NavigationTargetMode::Normal;
+	m_shellBrowser->GetNavigationController()->SetNavigationTargetMode(navigationTargetMode);
 
 	m_tabUpdatedSignal(*this, PropertyType::LockState);
 }

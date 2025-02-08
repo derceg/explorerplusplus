@@ -49,11 +49,11 @@ public:
 	HistoryEntryType historyEntryType = HistoryEntryType::AddEntry;
 	NavigationType navigationType = NavigationType::Normal;
 
-	// if true, the navigation will proceed in the current tab, regardless of the navigation mode in
-	// effect. Useful, for example, in situations where the current directory has been renamed or
-	// deleted and a navigation to another directory needs to occur within the tab, regardless of
-	// the navigation mode.
-	bool overrideNavigationMode = false;
+	// if true, the navigation will proceed in the current tab, regardless of the navigation target
+	// mode in effect. Useful, for example, in situations where the current directory has been
+	// renamed or deleted and a navigation to another directory needs to occur within the tab,
+	// regardless of the navigation target mode.
+	bool overrideNavigationTargetMode = false;
 
 	// When navigating up, this will store the pidl of the previous item.
 	PidlAbsolute originalPidl;

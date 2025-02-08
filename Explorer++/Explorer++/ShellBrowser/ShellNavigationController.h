@@ -15,7 +15,7 @@ class PreservedHistoryEntry;
 class ShellNavigator;
 class TabNavigationInterface;
 
-enum class NavigationMode
+enum class NavigationTargetMode
 {
 	Normal,
 	ForceNewTab
@@ -39,8 +39,8 @@ public:
 	void Navigate(const std::wstring &path);
 	void Navigate(NavigateParams &navigateParams);
 
-	void SetNavigationMode(NavigationMode navigationMode);
-	NavigationMode GetNavigationMode() const;
+	void SetNavigationTargetMode(NavigationTargetMode navigationTargetMode);
+	NavigationTargetMode GetNavigationTargetMode() const;
 
 	HistoryEntry *GetEntryById(int id);
 
@@ -58,7 +58,7 @@ private:
 	ShellNavigator *m_navigator;
 
 	TabNavigationInterface *m_tabNavigation;
-	NavigationMode m_navigationMode = NavigationMode::Normal;
+	NavigationTargetMode m_navigationTargetMode = NavigationTargetMode::Normal;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

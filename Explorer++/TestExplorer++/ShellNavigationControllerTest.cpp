@@ -267,7 +267,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 	EXPECT_EQ(entry->GetPidl(), pidl1);
 }
 
-TEST_F(ShellNavigationControllerTest, SetNavigationMode)
+TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 {
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	auto params = NavigateParams::Normal(pidl1.Raw());
@@ -281,18 +281,18 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	auto *navigationController = GetNavigationController();
-	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::Normal);
+	EXPECT_EQ(navigationController->GetNavigationTargetMode(), NavigationTargetMode::Normal);
 
 	navigationController->Navigate(params);
 
-	navigationController->SetNavigationMode(NavigationMode::ForceNewTab);
-	EXPECT_EQ(navigationController->GetNavigationMode(), NavigationMode::ForceNewTab);
+	navigationController->SetNavigationTargetMode(NavigationTargetMode::ForceNewTab);
+	EXPECT_EQ(navigationController->GetNavigationTargetMode(), NavigationTargetMode::ForceNewTab);
 
 	// The navigation is to the same directory, which is treated as an implicit refresh, so the
 	// following fields are expected to be set.
 	auto expectedParams = params;
 	expectedParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
-	expectedParams.overrideNavigationMode = true;
+	expectedParams.overrideNavigationTargetMode = true;
 
 	// Although the navigation mode has been set, the navigation is an implicit refresh and should
 	// always proceed in the same tab.
@@ -312,7 +312,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 
 	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"C:\\Fake3");
 	params = NavigateParams::Normal(pidl3.Raw());
-	params.overrideNavigationMode = true;
+	params.overrideNavigationTargetMode = true;
 
 	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
 	// the tab, even though a navigation mode was applied above.
@@ -322,10 +322,10 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	navigationController->Navigate(params);
 }
 
-TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
+TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 {
 	auto *navigationController = GetNavigationController();
-	navigationController->SetNavigationMode(NavigationMode::ForceNewTab);
+	navigationController->SetNavigationTargetMode(NavigationTargetMode::ForceNewTab);
 
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	auto params = NavigateParams::Normal(pidl1.Raw());

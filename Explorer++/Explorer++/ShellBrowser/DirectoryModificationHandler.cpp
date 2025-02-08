@@ -555,7 +555,7 @@ concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(
 
 	NavigateParams params =
 		NavigateParams::Normal(fullPidlUpdated.Raw(), HistoryEntryType::ReplaceCurrentEntry);
-	params.overrideNavigationMode = true;
+	params.overrideNavigationTargetMode = true;
 	weakSelf->m_navigationController->Navigate(params);
 }
 
@@ -632,6 +632,6 @@ concurrencpp::null_result ShellBrowserImpl::NavigateUpToClosestExistingItemIfNec
 	// The current directory no longer exists, so the navigation here needs to proceed in this tab,
 	// regardless of whether or not the tab is locked.
 	NavigateParams params = NavigateParams::Normal(closestExistingItemPidl.Raw());
-	params.overrideNavigationMode = true;
+	params.overrideNavigationTargetMode = true;
 	weakSelf->m_navigationController->Navigate(params);
 }
