@@ -10,6 +10,7 @@
 #include "GlobalTabEventDispatcher.h"
 #include "PopupMenuView.h"
 #include "PopupMenuViewTestHelper.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
@@ -37,7 +38,7 @@ protected:
 	void NavigateTab(Tab &tab, const PidlAbsolute &pidl)
 	{
 		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		tab.GetShellBrowser()->Navigate(navigateParams);
+		tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	}
 
 	PopupMenuView m_popupMenu;

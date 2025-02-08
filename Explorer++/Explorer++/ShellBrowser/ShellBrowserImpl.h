@@ -9,6 +9,7 @@
 #include "Columns.h"
 #include "FolderSettings.h"
 #include "MainFontSetter.h"
+#include "NavigationManager.h"
 #include "ServiceProvider.h"
 #include "ShellBrowser.h"
 #include "ShellChangeWatcher.h"
@@ -54,6 +55,7 @@ struct PreservedFolderState;
 class PreservedHistoryEntry;
 class Runtime;
 class ShellBrowserEmbedder;
+class ShellEnumeratorImpl;
 class ShellNavigationController;
 class TabNavigationInterface;
 class WindowSubclass;
@@ -89,7 +91,6 @@ public:
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
 	// ShellNavigator
-	void Navigate(NavigateParams &navigateParams) override;
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
@@ -390,6 +391,14 @@ private:
 		}
 	};
 
+	enum class NavigationState
+	{
+		NoFolderShown,
+		WillCommit,
+		Committed,
+		Completed
+	};
+
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
@@ -401,24 +410,23 @@ private:
 	void VerifySortMode();
 
 	/* Browsing support. */
-	static concurrencpp::null_result StartNavigation(WeakPtr<ShellBrowserImpl> weakSelf,
-		NavigateParams navigateParams);
 	void OnNavigationStarted(const NavigateParams &navigateParams);
-	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
-		std::vector<ItemInfo_t> &items);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
-	void CommitNavigation(const NavigateParams &navigateParams);
 	void ChangeFolders(const NavigateParams &navigateParams);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void StoreCurrentlySelectedItems();
 	void ResetFolderState();
-	void OnEnumerationCompleted(const std::vector<ItemInfo_t> &items,
-		const NavigateParams &navigateParams);
+	void OnNavigationWillCommit(const NavigateParams &navigateParams);
+	void OnNavigationComitted(const NavigateParams &navigateParams);
+	void OnNavigationItemsAvailable(const NavigateParams &navigateParams,
+		const std::vector<PidlChild> &itemPidls);
+	std::vector<ItemInfo_t> GetItemInformationFromPidls(const NavigateParams &navigateParams,
+		const std::vector<PidlChild> &itemPidls);
 	void InsertAwaitingItems();
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
-	void OnEnumerationFailed(const NavigateParams &navigateParams);
+	void OnNavigationFailed(const NavigateParams &navigateParams);
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
 	int AddItemInternal(int itemIndex, const ItemInfo_t &itemInfo, BOOL setPosition);
@@ -427,6 +435,7 @@ private:
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
+	void SetNavigationState(NavigationState navigationState);
 
 	// Shell window integration
 	void NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl);
@@ -643,11 +652,14 @@ private:
 
 	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 
+	std::shared_ptr<ShellEnumeratorImpl> m_shellEnumerator;
+	NavigationManager m_navigationManager;
 	NavigationStartedSignal m_navigationStartedSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;
 	NavigationCompletedSignal m_navigationCompletedSignal;
 	NavigationFailedSignal m_navigationFailedSignal;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
+	NavigationState m_navigationState = NavigationState::NoFolderShown;
 
 	TabNavigationInterface *m_tabNavigation;
 	FileActionHandler *m_fileActionHandler;

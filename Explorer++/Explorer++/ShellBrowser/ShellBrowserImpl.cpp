@@ -18,6 +18,7 @@
 #include "ServiceProvider.h"
 #include "ShellBrowserEmbedder.h"
 #include "ShellBrowserHelper.h"
+#include "ShellEnumeratorImpl.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
 #include "ThemeManager.h"
@@ -40,8 +41,8 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
-	m_navigationController =
-		std::make_unique<ShellNavigationController>(this, tabNavigation, history, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
+		tabNavigation, history, currentEntry);
 }
 
 ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
@@ -52,6 +53,16 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_hListView(GetHWND()),
 	m_hOwner(hOwner),
 	m_app(app),
+	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(hOwner,
+		folderSettings.showHidden ? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
+								  : ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden)),
+	m_navigationManager(app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
+			? NavigationManager::ExecutionMode::Async
+			: NavigationManager::ExecutionMode::Sync,
+		m_shellEnumerator, app->GetRuntime()->GetComStaExecutor(),
+		app->GetRuntime()->GetUiThreadExecutor()),
+	m_navigationController(
+		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation)),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
 	m_fontSetter(GetHWND(), app->GetConfig()),
@@ -81,7 +92,19 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
-	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation);
+
+	m_navigationManager.AddNavigationStartedObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this), boost::signals2::at_front);
+	m_navigationManager.AddNavigationWillCommitObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this),
+		boost::signals2::at_front);
+	m_navigationManager.AddNavigationCommittedObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this), boost::signals2::at_front);
+	m_navigationManager.AddNavigationItemsAvailableObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationItemsAvailable, this),
+		boost::signals2::at_front);
+	m_navigationManager.AddNavigationFailedObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationFailed, this), boost::signals2::at_front);
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
@@ -878,6 +901,10 @@ bool ShellBrowserImpl::GetShowHidden() const
 void ShellBrowserImpl::SetShowHidden(bool showHidden)
 {
 	m_folderSettings.showHidden = showHidden;
+
+	m_shellEnumerator->SetHiddenItemsPolicy(showHidden
+			? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
+			: ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden);
 }
 
 std::vector<SortMode> ShellBrowserImpl::GetAvailableSortModes() const

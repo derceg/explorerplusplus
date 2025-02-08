@@ -358,6 +358,15 @@
     <ClCompile Include="WindowSubclassTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="NavigationManagerTest.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellEnumeratorImplTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellEnumeratorFake.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -579,6 +588,9 @@
     <ClInclude Include="GTestHelper.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h">
       <Filter>Startup</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellEnumeratorFake.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

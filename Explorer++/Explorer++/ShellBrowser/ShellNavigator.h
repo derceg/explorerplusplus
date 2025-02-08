@@ -110,8 +110,6 @@ class ShellNavigator
 public:
 	virtual ~ShellNavigator() = default;
 
-	virtual void Navigate(NavigateParams &navigateParams) = 0;
-
 	// Navigations can result in various success or failure states, summarized by four primary
 	// cases:
 	//

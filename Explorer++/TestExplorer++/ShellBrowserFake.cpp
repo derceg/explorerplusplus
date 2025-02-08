@@ -7,66 +7,43 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowserHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
-#include "../Helper/WeakPtr.h"
-#include <gtest/gtest.h>
 
-NavigationRequest::NavigationRequest(const NavigateParams &navigateParams, Type type) :
-	m_navigateParams(navigateParams),
-	m_type(type)
+ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
+	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
+	NavigationManager::ExecutionMode executionMode,
+	std::shared_ptr<concurrencpp::executor> comStaExecutor,
+	std::shared_ptr<concurrencpp::executor> originalExecutor) :
+	ShellBrowserFake(tabNavigation, executionMode, comStaExecutor, originalExecutor)
 {
-}
-
-void NavigationRequest::Start()
-{
-	ASSERT_EQ(m_stage, Stage::NotStarted);
-
-	m_stage = Stage::Started;
-	navigationStartedSignal.m_signal(m_navigateParams);
-
-	if (m_type == Type::Sync)
-	{
-		m_stage = Stage::Completed;
-		enumerationCompletedSignal.m_signal(m_navigateParams);
-	}
-}
-
-void NavigationRequest::Complete()
-{
-	ASSERT_EQ(m_stage, Stage::Started);
-
-	m_stage = Stage::Completed;
-	enumerationCompletedSignal.m_signal(m_navigateParams);
-}
-
-void NavigationRequest::Fail()
-{
-	ASSERT_EQ(m_stage, Stage::Started);
-
-	m_stage = Stage::Completed;
-	enumerationFailedSignal.m_signal(m_navigateParams);
-}
-
-NavigationRequestSync::NavigationRequestSync(const NavigateParams &navigateParams) :
-	NavigationRequest(navigateParams, Type::Sync)
-{
-}
-
-NavigationRequestAsync::NavigationRequestAsync(const NavigateParams &navigateParams) :
-	NavigationRequest(navigateParams, Type::Async)
-{
+	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
+		tabNavigation, preservedEntries, currentEntry);
 }
 
 ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry)
+	NavigationManager::ExecutionMode executionMode,
+	std::shared_ptr<concurrencpp::executor> comStaExecutor,
+	std::shared_ptr<concurrencpp::executor> originalExecutor) :
+	m_shellEnumerator(std::make_unique<ShellEnumeratorFake>()),
+	m_navigationManager(executionMode, m_shellEnumerator, comStaExecutor, originalExecutor),
+	m_navigationController(
+		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation))
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
-		preservedEntries, currentEntry);
-}
+	if (executionMode == NavigationManager::ExecutionMode::Async)
+	{
+		CHECK(comStaExecutor);
+		CHECK(originalExecutor);
+	}
 
-ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation)
-{
-	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation);
+	m_navigationManager.AddNavigationStartedObserver([this](const NavigateParams &navigateParams)
+		{ m_navigationStartedSignal(navigateParams); });
+	m_navigationManager.AddNavigationCommittedObserver([this](const NavigateParams &navigateParams)
+		{ m_navigationCommittedSignal(navigateParams); });
+	m_navigationManager.AddNavigationCompletedObserver([this](const NavigateParams &navigateParams)
+		{ m_navigationCompletedSignal(navigateParams); });
+	m_navigationManager.AddNavigationFailedObserver(
+		[this](const NavigateParams &navigateParams) { m_navigationFailedSignal(navigateParams); });
 }
 
 ShellBrowserFake::~ShellBrowserFake() = default;
@@ -87,20 +64,9 @@ void ShellBrowserFake::NavigateToPath(const std::wstring &path, HistoryEntryType
 	}
 }
 
-void ShellBrowserFake::SetNavigationMode(NavigationMode navigationMode)
+NavigationManager *ShellBrowserFake::GetNavigationManager()
 {
-	if (navigationMode == m_navigationMode)
-	{
-		return;
-	}
-
-	m_navigationMode = navigationMode;
-	m_lastAsyncNavigationRequest.reset();
-}
-
-NavigationRequestAsync *ShellBrowserFake::GetLastAsyncNavigationRequest() const
-{
-	return m_lastAsyncNavigationRequest.get();
+	return &m_navigationManager;
 }
 
 FolderSettings ShellBrowserFake::GetFolderSettings() const
@@ -116,62 +82,6 @@ ShellNavigationController *ShellBrowserFake::GetNavigationController() const
 void ShellBrowserFake::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 {
 	m_helpers.push_back(std::move(helper));
-}
-
-void ShellBrowserFake::Navigate(NavigateParams &navigateParams)
-{
-	std::unique_ptr<NavigationRequest> ownedRequest;
-	NavigationRequest *request = nullptr;
-
-	if (m_navigationMode == NavigationMode::Sync)
-	{
-		ownedRequest = std::make_unique<NavigationRequestSync>(navigateParams);
-		request = ownedRequest.get();
-	}
-	else
-	{
-		m_lastAsyncNavigationRequest = std::make_unique<NavigationRequestAsync>(navigateParams);
-		request = m_lastAsyncNavigationRequest.get();
-	}
-
-	SetUpNavigationRequestListeners(request);
-	request->Start();
-}
-
-void ShellBrowserFake::SetUpNavigationRequestListeners(NavigationRequest *request)
-{
-	auto weakSelf = m_weakPtrFactory.GetWeakPtr();
-
-	request->navigationStartedSignal.AddObserver(
-		[weakSelf](const NavigateParams &navigateParams)
-		{
-			if (weakSelf)
-			{
-				weakSelf->m_navigationStartedSignal(navigateParams);
-			}
-		});
-
-	request->enumerationCompletedSignal.AddObserver(
-		[weakSelf](const NavigateParams &navigateParams)
-		{
-			if (weakSelf)
-			{
-				weakSelf->m_navigationCommittedSignal(navigateParams);
-				weakSelf->m_navigationCompletedSignal(navigateParams);
-
-				// This will cause any other simulated async navigation requests to be ignored.
-				weakSelf->m_weakPtrFactory.InvalidateWeakPtrs();
-			}
-		});
-
-	request->enumerationFailedSignal.AddObserver(
-		[weakSelf](const NavigateParams &navigateParams)
-		{
-			if (weakSelf)
-			{
-				weakSelf->m_navigationFailedSignal(navigateParams);
-			}
-		});
 }
 
 boost::signals2::connection ShellBrowserFake::AddNavigationStartedObserver(

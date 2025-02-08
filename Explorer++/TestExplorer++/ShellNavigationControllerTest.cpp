@@ -275,7 +275,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 	MockFunction<void(const NavigateParams &navigateParams)> navigationStartedCallback;
 	m_shellBrowser.AddNavigationStartedObserver(navigationStartedCallback.AsStdFunction());
 
-	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(params));
 
 	// By default, all navigations should proceed in the current tab.
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
@@ -296,7 +296,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 
 	// Although the navigation mode has been set, the navigation is an implicit refresh and should
 	// always proceed in the same tab.
-	EXPECT_CALL(navigationStartedCallback, Call(Eq(expectedParams)));
+	EXPECT_CALL(navigationStartedCallback, Call(expectedParams));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	navigationController->Navigate(params);
@@ -316,7 +316,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 
 	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
 	// the tab, even though a navigation mode was applied above.
-	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(params));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	navigationController->Navigate(params);
@@ -335,7 +335,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 
 	// The first navigation in a tab should always take place within that tab, regardless of the
 	// navigation mode in effect.
-	EXPECT_CALL(navigationStartedCallback, Call(Eq(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(params));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	navigationController->Navigate(params);
@@ -344,7 +344,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 	auto params2 = NavigateParams::Normal(pidl2.Raw());
 
 	// Subsequent navigations should then open in a new tab when necessary.
-	EXPECT_CALL(navigationStartedCallback, Call(Eq(params2))).Times(0);
+	EXPECT_CALL(navigationStartedCallback, Call(params2)).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params2), _));
 
 	navigationController->Navigate(params2);
@@ -430,10 +430,58 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 	EXPECT_EQ(entry->GetPidl(), pidl);
 }
 
-TEST_F(ShellNavigationControllerTest, InitialNavigation)
+TEST_F(ShellNavigationControllerTest, SlotOrdering)
 {
-	m_shellBrowser.SetNavigationMode(ShellBrowserFake::NavigationMode::Async);
+	m_shellBrowser.GetNavigationManager()->AddNavigationCommittedObserver(
+		[this](const NavigateParams &navigateParams)
+		{
+			UNREFERENCED_PARAMETER(navigateParams);
 
+			auto *navigationController = GetNavigationController();
+
+			// By the time this slot runs, the navigation controller should have already set up the
+			// current entry. That is, the slot set up by the navigation controller should always
+			// run before a slot like this.
+			auto entry = navigationController->GetCurrentEntry();
+			ASSERT_NE(entry, nullptr);
+			EXPECT_EQ(entry->GetInitialNavigationType(),
+				HistoryEntry::InitialNavigationType::NonInitial);
+		},
+		boost::signals2::at_front);
+
+	m_shellBrowser.NavigateToPath(L"C:\\Fake");
+}
+
+class ShellNavigationControllerAsyncTest : public Test
+{
+protected:
+	ShellNavigationControllerAsyncTest() :
+		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
+		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
+		m_shellBrowser(&m_tabNavigation, NavigationManager::ExecutionMode::Async,
+			m_manualExecutorBackground, m_manualExecutorCurrent)
+	{
+	}
+
+	~ShellNavigationControllerAsyncTest()
+	{
+		m_manualExecutorBackground->shutdown();
+		m_manualExecutorCurrent->shutdown();
+	}
+
+	ShellNavigationController *GetNavigationController() const
+	{
+		return m_shellBrowser.GetNavigationController();
+	}
+
+	TabNavigationMock m_tabNavigation;
+	std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorBackground;
+	std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorCurrent;
+	ShellBrowserFake m_shellBrowser;
+};
+
+TEST_F(ShellNavigationControllerAsyncTest, InitialNavigation)
+{
 	PidlAbsolute pidl;
 	m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl);
 
@@ -450,12 +498,10 @@ TEST_F(ShellNavigationControllerTest, InitialNavigation)
 	EXPECT_EQ(entry->GetPidl(), pidl);
 	int originalEntryId = entry->GetId();
 
-	auto *request = m_shellBrowser.GetLastAsyncNavigationRequest();
-	ASSERT_NE(request, nullptr);
-
-	// This should result in the initial entry being replaced. There should still only be a single
-	// entry.
-	request->Complete();
+	// This will cause the pending enumeration to complete and should result in the initial entry
+	// being replaced. There should still only be a single entry.
+	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
+	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
 

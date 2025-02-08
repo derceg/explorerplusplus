@@ -13,7 +13,7 @@
 #include "ItemData.h"
 #include "MainResource.h"
 #include "RuntimeHelper.h"
-#include "ShellEnumerator.h"
+#include "ShellEnumeratorImpl.h"
 #include "ShellNavigationController.h"
 #include "ShellView.h"
 #include "ViewModes.h"
@@ -25,80 +25,6 @@
 #include <propkey.h>
 #include <propvarutil.h>
 #include <list>
-
-void ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
-{
-	SetCursor(LoadCursor(nullptr, IDC_WAIT));
-	auto resetCursor = wil::scope_exit([] { SetCursor(LoadCursor(nullptr, IDC_ARROW)); });
-
-	StartNavigation(m_weakPtrFactory.GetWeakPtr(), navigateParams);
-}
-
-concurrencpp::null_result ShellBrowserImpl::StartNavigation(WeakPtr<ShellBrowserImpl> weakSelf,
-	NavigateParams navigateParams)
-{
-	weakSelf->OnNavigationStarted(navigateParams);
-
-	// It's not safe to access this object once the coroutine here has switched to a different
-	// thread, making it necessary to retrieve these values up front.
-	Runtime *runtime = weakSelf->m_app->GetRuntime();
-	HWND owner = weakSelf->m_hOwner;
-	bool includeHiddenItems = weakSelf->m_folderSettings.showHidden;
-	bool isAsync =
-		weakSelf->m_app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration);
-
-	if (isAsync)
-	{
-		co_await ResumeOnComStaThread(runtime);
-	}
-
-	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
-	// symlinks and virtual link objects aren't, so they will be handled here.
-	// Navigating to the target pidl is important for folders like the quick access folder. Although
-	// navigating directly to a recent/pinned folder works as expected, directory monitoring doesn't
-	// work. Presumably, that's because directory change notifications are only generated for the
-	// original (target) directory. To have things work correctly, the navigation needs to proceed
-	// to the original folder instead.
-	// Note that this call simply retrieves the target item, but doesn't attempt to resolve it. That
-	// matches the behavior of Explorer. For example, if a symlink to a directory is created and the
-	// target directory is then removed, Explorer will try to navigate to the target, without
-	// attempting to resolve the link.
-	unique_pidl_absolute targetPidl;
-	HRESULT hr = MaybeGetLinkTarget(navigateParams.pidl.Raw(), targetPidl);
-
-	if (SUCCEEDED(hr))
-	{
-		navigateParams.pidl = targetPidl.get();
-	}
-
-	// Note that if this coroutine operates asynchronously, the `owner` window handle passed in here
-	// could be invalidated at any time (since its lifetime is completely managed on the main
-	// thread). Unfortunately, there doesn't seem to be any way to deal with that. If the handle is
-	// invalid at the point where the enumerator needs to show UI, the enumeration will simply fail
-	// silently. While that behavior isn't an issue, there's still the general problem that window
-	// handles can be reused, so the window handle could end up referring to a completely different
-	// window.
-	std::vector<ItemInfo_t> items;
-	hr = EnumerateFolder(navigateParams.pidl.Raw(), owner, includeHiddenItems, items);
-
-	if (isAsync)
-	{
-		co_await ResumeOnUiThread(runtime);
-	}
-
-	if (!weakSelf)
-	{
-		co_return;
-	}
-
-	if (FAILED(hr))
-	{
-		weakSelf->OnEnumerationFailed(navigateParams);
-		co_return;
-	}
-
-	weakSelf->OnEnumerationCompleted(items, navigateParams);
-}
 
 void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
 {
@@ -114,45 +40,6 @@ void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
 	}
 
 	m_navigationStartedSignal(navigateParams);
-}
-
-HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
-	bool showHidden, std::vector<ItemInfo_t> &items)
-{
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
-
-	ShellEnumerator::Flags flags = ShellEnumerator::Flags::Standard;
-
-	if (showHidden)
-	{
-		WI_SetFlag(flags, ShellEnumerator::Flags::IncludeHidden);
-	}
-
-	ShellEnumerator enumerator;
-	std::vector<PidlChild> outputPidls;
-	RETURN_IF_FAILED(enumerator.EnumerateDirectory(shellFolder.get(), owner, flags, outputPidls));
-
-	for (const auto &pidl : outputPidls)
-	{
-		auto item = GetItemInformation(shellFolder.get(), pidlDirectory, pidl.Raw());
-
-		if (item)
-		{
-			items.push_back(*item);
-		}
-	}
-
-	return S_OK;
-}
-
-void ShellBrowserImpl::CommitNavigation(const NavigateParams &navigateParams)
-{
-	ChangeFolders(navigateParams);
-
-	NotifyShellOfNavigation(navigateParams.pidl.Raw());
-
-	m_navigationCommittedSignal(navigateParams);
 }
 
 void ShellBrowserImpl::ChangeFolders(const NavigateParams &navigateParams)
@@ -192,8 +79,6 @@ void ShellBrowserImpl::PrepareToChangeFolders()
 	ClearPendingResults();
 
 	m_shellChangeWatcher.StopWatchingAll();
-
-	StoreCurrentlySelectedItems();
 
 	ListView_DeleteAllItems(m_hListView);
 
@@ -573,10 +458,32 @@ HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellF
 	return hr;
 }
 
-void ShellBrowserImpl::OnEnumerationCompleted(const std::vector<ItemInfo_t> &items,
-	const NavigateParams &navigateParams)
+void ShellBrowserImpl::OnNavigationWillCommit(const NavigateParams &navigateParams)
 {
-	CommitNavigation(navigateParams);
+	UNREFERENCED_PARAMETER(navigateParams);
+
+	// The folder is going to change, so update the set of selected items before the current
+	// navigation entry changes.
+	StoreCurrentlySelectedItems();
+
+	SetNavigationState(NavigationState::WillCommit);
+}
+
+void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams)
+{
+	ChangeFolders(navigateParams);
+
+	NotifyShellOfNavigation(navigateParams.pidl.Raw());
+
+	SetNavigationState(NavigationState::Committed);
+
+	m_navigationCommittedSignal(navigateParams);
+}
+
+void ShellBrowserImpl::OnNavigationItemsAvailable(const NavigateParams &navigateParams,
+	const std::vector<PidlChild> &itemPidls)
+{
+	auto items = GetItemInformationFromPidls(navigateParams, itemPidls);
 
 	for (auto &item : items)
 	{
@@ -619,7 +526,35 @@ void ShellBrowserImpl::OnEnumerationCompleted(const std::vector<ItemInfo_t> &ite
 		StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
 	}
 
+	SetNavigationState(NavigationState::Completed);
+
 	m_navigationCompletedSignal(navigateParams);
+}
+
+std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFromPidls(
+	const NavigateParams &navigateParams, const std::vector<PidlChild> &itemPidls)
+{
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	HRESULT hr = BindToIdl(navigateParams.pidl.Raw(), IID_PPV_ARGS(&shellFolder));
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	std::vector<ItemInfo_t> items;
+
+	for (const auto &pidl : itemPidls)
+	{
+		auto item = GetItemInformation(shellFolder.get(), navigateParams.pidl.Raw(), pidl.Raw());
+
+		if (item)
+		{
+			items.push_back(*item);
+		}
+	}
+
+	return items;
 }
 
 void ShellBrowserImpl::InsertAwaitingItems()
@@ -796,20 +731,8 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	return bFilenameFiltered || bHideSystemFile;
 }
 
-void ShellBrowserImpl::OnEnumerationFailed(const NavigateParams &navigateParams)
+void ShellBrowserImpl::OnNavigationFailed(const NavigateParams &navigateParams)
 {
-	auto *currentEntry = m_navigationController->GetCurrentEntry();
-	CHECK(currentEntry);
-
-	if (currentEntry->IsInitialEntry())
-	{
-		// Typically, when a navigation fails, nothing will happen. The original folder will
-		// continue to be shown. However, when the initial navigation fails, there is no original
-		// folder, so the only reasonable choice is to commit the failed navigation, regardless.
-		OnEnumerationCompleted({}, navigateParams);
-		return;
-	}
-
 	m_navigationFailedSignal(navigateParams);
 }
 
@@ -893,4 +816,27 @@ boost::signals2::connection ShellBrowserImpl::AddNavigationFailedObserver(
 	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position)
 {
 	return m_navigationFailedSignal.connect(observer, position);
+}
+
+void ShellBrowserImpl::SetNavigationState(NavigationState navigationState)
+{
+	if (navigationState == NavigationState::WillCommit)
+	{
+		CHECK(m_navigationState == NavigationState::NoFolderShown
+			|| m_navigationState == NavigationState::Completed);
+	}
+	else if (navigationState == NavigationState::Committed)
+	{
+		CHECK(m_navigationState == NavigationState::WillCommit);
+	}
+	else if (navigationState == NavigationState::Completed)
+	{
+		CHECK(m_navigationState == NavigationState::Committed);
+	}
+	else
+	{
+		CHECK(false);
+	}
+
+	m_navigationState = navigationState;
 }

@@ -247,6 +247,7 @@
     <ClCompile Include="ListViewHelperTest.cpp" />
     <ClCompile Include="MessageLoop.cpp" />
     <ClCompile Include="ModelessDialogListTest.cpp" />
+    <ClCompile Include="NavigationManagerTest.cpp" />
     <ClCompile Include="PopupMenuViewTestHelper.cpp" />
     <ClCompile Include="ProcessManagerTest.cpp" />
     <ClCompile Include="RuntimeHelperTest.cpp" />
@@ -255,6 +256,8 @@
     <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp" />
     <ClCompile Include="ScopedRedrawDisablerTest.cpp" />
     <ClCompile Include="ScopedStopSourceTest.cpp" />
+    <ClCompile Include="ShellEnumeratorFake.cpp" />
+    <ClCompile Include="ShellEnumeratorImplTest.cpp" />
     <ClCompile Include="StartupFoldersRegistryStorageTest.cpp" />
     <ClCompile Include="StartupFoldersStorageTestHelper.cpp" />
     <ClCompile Include="StartupFoldersXmlStorageTest.cpp" />
@@ -364,6 +367,7 @@
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
     <ClInclude Include="ShellBrowserHelperTestBase.h" />
+    <ClInclude Include="ShellEnumeratorFake.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />

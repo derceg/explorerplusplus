@@ -1049,6 +1049,7 @@
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp" />
+    <ClCompile Include="ShellBrowser\NavigationManager.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
     <ClCompile Include="StartupFoldersRegistryStorage.cpp" />
     <ClCompile Include="StartupFoldersXmlStorage.cpp" />
@@ -1079,7 +1080,7 @@
     <ClCompile Include="MainRebarRegistryStorage.cpp" />
     <ClCompile Include="HistoryShellBrowserHelper.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp" />
-    <ClCompile Include="ShellEnumerator.cpp" />
+    <ClCompile Include="ShellEnumeratorImpl.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
     <ClCompile Include="TabParentItemsMenu.cpp" />
@@ -1349,7 +1350,9 @@
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="FrequentLocationsShellBrowserHelper.h" />
+    <ClInclude Include="ShellBrowser\NavigationManager.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
+    <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
     <ClInclude Include="StartupFoldersRegistryStorage.h" />
     <ClInclude Include="StartupFoldersXmlStorage.h" />
@@ -1388,7 +1391,7 @@
     <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
-    <ClInclude Include="ShellEnumerator.h" />
+    <ClInclude Include="ShellEnumeratorImpl.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
     <ClInclude Include="TabParentItemsMenu.h" />

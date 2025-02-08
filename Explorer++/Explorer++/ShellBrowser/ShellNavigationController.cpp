@@ -4,24 +4,24 @@
 
 #include "stdafx.h"
 #include "ShellNavigationController.h"
+#include "NavigationManager.h"
 #include "PreservedHistoryEntry.h"
-#include "ShellNavigator.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/ShellHelper.h"
 
-ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
+ShellNavigationController::ShellNavigationController(NavigationManager *navigationManager,
 	TabNavigationInterface *tabNavigation) :
-	m_navigator(navigator),
+	m_navigationManager(navigationManager),
 	m_tabNavigation(tabNavigation)
 {
 	Initialize();
 }
 
-ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
+ShellNavigationController::ShellNavigationController(NavigationManager *navigationManager,
 	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	NavigationController(CopyPreservedHistoryEntries(preservedEntries), currentEntry),
-	m_navigator(navigator),
+	m_navigationManager(navigationManager),
 	m_tabNavigation(tabNavigation)
 {
 	Initialize();
@@ -29,12 +29,12 @@ ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
 
 void ShellNavigationController::Initialize()
 {
-	m_connections.emplace_back(m_navigator->AddNavigationStartedObserver(
+	m_connections.emplace_back(m_navigationManager->AddNavigationStartedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationStarted, this),
-		boost::signals2::at_front));
-	m_connections.emplace_back(m_navigator->AddNavigationCommittedObserver(
+		boost::signals2::at_front, NavigationManager::SlotGroup::HighPriority));
+	m_connections.emplace_back(m_navigationManager->AddNavigationCommittedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
-		boost::signals2::at_front));
+		boost::signals2::at_front, NavigationManager::SlotGroup::HighPriority));
 }
 
 std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreservedHistoryEntries(
@@ -220,7 +220,7 @@ void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 		return;
 	}
 
-	m_navigator->Navigate(navigateParams);
+	m_navigationManager->StartNavigation(navigateParams);
 }
 
 void ShellNavigationController::SetNavigationTargetMode(NavigationTargetMode navigationTargetMode)

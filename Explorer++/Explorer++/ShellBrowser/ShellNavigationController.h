@@ -11,8 +11,8 @@
 #include <vector>
 
 struct NavigateParams;
+class NavigationManager;
 class PreservedHistoryEntry;
-class ShellNavigator;
 class TabNavigationInterface;
 
 enum class NavigationTargetMode
@@ -26,8 +26,10 @@ class ShellNavigationController :
 	private boost::noncopyable
 {
 public:
-	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation);
-	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
+	ShellNavigationController(NavigationManager *navigationManager,
+		TabNavigationInterface *tabNavigation);
+	ShellNavigationController(NavigationManager *navigationManager,
+		TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
@@ -55,7 +57,7 @@ private:
 	void OnNavigationStarted(const NavigateParams &navigateParams);
 	void OnNavigationCommitted(const NavigateParams &navigateParams);
 
-	ShellNavigator *m_navigator;
+	NavigationManager *const m_navigationManager;
 
 	TabNavigationInterface *m_tabNavigation;
 	NavigationTargetMode m_navigationTargetMode = NavigationTargetMode::Normal;
