@@ -11,37 +11,44 @@
 
 using namespace testing;
 
-class NavigationManagerTestBase : public Test
+class NavigationManagerTest : public Test
 {
 protected:
-	NavigationManagerTestBase(NavigationManager::ExecutionMode executionMode) :
+	NavigationManagerTest() :
 		m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
 		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
-		m_navigationManager(std::make_unique<NavigationManager>(executionMode, m_shellEnumerator,
+		m_navigationManager(std::make_unique<NavigationManager>(m_shellEnumerator,
 			m_manualExecutorBackground, m_manualExecutorCurrent))
 	{
 	}
 
-	~NavigationManagerTestBase()
+	~NavigationManagerTest()
 	{
 		m_manualExecutorBackground->shutdown();
 		m_manualExecutorCurrent->shutdown();
 	}
 
-	std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
-	std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorBackground;
-	std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorCurrent;
+	// Starts and then completes a navigation before returning.
+	void CompleteNavigation(const NavigateParams &navigateParams)
+	{
+		m_navigationManager->StartNavigation(navigateParams);
+		m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
+		m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
+	}
+
+	const std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
+	const std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorBackground;
+	const std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorCurrent;
 	std::unique_ptr<NavigationManager> m_navigationManager;
 };
 
 // The mocks here are all strict, which means that this should only be used as a base class when
 // testing that the appropriate mock methods are called.
-class NavigationManagerSignalTestBase : public NavigationManagerTestBase
+class NavigationManagerSignalTest : public NavigationManagerTest
 {
 protected:
-	NavigationManagerSignalTestBase(NavigationManager::ExecutionMode executionMode) :
-		NavigationManagerTestBase(executionMode)
+	NavigationManagerSignalTest()
 	{
 		m_navigationManager->AddNavigationStartedObserver(
 			m_navigationStartedCallback.AsStdFunction());
@@ -81,16 +88,7 @@ protected:
 		m_navigationCancelledCallback;
 };
 
-class NavigationManagerSignalSyncTest : public NavigationManagerSignalTestBase
-{
-protected:
-	NavigationManagerSignalSyncTest() :
-		NavigationManagerSignalTestBase(NavigationManager::ExecutionMode::Sync)
-	{
-	}
-};
-
-TEST_F(NavigationManagerSignalSyncTest, SuccessfulNavigation)
+TEST_F(NavigationManagerSignalTest, SuccessfulNavigation)
 {
 	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
@@ -105,10 +103,10 @@ TEST_F(NavigationManagerSignalSyncTest, SuccessfulNavigation)
 		EXPECT_CALL(m_navigationCompletedCallback, Call(navigateParams));
 	}
 
-	m_navigationManager->StartNavigation(navigateParams);
+	CompleteNavigation(navigateParams);
 }
 
-TEST_F(NavigationManagerSignalSyncTest, FailedInitialNavigation)
+TEST_F(NavigationManagerSignalTest, FailedInitialNavigation)
 {
 	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
@@ -126,10 +124,10 @@ TEST_F(NavigationManagerSignalSyncTest, FailedInitialNavigation)
 	}
 
 	m_shellEnumerator->SetShouldSucceed(false);
-	m_navigationManager->StartNavigation(navigateParams);
+	CompleteNavigation(navigateParams);
 }
 
-TEST_F(NavigationManagerSignalSyncTest, FailedSubsequentNavigation)
+TEST_F(NavigationManagerSignalTest, FailedSubsequentNavigation)
 {
 	PidlAbsolute pidlSuccess = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParamsSuccess = NavigateParams::Normal(pidlSuccess.Raw());
@@ -149,22 +147,13 @@ TEST_F(NavigationManagerSignalSyncTest, FailedSubsequentNavigation)
 		EXPECT_CALL(m_navigationFailedCallback, Call(navigateParamsFail));
 	}
 
-	m_navigationManager->StartNavigation(navigateParamsSuccess);
+	CompleteNavigation(navigateParamsSuccess);
 
 	m_shellEnumerator->SetShouldSucceed(false);
-	m_navigationManager->StartNavigation(navigateParamsFail);
+	CompleteNavigation(navigateParamsFail);
 }
 
-class NavigationManagerSignalAsyncTest : public NavigationManagerSignalTestBase
-{
-protected:
-	NavigationManagerSignalAsyncTest() :
-		NavigationManagerSignalTestBase(NavigationManager::ExecutionMode::Async)
-	{
-	}
-};
-
-TEST_F(NavigationManagerSignalAsyncTest, CommitWithPendingNavigation)
+TEST_F(NavigationManagerSignalTest, CommitWithPendingNavigation)
 {
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
@@ -193,7 +182,7 @@ TEST_F(NavigationManagerSignalAsyncTest, CommitWithPendingNavigation)
 	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 }
 
-TEST_F(NavigationManagerSignalAsyncTest, ManagerDestroyedWithPendingNavigation)
+TEST_F(NavigationManagerSignalTest, ManagerDestroyedWithPendingNavigation)
 {
 	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
@@ -215,11 +204,10 @@ TEST_F(NavigationManagerSignalAsyncTest, ManagerDestroyedWithPendingNavigation)
 	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 }
 
-class NavigationManagerSignalAsyncThreadTest : public NavigationManagerSignalTestBase
+class NavigationManagerSignalThreadTest : public NavigationManagerSignalTest
 {
 protected:
-	NavigationManagerSignalAsyncThreadTest() :
-		NavigationManagerSignalTestBase(NavigationManager::ExecutionMode::Async)
+	NavigationManagerSignalThreadTest()
 	{
 		auto originalThreadId = UniqueThreadId::GetForCurrentThread();
 
@@ -253,7 +241,7 @@ protected:
 	}
 };
 
-TEST_F(NavigationManagerSignalAsyncThreadTest, CheckThread)
+TEST_F(NavigationManagerSignalThreadTest, CheckThread)
 {
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
@@ -302,16 +290,7 @@ TEST_F(NavigationManagerSignalAsyncThreadTest, CheckThread)
 	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 }
 
-class NavigationManagerTestAsync : public NavigationManagerTestBase
-{
-protected:
-	NavigationManagerTestAsync() :
-		NavigationManagerTestBase(NavigationManager::ExecutionMode::Async)
-	{
-	}
-};
-
-TEST_F(NavigationManagerTestAsync, PendingNavigations)
+TEST_F(NavigationManagerTest, PendingNavigations)
 {
 	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 0);
 	EXPECT_FALSE(m_navigationManager->HasAnyPendingNavigations());

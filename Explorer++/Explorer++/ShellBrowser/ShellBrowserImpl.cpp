@@ -56,11 +56,13 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(hOwner,
 		folderSettings.showHidden ? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
 								  : ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden)),
-	m_navigationManager(app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
-			? NavigationManager::ExecutionMode::Async
-			: NavigationManager::ExecutionMode::Sync,
-		m_shellEnumerator, app->GetRuntime()->GetComStaExecutor(),
-		app->GetRuntime()->GetUiThreadExecutor()),
+	m_navigationManager(m_shellEnumerator,
+		app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
+			? app->GetRuntime()->GetComStaExecutor()
+			: app->GetRuntime()->GetInlineExecutor(),
+		app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
+			? app->GetRuntime()->GetUiThreadExecutor()
+			: app->GetRuntime()->GetInlineExecutor()),
 	m_navigationController(
 		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation)),
 	m_tabNavigation(tabNavigation),

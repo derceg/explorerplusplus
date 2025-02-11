@@ -458,8 +458,7 @@ protected:
 	ShellNavigationControllerAsyncTest() :
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
 		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
-		m_shellBrowser(&m_tabNavigation, NavigationManager::ExecutionMode::Async,
-			m_manualExecutorBackground, m_manualExecutorCurrent)
+		m_shellBrowser(&m_tabNavigation, m_manualExecutorBackground, m_manualExecutorCurrent)
 	{
 	}
 

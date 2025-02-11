@@ -38,21 +38,14 @@ public:
 	using NavigationCancelledSignal =
 		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 
-	enum class ExecutionMode
-	{
-		Sync,
-		Async
-	};
-
 	enum class SlotGroup
 	{
 		HighPriority = 0,
 		Default = 1
 	};
 
-	NavigationManager(ExecutionMode executionMode,
-		std::shared_ptr<const ShellEnumerator> shellEnumerator,
-		std::shared_ptr<concurrencpp::executor> comStaExecutor,
+	NavigationManager(std::shared_ptr<const ShellEnumerator> shellEnumerator,
+		std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 		std::shared_ptr<concurrencpp::executor> originalExecutor);
 	~NavigationManager();
 
@@ -102,9 +95,8 @@ private:
 	void OnEnumerationFailed(const NavigateParams &navigateParams);
 	void OnNavigationCancelled(const NavigateParams &navigateParams);
 
-	const ExecutionMode m_executionMode;
 	const std::shared_ptr<const ShellEnumerator> m_shellEnumerator;
-	const std::shared_ptr<concurrencpp::executor> m_comStaExecutor;
+	const std::shared_ptr<concurrencpp::executor> m_enumerationExecutor;
 	const std::shared_ptr<concurrencpp::executor> m_originalExecutor;
 
 	bool m_anyNavigationsCommitted = false;

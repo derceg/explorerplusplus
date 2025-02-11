@@ -8,13 +8,11 @@
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellHelper.h"
 
-NavigationManager::NavigationManager(ExecutionMode executionMode,
-	std::shared_ptr<const ShellEnumerator> shellEnumerator,
-	std::shared_ptr<concurrencpp::executor> comStaExecutor,
+NavigationManager::NavigationManager(std::shared_ptr<const ShellEnumerator> shellEnumerator,
+	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
-	m_executionMode(executionMode),
 	m_shellEnumerator(shellEnumerator),
-	m_comStaExecutor(comStaExecutor),
+	m_enumerationExecutor(enumerationExecutor),
 	m_originalExecutor(originalExecutor),
 	m_scopedStopSource(std::make_unique<ScopedStopSource>())
 {
@@ -36,16 +34,12 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 
 	// It's not safe to access this object once the coroutine here has switched to a different
 	// thread, making it necessary to retrieve these values up front.
-	bool isAsync = (weakSelf->m_executionMode == ExecutionMode::Async);
 	auto shellEnumerator = weakSelf->m_shellEnumerator;
-	auto comStaExecutor = weakSelf->m_comStaExecutor;
+	auto enumerationExecutor = weakSelf->m_enumerationExecutor;
 	auto originalExecutor = weakSelf->m_originalExecutor;
 	auto stopToken = weakSelf->m_scopedStopSource->GetToken();
 
-	if (isAsync)
-	{
-		co_await concurrencpp::resume_on(comStaExecutor);
-	}
+	co_await concurrencpp::resume_on(enumerationExecutor);
 
 	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
 	// symlinks and virtual link objects aren't, so they will be handled here.
@@ -71,10 +65,7 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 	std::vector<PidlChild> items;
 	hr = shellEnumerator->EnumerateDirectory(navigateParams.pidl.Raw(), items);
 
-	if (isAsync)
-	{
-		co_await concurrencpp::resume_on(originalExecutor);
-	}
+	co_await concurrencpp::resume_on(originalExecutor);
 
 	if (!weakSelf)
 	{

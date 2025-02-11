@@ -12,30 +12,25 @@
 
 ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
-	NavigationManager::ExecutionMode executionMode,
-	std::shared_ptr<concurrencpp::executor> comStaExecutor,
+	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
-	ShellBrowserFake(tabNavigation, executionMode, comStaExecutor, originalExecutor)
+	ShellBrowserFake(tabNavigation, enumerationExecutor, originalExecutor)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
 		tabNavigation, preservedEntries, currentEntry);
 }
 
 ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
-	NavigationManager::ExecutionMode executionMode,
-	std::shared_ptr<concurrencpp::executor> comStaExecutor,
+	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
 	m_shellEnumerator(std::make_unique<ShellEnumeratorFake>()),
-	m_navigationManager(executionMode, m_shellEnumerator, comStaExecutor, originalExecutor),
+	m_inlineExecutor(std::make_shared<concurrencpp::inline_executor>()),
+	m_navigationManager(m_shellEnumerator,
+		enumerationExecutor ? enumerationExecutor : m_inlineExecutor,
+		originalExecutor ? originalExecutor : m_inlineExecutor),
 	m_navigationController(
 		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation))
 {
-	if (executionMode == NavigationManager::ExecutionMode::Async)
-	{
-		CHECK(comStaExecutor);
-		CHECK(originalExecutor);
-	}
-
 	m_navigationManager.AddNavigationStartedObserver([this](const NavigateParams &navigateParams)
 		{ m_navigationStartedSignal(navigateParams); });
 	m_navigationManager.AddNavigationCommittedObserver([this](const NavigateParams &navigateParams)
@@ -46,7 +41,10 @@ ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
 		[this](const NavigateParams &navigateParams) { m_navigationFailedSignal(navigateParams); });
 }
 
-ShellBrowserFake::~ShellBrowserFake() = default;
+ShellBrowserFake::~ShellBrowserFake()
+{
+	m_inlineExecutor->shutdown();
+}
 
 // Although the ShellNavigationController can navigate to a path (by transforming it into a pidl),
 // it requires that the path exist. This function will transform the path into a simple pidl, which

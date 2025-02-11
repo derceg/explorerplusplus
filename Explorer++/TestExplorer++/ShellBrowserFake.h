@@ -7,6 +7,7 @@
 #include "ShellBrowser/NavigationManager.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/PidlHelper.h"
+#include <concurrencpp/concurrencpp.h>
 #include <memory>
 
 class PreservedHistoryEntry;
@@ -19,13 +20,10 @@ class ShellBrowserFake : public ShellBrowser
 public:
 	ShellBrowserFake(TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
-		int currentEntry,
-		NavigationManager::ExecutionMode executionMode = NavigationManager::ExecutionMode::Sync,
-		std::shared_ptr<concurrencpp::executor> comStaExecutor = nullptr,
+		int currentEntry, std::shared_ptr<concurrencpp::executor> enumerationExecutor = nullptr,
 		std::shared_ptr<concurrencpp::executor> originalExecutor = nullptr);
 	ShellBrowserFake(TabNavigationInterface *tabNavigation,
-		NavigationManager::ExecutionMode executionMode = NavigationManager::ExecutionMode::Sync,
-		std::shared_ptr<concurrencpp::executor> comStaExecutor = nullptr,
+		std::shared_ptr<concurrencpp::executor> enumerationExecutor = nullptr,
 		std::shared_ptr<concurrencpp::executor> originalExecutor = nullptr);
 	~ShellBrowserFake();
 
@@ -55,7 +53,8 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 private:
-	std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
+	const std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
+	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
