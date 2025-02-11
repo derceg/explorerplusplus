@@ -7,15 +7,31 @@
 #include "ShellNavigator.h"
 
 struct FolderSettings;
+class NavigationManager;
 class ShellBrowserHelperBase;
 class ShellNavigationController;
 
 class ShellBrowser : public ShellNavigator
 {
 public:
-	virtual ~ShellBrowser() = default;
-
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
 	virtual void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) = 0;
+
+	// ShellNavigator
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationCompletedObserver(
+		const NavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+
+protected:
+	virtual NavigationManager *GetNavigationManager() = 0;
 };

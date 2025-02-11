@@ -1050,6 +1050,7 @@
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp" />
     <ClCompile Include="ShellBrowser\NavigationManager.cpp" />
+    <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
     <ClCompile Include="StartupFoldersRegistryStorage.cpp" />
     <ClCompile Include="StartupFoldersXmlStorage.cpp" />

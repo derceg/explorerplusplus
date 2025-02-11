@@ -31,26 +31,13 @@ public:
 		HistoryEntryType addHistoryType = HistoryEntryType::AddEntry,
 		PidlAbsolute *outputPidl = nullptr);
 
-	NavigationManager *GetNavigationManager();
-
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
-	// ShellNavigator
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationCompletedObserver(
-		const NavigationCompletedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
+protected:
+	NavigationManager *GetNavigationManager() override;
 
 private:
 	const std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
@@ -58,9 +45,4 @@ private:
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
-
-	NavigationStartedSignal m_navigationStartedSignal;
-	NavigationCommittedSignal m_navigationCommittedSignal;
-	NavigationCompletedSignal m_navigationCompletedSignal;
-	NavigationFailedSignal m_navigationFailedSignal;
 };

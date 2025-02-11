@@ -432,7 +432,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 
 TEST_F(ShellNavigationControllerTest, SlotOrdering)
 {
-	m_shellBrowser.GetNavigationManager()->AddNavigationCommittedObserver(
+	m_shellBrowser.AddNavigationCommittedObserver(
 		[this](const NavigateParams &navigateParams)
 		{
 			UNREFERENCED_PARAMETER(navigateParams);

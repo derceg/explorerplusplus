@@ -96,17 +96,17 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
 
 	m_navigationManager.AddNavigationStartedObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this), boost::signals2::at_front);
+		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this), boost::signals2::at_front,
+		NavigationManager::SlotGroup::HighPriority);
 	m_navigationManager.AddNavigationWillCommitObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this),
-		boost::signals2::at_front);
+		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this), boost::signals2::at_front,
+		NavigationManager::SlotGroup::HighPriority);
 	m_navigationManager.AddNavigationCommittedObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this), boost::signals2::at_front);
+		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this), boost::signals2::at_front,
+		NavigationManager::SlotGroup::HighPriority);
 	m_navigationManager.AddNavigationItemsAvailableObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationItemsAvailable, this),
-		boost::signals2::at_front);
-	m_navigationManager.AddNavigationFailedObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationFailed, this), boost::signals2::at_front);
+		boost::signals2::at_front, NavigationManager::SlotGroup::HighPriority);
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
@@ -1370,4 +1370,9 @@ void ShellBrowserImpl::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 WeakPtr<ShellBrowserImpl> ShellBrowserImpl::GetWeakPtr()
 {
 	return m_weakPtrFactory.GetWeakPtr();
+}
+
+NavigationManager *ShellBrowserImpl::GetNavigationManager()
+{
+	return &m_navigationManager;
 }

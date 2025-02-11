@@ -38,8 +38,6 @@ void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
 		// entry occurs.
 		ChangeFolders(navigateParams);
 	}
-
-	m_navigationStartedSignal(navigateParams);
 }
 
 void ShellBrowserImpl::ChangeFolders(const NavigateParams &navigateParams)
@@ -476,8 +474,6 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams
 	NotifyShellOfNavigation(navigateParams.pidl.Raw());
 
 	SetNavigationState(NavigationState::Committed);
-
-	m_navigationCommittedSignal(navigateParams);
 }
 
 void ShellBrowserImpl::OnNavigationItemsAvailable(const NavigateParams &navigateParams,
@@ -527,8 +523,6 @@ void ShellBrowserImpl::OnNavigationItemsAvailable(const NavigateParams &navigate
 	}
 
 	SetNavigationState(NavigationState::Completed);
-
-	m_navigationCompletedSignal(navigateParams);
 }
 
 std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFromPidls(
@@ -731,11 +725,6 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	return bFilenameFiltered || bHideSystemFile;
 }
 
-void ShellBrowserImpl::OnNavigationFailed(const NavigateParams &navigateParams)
-{
-	m_navigationFailedSignal(navigateParams);
-}
-
 void ShellBrowserImpl::RemoveItem(int iItemInternal)
 {
 	ULARGE_INTEGER ulFileSize;
@@ -790,32 +779,6 @@ void ShellBrowserImpl::RemoveItem(int iItemInternal)
 ShellNavigationController *ShellBrowserImpl::GetNavigationController() const
 {
 	return m_navigationController.get();
-}
-
-boost::signals2::connection ShellBrowserImpl::AddNavigationStartedObserver(
-	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)
-{
-	return m_navigationStartedSignal.connect(observer, position);
-}
-
-boost::signals2::connection ShellBrowserImpl::AddNavigationCommittedObserver(
-	const NavigationCommittedSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return m_navigationCommittedSignal.connect(observer, position);
-}
-
-boost::signals2::connection ShellBrowserImpl::AddNavigationCompletedObserver(
-	const NavigationCompletedSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return m_navigationCompletedSignal.connect(observer, position);
-}
-
-boost::signals2::connection ShellBrowserImpl::AddNavigationFailedObserver(
-	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position)
-{
-	return m_navigationFailedSignal.connect(observer, position);
 }
 
 void ShellBrowserImpl::SetNavigationState(NavigationState navigationState)

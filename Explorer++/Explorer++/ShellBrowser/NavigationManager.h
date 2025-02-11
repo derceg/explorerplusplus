@@ -40,8 +40,9 @@ public:
 
 	enum class SlotGroup
 	{
-		HighPriority = 0,
-		Default = 1
+		HighestPriority = 0,
+		HighPriority = 1,
+		Default = 2
 	};
 
 	NavigationManager(std::shared_ptr<const ShellEnumerator> shellEnumerator,

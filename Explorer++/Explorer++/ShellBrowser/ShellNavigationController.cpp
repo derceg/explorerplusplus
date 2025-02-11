@@ -31,10 +31,10 @@ void ShellNavigationController::Initialize()
 {
 	m_connections.emplace_back(m_navigationManager->AddNavigationStartedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationStarted, this),
-		boost::signals2::at_front, NavigationManager::SlotGroup::HighPriority));
+		boost::signals2::at_front, NavigationManager::SlotGroup::HighestPriority));
 	m_connections.emplace_back(m_navigationManager->AddNavigationCommittedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
-		boost::signals2::at_front, NavigationManager::SlotGroup::HighPriority));
+		boost::signals2::at_front, NavigationManager::SlotGroup::HighestPriority));
 }
 
 std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreservedHistoryEntries(

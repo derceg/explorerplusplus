@@ -90,20 +90,6 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
-	// ShellNavigator
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationCompletedObserver(
-		const NavigationCompletedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
-
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
 	/* Get/Set current state. */
@@ -208,6 +194,9 @@ public:
 
 	SignalWrapper<ShellBrowserImpl, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
+
+protected:
+	NavigationManager *GetNavigationManager() override;
 
 private:
 	struct ItemInfo_t
@@ -426,7 +415,6 @@ private:
 		const std::vector<PidlChild> &itemPidls);
 	void InsertAwaitingItems();
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
-	void OnNavigationFailed(const NavigateParams &navigateParams);
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
 	int AddItemInternal(int itemIndex, const ItemInfo_t &itemInfo, BOOL setPosition);
@@ -654,10 +642,6 @@ private:
 
 	std::shared_ptr<ShellEnumeratorImpl> m_shellEnumerator;
 	NavigationManager m_navigationManager;
-	NavigationStartedSignal m_navigationStartedSignal;
-	NavigationCommittedSignal m_navigationCommittedSignal;
-	NavigationCompletedSignal m_navigationCompletedSignal;
-	NavigationFailedSignal m_navigationFailedSignal;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 	NavigationState m_navigationState = NavigationState::NoFolderShown;
 
