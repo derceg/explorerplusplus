@@ -134,7 +134,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 wil::com_ptr_nothrow<IContextMenu> ShellContextMenu::MaybeGetShellContextMenu(HWND hwnd) const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	HRESULT hr = BindToIdl(m_pidlParent.Raw(), IID_PPV_ARGS(&shellFolder));
+	HRESULT hr = SHBindToObject(nullptr, m_pidlParent.Raw(), nullptr, IID_PPV_ARGS(&shellFolder));
 
 	if (FAILED(hr))
 	{

@@ -17,7 +17,7 @@ HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
 	std::vector<PidlChild> &outputItems) const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
+	RETURN_IF_FAILED(SHBindToObject(nullptr, pidlDirectory, nullptr, IID_PPV_ARGS(&shellFolder)));
 
 	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
 

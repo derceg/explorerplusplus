@@ -529,7 +529,8 @@ std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFr
 	const NavigateParams &navigateParams, const std::vector<PidlChild> &itemPidls)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	HRESULT hr = BindToIdl(navigateParams.pidl.Raw(), IID_PPV_ARGS(&shellFolder));
+	HRESULT hr =
+		SHBindToObject(nullptr, navigateParams.pidl.Raw(), nullptr, IID_PPV_ARGS(&shellFolder));
 
 	if (FAILED(hr))
 	{

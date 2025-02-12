@@ -897,7 +897,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	auto pidlDirectory = GetNodePidl(hParent);
 
 	wil::com_ptr_nothrow<IShellFolder2> shellFolder2;
-	HRESULT hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&shellFolder2));
+	HRESULT hr = SHBindToObject(nullptr, pidlDirectory.get(), nullptr, IID_PPV_ARGS(&shellFolder2));
 
 	if (FAILED(hr))
 	{

@@ -182,7 +182,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 		pridl = ILCloneChild(ILFindLastID(pidlFull));
 
-		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
+		hr = SHBindToObject(nullptr, pidlParent, nullptr, IID_PPV_ARGS(&pShellFolder));
 
 		if (SUCCEEDED(hr))
 		{

@@ -434,29 +434,6 @@ HRESULT GetDefaultIcon(SHSTOCKICONID iconId, int &outputImageIndex)
 	return S_OK;
 }
 
-HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv)
-{
-	IShellFolder *pDesktop = nullptr;
-	HRESULT hr = SHGetDesktopFolder(&pDesktop);
-
-	if (SUCCEEDED(hr))
-	{
-		/* See http://blogs.msdn.com/b/oldnewthing/archive/2011/08/30/10202076.aspx. */
-		if (pidl->mkid.cb)
-		{
-			hr = pDesktop->BindToObject(pidl, nullptr, riid, ppv);
-		}
-		else
-		{
-			hr = pDesktop->QueryInterface(riid, ppv);
-		}
-
-		pDesktop->Release();
-	}
-
-	return hr;
-}
-
 HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl,
 	PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv)
 {
@@ -1168,7 +1145,7 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	IUnknown *site)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
+	RETURN_IF_FAILED(SHBindToObject(nullptr, pidlDirectory, nullptr, IID_PPV_ARGS(&shellFolder)));
 
 	wil::com_ptr_nothrow<IContextMenu> contextMenu;
 

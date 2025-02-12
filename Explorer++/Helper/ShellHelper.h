@@ -98,7 +98,6 @@ HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output);
 HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent);
 HRESULT GetRootPidl(PIDLIST_ABSOLUTE *pidl);
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
-HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv);
 HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl,
 	PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv);
 HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax,
