@@ -5,6 +5,8 @@
 #pragma once
 
 #include "ShellNavigator.h"
+#include <memory>
+#include <vector>
 
 struct FolderSettings;
 class NavigationManager;
@@ -16,7 +18,8 @@ class ShellBrowser : public ShellNavigator
 public:
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
-	virtual void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) = 0;
+
+	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper);
 
 	// ShellNavigator
 	boost::signals2::connection AddNavigationStartedObserver(
@@ -34,4 +37,7 @@ public:
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;
+
+private:
+	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 };

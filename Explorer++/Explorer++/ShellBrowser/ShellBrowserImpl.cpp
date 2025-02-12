@@ -1362,11 +1362,6 @@ void ShellBrowserImpl::OnInternalPaste(const ClipboardOperations::PastedItems &p
 	SelectItems(pidls);
 }
 
-void ShellBrowserImpl::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
-{
-	m_helpers.push_back(std::move(helper));
-}
-
 WeakPtr<ShellBrowserImpl> ShellBrowserImpl::GetWeakPtr()
 {
 	return m_weakPtrFactory.GetWeakPtr();

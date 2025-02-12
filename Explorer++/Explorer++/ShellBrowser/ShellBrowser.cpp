@@ -5,6 +5,12 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "NavigationManager.h"
+#include "ShellBrowserHelper.h"
+
+void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
+{
+	m_helpers.push_back(std::move(helper));
+}
 
 boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
 	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)

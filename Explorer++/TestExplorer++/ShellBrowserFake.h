@@ -34,7 +34,6 @@ public:
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
-	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;
@@ -44,5 +43,4 @@ private:
 	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
-	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 };

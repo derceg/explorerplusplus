@@ -68,8 +68,3 @@ ShellNavigationController *ShellBrowserFake::GetNavigationController() const
 {
 	return m_navigationController.get();
 }
-
-void ShellBrowserFake::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
-{
-	m_helpers.push_back(std::move(helper));
-}

@@ -88,7 +88,6 @@ public:
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
-	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
@@ -637,8 +636,6 @@ private:
 	HWND m_hOwner;
 
 	App *const m_app;
-
-	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 
 	std::shared_ptr<ShellEnumeratorImpl> m_shellEnumerator;
 	NavigationManager m_navigationManager;
