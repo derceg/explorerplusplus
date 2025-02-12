@@ -20,8 +20,8 @@ public:
 
 	ShellEnumeratorImpl(HWND embedder, HiddenItemsPolicy hiddenItemsPolicy);
 
-	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
-		std::vector<PidlChild> &outputItems) const override;
+	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory, std::vector<PidlChild> &outputItems,
+		std::stop_token stopToken) const override;
 
 	// It's safe to call this method on one thread while `EnumerateDirectory` is being run on a
 	// different thread.

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../Helper/PidlHelper.h"
+#include <stop_token>
 #include <vector>
 
 class ShellEnumerator
@@ -13,5 +14,5 @@ public:
 	virtual ~ShellEnumerator() = default;
 
 	virtual HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
-		std::vector<PidlChild> &outputItems) const = 0;
+		std::vector<PidlChild> &outputItems, std::stop_token stopToken) const = 0;
 };

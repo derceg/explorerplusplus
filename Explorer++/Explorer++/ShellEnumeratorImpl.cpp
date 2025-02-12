@@ -14,7 +14,7 @@ ShellEnumeratorImpl::ShellEnumeratorImpl(HWND embedder, HiddenItemsPolicy hidden
 }
 
 HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
-	std::vector<PidlChild> &outputItems) const
+	std::vector<PidlChild> &outputItems, std::stop_token stopToken) const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	RETURN_IF_FAILED(SHBindToObject(nullptr, pidlDirectory, nullptr, IID_PPV_ARGS(&shellFolder)));
@@ -43,7 +43,8 @@ HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
 	ULONG numFetched = 1;
 	unique_pidl_child pidlItem;
 
-	while (enumerator->Next(1, wil::out_param(pidlItem), &numFetched) == S_OK && (numFetched == 1))
+	while (!stopToken.stop_requested()
+		&& enumerator->Next(1, wil::out_param(pidlItem), &numFetched) == S_OK && (numFetched == 1))
 	{
 		outputItems.emplace_back(pidlItem.get());
 	}

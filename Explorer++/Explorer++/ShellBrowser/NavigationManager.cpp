@@ -63,7 +63,7 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 	}
 
 	std::vector<PidlChild> items;
-	hr = shellEnumerator->EnumerateDirectory(navigateParams.pidl.Raw(), items);
+	hr = shellEnumerator->EnumerateDirectory(navigateParams.pidl.Raw(), items, stopToken);
 
 	co_await concurrencpp::resume_on(originalExecutor);
 

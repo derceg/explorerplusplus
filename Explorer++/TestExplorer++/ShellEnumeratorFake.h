@@ -9,8 +9,8 @@
 class ShellEnumeratorFake : public ShellEnumerator
 {
 public:
-	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
-		std::vector<PidlChild> &outputItems) const override;
+	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory, std::vector<PidlChild> &outputItems,
+		std::stop_token stopToken) const override;
 
 	void SetShouldSucceed(bool shouldSucceed);
 

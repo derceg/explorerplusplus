@@ -6,10 +6,11 @@
 #include "ShellEnumeratorFake.h"
 
 HRESULT ShellEnumeratorFake::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
-	std::vector<PidlChild> &outputItems) const
+	std::vector<PidlChild> &outputItems, std::stop_token stopToken) const
 {
 	UNREFERENCED_PARAMETER(pidlDirectory);
 	UNREFERENCED_PARAMETER(outputItems);
+	UNREFERENCED_PARAMETER(stopToken);
 
 	return m_shouldSucceed ? S_OK : E_FAIL;
 }
