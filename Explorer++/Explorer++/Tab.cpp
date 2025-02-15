@@ -141,6 +141,11 @@ void Tab::SetLockState(LockState lockState)
 	m_tabUpdatedSignal(*this, PropertyType::LockState);
 }
 
+bool Tab::IsLocked() const
+{
+	return m_lockState == LockState::Locked || m_lockState == LockState::AddressLocked;
+}
+
 boost::signals2::connection Tab::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
 {
 	return m_tabUpdatedSignal.connect(observer);

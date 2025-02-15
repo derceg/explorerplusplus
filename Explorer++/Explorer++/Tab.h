@@ -63,6 +63,9 @@ public:
 	LockState GetLockState() const;
 	void SetLockState(LockState lockState);
 
+	// Returns true if the tab is locked, or address locked.
+	bool IsLocked() const;
+
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 
 	TabStorageData GetStorageData() const;

@@ -228,8 +228,8 @@ private:
 	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
 	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
-	int InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
-		std::optional<std::wstring> customName);
+	int InsertNewTab(const Tab &tab, const NavigateParams &navigateParams,
+		const TabSettings &tabSettings, int index);
 
 	void RemoveTabFromControl(const Tab &tab);
 

@@ -948,7 +948,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	index = InsertNewTab(index, tab.GetId(), navigateParams.pidl, tabSettings.name);
+	index = InsertNewTab(tab, navigateParams, tabSettings, index);
 
 	bool selected = false;
 
@@ -1019,26 +1019,27 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	return tab;
 }
 
-int TabContainer::InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
-	std::optional<std::wstring> customName)
+int TabContainer::InsertNewTab(const Tab &tab, const NavigateParams &navigateParams,
+	const TabSettings &tabSettings, int index)
 {
 	std::wstring name;
 
-	if (customName && !customName->empty())
+	if (tabSettings.name && !tabSettings.name->empty())
 	{
-		name = *customName;
+		name = *tabSettings.name;
 	}
 	else
 	{
-		GetDisplayName(pidlDirectory.Raw(), SHGDN_INFOLDER, name);
+		GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, name);
 	}
 
 	boost::replace_all(name, L"&", L"&&");
 
-	TCITEM tcItem;
-	tcItem.mask = TCIF_TEXT | TCIF_PARAM;
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
 	tcItem.pszText = name.data();
-	tcItem.lParam = tabId;
+	tcItem.iImage = tab.IsLocked() ? m_tabIconLockIndex : m_defaultFolderIconIndex;
+	tcItem.lParam = tab.GetId();
 	int insertedIndex = TabCtrl_InsertItem(m_hwnd, index, &tcItem);
 	CHECK_NE(insertedIndex, -1);
 
