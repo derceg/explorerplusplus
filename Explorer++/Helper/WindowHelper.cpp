@@ -152,6 +152,29 @@ bool IsRectVisible(const RECT *rect)
 	return monitor != nullptr;
 }
 
+// See https://devblogs.microsoft.com/oldnewthing/20220921-00/?p=107203.
+void RecalcWindowCursor(HWND window)
+{
+	POINT pt;
+	BOOL res = GetCursorPos(&pt);
+
+	if (!res)
+	{
+		return;
+	}
+
+	HWND target = WindowFromPoint(pt);
+
+	if (window != target && !IsChild(window, target))
+	{
+		return;
+	}
+
+	auto code = static_cast<UINT>(SendMessage(target, WM_NCHITTEST, 0, MAKELPARAM(pt.x, pt.y)));
+	SendMessage(target, WM_SETCURSOR, reinterpret_cast<WPARAM>(target),
+		MAKELPARAM(code, WM_MOUSEMOVE));
+}
+
 bool operator==(const RECT &first, const RECT &second)
 {
 	return EqualRect(&first, &second);

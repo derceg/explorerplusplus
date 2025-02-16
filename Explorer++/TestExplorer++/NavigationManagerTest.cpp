@@ -307,15 +307,60 @@ TEST_F(NavigationManagerTest, PendingNavigations)
 	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 2);
 	EXPECT_TRUE(m_navigationManager->HasAnyPendingNavigations());
 
-	// This should allow the first navigation to complete.
+	// This should allow navigation 1 to complete.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
 	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 1);
 	EXPECT_TRUE(m_navigationManager->HasAnyPendingNavigations());
 
-	// This should allow the second navigation to complete.
+	// This should allow navigation 2 to complete.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
 	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 0);
 	EXPECT_FALSE(m_navigationManager->HasAnyPendingNavigations());
+}
+
+TEST_F(NavigationManagerTest, ActiveNavigations)
+{
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0);
+	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
+
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
+	m_navigationManager->StartNavigation(navigateParams1);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1);
+	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
+
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
+	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
+	m_navigationManager->StartNavigation(navigateParams2);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 2);
+	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
+
+	// This should allow navigation 1 to complete, which should result in navigation 2 being
+	// cancelled. That should leave no active navigations.
+	m_manualExecutorBackground->loop(1);
+	m_manualExecutorCurrent->loop(1);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0);
+	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
+
+	// This navigation has been started after navigation 1 finished, so it can commit.
+	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"e:\\");
+	auto navigateParams3 = NavigateParams::Normal(pidl3.Raw());
+	m_navigationManager->StartNavigation(navigateParams3);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1);
+	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
+
+	// This should allow navigation 2 to complete, resulting in its cancellation being finalized.
+	// Navigation 3 should still be active, however.
+	m_manualExecutorBackground->loop(1);
+	m_manualExecutorCurrent->loop(1);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1);
+	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
+
+	// This will complete navigation 3, leaving no active navigations.
+	m_manualExecutorBackground->loop(1);
+	m_manualExecutorCurrent->loop(1);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0);
+	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
 }

@@ -91,6 +91,8 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 
 void NavigationManager::OnNavigationStarted(const NavigateParams &navigateParams)
 {
+	m_numActiveNavigations++;
+
 	m_navigationStartedSignal(navigateParams);
 }
 
@@ -99,6 +101,10 @@ void NavigationManager::OnEnumerationCompleted(const NavigateParams &navigatePar
 {
 	// This navigation will be committed, so all other navigations should be cancelled.
 	m_scopedStopSource = std::make_unique<ScopedStopSource>();
+
+	// This navigation is about to be committed and all other in progress navigations have been
+	// cancelled. So, at this point, there no other navigations in progress that can commit.
+	m_numActiveNavigations = 0;
 
 	m_anyNavigationsCommitted = true;
 
@@ -119,6 +125,8 @@ void NavigationManager::OnEnumerationFailed(const NavigateParams &navigateParams
 		return;
 	}
 
+	m_numActiveNavigations--;
+
 	m_navigationFailedSignal(navigateParams);
 }
 
@@ -135,6 +143,16 @@ int NavigationManager::GetNumPendingNavigations() const
 bool NavigationManager::HasAnyPendingNavigations() const
 {
 	return m_numPendingNavigations > 0;
+}
+
+int NavigationManager::GetNumActiveNavigations() const
+{
+	return m_numActiveNavigations;
+}
+
+bool NavigationManager::HasAnyActiveNavigations() const
+{
+	return m_numActiveNavigations > 0;
 }
 
 boost::signals2::connection NavigationManager::AddNavigationStartedObserver(

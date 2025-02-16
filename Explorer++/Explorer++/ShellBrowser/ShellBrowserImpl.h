@@ -443,6 +443,7 @@ private:
 	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);
 	bool OnMouseWheel(int xPos, int yPos, int delta, UINT keys);
+	bool OnSetCursor(HWND target);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	BOOL OnListViewGetEmptyMarkup(NMLVEMPTYMARKUP *emptyMarkup);
@@ -641,6 +642,7 @@ private:
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 	NavigationState m_navigationState = NavigationState::NoFolderShown;
+	const HCURSOR m_progressCursor;
 
 	TabNavigationInterface *m_tabNavigation;
 	FileActionHandler *m_fileActionHandler;

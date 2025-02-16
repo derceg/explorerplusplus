@@ -65,6 +65,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 			: app->GetRuntime()->GetInlineExecutor()),
 	m_navigationController(
 		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation)),
+	m_progressCursor(LoadCursor(nullptr, IDC_APPSTARTING)),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
 	m_fontSetter(GetHWND(), app->GetConfig()),

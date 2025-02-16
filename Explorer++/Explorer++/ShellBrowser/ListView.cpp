@@ -114,6 +114,13 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 		}
 		break;
 
+	case WM_SETCURSOR:
+		if (OnSetCursor(reinterpret_cast<HWND>(wParam)))
+		{
+			return TRUE;
+		}
+		break;
+
 	case WM_CLIPBOARDUPDATE:
 		OnClipboardUpdate();
 		return 0;
@@ -338,6 +345,23 @@ bool ShellBrowserImpl::OnMouseWheel(int xPos, int yPos, int delta, UINT keys)
 	}
 
 	return false;
+}
+
+bool ShellBrowserImpl::OnSetCursor(HWND target)
+{
+	if (target != m_hListView)
+	{
+		return false;
+	}
+
+	if (!m_navigationManager.HasAnyActiveNavigations())
+	{
+		return false;
+	}
+
+	SetCursor(m_progressCursor);
+
+	return true;
 }
 
 void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)

@@ -21,6 +21,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
+#include "../Helper/WindowHelper.h"
 #include <wil/com.h>
 #include <propkey.h>
 #include <propvarutil.h>
@@ -38,6 +39,8 @@ void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
 		// entry occurs.
 		ChangeFolders(navigateParams);
 	}
+
+	RecalcWindowCursor(m_hListView);
 }
 
 void ShellBrowserImpl::ChangeFolders(const NavigateParams &navigateParams)
@@ -472,6 +475,8 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams
 	ChangeFolders(navigateParams);
 
 	NotifyShellOfNavigation(navigateParams.pidl.Raw());
+
+	RecalcWindowCursor(m_hListView);
 
 	SetNavigationState(NavigationState::Committed);
 }

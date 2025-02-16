@@ -51,8 +51,18 @@ public:
 	~NavigationManager();
 
 	void StartNavigation(const NavigateParams &navigateParams);
+
+	// A pending navigation is one that is still in progress. This includes both navigations that
+	// will be cancelled once they return to the main thread (e.g. because a navigation was
+	// committed in the meantime), as well as active navigations that can still be committed once
+	// they return.
 	int GetNumPendingNavigations() const;
 	bool HasAnyPendingNavigations() const;
+
+	// An active navigation is one that may commit once it returns to the main thread. This
+	// explicitly excludes navigations that will be cancelled but are technically still in progress.
+	int GetNumActiveNavigations() const;
+	bool HasAnyActiveNavigations() const;
 
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
@@ -102,6 +112,7 @@ private:
 
 	bool m_anyNavigationsCommitted = false;
 	int m_numPendingNavigations = 0;
+	int m_numActiveNavigations = 0;
 
 	NavigationStartedSignal m_navigationStartedSignal;
 
