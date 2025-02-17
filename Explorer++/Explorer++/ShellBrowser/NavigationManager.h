@@ -52,16 +52,29 @@ public:
 
 	void StartNavigation(const NavigateParams &navigateParams);
 
+	// Stops all in-progress navigations.
+	void StopLoading();
+
+	// Returns the list of pending navigations, with more recent navigations appearing first.
+	//
 	// A pending navigation is one that is still in progress. This includes both navigations that
 	// will be cancelled once they return to the main thread (e.g. because a navigation was
 	// committed in the meantime), as well as active navigations that can still be committed once
 	// they return.
-	int GetNumPendingNavigations() const;
+	concurrencpp::generator<const NavigateParams &> GetPendingNavigations() const;
+
+	const NavigateParams *MaybeGetLatestPendingNavigation() const;
+	size_t GetNumPendingNavigations() const;
 	bool HasAnyPendingNavigations() const;
 
+	// Returns the list of active navigations, with more recent navigations appearing first.
+	//
 	// An active navigation is one that may commit once it returns to the main thread. This
 	// explicitly excludes navigations that will be cancelled but are technically still in progress.
-	int GetNumActiveNavigations() const;
+	concurrencpp::generator<const NavigateParams &> GetActiveNavigations() const;
+
+	const NavigateParams *MaybeGetLatestActiveNavigation() const;
+	size_t GetNumActiveNavigations() const;
 	bool HasAnyActiveNavigations() const;
 
 	boost::signals2::connection AddNavigationStartedObserver(
@@ -97,6 +110,12 @@ public:
 		SlotGroup slotGroup = SlotGroup::Default);
 
 private:
+	struct PendingNavigation
+	{
+		NavigateParams navigateParams;
+		std::stop_token stopToken;
+	};
+
 	static concurrencpp::null_result StartNavigationInternal(WeakPtr<NavigationManager> weakSelf,
 		NavigateParams navigateParams);
 
@@ -111,8 +130,8 @@ private:
 	const std::shared_ptr<concurrencpp::executor> m_originalExecutor;
 
 	bool m_anyNavigationsCommitted = false;
-	int m_numPendingNavigations = 0;
-	int m_numActiveNavigations = 0;
+	std::map<int, PendingNavigation, std::greater<int>> m_pendingNavigations;
+	int m_navigationIdCounter = 0;
 
 	NavigationStartedSignal m_navigationStartedSignal;
 

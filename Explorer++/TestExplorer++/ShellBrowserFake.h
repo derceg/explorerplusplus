@@ -37,6 +37,7 @@ public:
 
 protected:
 	NavigationManager *GetNavigationManager() override;
+	const NavigationManager *GetNavigationManager() const override;
 
 private:
 	const std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;

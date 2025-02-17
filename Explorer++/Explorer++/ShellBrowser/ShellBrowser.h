@@ -20,6 +20,7 @@ public:
 	virtual ShellNavigationController *GetNavigationController() const = 0;
 
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper);
+	const NavigateParams *MaybeGetLatestActiveNavigation() const;
 
 	// ShellNavigator
 	boost::signals2::connection AddNavigationStartedObserver(
@@ -37,6 +38,7 @@ public:
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;
+	virtual const NavigationManager *GetNavigationManager() const = 0;
 
 private:
 	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;

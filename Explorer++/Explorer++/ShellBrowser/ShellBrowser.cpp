@@ -12,6 +12,11 @@ void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 	m_helpers.push_back(std::move(helper));
 }
 
+const NavigateParams *ShellBrowser::MaybeGetLatestActiveNavigation() const
+{
+	return GetNavigationManager()->MaybeGetLatestActiveNavigation();
+}
+
 boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
 	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)
 {

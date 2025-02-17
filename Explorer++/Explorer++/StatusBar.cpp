@@ -153,9 +153,11 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab,
 	const NavigateParams &navigateParams)
 {
+	UNREFERENCED_PARAMETER(navigateParams);
+
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
-		SetStatusBarLoadingText(navigateParams.pidl.Raw());
+		UpdateStatusBarText(tab);
 	}
 }
 
@@ -205,8 +207,16 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
 	}
 }
 
-HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
+void Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
+	if (auto *navigation = tab.GetShellBrowser()->MaybeGetLatestActiveNavigation())
+	{
+		// In this case, there is at least one active navigation in progress, so the status bar
+		// should reflect that.
+		SetStatusBarLoadingText(navigation->pidl.Raw());
+		return;
+	}
+
 	int numItemsSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 	std::wstring numItemsText;
 
@@ -281,8 +291,6 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		CreateDriveFreeSpaceString(tab.GetShellBrowserImpl()->GetDirectory().c_str());
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(driveFreeSpaceText.c_str()));
-
-	return S_OK;
 }
 
 std::wstring Explorerplusplus::CreateDriveFreeSpaceString(const std::wstring &path)

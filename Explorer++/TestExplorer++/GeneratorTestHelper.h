@@ -5,6 +5,7 @@
 #pragma once
 
 #include <concurrencpp/concurrencpp.h>
+#include <type_traits>
 #include <vector>
 
 // This is useful in tests, as Google Test only currently supports matching STL-style containers.
@@ -13,9 +14,9 @@
 // within a test.
 // If Google Test adds support for broader container-like matching, this function can be removed.
 template <typename T>
-std::vector<T> GeneratorToVector(concurrencpp::generator<T> generator)
+std::vector<std::decay_t<T>> GeneratorToVector(concurrencpp::generator<T> generator)
 {
-	std::vector<T> items;
+	std::vector<std::decay_t<T>> items;
 
 	for (const auto &item : generator)
 	{

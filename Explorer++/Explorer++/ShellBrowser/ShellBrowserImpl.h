@@ -196,6 +196,7 @@ public:
 
 protected:
 	NavigationManager *GetNavigationManager() override;
+	const NavigationManager *GetNavigationManager() const override;
 
 private:
 	struct ItemInfo_t

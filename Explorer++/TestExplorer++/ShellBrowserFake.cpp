@@ -59,6 +59,11 @@ NavigationManager *ShellBrowserFake::GetNavigationManager()
 	return &m_navigationManager;
 }
 
+const NavigationManager *ShellBrowserFake::GetNavigationManager() const
+{
+	return &m_navigationManager;
+}
+
 FolderSettings ShellBrowserFake::GetFolderSettings() const
 {
 	return {};

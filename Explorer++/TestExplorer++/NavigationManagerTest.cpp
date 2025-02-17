@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "ShellBrowser/NavigationManager.h"
+#include "GeneratorTestHelper.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
 #include <gtest/gtest.h>
@@ -153,6 +154,25 @@ TEST_F(NavigationManagerSignalTest, FailedSubsequentNavigation)
 	CompleteNavigation(navigateParamsFail);
 }
 
+TEST_F(NavigationManagerSignalTest, StopLoading)
+{
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationCancelledCallback, Call(navigateParams));
+	}
+
+	m_navigationManager->StartNavigation(navigateParams);
+
+	m_navigationManager->StopLoading();
+	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
+	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
+}
+
 TEST_F(NavigationManagerSignalTest, CommitWithPendingNavigation)
 {
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
@@ -292,75 +312,219 @@ TEST_F(NavigationManagerSignalThreadTest, CheckThread)
 
 TEST_F(NavigationManagerTest, PendingNavigations)
 {
-	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 0);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetPendingNavigations()), IsEmpty());
+	EXPECT_EQ(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
+	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 0u);
 	EXPECT_FALSE(m_navigationManager->HasAnyPendingNavigations());
 
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
 	m_navigationManager->StartNavigation(navigateParams1);
-	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 1);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetPendingNavigations()),
+		ElementsAre(navigateParams1));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestPendingNavigation(), navigateParams1);
+	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 1u);
 	EXPECT_TRUE(m_navigationManager->HasAnyPendingNavigations());
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 	m_navigationManager->StartNavigation(navigateParams2);
-	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 2);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetPendingNavigations()),
+		ElementsAre(navigateParams2, navigateParams1));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestPendingNavigation(), navigateParams2);
+	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 2u);
 	EXPECT_TRUE(m_navigationManager->HasAnyPendingNavigations());
 
 	// This should allow navigation 1 to complete.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
-	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 1);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetPendingNavigations()),
+		ElementsAre(navigateParams2));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestPendingNavigation(), navigateParams2);
+	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 1u);
 	EXPECT_TRUE(m_navigationManager->HasAnyPendingNavigations());
 
 	// This should allow navigation 2 to complete.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
-	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 0);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetPendingNavigations()), IsEmpty());
+	EXPECT_EQ(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
+	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 0u);
 	EXPECT_FALSE(m_navigationManager->HasAnyPendingNavigations());
 }
 
 TEST_F(NavigationManagerTest, ActiveNavigations)
 {
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()), IsEmpty());
+	EXPECT_EQ(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0u);
 	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
 
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
 	m_navigationManager->StartNavigation(navigateParams1);
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()),
+		ElementsAre(navigateParams1));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestActiveNavigation(), navigateParams1);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1u);
 	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 	m_navigationManager->StartNavigation(navigateParams2);
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 2);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()),
+		ElementsAre(navigateParams2, navigateParams1));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestActiveNavigation(), navigateParams2);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 2u);
 	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
 
 	// This should allow navigation 1 to complete, which should result in navigation 2 being
 	// cancelled. That should leave no active navigations.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()), IsEmpty());
+	EXPECT_EQ(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0u);
 	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
 
 	// This navigation has been started after navigation 1 finished, so it can commit.
 	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"e:\\");
 	auto navigateParams3 = NavigateParams::Normal(pidl3.Raw());
 	m_navigationManager->StartNavigation(navigateParams3);
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()),
+		ElementsAre(navigateParams3));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestActiveNavigation(), navigateParams3);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1u);
 	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
 
 	// This should allow navigation 2 to complete, resulting in its cancellation being finalized.
 	// Navigation 3 should still be active, however.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()),
+		ElementsAre(navigateParams3));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestActiveNavigation(), navigateParams3);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1u);
 	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
 
 	// This will complete navigation 3, leaving no active navigations.
 	m_manualExecutorBackground->loop(1);
 	m_manualExecutorCurrent->loop(1);
-	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0);
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()), IsEmpty());
+	EXPECT_EQ(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0u);
 	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
+}
+
+class NavigationManagerLatestNavigationLifetimeTest : public NavigationManagerTest
+{
+protected:
+	NavigationManagerLatestNavigationLifetimeTest()
+	{
+		// The behavior of the initial navigation is different to subsequent navigations (e.g. the
+		// initial navigation will be committed if it fails). So, an initial navigation is made here
+		// first. That way, a failed navigation will result in a failed event, rather than a
+		// completed event.
+		PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+		auto navigateParams = NavigateParams::Normal(pidl.Raw());
+		CompleteNavigation(navigateParams);
+
+		// It's expected that a navigation will be registered for the duration of its lifetime. That
+		// is, that it will be added to the list of pending navigations before the navigation
+		// started event and removed after the completion event. Which then means that if there's a
+		// single navigation, it should be returned as the latest in both the start event and the
+		// completion event.
+		ON_CALL(m_navigationStartedCallback, Call)
+			.WillByDefault(std::bind_front(
+				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this));
+		ON_CALL(m_navigationCompletedCallback, Call)
+			.WillByDefault(std::bind_front(
+				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this));
+		ON_CALL(m_navigationFailedCallback, Call)
+			.WillByDefault(std::bind_front(
+				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this));
+		ON_CALL(m_navigationCancelledCallback, Call)
+			.WillByDefault(std::bind_front(
+				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this));
+
+		m_navigationManager->AddNavigationStartedObserver(
+			m_navigationStartedCallback.AsStdFunction());
+		m_navigationManager->AddNavigationCompletedObserver(
+			m_navigationCompletedCallback.AsStdFunction());
+		m_navigationManager->AddNavigationFailedObserver(
+			m_navigationFailedCallback.AsStdFunction());
+		m_navigationManager->AddNavigationCancelledObserver(
+			m_navigationCancelledCallback.AsStdFunction());
+	}
+
+	StrictMock<MockFunction<void(const NavigateParams &navigateParams)>>
+		m_navigationStartedCallback;
+	StrictMock<MockFunction<void(const NavigateParams &navigateParams)>>
+		m_navigationCompletedCallback;
+	StrictMock<MockFunction<void(const NavigateParams &navigateParams)>> m_navigationFailedCallback;
+	StrictMock<MockFunction<void(const NavigateParams &navigateParams)>>
+		m_navigationCancelledCallback;
+
+private:
+	void CheckIsLatestNavigation(const NavigateParams &navigateParams)
+	{
+		ASSERT_NE(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
+		EXPECT_EQ(*m_navigationManager->MaybeGetLatestPendingNavigation(), navigateParams);
+	}
+};
+
+TEST_F(NavigationManagerLatestNavigationLifetimeTest, SuccessfulNavigation)
+{
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationCompletedCallback, Call(navigateParams));
+	}
+
+	CompleteNavigation(navigateParams);
+}
+
+TEST_F(NavigationManagerLatestNavigationLifetimeTest, FailedNavigation)
+{
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationFailedCallback, Call(navigateParams));
+	}
+
+	m_shellEnumerator->SetShouldSucceed(false);
+	CompleteNavigation(navigateParams);
+}
+
+TEST_F(NavigationManagerLatestNavigationLifetimeTest, CancelledNavigation)
+{
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationCancelledCallback, Call(navigateParams));
+	}
+
+	m_navigationManager->StartNavigation(navigateParams);
+	m_navigationManager->StopLoading();
+	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
+	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 }

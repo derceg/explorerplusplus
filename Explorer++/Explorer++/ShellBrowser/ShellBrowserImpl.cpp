@@ -1372,3 +1372,8 @@ NavigationManager *ShellBrowserImpl::GetNavigationManager()
 {
 	return &m_navigationManager;
 }
+
+const NavigationManager *ShellBrowserImpl::GetNavigationManager() const
+{
+	return &m_navigationManager;
+}
