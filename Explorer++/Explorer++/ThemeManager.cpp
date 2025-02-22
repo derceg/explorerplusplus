@@ -378,6 +378,15 @@ void ThemeManager::ApplyThemeToRebar(HWND hwnd, bool enableDarkMode)
 
 void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 {
+	// Without this, the DarkMode::Toolbar theme may be applied in dark mode. That theme is
+	// problematic (e.g. it results in dropdown buttons being drawn incorrectly, see #519). This
+	// call will ensure that the default theme (i.e. Toolbar) will be used in both light mode and
+	// dark mode.
+	//
+	// Using the default theme is fine, since dark mode is implemented in other ways (e.g. by custom
+	// drawing).
+	SetWindowTheme(hwnd, L"", nullptr);
+
 	COLORREF insertMarkColor;
 
 	if (enableDarkMode)
