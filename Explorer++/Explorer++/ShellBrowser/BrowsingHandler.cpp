@@ -19,6 +19,7 @@
 #include "ViewModes.h"
 #include "WebBrowserApp.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include "../Helper/WindowHelper.h"
@@ -491,18 +492,12 @@ void ShellBrowserImpl::OnNavigationItemsAvailable(const NavigateParams &navigate
 		AddItemInternal(-1, item, FALSE);
 	}
 
-	/* Stop the list view from redrawing itself each time is inserted.
-	Redrawing will be allowed once all items have being inserted.
-	(reduces lag when a large number of items are going to be inserted). */
-	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
+	ScopedRedrawDisabler redrawDisabler(m_hListView);
 
 	InsertAwaitingItems();
 	SortFolder();
 
 	ListView_EnsureVisible(m_hListView, 0, FALSE);
-
-	/* Allow the listview to redraw itself once again. */
-	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);

@@ -12,6 +12,7 @@
 #include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellHelper.h"
 #include <list>
 
@@ -52,14 +53,12 @@ void ShellBrowserImpl::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 void ShellBrowserImpl::ProcessShellChangeNotifications(
 	const std::vector<ShellChangeNotification> &shellChangeNotifications)
 {
-	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
+	ScopedRedrawDisabler redrawDisabler(m_hListView);
 
 	for (const auto &change : shellChangeNotifications)
 	{
 		ProcessShellChangeNotification(change);
 	}
-
-	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
 	directoryContentsChanged.m_signal();
 }
@@ -152,9 +151,9 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 
 void ShellBrowserImpl::DirectoryAltered()
 {
-	EnterCriticalSection(&m_csDirectoryAltered);
+	ScopedRedrawDisabler redrawDisabler(m_hListView);
 
-	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
+	EnterCriticalSection(&m_csDirectoryAltered);
 
 	// Note that directory change notifications are received asynchronously. That means that, in
 	// each of the cases below, it's not reasonable to assume that the file being referenced
@@ -213,8 +212,6 @@ void ShellBrowserImpl::DirectoryAltered()
 			break;
 		}
 	}
-
-	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
 	directoryContentsChanged.m_signal();
 

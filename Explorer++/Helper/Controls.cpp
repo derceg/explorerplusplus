@@ -5,9 +5,11 @@
 #include "stdafx.h"
 #include "Controls.h"
 #include "DpiCompatibility.h"
+#include "ScopedRedrawDisabler.h"
 #include "WindowHelper.h"
 #include <glog/logging.h>
 #include <VSStyle.h>
+
 // wil/resource.h needs to be included after uxtheme.h to ensure that wil::unique_htheme is defined.
 // clang-format off
 #include <uxtheme.h>
@@ -221,9 +223,7 @@ BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck)
 // These issues can be worked around by deleting all buttons in the toolbar and reinserting them.
 void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 {
-	SendMessage(toolbar, WM_SETREDRAW, false, 0);
-
-	auto enableRedraw = wil::scope_exit([toolbar] { SendMessage(toolbar, WM_SETREDRAW, true, 0); });
+	ScopedRedrawDisabler redrawDisabler(toolbar);
 
 	struct SavedButton
 	{

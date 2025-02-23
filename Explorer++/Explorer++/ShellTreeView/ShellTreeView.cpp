@@ -38,6 +38,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
@@ -930,7 +931,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 		return hr;
 	}
 
-	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
+	ScopedRedrawDisabler redrawDisabler(m_hTreeView);
 
 	std::vector<unique_pidl_absolute> items;
 
@@ -971,8 +972,6 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	}
 
 	SortChildren(hParent);
-
-	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 
 	ShellTreeNode *parentNode = GetNodeFromTreeViewItem(hParent);
 	StartDirectoryMonitoringForNode(parentNode);

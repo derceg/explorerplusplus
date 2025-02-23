@@ -21,6 +21,7 @@
 #include "TabsOptionsPage.h"
 #include "WindowOptionsPage.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/algorithm/string/predicate.hpp>
@@ -176,7 +177,7 @@ void OptionsDialog::AddPagesToTreeView()
 {
 	auto treeView = GetDlgItem(m_hDlg, IDC_OPTIONS_PAGES_TREE);
 
-	SendMessage(treeView, WM_SETREDRAW, false, 0);
+	ScopedRedrawDisabler redrawDisabler(treeView);
 
 	// As items are deleted, the selection will be automatically updated, but there's no need to
 	// process the selection notification in that case.
@@ -195,8 +196,6 @@ void OptionsDialog::AddPagesToTreeView()
 	{
 		AddPageToTreeView(item.second.get(), item.first);
 	}
-
-	SendMessage(treeView, WM_SETREDRAW, true, 0);
 
 	HWND noResultsControl = GetDlgItem(m_hDlg, IDC_OPTIONS_NO_RESULTS_FOUND);
 

@@ -10,6 +10,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/algorithm/string/predicate.hpp>
@@ -144,12 +145,10 @@ std::wstring SearchTabsDialog::GetColumnText(ColumnType columnType)
 void SearchTabsDialog::RefreshTabList(SelectionOption selectionOption)
 {
 	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	SendMessage(listView, WM_SETREDRAW, FALSE, NULL);
 
+	ScopedRedrawDisabler redrawDisabler(listView);
 	ListView_DeleteAllItems(listView);
 	AddTabs(selectionOption);
-
-	SendMessage(listView, WM_SETREDRAW, TRUE, NULL);
 }
 
 void SearchTabsDialog::AddTabs(SelectionOption selectionOption)

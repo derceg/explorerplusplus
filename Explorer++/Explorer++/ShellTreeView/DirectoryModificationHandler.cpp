@@ -7,6 +7,7 @@
 #include "App.h"
 #include "FeatureList.h"
 #include "ShellTreeNode.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 
 // Starts monitoring for drive additions and removals, since they won't necessarily trigger updates
 // in the parent folder.
@@ -78,14 +79,12 @@ void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 void ShellTreeView::ProcessShellChangeNotifications(
 	const std::vector<ShellChangeNotification> &shellChangeNotifications)
 {
-	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
+	ScopedRedrawDisabler redrawDisabler(m_hTreeView);
 
 	for (const auto &change : shellChangeNotifications)
 	{
 		ProcessShellChangeNotification(change);
 	}
-
-	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 }
 
 void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification &change)

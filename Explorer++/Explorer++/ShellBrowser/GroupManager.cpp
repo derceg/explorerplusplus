@@ -10,6 +10,7 @@
 #include "ResourceHelper.h"
 #include "SortModes.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -823,14 +824,14 @@ void ShellBrowserImpl::MoveItemsIntoGroups()
 	int iGroupId;
 	int i = 0;
 
+	ScopedRedrawDisabler redrawDisabler(m_hListView);
+
 	ListView_RemoveAllGroups(m_hListView);
 	m_directoryState.groups.clear();
 
 	ListView_EnableGroupView(m_hListView, true);
 
 	nItems = ListView_GetItemCount(m_hListView);
-
-	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
 	for (i = 0; i < nItems; i++)
 	{
@@ -843,8 +844,6 @@ void ShellBrowserImpl::MoveItemsIntoGroups()
 
 		InsertItemIntoGroup(i, iGroupId);
 	}
-
-	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 }
 
 void ShellBrowserImpl::InsertItemIntoGroup(int index, int groupId)
