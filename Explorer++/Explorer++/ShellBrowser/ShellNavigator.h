@@ -106,6 +106,7 @@ using NavigationCompletedSignal =
 using NavigationFailedSignal = boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 using NavigationCancelledSignal =
 	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
+using NavigationsStoppedSignal = boost::signals2::signal<void()>;
 
 class ShellNavigator
 {
@@ -190,5 +191,9 @@ public:
 	// cancelled, this won't be triggered, as the navigation will be committed instead.
 	virtual boost::signals2::connection AddNavigationCancelledObserver(
 		const NavigationCancelledSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
+
+	virtual boost::signals2::connection AddNavigationsStoppeddObserver(
+		const NavigationsStoppedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 };

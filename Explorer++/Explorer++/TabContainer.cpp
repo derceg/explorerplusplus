@@ -991,6 +991,9 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationCancelledSignal.m_signal(tab, navigateParams); });
 
+	tab.GetShellBrowserImpl()->AddNavigationsStoppeddObserver(
+		[this, &tab]() { tabNavigationsStoppedSignal.m_signal(tab); });
+
 	tab.GetShellBrowserImpl()->directoryContentsChanged.AddObserver(
 		[this, &tab]() { tabDirectoryContentsChangedSignal.m_signal(tab); });
 

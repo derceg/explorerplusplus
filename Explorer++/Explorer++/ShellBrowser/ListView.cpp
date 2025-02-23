@@ -759,6 +759,10 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case VK_DELETE:
 		DeleteSelectedItems(IsKeyDown(VK_SHIFT));
 		break;
+
+	case VK_ESCAPE:
+		m_navigationManager.StopLoading();
+		break;
 	}
 }
 

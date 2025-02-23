@@ -49,3 +49,9 @@ boost::signals2::connection ShellBrowser::AddNavigationCancelledObserver(
 {
 	return GetNavigationManager()->AddNavigationCancelledObserver(observer, position);
 }
+
+boost::signals2::connection ShellBrowser::AddNavigationsStoppeddObserver(
+	const NavigationsStoppedSignal::slot_type &observer, boost::signals2::connect_position position)
+{
+	return GetNavigationManager()->AddNavigationsStoppeddObserver(observer, position);
+}

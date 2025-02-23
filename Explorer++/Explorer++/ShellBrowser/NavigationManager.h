@@ -38,6 +38,8 @@ public:
 	using NavigationCancelledSignal =
 		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 
+	using NavigationsStoppedSignal = boost::signals2::signal<void()>;
+
 	enum class SlotGroup
 	{
 		HighestPriority = 0,
@@ -109,6 +111,11 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
 
+	boost::signals2::connection AddNavigationsStoppeddObserver(
+		const NavigationsStoppedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
+
 private:
 	struct PendingNavigation
 	{
@@ -147,6 +154,8 @@ private:
 	NavigationFailedSignal m_navigationFailedSignal;
 
 	NavigationCancelledSignal m_navigationCancelledSignal;
+
+	NavigationsStoppedSignal m_navigationsStoppedSignal;
 
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 

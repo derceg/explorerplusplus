@@ -157,6 +157,8 @@ void NavigationManager::OnEnumerationStopped(const NavigateParams &navigateParam
 void NavigationManager::StopLoading()
 {
 	m_scopedStopSource = std::make_unique<ScopedStopSource>();
+
+	m_navigationsStoppedSignal();
 }
 
 // TODO: This should use std::generator once C++23 support is available.
@@ -285,4 +287,11 @@ boost::signals2::connection NavigationManager::AddNavigationCancelledObserver(
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_navigationCancelledSignal.connect(static_cast<int>(slotGroup), observer, position);
+}
+
+boost::signals2::connection NavigationManager::AddNavigationsStoppeddObserver(
+	const NavigationsStoppedSignal::slot_type &observer, boost::signals2::connect_position position,
+	SlotGroup slotGroup)
+{
+	return m_navigationsStoppedSignal.connect(static_cast<int>(slotGroup), observer, position);
 }

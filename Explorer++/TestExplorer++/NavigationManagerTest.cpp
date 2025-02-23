@@ -475,6 +475,15 @@ TEST_F(NavigationManagerTest, InitialNavigationActiveWhenStopped)
 	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
 }
 
+TEST_F(NavigationManagerTest, NavigationsStoppedSignal)
+{
+	MockFunction<void()> navigationsStoppedCallback;
+	m_navigationManager->AddNavigationsStoppeddObserver(navigationsStoppedCallback.AsStdFunction());
+	EXPECT_CALL(navigationsStoppedCallback, Call());
+
+	m_navigationManager->StopLoading();
+}
+
 class NavigationManagerLatestNavigationLifetimeTest : public NavigationManagerTest
 {
 protected:
