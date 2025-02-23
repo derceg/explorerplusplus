@@ -36,10 +36,8 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 	auto originalExecutor = weakSelf->m_originalExecutor;
 	auto stopToken = weakSelf->m_scopedStopSource->GetToken();
 
-	auto id = weakSelf->m_navigationIdCounter++;
-	auto [itr, didInsert] =
-		weakSelf->m_pendingNavigations.insert({ id, { navigateParams, stopToken } });
-	DCHECK(didInsert);
+	auto *pendingNavigation = weakSelf->AddPendingNavigation(
+		std::make_unique<PendingNavigation>(navigateParams, stopToken));
 
 	weakSelf->OnNavigationStarted(navigateParams);
 
@@ -79,15 +77,11 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 	// This is set up only once this coroutine is back on the original thread, as that's the only
 	// place where `weakSelf` can be properly accessed.
 	auto removePendingNavigation = wil::scope_exit(
-		[weakSelf, id]()
-		{
-			auto numRemoved = weakSelf->m_pendingNavigations.erase(id);
-			DCHECK_EQ(numRemoved, 1u);
-		});
+		[weakSelf, pendingNavigation]() { weakSelf->RemovePendingNavigation(pendingNavigation); });
 
 	if (stopToken.stop_requested())
 	{
-		weakSelf->OnNavigationCancelled(navigateParams);
+		weakSelf->OnEnumerationStopped(navigateParams);
 		co_return;
 	}
 
@@ -98,6 +92,22 @@ concurrencpp::null_result NavigationManager::StartNavigationInternal(
 	}
 
 	weakSelf->OnEnumerationCompleted(navigateParams, items);
+}
+
+NavigationManager::PendingNavigation *NavigationManager::AddPendingNavigation(
+	std::unique_ptr<PendingNavigation> pendingNavigation)
+{
+	auto *pendingNavigationRaw = pendingNavigation.get();
+	m_pendingNavigations.push_back(std::move(pendingNavigation));
+	return pendingNavigationRaw;
+}
+
+void NavigationManager::RemovePendingNavigation(PendingNavigation *pendingNavigation)
+{
+	auto itr = std::ranges::find_if(m_pendingNavigations,
+		[pendingNavigation](const auto &current) { return current.get() == pendingNavigation; });
+	CHECK(itr != m_pendingNavigations.end());
+	m_pendingNavigations.erase(itr);
 }
 
 void NavigationManager::OnNavigationStarted(const NavigateParams &navigateParams)
@@ -133,8 +143,14 @@ void NavigationManager::OnEnumerationFailed(const NavigateParams &navigateParams
 	m_navigationFailedSignal(navigateParams);
 }
 
-void NavigationManager::OnNavigationCancelled(const NavigateParams &navigateParams)
+void NavigationManager::OnEnumerationStopped(const NavigateParams &navigateParams)
 {
+	if (!m_anyNavigationsCommitted)
+	{
+		OnEnumerationCompleted(navigateParams, {});
+		return;
+	}
+
 	m_navigationCancelledSignal(navigateParams);
 }
 
@@ -146,9 +162,9 @@ void NavigationManager::StopLoading()
 // TODO: This should use std::generator once C++23 support is available.
 concurrencpp::generator<const NavigateParams &> NavigationManager::GetPendingNavigations() const
 {
-	for (const auto &pendingNavigation : m_pendingNavigations | std::views::values)
+	for (const auto &pendingNavigation : m_pendingNavigations)
 	{
-		co_yield pendingNavigation.navigateParams;
+		co_yield pendingNavigation->navigateParams;
 	}
 }
 
@@ -159,7 +175,8 @@ const NavigateParams *NavigationManager::MaybeGetLatestPendingNavigation() const
 		return nullptr;
 	}
 
-	return &m_pendingNavigations.begin()->second.navigateParams;
+	const auto &lastItem = *m_pendingNavigations.rbegin();
+	return &lastItem->navigateParams;
 }
 
 size_t NavigationManager::GetNumPendingNavigations() const
@@ -175,32 +192,44 @@ bool NavigationManager::HasAnyPendingNavigations() const
 // TODO: This should use std::generator once C++23 support is available.
 concurrencpp::generator<const NavigateParams &> NavigationManager::GetActiveNavigations() const
 {
-	for (const auto &pendingNavigation : m_pendingNavigations | std::views::values)
+	for (const auto &pendingNavigation : m_pendingNavigations
+			| std::views::filter(std::bind_front(&NavigationManager::ActiveNavigationFilter, this)))
 	{
-		if (!pendingNavigation.stopToken.stop_requested())
-		{
-			co_yield pendingNavigation.navigateParams;
-		}
+		co_yield pendingNavigation->navigateParams;
 	}
 }
 
 const NavigateParams *NavigationManager::MaybeGetLatestActiveNavigation() const
 {
-	auto itr = std::ranges::find_if(m_pendingNavigations,
-		[](const auto &item) { return !item.second.stopToken.stop_requested(); });
+	auto itr = std::ranges::find_if(m_pendingNavigations.rbegin(), m_pendingNavigations.rend(),
+		std::bind_front(&NavigationManager::ActiveNavigationFilter, this));
 
-	if (itr == m_pendingNavigations.end())
+	if (itr == m_pendingNavigations.rend())
 	{
 		return nullptr;
 	}
 
-	return &itr->second.navigateParams;
+	return &(*itr)->navigateParams;
 }
 
 size_t NavigationManager::GetNumActiveNavigations() const
 {
-	return std::ranges::count_if(m_pendingNavigations.begin(), m_pendingNavigations.end(),
-		[](const auto &item) { return !item.second.stopToken.stop_requested(); });
+	return std::ranges::count_if(m_pendingNavigations,
+		std::bind_front(&NavigationManager::ActiveNavigationFilter, this));
+}
+
+bool NavigationManager::ActiveNavigationFilter(
+	const std::unique_ptr<PendingNavigation> &pendingNavigation) const
+{
+	if (!m_anyNavigationsCommitted)
+	{
+		// In this case, any pending navigation has the ability to commit, so every pending
+		// navigation is considered active.
+		return true;
+	}
+
+	// Typically, only navigations that haven't been stopped are considered active.
+	return !pendingNavigation->stopToken.stop_requested();
 }
 
 bool NavigationManager::HasAnyActiveNavigations() const

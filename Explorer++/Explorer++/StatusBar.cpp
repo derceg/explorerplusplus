@@ -207,6 +207,17 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
 	}
 }
 
+void Explorerplusplus::OnNavigationCancelledStatusBar(const Tab &tab,
+	const NavigateParams &navigateParams)
+{
+	UNREFERENCED_PARAMETER(navigateParams);
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	{
+		UpdateStatusBarText(tab);
+	}
+}
+
 void Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
 	if (auto *navigation = tab.GetShellBrowser()->MaybeGetLatestActiveNavigation())

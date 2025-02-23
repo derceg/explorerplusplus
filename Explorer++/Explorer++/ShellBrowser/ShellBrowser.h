@@ -35,6 +35,9 @@ public:
 	boost::signals2::connection AddNavigationFailedObserver(
 		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationCancelledObserver(
+		const NavigationCancelledSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;

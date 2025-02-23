@@ -133,6 +133,8 @@ public:
 		tabNavigationCompletedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
 		tabNavigationFailedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+		tabNavigationCancelledSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;

@@ -136,6 +136,17 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 			}
 		}));
 
+	m_connections.push_back(tabContainer->tabNavigationCancelledSignal.AddObserver(
+		[this](const Tab &tab, const NavigateParams &navigateParams)
+		{
+			UNREFERENCED_PARAMETER(navigateParams);
+
+			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+			{
+				UpdateSelection();
+			}
+		}));
+
 	m_connections.push_back(tabContainer->tabSelectedSignal.AddObserver(
 		std::bind(&ShellTreeView::UpdateSelection, this)));
 

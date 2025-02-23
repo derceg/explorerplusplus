@@ -55,7 +55,7 @@ public:
 	// Stops all in-progress navigations.
 	void StopLoading();
 
-	// Returns the list of pending navigations, with more recent navigations appearing first.
+	// Returns the list of pending navigations, with more recent navigations appearing last.
 	//
 	// A pending navigation is one that is still in progress. This includes both navigations that
 	// will be cancelled once they return to the main thread (e.g. because a navigation was
@@ -67,7 +67,7 @@ public:
 	size_t GetNumPendingNavigations() const;
 	bool HasAnyPendingNavigations() const;
 
-	// Returns the list of active navigations, with more recent navigations appearing first.
+	// Returns the list of active navigations, with more recent navigations appearing last.
 	//
 	// An active navigation is one that may commit once it returns to the main thread. This
 	// explicitly excludes navigations that will be cancelled but are technically still in progress.
@@ -119,19 +119,23 @@ private:
 	static concurrencpp::null_result StartNavigationInternal(WeakPtr<NavigationManager> weakSelf,
 		NavigateParams navigateParams);
 
+	PendingNavigation *AddPendingNavigation(std::unique_ptr<PendingNavigation> pendingNavigation);
+	void RemovePendingNavigation(PendingNavigation *pendingNavigation);
+
 	void OnNavigationStarted(const NavigateParams &navigateParams);
 	void OnEnumerationCompleted(const NavigateParams &navigateParams,
 		const std::vector<PidlChild> &items);
 	void OnEnumerationFailed(const NavigateParams &navigateParams);
-	void OnNavigationCancelled(const NavigateParams &navigateParams);
+	void OnEnumerationStopped(const NavigateParams &navigateParams);
+
+	bool ActiveNavigationFilter(const std::unique_ptr<PendingNavigation> &pendingNavigation) const;
 
 	const std::shared_ptr<const ShellEnumerator> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::executor> m_enumerationExecutor;
 	const std::shared_ptr<concurrencpp::executor> m_originalExecutor;
 
 	bool m_anyNavigationsCommitted = false;
-	std::map<int, PendingNavigation, std::greater<int>> m_pendingNavigations;
-	int m_navigationIdCounter = 0;
+	std::vector<std::unique_ptr<PendingNavigation>> m_pendingNavigations;
 
 	NavigationStartedSignal m_navigationStartedSignal;
 

@@ -405,6 +405,7 @@ private:
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
 	void OnNavigationCompletedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void OnNavigationFailedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCancelledStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void UpdateStatusBarText(const Tab &tab);
 	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);
 

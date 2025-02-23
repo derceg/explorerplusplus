@@ -34,6 +34,11 @@ protected:
 	void CompleteNavigation(const NavigateParams &navigateParams)
 	{
 		m_navigationManager->StartNavigation(navigateParams);
+		RunExecutors();
+	}
+
+	void RunExecutors()
+	{
 		m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
 		m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 	}
@@ -128,6 +133,27 @@ TEST_F(NavigationManagerSignalTest, FailedInitialNavigation)
 	CompleteNavigation(navigateParams);
 }
 
+TEST_F(NavigationManagerSignalTest, CancelledInitialNavigation)
+{
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationWillCommitCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationCommittedCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationItemsAvailableCallback, Call(navigateParams, IsEmpty()));
+		EXPECT_CALL(m_navigationCompletedCallback, Call(navigateParams));
+	}
+
+	m_navigationManager->StartNavigation(navigateParams);
+
+	m_navigationManager->StopLoading();
+	RunExecutors();
+}
+
 TEST_F(NavigationManagerSignalTest, FailedSubsequentNavigation)
 {
 	PidlAbsolute pidlSuccess = CreateSimplePidlForTest(L"c:\\");
@@ -154,23 +180,31 @@ TEST_F(NavigationManagerSignalTest, FailedSubsequentNavigation)
 	CompleteNavigation(navigateParamsFail);
 }
 
-TEST_F(NavigationManagerSignalTest, StopLoading)
+TEST_F(NavigationManagerSignalTest, CancelledSubsequentNavigation)
 {
-	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
-	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+	PidlAbsolute pidlSuccess = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParamsSuccess = NavigateParams::Normal(pidlSuccess.Raw());
+
+	PidlAbsolute pidlCancel = CreateSimplePidlForTest(L"d:\\");
+	auto navigateParamsCancel = NavigateParams::Normal(pidlCancel.Raw());
 
 	{
 		InSequence seq;
 
-		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParams));
-		EXPECT_CALL(m_navigationCancelledCallback, Call(navigateParams));
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParamsSuccess));
+		EXPECT_CALL(m_navigationWillCommitCallback, Call(navigateParamsSuccess));
+		EXPECT_CALL(m_navigationCommittedCallback, Call(navigateParamsSuccess));
+		EXPECT_CALL(m_navigationItemsAvailableCallback, Call(navigateParamsSuccess, IsEmpty()));
+		EXPECT_CALL(m_navigationCompletedCallback, Call(navigateParamsSuccess));
+		EXPECT_CALL(m_navigationStartedCallback, Call(navigateParamsCancel));
+		EXPECT_CALL(m_navigationCancelledCallback, Call(navigateParamsCancel));
 	}
 
-	m_navigationManager->StartNavigation(navigateParams);
+	CompleteNavigation(navigateParamsSuccess);
 
+	m_navigationManager->StartNavigation(navigateParamsCancel);
 	m_navigationManager->StopLoading();
-	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
-	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
+	RunExecutors();
 }
 
 TEST_F(NavigationManagerSignalTest, CommitWithPendingNavigation)
@@ -198,8 +232,7 @@ TEST_F(NavigationManagerSignalTest, CommitWithPendingNavigation)
 
 	// This should allow the first navigation to proceed, allowing it to commit. That will then
 	// cause the second navigation to be cancelled.
-	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
-	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
+	RunExecutors();
 }
 
 TEST_F(NavigationManagerSignalTest, ManagerDestroyedWithPendingNavigation)
@@ -220,8 +253,7 @@ TEST_F(NavigationManagerSignalTest, ManagerDestroyedWithPendingNavigation)
 
 	// This will resume the asynchronous navigation. However, because the NavigationManager instance
 	// was destroyed, no signals should be emitted. This should be a safe operation.
-	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
-	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
+	RunExecutors();
 }
 
 class NavigationManagerSignalThreadTest : public NavigationManagerSignalTest
@@ -331,7 +363,7 @@ TEST_F(NavigationManagerTest, PendingNavigations)
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 	m_navigationManager->StartNavigation(navigateParams2);
 	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetPendingNavigations()),
-		ElementsAre(navigateParams2, navigateParams1));
+		ElementsAre(navigateParams1, navigateParams2));
 	ASSERT_NE(m_navigationManager->MaybeGetLatestPendingNavigation(), nullptr);
 	EXPECT_EQ(*m_navigationManager->MaybeGetLatestPendingNavigation(), navigateParams2);
 	EXPECT_EQ(m_navigationManager->GetNumPendingNavigations(), 2u);
@@ -377,7 +409,7 @@ TEST_F(NavigationManagerTest, ActiveNavigations)
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 	m_navigationManager->StartNavigation(navigateParams2);
 	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()),
-		ElementsAre(navigateParams2, navigateParams1));
+		ElementsAre(navigateParams1, navigateParams2));
 	ASSERT_NE(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
 	EXPECT_EQ(*m_navigationManager->MaybeGetLatestActiveNavigation(), navigateParams2);
 	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 2u);
@@ -421,6 +453,26 @@ TEST_F(NavigationManagerTest, ActiveNavigations)
 	EXPECT_EQ(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
 	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 0u);
 	EXPECT_FALSE(m_navigationManager->HasAnyActiveNavigations());
+}
+
+TEST_F(NavigationManagerTest, InitialNavigationActiveWhenStopped)
+{
+	// This navigation has been stopped. Ordinarily, that would result in it being cancelled, but
+	// since it's the initial navigation, it should be committed instead. That also means that the
+	// navigation should continue to appear in the active list.
+	//
+	// In other words, because the navigation can still commit (in spite of being stopped), it's
+	// considered active.
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+	m_navigationManager->StartNavigation(navigateParams);
+	m_navigationManager->StopLoading();
+	EXPECT_THAT(GeneratorToVector(m_navigationManager->GetActiveNavigations()),
+		ElementsAre(navigateParams));
+	ASSERT_NE(m_navigationManager->MaybeGetLatestActiveNavigation(), nullptr);
+	EXPECT_EQ(*m_navigationManager->MaybeGetLatestActiveNavigation(), navigateParams);
+	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1u);
+	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
 }
 
 class NavigationManagerLatestNavigationLifetimeTest : public NavigationManagerTest
@@ -525,6 +577,5 @@ TEST_F(NavigationManagerLatestNavigationLifetimeTest, CancelledNavigation)
 
 	m_navigationManager->StartNavigation(navigateParams);
 	m_navigationManager->StopLoading();
-	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
-	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
+	RunExecutors();
 }

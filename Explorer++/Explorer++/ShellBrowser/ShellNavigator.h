@@ -104,13 +104,15 @@ using NavigationCommittedSignal =
 using NavigationCompletedSignal =
 	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 using NavigationFailedSignal = boost::signals2::signal<void(const NavigateParams &navigateParams)>;
+using NavigationCancelledSignal =
+	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 
 class ShellNavigator
 {
 public:
 	virtual ~ShellNavigator() = default;
 
-	// Navigations can result in various success or failure states, summarized by four primary
+	// Navigations can result in various success or failure states, summarized by the following
 	// cases:
 	//
 	// 1. Initial Navigation (Success)
@@ -128,18 +130,30 @@ public:
 	//         current folder.
 	//    2.4. The "navigation completed" signal is triggered.
 	//
-	// 3. Subsequent Navigation (Success)
+	// 3. Initial Navigation (Cancellation)
 	//    3.1. The "navigation started" signal is triggered.
-	//    3.2. Directory enumeration succeeds.
+	//    3.2. The navigation is stopped early.
 	//    3.3. The "navigation committed" signal is triggered, making the requested folder the
 	//         current folder.
-	//    3.4. Items are displayed in the view.
-	//    3.5. The "navigation completed" signal is triggered.
+	//    3.4. The "navigation completed" signal is triggered.
 	//
-	// 4. Subsequent Navigation (Failure)
+	// 4. Subsequent Navigation (Success)
 	//    4.1. The "navigation started" signal is triggered.
-	//    4.2. Directory enumeration fails.
-	//    4.3. The "navigation failed" signal is triggered.
+	//    4.2. Directory enumeration succeeds.
+	//    4.3. The "navigation committed" signal is triggered, making the requested folder the
+	//         current folder.
+	//    4.4. Items are displayed in the view.
+	//    4.5. The "navigation completed" signal is triggered.
+	//
+	// 5. Subsequent Navigation (Failure)
+	//    5.1. The "navigation started" signal is triggered.
+	//    5.2. Directory enumeration fails.
+	//    5.3. The "navigation failed" signal is triggered.
+	//
+	// 6. Subsequent Navigation (Cancellation)
+	//    6.1. The "navigation started" signal is triggered.
+	//    6.2. The navigation is stopped early.
+	//    6.3. The "navigation cancelled" signal is triggered.
 
 	// Triggered when a navigation is initiated.
 	virtual boost::signals2::connection AddNavigationStartedObserver(
@@ -170,5 +184,11 @@ public:
 	// navigation fails, this won't be triggered, as the navigation will be committed instead.
 	virtual boost::signals2::connection AddNavigationFailedObserver(
 		const NavigationFailedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
+
+	// Triggered when a navigation is stopped early. As noted above, if the initial navigation is
+	// cancelled, this won't be triggered, as the navigation will be committed instead.
+	virtual boost::signals2::connection AddNavigationCancelledObserver(
+		const NavigationCancelledSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 };
