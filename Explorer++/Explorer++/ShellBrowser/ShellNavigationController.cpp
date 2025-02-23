@@ -62,8 +62,11 @@ void ShellNavigationController::OnNavigationStarted(const NavigateParams &naviga
 	}
 }
 
-void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams)
+void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams,
+	const std::vector<PidlChild> &items)
 {
+	UNREFERENCED_PARAMETER(items);
+
 	auto historyEntryType = navigateParams.historyEntryType;
 
 	// An initial entry should always be added when a navigation starts, so there should always be a

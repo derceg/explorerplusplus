@@ -105,9 +105,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_navigationManager.AddNavigationCommittedObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this), boost::signals2::at_front,
 		NavigationManager::SlotGroup::HighPriority);
-	m_navigationManager.AddNavigationItemsAvailableObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationItemsAvailable, this),
-		boost::signals2::at_front, NavigationManager::SlotGroup::HighPriority);
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 

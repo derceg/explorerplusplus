@@ -124,9 +124,7 @@ void NavigationManager::OnEnumerationCompleted(const NavigateParams &navigatePar
 	m_anyNavigationsCommitted = true;
 
 	m_navigationWillCommitSignal(navigateParams);
-	m_navigationCommittedSignal(navigateParams);
-	m_navigationItemsAvailableSignal(navigateParams, items);
-	m_navigationCompletedSignal(navigateParams);
+	m_navigationCommittedSignal(navigateParams, items);
 }
 
 void NavigationManager::OnEnumerationFailed(const NavigateParams &navigateParams)
@@ -260,21 +258,6 @@ boost::signals2::connection NavigationManager::AddNavigationCommittedObserver(
 	return m_navigationCommittedSignal.connect(static_cast<int>(slotGroup), observer, position);
 }
 
-boost::signals2::connection NavigationManager::AddNavigationItemsAvailableObserver(
-	const NavigationItemsAvailableSignal::slot_type &observer,
-	boost::signals2::connect_position position, SlotGroup slotGroup)
-{
-	return m_navigationItemsAvailableSignal.connect(static_cast<int>(slotGroup), observer,
-		position);
-}
-
-boost::signals2::connection NavigationManager::AddNavigationCompletedObserver(
-	const NavigationCompletedSignal::slot_type &observer,
-	boost::signals2::connect_position position, SlotGroup slotGroup)
-{
-	return m_navigationCompletedSignal.connect(static_cast<int>(slotGroup), observer, position);
-}
-
 boost::signals2::connection NavigationManager::AddNavigationFailedObserver(
 	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position,
 	SlotGroup slotGroup)
@@ -289,7 +272,7 @@ boost::signals2::connection NavigationManager::AddNavigationCancelledObserver(
 	return m_navigationCancelledSignal.connect(static_cast<int>(slotGroup), observer, position);
 }
 
-boost::signals2::connection NavigationManager::AddNavigationsStoppeddObserver(
+boost::signals2::connection NavigationManager::AddNavigationsStoppedObserver(
 	const NavigationsStoppedSignal::slot_type &observer, boost::signals2::connect_position position,
 	SlotGroup slotGroup)
 {

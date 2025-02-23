@@ -384,8 +384,7 @@ private:
 	{
 		NoFolderShown,
 		WillCommit,
-		Committed,
-		Completed
+		Committed
 	};
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
@@ -408,8 +407,9 @@ private:
 	void StoreCurrentlySelectedItems();
 	void ResetFolderState();
 	void OnNavigationWillCommit(const NavigateParams &navigateParams);
-	void OnNavigationComitted(const NavigateParams &navigateParams);
-	void OnNavigationItemsAvailable(const NavigateParams &navigateParams,
+	void OnNavigationComitted(const NavigateParams &navigateParams,
+		const std::vector<PidlChild> &items);
+	void AddNavigationItems(const NavigateParams &navigateParams,
 		const std::vector<PidlChild> &itemPidls);
 	std::vector<ItemInfo_t> GetItemInformationFromPidls(const NavigateParams &navigateParams,
 		const std::vector<PidlChild> &itemPidls);

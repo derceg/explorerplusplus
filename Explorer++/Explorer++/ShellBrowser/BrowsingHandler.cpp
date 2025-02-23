@@ -471,7 +471,8 @@ void ShellBrowserImpl::OnNavigationWillCommit(const NavigateParams &navigatePara
 	SetNavigationState(NavigationState::WillCommit);
 }
 
-void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams)
+void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams,
+	const std::vector<PidlChild> &items)
 {
 	ChangeFolders(navigateParams);
 
@@ -479,10 +480,12 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams
 
 	RecalcWindowCursor(m_hListView);
 
+	AddNavigationItems(navigateParams, items);
+
 	SetNavigationState(NavigationState::Committed);
 }
 
-void ShellBrowserImpl::OnNavigationItemsAvailable(const NavigateParams &navigateParams,
+void ShellBrowserImpl::AddNavigationItems(const NavigateParams &navigateParams,
 	const std::vector<PidlChild> &itemPidls)
 {
 	auto items = GetItemInformationFromPidls(navigateParams, itemPidls);
@@ -521,8 +524,6 @@ void ShellBrowserImpl::OnNavigationItemsAvailable(const NavigateParams &navigate
 	{
 		StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
 	}
-
-	SetNavigationState(NavigationState::Completed);
 }
 
 std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFromPidls(
@@ -787,15 +788,11 @@ void ShellBrowserImpl::SetNavigationState(NavigationState navigationState)
 	if (navigationState == NavigationState::WillCommit)
 	{
 		CHECK(m_navigationState == NavigationState::NoFolderShown
-			|| m_navigationState == NavigationState::Completed);
+			|| m_navigationState == NavigationState::Committed);
 	}
 	else if (navigationState == NavigationState::Committed)
 	{
 		CHECK(m_navigationState == NavigationState::WillCommit);
-	}
-	else if (navigationState == NavigationState::Completed)
-	{
-		CHECK(m_navigationState == NavigationState::Committed);
 	}
 	else
 	{

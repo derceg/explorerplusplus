@@ -101,8 +101,6 @@ private:
 using NavigationStartedSignal = boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 using NavigationCommittedSignal =
 	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-using NavigationCompletedSignal =
-	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 using NavigationFailedSignal = boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 using NavigationCancelledSignal =
 	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
@@ -121,30 +119,24 @@ public:
 	//    1.2. Directory enumeration succeeds.
 	//    1.3. The "navigation committed" signal is triggered, making the requested folder the
 	//         current folder.
-	//    1.4. Items are displayed in the view.
-	//    1.5. The "navigation completed" signal is triggered.
 	//
 	// 2. Initial Navigation (Failure)
 	//    2.1. The "navigation started" signal is triggered.
 	//    2.2. Directory enumeration fails.
 	//    2.3. The "navigation committed" signal is triggered, making the requested folder the
 	//         current folder.
-	//    2.4. The "navigation completed" signal is triggered.
 	//
 	// 3. Initial Navigation (Cancellation)
 	//    3.1. The "navigation started" signal is triggered.
 	//    3.2. The navigation is stopped early.
 	//    3.3. The "navigation committed" signal is triggered, making the requested folder the
 	//         current folder.
-	//    3.4. The "navigation completed" signal is triggered.
 	//
 	// 4. Subsequent Navigation (Success)
 	//    4.1. The "navigation started" signal is triggered.
 	//    4.2. Directory enumeration succeeds.
 	//    4.3. The "navigation committed" signal is triggered, making the requested folder the
 	//         current folder.
-	//    4.4. Items are displayed in the view.
-	//    4.5. The "navigation completed" signal is triggered.
 	//
 	// 5. Subsequent Navigation (Failure)
 	//    5.1. The "navigation started" signal is triggered.
@@ -162,23 +154,15 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 
 	// Triggered when the enumeration for a directory successfully finishes. At this point, the
-	// requested folder has become the current folder, though the enumerated items haven't yet been
-	// displayed.
+	// requested folder has become the current folder and the enumerated items have been displayed.
 	//
 	// This can also be triggered if the initial navigation fails. Typically, if a navigation fails,
 	// no folder change will occur. Instead, the original folder will continue to be shown. However,
 	// when the first navigation occurs, there is no original folder. Because a folder always needs
 	// to be displayed, the only effective option is to consider the failed navigation committed. In
-	// that case, this event will be triggered, followed by the completed event. A failed event
-	// won't be triggered.
+	// that case, this event will be triggered, while the failed event won't be triggered.
 	virtual boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
-
-	// Triggered when the enumerated items for a directory have been inserted into the view.
-	// Indicates that the navigation has fully completed.
-	virtual boost::signals2::connection AddNavigationCompletedObserver(
-		const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 
 	// Triggered when the enumeration for a navigation fails. As noted above, if the initial
@@ -193,7 +177,9 @@ public:
 		const NavigationCancelledSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 
-	virtual boost::signals2::connection AddNavigationsStoppeddObserver(
+	// Triggered when the pending navigations are requested to stop. At the point at which this
+	// observer is invoked, the navigations will still be pending and may still be active.
+	virtual boost::signals2::connection AddNavigationsStoppedObserver(
 		const NavigationsStoppedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 };

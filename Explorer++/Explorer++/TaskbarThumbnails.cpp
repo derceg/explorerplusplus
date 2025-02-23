@@ -119,8 +119,6 @@ void TaskbarThumbnails::SetUpObservers()
 		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this)));
 	m_connections.push_back(m_tabContainer->tabNavigationCommittedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this)));
-	m_connections.push_back(m_tabContainer->tabNavigationCompletedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::OnNavigationCompleted, this)));
 	m_connections.push_back(m_tabContainer->tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnDirectoryPropertiesChanged, this)));
 	m_connections.push_back(m_tabContainer->tabSelectedSignal.AddObserver(
@@ -621,13 +619,6 @@ void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, const NavigatePara
 	InvalidateTaskbarThumbnailBitmap(tab);
 	SetTabProxyIcon(tab);
 	UpdateTaskbarThumbnailTitle(tab);
-}
-
-void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab, const NavigateParams &navigateParams)
-{
-	UNREFERENCED_PARAMETER(navigateParams);
-
-	InvalidateTaskbarThumbnailBitmap(tab);
 }
 
 void TaskbarThumbnails::OnDirectoryPropertiesChanged(const Tab &tab)

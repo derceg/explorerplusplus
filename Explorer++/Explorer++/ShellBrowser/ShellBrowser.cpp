@@ -27,14 +27,14 @@ boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
 	const NavigationCommittedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
-	return GetNavigationManager()->AddNavigationCommittedObserver(observer, position);
-}
+	return GetNavigationManager()->AddNavigationCommittedObserver(
+		[observer](const NavigateParams &navigateParams, const std::vector<PidlChild> &items)
+		{
+			UNREFERENCED_PARAMETER(items);
 
-boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(
-	const NavigationCompletedSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return GetNavigationManager()->AddNavigationCompletedObserver(observer, position);
+			observer(navigateParams);
+		},
+		position);
 }
 
 boost::signals2::connection ShellBrowser::AddNavigationFailedObserver(
@@ -50,8 +50,8 @@ boost::signals2::connection ShellBrowser::AddNavigationCancelledObserver(
 	return GetNavigationManager()->AddNavigationCancelledObserver(observer, position);
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationsStoppeddObserver(
+boost::signals2::connection ShellBrowser::AddNavigationsStoppedObserver(
 	const NavigationsStoppedSignal::slot_type &observer, boost::signals2::connect_position position)
 {
-	return GetNavigationManager()->AddNavigationsStoppeddObserver(observer, position);
+	return GetNavigationManager()->AddNavigationsStoppedObserver(observer, position);
 }

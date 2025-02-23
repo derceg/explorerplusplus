@@ -403,7 +403,6 @@ private:
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
 	void OnNavigationStartedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
-	void OnNavigationCompletedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void OnNavigationFailedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void OnNavigationCancelledStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void OnNavigationsStoppedStatusBar(const Tab &tab);

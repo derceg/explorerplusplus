@@ -130,8 +130,6 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
 		tabNavigationCommittedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
-		tabNavigationCompletedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
 		tabNavigationFailedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
 		tabNavigationCancelledSignal;

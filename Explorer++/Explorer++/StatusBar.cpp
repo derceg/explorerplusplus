@@ -185,17 +185,6 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
 }
 
-void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab,
-	const NavigateParams &navigateParams)
-{
-	UNREFERENCED_PARAMETER(navigateParams);
-
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
-	{
-		UpdateStatusBarText(tab);
-	}
-}
-
 void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
 	const NavigateParams &navigateParams)
 {

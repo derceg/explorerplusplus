@@ -55,7 +55,8 @@ private:
 	void Navigate(const HistoryEntry *entry) override;
 
 	void OnNavigationStarted(const NavigateParams &navigateParams);
-	void OnNavigationCommitted(const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const NavigateParams &navigateParams,
+		const std::vector<PidlChild> &items);
 
 	NavigationManager *const m_navigationManager;
 

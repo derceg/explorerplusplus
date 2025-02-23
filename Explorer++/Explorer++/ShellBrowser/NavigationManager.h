@@ -25,12 +25,8 @@ public:
 
 	using NavigationWillCommitSignal =
 		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-	using NavigationCommittedSignal =
-		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-	using NavigationItemsAvailableSignal = boost::signals2::signal<void(
+	using NavigationCommittedSignal = boost::signals2::signal<void(
 		const NavigateParams &navigateParams, const std::vector<PidlChild> &items)>;
-	using NavigationCompletedSignal =
-		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
 
 	using NavigationFailedSignal =
 		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
@@ -92,14 +88,6 @@ public:
 		const NavigationCommittedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
-	boost::signals2::connection AddNavigationItemsAvailableObserver(
-		const NavigationItemsAvailableSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
-	boost::signals2::connection AddNavigationCompletedObserver(
-		const NavigationCompletedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
 
 	boost::signals2::connection AddNavigationFailedObserver(
 		const NavigationFailedSignal::slot_type &observer,
@@ -111,7 +99,7 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
 
-	boost::signals2::connection AddNavigationsStoppeddObserver(
+	boost::signals2::connection AddNavigationsStoppedObserver(
 		const NavigationsStoppedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
@@ -148,8 +136,6 @@ private:
 
 	NavigationWillCommitSignal m_navigationWillCommitSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;
-	NavigationItemsAvailableSignal m_navigationItemsAvailableSignal;
-	NavigationCompletedSignal m_navigationCompletedSignal;
 
 	NavigationFailedSignal m_navigationFailedSignal;
 

@@ -964,24 +964,19 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
+	// Capturing the tab by reference here is safe, since the tab object is guaranteed to exist
+	// whenever this method is called.
 	tab.GetShellBrowserImpl()->AddNavigationStartedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
-		{ tabNavigationStartedSignal.m_signal(tab, navigateParams); });
+		{
+			// Re-broadcast the event. This allows other classes to be notified of navigations in
+			// any tab, without having to observe navigation events for each tab individually.
+			tabNavigationStartedSignal.m_signal(tab, navigateParams);
+		});
 
 	tab.GetShellBrowserImpl()->AddNavigationCommittedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationCommittedSignal.m_signal(tab, navigateParams); });
-
-	// Capturing the tab by reference here is safe, since the tab object is
-	// guaranteed to exist whenever this method is called.
-	tab.GetShellBrowserImpl()->AddNavigationCompletedObserver(
-		[this, &tab](const NavigateParams &navigateParams)
-		{
-			// Re-broadcast the event. This allows other classes to be notified of
-			// navigations in any tab, without having to observe navigation events
-			// for each tab individually.
-			tabNavigationCompletedSignal.m_signal(tab, navigateParams);
-		});
 
 	tab.GetShellBrowserImpl()->AddNavigationFailedObserver(
 		[this, &tab](const NavigateParams &navigateParams)
@@ -991,7 +986,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		[this, &tab](const NavigateParams &navigateParams)
 		{ tabNavigationCancelledSignal.m_signal(tab, navigateParams); });
 
-	tab.GetShellBrowserImpl()->AddNavigationsStoppeddObserver(
+	tab.GetShellBrowserImpl()->AddNavigationsStoppedObserver(
 		[this, &tab]() { tabNavigationsStoppedSignal.m_signal(tab); });
 
 	tab.GetShellBrowserImpl()->directoryContentsChanged.AddObserver(
