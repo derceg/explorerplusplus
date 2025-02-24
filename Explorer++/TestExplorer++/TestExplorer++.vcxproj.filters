@@ -367,6 +367,9 @@
     <ClCompile Include="ShellEnumeratorFake.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="NavigationRequestTest.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

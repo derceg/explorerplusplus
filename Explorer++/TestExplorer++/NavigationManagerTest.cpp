@@ -7,6 +7,7 @@
 #include "GeneratorTestHelper.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
+#include "../Helper/UniqueThreadId.h"
 #include <gtest/gtest.h>
 #include <future>
 

@@ -4,20 +4,20 @@
 
 #pragma once
 
+#include "NavigationRequestListener.h"
 #include "ShellNavigator.h"
 #include "../Helper/PidlHelper.h"
-#include "../Helper/WeakPtr.h"
-#include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
 
+class NavigationRequest;
 class ScopedStopSource;
 class ShellEnumerator;
 
 // This class is responsible for managing ongoing navigations and allowing new navigations to be
 // started.
-class NavigationManager
+class NavigationManager : private NavigationRequestListener
 {
 public:
 	using NavigationStartedSignal =
@@ -105,32 +105,27 @@ public:
 		SlotGroup slotGroup = SlotGroup::Default);
 
 private:
-	struct PendingNavigation
-	{
-		NavigateParams navigateParams;
-		std::stop_token stopToken;
-	};
+	// NavigationRequestListener
+	void OnNavigationStarted(NavigationRequest *request) override;
+	void OnEnumerationCompleted(NavigationRequest *request) override;
+	void OnEnumerationFailed(NavigationRequest *request) override;
+	void OnEnumerationStopped(NavigationRequest *request) override;
+	void OnNavigationWillCommit(NavigationRequest *request) override;
+	void OnNavigationCommitted(NavigationRequest *request,
+		const std::vector<PidlChild> &items) override;
+	void OnNavigationFailed(NavigationRequest *request) override;
+	void OnNavigationCancelled(NavigationRequest *request) override;
 
-	static concurrencpp::null_result StartNavigationInternal(WeakPtr<NavigationManager> weakSelf,
-		NavigateParams navigateParams);
+	void RemoveNavigationRequest(NavigationRequest *request);
 
-	PendingNavigation *AddPendingNavigation(std::unique_ptr<PendingNavigation> pendingNavigation);
-	void RemovePendingNavigation(PendingNavigation *pendingNavigation);
-
-	void OnNavigationStarted(const NavigateParams &navigateParams);
-	void OnEnumerationCompleted(const NavigateParams &navigateParams,
-		const std::vector<PidlChild> &items);
-	void OnEnumerationFailed(const NavigateParams &navigateParams);
-	void OnEnumerationStopped(const NavigateParams &navigateParams);
-
-	bool ActiveNavigationFilter(const std::unique_ptr<PendingNavigation> &pendingNavigation) const;
+	bool ActiveNavigationFilter(const std::unique_ptr<NavigationRequest> &pendingNavigation) const;
 
 	const std::shared_ptr<const ShellEnumerator> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::executor> m_enumerationExecutor;
 	const std::shared_ptr<concurrencpp::executor> m_originalExecutor;
 
 	bool m_anyNavigationsCommitted = false;
-	std::vector<std::unique_ptr<PendingNavigation>> m_pendingNavigations;
+	std::vector<std::unique_ptr<NavigationRequest>> m_pendingNavigations;
 
 	NavigationStartedSignal m_navigationStartedSignal;
 
@@ -144,6 +139,4 @@ private:
 	NavigationsStoppedSignal m_navigationsStoppedSignal;
 
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
-
-	WeakPtrFactory<NavigationManager> m_weakPtrFactory{ this };
 };

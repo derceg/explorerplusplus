@@ -1050,6 +1050,7 @@
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp" />
     <ClCompile Include="ShellBrowser\NavigationManager.cpp" />
+    <ClCompile Include="ShellBrowser\NavigationRequest.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
     <ClCompile Include="StartupFoldersRegistryStorage.cpp" />
@@ -1352,6 +1353,8 @@
     <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="FrequentLocationsShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\NavigationManager.h" />
+    <ClInclude Include="ShellBrowser\NavigationRequest.h" />
+    <ClInclude Include="ShellBrowser\NavigationRequestListener.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
     <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
