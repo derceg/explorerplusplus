@@ -19,7 +19,7 @@ class App;
 class AsyncIconFetcher;
 class BrowserWindow;
 class CoreInterface;
-struct NavigateParams;
+class NavigationRequest;
 class Runtime;
 class Tab;
 
@@ -56,7 +56,7 @@ private:
 	void OnEscapePressed();
 	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void UpdateTextAndIcon(const Tab &tab,
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);

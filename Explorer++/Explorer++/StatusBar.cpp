@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigationRequest.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
@@ -151,9 +152,9 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 }
 
 void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab,
-	const NavigateParams &navigateParams)
+	const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
@@ -185,10 +186,9 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
 }
 
-void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
-	const NavigateParams &navigateParams)
+void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab, const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
@@ -197,9 +197,9 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
 }
 
 void Explorerplusplus::OnNavigationCancelledStatusBar(const Tab &tab,
-	const NavigateParams &navigateParams)
+	const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
@@ -223,7 +223,7 @@ void Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	{
 		// In this case, there is at least one active navigation in progress, so the status bar
 		// should reflect that.
-		SetStatusBarLoadingText(navigation->pidl.Raw());
+		SetStatusBarLoadingText(navigation->GetNavigateParams().pidl.Raw());
 		return;
 	}
 

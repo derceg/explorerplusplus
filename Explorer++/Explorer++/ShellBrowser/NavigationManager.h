@@ -5,12 +5,12 @@
 #pragma once
 
 #include "NavigationRequestListener.h"
-#include "ShellNavigator.h"
 #include "../Helper/PidlHelper.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
 
+struct NavigateParams;
 class NavigationRequest;
 class ScopedStopSource;
 class ShellEnumerator;
@@ -20,19 +20,17 @@ class ShellEnumerator;
 class NavigationManager : private NavigationRequestListener
 {
 public:
-	using NavigationStartedSignal =
-		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
+	using NavigationStartedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
 	using NavigationWillCommitSignal =
-		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-	using NavigationCommittedSignal = boost::signals2::signal<void(
-		const NavigateParams &navigateParams, const std::vector<PidlChild> &items)>;
+		boost::signals2::signal<void(const NavigationRequest *request)>;
+	using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request,
+		const std::vector<PidlChild> &items)>;
 
-	using NavigationFailedSignal =
-		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
+	using NavigationFailedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
 	using NavigationCancelledSignal =
-		boost::signals2::signal<void(const NavigateParams &navigateParams)>;
+		boost::signals2::signal<void(const NavigationRequest *request)>;
 
 	using NavigationsStoppedSignal = boost::signals2::signal<void()>;
 
@@ -59,9 +57,9 @@ public:
 	// will be cancelled once they return to the main thread (e.g. because a navigation was
 	// committed in the meantime), as well as active navigations that can still be committed once
 	// they return.
-	concurrencpp::generator<const NavigateParams &> GetPendingNavigations() const;
+	concurrencpp::generator<const NavigationRequest *> GetPendingNavigations() const;
 
-	const NavigateParams *MaybeGetLatestPendingNavigation() const;
+	const NavigationRequest *MaybeGetLatestPendingNavigation() const;
 	size_t GetNumPendingNavigations() const;
 	bool HasAnyPendingNavigations() const;
 
@@ -69,9 +67,9 @@ public:
 	//
 	// An active navigation is one that may commit once it returns to the main thread. This
 	// explicitly excludes navigations that will be cancelled but are technically still in progress.
-	concurrencpp::generator<const NavigateParams &> GetActiveNavigations() const;
+	concurrencpp::generator<const NavigationRequest *> GetActiveNavigations() const;
 
-	const NavigateParams *MaybeGetLatestActiveNavigation() const;
+	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
 	size_t GetNumActiveNavigations() const;
 	bool HasAnyActiveNavigations() const;
 

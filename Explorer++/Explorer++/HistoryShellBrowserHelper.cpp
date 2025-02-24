@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "HistoryShellBrowserHelper.h"
 #include "HistoryModel.h"
+#include "ShellBrowser/NavigationRequest.h"
 
 HistoryShellBrowserHelper::HistoryShellBrowserHelper(ShellBrowser *shellBrowser,
 	HistoryModel *historyModel) :
@@ -17,7 +18,7 @@ HistoryShellBrowserHelper::HistoryShellBrowserHelper(ShellBrowser *shellBrowser,
 		std::bind_front(&HistoryShellBrowserHelper::OnNavigationCommitted, this));
 }
 
-void HistoryShellBrowserHelper::OnNavigationCommitted(const NavigateParams &navigateParams)
+void HistoryShellBrowserHelper::OnNavigationCommitted(const NavigationRequest *request)
 {
-	m_historyModel->AddHistoryItem(navigateParams.pidl);
+	m_historyModel->AddHistoryItem(request->GetNavigateParams().pidl);
 }

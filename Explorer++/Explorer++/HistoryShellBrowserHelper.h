@@ -14,7 +14,7 @@ public:
 	HistoryShellBrowserHelper(ShellBrowser *shellBrowser, HistoryModel *historyModel);
 
 private:
-	void OnNavigationCommitted(const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const NavigationRequest *request);
 
 	HistoryModel *const m_historyModel;
 };

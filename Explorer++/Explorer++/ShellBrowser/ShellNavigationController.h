@@ -12,6 +12,7 @@
 
 struct NavigateParams;
 class NavigationManager;
+class NavigationRequest;
 class PreservedHistoryEntry;
 class TabNavigationInterface;
 
@@ -54,8 +55,8 @@ private:
 
 	void Navigate(const HistoryEntry *entry) override;
 
-	void OnNavigationStarted(const NavigateParams &navigateParams);
-	void OnNavigationCommitted(const NavigateParams &navigateParams,
+	void OnNavigationStarted(const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request,
 		const std::vector<PidlChild> &items);
 
 	NavigationManager *const m_navigationManager;

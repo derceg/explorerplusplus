@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellNavigationController.h"
 #include "NavigationManager.h"
+#include "NavigationRequest.h"
 #include "PreservedHistoryEntry.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/ShellHelper.h"
@@ -51,23 +52,23 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationStarted(const NavigateParams &navigateParams)
+void ShellNavigationController::OnNavigationStarted(const NavigationRequest *request)
 {
 	if (!GetCurrentEntry())
 	{
 		// There is no current entry, so this is the very first navigation. An initial entry should
 		// be added.
-		AddEntry(std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(),
+		AddEntry(std::make_unique<HistoryEntry>(request->GetNavigateParams().pidl.Raw(),
 			HistoryEntry::InitialNavigationType::Initial));
 	}
 }
 
-void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams,
+void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *request,
 	const std::vector<PidlChild> &items)
 {
 	UNREFERENCED_PARAMETER(items);
 
-	auto historyEntryType = navigateParams.historyEntryType;
+	auto historyEntryType = request->GetNavigateParams().historyEntryType;
 
 	// An initial entry should always be added when a navigation starts, so there should always be a
 	// current entry at this point.
@@ -86,9 +87,9 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 
 	// If navigating to a history entry, the current index will be set here. It's important this is
 	// done before attempting to replace the current entry.
-	if (navigateParams.historyEntryId)
+	if (request->GetNavigateParams().historyEntryId)
 	{
-		auto *entry = GetEntryById(*navigateParams.historyEntryId);
+		auto *entry = GetEntryById(*request->GetNavigateParams().historyEntryId);
 
 		if (entry)
 		{
@@ -109,7 +110,7 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 	if (historyEntryType == HistoryEntryType::AddEntry
 		|| historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
-		auto entry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw());
+		auto entry = std::make_unique<HistoryEntry>(request->GetNavigateParams().pidl.Raw());
 
 		if (historyEntryType == HistoryEntryType::AddEntry)
 		{

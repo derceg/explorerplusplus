@@ -13,7 +13,7 @@
 
 struct Config;
 class CoreInterface;
-struct NavigateParams;
+class NavigationRequest;
 class TabContainer;
 class WindowSubclass;
 
@@ -51,7 +51,7 @@ private:
 	wil::unique_hbitmap CaptureTabScreenshot(const Tab &tab);
 	wil::unique_hbitmap GetTabLivePreviewBitmap(const Tab &tab);
 	void OnTabSelectionChanged(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);

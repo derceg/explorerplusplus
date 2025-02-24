@@ -612,9 +612,9 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 	}
 }
 
-void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
+void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	InvalidateTaskbarThumbnailBitmap(tab);
 	SetTabProxyIcon(tab);

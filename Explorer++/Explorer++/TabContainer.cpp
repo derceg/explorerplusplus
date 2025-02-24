@@ -696,9 +696,9 @@ void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 	}
 }
 
-void TabContainer::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
+void TabContainer::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	UpdateTabNameInWindow(tab);
 	SetTabIcon(tab);
@@ -967,24 +967,24 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	// Capturing the tab by reference here is safe, since the tab object is guaranteed to exist
 	// whenever this method is called.
 	tab.GetShellBrowserImpl()->AddNavigationStartedObserver(
-		[this, &tab](const NavigateParams &navigateParams)
+		[this, &tab](const NavigationRequest *request)
 		{
 			// Re-broadcast the event. This allows other classes to be notified of navigations in
 			// any tab, without having to observe navigation events for each tab individually.
-			tabNavigationStartedSignal.m_signal(tab, navigateParams);
+			tabNavigationStartedSignal.m_signal(tab, request);
 		});
 
 	tab.GetShellBrowserImpl()->AddNavigationCommittedObserver(
-		[this, &tab](const NavigateParams &navigateParams)
-		{ tabNavigationCommittedSignal.m_signal(tab, navigateParams); });
+		[this, &tab](const NavigationRequest *request)
+		{ tabNavigationCommittedSignal.m_signal(tab, request); });
 
 	tab.GetShellBrowserImpl()->AddNavigationFailedObserver(
-		[this, &tab](const NavigateParams &navigateParams)
-		{ tabNavigationFailedSignal.m_signal(tab, navigateParams); });
+		[this, &tab](const NavigationRequest *request)
+		{ tabNavigationFailedSignal.m_signal(tab, request); });
 
 	tab.GetShellBrowserImpl()->AddNavigationCancelledObserver(
-		[this, &tab](const NavigateParams &navigateParams)
-		{ tabNavigationCancelledSignal.m_signal(tab, navigateParams); });
+		[this, &tab](const NavigationRequest *request)
+		{ tabNavigationCancelledSignal.m_signal(tab, request); });
 
 	tab.GetShellBrowserImpl()->AddNavigationsStoppedObserver(
 		[this, &tab]() { tabNavigationsStoppedSignal.m_signal(tab); });

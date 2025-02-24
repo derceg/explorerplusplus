@@ -10,6 +10,7 @@
 
 struct FolderSettings;
 class NavigationManager;
+class NavigationRequest;
 class ShellBrowserHelperBase;
 class ShellNavigationController;
 
@@ -20,7 +21,7 @@ public:
 	virtual ShellNavigationController *GetNavigationController() const = 0;
 
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper);
-	const NavigateParams *MaybeGetLatestActiveNavigation() const;
+	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
 
 	// ShellNavigator
 	boost::signals2::connection AddNavigationStartedObserver(

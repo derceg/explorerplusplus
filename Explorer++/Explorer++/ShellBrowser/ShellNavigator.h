@@ -8,6 +8,8 @@
 #include "../Helper/PidlHelper.h"
 #include <boost/signals2.hpp>
 
+class NavigationRequest;
+
 enum class NavigationType
 {
 	// Standard navigation to a folder.
@@ -98,12 +100,10 @@ private:
 	NavigateParams() = default;
 };
 
-using NavigationStartedSignal = boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-using NavigationCommittedSignal =
-	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-using NavigationFailedSignal = boost::signals2::signal<void(const NavigateParams &navigateParams)>;
-using NavigationCancelledSignal =
-	boost::signals2::signal<void(const NavigateParams &navigateParams)>;
+using NavigationStartedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
+using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
+using NavigationFailedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
+using NavigationCancelledSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationsStoppedSignal = boost::signals2::signal<void()>;
 
 class ShellNavigator
@@ -161,6 +161,8 @@ public:
 	// when the first navigation occurs, there is no original folder. Because a folder always needs
 	// to be displayed, the only effective option is to consider the failed navigation committed. In
 	// that case, this event will be triggered, while the failed event won't be triggered.
+	//
+	// For the same reasons, this can also be triggered if the initial navigation is stopped early.
 	virtual boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;

@@ -76,9 +76,9 @@ LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void MainWindow::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
+void MainWindow::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{

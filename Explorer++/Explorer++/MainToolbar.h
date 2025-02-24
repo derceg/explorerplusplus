@@ -22,7 +22,7 @@
 class BrowserWindow;
 struct Config;
 class IconResourceLoader;
-struct NavigateParams;
+class NavigationRequest;
 class ShellIconLoader;
 
 class MainToolbar : public BaseWindow
@@ -84,7 +84,7 @@ private:
 	POINT GetMenuPositionForButton(MainToolbarButton button);
 
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
 	void OnFocusChanged();
 
 	void UpdateToolbarButtonImageIndexes();

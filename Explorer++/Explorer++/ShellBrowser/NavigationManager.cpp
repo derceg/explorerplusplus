@@ -35,7 +35,7 @@ void NavigationManager::StartNavigation(const NavigateParams &navigateParams)
 
 void NavigationManager::OnNavigationStarted(NavigationRequest *request)
 {
-	m_navigationStartedSignal(request->GetNavigateParams());
+	m_navigationStartedSignal(request);
 }
 
 void NavigationManager::OnEnumerationCompleted(NavigationRequest *request)
@@ -70,7 +70,7 @@ void NavigationManager::OnEnumerationStopped(NavigationRequest *request)
 
 void NavigationManager::OnNavigationWillCommit(NavigationRequest *request)
 {
-	m_navigationWillCommitSignal(request->GetNavigateParams());
+	m_navigationWillCommitSignal(request);
 }
 
 void NavigationManager::OnNavigationCommitted(NavigationRequest *request,
@@ -81,21 +81,21 @@ void NavigationManager::OnNavigationCommitted(NavigationRequest *request,
 
 	m_anyNavigationsCommitted = true;
 
-	m_navigationCommittedSignal(request->GetNavigateParams(), items);
+	m_navigationCommittedSignal(request, items);
 
 	RemoveNavigationRequest(request);
 }
 
 void NavigationManager::OnNavigationFailed(NavigationRequest *request)
 {
-	m_navigationFailedSignal(request->GetNavigateParams());
+	m_navigationFailedSignal(request);
 
 	RemoveNavigationRequest(request);
 }
 
 void NavigationManager::OnNavigationCancelled(NavigationRequest *request)
 {
-	m_navigationCancelledSignal(request->GetNavigateParams());
+	m_navigationCancelledSignal(request);
 
 	RemoveNavigationRequest(request);
 }
@@ -116,15 +116,15 @@ void NavigationManager::StopLoading()
 }
 
 // TODO: This should use std::generator once C++23 support is available.
-concurrencpp::generator<const NavigateParams &> NavigationManager::GetPendingNavigations() const
+concurrencpp::generator<const NavigationRequest *> NavigationManager::GetPendingNavigations() const
 {
 	for (const auto &pendingNavigation : m_pendingNavigations)
 	{
-		co_yield pendingNavigation->GetNavigateParams();
+		co_yield pendingNavigation.get();
 	}
 }
 
-const NavigateParams *NavigationManager::MaybeGetLatestPendingNavigation() const
+const NavigationRequest *NavigationManager::MaybeGetLatestPendingNavigation() const
 {
 	if (m_pendingNavigations.empty())
 	{
@@ -132,7 +132,7 @@ const NavigateParams *NavigationManager::MaybeGetLatestPendingNavigation() const
 	}
 
 	const auto &lastItem = *m_pendingNavigations.rbegin();
-	return &lastItem->GetNavigateParams();
+	return lastItem.get();
 }
 
 size_t NavigationManager::GetNumPendingNavigations() const
@@ -146,16 +146,16 @@ bool NavigationManager::HasAnyPendingNavigations() const
 }
 
 // TODO: This should use std::generator once C++23 support is available.
-concurrencpp::generator<const NavigateParams &> NavigationManager::GetActiveNavigations() const
+concurrencpp::generator<const NavigationRequest *> NavigationManager::GetActiveNavigations() const
 {
 	for (const auto &pendingNavigation : m_pendingNavigations
 			| std::views::filter(std::bind_front(&NavigationManager::ActiveNavigationFilter, this)))
 	{
-		co_yield pendingNavigation->GetNavigateParams();
+		co_yield pendingNavigation.get();
 	}
 }
 
-const NavigateParams *NavigationManager::MaybeGetLatestActiveNavigation() const
+const NavigationRequest *NavigationManager::MaybeGetLatestActiveNavigation() const
 {
 	auto itr = std::ranges::find_if(m_pendingNavigations.rbegin(), m_pendingNavigations.rend(),
 		std::bind_front(&NavigationManager::ActiveNavigationFilter, this));
@@ -165,7 +165,7 @@ const NavigateParams *NavigationManager::MaybeGetLatestActiveNavigation() const
 		return nullptr;
 	}
 
-	return &(*itr)->GetNavigateParams();
+	return itr->get();
 }
 
 size_t NavigationManager::GetNumActiveNavigations() const

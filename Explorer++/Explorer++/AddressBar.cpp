@@ -256,9 +256,9 @@ void AddressBar::OnTabSelected(const Tab &tab)
 	UpdateTextAndIcon(tab);
 }
 
-void AddressBar::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
+void AddressBar::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{

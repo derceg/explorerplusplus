@@ -30,6 +30,7 @@ struct Config;
 class CoreInterface;
 class FileActionHandler;
 struct NavigateParams;
+class NavigationRequest;
 struct PreservedTab;
 class ShellBrowserEmbedder;
 
@@ -125,13 +126,13 @@ public:
 
 	// Signals
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationStartedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationCommittedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationFailedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationCancelledSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationsStoppedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
@@ -221,7 +222,7 @@ private:
 
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
 
-	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);

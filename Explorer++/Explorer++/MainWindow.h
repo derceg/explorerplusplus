@@ -10,7 +10,7 @@
 
 struct Config;
 class CoreInterface;
-struct NavigateParams;
+class NavigationRequest;
 class WindowSubclass;
 
 class MainWindow : private DropTargetInternal
@@ -26,7 +26,7 @@ private:
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void OnTabSelected(const Tab &tab);
 

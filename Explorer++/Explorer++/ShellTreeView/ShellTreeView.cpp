@@ -113,9 +113,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 	auto *tabContainer = m_browserWindow->GetActivePane()->GetTabContainer();
 
 	m_connections.push_back(tabContainer->tabNavigationCommittedSignal.AddObserver(
-		[this](const Tab &tab, const NavigateParams &navigateParams)
+		[this](const Tab &tab, const NavigationRequest *request)
 		{
-			UNREFERENCED_PARAMETER(navigateParams);
+			UNREFERENCED_PARAMETER(request);
 
 			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 			{
@@ -124,9 +124,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		}));
 
 	m_connections.push_back(tabContainer->tabNavigationFailedSignal.AddObserver(
-		[this](const Tab &tab, const NavigateParams &navigateParams)
+		[this](const Tab &tab, const NavigationRequest *request)
 		{
-			UNREFERENCED_PARAMETER(navigateParams);
+			UNREFERENCED_PARAMETER(request);
 
 			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 			{
@@ -138,9 +138,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		}));
 
 	m_connections.push_back(tabContainer->tabNavigationCancelledSignal.AddObserver(
-		[this](const Tab &tab, const NavigateParams &navigateParams)
+		[this](const Tab &tab, const NavigationRequest *request)
 		{
-			UNREFERENCED_PARAMETER(navigateParams);
+			UNREFERENCED_PARAMETER(request);
 
 			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 			{

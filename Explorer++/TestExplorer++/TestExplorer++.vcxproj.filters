@@ -595,6 +595,9 @@
     <ClInclude Include="ShellEnumeratorFake.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="NavigationRequestTestHelper.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

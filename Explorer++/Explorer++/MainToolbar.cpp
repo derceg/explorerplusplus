@@ -868,9 +868,9 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
+void MainToolbar::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{

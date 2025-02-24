@@ -12,6 +12,7 @@
 #include "IconFetcher.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "NavigationRequest.h"
 #include "RuntimeHelper.h"
 #include "ShellEnumeratorImpl.h"
 #include "ShellNavigationController.h"
@@ -28,7 +29,7 @@
 #include <propvarutil.h>
 #include <list>
 
-void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
+void ShellBrowserImpl::OnNavigationStarted(const NavigationRequest *request)
 {
 	if (!m_folderVisited)
 	{
@@ -38,19 +39,19 @@ void ShellBrowserImpl::OnNavigationStarted(const NavigateParams &navigateParams)
 		// Note that this path can be taken both when a new tab is created and the initial
 		// navigation occurs, as well as when a tab is restored and a navigation to the current
 		// entry occurs.
-		ChangeFolders(navigateParams);
+		ChangeFolders(request->GetNavigateParams().pidl);
 	}
 
 	RecalcWindowCursor(m_hListView);
 }
 
-void ShellBrowserImpl::ChangeFolders(const NavigateParams &navigateParams)
+void ShellBrowserImpl::ChangeFolders(const PidlAbsolute &directory)
 {
 	PrepareToChangeFolders();
 
 	bool isVirtualFolder = false;
 	SFGAOF attributes = SFGAO_FILESYSTEM;
-	HRESULT hr = GetItemAttributes(navigateParams.pidl.Raw(), &attributes);
+	HRESULT hr = GetItemAttributes(directory.Raw(), &attributes);
 	DCHECK(SUCCEEDED(hr));
 
 	if (SUCCEEDED(hr))
@@ -58,9 +59,8 @@ void ShellBrowserImpl::ChangeFolders(const NavigateParams &navigateParams)
 		isVirtualFolder = WI_IsFlagClear(attributes, SFGAO_FILESYSTEM);
 	}
 
-	m_directoryState.pidlDirectory = navigateParams.pidl;
-	m_directoryState.directory =
-		GetDisplayNameWithFallback(navigateParams.pidl.Raw(), SHGDN_FORPARSING);
+	m_directoryState.pidlDirectory = directory;
+	m_directoryState.directory = GetDisplayNameWithFallback(directory.Raw(), SHGDN_FORPARSING);
 	m_directoryState.virtualFolder = isVirtualFolder;
 	m_uniqueFolderId++;
 
@@ -460,9 +460,9 @@ HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellF
 	return hr;
 }
 
-void ShellBrowserImpl::OnNavigationWillCommit(const NavigateParams &navigateParams)
+void ShellBrowserImpl::OnNavigationWillCommit(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(navigateParams);
+	UNREFERENCED_PARAMETER(request);
 
 	// The folder is going to change, so update the set of selected items before the current
 	// navigation entry changes.
@@ -471,24 +471,24 @@ void ShellBrowserImpl::OnNavigationWillCommit(const NavigateParams &navigatePara
 	SetNavigationState(NavigationState::WillCommit);
 }
 
-void ShellBrowserImpl::OnNavigationComitted(const NavigateParams &navigateParams,
+void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request,
 	const std::vector<PidlChild> &items)
 {
-	ChangeFolders(navigateParams);
+	ChangeFolders(request->GetNavigateParams().pidl);
 
-	NotifyShellOfNavigation(navigateParams.pidl.Raw());
+	NotifyShellOfNavigation(request->GetNavigateParams().pidl.Raw());
 
 	RecalcWindowCursor(m_hListView);
 
-	AddNavigationItems(navigateParams, items);
+	AddNavigationItems(request, items);
 
 	SetNavigationState(NavigationState::Committed);
 }
 
-void ShellBrowserImpl::AddNavigationItems(const NavigateParams &navigateParams,
+void ShellBrowserImpl::AddNavigationItems(const NavigationRequest *request,
 	const std::vector<PidlChild> &itemPidls)
 {
-	auto items = GetItemInformationFromPidls(navigateParams, itemPidls);
+	auto items = GetItemInformationFromPidls(request, itemPidls);
 
 	for (auto &item : items)
 	{
@@ -509,13 +509,13 @@ void ShellBrowserImpl::AddNavigationItems(const NavigateParams &navigateParams,
 	// a current entry here, and that entry should be for the current navigation.
 	auto currentEntry = m_navigationController->GetCurrentEntry();
 	CHECK(currentEntry);
-	DCHECK(currentEntry->GetPidl() == navigateParams.pidl);
+	DCHECK(currentEntry->GetPidl() == request->GetNavigateParams().pidl);
 
 	SelectItems(currentEntry->GetSelectedItems());
 
-	if (navigateParams.navigationType == NavigationType::Up)
+	if (request->GetNavigateParams().navigationType == NavigationType::Up)
 	{
-		SelectItems({ navigateParams.originalPidl });
+		SelectItems({ request->GetNavigateParams().originalPidl });
 	}
 
 	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All
@@ -527,11 +527,11 @@ void ShellBrowserImpl::AddNavigationItems(const NavigateParams &navigateParams,
 }
 
 std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFromPidls(
-	const NavigateParams &navigateParams, const std::vector<PidlChild> &itemPidls)
+	const NavigationRequest *request, const std::vector<PidlChild> &itemPidls)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	HRESULT hr =
-		SHBindToObject(nullptr, navigateParams.pidl.Raw(), nullptr, IID_PPV_ARGS(&shellFolder));
+	HRESULT hr = SHBindToObject(nullptr, request->GetNavigateParams().pidl.Raw(), nullptr,
+		IID_PPV_ARGS(&shellFolder));
 
 	if (FAILED(hr))
 	{
@@ -542,7 +542,8 @@ std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFr
 
 	for (const auto &pidl : itemPidls)
 	{
-		auto item = GetItemInformation(shellFolder.get(), navigateParams.pidl.Raw(), pidl.Raw());
+		auto item = GetItemInformation(shellFolder.get(), request->GetNavigateParams().pidl.Raw(),
+			pidl.Raw());
 
 		if (item)
 		{

@@ -51,6 +51,7 @@ struct Config;
 class CoreInterface;
 class FileActionHandler;
 class IconFetcher;
+class NavigationRequest;
 struct PreservedFolderState;
 class PreservedHistoryEntry;
 class Runtime;
@@ -398,20 +399,20 @@ private:
 	void VerifySortMode();
 
 	/* Browsing support. */
-	void OnNavigationStarted(const NavigateParams &navigateParams);
+	void OnNavigationStarted(const NavigationRequest *request);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
-	void ChangeFolders(const NavigateParams &navigateParams);
+	void ChangeFolders(const PidlAbsolute &directory);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void StoreCurrentlySelectedItems();
 	void ResetFolderState();
-	void OnNavigationWillCommit(const NavigateParams &navigateParams);
-	void OnNavigationComitted(const NavigateParams &navigateParams,
+	void OnNavigationWillCommit(const NavigationRequest *request);
+	void OnNavigationComitted(const NavigationRequest *request,
 		const std::vector<PidlChild> &items);
-	void AddNavigationItems(const NavigateParams &navigateParams,
+	void AddNavigationItems(const NavigationRequest *request,
 		const std::vector<PidlChild> &itemPidls);
-	std::vector<ItemInfo_t> GetItemInformationFromPidls(const NavigateParams &navigateParams,
+	std::vector<ItemInfo_t> GetItemInformationFromPidls(const NavigationRequest *request,
 		const std::vector<PidlChild> &itemPidls);
 	void InsertAwaitingItems();
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;

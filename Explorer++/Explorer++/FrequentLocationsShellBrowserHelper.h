@@ -15,7 +15,7 @@ public:
 	FrequentLocationsShellBrowserHelper(ShellBrowser *shellBrowser, FrequentLocationsModel *model);
 
 private:
-	void OnNavigationCommitted(const NavigateParams &navigateParams);
+	void OnNavigationCommitted(const NavigationRequest *request);
 
 	FrequentLocationsModel *const m_model;
 };

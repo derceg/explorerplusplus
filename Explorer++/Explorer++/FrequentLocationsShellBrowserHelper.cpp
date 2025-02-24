@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FrequentLocationsShellBrowserHelper.h"
 #include "FrequentLocationsModel.h"
+#include "ShellBrowser/NavigationRequest.h"
 
 FrequentLocationsShellBrowserHelper::FrequentLocationsShellBrowserHelper(ShellBrowser *shellBrowser,
 	FrequentLocationsModel *model) :
@@ -15,8 +16,7 @@ FrequentLocationsShellBrowserHelper::FrequentLocationsShellBrowserHelper(ShellBr
 		std::bind_front(&FrequentLocationsShellBrowserHelper::OnNavigationCommitted, this));
 }
 
-void FrequentLocationsShellBrowserHelper::OnNavigationCommitted(
-	const NavigateParams &navigateParams)
+void FrequentLocationsShellBrowserHelper::OnNavigationCommitted(const NavigationRequest *request)
 {
-	m_model->RegisterLocationVisit(navigateParams.pidl);
+	m_model->RegisterLocationVisit(request->GetNavigateParams().pidl);
 }

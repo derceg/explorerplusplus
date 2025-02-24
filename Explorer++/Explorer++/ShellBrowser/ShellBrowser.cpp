@@ -12,7 +12,7 @@ void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 	m_helpers.push_back(std::move(helper));
 }
 
-const NavigateParams *ShellBrowser::MaybeGetLatestActiveNavigation() const
+const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const
 {
 	return GetNavigationManager()->MaybeGetLatestActiveNavigation();
 }
@@ -28,11 +28,11 @@ boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
 	boost::signals2::connect_position position)
 {
 	return GetNavigationManager()->AddNavigationCommittedObserver(
-		[observer](const NavigateParams &navigateParams, const std::vector<PidlChild> &items)
+		[observer](const NavigationRequest *request, const std::vector<PidlChild> &items)
 		{
 			UNREFERENCED_PARAMETER(items);
 
-			observer(navigateParams);
+			observer(request);
 		},
 		position);
 }
