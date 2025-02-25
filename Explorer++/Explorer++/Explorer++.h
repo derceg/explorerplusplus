@@ -24,6 +24,7 @@
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
+#include "TabStorage.h"
 #include "Theme.h"
 #include "ValueWrapper.h"
 #include "WindowStorage.h"
@@ -75,7 +76,6 @@ class ShellTreeView;
 class TabContainer;
 class TabRestorerMenu;
 struct TabSettings;
-struct TabStorageData;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
 class UiTheming;
@@ -247,7 +247,6 @@ private:
 	/* Main menu handlers. */
 	void OnNewTab();
 	bool OnCloseTab();
-	void OnNewWindow();
 	void OnSaveDirectoryListing() const;
 	void OnCloneWindow();
 	void OnCopyItemPath() const;
@@ -289,6 +288,8 @@ private:
 	void OnGoHome();
 
 	int HighlightSimilarFiles(HWND ListView) const;
+
+	void CreateNewWindow(const std::vector<TabStorageData> &tabs = {});
 
 	/* Main toolbar-specific handlers. */
 	void OnToolbarViews();

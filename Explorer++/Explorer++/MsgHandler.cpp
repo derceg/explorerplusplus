@@ -25,7 +25,6 @@
 #include "Storage.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
-#include "TabStorage.h"
 #include "TaskbarThumbnails.h"
 #include "ToolbarHelper.h"
 #include "WindowStorage.h"
@@ -231,15 +230,21 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 
 void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 {
-	/* Create a new instance of this program, with the
-	specified path as an argument. */
-	std::wstring path;
-	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, path);
+	if (m_app->GetFeatureList()->IsEnabled(Feature::MultipleWindowsPerSession))
+	{
+		CreateNewWindow({ { .pidl = pidlDirectory } });
+	}
+	else
+	{
+		// Create a new instance of this program, with the specified path as an argument.
+		std::wstring path;
+		GetDisplayName(pidlDirectory, SHGDN_FORPARSING, path);
 
-	TCHAR szParameters[512];
-	StringCchPrintf(szParameters, std::size(szParameters), _T("\"%s\""), path.c_str());
+		TCHAR szParameters[512];
+		StringCchPrintf(szParameters, std::size(szParameters), _T("\"%s\""), path.c_str());
 
-	LaunchCurrentProcess(m_hContainer, szParameters);
+		LaunchCurrentProcess(m_hContainer, szParameters);
+	}
 }
 
 void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
@@ -850,7 +855,7 @@ void Explorerplusplus::OnAssocChanged()
 	/* TODO: Update the address bar. */
 }
 
-void Explorerplusplus::OnNewWindow()
+void Explorerplusplus::CreateNewWindow(const std::vector<TabStorageData> &tabs)
 {
 	WINDOWPLACEMENT placement = {};
 	placement.length = sizeof(placement);
@@ -868,6 +873,7 @@ void Explorerplusplus::OnNewWindow()
 	initialData.treeViewWidth = m_treeViewWidth;
 	initialData.displayWindowWidth = m_displayWindowWidth;
 	initialData.displayWindowHeight = m_displayWindowHeight;
+	initialData.tabs = tabs;
 
 	Explorerplusplus::Create(m_app, &initialData);
 }

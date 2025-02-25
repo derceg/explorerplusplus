@@ -310,7 +310,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILE_NEW_WINDOW:
-		OnNewWindow();
+		CreateNewWindow();
 		break;
 
 	case IDM_FILE_CLONEWINDOW:
@@ -1097,10 +1097,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_VIEW_AUTOARRANGE:
 		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl()->SetAutoArrange(
 			!GetActivePane()
-				 ->GetTabContainer()
-				 ->GetSelectedTab()
-				 .GetShellBrowserImpl()
-				 ->GetAutoArrange());
+				->GetTabContainer()
+				->GetSelectedTab()
+				.GetShellBrowserImpl()
+				->GetAutoArrange());
 		break;
 
 	case IDM_VIEW_SHOWHIDDENFILES:
