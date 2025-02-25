@@ -11,8 +11,8 @@
 #include <wil/resource.h>
 #include <memory>
 
-struct Config;
-class CoreInterface;
+class App;
+class BrowserWindow;
 class NavigationRequest;
 class TabContainer;
 class WindowSubclass;
@@ -20,8 +20,7 @@ class WindowSubclass;
 class TaskbarThumbnails : private boost::noncopyable
 {
 public:
-	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
-		HINSTANCE resourceInstance, const Config *config);
+	TaskbarThumbnails(App *app, BrowserWindow *browser, TabContainer *tabContainer);
 	~TaskbarThumbnails();
 
 private:
@@ -57,9 +56,9 @@ private:
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
 	void UpdateTaskbarThumbnailTitle(const Tab &tab);
 
-	CoreInterface *m_coreInterface;
-	TabContainer *m_tabContainer;
-	HINSTANCE m_instance;
+	App *const m_app;
+	BrowserWindow *const m_browser;
+	TabContainer *const m_tabContainer;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::unique_ptr<WindowSubclass> m_mainWindowSubclass;
 

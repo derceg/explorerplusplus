@@ -69,12 +69,12 @@ void AddressBar::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&AddressBar::ParentWndProc, this)));
 
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+		std::bind_front(&AddressBar::OnTabSelected, this), m_browserWindow));
+
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(
-				m_coreInterface->GetTabContainer()->tabSelectedSignal.AddObserver(
-					std::bind_front(&AddressBar::OnTabSelected, this)));
 			m_connections.push_back(
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&AddressBar::OnNavigationCommitted, this)));

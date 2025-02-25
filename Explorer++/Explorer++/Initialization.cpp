@@ -31,7 +31,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 			&m_iconFetcher, m_app->GetThemeManager(), m_app->GetBookmarkTree(),
 			BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_app->GetResourceInstance(), this);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_app, this, this);
 
 	InitializeMainMenu();
 
@@ -53,8 +53,8 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	size initially. */
 	UpdateLayout();
 
-	m_taskbarThumbnails = std::make_unique<TaskbarThumbnails>(this,
-		GetActivePane()->GetTabContainer(), m_app->GetResourceInstance(), m_config);
+	m_taskbarThumbnails =
+		std::make_unique<TaskbarThumbnails>(m_app, this, GetActivePane()->GetTabContainer());
 
 	CreateInitialTabs(storageData);
 

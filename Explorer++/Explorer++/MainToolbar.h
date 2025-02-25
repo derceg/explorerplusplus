@@ -19,8 +19,8 @@
 #include <optional>
 #include <unordered_map>
 
+class App;
 class BrowserWindow;
-struct Config;
 class IconResourceLoader;
 class NavigationRequest;
 class ShellIconLoader;
@@ -28,10 +28,9 @@ class ShellIconLoader;
 class MainToolbar : public BaseWindow
 {
 public:
-	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, ShellIconLoader *shellIconLoader,
-		const Config *config,
+	static MainToolbar *Create(HWND parent, App *app, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
 	void UpdateConfigDependentButtonStates();
@@ -45,9 +44,8 @@ public:
 	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 
 private:
-	MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-		ShellIconLoader *shellIconLoader, const Config *config,
+	MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		const IconResourceLoader *iconResourceLoader, ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	~MainToolbar();
 
@@ -99,11 +97,10 @@ private:
 
 	void OnFontOrDpiUpdated();
 
-	HINSTANCE m_resourceInstance;
-	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
+	App *const m_app;
+	BrowserWindow *const m_browserWindow;
+	CoreInterface *const m_coreInterface;
 	ShellIconLoader *const m_shellIconLoader;
-	const Config *const m_config;
 	bool m_browserInitialized = false;
 
 	wil::unique_himagelist m_imageListSmall;

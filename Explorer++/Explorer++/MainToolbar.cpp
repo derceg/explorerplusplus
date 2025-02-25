@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MainToolbar.h"
+#include "App.h"
 #include "BrowserCommandController.h"
 #include "BrowserWindow.h"
 #include "Config.h"
@@ -67,28 +68,27 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 };
 // clang-format on
 
-MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader, ShellIconLoader *shellIconLoader,
-	const Config *config,
+MainToolbar *MainToolbar::Create(HWND parent, App *app, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	return new MainToolbar(parent, resourceInstance, browserWindow, coreInterface,
-		iconResourceLoader, shellIconLoader, config, initialButtons);
+	return new MainToolbar(parent, app, browserWindow, coreInterface, iconResourceLoader,
+		shellIconLoader, initialButtons);
 }
 
-MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
+MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-	ShellIconLoader *shellIconLoader, const Config *config,
+	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
 	BaseWindow(CreateMainToolbar(parent)),
-	m_resourceInstance(resourceInstance),
+	m_app(app),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_shellIconLoader(shellIconLoader),
-	m_config(config),
-	m_fontSetter(m_hwnd, config),
-	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)), config)
+	m_fontSetter(m_hwnd, m_app->GetConfig()),
+	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
+		m_app->GetConfig())
 {
 	Initialize(parent, iconResourceLoader, initialButtons);
 }
@@ -139,12 +139,12 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(
 		std::bind_front(&MainToolbar::OnBrowserInitialized, this)));
 
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+		std::bind_front(&MainToolbar::OnTabSelected, this), m_browserWindow));
+
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(
-				m_coreInterface->GetTabContainer()->tabSelectedSignal.AddObserver(
-					std::bind_front(&MainToolbar::OnTabSelected, this)));
 			m_connections.push_back(
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&MainToolbar::OnNavigationCommitted, this)));
@@ -152,9 +152,9 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 
 	m_connections.push_back(m_coreInterface->AddFocusChangeObserver(
 		std::bind_front(&MainToolbar::OnFocusChanged, this)));
-	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
+	m_connections.push_back(m_app->GetConfig()->useLargeToolbarIcons.addObserver(
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
-	m_connections.push_back(m_config->showFolders.addObserver(
+	m_connections.push_back(m_app->GetConfig()->showFolders.addObserver(
 		std::bind_front(&MainToolbar::OnShowFoldersUpdated, this)));
 
 	AddClipboardFormatListener(m_hwnd);
@@ -172,7 +172,7 @@ void MainToolbar::SetTooolbarImageList()
 {
 	HIMAGELIST himl;
 
-	if (m_config->useLargeToolbarIcons.get())
+	if (m_app->GetConfig()->useLargeToolbarIcons.get())
 	{
 		himl = m_imageListLarge.get();
 	}
@@ -327,7 +327,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 
 		int imagePosition;
 
-		if (m_config->useLargeToolbarIcons.get())
+		if (m_app->GetConfig()->useLargeToolbarIcons.get())
 		{
 			imagePosition = m_toolbarImageMapLarge.at(button);
 		}
@@ -349,7 +349,8 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 
 std::wstring MainToolbar::GetToolbarButtonText(MainToolbarButton button) const
 {
-	return ResourceHelper::LoadString(m_resourceInstance, LookupToolbarButtonTextID(button));
+	return ResourceHelper::LoadString(m_app->GetResourceInstance(),
+		LookupToolbarButtonTextID(button));
 }
 
 BYTE MainToolbar::LookupToolbarButtonExtraStyles(MainToolbarButton button) const
@@ -496,7 +497,7 @@ void MainToolbar::UpdateToolbarButtonImageIndexes()
 
 		int imagePosition;
 
-		if (m_config->useLargeToolbarIcons.get())
+		if (m_app->GetConfig()->useLargeToolbarIcons.get())
 		{
 			imagePosition = m_toolbarImageMapLarge.at(tbButton.idCommand);
 		}
@@ -589,7 +590,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 		if (entry)
 		{
 			std::wstring infoTipTemplate =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_BACK);
+				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_MAIN_TOOLBAR_BACK);
 			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
 				fmt::arg(L"folder_name",
 					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
@@ -603,7 +604,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 		if (entry)
 		{
 			std::wstring infoTipTemplate =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_FORWARD);
+				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_MAIN_TOOLBAR_FORWARD);
 			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
 				fmt::arg(L"folder_name",
 					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
@@ -645,7 +646,7 @@ std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 	}
 
 	std::wstring infoTipTemplate =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
+		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
 	std::wstring infoTip =
 		fmt::format(fmt::runtime(infoTipTemplate), fmt::arg(L"folder_name", parentName));
 
@@ -741,7 +742,8 @@ POINT MainToolbar::GetMenuPositionForButton(MainToolbarButton button)
 // or file selection.
 void MainToolbar::UpdateConfigDependentButtonStates()
 {
-	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders, m_config->showFolders.get());
+	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders,
+		m_app->GetConfig()->showFolders.get());
 }
 
 void MainToolbar::UpdateToolbarButtonStates()

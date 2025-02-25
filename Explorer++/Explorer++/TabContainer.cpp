@@ -116,8 +116,6 @@ void TabContainer::Initialize(HWND parent)
 	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this)));
 	m_connections.push_back(
-		tabSelectedSignal.AddObserver(std::bind_front(&TabContainer::OnTabSelected, this)));
-	m_connections.push_back(
 		tabRemovedSignal.AddObserver(std::bind_front(&TabContainer::OnTabRemoved, this)));
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
@@ -599,7 +597,7 @@ LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 			break;
 
 		case TCN_SELCHANGE:
-			tabSelectedSignal.m_signal(GetSelectedTab());
+			OnTabSelected(GetSelectedTab());
 			break;
 		}
 		break;
@@ -675,6 +673,8 @@ void TabContainer::OnTabSelected(const Tab &tab)
 	}
 
 	m_iPreviousTabSelectionId = tab.GetId();
+
+	m_app->GetGlobalTabEventDispatcher()->NotifySelected(tab);
 }
 
 void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
@@ -1013,7 +1013,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	{
 		TabCtrl_SetCurSel(m_hwnd, index);
 
-		tabSelectedSignal.m_signal(tab);
+		OnTabSelected(tab);
 	}
 
 	tabCreatedSignal.m_signal(tab.GetId(), selected);
@@ -1216,7 +1216,7 @@ void TabContainer::SelectTabAtIndex(int index)
 
 	TabCtrl_SetCurSel(m_hwnd, index);
 
-	tabSelectedSignal.m_signal(GetTabByIndex(index));
+	OnTabSelected(GetTabByIndex(index));
 }
 
 Tab &TabContainer::GetSelectedTab()

@@ -16,28 +16,26 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 
-MainWindow *MainWindow::Create(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
+MainWindow *MainWindow::Create(HWND hwnd, App *app, BrowserWindow *browser,
 	CoreInterface *coreInterface)
 {
-	return new MainWindow(hwnd, config, resourceInstance, coreInterface);
+	return new MainWindow(hwnd, app, browser, coreInterface);
 }
 
-MainWindow::MainWindow(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
-	CoreInterface *coreInterface) :
+MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterface *coreInterface) :
 	m_hwnd(hwnd),
-	m_config(config),
-	m_resourceInstance(resourceInstance),
+	m_app(app),
 	m_coreInterface(coreInterface)
 {
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainWindow::WndProc, this)));
 
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+		std::bind_front(&MainWindow::OnTabSelected, this), browser));
+
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(
-				m_coreInterface->GetTabContainer()->tabSelectedSignal.AddObserver(
-					std::bind_front(&MainWindow::OnTabSelected, this)));
 			m_connections.push_back(
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&MainWindow::OnNavigationCommitted, this)));
@@ -46,11 +44,11 @@ MainWindow::MainWindow(HWND hwnd, const Config *config, HINSTANCE resourceInstan
 					std::bind_front(&MainWindow::OnDirectoryPropertiesChanged, this)));
 		});
 
-	m_connections.push_back(m_config->showFullTitlePath.addObserver(
+	m_connections.push_back(m_app->GetConfig()->showFullTitlePath.addObserver(
 		std::bind_front(&MainWindow::OnShowFullTitlePathUpdated, this)));
-	m_connections.push_back(m_config->showUserNameInTitleBar.addObserver(
+	m_connections.push_back(m_app->GetConfig()->showUserNameInTitleBar.addObserver(
 		std::bind_front(&MainWindow::OnShowUserNameInTitleBarUpdated, this)));
-	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(
+	m_connections.push_back(m_app->GetConfig()->showPrivilegeLevelInTitleBar.addObserver(
 		std::bind_front(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this)));
 
 	// The main window is registered as a drop target only so that the drag image will be
@@ -131,7 +129,8 @@ void MainWindow::UpdateWindowText()
 
 	/* Don't show full paths for virtual folders (as only the folders
 	GUID will be shown). */
-	if (m_config->showFullTitlePath.get() && !tab.GetShellBrowserImpl()->InVirtualFolder())
+	if (m_app->GetConfig()->showFullTitlePath.get()
+		&& !tab.GetShellBrowserImpl()->InVirtualFolder())
 	{
 		GetDisplayName(pidlDirectory.get(), SHGDN_FORPARSING, folderDisplayName);
 	}
@@ -142,12 +141,13 @@ void MainWindow::UpdateWindowText()
 
 	std::wstring title = std::format(L"{} - {}", folderDisplayName, App::APP_NAME);
 
-	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
+	if (m_app->GetConfig()->showUserNameInTitleBar.get()
+		|| m_app->GetConfig()->showPrivilegeLevelInTitleBar.get())
 	{
 		title += L" [";
 	}
 
-	if (m_config->showUserNameInTitleBar.get())
+	if (m_app->GetConfig()->showUserNameInTitleBar.get())
 	{
 		TCHAR owner[512];
 		GetProcessOwner(GetCurrentProcessId(), owner, std::size(owner));
@@ -155,32 +155,32 @@ void MainWindow::UpdateWindowText()
 		title += owner;
 	}
 
-	if (m_config->showPrivilegeLevelInTitleBar.get())
+	if (m_app->GetConfig()->showPrivilegeLevelInTitleBar.get())
 	{
 		std::wstring privilegeLevel;
 
 		if (CheckGroupMembership(GroupType::Administrators))
 		{
-			privilegeLevel =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS);
+			privilegeLevel = ResourceHelper::LoadString(m_app->GetResourceInstance(),
+				IDS_PRIVILEGE_LEVEL_ADMINISTRATORS);
 		}
 		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
-			privilegeLevel =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_POWER_USERS);
+			privilegeLevel = ResourceHelper::LoadString(m_app->GetResourceInstance(),
+				IDS_PRIVILEGE_LEVEL_POWER_USERS);
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
 			privilegeLevel =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS);
+				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_PRIVILEGE_LEVEL_USERS);
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
-			privilegeLevel = ResourceHelper::LoadString(m_resourceInstance,
+			privilegeLevel = ResourceHelper::LoadString(m_app->GetResourceInstance(),
 				IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED);
 		}
 
-		if (m_config->showUserNameInTitleBar.get())
+		if (m_app->GetConfig()->showUserNameInTitleBar.get())
 		{
 			title += L" - ";
 		}
@@ -188,7 +188,8 @@ void MainWindow::UpdateWindowText()
 		title += privilegeLevel;
 	}
 
-	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
+	if (m_app->GetConfig()->showUserNameInTitleBar.get()
+		|| m_app->GetConfig()->showPrivilegeLevelInTitleBar.get())
 	{
 		title += L"]";
 	}

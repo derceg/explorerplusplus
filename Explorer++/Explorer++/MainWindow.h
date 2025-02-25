@@ -8,7 +8,8 @@
 #include "../Helper/DropTargetWindow.h"
 #include "../Helper/WinRTBaseWrapper.h"
 
-struct Config;
+class App;
+class BrowserWindow;
 class CoreInterface;
 class NavigationRequest;
 class WindowSubclass;
@@ -16,12 +17,11 @@ class WindowSubclass;
 class MainWindow : private DropTargetInternal
 {
 public:
-	static MainWindow *Create(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
+	static MainWindow *Create(HWND hwnd, App *app, BrowserWindow *browser,
 		CoreInterface *coreInterface);
 
 private:
-	MainWindow(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
-		CoreInterface *coreInterface);
+	MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterface *coreInterface);
 	~MainWindow() = default;
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -44,10 +44,9 @@ private:
 
 	void OnNcDestroy();
 
-	HWND m_hwnd;
-	const Config *const m_config;
-	HINSTANCE m_resourceInstance;
-	CoreInterface *m_coreInterface;
+	const HWND m_hwnd;
+	App *const m_app;
+	CoreInterface *const m_coreInterface;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

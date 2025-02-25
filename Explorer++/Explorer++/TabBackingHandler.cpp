@@ -56,13 +56,14 @@ void Explorerplusplus::OnTabsInitialized()
 	GetActivePane()->GetTabContainer()->tabUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
 
-	GetActivePane()->GetTabContainer()->tabSelectedSignal.AddObserver(
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
 		[this](const Tab &tab)
 		{
 			UNREFERENCED_PARAMETER(tab);
 
 			UpdateTabToolbar();
-		});
+		},
+		this));
 
 	GetActivePane()->GetTabContainer()->tabRemovedSignal.AddObserver(
 		[this](int tabId)

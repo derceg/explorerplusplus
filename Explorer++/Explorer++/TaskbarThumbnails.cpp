@@ -9,9 +9,10 @@
 
 #include "stdafx.h"
 #include "TaskbarThumbnails.h"
+#include "App.h"
+#include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -31,12 +32,11 @@ struct TabProxy
 };
 }
 
-TaskbarThumbnails::TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
-	HINSTANCE resourceInstance, const Config *config) :
-	m_coreInterface(coreInterface),
+TaskbarThumbnails::TaskbarThumbnails(App *app, BrowserWindow *browser, TabContainer *tabContainer) :
+	m_app(app),
+	m_browser(browser),
 	m_tabContainer(tabContainer),
-	m_instance(resourceInstance),
-	m_enabled(config->showTaskbarThumbnails)
+	m_enabled(app->GetConfig()->showTaskbarThumbnails)
 {
 	Initialize();
 }
@@ -65,7 +65,7 @@ void TaskbarThumbnails::Initialize()
 	ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP, MSGFLT_ADD);
 
 	// Subclass the main window until the above message (TaskbarButtonCreated) is caught.
-	m_mainWindowSubclass = std::make_unique<WindowSubclass>(m_coreInterface->GetMainWindow(),
+	m_mainWindowSubclass = std::make_unique<WindowSubclass>(m_browser->GetHWND(),
 		std::bind_front(&TaskbarThumbnails::MainWndProc, this));
 }
 
@@ -121,8 +121,8 @@ void TaskbarThumbnails::SetUpObservers()
 		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this)));
 	m_connections.push_back(m_tabContainer->tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnDirectoryPropertiesChanged, this)));
-	m_connections.push_back(m_tabContainer->tabSelectedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this), m_browser));
 	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this)));
 }
@@ -132,7 +132,7 @@ void TaskbarThumbnails::SetupJumplistTasks()
 	TCHAR szCurrentProcess[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, std::size(szCurrentProcess));
 
-	std::wstring name = ResourceHelper::LoadString(m_instance, IDS_TASKS_NEWTAB);
+	std::wstring name = ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_TASKS_NEWTAB);
 
 	/* New tab task. */
 	JumpListTaskInformation jlti;
@@ -260,14 +260,14 @@ void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, 
 {
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */
-	m_taskbarList->RegisterTab(hTabProxy, m_coreInterface->GetMainWindow());
+	m_taskbarList->RegisterTab(hTabProxy, m_browser->GetHWND());
 	m_taskbarList->SetTabOrder(hTabProxy, nullptr);
 
 	m_taskbarList->SetThumbnailTooltip(hTabProxy, szDisplayName);
 
 	if (bTabActive)
 	{
-		m_taskbarList->SetTabActive(hTabProxy, m_coreInterface->GetMainWindow(), 0);
+		m_taskbarList->SetTabActive(hTabProxy, m_browser->GetHWND(), 0);
 	}
 }
 
@@ -307,9 +307,9 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 	case WM_ACTIVATE:
 		/* Restore the main window if necessary, and switch
 		to the actual tab. */
-		if (IsIconic(m_coreInterface->GetMainWindow()))
+		if (IsIconic(m_browser->GetHWND()))
 		{
-			ShowWindow(m_coreInterface->GetMainWindow(), SW_RESTORE);
+			ShowWindow(m_browser->GetHWND(), SW_RESTORE);
 		}
 
 		m_tabContainer->SelectTab(*tab);
@@ -347,7 +347,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 
 	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
 	{
-		if (IsIconic(m_coreInterface->GetMainWindow()))
+		if (IsIconic(m_browser->GetHWND()))
 		{
 			/* TODO: Show an image here... */
 		}
@@ -357,12 +357,12 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 
 			RECT rcTab;
 			GetClientRect(tab->GetShellBrowserImpl()->GetListView(), &rcTab);
-			MapWindowPoints(tab->GetShellBrowserImpl()->GetListView(),
-				m_coreInterface->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
+			MapWindowPoints(tab->GetShellBrowserImpl()->GetListView(), m_browser->GetHWND(),
+				reinterpret_cast<LPPOINT>(&rcTab), 2);
 
 			MENUBARINFO mbi;
 			mbi.cbSize = sizeof(mbi);
-			GetMenuBarInfo(m_coreInterface->GetMainWindow(), OBJID_MENU, 0, &mbi);
+			GetMenuBarInfo(m_browser->GetHWND(), OBJID_MENU, 0, &mbi);
 
 			POINT ptOrigin;
 
@@ -387,7 +387,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 		{
 			/* If this is the last tab, we'll close
 			the whole application. */
-			SendMessage(m_coreInterface->GetMainWindow(), WM_CLOSE, 0, 0);
+			SendMessage(m_browser->GetHWND(), WM_CLOSE, 0, 0);
 		}
 		else
 		{
@@ -408,7 +408,7 @@ void TaskbarThumbnails::OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, 
 	/* If the main window is minimized, it won't be possible
 	to generate a thumbnail for any of the tabs. In that
 	case, use a static 'No Preview Available' bitmap. */
-	if (IsIconic(m_coreInterface->GetMainWindow()))
+	if (IsIconic(m_browser->GetHWND()))
 	{
 		hbmTab.reset(static_cast<HBITMAP>(LoadImage(GetModuleHandle(nullptr),
 			MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE), IMAGE_BITMAP, 0, 0, 0)));
@@ -424,7 +424,7 @@ void TaskbarThumbnails::OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, 
 	GetBitmapDimensionEx(hbmTab.get(), &currentSize);
 
 	/* Shrink the bitmap. */
-	wil::unique_hdc_window hdc = wil::GetDC(m_coreInterface->GetMainWindow());
+	wil::unique_hdc_window hdc = wil::GetDC(m_browser->GetHWND());
 	wil::unique_hdc hdcSrc(CreateCompatibleDC(hdc.get()));
 
 	auto previousTabBitmap = wil::SelectObject(hdcSrc.get(), hbmTab.get());
@@ -468,11 +468,11 @@ void TaskbarThumbnails::OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, 
 
 wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 {
-	wil::unique_hdc_window hdc = wil::GetDC(m_coreInterface->GetMainWindow());
+	wil::unique_hdc_window hdc = wil::GetDC(m_browser->GetHWND());
 	wil::unique_hdc hdcSrc(CreateCompatibleDC(hdc.get()));
 
 	RECT rcMain;
-	GetClientRect(m_coreInterface->GetMainWindow(), &rcMain);
+	GetClientRect(m_browser->GetHWND(), &rcMain);
 
 	/* Any bitmap sent back to the operating system will need to be in 32-bit
 	ARGB format. */
@@ -511,7 +511,7 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 		ShowWindow(tab.GetShellBrowserImpl()->GetListView(), SW_HIDE);
 	}
 
-	MapWindowPoints(tab.GetShellBrowserImpl()->GetListView(), m_coreInterface->GetMainWindow(),
+	MapWindowPoints(tab.GetShellBrowserImpl()->GetListView(), m_browser->GetHWND(),
 		reinterpret_cast<LPPOINT>(&rcTab), 2);
 	BitBlt(hdcSrc.get(), rcTab.left, rcTab.top, GetRectWidth(&rcTab), GetRectHeight(&rcTab),
 		hdcTabSrc.get(), 0, 0, SRCCOPY);
@@ -606,7 +606,7 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 				}
 			}
 
-			m_taskbarList->SetTabActive(tabProxyInfo.hProxy, m_coreInterface->GetMainWindow(), 0);
+			m_taskbarList->SetTabActive(tabProxyInfo.hProxy, m_browser->GetHWND(), 0);
 			break;
 		}
 	}

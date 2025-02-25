@@ -138,7 +138,6 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabSelectedSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryContentsChangedSignal;

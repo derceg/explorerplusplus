@@ -370,6 +370,9 @@
     <ClCompile Include="NavigationRequestTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="GlobalTabEventDispatcherTest.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
