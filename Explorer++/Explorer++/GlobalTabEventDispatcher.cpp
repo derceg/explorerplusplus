@@ -7,6 +7,23 @@
 #include "BrowserWindow.h"
 #include "Tab.h"
 
+boost::signals2::connection GlobalTabEventDispatcher::AddCreatedObserver(
+	const CreatedSignal::slot_type &observer, BrowserWindow *browser,
+	boost::signals2::connect_position position)
+{
+	return m_createdSignal.connect(
+		[browserId = GetIdFromBrowser(browser), observer](const Tab &tab, bool selected)
+		{
+			if (!DoesBrowserMatch(browserId, tab))
+			{
+				return;
+			}
+
+			observer(tab, selected);
+		},
+		position);
+}
+
 boost::signals2::connection GlobalTabEventDispatcher::AddSelectedObserver(
 	const SelectedSignal::slot_type &observer, BrowserWindow *browser,
 	boost::signals2::connect_position position)
@@ -59,6 +76,11 @@ bool GlobalTabEventDispatcher::DoesBrowserMatch(std::optional<int> browserId, co
 	}
 
 	return *browserId == tab.GetBrowser()->GetId();
+}
+
+void GlobalTabEventDispatcher::NotifyCreated(const Tab &tab, bool selected)
+{
+	m_createdSignal(tab, selected);
 }
 
 void GlobalTabEventDispatcher::NotifySelected(const Tab &tab)

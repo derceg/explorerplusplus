@@ -6,21 +6,28 @@
 
 class AcceleratorUpdater;
 class CoreInterface;
+class GlobalTabEventDispatcher;
 class TabContainer;
 class UiTheming;
 
 namespace Plugins
 {
+
 class PluginCommandManager;
 class PluginMenuManager;
+
 }
 
-__interface PluginInterface
+class PluginInterface
 {
-	CoreInterface *GetCoreInterface();
-	TabContainer *GetTabContainer();
-	Plugins::PluginMenuManager *GetPluginMenuManager();
-	UiTheming *GetUiTheming();
-	AcceleratorUpdater *GetAccleratorUpdater();
-	Plugins::PluginCommandManager *GetPluginCommandManager();
+public:
+	virtual ~PluginInterface() = default;
+
+	virtual CoreInterface *GetCoreInterface() = 0;
+	virtual GlobalTabEventDispatcher *GetGlobalTabEventDispatcher() = 0;
+	virtual TabContainer *GetTabContainer() = 0;
+	virtual Plugins::PluginMenuManager *GetPluginMenuManager() = 0;
+	virtual UiTheming *GetUiTheming() = 0;
+	virtual AcceleratorUpdater *GetAccleratorUpdater() = 0;
+	virtual Plugins::PluginCommandManager *GetPluginCommandManager() = 0;
 };

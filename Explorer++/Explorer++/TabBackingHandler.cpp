@@ -39,22 +39,15 @@ void Explorerplusplus::CreateTabBacking()
 	m_tabToolbarTooltipFontSetter = std::make_unique<MainFontSetter>(
 		reinterpret_cast<HWND>(SendMessage(m_hTabWindowToolbar, TB_GETTOOLTIPS, 0, 0)), m_config);
 
-	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
-}
-
-void Explorerplusplus::OnTabsInitialized()
-{
-	GetActivePane()->GetTabContainer()->tabCreatedSignal.AddObserver(
-		[this](int tabId, BOOL switchToNewTab)
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+		[this](const Tab &tab, bool selected)
 		{
-			UNREFERENCED_PARAMETER(tabId);
-			UNREFERENCED_PARAMETER(switchToNewTab);
+			UNREFERENCED_PARAMETER(tab);
+			UNREFERENCED_PARAMETER(selected);
 
 			UpdateTabToolbar();
-		});
-
-	GetActivePane()->GetTabContainer()->tabUpdatedSignal.AddObserver(
-		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
+		},
+		this));
 
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
 		[this](const Tab &tab)
@@ -64,6 +57,14 @@ void Explorerplusplus::OnTabsInitialized()
 			UpdateTabToolbar();
 		},
 		this));
+
+	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
+}
+
+void Explorerplusplus::OnTabsInitialized()
+{
+	GetActivePane()->GetTabContainer()->tabUpdatedSignal.AddObserver(
+		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
 
 	GetActivePane()->GetTabContainer()->tabRemovedSignal.AddObserver(
 		[this](int tabId)

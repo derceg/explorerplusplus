@@ -104,7 +104,7 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 
 	for (const auto &tab : m_tabContainer->GetAllTabsInOrder())
 	{
-		CreateTabProxy(tab.get().GetId(), m_tabContainer->IsTabSelected(tab.get()));
+		CreateTabProxy(tab.get(), m_tabContainer->IsTabSelected(tab.get()));
 	}
 
 	SetUpObservers();
@@ -115,8 +115,8 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 // enabled and the functionality is available.
 void TaskbarThumbnails::SetUpObservers()
 {
-	m_connections.push_back(m_tabContainer->tabCreatedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this), m_browser));
 	m_connections.push_back(m_tabContainer->tabNavigationCommittedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this)));
 	m_connections.push_back(m_tabContainer->tabDirectoryPropertiesChangedSignal.AddObserver(
@@ -175,7 +175,7 @@ References:
 http://dotnet.dzone.com/news/windows-7-taskbar-tabbed
 http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exercise-Experiment-with-the-New-Windows-7-Taskbar-Features/
 */
-void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
+void TaskbarThumbnails::CreateTabProxy(const Tab &tab, bool selected)
 {
 	static int proxyCount = 0;
 	std::wstring proxyClassName = std::format(L"Explorer++TabProxy{}", proxyCount++);
@@ -189,7 +189,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 
 	TabProxy *ptp = new TabProxy();
 	ptp->taskbarThumbnails = this;
-	ptp->iTabId = iTabId;
+	ptp->iTabId = tab.GetId();
 
 	HWND hTabProxy = CreateWindow(proxyClassName.c_str(), L"", WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
 		nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
@@ -202,16 +202,15 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 	BOOL bValue = TRUE;
 	DwmSetWindowAttribute(hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue, sizeof(BOOL));
 	DwmSetWindowAttribute(hTabProxy, DWMWA_HAS_ICONIC_BITMAP, &bValue, sizeof(BOOL));
-	RegisterTab(hTabProxy, L"", bSwitchToNewTab);
+	RegisterTab(hTabProxy, L"", selected);
 
 	TabProxyInfo tpi;
 	tpi.hProxy = hTabProxy;
-	tpi.iTabId = iTabId;
+	tpi.iTabId = tab.GetId();
 	tpi.atomClass = aRet;
 
 	m_TabProxyList.push_back(std::move(tpi));
 
-	const Tab &tab = m_tabContainer->GetTab(iTabId);
 	SetTabProxyIcon(tab);
 	UpdateTaskbarThumbnailTitle(tab);
 }

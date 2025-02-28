@@ -996,6 +996,11 @@ CoreInterface *Explorerplusplus::GetCoreInterface()
 	return this;
 }
 
+GlobalTabEventDispatcher *Explorerplusplus::GetGlobalTabEventDispatcher()
+{
+	return m_app->GetGlobalTabEventDispatcher();
+}
+
 TabContainer *Explorerplusplus::GetTabContainer() const
 {
 	return GetActivePane()->GetTabContainer();

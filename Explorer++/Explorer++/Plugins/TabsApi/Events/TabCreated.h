@@ -6,22 +6,25 @@
 
 #include "Plugins/Event.h"
 
-class TabContainer;
+class GlobalTabEventDispatcher;
+class Tab;
 
 namespace Plugins
 {
+
 class TabCreated : public Event
 {
 public:
-	TabCreated(TabContainer *tabContainer);
+	TabCreated(GlobalTabEventDispatcher *globalTabEventDispatcher);
 
 protected:
 	boost::signals2::connection connectObserver(sol::protected_function observer,
 		sol::this_state state) override;
 
 private:
-	void onTabCreated(int tabId, sol::protected_function observer);
+	void onTabCreated(const Tab &tab, sol::protected_function observer);
 
-	TabContainer *m_tabContainer;
+	GlobalTabEventDispatcher *const m_globalTabEventDispatcher;
 };
+
 }

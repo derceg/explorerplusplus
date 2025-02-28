@@ -68,7 +68,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	SetFocus(m_hActiveListView);
 
-	m_uiTheming = std::make_unique<UiTheming>(this, GetActivePane()->GetTabContainer());
+	m_uiTheming = std::make_unique<UiTheming>(m_app, this, GetActivePane()->GetTabContainer());
 
 	InitializePlugins();
 

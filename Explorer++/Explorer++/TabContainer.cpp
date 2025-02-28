@@ -109,8 +109,6 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 
-	m_connections.push_back(
-		tabCreatedSignal.AddObserver(std::bind_front(&TabContainer::OnTabCreated, this)));
 	m_connections.push_back(tabNavigationCommittedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnNavigationCommitted, this)));
 	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
@@ -644,15 +642,14 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 	dispInfo->lpszText = tabToolTip;
 }
 
-void TabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
+void TabContainer::OnTabCreated(const Tab &tab, bool selected)
 {
-	UNREFERENCED_PARAMETER(tabId);
-	UNREFERENCED_PARAMETER(switchToNewTab);
-
 	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() > 1))
 	{
 		m_coreInterface->ShowTabBar();
 	}
+
+	m_app->GetGlobalTabEventDispatcher()->NotifyCreated(tab, selected);
 }
 
 void TabContainer::OnTabRemoved(int tabId)
@@ -1016,7 +1013,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		OnTabSelected(tab);
 	}
 
-	tabCreatedSignal.m_signal(tab.GetId(), selected);
+	OnTabCreated(tab, selected);
 
 	return tab;
 }

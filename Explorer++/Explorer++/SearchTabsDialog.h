@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 
+class App;
 class CoreInterface;
 class SearchTabsDialog;
 class Tab;
@@ -31,8 +32,7 @@ private:
 class SearchTabsDialog : public ThemedDialog
 {
 public:
-	static SearchTabsDialog *Create(HINSTANCE resourceInstance, HWND parent,
-		ThemeManager *themeManager, CoreInterface *coreInterface);
+	static SearchTabsDialog *Create(App *app, HWND parent, CoreInterface *coreInterface);
 
 private:
 	enum class ColumnType
@@ -62,8 +62,7 @@ private:
 	static inline const Column COLUMNS[] = { { ColumnType::TabName, 0.3f },
 		{ ColumnType::Path, 0.7f } };
 
-	SearchTabsDialog(HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager,
-		CoreInterface *coreInterface);
+	SearchTabsDialog(App *app, HWND parent, CoreInterface *coreInterface);
 
 	INT_PTR OnInitDialog() override;
 	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
@@ -94,7 +93,8 @@ private:
 	void SaveState() override;
 	INT_PTR OnNcDestroy() override;
 
-	CoreInterface *m_coreInterface;
+	App *const m_app;
+	CoreInterface *const m_coreInterface;
 	std::unique_ptr<WindowSubclass> m_editSubclass;
 	static inline std::wstring m_filter;
 	std::vector<boost::signals2::scoped_connection> m_connections;

@@ -21,8 +21,8 @@ void Explorerplusplus::InitializeTabs()
 		m_app->GetResourceInstance(), m_config);
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
 
-	tabContainer->tabCreatedSignal.AddObserver(
-		std::bind_front(&Explorerplusplus::OnTabCreated, this), boost::signals2::at_front);
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+		std::bind_front(&Explorerplusplus::OnTabCreated, this), this, boost::signals2::at_front));
 	tabContainer->tabNavigationStartedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
 		boost::signals2::at_front);
@@ -62,11 +62,9 @@ void Explorerplusplus::InitializeTabs()
 	m_tabsInitializedSignal();
 }
 
-void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
+void Explorerplusplus::OnTabCreated(const Tab &tab, bool selected)
 {
-	UNREFERENCED_PARAMETER(switchToNewTab);
-
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
+	UNREFERENCED_PARAMETER(selected);
 
 	/* TODO: This subclass needs to be removed. */
 	SetWindowSubclass(tab.GetShellBrowserImpl()->GetListView(), ListViewProcStub, 0,

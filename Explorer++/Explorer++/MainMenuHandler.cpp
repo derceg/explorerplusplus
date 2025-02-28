@@ -138,7 +138,8 @@ void Explorerplusplus::OnRunScript()
 void Explorerplusplus::OnShowOptions()
 {
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"OptionsDialog",
-		[this] {
+		[this]
+		{
 			return new OptionsDialog(m_app->GetResourceInstance(), m_hContainer, m_app, m_config,
 				this);
 		});
@@ -147,11 +148,7 @@ void Explorerplusplus::OnShowOptions()
 void Explorerplusplus::OnSearchTabs()
 {
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchTabsDialog",
-		[this]
-		{
-			return SearchTabsDialog::Create(m_app->GetResourceInstance(), m_hContainer,
-				m_app->GetThemeManager(), this);
-		});
+		[this] { return SearchTabsDialog::Create(m_app, m_hContainer, this); });
 }
 
 void Explorerplusplus::OnOpenOnlineDocumentation()

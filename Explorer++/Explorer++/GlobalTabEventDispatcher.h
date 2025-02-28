@@ -26,6 +26,7 @@ class Tab;
 class GlobalTabEventDispatcher : private boost::noncopyable
 {
 public:
+	using CreatedSignal = boost::signals2::signal<void(const Tab &tab, bool selected)>;
 	using SelectedSignal = boost::signals2::signal<void(const Tab &tab)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 
@@ -33,6 +34,9 @@ public:
 	// only be notified of events that occur within that window. If no BrowserWindow is provided,
 	// the observer will be triggered for all events that occur, regardless of which window they
 	// occur in.
+	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
+		BrowserWindow *browser = nullptr,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddSelectedObserver(const SelectedSignal::slot_type &observer,
 		BrowserWindow *browser = nullptr,
 		boost::signals2::connect_position position = boost::signals2::at_back);
@@ -40,6 +44,7 @@ public:
 		BrowserWindow *browser = nullptr,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
+	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
 	void NotifyPreRemoval(const Tab &tab, int index);
 
@@ -47,6 +52,7 @@ private:
 	static std::optional<int> GetIdFromBrowser(BrowserWindow *browser);
 	static bool DoesBrowserMatch(std::optional<int> browserId, const Tab &tab);
 
+	CreatedSignal m_createdSignal;
 	SelectedSignal m_selectedSignal;
 	PreRemovalSignal m_preRemovalSignal;
 };

@@ -42,7 +42,7 @@ private:
 	void SetUpObservers();
 	void SetupJumplistTasks();
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
-	void CreateTabProxy(int iTabId, BOOL bSwitchToNewTab);
+	void CreateTabProxy(const Tab &tab, bool selected);
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
 	void RemoveTabProxy(int iTabId);
 	void DestroyTabProxy(TabProxyInfo &tabProxy);

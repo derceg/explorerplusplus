@@ -321,7 +321,7 @@ private:
 	void InitializeTabs();
 	boost::signals2::connection AddTabsInitializedObserver(
 		const TabsInitializedSignal::slot_type &observer) override;
-	void OnTabCreated(int tabId, BOOL switchToNewTab);
+	void OnTabCreated(const Tab &tab, bool selected);
 	void OnTabSelected(const Tab &tab);
 	void ShowTabBar() override;
 	void HideTabBar() override;
@@ -341,6 +341,7 @@ private:
 
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;
+	GlobalTabEventDispatcher *GetGlobalTabEventDispatcher() override;
 	TabContainer *GetTabContainer() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;
 	UiTheming *GetUiTheming() override;

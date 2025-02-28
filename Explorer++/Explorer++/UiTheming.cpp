@@ -4,25 +4,24 @@
 
 #include "stdafx.h"
 #include "UiTheming.h"
+#include "App.h"
 #include "CoreInterface.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "Tab.h"
 #include "TabContainer.h"
 
-UiTheming::UiTheming(CoreInterface *coreInterface, TabContainer *tabContainer) :
+UiTheming::UiTheming(App *app, CoreInterface *coreInterface, TabContainer *tabContainer) :
 	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)
 {
-	m_connections.emplace_back(m_tabContainer->tabCreatedSignal.AddObserver(
+	m_connections.emplace_back(app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
 		std::bind_front(&UiTheming::OnTabCreated, this)));
 }
 
-void UiTheming::OnTabCreated(int tabId, BOOL switchToNewTab)
+void UiTheming::OnTabCreated(const Tab &tab, bool selected)
 {
-	UNREFERENCED_PARAMETER(switchToNewTab);
-
-	const Tab &tab = m_tabContainer->GetTab(tabId);
+	UNREFERENCED_PARAMETER(selected);
 
 	if (m_customListViewColorsApplied)
 	{

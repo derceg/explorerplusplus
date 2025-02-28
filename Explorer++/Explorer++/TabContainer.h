@@ -125,7 +125,6 @@ public:
 	std::vector<TabStorageData> GetStorageData() const;
 
 	// Signals
-	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationStartedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
@@ -214,7 +213,7 @@ private:
 	void ShowBackgroundContextMenu(const POINT &ptClient);
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
-	void OnTabCreated(int tabId, BOOL switchToNewTab);
+	void OnTabCreated(const Tab &tab, bool selected);
 	void OnTabRemoved(int tabId);
 
 	void OnTabSelected(const Tab &tab);

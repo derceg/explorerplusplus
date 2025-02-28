@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SearchTabsDialog.h"
+#include "App.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceManager.h"
@@ -16,16 +17,15 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <glog/logging.h>
 
-SearchTabsDialog *SearchTabsDialog::Create(HINSTANCE resourceInstance, HWND parent,
-	ThemeManager *themeManager, CoreInterface *coreInterface)
+SearchTabsDialog *SearchTabsDialog::Create(App *app, HWND parent, CoreInterface *coreInterface)
 {
-	return new SearchTabsDialog(resourceInstance, parent, themeManager, coreInterface);
+	return new SearchTabsDialog(app, parent, coreInterface);
 }
 
-SearchTabsDialog::SearchTabsDialog(HINSTANCE resourceInstance, HWND parent,
-	ThemeManager *themeManager, CoreInterface *coreInterface) :
-	ThemedDialog(resourceInstance, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both,
-		themeManager),
+SearchTabsDialog::SearchTabsDialog(App *app, HWND parent, CoreInterface *coreInterface) :
+	ThemedDialog(app->GetResourceInstance(), IDD_SEARCH_TABS, parent,
+		BaseDialog::DialogSizingType::Both, app->GetThemeManager()),
+	m_app(app),
 	m_coreInterface(coreInterface),
 	m_persistentSettings(&SearchTabsDialogPersistentSettings::GetInstance())
 {
@@ -36,7 +36,7 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	SetupListView();
 	SetupEditControl();
 
-	m_connections.push_back(m_coreInterface->GetTabContainer()->tabCreatedSignal.AddObserver(
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
 	m_connections.push_back(
 		m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(

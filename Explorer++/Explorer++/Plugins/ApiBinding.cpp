@@ -19,7 +19,8 @@
 #include "UiTheming.h"
 #include <sol/sol.hpp>
 
-void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabContainer *tabContainer);
+void BindTabsAPI(sol::state &state, CoreInterface *coreInterface,
+	GlobalTabEventDispatcher *globalTabEventDispatcher, TabContainer *tabContainer);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state,
@@ -34,13 +35,15 @@ int deny(lua_State *state);
 
 void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface)
 {
-	BindTabsAPI(state, pluginInterface->GetCoreInterface(), pluginInterface->GetTabContainer());
+	BindTabsAPI(state, pluginInterface->GetCoreInterface(),
+		pluginInterface->GetGlobalTabEventDispatcher(), pluginInterface->GetTabContainer());
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
 	BindUiApi(state, pluginInterface->GetUiTheming());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabContainer *tabContainer)
+void BindTabsAPI(sol::state &state, CoreInterface *coreInterface,
+	GlobalTabEventDispatcher *globalTabEventDispatcher, TabContainer *tabContainer)
 {
 	std::shared_ptr<Plugins::TabsApi> tabsApi =
 		std::make_shared<Plugins::TabsApi>(coreInterface, tabContainer);
@@ -57,7 +60,7 @@ void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabContainer *
 	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
 	std::shared_ptr<Plugins::TabCreated> tabCreated =
-		std::make_shared<Plugins::TabCreated>(tabContainer);
+		std::make_shared<Plugins::TabCreated>(globalTabEventDispatcher);
 	BindObserverMethods(state, tabsMetaTable, "onCreated", tabCreated);
 
 	std::shared_ptr<Plugins::TabMoved> tabMoved = std::make_shared<Plugins::TabMoved>(tabContainer);
