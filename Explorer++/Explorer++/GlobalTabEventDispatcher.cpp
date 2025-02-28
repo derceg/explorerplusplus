@@ -61,6 +61,24 @@ boost::signals2::connection GlobalTabEventDispatcher::AddSelectedObserver(
 		position);
 }
 
+boost::signals2::connection GlobalTabEventDispatcher::AddMovedObserver(
+	const MovedSignal::slot_type &observer, const TabEventScope &scope,
+	boost::signals2::connect_position position)
+{
+	return m_movedSignal.connect(
+		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab, int fromIndex,
+			int toIndex)
+		{
+			if (!DoesBrowserMatch(browserId, tab))
+			{
+				return;
+			}
+
+			observer(tab, fromIndex, toIndex);
+		},
+		position);
+}
+
 boost::signals2::connection GlobalTabEventDispatcher::AddPreRemovalObserver(
 	const PreRemovalSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
@@ -106,6 +124,11 @@ void GlobalTabEventDispatcher::NotifyCreated(const Tab &tab, bool selected)
 void GlobalTabEventDispatcher::NotifySelected(const Tab &tab)
 {
 	m_selectedSignal(tab);
+}
+
+void GlobalTabEventDispatcher::NotifyMoved(const Tab &tab, int fromIndex, int toIndex)
+{
+	m_movedSignal(tab, fromIndex, toIndex);
 }
 
 void GlobalTabEventDispatcher::NotifyPreRemoval(const Tab &tab, int index)

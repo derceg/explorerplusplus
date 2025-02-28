@@ -254,7 +254,8 @@ void TabContainer::OnTabCtrlLButtonUp()
 	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
 	{
 		const Tab &tab = GetTabByIndex(m_draggedTabEndIndex);
-		tabMovedSignal.m_signal(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
+		m_app->GetGlobalTabEventDispatcher()->NotifyMoved(tab, m_draggedTabStartIndex,
+			m_draggedTabEndIndex);
 	}
 }
 

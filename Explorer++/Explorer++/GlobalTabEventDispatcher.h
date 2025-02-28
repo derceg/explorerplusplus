@@ -44,6 +44,7 @@ class GlobalTabEventDispatcher : private boost::noncopyable
 public:
 	using CreatedSignal = boost::signals2::signal<void(const Tab &tab, bool selected)>;
 	using SelectedSignal = boost::signals2::signal<void(const Tab &tab)>;
+	using MovedSignal = boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
@@ -52,12 +53,16 @@ public:
 	boost::signals2::connection AddSelectedObserver(const SelectedSignal::slot_type &observer,
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
+	boost::signals2::connection AddMovedObserver(const MovedSignal::slot_type &observer,
+		const TabEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddPreRemovalObserver(const PreRemovalSignal::slot_type &observer,
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
+	void NotifyMoved(const Tab &tab, int fromIndex, int toIndex);
 	void NotifyPreRemoval(const Tab &tab, int index);
 
 private:
@@ -66,5 +71,6 @@ private:
 
 	CreatedSignal m_createdSignal;
 	SelectedSignal m_selectedSignal;
+	MovedSignal m_movedSignal;
 	PreRemovalSignal m_preRemovalSignal;
 };
