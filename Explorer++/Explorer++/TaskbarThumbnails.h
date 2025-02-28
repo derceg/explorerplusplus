@@ -44,7 +44,7 @@ private:
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
 	void CreateTabProxy(const Tab &tab, bool selected);
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
-	void RemoveTabProxy(int iTabId);
+	void RemoveTabProxy(const Tab &tab);
 	void DestroyTabProxy(TabProxyInfo &tabProxy);
 	void OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, int maxWidth, int maxHeight);
 	wil::unique_hbitmap CaptureTabScreenshot(const Tab &tab);

@@ -113,8 +113,6 @@ void TabContainer::Initialize(HWND parent)
 		std::bind_front(&TabContainer::OnNavigationCommitted, this)));
 	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this)));
-	m_connections.push_back(
-		tabRemovedSignal.AddObserver(std::bind_front(&TabContainer::OnTabRemoved, this)));
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
 		std::bind_front(&TabContainer::OnAlwaysShowTabBarUpdated, this)));
@@ -503,10 +501,9 @@ void TabContainer::OnRefreshAllTabs()
 	}
 }
 
-void TabContainer::OnRenameTab(const Tab &tab)
+void TabContainer::OnRenameTab(Tab &tab)
 {
-	RenameTabDialog renameTabDialog(m_resourceInstance, m_coreInterface->GetMainWindow(),
-		m_app->GetThemeManager(), tab.GetId(), this);
+	RenameTabDialog renameTabDialog(m_coreInterface->GetMainWindow(), m_app, &tab);
 	renameTabDialog.ShowModalDialog();
 }
 
@@ -653,14 +650,14 @@ void TabContainer::OnTabCreated(const Tab &tab, bool selected)
 	m_app->GetGlobalTabEventDispatcher()->NotifyCreated(tab, selected);
 }
 
-void TabContainer::OnTabRemoved(int tabId)
+void TabContainer::OnTabRemoved(const Tab &tab)
 {
-	UNREFERENCED_PARAMETER(tabId);
-
 	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() == 1))
 	{
 		m_coreInterface->HideTabBar();
 	}
+
+	m_app->GetGlobalTabEventDispatcher()->NotifyRemoved(tab);
 }
 
 void TabContainer::OnTabSelected(const Tab &tab)
@@ -1081,14 +1078,15 @@ bool TabContainer::CloseTab(const Tab &tab)
 		m_coreInterface->GetDirectoryMonitor()->StopDirectoryMonitor(*dirMonitorId);
 	}
 
-	// This is needed, as the erase() call below will remove the element
-	// from the tabs container (which will invalidate the reference
-	// passed to the function).
-	int tabId = tab.GetId();
+	// Taking ownership of the tab here will ensure it's still live when the observers are notified
+	// below.
+	auto itr = m_tabs.find(tab.GetId());
+	CHECK(itr != m_tabs.end());
+	auto ownedTab = std::move(*itr);
 
-	m_tabs.erase(tab.GetId());
+	m_tabs.erase(itr);
 
-	tabRemovedSignal.m_signal(tabId);
+	OnTabRemoved(tab);
 
 	return true;
 }

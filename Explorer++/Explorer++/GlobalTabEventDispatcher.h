@@ -46,6 +46,7 @@ public:
 	using SelectedSignal = boost::signals2::signal<void(const Tab &tab)>;
 	using MovedSignal = boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
+	using RemovedSignal = boost::signals2::signal<void(const Tab &tab)>;
 
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
@@ -59,11 +60,15 @@ public:
 	boost::signals2::connection AddPreRemovalObserver(const PreRemovalSignal::slot_type &observer,
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
+	boost::signals2::connection AddRemovedObserver(const RemovedSignal::slot_type &observer,
+		const TabEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
 	void NotifyMoved(const Tab &tab, int fromIndex, int toIndex);
 	void NotifyPreRemoval(const Tab &tab, int index);
+	void NotifyRemoved(const Tab &tab);
 
 private:
 	static std::optional<int> GetIdFromBrowser(const BrowserWindow *browser);
@@ -73,4 +78,5 @@ private:
 	SelectedSignal m_selectedSignal;
 	MovedSignal m_movedSignal;
 	PreRemovalSignal m_preRemovalSignal;
+	RemovedSignal m_removedSignal;
 };

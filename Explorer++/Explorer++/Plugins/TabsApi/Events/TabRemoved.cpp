@@ -4,17 +4,25 @@
 
 #include "stdafx.h"
 #include "Plugins/TabsApi/Events/TabRemoved.h"
-#include "TabContainer.h"
+#include "GlobalTabEventDispatcher.h"
+#include "Tab.h"
 #include <sol/sol.hpp>
 
-Plugins::TabRemoved::TabRemoved(TabContainer *tabContainer) : m_tabContainer(tabContainer)
+namespace Plugins
+{
+
+TabRemoved::TabRemoved(GlobalTabEventDispatcher *globalTabEventDispatcher) :
+	m_globalTabEventDispatcher(globalTabEventDispatcher)
 {
 }
 
-boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_function observer,
+boost::signals2::connection TabRemoved::connectObserver(sol::protected_function observer,
 	sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabContainer->tabRemovedSignal.AddObserver(observer);
+	return m_globalTabEventDispatcher->AddRemovedObserver([observer](const Tab &tab)
+		{ observer(tab.GetId()); }, TabEventScope::Global());
+}
+
 }

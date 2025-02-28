@@ -125,8 +125,9 @@ void TaskbarThumbnails::SetUpObservers()
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
 		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this),
 		TabEventScope::ForBrowser(m_browser)));
-	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this),
+		TabEventScope::ForBrowser(m_browser)));
 }
 
 void TaskbarThumbnails::SetupJumplistTasks()
@@ -217,14 +218,15 @@ void TaskbarThumbnails::CreateTabProxy(const Tab &tab, bool selected)
 	UpdateTaskbarThumbnailTitle(tab);
 }
 
-void TaskbarThumbnails::RemoveTabProxy(int iTabId)
+void TaskbarThumbnails::RemoveTabProxy(const Tab &tab)
 {
 	auto tabProxy = std::find_if(m_TabProxyList.begin(), m_TabProxyList.end(),
-		[iTabId](const TabProxyInfo &currentTabProxy) { return currentTabProxy.iTabId == iTabId; });
+		[&tab](const TabProxyInfo &currentTabProxy)
+		{ return currentTabProxy.iTabId == tab.GetId(); });
 
 	if (tabProxy == m_TabProxyList.end())
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 

@@ -34,6 +34,7 @@ protected:
 	MockFunction<void(const Tab &tab)> m_tabSelectedCallback;
 	MockFunction<void(const Tab &tab, int fromIndex, int toIndex)> m_tabMovedCallback;
 	MockFunction<void(const Tab &tab, int index)> m_tabPreRemovalCallback;
+	MockFunction<void(const Tab &tab)> m_tabRemovedCallback;
 };
 
 TEST_F(GlobalTabEventDispatcherTest, Signals)
@@ -55,11 +56,17 @@ TEST_F(GlobalTabEventDispatcherTest, Signals)
 		TabEventScope::Global());
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
+	m_dispatcher.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(), TabEventScope::Global());
+	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab2)));
+	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab1)));
+
 	m_dispatcher.NotifyCreated(m_tab1, true);
 	m_dispatcher.NotifyCreated(m_tab2, false);
 	m_dispatcher.NotifySelected(m_tab1);
 	m_dispatcher.NotifyMoved(m_tab2, 1, 2);
 	m_dispatcher.NotifyPreRemoval(m_tab2, 0);
+	m_dispatcher.NotifyRemoved(m_tab2);
+	m_dispatcher.NotifyRemoved(m_tab1);
 }
 
 TEST_F(GlobalTabEventDispatcherTest, SignalsFilteredByBrowser)
@@ -85,6 +92,10 @@ TEST_F(GlobalTabEventDispatcherTest, SignalsFilteredByBrowser)
 		TabEventScope::ForBrowser(&m_browser2));
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
+	m_dispatcher.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser1));
+	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab1)));
+
 	m_dispatcher.NotifyCreated(m_tab1, false);
 	m_dispatcher.NotifyCreated(m_tab2, false);
 
@@ -96,4 +107,7 @@ TEST_F(GlobalTabEventDispatcherTest, SignalsFilteredByBrowser)
 
 	m_dispatcher.NotifyPreRemoval(m_tab1, 0);
 	m_dispatcher.NotifyPreRemoval(m_tab2, 0);
+
+	m_dispatcher.NotifyRemoved(m_tab1);
+	m_dispatcher.NotifyRemoved(m_tab2);
 }

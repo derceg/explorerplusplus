@@ -4,31 +4,29 @@
 
 #include "stdafx.h"
 #include "RenameTabDialog.h"
+#include "App.h"
 #include "MainResource.h"
-#include "TabContainer.h"
 #include "../Helper/WindowHelper.h"
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
-RenameTabDialog::RenameTabDialog(HINSTANCE resourceInstance, HWND hParent,
-	ThemeManager *themeManager, int tabId, TabContainer *tabContainer) :
-	ThemedDialog(resourceInstance, IDD_RENAMETAB, hParent, DialogSizingType::None, themeManager),
-	m_tabId(tabId),
-	m_tabContainer(tabContainer)
+RenameTabDialog::RenameTabDialog(HWND parent, App *app, Tab *tab) :
+	ThemedDialog(app->GetResourceInstance(), IDD_RENAMETAB, parent, DialogSizingType::None,
+		app->GetThemeManager()),
+	m_tab(tab)
 {
 	m_prtdps = &RenameTabDialogPersistentSettings::GetInstance();
 
-	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
-		std::bind_front(&RenameTabDialog::OnTabClosed, this)));
+	m_connections.push_back(app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+		std::bind_front(&RenameTabDialog::OnTabClosed, this),
+		TabEventScope::ForBrowser(m_tab->GetBrowser())));
 }
 
 INT_PTR RenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
-	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
-
-	SetWindowText(hEditName, tab->GetName().c_str());
+	SetWindowText(hEditName, m_tab->GetName().c_str());
 
 	/* When this dialog is opened, the 'custom name' option will
 	be selected by default (whether or not that is the actual
@@ -95,18 +93,16 @@ void RenameTabDialog::OnOk()
 {
 	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg, IDC_RENAMETAB_USEFOLDERNAME);
 
-	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
-
 	if (uCheckStatus == BST_CHECKED)
 	{
-		tab->ClearCustomName();
+		m_tab->ClearCustomName();
 	}
 	else
 	{
 		HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
 		std::wstring tabText = GetWindowString(hEditName);
-		tab->SetCustomName(tabText);
+		m_tab->SetCustomName(tabText);
 	}
 
 	EndDialog(m_hDlg, 1);
@@ -117,13 +113,12 @@ void RenameTabDialog::OnCancel()
 	EndDialog(m_hDlg, 0);
 }
 
-void RenameTabDialog::OnTabClosed(int tabId)
+void RenameTabDialog::OnTabClosed(const Tab &tab)
 {
-	if (tabId == m_tabId)
+	if (&tab == m_tab)
 	{
-		// Although tabs can't be closed from the user interface while
-		// this dialog is open, plugins can close tabs at any time,
-		// meaning the tab this dialog is renaming could be closed while
+		// Although tabs can't be closed from the user interface while this dialog is open, plugins
+		// can close tabs at any time, meaning the tab this dialog is renaming could be closed while
 		// the dialog is open.
 		EndDialog(m_hDlg, 0);
 	}

@@ -58,6 +58,15 @@ void Explorerplusplus::CreateTabBacking()
 		},
 		TabEventScope::ForBrowser(this)));
 
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+		[this](const Tab &tab)
+		{
+			UNREFERENCED_PARAMETER(tab);
+
+			UpdateTabToolbar();
+		},
+		TabEventScope::ForBrowser(this)));
+
 	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }
 
@@ -65,14 +74,6 @@ void Explorerplusplus::OnTabsInitialized()
 {
 	GetActivePane()->GetTabContainer()->tabUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
-
-	GetActivePane()->GetTabContainer()->tabRemovedSignal.AddObserver(
-		[this](int tabId)
-		{
-			UNREFERENCED_PARAMETER(tabId);
-
-			UpdateTabToolbar();
-		});
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)

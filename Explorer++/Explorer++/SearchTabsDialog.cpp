@@ -48,8 +48,8 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddMovedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_coreInterface->GetTabContainer()->tabRemovedSignal.AddObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 
 	SendMessage(m_hDlg, WM_NEXTDLGCTL,
 		reinterpret_cast<WPARAM>(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM)), true);

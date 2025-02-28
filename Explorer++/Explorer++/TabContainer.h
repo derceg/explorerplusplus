@@ -136,7 +136,6 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationsStoppedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
-	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryContentsChangedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryPropertiesChangedSignal;
@@ -203,7 +202,7 @@ private:
 	void OnOpenParentInNewTab(const Tab &tab);
 	void OnRefreshTab(Tab &tab);
 	void OnRefreshAllTabs();
-	void OnRenameTab(const Tab &tab);
+	void OnRenameTab(Tab &tab);
 	void OnLockTab(Tab &tab);
 	void OnLockTabAndAddress(Tab &tab);
 	void OnCloseOtherTabs(int index);
@@ -213,7 +212,7 @@ private:
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
 	void OnTabCreated(const Tab &tab, bool selected);
-	void OnTabRemoved(int tabId);
+	void OnTabRemoved(const Tab &tab);
 
 	void OnTabSelected(const Tab &tab);
 

@@ -96,6 +96,23 @@ boost::signals2::connection GlobalTabEventDispatcher::AddPreRemovalObserver(
 		position);
 }
 
+boost::signals2::connection GlobalTabEventDispatcher::AddRemovedObserver(
+	const RemovedSignal::slot_type &observer, const TabEventScope &scope,
+	boost::signals2::connect_position position)
+{
+	return m_removedSignal.connect(
+		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab)
+		{
+			if (!DoesBrowserMatch(browserId, tab))
+			{
+				return;
+			}
+
+			observer(tab);
+		},
+		position);
+}
+
 std::optional<int> GlobalTabEventDispatcher::GetIdFromBrowser(const BrowserWindow *browser)
 {
 	if (!browser)
@@ -134,4 +151,9 @@ void GlobalTabEventDispatcher::NotifyMoved(const Tab &tab, int fromIndex, int to
 void GlobalTabEventDispatcher::NotifyPreRemoval(const Tab &tab, int index)
 {
 	m_preRemovalSignal(tab, index);
+}
+
+void GlobalTabEventDispatcher::NotifyRemoved(const Tab &tab)
+{
+	m_removedSignal(tab);
 }

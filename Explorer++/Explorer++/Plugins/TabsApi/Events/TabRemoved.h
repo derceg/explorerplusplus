@@ -6,20 +6,22 @@
 
 #include "Plugins/Event.h"
 
-class TabContainer;
+class GlobalTabEventDispatcher;
 
 namespace Plugins
 {
+
 class TabRemoved : public Event
 {
 public:
-	TabRemoved(TabContainer *tabContainer);
+	TabRemoved(GlobalTabEventDispatcher *globalTabEventDispatcher);
 
 protected:
 	boost::signals2::connection connectObserver(sol::protected_function observer,
 		sol::this_state state) override;
 
 private:
-	TabContainer *m_tabContainer;
+	GlobalTabEventDispatcher *const m_globalTabEventDispatcher;
 };
+
 }

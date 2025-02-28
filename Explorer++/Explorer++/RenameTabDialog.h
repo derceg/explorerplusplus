@@ -7,8 +7,9 @@
 #include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 
+class App;
 class RenameTabDialog;
-class TabContainer;
+class Tab;
 
 class RenameTabDialogPersistentSettings : public DialogSettings
 {
@@ -29,8 +30,7 @@ private:
 class RenameTabDialog : public ThemedDialog
 {
 public:
-	RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager, int tabId,
-		TabContainer *tabContainer);
+	RenameTabDialog(HWND parent, App *app, Tab *tab);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -45,12 +45,11 @@ private:
 	void OnOk();
 	void OnCancel();
 
-	void OnTabClosed(int tabId);
+	void OnTabClosed(const Tab &tab);
 
 	RenameTabDialogPersistentSettings *m_prtdps;
 
-	int m_tabId;
-	TabContainer *m_tabContainer;
+	Tab *const m_tab;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

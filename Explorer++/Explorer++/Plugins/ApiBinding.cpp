@@ -72,7 +72,7 @@ void BindTabsAPI(sol::state &state, CoreInterface *coreInterface,
 	BindObserverMethods(state, tabsMetaTable, "onUpdated", tabUpdated);
 
 	std::shared_ptr<Plugins::TabRemoved> tabRemoved =
-		std::make_shared<Plugins::TabRemoved>(tabContainer);
+		std::make_shared<Plugins::TabRemoved>(globalTabEventDispatcher);
 	BindObserverMethods(state, tabsMetaTable, "onRemoved", tabRemoved);
 
 	// clang-format off
