@@ -47,7 +47,7 @@ void Explorerplusplus::CreateTabBacking()
 
 			UpdateTabToolbar();
 		},
-		this));
+		TabEventScope::ForBrowser(this)));
 
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
 		[this](const Tab &tab)
@@ -56,7 +56,7 @@ void Explorerplusplus::CreateTabBacking()
 
 			UpdateTabToolbar();
 		},
-		this));
+		TabEventScope::ForBrowser(this)));
 
 	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }

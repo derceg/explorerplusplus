@@ -13,7 +13,7 @@ TabRestorer::TabRestorer(GlobalTabEventDispatcher *globalTabEventDispatcher,
 	m_browserList(browserList)
 {
 	m_connections.push_back(globalTabEventDispatcher->AddPreRemovalObserver(
-		std::bind_front(&TabRestorer::OnTabPreRemoval, this)));
+		std::bind_front(&TabRestorer::OnTabPreRemoval, this), TabEventScope::Global()));
 }
 
 void TabRestorer::OnTabPreRemoval(const Tab &tab, int index)

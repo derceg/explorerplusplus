@@ -27,7 +27,8 @@ boost::signals2::connection TabCreated::connectObserver(sol::protected_function 
 			UNREFERENCED_PARAMETER(selected);
 
 			onTabCreated(tab, observer);
-		});
+		},
+		TabEventScope::Global());
 }
 
 void TabCreated::onTabCreated(const Tab &tab, sol::protected_function observer)

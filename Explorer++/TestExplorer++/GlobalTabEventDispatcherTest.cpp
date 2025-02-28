@@ -39,14 +39,16 @@ TEST_F(GlobalTabEventDispatcherTest, Signals)
 {
 	InSequence seq;
 
-	m_dispatcher.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction());
+	m_dispatcher.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), true));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab2), false));
 
-	m_dispatcher.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction());
+	m_dispatcher.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
+		TabEventScope::Global());
 	EXPECT_CALL(m_tabSelectedCallback, Call(Ref(m_tab1)));
 
-	m_dispatcher.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction());
+	m_dispatcher.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
+		TabEventScope::Global());
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
 	m_dispatcher.NotifyCreated(m_tab1, true);
@@ -61,14 +63,17 @@ TEST_F(GlobalTabEventDispatcherTest, SignalsFilteredByBrowser)
 
 	// The observer here should only be triggered when a tab event in m_browser1 occurs. That is,
 	// only when m_tab1 is created.
-	m_dispatcher.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(), &m_browser1);
+	m_dispatcher.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser1));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), false));
 
-	m_dispatcher.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(), &m_browser1);
+	m_dispatcher.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser1));
 	EXPECT_CALL(m_tabSelectedCallback, Call(Ref(m_tab1)));
 
 	// Likewise, the observer here should only be triggered when a tab event in m_browser2 occurs.
-	m_dispatcher.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(), &m_browser2);
+	m_dispatcher.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser2));
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
 	m_dispatcher.NotifyCreated(m_tab1, false);

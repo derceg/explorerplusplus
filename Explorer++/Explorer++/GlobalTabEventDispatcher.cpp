@@ -7,12 +7,32 @@
 #include "BrowserWindow.h"
 #include "Tab.h"
 
+TabEventScope TabEventScope::ForBrowser(BrowserWindow *browser)
+{
+	DCHECK(browser != nullptr);
+	return TabEventScope(browser);
+}
+
+TabEventScope TabEventScope::Global()
+{
+	return TabEventScope(nullptr);
+}
+
+const BrowserWindow *TabEventScope::GetBrowser() const
+{
+	return m_browser;
+}
+
+TabEventScope::TabEventScope(BrowserWindow *browser) : m_browser(browser)
+{
+}
+
 boost::signals2::connection GlobalTabEventDispatcher::AddCreatedObserver(
-	const CreatedSignal::slot_type &observer, BrowserWindow *browser,
+	const CreatedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
 	return m_createdSignal.connect(
-		[browserId = GetIdFromBrowser(browser), observer](const Tab &tab, bool selected)
+		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab, bool selected)
 		{
 			if (!DoesBrowserMatch(browserId, tab))
 			{
@@ -25,11 +45,11 @@ boost::signals2::connection GlobalTabEventDispatcher::AddCreatedObserver(
 }
 
 boost::signals2::connection GlobalTabEventDispatcher::AddSelectedObserver(
-	const SelectedSignal::slot_type &observer, BrowserWindow *browser,
+	const SelectedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
 	return m_selectedSignal.connect(
-		[browserId = GetIdFromBrowser(browser), observer](const Tab &tab)
+		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab)
 		{
 			if (!DoesBrowserMatch(browserId, tab))
 			{
@@ -42,11 +62,11 @@ boost::signals2::connection GlobalTabEventDispatcher::AddSelectedObserver(
 }
 
 boost::signals2::connection GlobalTabEventDispatcher::AddPreRemovalObserver(
-	const PreRemovalSignal::slot_type &observer, BrowserWindow *browser,
+	const PreRemovalSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
 	return m_preRemovalSignal.connect(
-		[browserId = GetIdFromBrowser(browser), observer](const Tab &tab, int index)
+		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab, int index)
 		{
 			if (!DoesBrowserMatch(browserId, tab))
 			{
@@ -58,7 +78,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddPreRemovalObserver(
 		position);
 }
 
-std::optional<int> GlobalTabEventDispatcher::GetIdFromBrowser(BrowserWindow *browser)
+std::optional<int> GlobalTabEventDispatcher::GetIdFromBrowser(const BrowserWindow *browser)
 {
 	if (!browser)
 	{

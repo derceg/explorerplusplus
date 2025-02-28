@@ -31,7 +31,7 @@ MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterfac
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainWindow::WndProc, this)));
 
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
-		std::bind_front(&MainWindow::OnTabSelected, this), browser));
+		std::bind_front(&MainWindow::OnTabSelected, this), TabEventScope::ForBrowser(browser)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]

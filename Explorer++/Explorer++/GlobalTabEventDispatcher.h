@@ -10,6 +10,22 @@
 class BrowserWindow;
 class Tab;
 
+// When adding an observer, this class can be used to indicate when the observer should be triggered
+// - on all tab events, or only those that occur in a specific browser window.
+class TabEventScope
+{
+public:
+	static TabEventScope ForBrowser(BrowserWindow *browser);
+	static TabEventScope Global();
+
+	const BrowserWindow *GetBrowser() const;
+
+private:
+	TabEventScope(BrowserWindow *browser);
+
+	const BrowserWindow *const m_browser;
+};
+
 // When there are multiple browser windows, subscribing to tab events globally becomes more
 // difficult. For example, to be notified of tab events in all windows, a class would have to
 // subscribe both to tab events in a window, as well as window creation events (to allow
@@ -30,18 +46,14 @@ public:
 	using SelectedSignal = boost::signals2::signal<void(const Tab &tab)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 
-	// For each of the functions below, if a BrowserWindow instance is provided, the observer will
-	// only be notified of events that occur within that window. If no BrowserWindow is provided,
-	// the observer will be triggered for all events that occur, regardless of which window they
-	// occur in.
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
-		BrowserWindow *browser = nullptr,
+		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddSelectedObserver(const SelectedSignal::slot_type &observer,
-		BrowserWindow *browser = nullptr,
+		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddPreRemovalObserver(const PreRemovalSignal::slot_type &observer,
-		BrowserWindow *browser = nullptr,
+		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	void NotifyCreated(const Tab &tab, bool selected);
@@ -49,7 +61,7 @@ public:
 	void NotifyPreRemoval(const Tab &tab, int index);
 
 private:
-	static std::optional<int> GetIdFromBrowser(BrowserWindow *browser);
+	static std::optional<int> GetIdFromBrowser(const BrowserWindow *browser);
 	static bool DoesBrowserMatch(std::optional<int> browserId, const Tab &tab);
 
 	CreatedSignal m_createdSignal;

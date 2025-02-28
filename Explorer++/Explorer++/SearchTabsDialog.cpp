@@ -37,7 +37,7 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	SetupEditControl();
 
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
+		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 	m_connections.push_back(
 		m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 			std::bind(&SearchTabsDialog::OnTabsChanged, this)));
