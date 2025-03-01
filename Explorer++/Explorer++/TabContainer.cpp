@@ -1150,7 +1150,9 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 
 Tab &TabContainer::GetTab(int tabId)
 {
-	return *m_tabs.at(tabId);
+	auto *tab = GetTabOptional(tabId);
+	CHECK(tab);
+	return *tab;
 }
 
 Tab *TabContainer::GetTabOptional(int tabId)
