@@ -130,6 +130,8 @@ protected:
 
 	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
 		m_tabNavigationStartedCallback;
+	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
+		m_tabNavigationCommittedCallback;
 };
 
 TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
@@ -145,6 +147,13 @@ TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
 	EXPECT_CALL(m_tabNavigationStartedCallback,
 		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
 	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
+
+	m_dispatcher.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
+		TabEventScope::Global());
+	EXPECT_CALL(m_tabNavigationCommittedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
+	EXPECT_CALL(m_tabNavigationCommittedCallback,
 		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
 
 	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
@@ -163,6 +172,11 @@ TEST_F(GlobalTabEventDispatcherNavigationSignalTest, SignalsFilteredByBrowser)
 		TabEventScope::ForBrowser(&m_browser1));
 	EXPECT_CALL(m_tabNavigationStartedCallback,
 		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
+
+	m_dispatcher.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser2));
+	EXPECT_CALL(m_tabNavigationCommittedCallback,
+		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
 
 	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
 	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);

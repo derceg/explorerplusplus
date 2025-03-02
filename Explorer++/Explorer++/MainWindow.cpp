@@ -32,13 +32,13 @@ MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterfac
 
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
 		std::bind_front(&MainWindow::OnTabSelected, this), TabEventScope::ForBrowser(browser)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+		std::bind_front(&MainWindow::OnNavigationCommitted, this),
+		TabEventScope::ForBrowser(browser)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(
-				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
-					std::bind_front(&MainWindow::OnNavigationCommitted, this)));
 			m_connections.push_back(
 				m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
 					std::bind_front(&MainWindow::OnDirectoryPropertiesChanged, this)));

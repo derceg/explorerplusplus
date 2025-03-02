@@ -27,8 +27,9 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationStartedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
 		TabEventScope::ForBrowser(this), boost::signals2::at_front));
-	tabContainer->tabNavigationCommittedSignal.AddObserver(
-		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this), boost::signals2::at_front);
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
+		TabEventScope::ForBrowser(this), boost::signals2::at_front));
 	tabContainer->tabNavigationFailedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationFailedStatusBar, this),
 		boost::signals2::at_front);

@@ -55,6 +55,8 @@ public:
 
 	using NavigationStartedSignal =
 		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
+	using NavigationCommittedSignal =
+		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
 
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
@@ -75,6 +77,9 @@ public:
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer, const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
@@ -93,6 +98,7 @@ private:
 	RemovedSignal m_removedSignal;
 
 	NavigationStartedSignal m_navigationStartedSignal;
+	NavigationCommittedSignal m_navigationCommittedSignal;
 
 	WeakPtrFactory<GlobalTabEventDispatcher> m_weakPtrFactory{ this };
 };

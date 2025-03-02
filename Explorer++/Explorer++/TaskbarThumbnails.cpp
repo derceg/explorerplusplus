@@ -118,8 +118,9 @@ void TaskbarThumbnails::SetUpObservers()
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
 		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this),
 		TabEventScope::ForBrowser(m_browser)));
-	m_connections.push_back(m_tabContainer->tabNavigationCommittedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this),
+		TabEventScope::ForBrowser(m_browser)));
 	m_connections.push_back(m_tabContainer->tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnDirectoryPropertiesChanged, this)));
 	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(

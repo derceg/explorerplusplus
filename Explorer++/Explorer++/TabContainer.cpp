@@ -109,8 +109,9 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 
-	m_connections.push_back(tabNavigationCommittedSignal.AddObserver(
-		std::bind_front(&TabContainer::OnNavigationCommitted, this)));
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+		std::bind_front(&TabContainer::OnNavigationCommitted, this),
+		TabEventScope::ForBrowser(m_browser)));
 	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this)));
 
@@ -958,10 +959,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		// a selected tab), regardless of what the caller passes in.
 		selected = true;
 	}
-
-	tab.GetShellBrowserImpl()->AddNavigationCommittedObserver(
-		[this, &tab](const NavigationRequest *request)
-		{ tabNavigationCommittedSignal.m_signal(tab, request); });
 
 	tab.GetShellBrowserImpl()->AddNavigationFailedObserver(
 		[this, &tab](const NavigationRequest *request)
