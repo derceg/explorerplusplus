@@ -43,6 +43,21 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
 		tabNavigation, history, currentEntry);
+
+	ChangeToInitialFolder();
+}
+
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
+	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
+	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
+		folderSettings, initialColumns)
+{
+	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
+		tabNavigation, initialPidl);
+
+	ChangeToInitialFolder();
 }
 
 ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
@@ -63,8 +78,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 		app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
 			? app->GetRuntime()->GetUiThreadExecutor()
 			: app->GetRuntime()->GetInlineExecutor()),
-	m_navigationController(
-		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation)),
 	m_progressCursor(LoadCursor(nullptr, IDC_APPSTARTING)),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
@@ -228,6 +241,15 @@ void ShellBrowserImpl::InitializeListView()
 	{
 		ListView_EnableGroupView(m_hListView, true);
 	}
+}
+
+void ShellBrowserImpl::ChangeToInitialFolder()
+{
+	// This class always needs to represent a folder. Therefore, it's necessary to immediately
+	// switch to a folder, in this case, the folder represented by the current entry. Normally, this
+	// is only done once a navigation commits.
+	auto *currentEntry = m_navigationController->GetCurrentEntry();
+	ChangeFolders(currentEntry->GetPidl());
 }
 
 bool ShellBrowserImpl::GetAutoArrange() const

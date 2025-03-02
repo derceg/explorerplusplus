@@ -31,16 +31,7 @@
 
 void ShellBrowserImpl::OnNavigationStarted(const NavigationRequest *request)
 {
-	if (!m_folderVisited)
-	{
-		// This is the first navigation. As this class always represents a folder, it's necessary to
-		// immediately switch to the folder for the initial navigation. Normally, this is only done
-		// once the navigation commits.
-		// Note that this path can be taken both when a new tab is created and the initial
-		// navigation occurs, as well as when a tab is restored and a navigation to the current
-		// entry occurs.
-		ChangeFolders(request->GetNavigateParams().pidl);
-	}
+	UNREFERENCED_PARAMETER(request);
 
 	RecalcWindowCursor(m_hListView);
 }
@@ -110,12 +101,6 @@ void ShellBrowserImpl::ClearPendingResults()
 void ShellBrowserImpl::StoreCurrentlySelectedItems()
 {
 	auto *entry = m_navigationController->GetCurrentEntry();
-
-	if (!entry)
-	{
-		return;
-	}
-
 	auto selectedItems = GetSelectedItemPidls();
 	entry->SetSelectedItems(selectedItems);
 }
@@ -505,10 +490,9 @@ void ShellBrowserImpl::AddNavigationItems(const NavigationRequest *request,
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	// A history entry should be created when the navigation is committed, so there should always be
-	// a current entry here, and that entry should be for the current navigation.
-	auto currentEntry = m_navigationController->GetCurrentEntry();
-	CHECK(currentEntry);
+	// A history entry should be created when the navigation is committed, so the current entry
+	// should always be for the current navigation.
+	auto *currentEntry = m_navigationController->GetCurrentEntry();
 	DCHECK(currentEntry->GetPidl() == request->GetNavigateParams().pidl);
 
 	SelectItems(currentEntry->GetSelectedItems());

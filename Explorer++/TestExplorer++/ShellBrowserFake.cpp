@@ -29,7 +29,8 @@ ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
 		enumerationExecutor ? enumerationExecutor : m_inlineExecutor,
 		originalExecutor ? originalExecutor : m_inlineExecutor),
 	m_navigationController(
-		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation))
+		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation,
+			CreateSimplePidlForTest(L"c:\\initial_path", nullptr, ShellItemType::Folder)))
 {
 }
 

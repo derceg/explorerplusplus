@@ -32,15 +32,12 @@ protected:
 	ShellBrowserFake m_shellBrowser;
 };
 
-TEST_F(ShellNavigationControllerTest, Refresh)
+TEST_F(ShellNavigationControllerTest, RefreshInitialEntry)
 {
 	auto *navigationController = GetNavigationController();
 
-	// Shouldn't be able to refresh when no navigation has occurred yet.
-	navigationController->Refresh();
-	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 0);
-
-	m_shellBrowser.NavigateToPath(L"C:\\Fake");
+	auto initialEntry = navigationController->GetCurrentEntry();
+	auto initialEntryPidl = initialEntry->GetPidl();
 
 	navigationController->Refresh();
 
@@ -48,6 +45,31 @@ TEST_F(ShellNavigationControllerTest, Refresh)
 	EXPECT_FALSE(navigationController->CanGoBack());
 	EXPECT_FALSE(navigationController->CanGoForward());
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
+
+	auto updatedEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(updatedEntry, nullptr);
+	EXPECT_EQ(updatedEntry->GetInitialNavigationType(),
+		HistoryEntry::InitialNavigationType::NonInitial);
+	EXPECT_FALSE(updatedEntry->IsInitialEntry());
+	EXPECT_EQ(updatedEntry->GetPidl(), initialEntryPidl);
+}
+
+TEST_F(ShellNavigationControllerTest, RefreshSubsequentEntry)
+{
+	auto *navigationController = GetNavigationController();
+
+	PidlAbsolute pidl;
+	m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::AddEntry, &pidl);
+
+	navigationController->Refresh();
+
+	EXPECT_FALSE(navigationController->CanGoBack());
+	EXPECT_FALSE(navigationController->CanGoForward());
+	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
+
+	auto updatedEntry = navigationController->GetCurrentEntry();
+	ASSERT_NE(updatedEntry, nullptr);
+	EXPECT_EQ(updatedEntry->GetPidl(), pidl);
 }
 
 TEST_F(ShellNavigationControllerTest, NavigateToSameFolder)
@@ -230,11 +252,14 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 {
 	auto *navigationController = GetNavigationController();
 
-	auto entry = navigationController->GetCurrentEntry();
-	EXPECT_EQ(entry, nullptr);
+	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
 
-	entry = navigationController->GetEntryAtIndex(0);
-	EXPECT_EQ(entry, nullptr);
+	// There should always be a current entry.
+	auto entry = navigationController->GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+
+	EXPECT_EQ(navigationController->GetIndexOfEntry(entry), 0);
+	EXPECT_EQ(navigationController->GetEntryById(entry->GetId()), entry);
 
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
@@ -453,41 +478,11 @@ TEST_F(ShellNavigationControllerTest, SlotOrdering)
 	m_shellBrowser.NavigateToPath(L"C:\\Fake");
 }
 
-class ShellNavigationControllerAsyncTest : public Test
+TEST_F(ShellNavigationControllerTest, FirstNavigation)
 {
-protected:
-	ShellNavigationControllerAsyncTest() :
-		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
-		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
-		m_shellBrowser(&m_tabNavigation, m_manualExecutorBackground, m_manualExecutorCurrent)
-	{
-	}
-
-	~ShellNavigationControllerAsyncTest()
-	{
-		m_manualExecutorBackground->shutdown();
-		m_manualExecutorCurrent->shutdown();
-	}
-
-	ShellNavigationController *GetNavigationController() const
-	{
-		return m_shellBrowser.GetNavigationController();
-	}
-
-	TabNavigationMock m_tabNavigation;
-	std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorBackground;
-	std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorCurrent;
-	ShellBrowserFake m_shellBrowser;
-};
-
-TEST_F(ShellNavigationControllerAsyncTest, InitialNavigation)
-{
-	PidlAbsolute pidl;
-	m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl);
-
 	auto *navigationController = GetNavigationController();
 
-	// An initial entry should be added, regardless of the history entry type requested.
+	// There should always be an initial entry.
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
 
@@ -495,16 +490,13 @@ TEST_F(ShellNavigationControllerAsyncTest, InitialNavigation)
 	ASSERT_NE(entry, nullptr);
 	EXPECT_EQ(entry->GetInitialNavigationType(), HistoryEntry::InitialNavigationType::Initial);
 	EXPECT_TRUE(entry->IsInitialEntry());
-	EXPECT_EQ(entry->GetPidl(), pidl);
 	int originalEntryId = entry->GetId();
 
-	// This will cause the pending enumeration to complete and should result in the initial entry
-	// being replaced. There should still only be a single entry.
-	m_manualExecutorBackground->loop(std::numeric_limits<size_t>::max());
-	m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
-	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 1);
-	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
+	PidlAbsolute pidl;
+	m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl);
 
+	// The navigation above should result in the initial entry being replaced. There should still
+	// only be a single entry.
 	auto updatedEntry = navigationController->GetCurrentEntry();
 	ASSERT_NE(updatedEntry, nullptr);
 	EXPECT_NE(updatedEntry->GetId(), originalEntryId);

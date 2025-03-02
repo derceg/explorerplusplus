@@ -24,7 +24,6 @@ std::vector<PidlAbsolute> TabParentItemsMenu::GetParentPidlCollection(
 	const ShellBrowser *shellBrowser)
 {
 	auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
-	CHECK(currentEntry);
 
 	std::vector<PidlAbsolute> pidls;
 	auto currentPidl = currentEntry->GetPidl();

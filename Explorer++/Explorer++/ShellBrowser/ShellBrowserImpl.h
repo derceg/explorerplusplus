@@ -80,8 +80,8 @@ public:
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
 		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
+		FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
@@ -392,8 +392,14 @@ private:
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
+	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
+
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
+	void ChangeToInitialFolder();
 	int GenerateUniqueItemId();
 	void MarkItemAsCut(int item, bool cut);
 	void VerifySortMode();

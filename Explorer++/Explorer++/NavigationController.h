@@ -18,9 +18,15 @@ public:
 
 	NavigationController(std::vector<std::unique_ptr<HistoryEntryType>> &&entries,
 		int currentEntry) :
-		m_entries(std::move(entries)),
-		m_currentEntry(currentEntry)
+		m_entries(std::move(entries))
 	{
+		// This constructor should only be called with at least one entry. Passing in an empty set
+		// of entries isn't valid. It's necessary to validate this before initializing
+		// `m_currentEntry` below, since the `std::clamp` call won't be valid if the set of entries
+		// is empty (lo will be greater than hi, which will cause undefined behavior).
+		CHECK(!m_entries.empty());
+
+		m_currentEntry = std::clamp(currentEntry, 0, static_cast<int>(m_entries.size() - 1));
 	}
 
 	virtual ~NavigationController() = default;

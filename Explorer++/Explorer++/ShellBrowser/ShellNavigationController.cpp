@@ -11,11 +11,14 @@
 #include "../Helper/ShellHelper.h"
 
 ShellNavigationController::ShellNavigationController(NavigationManager *navigationManager,
-	TabNavigationInterface *tabNavigation) :
+	TabNavigationInterface *tabNavigation, const PidlAbsolute &initialPidl) :
 	m_navigationManager(navigationManager),
 	m_tabNavigation(tabNavigation)
 {
 	Initialize();
+
+	AddEntry(
+		std::make_unique<HistoryEntry>(initialPidl, HistoryEntry::InitialNavigationType::Initial));
 }
 
 ShellNavigationController::ShellNavigationController(NavigationManager *navigationManager,
@@ -30,9 +33,6 @@ ShellNavigationController::ShellNavigationController(NavigationManager *navigati
 
 void ShellNavigationController::Initialize()
 {
-	m_connections.emplace_back(m_navigationManager->AddNavigationStartedObserver(
-		std::bind_front(&ShellNavigationController::OnNavigationStarted, this),
-		boost::signals2::at_front, NavigationManager::SlotGroup::HighestPriority));
 	m_connections.emplace_back(m_navigationManager->AddNavigationCommittedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
 		boost::signals2::at_front, NavigationManager::SlotGroup::HighestPriority));
@@ -52,17 +52,6 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationStarted(const NavigationRequest *request)
-{
-	if (!GetCurrentEntry())
-	{
-		// There is no current entry, so this is the very first navigation. An initial entry should
-		// be added.
-		AddEntry(std::make_unique<HistoryEntry>(request->GetNavigateParams().pidl.Raw(),
-			HistoryEntry::InitialNavigationType::Initial));
-	}
-}
-
 void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *request,
 	const std::vector<PidlChild> &items)
 {
@@ -70,10 +59,7 @@ void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *r
 
 	auto historyEntryType = request->GetNavigateParams().historyEntryType;
 
-	// An initial entry should always be added when a navigation starts, so there should always be a
-	// current entry at this point.
 	auto *currentEntry = GetCurrentEntry();
-	CHECK(currentEntry);
 
 	// If the current entry is the initial entry, it should be replaced, regardless of the requested
 	// history entry type.
@@ -110,7 +96,7 @@ void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *r
 	if (historyEntryType == HistoryEntryType::AddEntry
 		|| historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
-		auto entry = std::make_unique<HistoryEntry>(request->GetNavigateParams().pidl.Raw());
+		auto entry = std::make_unique<HistoryEntry>(request->GetNavigateParams().pidl);
 
 		if (historyEntryType == HistoryEntryType::AddEntry)
 		{
@@ -129,23 +115,12 @@ void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *r
 bool ShellNavigationController::CanGoUp() const
 {
 	auto *currentEntry = GetCurrentEntry();
-
-	if (!currentEntry)
-	{
-		return false;
-	}
-
 	return !IsNamespaceRoot(currentEntry->GetPidl().Raw());
 }
 
 void ShellNavigationController::GoUp()
 {
 	auto *currentEntry = GetCurrentEntry();
-
-	if (!currentEntry)
-	{
-		return;
-	}
 
 	unique_pidl_absolute pidlParent;
 	HRESULT hr = GetVirtualParentPath(currentEntry->GetPidl().Raw(), wil::out_param(pidlParent));
@@ -162,12 +137,6 @@ void ShellNavigationController::GoUp()
 void ShellNavigationController::Refresh()
 {
 	auto *currentEntry = GetCurrentEntry();
-
-	if (!currentEntry)
-	{
-		return;
-	}
-
 	auto navigateParams = NavigateParams::History(currentEntry);
 	Navigate(navigateParams);
 }
@@ -194,7 +163,7 @@ void ShellNavigationController::Navigate(const std::wstring &path)
 
 void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 {
-	auto currentEntry = GetCurrentEntry();
+	auto *currentEntry = GetCurrentEntry();
 	HistoryEntry *targetEntry = nullptr;
 
 	if (navigateParams.navigationType == NavigationType::History)
@@ -210,15 +179,14 @@ void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	// the current tab, regardless of whether or not the tab is locked. The only exception is a
 	// navigation to a history entry, except the current history entry (navigating to the current
 	// history entry is an explicit refresh).
-	if (currentEntry && targetEntry == currentEntry
-		&& currentEntry->GetPidl() == navigateParams.pidl)
+	if (targetEntry == currentEntry && currentEntry->GetPidl() == navigateParams.pidl)
 	{
 		navigateParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 		navigateParams.overrideNavigationTargetMode = true;
 	}
 
-	if (m_navigationTargetMode == NavigationTargetMode::ForceNewTab && currentEntry
-		&& !navigateParams.overrideNavigationTargetMode)
+	if (m_navigationTargetMode == NavigationTargetMode::ForceNewTab
+		&& !currentEntry->IsInitialEntry() && !navigateParams.overrideNavigationTargetMode)
 	{
 		m_tabNavigation->CreateNewTab(navigateParams, true);
 		return;

@@ -897,7 +897,7 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 
 	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
 		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
-		folderSettingsFinal, initialColumns);
+		navigateParams.pidl, folderSettingsFinal, initialColumns);
 	auto tabTemp = std::make_unique<Tab>(std::move(shellBrowser), m_browser);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
@@ -996,8 +996,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	tab.GetShellBrowserImpl()->columnsChanged.AddObserver(
 		[this, &tab]() { tabColumnsChangedSignal.m_signal(tab); });
 
-	tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
-
 	// There's no need to manually disconnect this. Either it will be
 	// disconnected when the tab is closed and the tab object (and
 	// associated signal) is destroyed or when the tab is destroyed
@@ -1007,11 +1005,16 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	if (selected)
 	{
 		TabCtrl_SetCurSel(m_hwnd, index);
-
-		OnTabSelected(tab);
 	}
 
 	OnTabCreated(tab, selected);
+
+	if (selected)
+	{
+		OnTabSelected(tab);
+	}
+
+	tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
 
 	return tab;
 }

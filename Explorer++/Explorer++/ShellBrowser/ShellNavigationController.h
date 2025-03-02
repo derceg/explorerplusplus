@@ -27,8 +27,11 @@ class ShellNavigationController :
 	private boost::noncopyable
 {
 public:
+	// `initialPidl` here will be used to set up an initial entry. That then means that there will
+	// always be a current entry. That is, `GetCurrentEntry` will always return a non-null value.
 	ShellNavigationController(NavigationManager *navigationManager,
-		TabNavigationInterface *tabNavigation);
+		TabNavigationInterface *tabNavigation, const PidlAbsolute &initialPidl);
+
 	ShellNavigationController(NavigationManager *navigationManager,
 		TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
@@ -55,7 +58,6 @@ private:
 
 	void Navigate(const HistoryEntry *entry) override;
 
-	void OnNavigationStarted(const NavigationRequest *request);
 	void OnNavigationCommitted(const NavigationRequest *request,
 		const std::vector<PidlChild> &items);
 
