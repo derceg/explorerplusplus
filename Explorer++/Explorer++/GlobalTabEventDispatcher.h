@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include "../Helper/WeakPtrFactory.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
 class BrowserWindow;
+class NavigationRequest;
 class Tab;
 
 // When adding an observer, this class can be used to indicate when the observer should be triggered
@@ -39,6 +41,9 @@ private:
 //
 // It also means that a subscriber can be notified when a tab event happens, without having to know
 // exactly where that event came from.
+//
+// This class is designed to outlive any individual tab. It's up to the owner to ensure that the
+// instance is created before any tabs are created and destroyed after all tabs have been closed.
 class GlobalTabEventDispatcher : private boost::noncopyable
 {
 public:
@@ -47,6 +52,9 @@ public:
 	using MovedSignal = boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 	using RemovedSignal = boost::signals2::signal<void(const Tab &tab)>;
+
+	using NavigationStartedSignal =
+		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
 
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
@@ -64,6 +72,10 @@ public:
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer, const TabEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
+
 	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
 	void NotifyMoved(const Tab &tab, int fromIndex, int toIndex);
@@ -79,4 +91,8 @@ private:
 	MovedSignal m_movedSignal;
 	PreRemovalSignal m_preRemovalSignal;
 	RemovedSignal m_removedSignal;
+
+	NavigationStartedSignal m_navigationStartedSignal;
+
+	WeakPtrFactory<GlobalTabEventDispatcher> m_weakPtrFactory{ this };
 };

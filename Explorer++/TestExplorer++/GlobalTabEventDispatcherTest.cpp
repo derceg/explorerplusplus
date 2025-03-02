@@ -5,7 +5,10 @@
 #include "pch.h"
 #include "GlobalTabEventDispatcher.h"
 #include "BrowserWindowMock.h"
+#include "NavigationRequestTestHelper.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
+#include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
 
@@ -29,15 +32,19 @@ protected:
 	NiceMock<BrowserWindowMock> m_browser2;
 	NiceMock<TabNavigationMock> m_tabNavigation2;
 	Tab m_tab2;
-
-	MockFunction<void(const Tab &tab, bool selected)> m_tabCreatedCallback;
-	MockFunction<void(const Tab &tab)> m_tabSelectedCallback;
-	MockFunction<void(const Tab &tab, int fromIndex, int toIndex)> m_tabMovedCallback;
-	MockFunction<void(const Tab &tab, int index)> m_tabPreRemovalCallback;
-	MockFunction<void(const Tab &tab)> m_tabRemovedCallback;
 };
 
-TEST_F(GlobalTabEventDispatcherTest, Signals)
+class GlobalTabEventDispatcherTabSignalTest : public GlobalTabEventDispatcherTest
+{
+protected:
+	StrictMock<MockFunction<void(const Tab &tab, bool selected)>> m_tabCreatedCallback;
+	StrictMock<MockFunction<void(const Tab &tab)>> m_tabSelectedCallback;
+	StrictMock<MockFunction<void(const Tab &tab, int fromIndex, int toIndex)>> m_tabMovedCallback;
+	StrictMock<MockFunction<void(const Tab &tab, int index)>> m_tabPreRemovalCallback;
+	StrictMock<MockFunction<void(const Tab &tab)>> m_tabRemovedCallback;
+};
+
+TEST_F(GlobalTabEventDispatcherTabSignalTest, Signals)
 {
 	InSequence seq;
 
@@ -69,7 +76,7 @@ TEST_F(GlobalTabEventDispatcherTest, Signals)
 	m_dispatcher.NotifyRemoved(m_tab1);
 }
 
-TEST_F(GlobalTabEventDispatcherTest, SignalsFilteredByBrowser)
+TEST_F(GlobalTabEventDispatcherTabSignalTest, SignalsFilteredByBrowser)
 {
 	InSequence seq;
 
@@ -110,4 +117,53 @@ TEST_F(GlobalTabEventDispatcherTest, SignalsFilteredByBrowser)
 
 	m_dispatcher.NotifyRemoved(m_tab1);
 	m_dispatcher.NotifyRemoved(m_tab2);
+}
+
+class GlobalTabEventDispatcherNavigationSignalTest : public GlobalTabEventDispatcherTest
+{
+protected:
+	GlobalTabEventDispatcherNavigationSignalTest()
+	{
+		m_dispatcher.NotifyCreated(m_tab1, false);
+		m_dispatcher.NotifyCreated(m_tab2, false);
+	}
+
+	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
+		m_tabNavigationStartedCallback;
+};
+
+TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
+{
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
+
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
+	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
+
+	m_dispatcher.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
+		TabEventScope::Global());
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
+
+	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
+	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);
+}
+
+TEST_F(GlobalTabEventDispatcherNavigationSignalTest, SignalsFilteredByBrowser)
+{
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
+	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
+
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
+	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
+
+	m_dispatcher.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser1));
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
+
+	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
+	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);
 }

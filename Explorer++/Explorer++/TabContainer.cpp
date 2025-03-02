@@ -959,16 +959,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	// Capturing the tab by reference here is safe, since the tab object is guaranteed to exist
-	// whenever this method is called.
-	tab.GetShellBrowserImpl()->AddNavigationStartedObserver(
-		[this, &tab](const NavigationRequest *request)
-		{
-			// Re-broadcast the event. This allows other classes to be notified of navigations in
-			// any tab, without having to observe navigation events for each tab individually.
-			tabNavigationStartedSignal.m_signal(tab, request);
-		});
-
 	tab.GetShellBrowserImpl()->AddNavigationCommittedObserver(
 		[this, &tab](const NavigationRequest *request)
 		{ tabNavigationCommittedSignal.m_signal(tab, request); });

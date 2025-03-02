@@ -126,8 +126,6 @@ public:
 
 	// Signals
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
-		tabNavigationStartedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationCommittedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationFailedSignal;

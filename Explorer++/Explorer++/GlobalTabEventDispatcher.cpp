@@ -5,7 +5,9 @@
 #include "stdafx.h"
 #include "GlobalTabEventDispatcher.h"
 #include "BrowserWindow.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
+#include "../Helper/WeakPtr.h"
 
 TabEventScope TabEventScope::ForBrowser(BrowserWindow *browser)
 {
@@ -113,6 +115,24 @@ boost::signals2::connection GlobalTabEventDispatcher::AddRemovedObserver(
 		position);
 }
 
+boost::signals2::connection GlobalTabEventDispatcher::AddNavigationStartedObserver(
+	const NavigationStartedSignal::slot_type &observer, const TabEventScope &scope,
+	boost::signals2::connect_position position)
+{
+	return m_navigationStartedSignal.connect(
+		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab,
+			const NavigationRequest *request)
+		{
+			if (!DoesBrowserMatch(browserId, tab))
+			{
+				return;
+			}
+
+			observer(tab, request);
+		},
+		position);
+}
+
 std::optional<int> GlobalTabEventDispatcher::GetIdFromBrowser(const BrowserWindow *browser)
 {
 	if (!browser)
@@ -135,6 +155,19 @@ bool GlobalTabEventDispatcher::DoesBrowserMatch(std::optional<int> browserId, co
 
 void GlobalTabEventDispatcher::NotifyCreated(const Tab &tab, bool selected)
 {
+	// This class is implicitly designed to have a lifetime that's longer than any individual tab,
+	// so accessing this class in the observer should always be safe (access through the WeakPtr
+	// will deterministically fail if the instance has been destroyed).
+	//
+	// That also means that there's no need to disconnect this observer, since this class will
+	// always outlive the tab.
+	//
+	// Also, capturing the tab by reference here is safe, since the tab object is guaranteed to
+	// exist whenever this method is called.
+	tab.GetShellBrowser()->AddNavigationStartedObserver(
+		[weakSelf = m_weakPtrFactory.GetWeakPtr(), &tab](const NavigationRequest *request)
+		{ weakSelf->m_navigationStartedSignal(tab, request); });
+
 	m_createdSignal(tab, selected);
 }
 
