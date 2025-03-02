@@ -55,6 +55,11 @@ void ShellBrowserFake::NavigateToPath(const std::wstring &path, HistoryEntryType
 	}
 }
 
+void ShellBrowserFake::SetShouldEnumerationSucceed(bool shouldSucceed)
+{
+	m_shellEnumerator->SetShouldSucceed(shouldSucceed);
+}
+
 NavigationManager *ShellBrowserFake::GetNavigationManager()
 {
 	return &m_navigationManager;

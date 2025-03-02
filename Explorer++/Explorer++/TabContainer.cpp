@@ -960,10 +960,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	tab.GetShellBrowserImpl()->AddNavigationFailedObserver(
-		[this, &tab](const NavigationRequest *request)
-		{ tabNavigationFailedSignal.m_signal(tab, request); });
-
 	tab.GetShellBrowserImpl()->AddNavigationCancelledObserver(
 		[this, &tab](const NavigationRequest *request)
 		{ tabNavigationCancelledSignal.m_signal(tab, request); });

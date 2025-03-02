@@ -124,7 +124,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		},
 		TabEventScope::ForBrowser(m_browserWindow)));
 
-	m_connections.push_back(tabContainer->tabNavigationFailedSignal.AddObserver(
+	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationFailedObserver(
 		[this](const Tab &tab, const NavigationRequest *request)
 		{
 			UNREFERENCED_PARAMETER(request);
@@ -136,7 +136,8 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 				// reset here.
 				UpdateSelection();
 			}
-		}));
+		},
+		TabEventScope::ForBrowser(m_browserWindow)));
 
 	m_connections.push_back(tabContainer->tabNavigationCancelledSignal.AddObserver(
 		[this](const Tab &tab, const NavigationRequest *request)

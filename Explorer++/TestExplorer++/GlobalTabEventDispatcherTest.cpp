@@ -132,52 +132,97 @@ protected:
 		m_tabNavigationStartedCallback;
 	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
 		m_tabNavigationCommittedCallback;
+	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
+		m_tabNavigationFailedCallback;
 };
 
 TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
 {
+	InSequence seq;
+
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 
+	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"e:\\");
+	auto navigateParams3 = NavigateParams::Normal(pidl3.Raw());
+
+	PidlAbsolute pidl4 = CreateSimplePidlForTest(L"f:\\");
+	auto navigateParams4 = NavigateParams::Normal(pidl4.Raw());
+
 	m_dispatcher.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
 		TabEventScope::Global());
-	EXPECT_CALL(m_tabNavigationStartedCallback,
-		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
-	EXPECT_CALL(m_tabNavigationStartedCallback,
-		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
-
 	m_dispatcher.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
 		TabEventScope::Global());
-	EXPECT_CALL(m_tabNavigationCommittedCallback,
+	m_dispatcher.AddNavigationFailedObserver(m_tabNavigationFailedCallback.AsStdFunction(),
+		TabEventScope::Global());
+
+	EXPECT_CALL(m_tabNavigationStartedCallback,
 		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
 	EXPECT_CALL(m_tabNavigationCommittedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
+	EXPECT_CALL(m_tabNavigationStartedCallback,
 		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
+	EXPECT_CALL(m_tabNavigationCommittedCallback,
+		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
+
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams3)));
+	EXPECT_CALL(m_tabNavigationFailedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams3)));
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams4)));
+	EXPECT_CALL(m_tabNavigationFailedCallback,
+		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams4)));
 
 	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
 	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);
+
+	static_cast<ShellBrowserFake *>(m_tab1.GetShellBrowser())->SetShouldEnumerationSucceed(false);
+	static_cast<ShellBrowserFake *>(m_tab2.GetShellBrowser())->SetShouldEnumerationSucceed(false);
+	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams3);
+	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams4);
 }
 
 TEST_F(GlobalTabEventDispatcherNavigationSignalTest, SignalsFilteredByBrowser)
 {
+	InSequence seq;
+
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
 	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
 
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 
+	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"e:\\");
+	auto navigateParams3 = NavigateParams::Normal(pidl3.Raw());
+
+	PidlAbsolute pidl4 = CreateSimplePidlForTest(L"f:\\");
+	auto navigateParams4 = NavigateParams::Normal(pidl4.Raw());
+
 	m_dispatcher.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser1));
-	EXPECT_CALL(m_tabNavigationStartedCallback,
-		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
-
 	m_dispatcher.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser2));
+	m_dispatcher.AddNavigationFailedObserver(m_tabNavigationFailedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(&m_browser1));
+
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
 	EXPECT_CALL(m_tabNavigationCommittedCallback,
 		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
+	EXPECT_CALL(m_tabNavigationStartedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams3)));
+	EXPECT_CALL(m_tabNavigationFailedCallback,
+		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams3)));
 
 	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
 	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);
+
+	static_cast<ShellBrowserFake *>(m_tab1.GetShellBrowser())->SetShouldEnumerationSucceed(false);
+	static_cast<ShellBrowserFake *>(m_tab2.GetShellBrowser())->SetShouldEnumerationSucceed(false);
+	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams3);
+	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams4);
 }
