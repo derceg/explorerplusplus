@@ -39,7 +39,7 @@ void Explorerplusplus::CreateTabBacking()
 	m_tabToolbarTooltipFontSetter = std::make_unique<MainFontSetter>(
 		reinterpret_cast<HWND>(SendMessage(m_hTabWindowToolbar, TB_GETTOOLTIPS, 0, 0)), m_config);
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		[this](const Tab &tab, bool selected)
 		{
 			UNREFERENCED_PARAMETER(tab);
@@ -49,7 +49,7 @@ void Explorerplusplus::CreateTabBacking()
 		},
 		TabEventScope::ForBrowser(this)));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		[this](const Tab &tab)
 		{
 			UNREFERENCED_PARAMETER(tab);
@@ -58,7 +58,7 @@ void Explorerplusplus::CreateTabBacking()
 		},
 		TabEventScope::ForBrowser(this)));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
 		[this](const Tab &tab)
 		{
 			UNREFERENCED_PARAMETER(tab);

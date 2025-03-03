@@ -1031,7 +1031,7 @@
     <ClCompile Include="FrequentLocationsXmlStorage.cpp" />
     <ClCompile Include="HistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
-    <ClCompile Include="GlobalTabEventDispatcher.cpp" />
+    <ClCompile Include="TabEvents.cpp" />
     <ClCompile Include="LanguageHelper.cpp" />
     <ClCompile Include="LayoutDefaults.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
@@ -1335,7 +1335,7 @@
     <ClInclude Include="FrequentLocationsXmlStorage.h" />
     <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
-    <ClInclude Include="GlobalTabEventDispatcher.h" />
+    <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />
     <ClInclude Include="LocationVisitInfo.h" />
     <ClInclude Include="MainMenuSubMenuView.h" />

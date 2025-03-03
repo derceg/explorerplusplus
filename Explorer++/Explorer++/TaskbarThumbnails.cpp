@@ -115,18 +115,18 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 // enabled and the functionality is available.
 void TaskbarThumbnails::SetUpObservers()
 {
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this),
 		TabEventScope::ForBrowser(m_browser)));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this),
 		TabEventScope::ForBrowser(m_browser)));
 	m_connections.push_back(m_tabContainer->tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnDirectoryPropertiesChanged, this)));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this),
 		TabEventScope::ForBrowser(m_browser)));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
 		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this),
 		TabEventScope::ForBrowser(m_browser)));
 }

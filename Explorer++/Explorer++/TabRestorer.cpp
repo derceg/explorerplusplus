@@ -6,13 +6,12 @@
 #include "TabRestorer.h"
 #include "BrowserList.h"
 #include "BrowserWindow.h"
-#include "GlobalTabEventDispatcher.h"
+#include "TabEvents.h"
 
-TabRestorer::TabRestorer(GlobalTabEventDispatcher *globalTabEventDispatcher,
-	const BrowserList *browserList) :
+TabRestorer::TabRestorer(TabEvents *tabEvents, const BrowserList *browserList) :
 	m_browserList(browserList)
 {
-	m_connections.push_back(globalTabEventDispatcher->AddPreRemovalObserver(
+	m_connections.push_back(tabEvents->AddPreRemovalObserver(
 		std::bind_front(&TabRestorer::OnTabPreRemoval, this), TabEventScope::Global()));
 }
 

@@ -6,8 +6,8 @@
 
 class AcceleratorUpdater;
 class CoreInterface;
-class GlobalTabEventDispatcher;
 class TabContainer;
+class TabEvents;
 class UiTheming;
 
 namespace Plugins
@@ -24,7 +24,7 @@ public:
 	virtual ~PluginInterface() = default;
 
 	virtual CoreInterface *GetCoreInterface() = 0;
-	virtual GlobalTabEventDispatcher *GetGlobalTabEventDispatcher() = 0;
+	virtual TabEvents *GetTabEvents() = 0;
 	virtual TabContainer *GetTabContainer() = 0;
 	virtual Plugins::PluginMenuManager *GetPluginMenuManager() = 0;
 	virtual UiTheming *GetUiTheming() = 0;

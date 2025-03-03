@@ -748,7 +748,7 @@
     <ClCompile Include="LanguageHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalTabEventDispatcher.cpp">
+    <ClCompile Include="TabEvents.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="FrequentLocationsRegistryStorage.cpp">
@@ -1596,7 +1596,7 @@
     <ClInclude Include="LanguageHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalTabEventDispatcher.h">
+    <ClInclude Include="TabEvents.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="LayoutDefaults.h">

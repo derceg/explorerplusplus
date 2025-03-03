@@ -46,7 +46,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
-	m_tabRestorer(&m_globalTabEventDispatcher, &m_browserList),
+	m_tabRestorer(&m_tabEvents, &m_browserList),
 	m_darkModeManager(&m_config),
 	m_themeManager(&m_darkModeManager),
 	m_frequentLocationsModel(&m_systemClock),
@@ -415,9 +415,9 @@ HINSTANCE App::GetResourceInstance() const
 	return m_resourceInstance;
 }
 
-GlobalTabEventDispatcher *App::GetGlobalTabEventDispatcher()
+TabEvents *App::GetTabEvents()
 {
-	return &m_globalTabEventDispatcher;
+	return &m_tabEvents;
 }
 
 TabRestorer *App::GetTabRestorer()

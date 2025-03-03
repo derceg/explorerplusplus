@@ -341,7 +341,7 @@ private:
 
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;
-	GlobalTabEventDispatcher *GetGlobalTabEventDispatcher() override;
+	TabEvents *GetTabEvents() override;
 	TabContainer *GetTabContainer() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;
 	UiTheming *GetUiTheming() override;

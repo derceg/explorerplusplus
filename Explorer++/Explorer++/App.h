@@ -13,11 +13,11 @@
 #include "DarkModeManager.h"
 #include "FeatureList.h"
 #include "FrequentLocationsModel.h"
-#include "GlobalTabEventDispatcher.h"
 #include "HistoryModel.h"
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
+#include "TabEvents.h"
 #include "TabRestorer.h"
 #include "ThemeManager.h"
 #include "../Helper/SystemClockImpl.h"
@@ -61,7 +61,7 @@ public:
 	Applications::ApplicationModel *GetApplicationModel();
 	IconResourceLoader *GetIconResourceLoader() const;
 	HINSTANCE GetResourceInstance() const;
-	GlobalTabEventDispatcher *GetGlobalTabEventDispatcher();
+	TabEvents *GetTabEvents();
 	TabRestorer *GetTabRestorer();
 	DarkModeManager *GetDarkModeManager();
 	ThemeManager *GetThemeManager();
@@ -110,7 +110,7 @@ private:
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 	HINSTANCE m_resourceInstance;
 	ProcessManager m_processManager;
-	GlobalTabEventDispatcher m_globalTabEventDispatcher;
+	TabEvents m_tabEvents;
 	TabRestorer m_tabRestorer;
 	DarkModeManager m_darkModeManager;
 	ThemeManager m_themeManager;

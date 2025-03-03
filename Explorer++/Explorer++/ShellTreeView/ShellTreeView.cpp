@@ -112,7 +112,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 
 	auto *tabContainer = m_browserWindow->GetActivePane()->GetTabContainer();
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		[this](const Tab &tab, const NavigationRequest *request)
 		{
 			UNREFERENCED_PARAMETER(request);
@@ -124,7 +124,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		},
 		TabEventScope::ForBrowser(m_browserWindow)));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationFailedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationFailedObserver(
 		[this](const Tab &tab, const NavigationRequest *request)
 		{
 			UNREFERENCED_PARAMETER(request);
@@ -150,9 +150,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 			}
 		}));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
-		std::bind(&ShellTreeView::UpdateSelection, this),
-		TabEventScope::ForBrowser(m_browserWindow)));
+	m_connections.push_back(
+		m_app->GetTabEvents()->AddSelectedObserver(std::bind(&ShellTreeView::UpdateSelection, this),
+			TabEventScope::ForBrowser(m_browserWindow)));
 
 	m_connections.push_back(m_cutCopiedItemManager.cutItemChangedSignal.AddObserver(
 		std::bind_front(&ShellTreeView::OnCutItemChanged, this)));

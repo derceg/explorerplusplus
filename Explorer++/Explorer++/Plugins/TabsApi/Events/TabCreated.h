@@ -6,8 +6,8 @@
 
 #include "Plugins/Event.h"
 
-class GlobalTabEventDispatcher;
 class Tab;
+class TabEvents;
 
 namespace Plugins
 {
@@ -15,7 +15,7 @@ namespace Plugins
 class TabCreated : public Event
 {
 public:
-	TabCreated(GlobalTabEventDispatcher *globalTabEventDispatcher);
+	TabCreated(TabEvents *tabEvents);
 
 protected:
 	boost::signals2::connection connectObserver(sol::protected_function observer,
@@ -24,7 +24,7 @@ protected:
 private:
 	void onTabCreated(const Tab &tab, sol::protected_function observer);
 
-	GlobalTabEventDispatcher *const m_globalTabEventDispatcher;
+	TabEvents *const m_tabEvents;
 };
 
 }

@@ -4,15 +4,14 @@
 
 #include "stdafx.h"
 #include "Plugins/TabsApi/Events/TabCreated.h"
-#include "GlobalTabEventDispatcher.h"
 #include "Plugins/TabsApi/TabsApi.h"
+#include "TabEvents.h"
 #include <sol/sol.hpp>
 
 namespace Plugins
 {
 
-TabCreated::TabCreated(GlobalTabEventDispatcher *globalTabEventDispatcher) :
-	m_globalTabEventDispatcher(globalTabEventDispatcher)
+TabCreated::TabCreated(TabEvents *tabEvents) : m_tabEvents(tabEvents)
 {
 }
 
@@ -21,7 +20,7 @@ boost::signals2::connection TabCreated::connectObserver(sol::protected_function 
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_globalTabEventDispatcher->AddCreatedObserver(
+	return m_tabEvents->AddCreatedObserver(
 		[this, observer](const Tab &tab, bool selected)
 		{
 			UNREFERENCED_PARAMETER(selected);

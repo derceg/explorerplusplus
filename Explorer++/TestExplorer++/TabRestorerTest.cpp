@@ -6,8 +6,8 @@
 #include "TabRestorer.h"
 #include "BrowserList.h"
 #include "BrowserWindowMock.h"
-#include "GlobalTabEventDispatcher.h"
 #include "ShellBrowserFake.h"
+#include "TabEvents.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
 
@@ -16,7 +16,7 @@ using namespace testing;
 class TabRestorerTest : public Test
 {
 protected:
-	TabRestorerTest() : m_tabRestorer(&m_dispatcher, &m_browserList)
+	TabRestorerTest() : m_tabRestorer(&m_tabEvents, &m_browserList)
 	{
 	}
 
@@ -30,7 +30,7 @@ protected:
 		return Tab(std::make_unique<ShellBrowserFake>(&m_tabNavigation), browser);
 	}
 
-	GlobalTabEventDispatcher m_dispatcher;
+	TabEvents m_tabEvents;
 	BrowserList m_browserList;
 	TabRestorer m_tabRestorer;
 
@@ -47,10 +47,10 @@ TEST_F(TabRestorerTest, InitialState)
 TEST_F(TabRestorerTest, GetTabs)
 {
 	auto tab1 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab1, 1);
+	m_tabEvents.NotifyPreRemoval(tab1, 1);
 
 	auto tab2 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
 	const auto &closedTabs = m_tabRestorer.GetClosedTabs();
 	ASSERT_EQ(closedTabs.size(), 2u);
@@ -68,10 +68,10 @@ TEST_F(TabRestorerTest, GetTabs)
 TEST_F(TabRestorerTest, RestoreLastTab)
 {
 	auto tab1 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab1, 1);
+	m_tabEvents.NotifyPreRemoval(tab1, 1);
 
 	auto tab2 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
 	m_tabRestorer.RestoreLastTab();
 
@@ -87,10 +87,10 @@ TEST_F(TabRestorerTest, RestoreLastTab)
 TEST_F(TabRestorerTest, RestoreTabById)
 {
 	auto tab1 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab1, 1);
+	m_tabEvents.NotifyPreRemoval(tab1, 1);
 
 	auto tab2 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
 	m_tabRestorer.RestoreTabById(tab1.GetId());
 
@@ -111,10 +111,10 @@ TEST_F(TabRestorerTest, BrowserUsedForRestore)
 	m_browserList.AddBrowser(&browser2);
 
 	auto tab1 = BuildTab(&browser1);
-	m_dispatcher.NotifyPreRemoval(tab1, 0);
+	m_tabEvents.NotifyPreRemoval(tab1, 0);
 
 	auto tab2 = BuildTab(&browser1);
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
 	MockFunction<void(int)> check;
 	{
@@ -161,11 +161,11 @@ TEST_F(TabRestorerTest, ItemsChanged)
 	}
 
 	auto tab1 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab1, 1);
+	m_tabEvents.NotifyPreRemoval(tab1, 1);
 	check.Call(1);
 
 	auto tab2 = BuildTab();
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 	check.Call(2);
 
 	m_tabRestorer.RestoreTabById(tab1.GetId());

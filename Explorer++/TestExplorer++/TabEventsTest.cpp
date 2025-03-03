@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "GlobalTabEventDispatcher.h"
+#include "TabEvents.h"
 #include "BrowserWindowMock.h"
 #include "NavigationRequestTestHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -14,16 +14,16 @@
 
 using namespace testing;
 
-class GlobalTabEventDispatcherTest : public Test
+class TabEventsTest : public Test
 {
 protected:
-	GlobalTabEventDispatcherTest() :
+	TabEventsTest() :
 		m_tab1(std::make_unique<ShellBrowserFake>(&m_tabNavigation1), &m_browser1),
 		m_tab2(std::make_unique<ShellBrowserFake>(&m_tabNavigation2), &m_browser2)
 	{
 	}
 
-	GlobalTabEventDispatcher m_dispatcher;
+	TabEvents m_tabEvents;
 
 	NiceMock<BrowserWindowMock> m_browser1;
 	NiceMock<TabNavigationMock> m_tabNavigation1;
@@ -34,7 +34,7 @@ protected:
 	Tab m_tab2;
 };
 
-class GlobalTabEventDispatcherTabSignalTest : public GlobalTabEventDispatcherTest
+class TabEventsTabSignalTest : public TabEventsTest
 {
 protected:
 	StrictMock<MockFunction<void(const Tab &tab, bool selected)>> m_tabCreatedCallback;
@@ -44,88 +44,87 @@ protected:
 	StrictMock<MockFunction<void(const Tab &tab)>> m_tabRemovedCallback;
 };
 
-TEST_F(GlobalTabEventDispatcherTabSignalTest, Signals)
+TEST_F(TabEventsTabSignalTest, Signals)
 {
 	InSequence seq;
 
-	m_dispatcher.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(), TabEventScope::Global());
+	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), true));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab2), false));
 
-	m_dispatcher.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
-		TabEventScope::Global());
+	m_tabEvents.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabSelectedCallback, Call(Ref(m_tab1)));
 
-	m_dispatcher.AddMovedObserver(m_tabMovedCallback.AsStdFunction(), TabEventScope::Global());
+	m_tabEvents.AddMovedObserver(m_tabMovedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabMovedCallback, Call(Ref(m_tab2), 1, 2));
 
-	m_dispatcher.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
+	m_tabEvents.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
 		TabEventScope::Global());
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
-	m_dispatcher.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(), TabEventScope::Global());
+	m_tabEvents.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab2)));
 	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab1)));
 
-	m_dispatcher.NotifyCreated(m_tab1, true);
-	m_dispatcher.NotifyCreated(m_tab2, false);
-	m_dispatcher.NotifySelected(m_tab1);
-	m_dispatcher.NotifyMoved(m_tab2, 1, 2);
-	m_dispatcher.NotifyPreRemoval(m_tab2, 0);
-	m_dispatcher.NotifyRemoved(m_tab2);
-	m_dispatcher.NotifyRemoved(m_tab1);
+	m_tabEvents.NotifyCreated(m_tab1, true);
+	m_tabEvents.NotifyCreated(m_tab2, false);
+	m_tabEvents.NotifySelected(m_tab1);
+	m_tabEvents.NotifyMoved(m_tab2, 1, 2);
+	m_tabEvents.NotifyPreRemoval(m_tab2, 0);
+	m_tabEvents.NotifyRemoved(m_tab2);
+	m_tabEvents.NotifyRemoved(m_tab1);
 }
 
-TEST_F(GlobalTabEventDispatcherTabSignalTest, SignalsFilteredByBrowser)
+TEST_F(TabEventsTabSignalTest, SignalsFilteredByBrowser)
 {
 	InSequence seq;
 
 	// The observer here should only be triggered when a tab event in m_browser1 occurs. That is,
 	// only when m_tab1 is created.
-	m_dispatcher.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(),
+	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser1));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), false));
 
-	m_dispatcher.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
+	m_tabEvents.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser1));
 	EXPECT_CALL(m_tabSelectedCallback, Call(Ref(m_tab1)));
 
 	// Likewise, the observer here should only be triggered when a tab event in m_browser2 occurs.
-	m_dispatcher.AddMovedObserver(m_tabMovedCallback.AsStdFunction(),
+	m_tabEvents.AddMovedObserver(m_tabMovedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser2));
 	EXPECT_CALL(m_tabMovedCallback, Call(Ref(m_tab2), 3, 4));
 
-	m_dispatcher.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
+	m_tabEvents.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser2));
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
-	m_dispatcher.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(),
+	m_tabEvents.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser1));
 	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab1)));
 
-	m_dispatcher.NotifyCreated(m_tab1, false);
-	m_dispatcher.NotifyCreated(m_tab2, false);
+	m_tabEvents.NotifyCreated(m_tab1, false);
+	m_tabEvents.NotifyCreated(m_tab2, false);
 
-	m_dispatcher.NotifySelected(m_tab1);
-	m_dispatcher.NotifySelected(m_tab2);
+	m_tabEvents.NotifySelected(m_tab1);
+	m_tabEvents.NotifySelected(m_tab2);
 
-	m_dispatcher.NotifyMoved(m_tab1, 1, 2);
-	m_dispatcher.NotifyMoved(m_tab2, 3, 4);
+	m_tabEvents.NotifyMoved(m_tab1, 1, 2);
+	m_tabEvents.NotifyMoved(m_tab2, 3, 4);
 
-	m_dispatcher.NotifyPreRemoval(m_tab1, 0);
-	m_dispatcher.NotifyPreRemoval(m_tab2, 0);
+	m_tabEvents.NotifyPreRemoval(m_tab1, 0);
+	m_tabEvents.NotifyPreRemoval(m_tab2, 0);
 
-	m_dispatcher.NotifyRemoved(m_tab1);
-	m_dispatcher.NotifyRemoved(m_tab2);
+	m_tabEvents.NotifyRemoved(m_tab1);
+	m_tabEvents.NotifyRemoved(m_tab2);
 }
 
-class GlobalTabEventDispatcherNavigationSignalTest : public GlobalTabEventDispatcherTest
+class TabEventsNavigationSignalTest : public TabEventsTest
 {
 protected:
-	GlobalTabEventDispatcherNavigationSignalTest()
+	TabEventsNavigationSignalTest()
 	{
-		m_dispatcher.NotifyCreated(m_tab1, false);
-		m_dispatcher.NotifyCreated(m_tab2, false);
+		m_tabEvents.NotifyCreated(m_tab1, false);
+		m_tabEvents.NotifyCreated(m_tab2, false);
 	}
 
 	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
@@ -136,7 +135,7 @@ protected:
 		m_tabNavigationFailedCallback;
 };
 
-TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
+TEST_F(TabEventsNavigationSignalTest, Signals)
 {
 	InSequence seq;
 
@@ -152,11 +151,11 @@ TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
 	PidlAbsolute pidl4 = CreateSimplePidlForTest(L"f:\\");
 	auto navigateParams4 = NavigateParams::Normal(pidl4.Raw());
 
-	m_dispatcher.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
+	m_tabEvents.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
 		TabEventScope::Global());
-	m_dispatcher.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
+	m_tabEvents.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
 		TabEventScope::Global());
-	m_dispatcher.AddNavigationFailedObserver(m_tabNavigationFailedCallback.AsStdFunction(),
+	m_tabEvents.AddNavigationFailedObserver(m_tabNavigationFailedCallback.AsStdFunction(),
 		TabEventScope::Global());
 
 	EXPECT_CALL(m_tabNavigationStartedCallback,
@@ -186,7 +185,7 @@ TEST_F(GlobalTabEventDispatcherNavigationSignalTest, Signals)
 	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams4);
 }
 
-TEST_F(GlobalTabEventDispatcherNavigationSignalTest, SignalsFilteredByBrowser)
+TEST_F(TabEventsNavigationSignalTest, SignalsFilteredByBrowser)
 {
 	InSequence seq;
 
@@ -202,11 +201,11 @@ TEST_F(GlobalTabEventDispatcherNavigationSignalTest, SignalsFilteredByBrowser)
 	PidlAbsolute pidl4 = CreateSimplePidlForTest(L"f:\\");
 	auto navigateParams4 = NavigateParams::Normal(pidl4.Raw());
 
-	m_dispatcher.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
+	m_tabEvents.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser1));
-	m_dispatcher.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
+	m_tabEvents.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser2));
-	m_dispatcher.AddNavigationFailedObserver(m_tabNavigationFailedCallback.AsStdFunction(),
+	m_tabEvents.AddNavigationFailedObserver(m_tabNavigationFailedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser1));
 
 	EXPECT_CALL(m_tabNavigationStartedCallback,

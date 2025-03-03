@@ -11,14 +11,14 @@
 #include <vector>
 
 class BrowserList;
-class GlobalTabEventDispatcher;
+class TabEvents;
 
 class TabRestorer : private boost::noncopyable
 {
 public:
 	using ItemsChangedSignal = boost::signals2::signal<void()>;
 
-	TabRestorer(GlobalTabEventDispatcher *globalTabEventDispatcher, const BrowserList *browserList);
+	TabRestorer(TabEvents *tabEvents, const BrowserList *browserList);
 
 	const std::list<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
 	const PreservedTab *GetTabById(int id) const;

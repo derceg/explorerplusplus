@@ -15,7 +15,7 @@ UiTheming::UiTheming(App *app, CoreInterface *coreInterface, TabContainer *tabCo
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)
 {
-	m_connections.emplace_back(app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+	m_connections.emplace_back(app->GetTabEvents()->AddCreatedObserver(
 		std::bind_front(&UiTheming::OnTabCreated, this), TabEventScope::Global()));
 }
 

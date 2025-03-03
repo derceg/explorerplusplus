@@ -44,7 +44,7 @@ private:
 //
 // This class is designed to outlive any individual tab. It's up to the owner to ensure that the
 // instance is created before any tabs are created and destroyed after all tabs have been closed.
-class GlobalTabEventDispatcher : private boost::noncopyable
+class TabEvents : private boost::noncopyable
 {
 public:
 	using CreatedSignal = boost::signals2::signal<void(const Tab &tab, bool selected)>;
@@ -106,5 +106,5 @@ private:
 	NavigationCommittedSignal m_navigationCommittedSignal;
 	NavigationFailedSignal m_navigationFailedSignal;
 
-	WeakPtrFactory<GlobalTabEventDispatcher> m_weakPtrFactory{ this };
+	WeakPtrFactory<TabEvents> m_weakPtrFactory{ this };
 };

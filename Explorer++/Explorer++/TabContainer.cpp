@@ -109,7 +109,7 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind_front(&TabContainer::OnNavigationCommitted, this),
 		TabEventScope::ForBrowser(m_browser)));
 	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
@@ -253,8 +253,7 @@ void TabContainer::OnTabCtrlLButtonUp()
 	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
 	{
 		const Tab &tab = GetTabByIndex(m_draggedTabEndIndex);
-		m_app->GetGlobalTabEventDispatcher()->NotifyMoved(tab, m_draggedTabStartIndex,
-			m_draggedTabEndIndex);
+		m_app->GetTabEvents()->NotifyMoved(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
 	}
 }
 
@@ -648,7 +647,7 @@ void TabContainer::OnTabCreated(const Tab &tab, bool selected)
 		m_coreInterface->ShowTabBar();
 	}
 
-	m_app->GetGlobalTabEventDispatcher()->NotifyCreated(tab, selected);
+	m_app->GetTabEvents()->NotifyCreated(tab, selected);
 }
 
 void TabContainer::OnTabRemoved(const Tab &tab)
@@ -658,7 +657,7 @@ void TabContainer::OnTabRemoved(const Tab &tab)
 		m_coreInterface->HideTabBar();
 	}
 
-	m_app->GetGlobalTabEventDispatcher()->NotifyRemoved(tab);
+	m_app->GetTabEvents()->NotifyRemoved(tab);
 }
 
 void TabContainer::OnTabSelected(const Tab &tab)
@@ -670,7 +669,7 @@ void TabContainer::OnTabSelected(const Tab &tab)
 
 	m_iPreviousTabSelectionId = tab.GetId();
 
-	m_app->GetGlobalTabEventDispatcher()->NotifySelected(tab);
+	m_app->GetTabEvents()->NotifySelected(tab);
 }
 
 void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
@@ -1053,7 +1052,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 		return false;
 	}
 
-	m_app->GetGlobalTabEventDispatcher()->NotifyPreRemoval(tab, GetTabIndex(tab));
+	m_app->GetTabEvents()->NotifyPreRemoval(tab, GetTabIndex(tab));
 
 	RemoveTabFromControl(tab);
 

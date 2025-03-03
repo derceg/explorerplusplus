@@ -30,9 +30,9 @@ MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterfac
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainWindow::WndProc, this)));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&MainWindow::OnTabSelected, this), TabEventScope::ForBrowser(browser)));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind_front(&MainWindow::OnNavigationCommitted, this),
 		TabEventScope::ForBrowser(browser)));
 

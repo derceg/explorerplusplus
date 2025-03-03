@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "GlobalTabEventDispatcher.h"
+#include "TabEvents.h"
 #include "BrowserWindow.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
@@ -29,9 +29,8 @@ TabEventScope::TabEventScope(BrowserWindow *browser) : m_browser(browser)
 {
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddCreatedObserver(
-	const CreatedSignal::slot_type &observer, const TabEventScope &scope,
-	boost::signals2::connect_position position)
+boost::signals2::connection TabEvents::AddCreatedObserver(const CreatedSignal::slot_type &observer,
+	const TabEventScope &scope, boost::signals2::connect_position position)
 {
 	return m_createdSignal.connect(
 		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab, bool selected)
@@ -46,7 +45,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddCreatedObserver(
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddSelectedObserver(
+boost::signals2::connection TabEvents::AddSelectedObserver(
 	const SelectedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
@@ -63,9 +62,8 @@ boost::signals2::connection GlobalTabEventDispatcher::AddSelectedObserver(
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddMovedObserver(
-	const MovedSignal::slot_type &observer, const TabEventScope &scope,
-	boost::signals2::connect_position position)
+boost::signals2::connection TabEvents::AddMovedObserver(const MovedSignal::slot_type &observer,
+	const TabEventScope &scope, boost::signals2::connect_position position)
 {
 	return m_movedSignal.connect(
 		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab, int fromIndex,
@@ -81,7 +79,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddMovedObserver(
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddPreRemovalObserver(
+boost::signals2::connection TabEvents::AddPreRemovalObserver(
 	const PreRemovalSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
@@ -98,9 +96,8 @@ boost::signals2::connection GlobalTabEventDispatcher::AddPreRemovalObserver(
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddRemovedObserver(
-	const RemovedSignal::slot_type &observer, const TabEventScope &scope,
-	boost::signals2::connect_position position)
+boost::signals2::connection TabEvents::AddRemovedObserver(const RemovedSignal::slot_type &observer,
+	const TabEventScope &scope, boost::signals2::connect_position position)
 {
 	return m_removedSignal.connect(
 		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab)
@@ -115,7 +112,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddRemovedObserver(
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddNavigationStartedObserver(
+boost::signals2::connection TabEvents::AddNavigationStartedObserver(
 	const NavigationStartedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
@@ -133,7 +130,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddNavigationStartedObserv
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddNavigationCommittedObserver(
+boost::signals2::connection TabEvents::AddNavigationCommittedObserver(
 	const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
@@ -151,7 +148,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddNavigationCommittedObse
 		position);
 }
 
-boost::signals2::connection GlobalTabEventDispatcher::AddNavigationFailedObserver(
+boost::signals2::connection TabEvents::AddNavigationFailedObserver(
 	const NavigationFailedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
 {
@@ -169,7 +166,7 @@ boost::signals2::connection GlobalTabEventDispatcher::AddNavigationFailedObserve
 		position);
 }
 
-std::optional<int> GlobalTabEventDispatcher::GetIdFromBrowser(const BrowserWindow *browser)
+std::optional<int> TabEvents::GetIdFromBrowser(const BrowserWindow *browser)
 {
 	if (!browser)
 	{
@@ -179,7 +176,7 @@ std::optional<int> GlobalTabEventDispatcher::GetIdFromBrowser(const BrowserWindo
 	return browser->GetId();
 }
 
-bool GlobalTabEventDispatcher::DoesBrowserMatch(std::optional<int> browserId, const Tab &tab)
+bool TabEvents::DoesBrowserMatch(std::optional<int> browserId, const Tab &tab)
 {
 	if (!browserId)
 	{
@@ -189,7 +186,7 @@ bool GlobalTabEventDispatcher::DoesBrowserMatch(std::optional<int> browserId, co
 	return *browserId == tab.GetBrowser()->GetId();
 }
 
-void GlobalTabEventDispatcher::NotifyCreated(const Tab &tab, bool selected)
+void TabEvents::NotifyCreated(const Tab &tab, bool selected)
 {
 	// This class is implicitly designed to have a lifetime that's longer than any individual tab,
 	// so accessing this class in the observer should always be safe (access through the WeakPtr
@@ -215,22 +212,22 @@ void GlobalTabEventDispatcher::NotifyCreated(const Tab &tab, bool selected)
 	m_createdSignal(tab, selected);
 }
 
-void GlobalTabEventDispatcher::NotifySelected(const Tab &tab)
+void TabEvents::NotifySelected(const Tab &tab)
 {
 	m_selectedSignal(tab);
 }
 
-void GlobalTabEventDispatcher::NotifyMoved(const Tab &tab, int fromIndex, int toIndex)
+void TabEvents::NotifyMoved(const Tab &tab, int fromIndex, int toIndex)
 {
 	m_movedSignal(tab, fromIndex, toIndex);
 }
 
-void GlobalTabEventDispatcher::NotifyPreRemoval(const Tab &tab, int index)
+void TabEvents::NotifyPreRemoval(const Tab &tab, int index)
 {
 	m_preRemovalSignal(tab, index);
 }
 
-void GlobalTabEventDispatcher::NotifyRemoved(const Tab &tab)
+void TabEvents::NotifyRemoved(const Tab &tab)
 {
 	m_removedSignal(tab);
 }

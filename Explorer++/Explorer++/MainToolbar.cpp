@@ -139,10 +139,10 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(
 		std::bind_front(&MainToolbar::OnBrowserInitialized, this)));
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddSelectedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&MainToolbar::OnTabSelected, this),
 		TabEventScope::ForBrowser(m_browserWindow)));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind_front(&MainToolbar::OnNavigationCommitted, this),
 		TabEventScope::ForBrowser(m_browserWindow)));
 

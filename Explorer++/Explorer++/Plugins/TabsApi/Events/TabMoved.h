@@ -6,7 +6,7 @@
 
 #include "Plugins/Event.h"
 
-class GlobalTabEventDispatcher;
+class TabEvents;
 
 namespace Plugins
 {
@@ -14,14 +14,14 @@ namespace Plugins
 class TabMoved : public Event
 {
 public:
-	TabMoved(GlobalTabEventDispatcher *globalTabEventDispatcher);
+	TabMoved(TabEvents *tabEvents);
 
 protected:
 	boost::signals2::connection connectObserver(sol::protected_function observer,
 		sol::this_state state) override;
 
 private:
-	GlobalTabEventDispatcher *const m_globalTabEventDispatcher;
+	TabEvents *const m_tabEvents;
 };
 
 }

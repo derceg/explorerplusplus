@@ -238,7 +238,7 @@
     <ClCompile Include="FrequentLocationsXmlStorageTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
-    <ClCompile Include="GlobalTabEventDispatcherTest.cpp" />
+    <ClCompile Include="TabEventsTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />

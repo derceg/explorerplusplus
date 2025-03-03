@@ -7,13 +7,13 @@
 #include "AcceleratorManager.h"
 #include "BrowserList.h"
 #include "BrowserWindowMock.h"
-#include "GlobalTabEventDispatcher.h"
 #include "PopupMenuView.h"
 #include "PopupMenuViewTestHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
+#include "TabEvents.h"
 #include "TabNavigationMock.h"
 #include "TabRestorer.h"
 #include "Win32ResourceLoader.h"
@@ -25,7 +25,7 @@ class TabRestorerMenuTest : public Test
 {
 protected:
 	TabRestorerMenuTest() :
-		m_tabRestorer(&m_dispatcher, &m_browserList),
+		m_tabRestorer(&m_tabEvents, &m_browserList),
 		m_resourceLoader(GetModuleHandle(nullptr))
 	{
 	}
@@ -44,7 +44,7 @@ protected:
 	PopupMenuView m_popupMenu;
 	AcceleratorManager m_acceleratorManager;
 
-	GlobalTabEventDispatcher m_dispatcher;
+	TabEvents m_tabEvents;
 	BrowserList m_browserList;
 	TabRestorer m_tabRestorer;
 
@@ -60,12 +60,12 @@ TEST_F(TabRestorerMenuTest, CheckItems)
 	auto tab1 = BuildTab();
 	auto path1 = CreateSimplePidlForTest(L"c:\\path1");
 	NavigateTab(tab1, path1);
-	m_dispatcher.NotifyPreRemoval(tab1, 0);
+	m_tabEvents.NotifyPreRemoval(tab1, 0);
 
 	auto tab2 = BuildTab();
 	auto path2 = CreateSimplePidlForTest(L"c:\\path2");
 	NavigateTab(tab2, path2);
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
 	TabRestorerMenu menu(&m_popupMenu, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
 		&m_resourceLoader);
@@ -78,17 +78,17 @@ TEST_F(TabRestorerMenuTest, Selection)
 	auto tab1 = BuildTab();
 	auto path1 = CreateSimplePidlForTest(L"c:\\path1");
 	NavigateTab(tab1, path1);
-	m_dispatcher.NotifyPreRemoval(tab1, 0);
+	m_tabEvents.NotifyPreRemoval(tab1, 0);
 
 	auto tab2 = BuildTab();
 	auto path2 = CreateSimplePidlForTest(L"c:\\path2");
 	NavigateTab(tab2, path2);
-	m_dispatcher.NotifyPreRemoval(tab2, 0);
+	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
 	auto tab3 = BuildTab();
 	auto path3 = CreateSimplePidlForTest(L"c:\\path3");
 	NavigateTab(tab3, path3);
-	m_dispatcher.NotifyPreRemoval(tab3, 0);
+	m_tabEvents.NotifyPreRemoval(tab3, 0);
 
 	TabRestorerMenu menu(&m_popupMenu, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
 		&m_resourceLoader);

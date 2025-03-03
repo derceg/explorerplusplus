@@ -36,18 +36,18 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	SetupListView();
 	SetupEditControl();
 
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddCreatedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 	m_connections.push_back(
 		m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
 			std::bind(&SearchTabsDialog::OnTabsChanged, this)));
 	m_connections.push_back(m_coreInterface->GetTabContainer()->tabUpdatedSignal.AddObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddMovedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddMovedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_app->GetGlobalTabEventDispatcher()->AddRemovedObserver(
+	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 
 	SendMessage(m_hDlg, WM_NEXTDLGCTL,
