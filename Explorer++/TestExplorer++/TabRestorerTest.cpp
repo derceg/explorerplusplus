@@ -6,6 +6,7 @@
 #include "TabRestorer.h"
 #include "BrowserList.h"
 #include "BrowserWindowMock.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowserFake.h"
 #include "TabEvents.h"
 #include "TabNavigationMock.h"
@@ -22,18 +23,21 @@ protected:
 
 	Tab BuildTab()
 	{
-		return Tab(std::make_unique<ShellBrowserFake>(&m_tabNavigation), &m_browser);
+		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
+			&m_browser);
 	}
 
 	Tab BuildTab(BrowserWindow *browser)
 	{
-		return Tab(std::make_unique<ShellBrowserFake>(&m_tabNavigation), browser);
+		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
+			browser);
 	}
 
 	TabEvents m_tabEvents;
 	BrowserList m_browserList;
 	TabRestorer m_tabRestorer;
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	BrowserWindowMock m_browser;
 };

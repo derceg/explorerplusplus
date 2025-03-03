@@ -7,6 +7,27 @@
 #include "NavigationManager.h"
 #include "ShellBrowserHelper.h"
 
+ShellBrowser::ShellBrowser() : m_id(idCounter++)
+{
+}
+
+int ShellBrowser::GetId() const
+{
+	return m_id;
+}
+
+const Tab *ShellBrowser::GetTab() const
+{
+	CHECK(m_tab);
+	return m_tab;
+}
+
+void ShellBrowser::SetTab(const Tab *tab)
+{
+	CHECK(!m_tab);
+	m_tab = tab;
+}
+
 void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 {
 	m_helpers.push_back(std::move(helper));
@@ -48,10 +69,4 @@ boost::signals2::connection ShellBrowser::AddNavigationCancelledObserver(
 	boost::signals2::connect_position position)
 {
 	return GetNavigationManager()->AddNavigationCancelledObserver(observer, position);
-}
-
-boost::signals2::connection ShellBrowser::AddNavigationsStoppedObserver(
-	const NavigationsStoppedSignal::slot_type &observer, boost::signals2::connect_position position)
-{
-	return GetNavigationManager()->AddNavigationsStoppedObserver(observer, position);
 }

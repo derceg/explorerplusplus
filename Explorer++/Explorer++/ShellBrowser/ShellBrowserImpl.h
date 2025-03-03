@@ -115,10 +115,6 @@ public:
 	int GetNumSelectedFolders() const;
 	int GetNumSelected() const;
 
-	/* ID. */
-	void SetID(int id);
-	int GetId() const;
-
 	/* Directory modification support. */
 	void FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
 	void DirectoryAltered();
@@ -702,9 +698,6 @@ private:
 
 	const Config *m_config;
 	FolderSettings m_folderSettings;
-
-	/* ID. */
-	std::optional<int> m_ID;
 
 	// Directory monitoring
 	ShellChangeWatcher m_shellChangeWatcher;

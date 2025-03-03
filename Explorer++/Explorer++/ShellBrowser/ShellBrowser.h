@@ -13,12 +13,20 @@ class NavigationManager;
 class NavigationRequest;
 class ShellBrowserHelperBase;
 class ShellNavigationController;
+class Tab;
 
 class ShellBrowser : public ShellNavigator
 {
 public:
+	ShellBrowser();
+
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
+
+	int GetId() const;
+
+	const Tab *GetTab() const;
+	void SetTab(const Tab *tab);
 
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper);
 	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
@@ -36,14 +44,15 @@ public:
 	boost::signals2::connection AddNavigationCancelledObserver(
 		const NavigationCancelledSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
-	boost::signals2::connection AddNavigationsStoppedObserver(
-		const NavigationsStoppedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;
 	virtual const NavigationManager *GetNavigationManager() const = 0;
 
 private:
+	static inline int idCounter = 1;
+	const int m_id;
+
 	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
+	const Tab *m_tab = nullptr;
 };

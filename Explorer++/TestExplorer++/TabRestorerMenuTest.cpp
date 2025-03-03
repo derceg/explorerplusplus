@@ -9,6 +9,7 @@
 #include "BrowserWindowMock.h"
 #include "PopupMenuView.h"
 #include "PopupMenuViewTestHelper.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellIconLoaderFake.h"
@@ -32,7 +33,8 @@ protected:
 
 	Tab BuildTab()
 	{
-		return Tab(std::make_unique<ShellBrowserFake>(&m_tabNavigation), &m_browser);
+		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
+			&m_browser);
 	}
 
 	void NavigateTab(Tab &tab, const PidlAbsolute &pidl)
@@ -51,6 +53,7 @@ protected:
 	ShellIconLoaderFake m_shellIconLoader;
 	Win32ResourceLoader m_resourceLoader;
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	BrowserWindowMock m_browser;
 };

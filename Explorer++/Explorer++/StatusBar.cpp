@@ -207,13 +207,15 @@ void Explorerplusplus::OnNavigationCancelledStatusBar(const Tab &tab,
 	}
 }
 
-void Explorerplusplus::OnNavigationsStoppedStatusBar(const Tab &tab)
+void Explorerplusplus::OnNavigationsStoppedStatusBar(const ShellBrowser *shellBrowser)
 {
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
 		// All pending navigations have been stopped, so it's possible there are no longer any
 		// active navigations, in which case, the status bar text will need to be updated.
-		UpdateStatusBarText(tab);
+		UpdateStatusBarText(*tab);
 	}
 }
 

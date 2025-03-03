@@ -17,6 +17,7 @@
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "TabEvents.h"
 #include "TabRestorer.h"
 #include "ThemeManager.h"
@@ -62,6 +63,7 @@ public:
 	IconResourceLoader *GetIconResourceLoader() const;
 	HINSTANCE GetResourceInstance() const;
 	TabEvents *GetTabEvents();
+	NavigationEvents *GetNavigationEvents();
 	TabRestorer *GetTabRestorer();
 	DarkModeManager *GetDarkModeManager();
 	ThemeManager *GetThemeManager();
@@ -111,6 +113,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	ProcessManager m_processManager;
 	TabEvents m_tabEvents;
+	NavigationEvents m_navigationEvents;
 	TabRestorer m_tabRestorer;
 	DarkModeManager m_darkModeManager;
 	ThemeManager m_themeManager;

@@ -6,6 +6,7 @@
 #include "ShellBrowser/NavigationManager.h"
 #include "GeneratorTestHelper.h"
 #include "NavigationRequestTestHelper.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
 #include "../Helper/UniqueThreadId.h"
@@ -21,8 +22,8 @@ protected:
 		m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
 		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
-		m_navigationManager(std::make_unique<NavigationManager>(m_shellEnumerator,
-			m_manualExecutorBackground, m_manualExecutorCurrent))
+		m_navigationManager(std::make_unique<NavigationManager>(nullptr, &m_navigationEvents,
+			m_shellEnumerator, m_manualExecutorBackground, m_manualExecutorCurrent))
 	{
 	}
 
@@ -45,6 +46,7 @@ protected:
 		m_manualExecutorCurrent->loop(std::numeric_limits<size_t>::max());
 	}
 
+	NavigationEvents m_navigationEvents;
 	const std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorBackground;
 	const std::shared_ptr<concurrencpp::manual_executor> m_manualExecutorCurrent;
@@ -461,15 +463,6 @@ TEST_F(NavigationManagerTest, InitialNavigationActiveWhenStopped)
 		NavigateParamsMatch(navigateParams));
 	EXPECT_EQ(m_navigationManager->GetNumActiveNavigations(), 1u);
 	EXPECT_TRUE(m_navigationManager->HasAnyActiveNavigations());
-}
-
-TEST_F(NavigationManagerTest, NavigationsStoppedSignal)
-{
-	MockFunction<void()> navigationsStoppedCallback;
-	m_navigationManager->AddNavigationsStoppedObserver(navigationsStoppedCallback.AsStdFunction());
-	EXPECT_CALL(navigationsStoppedCallback, Call());
-
-	m_navigationManager->StopLoading();
 }
 
 class NavigationManagerLatestNavigationLifetimeTest : public NavigationManagerTest

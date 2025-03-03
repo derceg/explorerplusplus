@@ -104,7 +104,6 @@ using NavigationStartedSignal = boost::signals2::signal<void(const NavigationReq
 using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationFailedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationCancelledSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
-using NavigationsStoppedSignal = boost::signals2::signal<void()>;
 
 class ShellNavigator
 {
@@ -177,11 +176,5 @@ public:
 	// cancelled, this won't be triggered, as the navigation will be committed instead.
 	virtual boost::signals2::connection AddNavigationCancelledObserver(
 		const NavigationCancelledSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
-
-	// Triggered when the pending navigations are requested to stop. At the point at which this
-	// observer is invoked, the navigations will still be pending and may still be active.
-	virtual boost::signals2::connection AddNavigationsStoppedObserver(
-		const NavigationsStoppedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 };

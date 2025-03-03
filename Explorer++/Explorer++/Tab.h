@@ -78,6 +78,8 @@ public:
 	// BOOL	bUsingDefaultColumns;
 
 private:
+	void Initialize();
+
 	static inline int idCounter = 1;
 	const int m_id;
 

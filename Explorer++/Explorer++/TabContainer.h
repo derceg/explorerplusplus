@@ -127,7 +127,6 @@ public:
 	// Signals
 	SignalWrapper<TabContainer, void(const Tab &tab, const NavigationRequest *request)>
 		tabNavigationCancelledSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationsStoppedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 

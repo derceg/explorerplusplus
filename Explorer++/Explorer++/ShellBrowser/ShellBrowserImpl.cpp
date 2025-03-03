@@ -71,7 +71,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(hOwner,
 		folderSettings.showHidden ? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
 								  : ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden)),
-	m_navigationManager(m_shellEnumerator,
+	m_navigationManager(this, app->GetNavigationEvents(), m_shellEnumerator,
 		app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
 			? app->GetRuntime()->GetComStaExecutor()
 			: app->GetRuntime()->GetInlineExecutor(),
@@ -558,20 +558,6 @@ void ShellBrowserImpl::SetGroupSortDirection(SortDirection direction)
 	m_folderSettings.groupSortDirection = direction;
 
 	ListView_SortGroups(m_hListView, GroupComparisonStub, this);
-}
-
-void ShellBrowserImpl::SetID(int id)
-{
-	assert(!m_ID);
-
-	m_ID = id;
-}
-
-int ShellBrowserImpl::GetId() const
-{
-	assert(m_ID);
-
-	return *m_ID;
 }
 
 std::wstring ShellBrowserImpl::GetItemName(int index) const

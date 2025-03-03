@@ -420,6 +420,11 @@ TabEvents *App::GetTabEvents()
 	return &m_tabEvents;
 }
 
+NavigationEvents *App::GetNavigationEvents()
+{
+	return &m_navigationEvents;
+}
+
 TabRestorer *App::GetTabRestorer()
 {
 	return &m_tabRestorer;

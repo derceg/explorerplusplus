@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Tab.h"
 #include "BrowserWindowMock.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
@@ -29,7 +30,8 @@ class TabTest : public Test
 protected:
 	TabTest()
 	{
-		auto shellBrowser = std::make_unique<ShellBrowserFake>(&m_tabNavigation);
+		auto shellBrowser =
+			std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation);
 		m_shellBrowser = shellBrowser.get();
 
 		m_tab = std::make_unique<Tab>(std::move(shellBrowser), &m_browser);
@@ -37,6 +39,7 @@ protected:
 		m_observer = std::make_unique<TabObserverMock>(m_tab.get());
 	}
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	ShellBrowserFake *m_shellBrowser = nullptr;
 	BrowserWindowMock m_browser;

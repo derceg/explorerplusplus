@@ -36,9 +36,9 @@ void Explorerplusplus::InitializeTabs()
 	tabContainer->tabNavigationCancelledSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCancelledStatusBar, this),
 		boost::signals2::at_front);
-	tabContainer->tabNavigationsStoppedSignal.AddObserver(
+	m_connections.push_back(m_app->GetNavigationEvents()->AddStoppedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationsStoppedStatusBar, this),
-		boost::signals2::at_front);
+		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(this),
 		boost::signals2::at_front));

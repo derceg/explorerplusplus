@@ -10,6 +10,7 @@
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
 
+class NavigationEvents;
 class PreservedHistoryEntry;
 class ShellEnumeratorFake;
 class ShellNavigationController;
@@ -18,11 +19,11 @@ class TabNavigationInterface;
 class ShellBrowserFake : public ShellBrowser
 {
 public:
-	ShellBrowserFake(TabNavigationInterface *tabNavigation,
+	ShellBrowserFake(NavigationEvents *navigationEvents, TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry, std::shared_ptr<concurrencpp::executor> enumerationExecutor = nullptr,
 		std::shared_ptr<concurrencpp::executor> originalExecutor = nullptr);
-	ShellBrowserFake(TabNavigationInterface *tabNavigation,
+	ShellBrowserFake(NavigationEvents *navigationEvents, TabNavigationInterface *tabNavigation,
 		std::shared_ptr<concurrencpp::executor> enumerationExecutor = nullptr,
 		std::shared_ptr<concurrencpp::executor> originalExecutor = nullptr);
 	~ShellBrowserFake();

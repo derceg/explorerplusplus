@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "NavigationRequestTestHelper.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
@@ -19,7 +20,7 @@ using namespace testing;
 class ShellNavigationControllerTest : public Test
 {
 protected:
-	ShellNavigationControllerTest() : m_shellBrowser(&m_tabNavigation)
+	ShellNavigationControllerTest() : m_shellBrowser(&m_navigationEvents, &m_tabNavigation)
 	{
 	}
 
@@ -28,6 +29,7 @@ protected:
 		return m_shellBrowser.GetNavigationController();
 	}
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	ShellBrowserFake m_shellBrowser;
 };
@@ -519,8 +521,8 @@ protected:
 			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake2"));
 		m_preservedEntries.push_back(std::move(preservedEntry));
 
-		m_shellBrowser =
-			std::make_unique<ShellBrowserFake>(&m_tabNavigation, m_preservedEntries, currentEntry);
+		m_shellBrowser = std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation,
+			m_preservedEntries, currentEntry);
 	}
 
 	ShellNavigationController *GetNavigationController() const
@@ -528,6 +530,7 @@ protected:
 		return m_shellBrowser->GetNavigationController();
 	}
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	std::unique_ptr<ShellBrowserFake> m_shellBrowser;
 

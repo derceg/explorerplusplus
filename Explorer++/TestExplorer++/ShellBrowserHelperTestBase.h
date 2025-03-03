@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
@@ -18,10 +19,12 @@ protected:
 	template <typename... Args>
 	std::unique_ptr<ShellBrowserFake> CreateTab(Args &&...args)
 	{
-		auto shellBrowser = std::make_unique<ShellBrowserFake>(&m_tabNavigation);
+		auto shellBrowser =
+			std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation);
 		Helper::CreateAndAttachToShellBrowser(shellBrowser.get(), std::forward<Args>(args)...);
 		return shellBrowser;
 	}
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 };

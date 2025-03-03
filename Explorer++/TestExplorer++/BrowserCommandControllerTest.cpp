@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "BrowserCommandController.h"
 #include "MainResource.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
@@ -18,11 +19,12 @@ class BrowserCommandControllerTest : public Test
 {
 protected:
 	BrowserCommandControllerTest() :
-		m_shellBrowser(&m_tabNavigation),
+		m_shellBrowser(&m_navigationEvents, &m_tabNavigation),
 		m_commandController(&m_shellBrowser)
 	{
 	}
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	ShellBrowserFake m_shellBrowser;
 	BrowserCommandController m_commandController;

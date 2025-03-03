@@ -6,6 +6,7 @@
 #include "TabEvents.h"
 #include "BrowserWindowMock.h"
 #include "NavigationRequestTestHelper.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
@@ -18,12 +19,15 @@ class TabEventsTest : public Test
 {
 protected:
 	TabEventsTest() :
-		m_tab1(std::make_unique<ShellBrowserFake>(&m_tabNavigation1), &m_browser1),
-		m_tab2(std::make_unique<ShellBrowserFake>(&m_tabNavigation2), &m_browser2)
+		m_tab1(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
+			&m_browser1),
+		m_tab2(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation2),
+			&m_browser2)
 	{
 	}
 
 	TabEvents m_tabEvents;
+	NavigationEvents m_navigationEvents;
 
 	NiceMock<BrowserWindowMock> m_browser1;
 	NiceMock<TabNavigationMock> m_tabNavigation1;

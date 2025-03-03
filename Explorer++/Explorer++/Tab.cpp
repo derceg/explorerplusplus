@@ -37,11 +37,7 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser) :
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked)
 {
-	// The provided ShellBrowser instance may be null in tests.
-	if (m_shellBrowserImpl)
-	{
-		m_shellBrowserImpl->SetID(m_id);
-	}
+	Initialize();
 }
 
 Tab::Tab(const PreservedTab &preservedTab, std::unique_ptr<ShellBrowser> shellBrowser,
@@ -54,10 +50,12 @@ Tab::Tab(const PreservedTab &preservedTab, std::unique_ptr<ShellBrowser> shellBr
 	m_customName(preservedTab.customName),
 	m_lockState(preservedTab.lockState)
 {
-	if (m_shellBrowserImpl)
-	{
-		m_shellBrowserImpl->SetID(m_id);
-	}
+	Initialize();
+}
+
+void Tab::Initialize()
+{
+	m_shellBrowser->SetTab(this);
 }
 
 int Tab::GetId() const

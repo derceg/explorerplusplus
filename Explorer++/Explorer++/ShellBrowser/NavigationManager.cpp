@@ -4,15 +4,19 @@
 
 #include "stdafx.h"
 #include "NavigationManager.h"
+#include "NavigationEvents.h"
 #include "NavigationRequest.h"
 #include "ShellEnumerator.h"
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellHelper.h"
 #include <algorithm>
 
-NavigationManager::NavigationManager(std::shared_ptr<const ShellEnumerator> shellEnumerator,
+NavigationManager::NavigationManager(const ShellBrowser *shellBrowser,
+	NavigationEvents *navigationEvents, std::shared_ptr<const ShellEnumerator> shellEnumerator,
 	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
+	m_shellBrowser(shellBrowser),
+	m_navigationEvents(navigationEvents),
 	m_shellEnumerator(shellEnumerator),
 	m_enumerationExecutor(enumerationExecutor),
 	m_originalExecutor(originalExecutor),
@@ -112,7 +116,7 @@ void NavigationManager::StopLoading()
 {
 	m_scopedStopSource = std::make_unique<ScopedStopSource>();
 
-	m_navigationsStoppedSignal();
+	m_navigationEvents->NotifyStopped(m_shellBrowser);
 }
 
 // TODO: This should use std::generator once C++23 support is available.
@@ -226,11 +230,4 @@ boost::signals2::connection NavigationManager::AddNavigationCancelledObserver(
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_navigationCancelledSignal.connect(static_cast<int>(slotGroup), observer, position);
-}
-
-boost::signals2::connection NavigationManager::AddNavigationsStoppedObserver(
-	const NavigationsStoppedSignal::slot_type &observer, boost::signals2::connect_position position,
-	SlotGroup slotGroup)
-{
-	return m_navigationsStoppedSignal.connect(static_cast<int>(slotGroup), observer, position);
 }

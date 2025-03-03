@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellView.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "Tab.h"
 #include "TabNavigationInterface.h"
 
 ShellView::ShellView(WeakPtr<ShellBrowserImpl> shellBrowserWeak,
@@ -99,7 +100,7 @@ IFACEMETHODIMP ShellView::SelectItem(PCUITEMID_CHILD pidlItem, SVSIF flags)
 	{
 		if (m_switchToTabOnSelect)
 		{
-			m_tabNavigation->SelectTabById(m_shellBrowserWeak->GetId());
+			m_tabNavigation->SelectTabById(m_shellBrowserWeak->GetTab()->GetId());
 		}
 
 		auto pidlComplete =

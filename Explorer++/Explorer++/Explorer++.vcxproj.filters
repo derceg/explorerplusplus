@@ -796,6 +796,9 @@
     <ClCompile Include="ShellBrowser\NavigationRequest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\NavigationEvents.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1648,6 +1651,9 @@
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\NavigationRequestListener.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\NavigationEvents.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>

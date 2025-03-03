@@ -10,22 +10,24 @@
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
 
-ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
+ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
+	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
 	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
-	ShellBrowserFake(tabNavigation, enumerationExecutor, originalExecutor)
+	ShellBrowserFake(navigationEvents, tabNavigation, enumerationExecutor, originalExecutor)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
 		tabNavigation, preservedEntries, currentEntry);
 }
 
-ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation,
+ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
+	TabNavigationInterface *tabNavigation,
 	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
 	m_shellEnumerator(std::make_unique<ShellEnumeratorFake>()),
 	m_inlineExecutor(std::make_shared<concurrencpp::inline_executor>()),
-	m_navigationManager(m_shellEnumerator,
+	m_navigationManager(this, navigationEvents, m_shellEnumerator,
 		enumerationExecutor ? enumerationExecutor : m_inlineExecutor,
 		originalExecutor ? originalExecutor : m_inlineExecutor),
 	m_navigationController(

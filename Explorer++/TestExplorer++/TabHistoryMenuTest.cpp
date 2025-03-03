@@ -7,6 +7,7 @@
 #include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
 #include "PopupMenuView.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellIconLoaderFake.h"
@@ -19,12 +20,13 @@ using namespace testing;
 class TabHistoryMenuTest : public Test
 {
 protected:
-	TabHistoryMenuTest() : m_shellBrowser(&m_tabNavigation)
+	TabHistoryMenuTest() : m_shellBrowser(&m_navigationEvents, &m_tabNavigation)
 	{
 		ON_CALL(m_browserWindow, GetActiveShellBrowser)
 			.WillByDefault([this]() { return &m_shellBrowser; });
 	}
 
+	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
 	ShellBrowserFake m_shellBrowser;
 	AcceleratorManager m_acceleratorManager;

@@ -11,8 +11,10 @@
 #include <memory>
 
 struct NavigateParams;
+class NavigationEvents;
 class NavigationRequest;
 class ScopedStopSource;
+class ShellBrowser;
 class ShellEnumerator;
 
 // This class is responsible for managing ongoing navigations and allowing new navigations to be
@@ -32,8 +34,6 @@ public:
 	using NavigationCancelledSignal =
 		boost::signals2::signal<void(const NavigationRequest *request)>;
 
-	using NavigationsStoppedSignal = boost::signals2::signal<void()>;
-
 	enum class SlotGroup
 	{
 		HighestPriority = 0,
@@ -41,7 +41,8 @@ public:
 		Default = 2
 	};
 
-	NavigationManager(std::shared_ptr<const ShellEnumerator> shellEnumerator,
+	NavigationManager(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents,
+		std::shared_ptr<const ShellEnumerator> shellEnumerator,
 		std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 		std::shared_ptr<concurrencpp::executor> originalExecutor);
 	~NavigationManager();
@@ -97,11 +98,6 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
 
-	boost::signals2::connection AddNavigationsStoppedObserver(
-		const NavigationsStoppedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
-
 private:
 	// NavigationRequestListener
 	void OnNavigationStarted(NavigationRequest *request) override;
@@ -118,6 +114,8 @@ private:
 
 	bool ActiveNavigationFilter(const std::unique_ptr<NavigationRequest> &pendingNavigation) const;
 
+	const ShellBrowser *const m_shellBrowser;
+	NavigationEvents *const m_navigationEvents;
 	const std::shared_ptr<const ShellEnumerator> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::executor> m_enumerationExecutor;
 	const std::shared_ptr<concurrencpp::executor> m_originalExecutor;
@@ -133,8 +131,6 @@ private:
 	NavigationFailedSignal m_navigationFailedSignal;
 
 	NavigationCancelledSignal m_navigationCancelledSignal;
-
-	NavigationsStoppedSignal m_navigationsStoppedSignal;
 
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 };
