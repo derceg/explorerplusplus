@@ -22,6 +22,6 @@ public:
 	virtual void OnNavigationWillCommit(NavigationRequest *request) = 0;
 	virtual void OnNavigationCommitted(NavigationRequest *request,
 		const std::vector<PidlChild> &items) = 0;
-	virtual void OnNavigationFailed(NavigationRequest *request) = 0;
 	virtual void OnNavigationCancelled(NavigationRequest *request) = 0;
+	virtual void OnNavigationFinished(NavigationRequest *request) = 0;
 };

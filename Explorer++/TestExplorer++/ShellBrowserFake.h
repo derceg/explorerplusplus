@@ -32,8 +32,6 @@ public:
 		HistoryEntryType addHistoryType = HistoryEntryType::AddEntry,
 		PidlAbsolute *outputPidl = nullptr);
 
-	void SetShouldEnumerationSucceed(bool shouldSucceed);
-
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;

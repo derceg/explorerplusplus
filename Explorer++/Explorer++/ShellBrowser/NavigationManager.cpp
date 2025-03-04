@@ -28,7 +28,7 @@ NavigationManager::~NavigationManager() = default;
 
 void NavigationManager::StartNavigation(const NavigateParams &navigateParams)
 {
-	auto navigationRequest = std::make_unique<NavigationRequest>(
+	auto navigationRequest = std::make_unique<NavigationRequest>(m_shellBrowser, m_navigationEvents,
 		static_cast<NavigationRequestListener *>(this), m_shellEnumerator, m_enumerationExecutor,
 		m_originalExecutor, navigateParams, m_scopedStopSource->GetToken());
 	auto *rawNavigationRequest = navigationRequest.get();
@@ -86,21 +86,15 @@ void NavigationManager::OnNavigationCommitted(NavigationRequest *request,
 	m_anyNavigationsCommitted = true;
 
 	m_navigationCommittedSignal(request, items);
-
-	RemoveNavigationRequest(request);
-}
-
-void NavigationManager::OnNavigationFailed(NavigationRequest *request)
-{
-	m_navigationFailedSignal(request);
-
-	RemoveNavigationRequest(request);
 }
 
 void NavigationManager::OnNavigationCancelled(NavigationRequest *request)
 {
 	m_navigationCancelledSignal(request);
+}
 
+void NavigationManager::OnNavigationFinished(NavigationRequest *request)
+{
 	RemoveNavigationRequest(request);
 }
 
@@ -216,13 +210,6 @@ boost::signals2::connection NavigationManager::AddNavigationCommittedObserver(
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_navigationCommittedSignal.connect(static_cast<int>(slotGroup), observer, position);
-}
-
-boost::signals2::connection NavigationManager::AddNavigationFailedObserver(
-	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position,
-	SlotGroup slotGroup)
-{
-	return m_navigationFailedSignal.connect(static_cast<int>(slotGroup), observer, position);
 }
 
 boost::signals2::connection NavigationManager::AddNavigationCancelledObserver(

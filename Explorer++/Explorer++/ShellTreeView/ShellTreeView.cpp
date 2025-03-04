@@ -124,12 +124,14 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		},
 		TabEventScope::ForBrowser(m_browserWindow)));
 
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationFailedObserver(
-		[this](const Tab &tab, const NavigationRequest *request)
+	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
+		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
 		{
 			UNREFERENCED_PARAMETER(request);
 
-			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+			const auto *tab = shellBrowser->GetTab();
+
+			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 			{
 				// When manually selecting an item in the treeview, a navigation will be initiated.
 				// It's possible that navigation may fail, in which case, the selection will be
@@ -137,7 +139,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 				UpdateSelection();
 			}
 		},
-		TabEventScope::ForBrowser(m_browserWindow)));
+		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
 	m_connections.push_back(tabContainer->tabNavigationCancelledSignal.AddObserver(
 		[this](const Tab &tab, const NavigationRequest *request)

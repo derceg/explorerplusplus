@@ -406,7 +406,8 @@ private:
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
 	void OnNavigationStartedStatusBar(const Tab &tab, const NavigationRequest *request);
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
-	void OnNavigationFailedStatusBar(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationFailedStatusBar(const ShellBrowser *shellBrowser,
+		const NavigationRequest *request);
 	void OnNavigationCancelledStatusBar(const Tab &tab, const NavigationRequest *request);
 	void OnNavigationsStoppedStatusBar(const ShellBrowser *shellBrowser);
 	void UpdateStatusBarText(const Tab &tab);

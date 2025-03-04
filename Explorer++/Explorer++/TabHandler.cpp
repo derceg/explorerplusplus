@@ -24,24 +24,25 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind_front(&Explorerplusplus::OnTabCreated, this), TabEventScope::ForBrowser(this),
 		boost::signals2::at_front));
+	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
+		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(this),
+		boost::signals2::at_front));
+
 	m_connections.push_back(m_app->GetTabEvents()->AddNavigationStartedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
 		TabEventScope::ForBrowser(this), boost::signals2::at_front));
 	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
 		TabEventScope::ForBrowser(this), boost::signals2::at_front));
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationFailedObserver(
+	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationFailedStatusBar, this),
-		TabEventScope::ForBrowser(this), boost::signals2::at_front));
+		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
 	tabContainer->tabNavigationCancelledSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCancelledStatusBar, this),
 		boost::signals2::at_front);
 	m_connections.push_back(m_app->GetNavigationEvents()->AddStoppedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationsStoppedStatusBar, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
-	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
-		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(this),
-		boost::signals2::at_front));
 
 	tabContainer->tabDirectoryContentsChangedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnDirectoryContentsChanged, this),

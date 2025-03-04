@@ -186,13 +186,16 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
 }
 
-void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab, const NavigationRequest *request)
+void Explorerplusplus::OnNavigationFailedStatusBar(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
-		UpdateStatusBarText(tab);
+		UpdateStatusBarText(*tab);
 	}
 }
 

@@ -148,24 +148,6 @@ boost::signals2::connection TabEvents::AddNavigationCommittedObserver(
 		position);
 }
 
-boost::signals2::connection TabEvents::AddNavigationFailedObserver(
-	const NavigationFailedSignal::slot_type &observer, const TabEventScope &scope,
-	boost::signals2::connect_position position)
-{
-	return m_navigationFailedSignal.connect(
-		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab,
-			const NavigationRequest *request)
-		{
-			if (!DoesBrowserMatch(browserId, tab))
-			{
-				return;
-			}
-
-			observer(tab, request);
-		},
-		position);
-}
-
 std::optional<int> TabEvents::GetIdFromBrowser(const BrowserWindow *browser)
 {
 	if (!browser)
@@ -204,10 +186,6 @@ void TabEvents::NotifyCreated(const Tab &tab, bool selected)
 	tab.GetShellBrowser()->AddNavigationCommittedObserver(
 		[weakSelf = m_weakPtrFactory.GetWeakPtr(), &tab](const NavigationRequest *request)
 		{ weakSelf->m_navigationCommittedSignal(tab, request); });
-
-	tab.GetShellBrowser()->AddNavigationFailedObserver(
-		[weakSelf = m_weakPtrFactory.GetWeakPtr(), &tab](const NavigationRequest *request)
-		{ weakSelf->m_navigationFailedSignal(tab, request); });
 
 	m_createdSignal(tab, selected);
 }

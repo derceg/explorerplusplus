@@ -4,15 +4,19 @@
 
 #include "stdafx.h"
 #include "NavigationRequest.h"
+#include "NavigationEvents.h"
 #include "NavigationRequestListener.h"
 #include "ShellEnumerator.h"
 #include "../Helper/ShellHelper.h"
 
-NavigationRequest::NavigationRequest(NavigationRequestListener *listener,
+NavigationRequest::NavigationRequest(const ShellBrowser *shellBrowser,
+	NavigationEvents *navigationEvents, NavigationRequestListener *listener,
 	std::shared_ptr<const ShellEnumerator> shellEnumerator,
 	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor, const NavigateParams &navigateParams,
 	std::stop_token stopToken) :
+	m_shellBrowser(shellBrowser),
+	m_navigationEvents(navigationEvents),
 	m_listener(listener),
 	m_shellEnumerator(shellEnumerator),
 	m_enumerationExecutor(enumerationExecutor),
@@ -36,13 +40,17 @@ void NavigationRequest::Commit()
 
 	SetState(State::Committed);
 	m_listener->OnNavigationCommitted(this, m_items);
+
+	m_listener->OnNavigationFinished(this);
 }
 
 void NavigationRequest::Fail()
 {
 	SetState(State::Failed);
 
-	m_listener->OnNavigationFailed(this);
+	m_navigationEvents->NotifyFailed(m_shellBrowser, this);
+
+	m_listener->OnNavigationFinished(this);
 }
 
 void NavigationRequest::Cancel()
@@ -50,6 +58,8 @@ void NavigationRequest::Cancel()
 	SetState(State::Cancelled);
 
 	m_listener->OnNavigationCancelled(this);
+
+	m_listener->OnNavigationFinished(this);
 }
 
 NavigationRequest::State NavigationRequest::GetState() const

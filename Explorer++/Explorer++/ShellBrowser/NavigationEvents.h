@@ -10,6 +10,7 @@
 #include <utility>
 
 class BrowserWindow;
+class NavigationRequest;
 class ShellBrowser;
 
 class NavigationEventScope
@@ -43,13 +44,24 @@ private:
 class NavigationEvents : private boost::noncopyable
 {
 public:
+	using FailedSignal = boost::signals2::signal<void(const ShellBrowser *shellBrowser,
+		const NavigationRequest *request)>;
+
 	using StoppedSignal = boost::signals2::signal<void(const ShellBrowser *shellBrowser)>;
+
+	// Triggered when the enumeration for a navigation fails. If the initial navigation fails, this
+	// won't be triggered, as the navigation will be committed instead.
+	boost::signals2::connection AddFailedObserver(const FailedSignal::slot_type &observer,
+		const NavigationEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	// Triggered when the pending navigations are requested to stop. At the point at which this
 	// observer is invoked, the navigations will still be pending and may still be active.
 	boost::signals2::connection AddStoppedObserver(const StoppedSignal::slot_type &observer,
 		const NavigationEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
+
+	void NotifyFailed(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 
 	void NotifyStopped(const ShellBrowser *shellBrowser);
 
@@ -71,6 +83,8 @@ private:
 
 	static bool DoesEventMatchScope(const NavigationEventScope &scope,
 		const ShellBrowser *shellBrowser);
+
+	FailedSignal m_failedSignal;
 
 	StoppedSignal m_stoppedSignal;
 };

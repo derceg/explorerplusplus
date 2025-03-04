@@ -54,6 +54,13 @@ std::optional<int> NavigationEventScope::GetShellBrowserId() const
 	return m_shellBrowserId;
 }
 
+boost::signals2::connection NavigationEvents::AddFailedObserver(
+	const FailedSignal::slot_type &observer, const NavigationEventScope &scope,
+	boost::signals2::connect_position position)
+{
+	return m_failedSignal.connect(MakeFilteredObserver(observer, scope), position);
+}
+
 boost::signals2::connection NavigationEvents::AddStoppedObserver(
 	const StoppedSignal::slot_type &observer, const NavigationEventScope &scope,
 	boost::signals2::connect_position position)
@@ -76,6 +83,12 @@ bool NavigationEvents::DoesEventMatchScope(const NavigationEventScope &scope,
 	default:
 		return true;
 	}
+}
+
+void NavigationEvents::NotifyFailed(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
+{
+	m_failedSignal(shellBrowser, request);
 }
 
 void NavigationEvents::NotifyStopped(const ShellBrowser *shellBrowser)

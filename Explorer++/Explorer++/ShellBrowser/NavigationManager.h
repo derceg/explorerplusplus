@@ -29,8 +29,6 @@ public:
 	using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request,
 		const std::vector<PidlChild> &items)>;
 
-	using NavigationFailedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
-
 	using NavigationCancelledSignal =
 		boost::signals2::signal<void(const NavigationRequest *request)>;
 
@@ -88,11 +86,6 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
 
-	boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
-
 	boost::signals2::connection AddNavigationCancelledObserver(
 		const NavigationCancelledSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back,
@@ -107,8 +100,8 @@ private:
 	void OnNavigationWillCommit(NavigationRequest *request) override;
 	void OnNavigationCommitted(NavigationRequest *request,
 		const std::vector<PidlChild> &items) override;
-	void OnNavigationFailed(NavigationRequest *request) override;
 	void OnNavigationCancelled(NavigationRequest *request) override;
+	void OnNavigationFinished(NavigationRequest *request) override;
 
 	void RemoveNavigationRequest(NavigationRequest *request);
 
@@ -127,8 +120,6 @@ private:
 
 	NavigationWillCommitSignal m_navigationWillCommitSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;
-
-	NavigationFailedSignal m_navigationFailedSignal;
 
 	NavigationCancelledSignal m_navigationCancelledSignal;
 

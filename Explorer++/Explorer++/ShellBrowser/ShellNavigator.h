@@ -102,7 +102,6 @@ private:
 
 using NavigationStartedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
-using NavigationFailedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationCancelledSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
 class ShellNavigator
@@ -164,12 +163,6 @@ public:
 	// For the same reasons, this can also be triggered if the initial navigation is stopped early.
 	virtual boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
-
-	// Triggered when the enumeration for a navigation fails. As noted above, if the initial
-	// navigation fails, this won't be triggered, as the navigation will be committed instead.
-	virtual boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 
 	// Triggered when a navigation is stopped early. As noted above, if the initial navigation is

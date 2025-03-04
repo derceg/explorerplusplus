@@ -12,7 +12,9 @@
 #include <concurrencpp/concurrencpp.h>
 #include <vector>
 
+class NavigationEvents;
 class NavigationRequestListener;
+class ShellBrowser;
 class ShellEnumerator;
 
 // Manages a single navigation. An instance of this class may be destroyed at any point after
@@ -31,8 +33,8 @@ public:
 		Cancelled
 	};
 
-	NavigationRequest(NavigationRequestListener *listener,
-		std::shared_ptr<const ShellEnumerator> shellEnumerator,
+	NavigationRequest(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents,
+		NavigationRequestListener *listener, std::shared_ptr<const ShellEnumerator> shellEnumerator,
 		std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 		std::shared_ptr<concurrencpp::executor> originalExecutor,
 		const NavigateParams &navigateParams, std::stop_token stopToken);
@@ -55,6 +57,8 @@ private:
 
 	void SetState(State state);
 
+	const ShellBrowser *const m_shellBrowser;
+	NavigationEvents *const m_navigationEvents;
 	NavigationRequestListener *const m_listener;
 	const std::shared_ptr<const ShellEnumerator> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::executor> m_enumerationExecutor;

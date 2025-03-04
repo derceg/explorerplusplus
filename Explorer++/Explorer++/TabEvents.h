@@ -57,8 +57,6 @@ public:
 		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
 	using NavigationCommittedSignal =
 		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
-	using NavigationFailedSignal =
-		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
 
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
@@ -82,9 +80,6 @@ public:
 	boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
-	boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer, const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
@@ -104,7 +99,6 @@ private:
 
 	NavigationStartedSignal m_navigationStartedSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;
-	NavigationFailedSignal m_navigationFailedSignal;
 
 	WeakPtrFactory<TabEvents> m_weakPtrFactory{ this };
 };
