@@ -22,8 +22,6 @@ class ShellEnumerator;
 class NavigationManager : private NavigationRequestListener
 {
 public:
-	using NavigationStartedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
-
 	using NavigationWillCommitSignal =
 		boost::signals2::signal<void(const NavigationRequest *request)>;
 	using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request,
@@ -72,11 +70,6 @@ public:
 	size_t GetNumActiveNavigations() const;
 	bool HasAnyActiveNavigations() const;
 
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
-
 	boost::signals2::connection AddNavigationWillCommitObserver(
 		const NavigationWillCommitSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back,
@@ -93,7 +86,6 @@ public:
 
 private:
 	// NavigationRequestListener
-	void OnNavigationStarted(NavigationRequest *request) override;
 	void OnEnumerationCompleted(NavigationRequest *request) override;
 	void OnEnumerationFailed(NavigationRequest *request) override;
 	void OnEnumerationStopped(NavigationRequest *request) override;
@@ -115,8 +107,6 @@ private:
 
 	bool m_anyNavigationsCommitted = false;
 	std::vector<std::unique_ptr<NavigationRequest>> m_pendingNavigations;
-
-	NavigationStartedSignal m_navigationStartedSignal;
 
 	NavigationWillCommitSignal m_navigationWillCommitSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;

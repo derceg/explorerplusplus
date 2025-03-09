@@ -87,7 +87,7 @@ concurrencpp::null_result NavigationRequest::StartInternal(WeakPtr<NavigationReq
 	auto navigateParams = weakSelf->m_navigateParams;
 	auto stopToken = weakSelf->m_stopToken;
 
-	weakSelf->m_listener->OnNavigationStarted(weakSelf.Get());
+	weakSelf->m_navigationEvents->NotifyStarted(weakSelf->m_shellBrowser, weakSelf.Get());
 
 	co_await concurrencpp::resume_on(enumerationExecutor);
 

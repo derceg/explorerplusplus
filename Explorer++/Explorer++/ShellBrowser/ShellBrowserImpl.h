@@ -401,7 +401,7 @@ private:
 	void VerifySortMode();
 
 	/* Browsing support. */
-	void OnNavigationStarted(const NavigationRequest *request);
+	void OnNavigationStarted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	void ChangeFolders(const PidlAbsolute &directory);

@@ -109,9 +109,9 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
 
-	m_navigationManager.AddNavigationStartedObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this), boost::signals2::at_front,
-		NavigationManager::SlotGroup::HighPriority);
+	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this),
+		NavigationEventScope::ForShellBrowser(*this)));
 	m_navigationManager.AddNavigationWillCommitObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this), boost::signals2::at_front,
 		NavigationManager::SlotGroup::HighPriority);

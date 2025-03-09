@@ -100,7 +100,6 @@ private:
 	NavigateParams() = default;
 };
 
-using NavigationStartedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationCancelledSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
@@ -145,11 +144,6 @@ public:
 	//    6.1. The "navigation started" signal is triggered.
 	//    6.2. The navigation is stopped early.
 	//    6.3. The "navigation cancelled" signal is triggered.
-
-	// Triggered when a navigation is initiated.
-	virtual boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 
 	// Triggered when the enumeration for a directory successfully finishes. At this point, the
 	// requested folder has become the current folder and the enumerated items have been displayed.

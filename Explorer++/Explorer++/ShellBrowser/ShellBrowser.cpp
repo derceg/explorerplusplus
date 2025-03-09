@@ -38,12 +38,6 @@ const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const
 	return GetNavigationManager()->MaybeGetLatestActiveNavigation();
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
-	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)
-{
-	return GetNavigationManager()->AddNavigationStartedObserver(observer, position);
-}
-
 boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
 	const NavigationCommittedSignal::slot_type &observer,
 	boost::signals2::connect_position position)

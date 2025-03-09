@@ -28,9 +28,9 @@ void Explorerplusplus::InitializeTabs()
 		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(this),
 		boost::signals2::at_front));
 
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationStartedObserver(
+	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
-		TabEventScope::ForBrowser(this), boost::signals2::at_front));
+		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
 	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
 		TabEventScope::ForBrowser(this), boost::signals2::at_front));

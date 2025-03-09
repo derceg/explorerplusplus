@@ -404,7 +404,8 @@ private:
 	void SetStatusBarParts();
 	void UpdateStatusBarMinHeight();
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStartedStatusBar(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationStartedStatusBar(const ShellBrowser *shellBrowser,
+		const NavigationRequest *request);
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
 	void OnNavigationFailedStatusBar(const ShellBrowser *shellBrowser,
 		const NavigationRequest *request);

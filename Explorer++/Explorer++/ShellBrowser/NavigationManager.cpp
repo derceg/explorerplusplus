@@ -37,11 +37,6 @@ void NavigationManager::StartNavigation(const NavigateParams &navigateParams)
 	rawNavigationRequest->Start();
 }
 
-void NavigationManager::OnNavigationStarted(NavigationRequest *request)
-{
-	m_navigationStartedSignal(request);
-}
-
 void NavigationManager::OnEnumerationCompleted(NavigationRequest *request)
 {
 	request->Commit();
@@ -189,13 +184,6 @@ bool NavigationManager::ActiveNavigationFilter(
 bool NavigationManager::HasAnyActiveNavigations() const
 {
 	return GetNumActiveNavigations() > 0;
-}
-
-boost::signals2::connection NavigationManager::AddNavigationStartedObserver(
-	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position,
-	SlotGroup slotGroup)
-{
-	return m_navigationStartedSignal.connect(static_cast<int>(slotGroup), observer, position);
 }
 
 boost::signals2::connection NavigationManager::AddNavigationWillCommitObserver(

@@ -132,8 +132,6 @@ protected:
 	}
 
 	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
-		m_tabNavigationStartedCallback;
-	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
 		m_tabNavigationCommittedCallback;
 };
 
@@ -147,17 +145,11 @@ TEST_F(TabEventsNavigationSignalTest, Signals)
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 
-	m_tabEvents.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
-		TabEventScope::Global());
 	m_tabEvents.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
 		TabEventScope::Global());
 
-	EXPECT_CALL(m_tabNavigationStartedCallback,
-		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
 	EXPECT_CALL(m_tabNavigationCommittedCallback,
 		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
-	EXPECT_CALL(m_tabNavigationStartedCallback,
-		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
 	EXPECT_CALL(m_tabNavigationCommittedCallback,
 		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
 
@@ -175,13 +167,9 @@ TEST_F(TabEventsNavigationSignalTest, SignalsFilteredByBrowser)
 	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
 	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 
-	m_tabEvents.AddNavigationStartedObserver(m_tabNavigationStartedCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser1));
 	m_tabEvents.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(&m_browser2));
 
-	EXPECT_CALL(m_tabNavigationStartedCallback,
-		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
 	EXPECT_CALL(m_tabNavigationCommittedCallback,
 		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
 

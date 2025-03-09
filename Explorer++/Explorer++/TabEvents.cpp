@@ -112,24 +112,6 @@ boost::signals2::connection TabEvents::AddRemovedObserver(const RemovedSignal::s
 		position);
 }
 
-boost::signals2::connection TabEvents::AddNavigationStartedObserver(
-	const NavigationStartedSignal::slot_type &observer, const TabEventScope &scope,
-	boost::signals2::connect_position position)
-{
-	return m_navigationStartedSignal.connect(
-		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab,
-			const NavigationRequest *request)
-		{
-			if (!DoesBrowserMatch(browserId, tab))
-			{
-				return;
-			}
-
-			observer(tab, request);
-		},
-		position);
-}
-
 boost::signals2::connection TabEvents::AddNavigationCommittedObserver(
 	const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
 	boost::signals2::connect_position position)
@@ -179,10 +161,6 @@ void TabEvents::NotifyCreated(const Tab &tab, bool selected)
 	//
 	// Also, capturing the tab by reference here is safe, since the tab object is guaranteed to
 	// exist whenever this method is called.
-	tab.GetShellBrowser()->AddNavigationStartedObserver(
-		[weakSelf = m_weakPtrFactory.GetWeakPtr(), &tab](const NavigationRequest *request)
-		{ weakSelf->m_navigationStartedSignal(tab, request); });
-
 	tab.GetShellBrowser()->AddNavigationCommittedObserver(
 		[weakSelf = m_weakPtrFactory.GetWeakPtr(), &tab](const NavigationRequest *request)
 		{ weakSelf->m_navigationCommittedSignal(tab, request); });

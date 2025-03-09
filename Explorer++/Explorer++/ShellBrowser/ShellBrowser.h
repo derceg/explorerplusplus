@@ -32,9 +32,6 @@ public:
 	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
 
 	// ShellNavigator
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
 	boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;

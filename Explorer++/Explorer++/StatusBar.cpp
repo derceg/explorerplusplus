@@ -151,14 +151,16 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab,
+void Explorerplusplus::OnNavigationStartedStatusBar(const ShellBrowser *shellBrowser,
 	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
-		UpdateStatusBarText(tab);
+		UpdateStatusBarText(*tab);
 	}
 }
 

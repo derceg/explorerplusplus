@@ -15,7 +15,6 @@ class NavigationRequestListener
 public:
 	virtual ~NavigationRequestListener() = default;
 
-	virtual void OnNavigationStarted(NavigationRequest *request) = 0;
 	virtual void OnEnumerationCompleted(NavigationRequest *request) = 0;
 	virtual void OnEnumerationFailed(NavigationRequest *request) = 0;
 	virtual void OnEnumerationStopped(NavigationRequest *request) = 0;

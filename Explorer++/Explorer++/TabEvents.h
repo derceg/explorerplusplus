@@ -53,8 +53,6 @@ public:
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 	using RemovedSignal = boost::signals2::signal<void(const Tab &tab)>;
 
-	using NavigationStartedSignal =
-		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
 	using NavigationCommittedSignal =
 		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
 
@@ -74,9 +72,6 @@ public:
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer, const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddNavigationCommittedObserver(
 		const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
@@ -97,7 +92,6 @@ private:
 	PreRemovalSignal m_preRemovalSignal;
 	RemovedSignal m_removedSignal;
 
-	NavigationStartedSignal m_navigationStartedSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;
 
 	WeakPtrFactory<TabEvents> m_weakPtrFactory{ this };

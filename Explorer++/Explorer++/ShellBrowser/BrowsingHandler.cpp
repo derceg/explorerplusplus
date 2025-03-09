@@ -29,9 +29,12 @@
 #include <propvarutil.h>
 #include <list>
 
-void ShellBrowserImpl::OnNavigationStarted(const NavigationRequest *request)
+void ShellBrowserImpl::OnNavigationStarted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
+
+	DCHECK(shellBrowser == this);
 
 	RecalcWindowCursor(m_hListView);
 }
