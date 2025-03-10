@@ -32,9 +32,10 @@ MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterfac
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&MainWindow::OnTabSelected, this), TabEventScope::ForBrowser(browser)));
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
+
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&MainWindow::OnNavigationCommitted, this),
-		TabEventScope::ForBrowser(browser)));
+		NavigationEventScope::ForBrowser(*browser)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
@@ -74,11 +75,14 @@ LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void MainWindow::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
+void MainWindow::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
 	{
 		UpdateWindowText();
 	}

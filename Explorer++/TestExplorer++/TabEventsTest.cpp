@@ -5,11 +5,8 @@
 #include "pch.h"
 #include "TabEvents.h"
 #include "BrowserWindowMock.h"
-#include "NavigationRequestTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
-#include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
-#include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
 
@@ -120,59 +117,4 @@ TEST_F(TabEventsTabSignalTest, SignalsFilteredByBrowser)
 
 	m_tabEvents.NotifyRemoved(m_tab1);
 	m_tabEvents.NotifyRemoved(m_tab2);
-}
-
-class TabEventsNavigationSignalTest : public TabEventsTest
-{
-protected:
-	TabEventsNavigationSignalTest()
-	{
-		m_tabEvents.NotifyCreated(m_tab1, false);
-		m_tabEvents.NotifyCreated(m_tab2, false);
-	}
-
-	StrictMock<MockFunction<void(const Tab &tab, const NavigationRequest *request)>>
-		m_tabNavigationCommittedCallback;
-};
-
-TEST_F(TabEventsNavigationSignalTest, Signals)
-{
-	InSequence seq;
-
-	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
-	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
-
-	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
-	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
-
-	m_tabEvents.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
-		TabEventScope::Global());
-
-	EXPECT_CALL(m_tabNavigationCommittedCallback,
-		Call(Ref(m_tab1), NavigateParamsMatch(navigateParams1)));
-	EXPECT_CALL(m_tabNavigationCommittedCallback,
-		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
-
-	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
-	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);
-}
-
-TEST_F(TabEventsNavigationSignalTest, SignalsFilteredByBrowser)
-{
-	InSequence seq;
-
-	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"c:\\");
-	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
-
-	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"d:\\");
-	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
-
-	m_tabEvents.AddNavigationCommittedObserver(m_tabNavigationCommittedCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser2));
-
-	EXPECT_CALL(m_tabNavigationCommittedCallback,
-		Call(Ref(m_tab2), NavigateParamsMatch(navigateParams2)));
-
-	m_tab1.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams1);
-	m_tab2.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams2);
 }

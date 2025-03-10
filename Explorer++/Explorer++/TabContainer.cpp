@@ -109,9 +109,10 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&TabContainer::OnNavigationCommitted, this),
-		TabEventScope::ForBrowser(m_browser)));
+		NavigationEventScope::ForBrowser(*m_browser)));
+
 	m_connections.push_back(tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this)));
 
@@ -691,12 +692,15 @@ void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 	}
 }
 
-void TabContainer::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
+void TabContainer::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	UpdateTabNameInWindow(tab);
-	SetTabIcon(tab);
+	const auto *tab = shellBrowser->GetTab();
+
+	UpdateTabNameInWindow(*tab);
+	SetTabIcon(*tab);
 }
 
 void TabContainer::OnDirectoryPropertiesChanged(const Tab &tab)

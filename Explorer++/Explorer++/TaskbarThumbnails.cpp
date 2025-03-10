@@ -118,9 +118,6 @@ void TaskbarThumbnails::SetUpObservers()
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this),
 		TabEventScope::ForBrowser(m_browser)));
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
-		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this),
-		TabEventScope::ForBrowser(m_browser)));
 	m_connections.push_back(m_tabContainer->tabDirectoryPropertiesChangedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::OnDirectoryPropertiesChanged, this)));
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
@@ -129,6 +126,10 @@ void TaskbarThumbnails::SetUpObservers()
 	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
 		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this),
 		TabEventScope::ForBrowser(m_browser)));
+
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
+		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this),
+		NavigationEventScope::ForBrowser(*m_browser)));
 }
 
 void TaskbarThumbnails::SetupJumplistTasks()
@@ -616,13 +617,16 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 	}
 }
 
-void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
+void TaskbarThumbnails::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	InvalidateTaskbarThumbnailBitmap(tab);
-	SetTabProxyIcon(tab);
-	UpdateTaskbarThumbnailTitle(tab);
+	const auto *tab = shellBrowser->GetTab();
+
+	InvalidateTaskbarThumbnailBitmap(*tab);
+	SetTabProxyIcon(*tab);
+	UpdateTaskbarThumbnailTitle(*tab);
 }
 
 void TaskbarThumbnails::OnDirectoryPropertiesChanged(const Tab &tab)

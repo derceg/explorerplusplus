@@ -5,20 +5,23 @@
 #include "stdafx.h"
 #include "HistoryShellBrowserHelper.h"
 #include "HistoryModel.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/NavigationRequest.h"
 
 HistoryShellBrowserHelper::HistoryShellBrowserHelper(ShellBrowser *shellBrowser,
-	HistoryModel *historyModel) :
+	HistoryModel *historyModel, NavigationEvents *navigationEvents) :
 	ShellBrowserHelper(shellBrowser),
 	m_historyModel(historyModel)
 {
-	// There's no need to explicitly remove this observer, since this object is tied to the
-	// lifetime of the shellBrowser instance.
-	shellBrowser->AddNavigationCommittedObserver(
-		std::bind_front(&HistoryShellBrowserHelper::OnNavigationCommitted, this));
+	m_connections.push_back(navigationEvents->AddCommittedObserver(
+		std::bind_front(&HistoryShellBrowserHelper::OnNavigationCommitted, this),
+		NavigationEventScope::ForShellBrowser(*shellBrowser)));
 }
 
-void HistoryShellBrowserHelper::OnNavigationCommitted(const NavigationRequest *request)
+void HistoryShellBrowserHelper::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
+	UNREFERENCED_PARAMETER(shellBrowser);
+
 	m_historyModel->AddHistoryItem(request->GetNavigateParams().pidl);
 }

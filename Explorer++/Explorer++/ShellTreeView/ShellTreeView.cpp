@@ -112,17 +112,19 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 
 	auto *tabContainer = m_browserWindow->GetActivePane()->GetTabContainer();
 
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
-		[this](const Tab &tab, const NavigationRequest *request)
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
+		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
 		{
 			UNREFERENCED_PARAMETER(request);
 
-			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+			const auto *tab = shellBrowser->GetTab();
+
+			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 			{
 				UpdateSelection();
 			}
 		},
-		TabEventScope::ForBrowser(m_browserWindow)));
+		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
 		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)

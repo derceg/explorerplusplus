@@ -334,7 +334,7 @@ private:
 	void CreateNewTab(NavigateParams &navigateParams, bool selected) override;
 	void SelectTabById(int tabId) override;
 
-	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 
 	// ShellBrowserEmbedder
 	void OnShellBrowserCreated(ShellBrowser *shellBrowser) override;

@@ -466,22 +466,29 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 
 TEST_F(ShellNavigationControllerTest, SlotOrdering)
 {
-	m_shellBrowser.AddNavigationCommittedObserver(
-		[this](const NavigationRequest *request)
-		{
-			UNREFERENCED_PARAMETER(request);
+	MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>
+		navigationCommittedCallback;
+	ON_CALL(navigationCommittedCallback, Call(_, _))
+		.WillByDefault(
+			[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
+			{
+				UNREFERENCED_PARAMETER(shellBrowser);
+				UNREFERENCED_PARAMETER(request);
 
-			auto *navigationController = GetNavigationController();
+				auto *navigationController = GetNavigationController();
 
-			// By the time this slot runs, the navigation controller should have already set up the
-			// current entry. That is, the slot set up by the navigation controller should always
-			// run before a slot like this.
-			auto entry = navigationController->GetCurrentEntry();
-			ASSERT_NE(entry, nullptr);
-			EXPECT_EQ(entry->GetInitialNavigationType(),
-				HistoryEntry::InitialNavigationType::NonInitial);
-		},
-		boost::signals2::at_front);
+				// By the time this slot runs, the navigation controller should have already set up
+				// the current entry. That is, the slot set up by the navigation controller should
+				// always run before a slot like this.
+				auto entry = navigationController->GetCurrentEntry();
+				ASSERT_NE(entry, nullptr);
+				EXPECT_EQ(entry->GetInitialNavigationType(),
+					HistoryEntry::InitialNavigationType::NonInitial);
+			});
+
+	m_navigationEvents.AddCommittedObserver(navigationCommittedCallback.AsStdFunction(),
+		NavigationEventScope::ForShellBrowser(m_shellBrowser), boost::signals2::at_front);
+	EXPECT_CALL(navigationCommittedCallback, Call(&m_shellBrowser, _));
 
 	m_shellBrowser.NavigateToPath(L"C:\\Fake");
 }

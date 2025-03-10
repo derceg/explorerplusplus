@@ -17,8 +17,8 @@ ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
 	std::shared_ptr<concurrencpp::executor> originalExecutor) :
 	ShellBrowserFake(navigationEvents, tabNavigation, enumerationExecutor, originalExecutor)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
-		tabNavigation, preservedEntries, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
+		navigationEvents, tabNavigation, preservedEntries, currentEntry);
 }
 
 ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
@@ -30,9 +30,9 @@ ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
 	m_navigationManager(this, navigationEvents, m_shellEnumerator,
 		enumerationExecutor ? enumerationExecutor : m_inlineExecutor,
 		originalExecutor ? originalExecutor : m_inlineExecutor),
-	m_navigationController(
-		std::make_unique<ShellNavigationController>(&m_navigationManager, tabNavigation,
-			CreateSimplePidlForTest(L"c:\\initial_path", nullptr, ShellItemType::Folder)))
+	m_navigationController(std::make_unique<ShellNavigationController>(this, &m_navigationManager,
+		navigationEvents, tabNavigation,
+		CreateSimplePidlForTest(L"c:\\initial_path", nullptr, ShellItemType::Folder)))
 {
 }
 

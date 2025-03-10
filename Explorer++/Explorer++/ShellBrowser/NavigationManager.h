@@ -22,20 +22,8 @@ class ShellEnumerator;
 class NavigationManager : private NavigationRequestListener
 {
 public:
-	using NavigationWillCommitSignal =
-		boost::signals2::signal<void(const NavigationRequest *request)>;
-	using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request,
-		const std::vector<PidlChild> &items)>;
-
 	using NavigationCancelledSignal =
 		boost::signals2::signal<void(const NavigationRequest *request)>;
-
-	enum class SlotGroup
-	{
-		HighestPriority = 0,
-		HighPriority = 1,
-		Default = 2
-	};
 
 	NavigationManager(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents,
 		std::shared_ptr<const ShellEnumerator> shellEnumerator,
@@ -70,30 +58,19 @@ public:
 	size_t GetNumActiveNavigations() const;
 	bool HasAnyActiveNavigations() const;
 
-	boost::signals2::connection AddNavigationWillCommitObserver(
-		const NavigationWillCommitSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
-	boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
-
 	boost::signals2::connection AddNavigationCancelledObserver(
 		const NavigationCancelledSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back,
-		SlotGroup slotGroup = SlotGroup::Default);
+		boost::signals2::connect_position position = boost::signals2::at_back);
 
 private:
 	// NavigationRequestListener
 	void OnEnumerationCompleted(NavigationRequest *request) override;
 	void OnEnumerationFailed(NavigationRequest *request) override;
 	void OnEnumerationStopped(NavigationRequest *request) override;
-	void OnNavigationWillCommit(NavigationRequest *request) override;
-	void OnNavigationCommitted(NavigationRequest *request,
-		const std::vector<PidlChild> &items) override;
 	void OnNavigationCancelled(NavigationRequest *request) override;
 	void OnNavigationFinished(NavigationRequest *request) override;
+
+	void CommitNavigation(NavigationRequest *request);
 
 	void RemoveNavigationRequest(NavigationRequest *request);
 
@@ -107,9 +84,6 @@ private:
 
 	bool m_anyNavigationsCommitted = false;
 	std::vector<std::unique_ptr<NavigationRequest>> m_pendingNavigations;
-
-	NavigationWillCommitSignal m_navigationWillCommitSignal;
-	NavigationCommittedSignal m_navigationCommittedSignal;
 
 	NavigationCancelledSignal m_navigationCancelledSignal;
 

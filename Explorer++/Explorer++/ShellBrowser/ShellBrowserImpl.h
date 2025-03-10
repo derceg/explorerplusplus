@@ -409,9 +409,8 @@ private:
 	void ClearPendingResults();
 	void StoreCurrentlySelectedItems();
 	void ResetFolderState();
-	void OnNavigationWillCommit(const NavigationRequest *request);
-	void OnNavigationComitted(const NavigationRequest *request,
-		const std::vector<PidlChild> &items);
+	void OnNavigationWillCommit(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationComitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 	void AddNavigationItems(const NavigationRequest *request,
 		const std::vector<PidlChild> &itemPidls);
 	std::vector<ItemInfo_t> GetItemInformationFromPidls(const NavigationRequest *request,

@@ -72,9 +72,10 @@ void AddressBar::Initialize(HWND parent)
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&AddressBar::OnTabSelected, this),
 		TabEventScope::ForBrowser(m_browserWindow)));
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
+
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),
-		TabEventScope::ForBrowser(m_browserWindow)));
+		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
@@ -257,13 +258,16 @@ void AddressBar::OnTabSelected(const Tab &tab)
 	UpdateTextAndIcon(tab);
 }
 
-void AddressBar::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
+void AddressBar::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
 	{
-		UpdateTextAndIcon(tab);
+		UpdateTextAndIcon(*tab);
 	}
 }
 

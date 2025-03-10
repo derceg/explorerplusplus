@@ -38,20 +38,6 @@ const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const
 	return GetNavigationManager()->MaybeGetLatestActiveNavigation();
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
-	const NavigationCommittedSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return GetNavigationManager()->AddNavigationCommittedObserver(
-		[observer](const NavigationRequest *request, const std::vector<PidlChild> &items)
-		{
-			UNREFERENCED_PARAMETER(items);
-
-			observer(request);
-		},
-		position);
-}
-
 boost::signals2::connection ShellBrowser::AddNavigationCancelledObserver(
 	const NavigationCancelledSignal::slot_type &observer,
 	boost::signals2::connect_position position)

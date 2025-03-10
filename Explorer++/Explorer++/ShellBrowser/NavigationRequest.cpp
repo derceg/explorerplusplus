@@ -36,10 +36,10 @@ void NavigationRequest::Start()
 void NavigationRequest::Commit()
 {
 	SetState(State::WillCommit);
-	m_listener->OnNavigationWillCommit(this);
+	m_navigationEvents->NotifyWillCommit(m_shellBrowser, this);
 
 	SetState(State::Committed);
-	m_listener->OnNavigationCommitted(this, m_items);
+	m_navigationEvents->NotifyCommitted(m_shellBrowser, this);
 
 	m_listener->OnNavigationFinished(this);
 }
@@ -70,6 +70,11 @@ NavigationRequest::State NavigationRequest::GetState() const
 const NavigateParams &NavigationRequest::GetNavigateParams() const
 {
 	return m_navigateParams;
+}
+
+const std::vector<PidlChild> &NavigationRequest::GetItems() const
+{
+	return m_items;
 }
 
 bool NavigationRequest::Stopped() const

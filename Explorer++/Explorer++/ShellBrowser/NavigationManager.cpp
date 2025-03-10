@@ -39,7 +39,7 @@ void NavigationManager::StartNavigation(const NavigateParams &navigateParams)
 
 void NavigationManager::OnEnumerationCompleted(NavigationRequest *request)
 {
-	request->Commit();
+	CommitNavigation(request);
 }
 
 void NavigationManager::OnEnumerationFailed(NavigationRequest *request)
@@ -49,7 +49,7 @@ void NavigationManager::OnEnumerationFailed(NavigationRequest *request)
 		// Typically, when a navigation fails, nothing will happen. The original folder will
 		// continue to be shown. However, when the initial navigation fails, there is no original
 		// folder, so the only reasonable choice is to commit the failed navigation, regardless.
-		request->Commit();
+		CommitNavigation(request);
 		return;
 	}
 
@@ -60,27 +60,11 @@ void NavigationManager::OnEnumerationStopped(NavigationRequest *request)
 {
 	if (!m_anyNavigationsCommitted)
 	{
-		request->Commit();
+		CommitNavigation(request);
 		return;
 	}
 
 	request->Cancel();
-}
-
-void NavigationManager::OnNavigationWillCommit(NavigationRequest *request)
-{
-	m_navigationWillCommitSignal(request);
-}
-
-void NavigationManager::OnNavigationCommitted(NavigationRequest *request,
-	const std::vector<PidlChild> &items)
-{
-	// This navigation has been committed, so all other navigations should be cancelled.
-	m_scopedStopSource = std::make_unique<ScopedStopSource>();
-
-	m_anyNavigationsCommitted = true;
-
-	m_navigationCommittedSignal(request, items);
 }
 
 void NavigationManager::OnNavigationCancelled(NavigationRequest *request)
@@ -91,6 +75,18 @@ void NavigationManager::OnNavigationCancelled(NavigationRequest *request)
 void NavigationManager::OnNavigationFinished(NavigationRequest *request)
 {
 	RemoveNavigationRequest(request);
+}
+
+void NavigationManager::CommitNavigation(NavigationRequest *request)
+{
+	UNREFERENCED_PARAMETER(request);
+
+	// The specified navigation will be committed, so all other navigations should be cancelled.
+	m_scopedStopSource = std::make_unique<ScopedStopSource>();
+
+	m_anyNavigationsCommitted = true;
+
+	request->Commit();
 }
 
 void NavigationManager::RemoveNavigationRequest(NavigationRequest *request)
@@ -186,23 +182,9 @@ bool NavigationManager::HasAnyActiveNavigations() const
 	return GetNumActiveNavigations() > 0;
 }
 
-boost::signals2::connection NavigationManager::AddNavigationWillCommitObserver(
-	const NavigationWillCommitSignal::slot_type &observer,
-	boost::signals2::connect_position position, SlotGroup slotGroup)
-{
-	return m_navigationWillCommitSignal.connect(static_cast<int>(slotGroup), observer, position);
-}
-
-boost::signals2::connection NavigationManager::AddNavigationCommittedObserver(
-	const NavigationCommittedSignal::slot_type &observer,
-	boost::signals2::connect_position position, SlotGroup slotGroup)
-{
-	return m_navigationCommittedSignal.connect(static_cast<int>(slotGroup), observer, position);
-}
-
 boost::signals2::connection NavigationManager::AddNavigationCancelledObserver(
 	const NavigationCancelledSignal::slot_type &observer,
-	boost::signals2::connect_position position, SlotGroup slotGroup)
+	boost::signals2::connect_position position)
 {
-	return m_navigationCancelledSignal.connect(static_cast<int>(slotGroup), observer, position);
+	return m_navigationCancelledSignal.connect(observer, position);
 }

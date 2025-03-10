@@ -22,9 +22,6 @@ public:
 	MOCK_METHOD(void, OnEnumerationCompleted, (NavigationRequest * request), (override));
 	MOCK_METHOD(void, OnEnumerationFailed, (NavigationRequest * request), (override));
 	MOCK_METHOD(void, OnEnumerationStopped, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnNavigationWillCommit, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnNavigationCommitted,
-		(NavigationRequest * request, const std::vector<PidlChild> &items), (override));
 	MOCK_METHOD(void, OnNavigationCancelled, (NavigationRequest * request), (override));
 	MOCK_METHOD(void, OnNavigationFinished, (NavigationRequest * request), (override));
 };
@@ -150,6 +147,10 @@ protected:
 	{
 		m_navigationEvents.AddStartedObserver(m_navigationStartedCallback.AsStdFunction(),
 			NavigationEventScope::Global());
+		m_navigationEvents.AddWillCommitObserver(m_navigationWillCommitCallback.AsStdFunction(),
+			NavigationEventScope::Global());
+		m_navigationEvents.AddCommittedObserver(m_navigationCommittedCallback.AsStdFunction(),
+			NavigationEventScope::Global());
 		m_navigationEvents.AddFailedObserver(m_navigationFailedCallback.AsStdFunction(),
 			NavigationEventScope::Global());
 	}
@@ -162,6 +163,12 @@ protected:
 	StrictMock<
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_navigationStartedCallback;
+	StrictMock<
+		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
+		m_navigationWillCommitCallback;
+	StrictMock<
+		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
+		m_navigationCommittedCallback;
 	StrictMock<
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_navigationFailedCallback;
@@ -181,8 +188,8 @@ TEST_F(NavigationRequestSignalTest, CommittedNavigation)
 
 		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
 		EXPECT_CALL(m_strictListener, OnEnumerationCompleted(request.get()));
-		EXPECT_CALL(m_strictListener, OnNavigationWillCommit(request.get()));
-		EXPECT_CALL(m_strictListener, OnNavigationCommitted(request.get(), IsEmpty()));
+		EXPECT_CALL(m_navigationWillCommitCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationCommittedCallback, Call(nullptr, request.get()));
 		EXPECT_CALL(m_strictListener, OnNavigationFinished(request.get()));
 	}
 

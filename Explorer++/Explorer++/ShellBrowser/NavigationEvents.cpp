@@ -56,23 +56,42 @@ std::optional<int> NavigationEventScope::GetShellBrowserId() const
 
 boost::signals2::connection NavigationEvents::AddStartedObserver(
 	const StartedSignal::slot_type &observer, const NavigationEventScope &scope,
-	boost::signals2::connect_position position)
+	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
-	return m_startedSignal.connect(MakeFilteredObserver(observer, scope), position);
+	return m_startedSignal.connect(static_cast<int>(slotGroup),
+		MakeFilteredObserver(observer, scope), position);
+}
+
+boost::signals2::connection NavigationEvents::AddWillCommitObserver(
+	const WillCommitSignal::slot_type &observer, const NavigationEventScope &scope,
+	boost::signals2::connect_position position, SlotGroup slotGroup)
+{
+	return m_willCommitSignal.connect(static_cast<int>(slotGroup),
+		MakeFilteredObserver(observer, scope), position);
+}
+
+boost::signals2::connection NavigationEvents::AddCommittedObserver(
+	const CommittedSignal::slot_type &observer, const NavigationEventScope &scope,
+	boost::signals2::connect_position position, SlotGroup slotGroup)
+{
+	return m_committedSignal.connect(static_cast<int>(slotGroup),
+		MakeFilteredObserver(observer, scope), position);
 }
 
 boost::signals2::connection NavigationEvents::AddFailedObserver(
 	const FailedSignal::slot_type &observer, const NavigationEventScope &scope,
-	boost::signals2::connect_position position)
+	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
-	return m_failedSignal.connect(MakeFilteredObserver(observer, scope), position);
+	return m_failedSignal.connect(static_cast<int>(slotGroup),
+		MakeFilteredObserver(observer, scope), position);
 }
 
 boost::signals2::connection NavigationEvents::AddStoppedObserver(
 	const StoppedSignal::slot_type &observer, const NavigationEventScope &scope,
-	boost::signals2::connect_position position)
+	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
-	return m_stoppedSignal.connect(MakeFilteredObserver(observer, scope), position);
+	return m_stoppedSignal.connect(static_cast<int>(slotGroup),
+		MakeFilteredObserver(observer, scope), position);
 }
 
 bool NavigationEvents::DoesEventMatchScope(const NavigationEventScope &scope,
@@ -96,6 +115,18 @@ void NavigationEvents::NotifyStarted(const ShellBrowser *shellBrowser,
 	const NavigationRequest *request)
 {
 	m_startedSignal(shellBrowser, request);
+}
+
+void NavigationEvents::NotifyWillCommit(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
+{
+	m_willCommitSignal(shellBrowser, request);
+}
+
+void NavigationEvents::NotifyCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
+{
+	m_committedSignal(shellBrowser, request);
 }
 
 void NavigationEvents::NotifyFailed(const ShellBrowser *shellBrowser,

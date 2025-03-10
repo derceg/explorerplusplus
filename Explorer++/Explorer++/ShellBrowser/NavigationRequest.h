@@ -47,6 +47,10 @@ public:
 	State GetState() const;
 	const NavigateParams &GetNavigateParams() const;
 
+	// This will return the set of enumerated items, to be used when the navigation is in the
+	// `WillCommit` or `Committed` state.
+	const std::vector<PidlChild> &GetItems() const;
+
 	// Indicates whether the enumeration process was stopped early. Note that this is independent of
 	// whether the navigation is ultimately committed or cancelled. That is, it's up to the caller
 	// to decide whether a stopped enumeration should result in a cancellation or not.

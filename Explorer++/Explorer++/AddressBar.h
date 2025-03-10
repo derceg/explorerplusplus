@@ -21,6 +21,7 @@ class BrowserWindow;
 class CoreInterface;
 class NavigationRequest;
 class Runtime;
+class ShellBrowser;
 class Tab;
 
 class AddressBar : public BaseWindow
@@ -56,7 +57,7 @@ private:
 	void OnEscapePressed();
 	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void UpdateTextAndIcon(const Tab &tab,
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);

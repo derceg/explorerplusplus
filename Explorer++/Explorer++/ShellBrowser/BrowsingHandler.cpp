@@ -448,9 +448,12 @@ HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellF
 	return hr;
 }
 
-void ShellBrowserImpl::OnNavigationWillCommit(const NavigationRequest *request)
+void ShellBrowserImpl::OnNavigationWillCommit(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
+
+	DCHECK(shellBrowser == this);
 
 	// The folder is going to change, so update the set of selected items before the current
 	// navigation entry changes.
@@ -459,16 +462,18 @@ void ShellBrowserImpl::OnNavigationWillCommit(const NavigationRequest *request)
 	SetNavigationState(NavigationState::WillCommit);
 }
 
-void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request,
-	const std::vector<PidlChild> &items)
+void ShellBrowserImpl::OnNavigationComitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
+	DCHECK(shellBrowser == this);
+
 	ChangeFolders(request->GetNavigateParams().pidl);
 
 	NotifyShellOfNavigation(request->GetNavigateParams().pidl.Raw());
 
 	RecalcWindowCursor(m_hListView);
 
-	AddNavigationItems(request, items);
+	AddNavigationItems(request, request->GetItems());
 
 	SetNavigationState(NavigationState::Committed);
 }

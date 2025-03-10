@@ -260,8 +260,8 @@ ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 
 void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
 {
-	HistoryShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser,
-		m_app->GetHistoryModel());
+	HistoryShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser, m_app->GetHistoryModel(),
+		m_app->GetNavigationEvents());
 	FrequentLocationsShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser,
-		m_app->GetFrequentLocationsModel());
+		m_app->GetFrequentLocationsModel(), m_app->GetNavigationEvents());
 }

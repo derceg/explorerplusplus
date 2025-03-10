@@ -4,12 +4,10 @@
 
 #pragma once
 
-#include "../Helper/WeakPtrFactory.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
 class BrowserWindow;
-class NavigationRequest;
 class Tab;
 
 // When adding an observer, this class can be used to indicate when the observer should be triggered
@@ -53,9 +51,6 @@ public:
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 	using RemovedSignal = boost::signals2::signal<void(const Tab &tab)>;
 
-	using NavigationCommittedSignal =
-		boost::signals2::signal<void(const Tab &tab, const NavigationRequest *request)>;
-
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
@@ -70,10 +65,6 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddRemovedObserver(const RemovedSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
-
-	boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	void NotifyCreated(const Tab &tab, bool selected);
@@ -91,8 +82,4 @@ private:
 	MovedSignal m_movedSignal;
 	PreRemovalSignal m_preRemovalSignal;
 	RemovedSignal m_removedSignal;
-
-	NavigationCommittedSignal m_navigationCommittedSignal;
-
-	WeakPtrFactory<TabEvents> m_weakPtrFactory{ this };
 };

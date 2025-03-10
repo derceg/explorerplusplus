@@ -12,6 +12,7 @@ class App;
 class BrowserWindow;
 class CoreInterface;
 class NavigationRequest;
+class ShellBrowser;
 class WindowSubclass;
 
 class MainWindow : private DropTargetInternal
@@ -26,7 +27,7 @@ private:
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void OnTabSelected(const Tab &tab);
 

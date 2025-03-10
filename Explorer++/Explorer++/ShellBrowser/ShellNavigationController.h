@@ -11,9 +11,11 @@
 #include <vector>
 
 struct NavigateParams;
+class NavigationEvents;
 class NavigationManager;
 class NavigationRequest;
 class PreservedHistoryEntry;
+class ShellBrowser;
 class TabNavigationInterface;
 
 enum class NavigationTargetMode
@@ -29,10 +31,12 @@ class ShellNavigationController :
 public:
 	// `initialPidl` here will be used to set up an initial entry. That then means that there will
 	// always be a current entry. That is, `GetCurrentEntry` will always return a non-null value.
-	ShellNavigationController(NavigationManager *navigationManager,
+	ShellNavigationController(const ShellBrowser *shellBrowser,
+		NavigationManager *navigationManager, NavigationEvents *navigationEvents,
 		TabNavigationInterface *tabNavigation, const PidlAbsolute &initialPidl);
 
-	ShellNavigationController(NavigationManager *navigationManager,
+	ShellNavigationController(const ShellBrowser *shellBrowser,
+		NavigationManager *navigationManager, NavigationEvents *navigationEvents,
 		TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
@@ -51,15 +55,14 @@ public:
 	HistoryEntry *GetEntryById(int id);
 
 private:
-	void Initialize();
+	void Initialize(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents);
 
 	static std::vector<std::unique_ptr<HistoryEntry>> CopyPreservedHistoryEntries(
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries);
 
 	void Navigate(const HistoryEntry *entry) override;
 
-	void OnNavigationCommitted(const NavigationRequest *request,
-		const std::vector<PidlChild> &items);
+	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 
 	NavigationManager *const m_navigationManager;
 

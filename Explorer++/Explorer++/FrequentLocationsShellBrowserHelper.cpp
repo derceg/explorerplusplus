@@ -5,18 +5,23 @@
 #include "stdafx.h"
 #include "FrequentLocationsShellBrowserHelper.h"
 #include "FrequentLocationsModel.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/NavigationRequest.h"
 
 FrequentLocationsShellBrowserHelper::FrequentLocationsShellBrowserHelper(ShellBrowser *shellBrowser,
-	FrequentLocationsModel *model) :
+	FrequentLocationsModel *model, NavigationEvents *navigationEvents) :
 	ShellBrowserHelper(shellBrowser),
 	m_model(model)
 {
-	shellBrowser->AddNavigationCommittedObserver(
-		std::bind_front(&FrequentLocationsShellBrowserHelper::OnNavigationCommitted, this));
+	m_connections.push_back(navigationEvents->AddCommittedObserver(
+		std::bind_front(&FrequentLocationsShellBrowserHelper::OnNavigationCommitted, this),
+		NavigationEventScope::ForShellBrowser(*shellBrowser)));
 }
 
-void FrequentLocationsShellBrowserHelper::OnNavigationCommitted(const NavigationRequest *request)
+void FrequentLocationsShellBrowserHelper::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
+	UNREFERENCED_PARAMETER(shellBrowser);
+
 	m_model->RegisterLocationVisit(request->GetNavigateParams().pidl);
 }

@@ -4,38 +4,44 @@
 
 #include "stdafx.h"
 #include "ShellNavigationController.h"
+#include "NavigationEvents.h"
 #include "NavigationManager.h"
 #include "NavigationRequest.h"
 #include "PreservedHistoryEntry.h"
 #include "TabNavigationInterface.h"
+#include "TestHelper.h"
 #include "../Helper/ShellHelper.h"
 
-ShellNavigationController::ShellNavigationController(NavigationManager *navigationManager,
+ShellNavigationController::ShellNavigationController(const ShellBrowser *shellBrowser,
+	NavigationManager *navigationManager, NavigationEvents *navigationEvents,
 	TabNavigationInterface *tabNavigation, const PidlAbsolute &initialPidl) :
 	m_navigationManager(navigationManager),
 	m_tabNavigation(tabNavigation)
 {
-	Initialize();
+	Initialize(shellBrowser, navigationEvents);
 
 	AddEntry(
 		std::make_unique<HistoryEntry>(initialPidl, HistoryEntry::InitialNavigationType::Initial));
 }
 
-ShellNavigationController::ShellNavigationController(NavigationManager *navigationManager,
+ShellNavigationController::ShellNavigationController(const ShellBrowser *shellBrowser,
+	NavigationManager *navigationManager, NavigationEvents *navigationEvents,
 	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	NavigationController(CopyPreservedHistoryEntries(preservedEntries), currentEntry),
 	m_navigationManager(navigationManager),
 	m_tabNavigation(tabNavigation)
 {
-	Initialize();
+	Initialize(shellBrowser, navigationEvents);
 }
 
-void ShellNavigationController::Initialize()
+void ShellNavigationController::Initialize(const ShellBrowser *shellBrowser,
+	NavigationEvents *navigationEvents)
 {
-	m_connections.emplace_back(m_navigationManager->AddNavigationCommittedObserver(
+	m_connections.push_back(navigationEvents->AddCommittedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
-		boost::signals2::at_front, NavigationManager::SlotGroup::HighestPriority));
+		NavigationEventScope::ForShellBrowser(*shellBrowser), boost::signals2::at_front,
+		NavigationEvents::SlotGroup::HighestPriority));
 }
 
 std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreservedHistoryEntries(
@@ -52,10 +58,17 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *request,
-	const std::vector<PidlChild> &items)
+void ShellNavigationController::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(items);
+	UNREFERENCED_PARAMETER(shellBrowser);
+
+	// `request` may be null in tests.
+	if (!request)
+	{
+		CHECK(IsInTest());
+		return;
+	}
 
 	auto historyEntryType = request->GetNavigateParams().historyEntryType;
 

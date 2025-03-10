@@ -38,8 +38,6 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 	m_connections.push_back(
 		m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
 			std::bind(&SearchTabsDialog::OnTabsChanged, this)));
@@ -49,6 +47,9 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
+
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
+		std::bind(&SearchTabsDialog::OnTabsChanged, this), NavigationEventScope::Global()));
 
 	SendMessage(m_hDlg, WM_NEXTDLGCTL,
 		reinterpret_cast<WPARAM>(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM)), true);

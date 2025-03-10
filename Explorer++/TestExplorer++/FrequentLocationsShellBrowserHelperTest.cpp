@@ -21,7 +21,7 @@ protected:
 
 	void NavigateInNewTab(const std::wstring &path, PidlAbsolute *outputPidl)
 	{
-		auto shellBrowser = CreateTab(&m_frequentLocationsModel);
+		auto shellBrowser = CreateTab(&m_frequentLocationsModel, &m_navigationEvents);
 		shellBrowser->NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl);
 	}
 

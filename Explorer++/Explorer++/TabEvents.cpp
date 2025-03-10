@@ -7,7 +7,6 @@
 #include "BrowserWindow.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
-#include "../Helper/WeakPtr.h"
 
 TabEventScope TabEventScope::ForBrowser(BrowserWindow *browser)
 {
@@ -112,24 +111,6 @@ boost::signals2::connection TabEvents::AddRemovedObserver(const RemovedSignal::s
 		position);
 }
 
-boost::signals2::connection TabEvents::AddNavigationCommittedObserver(
-	const NavigationCommittedSignal::slot_type &observer, const TabEventScope &scope,
-	boost::signals2::connect_position position)
-{
-	return m_navigationCommittedSignal.connect(
-		[browserId = GetIdFromBrowser(scope.GetBrowser()), observer](const Tab &tab,
-			const NavigationRequest *request)
-		{
-			if (!DoesBrowserMatch(browserId, tab))
-			{
-				return;
-			}
-
-			observer(tab, request);
-		},
-		position);
-}
-
 std::optional<int> TabEvents::GetIdFromBrowser(const BrowserWindow *browser)
 {
 	if (!browser)
@@ -152,19 +133,6 @@ bool TabEvents::DoesBrowserMatch(std::optional<int> browserId, const Tab &tab)
 
 void TabEvents::NotifyCreated(const Tab &tab, bool selected)
 {
-	// This class is implicitly designed to have a lifetime that's longer than any individual tab,
-	// so accessing this class in the observer should always be safe (access through the WeakPtr
-	// will deterministically fail if the instance has been destroyed).
-	//
-	// That also means that there's no need to disconnect this observer, since this class will
-	// always outlive the tab.
-	//
-	// Also, capturing the tab by reference here is safe, since the tab object is guaranteed to
-	// exist whenever this method is called.
-	tab.GetShellBrowser()->AddNavigationCommittedObserver(
-		[weakSelf = m_weakPtrFactory.GetWeakPtr(), &tab](const NavigationRequest *request)
-		{ weakSelf->m_navigationCommittedSignal(tab, request); });
-
 	m_createdSignal(tab, selected);
 }
 

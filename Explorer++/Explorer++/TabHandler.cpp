@@ -31,9 +31,9 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
-	m_connections.push_back(m_app->GetTabEvents()->AddNavigationCommittedObserver(
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
-		TabEventScope::ForBrowser(this), boost::signals2::at_front));
+		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
 	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationFailedStatusBar, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
@@ -85,22 +85,25 @@ boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
 	return m_tabsInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::OnNavigationCommitted(const Tab &tab, const NavigationRequest *request)
+void Explorerplusplus::OnNavigationCommitted(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
-		UpdateWindowStates(tab);
+		UpdateWindowStates(*tab);
 	}
 
-	StopDirectoryMonitoringForTab(tab);
+	StopDirectoryMonitoringForTab(*tab);
 
 	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::Disabled
 		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
-			&& !tab.GetShellBrowserImpl()->InVirtualFolder()))
+			&& !tab->GetShellBrowserImpl()->InVirtualFolder()))
 	{
-		StartDirectoryMonitoringForTab(tab);
+		StartDirectoryMonitoringForTab(*tab);
 	}
 }
 

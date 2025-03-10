@@ -23,6 +23,7 @@ class App;
 class BrowserWindow;
 class IconResourceLoader;
 class NavigationRequest;
+class ShellBrowser;
 class ShellIconLoader;
 
 class MainToolbar : public BaseWindow
@@ -82,7 +83,7 @@ private:
 	POINT GetMenuPositionForButton(MainToolbarButton button);
 
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
 	void OnFocusChanged();
 
 	void UpdateToolbarButtonImageIndexes();

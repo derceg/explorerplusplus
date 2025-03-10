@@ -100,7 +100,6 @@ private:
 	NavigateParams() = default;
 };
 
-using NavigationCommittedSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 using NavigationCancelledSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
 class ShellNavigator
@@ -144,20 +143,6 @@ public:
 	//    6.1. The "navigation started" signal is triggered.
 	//    6.2. The navigation is stopped early.
 	//    6.3. The "navigation cancelled" signal is triggered.
-
-	// Triggered when the enumeration for a directory successfully finishes. At this point, the
-	// requested folder has become the current folder and the enumerated items have been displayed.
-	//
-	// This can also be triggered if the initial navigation fails. Typically, if a navigation fails,
-	// no folder change will occur. Instead, the original folder will continue to be shown. However,
-	// when the first navigation occurs, there is no original folder. Because a folder always needs
-	// to be displayed, the only effective option is to consider the failed navigation committed. In
-	// that case, this event will be triggered, while the failed event won't be triggered.
-	//
-	// For the same reasons, this can also be triggered if the initial navigation is stopped early.
-	virtual boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 
 	// Triggered when a navigation is stopped early. As noted above, if the initial navigation is
 	// cancelled, this won't be triggered, as the navigation will be committed instead.

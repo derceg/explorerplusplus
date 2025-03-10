@@ -15,7 +15,7 @@ class HistoryShellBrowserHelperTest : public ShellBrowserHelperTestBase<HistoryS
 protected:
 	void NavigateInNewTab(const std::wstring &path, PidlAbsolute *outputPidl)
 	{
-		auto shellBrowser = CreateTab(&m_historyModel);
+		auto shellBrowser = CreateTab(&m_historyModel, &m_navigationEvents);
 		shellBrowser->NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl);
 	}
 

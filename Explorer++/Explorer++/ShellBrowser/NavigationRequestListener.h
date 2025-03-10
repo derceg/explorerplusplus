@@ -18,9 +18,6 @@ public:
 	virtual void OnEnumerationCompleted(NavigationRequest *request) = 0;
 	virtual void OnEnumerationFailed(NavigationRequest *request) = 0;
 	virtual void OnEnumerationStopped(NavigationRequest *request) = 0;
-	virtual void OnNavigationWillCommit(NavigationRequest *request) = 0;
-	virtual void OnNavigationCommitted(NavigationRequest *request,
-		const std::vector<PidlChild> &items) = 0;
 	virtual void OnNavigationCancelled(NavigationRequest *request) = 0;
 	virtual void OnNavigationFinished(NavigationRequest *request) = 0;
 };

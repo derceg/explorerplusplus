@@ -41,8 +41,8 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
-		tabNavigation, history, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
+		m_app->GetNavigationEvents(), tabNavigation, history, currentEntry);
 
 	ChangeToInitialFolder();
 }
@@ -54,8 +54,8 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
 		folderSettings, initialColumns)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(&m_navigationManager,
-		tabNavigation, initialPidl);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
+		m_app->GetNavigationEvents(), tabNavigation, initialPidl);
 
 	ChangeToInitialFolder();
 }
@@ -112,12 +112,14 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this),
 		NavigationEventScope::ForShellBrowser(*this)));
-	m_navigationManager.AddNavigationWillCommitObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this), boost::signals2::at_front,
-		NavigationManager::SlotGroup::HighPriority);
-	m_navigationManager.AddNavigationCommittedObserver(
-		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this), boost::signals2::at_front,
-		NavigationManager::SlotGroup::HighPriority);
+	m_connections.push_back(m_app->GetNavigationEvents()->AddWillCommitObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this),
+		NavigationEventScope::ForShellBrowser(*this), boost::signals2::at_front,
+		NavigationEvents::SlotGroup::HighPriority));
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
+		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this),
+		NavigationEventScope::ForShellBrowser(*this), boost::signals2::at_front,
+		NavigationEvents::SlotGroup::HighPriority));
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
