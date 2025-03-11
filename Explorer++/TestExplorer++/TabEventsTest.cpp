@@ -83,24 +83,24 @@ TEST_F(TabEventsTabSignalTest, SignalsFilteredByBrowser)
 	// The observer here should only be triggered when a tab event in m_browser1 occurs. That is,
 	// only when m_tab1 is created.
 	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser1));
+		TabEventScope::ForBrowser(m_browser1));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), false));
 
 	m_tabEvents.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser1));
+		TabEventScope::ForBrowser(m_browser1));
 	EXPECT_CALL(m_tabSelectedCallback, Call(Ref(m_tab1)));
 
 	// Likewise, the observer here should only be triggered when a tab event in m_browser2 occurs.
 	m_tabEvents.AddMovedObserver(m_tabMovedCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser2));
+		TabEventScope::ForBrowser(m_browser2));
 	EXPECT_CALL(m_tabMovedCallback, Call(Ref(m_tab2), 3, 4));
 
 	m_tabEvents.AddPreRemovalObserver(m_tabPreRemovalCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser2));
+		TabEventScope::ForBrowser(m_browser2));
 	EXPECT_CALL(m_tabPreRemovalCallback, Call(Ref(m_tab2), 0));
 
 	m_tabEvents.AddRemovedObserver(m_tabRemovedCallback.AsStdFunction(),
-		TabEventScope::ForBrowser(&m_browser1));
+		TabEventScope::ForBrowser(m_browser1));
 	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(m_tab1)));
 
 	m_tabEvents.NotifyCreated(m_tab1, false);

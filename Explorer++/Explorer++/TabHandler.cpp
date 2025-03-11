@@ -23,10 +23,10 @@ void Explorerplusplus::InitializeTabs()
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
 
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
-		std::bind_front(&Explorerplusplus::OnTabCreated, this), TabEventScope::ForBrowser(this),
+		std::bind_front(&Explorerplusplus::OnTabCreated, this), TabEventScope::ForBrowser(*this),
 		boost::signals2::at_front));
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
-		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(this),
+		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(*this),
 		boost::signals2::at_front));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(

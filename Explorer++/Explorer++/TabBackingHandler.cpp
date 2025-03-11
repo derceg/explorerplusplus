@@ -47,7 +47,7 @@ void Explorerplusplus::CreateTabBacking()
 
 			UpdateTabToolbar();
 		},
-		TabEventScope::ForBrowser(this)));
+		TabEventScope::ForBrowser(*this)));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		[this](const Tab &tab)
@@ -56,7 +56,7 @@ void Explorerplusplus::CreateTabBacking()
 
 			UpdateTabToolbar();
 		},
-		TabEventScope::ForBrowser(this)));
+		TabEventScope::ForBrowser(*this)));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
 		[this](const Tab &tab)
@@ -65,7 +65,7 @@ void Explorerplusplus::CreateTabBacking()
 
 			UpdateTabToolbar();
 		},
-		TabEventScope::ForBrowser(this)));
+		TabEventScope::ForBrowser(*this)));
 
 	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }

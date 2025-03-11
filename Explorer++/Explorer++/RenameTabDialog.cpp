@@ -19,7 +19,7 @@ RenameTabDialog::RenameTabDialog(HWND parent, App *app, Tab *tab) :
 
 	m_connections.push_back(app->GetTabEvents()->AddRemovedObserver(
 		std::bind_front(&RenameTabDialog::OnTabClosed, this),
-		TabEventScope::ForBrowser(m_tab->GetBrowser())));
+		TabEventScope::ForBrowser(*m_tab->GetBrowser())));
 }
 
 INT_PTR RenameTabDialog::OnInitDialog()

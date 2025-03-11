@@ -71,7 +71,7 @@ void AddressBar::Initialize(HWND parent)
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&AddressBar::OnTabSelected, this),
-		TabEventScope::ForBrowser(m_browserWindow)));
+		TabEventScope::ForBrowser(*m_browserWindow)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),

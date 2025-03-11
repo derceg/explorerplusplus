@@ -6,6 +6,7 @@
 
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
+#include <optional>
 
 class BrowserWindow;
 class Tab;
@@ -15,15 +16,24 @@ class Tab;
 class TabEventScope
 {
 public:
-	static TabEventScope ForBrowser(BrowserWindow *browser);
-	static TabEventScope Global();
+	enum class Scope
+	{
+		Global,
+		Browser
+	};
 
-	const BrowserWindow *GetBrowser() const;
+	static TabEventScope Global();
+	static TabEventScope ForBrowser(const BrowserWindow &browser);
+
+	Scope GetScope() const;
+	std::optional<int> GetBrowserId() const;
 
 private:
-	TabEventScope(BrowserWindow *browser);
+	TabEventScope();
+	TabEventScope(const BrowserWindow &browser);
 
-	const BrowserWindow *const m_browser;
+	const Scope m_scope;
+	const std::optional<int> m_browserId;
 };
 
 // When there are multiple browser windows, subscribing to tab events globally becomes more
@@ -74,8 +84,22 @@ public:
 	void NotifyRemoved(const Tab &tab);
 
 private:
-	static std::optional<int> GetIdFromBrowser(const BrowserWindow *browser);
-	static bool DoesBrowserMatch(std::optional<int> browserId, const Tab &tab);
+	template <typename Observer>
+	static auto MakeFilteredObserver(Observer &&observer, const TabEventScope &scope)
+	{
+		return [observer = std::forward<Observer>(observer),
+				   scope]<typename... Args>(const Tab &tab, Args &&...args)
+		{
+			if (!DoesEventMatchScope(scope, tab))
+			{
+				return;
+			}
+
+			observer(tab, std::forward<Args>(args)...);
+		};
+	}
+
+	static bool DoesEventMatchScope(const TabEventScope &scope, const Tab &tab);
 
 	CreatedSignal m_createdSignal;
 	SelectedSignal m_selectedSignal;
