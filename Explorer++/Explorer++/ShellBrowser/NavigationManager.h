@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "NavigationRequestListener.h"
+#include "NavigationRequestDelegate.h"
 #include "../Helper/PidlHelper.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
@@ -19,7 +19,7 @@ class ShellEnumerator;
 
 // This class is responsible for managing ongoing navigations and allowing new navigations to be
 // started.
-class NavigationManager : private NavigationRequestListener
+class NavigationManager : private NavigationRequestDelegate
 {
 public:
 	NavigationManager(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents,

@@ -13,7 +13,7 @@
 #include <vector>
 
 class NavigationEvents;
-class NavigationRequestListener;
+class NavigationRequestDelegate;
 class ShellBrowser;
 class ShellEnumerator;
 
@@ -34,7 +34,7 @@ public:
 	};
 
 	NavigationRequest(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents,
-		NavigationRequestListener *listener, std::shared_ptr<const ShellEnumerator> shellEnumerator,
+		NavigationRequestDelegate *delegate, std::shared_ptr<const ShellEnumerator> shellEnumerator,
 		std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 		std::shared_ptr<concurrencpp::executor> originalExecutor,
 		const NavigateParams &navigateParams, std::stop_token stopToken);
@@ -63,7 +63,7 @@ private:
 
 	const ShellBrowser *const m_shellBrowser;
 	NavigationEvents *const m_navigationEvents;
-	NavigationRequestListener *const m_listener;
+	NavigationRequestDelegate *const m_delegate;
 	const std::shared_ptr<const ShellEnumerator> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::executor> m_enumerationExecutor;
 	const std::shared_ptr<concurrencpp::executor> m_originalExecutor;

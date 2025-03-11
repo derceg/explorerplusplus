@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "ShellBrowser/NavigationRequest.h"
 #include "ShellBrowser/NavigationEvents.h"
-#include "ShellBrowser/NavigationRequestListener.h"
+#include "ShellBrowser/NavigationRequestDelegate.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
 #include <gmock/gmock.h>
@@ -16,7 +16,7 @@ using namespace testing;
 namespace
 {
 
-class NavigationRequestListenerMock : public NavigationRequestListener
+class NavigationRequestDelegateMock : public NavigationRequestDelegate
 {
 public:
 	MOCK_METHOD(void, OnEnumerationCompleted, (NavigationRequest * request), (override));
@@ -45,7 +45,7 @@ protected:
 
 	std::unique_ptr<NavigationRequest> MakeNavigationRequest(const NavigateParams &navigateParams)
 	{
-		return std::make_unique<NavigationRequest>(nullptr, &m_navigationEvents, GetListener(),
+		return std::make_unique<NavigationRequest>(nullptr, &m_navigationEvents, GetDelegate(),
 			m_shellEnumerator, m_manualExecutorBackground, m_manualExecutorCurrent, navigateParams,
 			m_stopSource.get_token());
 	}
@@ -62,9 +62,9 @@ protected:
 		return request;
 	}
 
-	virtual NavigationRequestListener *GetListener()
+	virtual NavigationRequestDelegate *GetDelegate()
 	{
-		return &m_listener;
+		return &m_delegate;
 	}
 
 	void RunExecutors()
@@ -80,7 +80,7 @@ protected:
 	std::stop_source m_stopSource;
 
 private:
-	NiceMock<NavigationRequestListenerMock> m_listener;
+	NiceMock<NavigationRequestDelegateMock> m_delegate;
 };
 
 TEST_F(NavigationRequestTest, StartedState)
@@ -156,9 +156,9 @@ protected:
 			NavigationEventScope::Global());
 	}
 
-	NavigationRequestListener *GetListener() override
+	NavigationRequestDelegate *GetDelegate() override
 	{
-		return &m_strictListener;
+		return &m_strictDelegate;
 	}
 
 	StrictMock<
@@ -177,7 +177,7 @@ protected:
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_navigationCancelledCallback;
 
-	StrictMock<NavigationRequestListenerMock> m_strictListener;
+	StrictMock<NavigationRequestDelegateMock> m_strictDelegate;
 };
 
 TEST_F(NavigationRequestSignalTest, CommittedNavigation)
@@ -191,10 +191,10 @@ TEST_F(NavigationRequestSignalTest, CommittedNavigation)
 		InSequence seq;
 
 		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnEnumerationCompleted(request.get()));
+		EXPECT_CALL(m_strictDelegate, OnEnumerationCompleted(request.get()));
 		EXPECT_CALL(m_navigationWillCommitCallback, Call(nullptr, request.get()));
 		EXPECT_CALL(m_navigationCommittedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnFinished(request.get()));
+		EXPECT_CALL(m_strictDelegate, OnFinished(request.get()));
 	}
 
 	request->Start();
@@ -214,9 +214,9 @@ TEST_F(NavigationRequestSignalTest, FailedNavigation)
 		InSequence seq;
 
 		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnEnumerationFailed(request.get()));
+		EXPECT_CALL(m_strictDelegate, OnEnumerationFailed(request.get()));
 		EXPECT_CALL(m_navigationFailedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnFinished(request.get()));
+		EXPECT_CALL(m_strictDelegate, OnFinished(request.get()));
 	}
 
 	m_shellEnumerator->SetShouldSucceed(false);
@@ -237,9 +237,9 @@ TEST_F(NavigationRequestSignalTest, CancelledNavigation)
 		InSequence seq;
 
 		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnEnumerationStopped(request.get()));
+		EXPECT_CALL(m_strictDelegate, OnEnumerationStopped(request.get()));
 		EXPECT_CALL(m_navigationCancelledCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnFinished(request.get()));
+		EXPECT_CALL(m_strictDelegate, OnFinished(request.get()));
 	}
 
 	request->Start();

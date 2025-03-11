@@ -5,19 +5,19 @@
 #include "stdafx.h"
 #include "NavigationRequest.h"
 #include "NavigationEvents.h"
-#include "NavigationRequestListener.h"
+#include "NavigationRequestDelegate.h"
 #include "ShellEnumerator.h"
 #include "../Helper/ShellHelper.h"
 
 NavigationRequest::NavigationRequest(const ShellBrowser *shellBrowser,
-	NavigationEvents *navigationEvents, NavigationRequestListener *listener,
+	NavigationEvents *navigationEvents, NavigationRequestDelegate *delegate,
 	std::shared_ptr<const ShellEnumerator> shellEnumerator,
 	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
 	std::shared_ptr<concurrencpp::executor> originalExecutor, const NavigateParams &navigateParams,
 	std::stop_token stopToken) :
 	m_shellBrowser(shellBrowser),
 	m_navigationEvents(navigationEvents),
-	m_listener(listener),
+	m_delegate(delegate),
 	m_shellEnumerator(shellEnumerator),
 	m_enumerationExecutor(enumerationExecutor),
 	m_originalExecutor(originalExecutor),
@@ -41,7 +41,7 @@ void NavigationRequest::Commit()
 	SetState(State::Committed);
 	m_navigationEvents->NotifyCommitted(m_shellBrowser, this);
 
-	m_listener->OnFinished(this);
+	m_delegate->OnFinished(this);
 }
 
 void NavigationRequest::Fail()
@@ -50,7 +50,7 @@ void NavigationRequest::Fail()
 
 	m_navigationEvents->NotifyFailed(m_shellBrowser, this);
 
-	m_listener->OnFinished(this);
+	m_delegate->OnFinished(this);
 }
 
 void NavigationRequest::Cancel()
@@ -59,7 +59,7 @@ void NavigationRequest::Cancel()
 
 	m_navigationEvents->NotifyCancelled(m_shellBrowser, this);
 
-	m_listener->OnFinished(this);
+	m_delegate->OnFinished(this);
 }
 
 NavigationRequest::State NavigationRequest::GetState() const
@@ -133,17 +133,17 @@ concurrencpp::null_result NavigationRequest::StartInternal(WeakPtr<NavigationReq
 
 	if (stopToken.stop_requested())
 	{
-		weakSelf->m_listener->OnEnumerationStopped(weakSelf.Get());
+		weakSelf->m_delegate->OnEnumerationStopped(weakSelf.Get());
 		co_return;
 	}
 
 	if (FAILED(hr))
 	{
-		weakSelf->m_listener->OnEnumerationFailed(weakSelf.Get());
+		weakSelf->m_delegate->OnEnumerationFailed(weakSelf.Get());
 		co_return;
 	}
 
-	weakSelf->m_listener->OnEnumerationCompleted(weakSelf.Get());
+	weakSelf->m_delegate->OnEnumerationCompleted(weakSelf.Get());
 }
 
 void NavigationRequest::SetState(State state)

@@ -29,7 +29,7 @@ NavigationManager::~NavigationManager() = default;
 void NavigationManager::StartNavigation(const NavigateParams &navigateParams)
 {
 	auto navigationRequest = std::make_unique<NavigationRequest>(m_shellBrowser, m_navigationEvents,
-		static_cast<NavigationRequestListener *>(this), m_shellEnumerator, m_enumerationExecutor,
+		static_cast<NavigationRequestDelegate *>(this), m_shellEnumerator, m_enumerationExecutor,
 		m_originalExecutor, navigateParams, m_scopedStopSource->GetToken());
 	auto *rawNavigationRequest = navigationRequest.get();
 	m_pendingNavigations.push_back(std::move(navigationRequest));

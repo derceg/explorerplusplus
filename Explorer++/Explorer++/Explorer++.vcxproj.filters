@@ -1650,7 +1650,7 @@
     <ClInclude Include="ShellBrowser\NavigationRequest.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\NavigationRequestListener.h">
+    <ClInclude Include="ShellBrowser\NavigationRequestDelegate.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\NavigationEvents.h">
