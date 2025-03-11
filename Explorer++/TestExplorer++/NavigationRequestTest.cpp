@@ -22,8 +22,7 @@ public:
 	MOCK_METHOD(void, OnEnumerationCompleted, (NavigationRequest * request), (override));
 	MOCK_METHOD(void, OnEnumerationFailed, (NavigationRequest * request), (override));
 	MOCK_METHOD(void, OnEnumerationStopped, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnNavigationCancelled, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnNavigationFinished, (NavigationRequest * request), (override));
+	MOCK_METHOD(void, OnFinished, (NavigationRequest * request), (override));
 };
 
 }
@@ -153,6 +152,8 @@ protected:
 			NavigationEventScope::Global());
 		m_navigationEvents.AddFailedObserver(m_navigationFailedCallback.AsStdFunction(),
 			NavigationEventScope::Global());
+		m_navigationEvents.AddCancelledObserver(m_navigationCancelledCallback.AsStdFunction(),
+			NavigationEventScope::Global());
 	}
 
 	NavigationRequestListener *GetListener() override
@@ -172,6 +173,9 @@ protected:
 	StrictMock<
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_navigationFailedCallback;
+	StrictMock<
+		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
+		m_navigationCancelledCallback;
 
 	StrictMock<NavigationRequestListenerMock> m_strictListener;
 };
@@ -190,7 +194,7 @@ TEST_F(NavigationRequestSignalTest, CommittedNavigation)
 		EXPECT_CALL(m_strictListener, OnEnumerationCompleted(request.get()));
 		EXPECT_CALL(m_navigationWillCommitCallback, Call(nullptr, request.get()));
 		EXPECT_CALL(m_navigationCommittedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnNavigationFinished(request.get()));
+		EXPECT_CALL(m_strictListener, OnFinished(request.get()));
 	}
 
 	request->Start();
@@ -212,7 +216,7 @@ TEST_F(NavigationRequestSignalTest, FailedNavigation)
 		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
 		EXPECT_CALL(m_strictListener, OnEnumerationFailed(request.get()));
 		EXPECT_CALL(m_navigationFailedCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_strictListener, OnNavigationFinished(request.get()));
+		EXPECT_CALL(m_strictListener, OnFinished(request.get()));
 	}
 
 	m_shellEnumerator->SetShouldSucceed(false);
@@ -234,8 +238,8 @@ TEST_F(NavigationRequestSignalTest, CancelledNavigation)
 
 		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
 		EXPECT_CALL(m_strictListener, OnEnumerationStopped(request.get()));
-		EXPECT_CALL(m_strictListener, OnNavigationCancelled(request.get()));
-		EXPECT_CALL(m_strictListener, OnNavigationFinished(request.get()));
+		EXPECT_CALL(m_navigationCancelledCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_strictListener, OnFinished(request.get()));
 	}
 
 	request->Start();

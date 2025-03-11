@@ -11,6 +11,7 @@
 #include "ItemData.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
+#include "NavigateParams.h"
 #include "ResourceHelper.h"
 #include "SelectColumnsDialog.h"
 #include "SetFileAttributesDialog.h"

@@ -47,6 +47,9 @@ protected:
 	StrictMock<
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_failedCallback;
+	StrictMock<
+		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
+		m_cancelledCallback;
 
 	StrictMock<MockFunction<void(const ShellBrowser *shellBrowser)>> m_stoppedCallback;
 };
@@ -79,6 +82,12 @@ TEST_F(NavigationEventsTest, Signals)
 	EXPECT_CALL(m_failedCallback, Call(m_tab2.GetShellBrowser(), nullptr));
 	EXPECT_CALL(m_failedCallback, Call(m_tab3.GetShellBrowser(), nullptr));
 
+	m_navigationEvents.AddCancelledObserver(m_cancelledCallback.AsStdFunction(),
+		NavigationEventScope::Global());
+	EXPECT_CALL(m_cancelledCallback, Call(m_tab1.GetShellBrowser(), nullptr));
+	EXPECT_CALL(m_cancelledCallback, Call(m_tab2.GetShellBrowser(), nullptr));
+	EXPECT_CALL(m_cancelledCallback, Call(m_tab3.GetShellBrowser(), nullptr));
+
 	m_navigationEvents.AddStoppedObserver(m_stoppedCallback.AsStdFunction(),
 		NavigationEventScope::Global());
 	EXPECT_CALL(m_stoppedCallback, Call(m_tab1.GetShellBrowser()));
@@ -100,6 +109,10 @@ TEST_F(NavigationEventsTest, Signals)
 	m_navigationEvents.NotifyFailed(m_tab1.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyFailed(m_tab2.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyFailed(m_tab3.GetShellBrowser(), nullptr);
+
+	m_navigationEvents.NotifyCancelled(m_tab1.GetShellBrowser(), nullptr);
+	m_navigationEvents.NotifyCancelled(m_tab2.GetShellBrowser(), nullptr);
+	m_navigationEvents.NotifyCancelled(m_tab3.GetShellBrowser(), nullptr);
 
 	m_navigationEvents.NotifyStopped(m_tab1.GetShellBrowser());
 	m_navigationEvents.NotifyStopped(m_tab2.GetShellBrowser());
@@ -128,10 +141,14 @@ TEST_F(NavigationEventsTest, SignalsFilteredByBrowser)
 		NavigationEventScope::ForBrowser(m_browser2));
 	EXPECT_CALL(m_failedCallback, Call(m_tab3.GetShellBrowser(), nullptr));
 
-	m_navigationEvents.AddStoppedObserver(m_stoppedCallback.AsStdFunction(),
+	m_navigationEvents.AddCancelledObserver(m_cancelledCallback.AsStdFunction(),
 		NavigationEventScope::ForBrowser(m_browser1));
-	EXPECT_CALL(m_stoppedCallback, Call(m_tab1.GetShellBrowser()));
-	EXPECT_CALL(m_stoppedCallback, Call(m_tab2.GetShellBrowser()));
+	EXPECT_CALL(m_cancelledCallback, Call(m_tab1.GetShellBrowser(), nullptr));
+	EXPECT_CALL(m_cancelledCallback, Call(m_tab2.GetShellBrowser(), nullptr));
+
+	m_navigationEvents.AddStoppedObserver(m_stoppedCallback.AsStdFunction(),
+		NavigationEventScope::ForBrowser(m_browser2));
+	EXPECT_CALL(m_stoppedCallback, Call(m_tab3.GetShellBrowser()));
 
 	m_navigationEvents.NotifyStarted(m_tab1.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyStarted(m_tab2.GetShellBrowser(), nullptr);
@@ -148,6 +165,10 @@ TEST_F(NavigationEventsTest, SignalsFilteredByBrowser)
 	m_navigationEvents.NotifyFailed(m_tab1.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyFailed(m_tab2.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyFailed(m_tab3.GetShellBrowser(), nullptr);
+
+	m_navigationEvents.NotifyCancelled(m_tab1.GetShellBrowser(), nullptr);
+	m_navigationEvents.NotifyCancelled(m_tab2.GetShellBrowser(), nullptr);
+	m_navigationEvents.NotifyCancelled(m_tab3.GetShellBrowser(), nullptr);
 
 	m_navigationEvents.NotifyStopped(m_tab1.GetShellBrowser());
 	m_navigationEvents.NotifyStopped(m_tab2.GetShellBrowser());
@@ -174,6 +195,10 @@ TEST_F(NavigationEventsTest, SignalsFilteredByShellBrowser)
 		NavigationEventScope::ForShellBrowser(*m_tab3.GetShellBrowser()));
 	EXPECT_CALL(m_failedCallback, Call(m_tab3.GetShellBrowser(), nullptr));
 
+	m_navigationEvents.AddCancelledObserver(m_cancelledCallback.AsStdFunction(),
+		NavigationEventScope::ForShellBrowser(*m_tab3.GetShellBrowser()));
+	EXPECT_CALL(m_cancelledCallback, Call(m_tab3.GetShellBrowser(), nullptr));
+
 	m_navigationEvents.AddStoppedObserver(m_stoppedCallback.AsStdFunction(),
 		NavigationEventScope::ForShellBrowser(*m_tab2.GetShellBrowser()));
 	EXPECT_CALL(m_stoppedCallback, Call(m_tab2.GetShellBrowser()));
@@ -193,6 +218,10 @@ TEST_F(NavigationEventsTest, SignalsFilteredByShellBrowser)
 	m_navigationEvents.NotifyFailed(m_tab1.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyFailed(m_tab2.GetShellBrowser(), nullptr);
 	m_navigationEvents.NotifyFailed(m_tab3.GetShellBrowser(), nullptr);
+
+	m_navigationEvents.NotifyCancelled(m_tab1.GetShellBrowser(), nullptr);
+	m_navigationEvents.NotifyCancelled(m_tab2.GetShellBrowser(), nullptr);
+	m_navigationEvents.NotifyCancelled(m_tab3.GetShellBrowser(), nullptr);
 
 	m_navigationEvents.NotifyStopped(m_tab1.GetShellBrowser());
 	m_navigationEvents.NotifyStopped(m_tab2.GetShellBrowser());

@@ -24,9 +24,9 @@
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
@@ -110,8 +110,6 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 	m_connections.push_back(
 		m_config->showFolders.addObserver(std::bind(&ShellTreeView::UpdateSelection, this)));
 
-	auto *tabContainer = m_browserWindow->GetActivePane()->GetTabContainer();
-
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
 		{
@@ -143,16 +141,19 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		},
 		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
-	m_connections.push_back(tabContainer->tabNavigationCancelledSignal.AddObserver(
-		[this](const Tab &tab, const NavigationRequest *request)
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCancelledObserver(
+		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
 		{
 			UNREFERENCED_PARAMETER(request);
 
-			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+			const auto *tab = shellBrowser->GetTab();
+
+			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 			{
 				UpdateSelection();
 			}
-		}));
+		},
+		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
 	m_connections.push_back(
 		m_app->GetTabEvents()->AddSelectedObserver(std::bind(&ShellTreeView::UpdateSelection, this),

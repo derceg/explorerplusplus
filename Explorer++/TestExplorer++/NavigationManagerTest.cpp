@@ -71,8 +71,8 @@ protected:
 		m_navigationEvents.AddFailedObserver(m_navigationFailedCallback.AsStdFunction(),
 			NavigationEventScope::Global());
 
-		m_navigationManager->AddNavigationCancelledObserver(
-			m_navigationCancelledCallback.AsStdFunction());
+		m_navigationEvents.AddCancelledObserver(m_navigationCancelledCallback.AsStdFunction(),
+			NavigationEventScope::Global());
 	}
 
 	StrictMock<
@@ -90,7 +90,9 @@ protected:
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_navigationFailedCallback;
 
-	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationCancelledCallback;
+	StrictMock<
+		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
+		m_navigationCancelledCallback;
 };
 
 TEST_F(NavigationManagerSignalTest, SuccessfulNavigation)
@@ -204,7 +206,8 @@ TEST_F(NavigationManagerSignalTest, CancelledSubsequentNavigation)
 			Call(nullptr, NavigateParamsMatch(navigateParamsSuccess)));
 		EXPECT_CALL(m_navigationStartedCallback,
 			Call(nullptr, NavigateParamsMatch(navigateParamsCancel)));
-		EXPECT_CALL(m_navigationCancelledCallback, Call(NavigateParamsMatch(navigateParamsCancel)));
+		EXPECT_CALL(m_navigationCancelledCallback,
+			Call(nullptr, NavigateParamsMatch(navigateParamsCancel)));
 	}
 
 	CompleteNavigation(navigateParamsSuccess);
@@ -233,7 +236,8 @@ TEST_F(NavigationManagerSignalTest, CommitWithPendingNavigation)
 			Call(nullptr, NavigateParamsMatch(navigateParams1)));
 		EXPECT_CALL(m_navigationCommittedCallback,
 			Call(nullptr, NavigateParamsMatch(navigateParams1)));
-		EXPECT_CALL(m_navigationCancelledCallback, Call(NavigateParamsMatch(navigateParams2)));
+		EXPECT_CALL(m_navigationCancelledCallback,
+			Call(nullptr, NavigateParamsMatch(navigateParams2)));
 	}
 
 	m_navigationManager->StartNavigation(navigateParams1);
@@ -291,7 +295,7 @@ protected:
 				{ EXPECT_EQ(UniqueThreadId::GetForCurrentThread(), originalThreadId); });
 
 		ON_CALL(m_navigationCancelledCallback, Call)
-			.WillByDefault([originalThreadId](const NavigationRequest *)
+			.WillByDefault([originalThreadId](const ShellBrowser *, const NavigationRequest *)
 				{ EXPECT_EQ(UniqueThreadId::GetForCurrentThread(), originalThreadId); });
 	}
 };
@@ -318,7 +322,8 @@ TEST_F(NavigationManagerSignalThreadTest, CheckThread)
 			Call(nullptr, NavigateParamsMatch(navigateParams1)));
 		EXPECT_CALL(m_navigationCommittedCallback,
 			Call(nullptr, NavigateParamsMatch(navigateParams1)));
-		EXPECT_CALL(m_navigationCancelledCallback, Call(NavigateParamsMatch(navigateParams2)));
+		EXPECT_CALL(m_navigationCancelledCallback,
+			Call(nullptr, NavigateParamsMatch(navigateParams2)));
 
 		EXPECT_CALL(m_navigationStartedCallback,
 			Call(nullptr, NavigateParamsMatch(navigateParams3)));
@@ -519,8 +524,7 @@ protected:
 				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this));
 		ON_CALL(m_navigationCancelledCallback, Call)
 			.WillByDefault(std::bind_front(
-				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this,
-				nullptr));
+				&NavigationManagerLatestNavigationLifetimeTest::CheckIsLatestNavigation, this));
 
 		m_navigationEvents.AddStartedObserver(m_navigationStartedCallback.AsStdFunction(),
 			NavigationEventScope::Global());
@@ -528,8 +532,8 @@ protected:
 			NavigationEventScope::Global());
 		m_navigationEvents.AddFailedObserver(m_navigationFailedCallback.AsStdFunction(),
 			NavigationEventScope::Global());
-		m_navigationManager->AddNavigationCancelledObserver(
-			m_navigationCancelledCallback.AsStdFunction());
+		m_navigationEvents.AddCancelledObserver(m_navigationCancelledCallback.AsStdFunction(),
+			NavigationEventScope::Global());
 	}
 
 	StrictMock<
@@ -541,7 +545,9 @@ protected:
 	StrictMock<
 		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
 		m_navigationFailedCallback;
-	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationCancelledCallback;
+	StrictMock<
+		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
+		m_navigationCancelledCallback;
 
 private:
 	void CheckIsLatestNavigation(const ShellBrowser *shellBrowser, const NavigationRequest *request)
@@ -596,7 +602,8 @@ TEST_F(NavigationManagerLatestNavigationLifetimeTest, CancelledNavigation)
 
 		EXPECT_CALL(m_navigationStartedCallback,
 			Call(nullptr, NavigateParamsMatch(navigateParams)));
-		EXPECT_CALL(m_navigationCancelledCallback, Call(NavigateParamsMatch(navigateParams)));
+		EXPECT_CALL(m_navigationCancelledCallback,
+			Call(nullptr, NavigateParamsMatch(navigateParams)));
 	}
 
 	m_navigationManager->StartNavigation(navigateParams);

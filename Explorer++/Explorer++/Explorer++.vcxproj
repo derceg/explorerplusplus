@@ -1514,7 +1514,7 @@
     <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\HistoryEntry.h" />
     <ClInclude Include="ShellBrowser\ShellNavigationController.h" />
-    <ClInclude Include="ShellBrowser\ShellNavigator.h" />
+    <ClInclude Include="ShellBrowser\NavigateParams.h" />
     <ClInclude Include="ShellBrowser\PreservedFolderState.h" />
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserImpl.h" />

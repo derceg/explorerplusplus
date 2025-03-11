@@ -9,6 +9,7 @@
 #include "DirectoryOperationsHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "SortMenuBuilder.h"

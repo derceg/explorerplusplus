@@ -18,6 +18,5 @@ public:
 	virtual void OnEnumerationCompleted(NavigationRequest *request) = 0;
 	virtual void OnEnumerationFailed(NavigationRequest *request) = 0;
 	virtual void OnEnumerationStopped(NavigationRequest *request) = 0;
-	virtual void OnNavigationCancelled(NavigationRequest *request) = 0;
-	virtual void OnNavigationFinished(NavigationRequest *request) = 0;
+	virtual void OnFinished(NavigationRequest *request) = 0;
 };

@@ -7,6 +7,7 @@
 #include "App.h"
 #include "ColumnStorage.h"
 #include "Config.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "TabStorage.h"
@@ -37,9 +38,9 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationFailedStatusBar, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
-	tabContainer->tabNavigationCancelledSignal.AddObserver(
+	m_connections.push_back(m_app->GetNavigationEvents()->AddCancelledObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCancelledStatusBar, this),
-		boost::signals2::at_front);
+		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
 	m_connections.push_back(m_app->GetNavigationEvents()->AddStoppedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationsStoppedStatusBar, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));

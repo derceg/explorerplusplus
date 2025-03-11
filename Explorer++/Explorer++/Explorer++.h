@@ -409,7 +409,8 @@ private:
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
 	void OnNavigationFailedStatusBar(const ShellBrowser *shellBrowser,
 		const NavigationRequest *request);
-	void OnNavigationCancelledStatusBar(const Tab &tab, const NavigationRequest *request);
+	void OnNavigationCancelledStatusBar(const ShellBrowser *shellBrowser,
+		const NavigationRequest *request);
 	void OnNavigationsStoppedStatusBar(const ShellBrowser *shellBrowser);
 	void UpdateStatusBarText(const Tab &tab);
 	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);

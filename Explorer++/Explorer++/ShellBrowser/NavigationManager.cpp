@@ -67,12 +67,7 @@ void NavigationManager::OnEnumerationStopped(NavigationRequest *request)
 	request->Cancel();
 }
 
-void NavigationManager::OnNavigationCancelled(NavigationRequest *request)
-{
-	m_navigationCancelledSignal(request);
-}
-
-void NavigationManager::OnNavigationFinished(NavigationRequest *request)
+void NavigationManager::OnFinished(NavigationRequest *request)
 {
 	RemoveNavigationRequest(request);
 }
@@ -180,11 +175,4 @@ bool NavigationManager::ActiveNavigationFilter(
 bool NavigationManager::HasAnyActiveNavigations() const
 {
 	return GetNumActiveNavigations() > 0;
-}
-
-boost::signals2::connection NavigationManager::AddNavigationCancelledObserver(
-	const NavigationCancelledSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return m_navigationCancelledSignal.connect(observer, position);
 }

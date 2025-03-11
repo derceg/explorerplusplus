@@ -7,6 +7,7 @@
 #include "App.h"
 #include "Config.h"
 #include "ItemData.h"
+#include "NavigateParams.h"
 #include "Runtime.h"
 #include "RuntimeHelper.h"
 #include "ShellNavigationController.h"

@@ -18,6 +18,7 @@
 #include "MainToolbar.h"
 #include "Plugins/PluginManager.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"

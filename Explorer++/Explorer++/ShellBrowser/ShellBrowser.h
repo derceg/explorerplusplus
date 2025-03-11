@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "ShellNavigator.h"
 #include <memory>
 #include <vector>
 
@@ -15,10 +14,11 @@ class ShellBrowserHelperBase;
 class ShellNavigationController;
 class Tab;
 
-class ShellBrowser : public ShellNavigator
+class ShellBrowser
 {
 public:
 	ShellBrowser();
+	virtual ~ShellBrowser() = default;
 
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
@@ -30,11 +30,6 @@ public:
 
 	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper);
 	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
-
-	// ShellNavigator
-	boost::signals2::connection AddNavigationCancelledObserver(
-		const NavigationCancelledSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;

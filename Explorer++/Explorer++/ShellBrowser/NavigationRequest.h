@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ShellNavigator.h"
+#include "NavigateParams.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"

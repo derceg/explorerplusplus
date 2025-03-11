@@ -37,10 +37,3 @@ const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const
 {
 	return GetNavigationManager()->MaybeGetLatestActiveNavigation();
 }
-
-boost::signals2::connection ShellBrowser::AddNavigationCancelledObserver(
-	const NavigationCancelledSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return GetNavigationManager()->AddNavigationCancelledObserver(observer, position);
-}

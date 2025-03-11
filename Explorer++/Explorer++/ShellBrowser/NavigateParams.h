@@ -6,7 +6,7 @@
 
 #include "HistoryEntry.h"
 #include "../Helper/PidlHelper.h"
-#include <boost/signals2.hpp>
+#include <optional>
 
 class NavigationRequest;
 
@@ -98,55 +98,4 @@ public:
 
 private:
 	NavigateParams() = default;
-};
-
-using NavigationCancelledSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
-
-class ShellNavigator
-{
-public:
-	virtual ~ShellNavigator() = default;
-
-	// Navigations can result in various success or failure states, summarized by the following
-	// cases:
-	//
-	// 1. Initial Navigation (Success)
-	//    1.1. The "navigation started" signal is triggered.
-	//    1.2. Directory enumeration succeeds.
-	//    1.3. The "navigation committed" signal is triggered, making the requested folder the
-	//         current folder.
-	//
-	// 2. Initial Navigation (Failure)
-	//    2.1. The "navigation started" signal is triggered.
-	//    2.2. Directory enumeration fails.
-	//    2.3. The "navigation committed" signal is triggered, making the requested folder the
-	//         current folder.
-	//
-	// 3. Initial Navigation (Cancellation)
-	//    3.1. The "navigation started" signal is triggered.
-	//    3.2. The navigation is stopped early.
-	//    3.3. The "navigation committed" signal is triggered, making the requested folder the
-	//         current folder.
-	//
-	// 4. Subsequent Navigation (Success)
-	//    4.1. The "navigation started" signal is triggered.
-	//    4.2. Directory enumeration succeeds.
-	//    4.3. The "navigation committed" signal is triggered, making the requested folder the
-	//         current folder.
-	//
-	// 5. Subsequent Navigation (Failure)
-	//    5.1. The "navigation started" signal is triggered.
-	//    5.2. Directory enumeration fails.
-	//    5.3. The "navigation failed" signal is triggered.
-	//
-	// 6. Subsequent Navigation (Cancellation)
-	//    6.1. The "navigation started" signal is triggered.
-	//    6.2. The navigation is stopped early.
-	//    6.3. The "navigation cancelled" signal is triggered.
-
-	// Triggered when a navigation is stopped early. As noted above, if the initial navigation is
-	// cancelled, this won't be triggered, as the navigation will be committed instead.
-	virtual boost::signals2::connection AddNavigationCancelledObserver(
-		const NavigationCancelledSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) = 0;
 };

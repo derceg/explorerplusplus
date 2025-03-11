@@ -55,7 +55,7 @@ std::optional<int> NavigationEventScope::GetShellBrowserId() const
 }
 
 boost::signals2::connection NavigationEvents::AddStartedObserver(
-	const StartedSignal::slot_type &observer, const NavigationEventScope &scope,
+	const NavigationSignal::slot_type &observer, const NavigationEventScope &scope,
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_startedSignal.connect(static_cast<int>(slotGroup),
@@ -63,7 +63,7 @@ boost::signals2::connection NavigationEvents::AddStartedObserver(
 }
 
 boost::signals2::connection NavigationEvents::AddWillCommitObserver(
-	const WillCommitSignal::slot_type &observer, const NavigationEventScope &scope,
+	const NavigationSignal::slot_type &observer, const NavigationEventScope &scope,
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_willCommitSignal.connect(static_cast<int>(slotGroup),
@@ -71,7 +71,7 @@ boost::signals2::connection NavigationEvents::AddWillCommitObserver(
 }
 
 boost::signals2::connection NavigationEvents::AddCommittedObserver(
-	const CommittedSignal::slot_type &observer, const NavigationEventScope &scope,
+	const NavigationSignal::slot_type &observer, const NavigationEventScope &scope,
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_committedSignal.connect(static_cast<int>(slotGroup),
@@ -79,10 +79,18 @@ boost::signals2::connection NavigationEvents::AddCommittedObserver(
 }
 
 boost::signals2::connection NavigationEvents::AddFailedObserver(
-	const FailedSignal::slot_type &observer, const NavigationEventScope &scope,
+	const NavigationSignal::slot_type &observer, const NavigationEventScope &scope,
 	boost::signals2::connect_position position, SlotGroup slotGroup)
 {
 	return m_failedSignal.connect(static_cast<int>(slotGroup),
+		MakeFilteredObserver(observer, scope), position);
+}
+
+boost::signals2::connection NavigationEvents::AddCancelledObserver(
+	const NavigationSignal::slot_type &observer, const NavigationEventScope &scope,
+	boost::signals2::connect_position position, SlotGroup slotGroup)
+{
+	return m_cancelledSignal.connect(static_cast<int>(slotGroup),
 		MakeFilteredObserver(observer, scope), position);
 }
 
@@ -133,6 +141,12 @@ void NavigationEvents::NotifyFailed(const ShellBrowser *shellBrowser,
 	const NavigationRequest *request)
 {
 	m_failedSignal(shellBrowser, request);
+}
+
+void NavigationEvents::NotifyCancelled(const ShellBrowser *shellBrowser,
+	const NavigationRequest *request)
+{
+	m_cancelledSignal(shellBrowser, request);
 }
 
 void NavigationEvents::NotifyStopped(const ShellBrowser *shellBrowser)

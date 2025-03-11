@@ -201,14 +201,16 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const ShellBrowser *shellBrow
 	}
 }
 
-void Explorerplusplus::OnNavigationCancelledStatusBar(const Tab &tab,
+void Explorerplusplus::OnNavigationCancelledStatusBar(const ShellBrowser *shellBrowser,
 	const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
-		UpdateStatusBarText(tab);
+		UpdateStatusBarText(*tab);
 	}
 }
 

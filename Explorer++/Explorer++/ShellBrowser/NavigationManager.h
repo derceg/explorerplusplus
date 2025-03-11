@@ -22,9 +22,6 @@ class ShellEnumerator;
 class NavigationManager : private NavigationRequestListener
 {
 public:
-	using NavigationCancelledSignal =
-		boost::signals2::signal<void(const NavigationRequest *request)>;
-
 	NavigationManager(const ShellBrowser *shellBrowser, NavigationEvents *navigationEvents,
 		std::shared_ptr<const ShellEnumerator> shellEnumerator,
 		std::shared_ptr<concurrencpp::executor> enumerationExecutor,
@@ -58,17 +55,12 @@ public:
 	size_t GetNumActiveNavigations() const;
 	bool HasAnyActiveNavigations() const;
 
-	boost::signals2::connection AddNavigationCancelledObserver(
-		const NavigationCancelledSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back);
-
 private:
 	// NavigationRequestListener
 	void OnEnumerationCompleted(NavigationRequest *request) override;
 	void OnEnumerationFailed(NavigationRequest *request) override;
 	void OnEnumerationStopped(NavigationRequest *request) override;
-	void OnNavigationCancelled(NavigationRequest *request) override;
-	void OnNavigationFinished(NavigationRequest *request) override;
+	void OnFinished(NavigationRequest *request) override;
 
 	void CommitNavigation(NavigationRequest *request);
 
@@ -84,8 +76,6 @@ private:
 
 	bool m_anyNavigationsCommitted = false;
 	std::vector<std::unique_ptr<NavigationRequest>> m_pendingNavigations;
-
-	NavigationCancelledSignal m_navigationCancelledSignal;
 
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 };

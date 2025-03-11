@@ -41,7 +41,7 @@ void NavigationRequest::Commit()
 	SetState(State::Committed);
 	m_navigationEvents->NotifyCommitted(m_shellBrowser, this);
 
-	m_listener->OnNavigationFinished(this);
+	m_listener->OnFinished(this);
 }
 
 void NavigationRequest::Fail()
@@ -50,16 +50,16 @@ void NavigationRequest::Fail()
 
 	m_navigationEvents->NotifyFailed(m_shellBrowser, this);
 
-	m_listener->OnNavigationFinished(this);
+	m_listener->OnFinished(this);
 }
 
 void NavigationRequest::Cancel()
 {
 	SetState(State::Cancelled);
 
-	m_listener->OnNavigationCancelled(this);
+	m_navigationEvents->NotifyCancelled(m_shellBrowser, this);
 
-	m_listener->OnNavigationFinished(this);
+	m_listener->OnFinished(this);
 }
 
 NavigationRequest::State NavigationRequest::GetState() const

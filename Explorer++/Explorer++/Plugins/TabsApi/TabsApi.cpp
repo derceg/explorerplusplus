@@ -8,6 +8,7 @@
 #include "CoreInterface.h"
 #include "Plugins/TabsApi/TabProperties.h"
 #include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/SortModes.h"

@@ -16,6 +16,7 @@
 #include "PreservedTab.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -962,10 +963,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		// a selected tab), regardless of what the caller passes in.
 		selected = true;
 	}
-
-	tab.GetShellBrowserImpl()->AddNavigationCancelledObserver(
-		[this, &tab](const NavigationRequest *request)
-		{ tabNavigationCancelledSignal.m_signal(tab, request); });
 
 	tab.GetShellBrowserImpl()->directoryContentsChanged.AddObserver(
 		[this, &tab]() { tabDirectoryContentsChangedSignal.m_signal(tab); });

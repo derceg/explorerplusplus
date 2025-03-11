@@ -10,6 +10,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"

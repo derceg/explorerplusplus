@@ -1026,7 +1026,7 @@
     <ClInclude Include="TabNavigationInterface.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\ShellNavigator.h">
+    <ClInclude Include="ShellBrowser\NavigateParams.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\HistoryEntry.h">
