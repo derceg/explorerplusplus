@@ -4,37 +4,13 @@
 
 #pragma once
 
+#include "EventScope.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
-#include <optional>
 
-class BrowserWindow;
 class Tab;
 
-// When adding an observer, this class can be used to indicate when the observer should be triggered
-// - on all tab events, or only those that occur in a specific browser window.
-class TabEventScope
-{
-public:
-	enum class Scope
-	{
-		Global,
-		Browser
-	};
-
-	static TabEventScope Global();
-	static TabEventScope ForBrowser(const BrowserWindow &browser);
-
-	Scope GetScope() const;
-	std::optional<int> GetBrowserId() const;
-
-private:
-	TabEventScope();
-	TabEventScope(const BrowserWindow &browser);
-
-	const Scope m_scope;
-	const std::optional<int> m_browserId;
-};
+using TabEventScope = EventScope<EventScopeMinimumLevel::Browser>;
 
 // When there are multiple browser windows, subscribing to tab events globally becomes more
 // difficult. For example, to be notified of tab events in all windows, a class would have to
@@ -90,7 +66,7 @@ private:
 		return [observer = std::forward<Observer>(observer),
 				   scope]<typename... Args>(const Tab &tab, Args &&...args)
 		{
-			if (!DoesEventMatchScope(scope, tab))
+			if (!scope.DoesEventSourceMatch(tab))
 			{
 				return;
 			}
@@ -98,8 +74,6 @@ private:
 			observer(tab, std::forward<Args>(args)...);
 		};
 	}
-
-	static bool DoesEventMatchScope(const TabEventScope &scope, const Tab &tab);
 
 	CreatedSignal m_createdSignal;
 	SelectedSignal m_selectedSignal;

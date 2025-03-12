@@ -4,42 +4,15 @@
 
 #pragma once
 
+#include "EventScope.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
-#include <optional>
 #include <utility>
 
-class BrowserWindow;
 class NavigationRequest;
 class ShellBrowser;
 
-class NavigationEventScope
-{
-public:
-	enum class Scope
-	{
-		Global,
-		Browser,
-		ShellBrowser
-	};
-
-	static NavigationEventScope Global();
-	static NavigationEventScope ForBrowser(const BrowserWindow &browser);
-	static NavigationEventScope ForShellBrowser(const ShellBrowser &shellBrowser);
-
-	Scope GetScope() const;
-	std::optional<int> GetBrowserId() const;
-	std::optional<int> GetShellBrowserId() const;
-
-private:
-	NavigationEventScope();
-	NavigationEventScope(const BrowserWindow &browser);
-	NavigationEventScope(const ShellBrowser &shellBrowser);
-
-	const Scope m_scope;
-	const std::optional<int> m_browserId;
-	const std::optional<int> m_shellBrowserId;
-};
+using NavigationEventScope = EventScope<EventScopeMinimumLevel::ShellBrowser>;
 
 // Navigations can result in various success or failure states, summarized by the following cases:
 //
@@ -158,7 +131,7 @@ private:
 		return [observer = std::forward<Observer>(observer),
 				   scope]<typename... Args>(const ShellBrowser *shellBrowser, Args &&...args)
 		{
-			if (!DoesEventMatchScope(scope, shellBrowser))
+			if (!scope.DoesEventSourceMatch(*shellBrowser))
 			{
 				return;
 			}
@@ -166,9 +139,6 @@ private:
 			observer(shellBrowser, std::forward<Args>(args)...);
 		};
 	}
-
-	static bool DoesEventMatchScope(const NavigationEventScope &scope,
-		const ShellBrowser *shellBrowser);
 
 	NavigationSignal m_startedSignal;
 	NavigationSignal m_willCommitSignal;

@@ -799,6 +799,9 @@
     <ClCompile Include="ShellBrowser\NavigationEvents.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="EventScope.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1655,6 +1658,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\NavigationEvents.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="EventScope.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

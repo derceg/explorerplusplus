@@ -4,39 +4,6 @@
 
 #include "stdafx.h"
 #include "TabEvents.h"
-#include "BrowserWindow.h"
-#include "ShellBrowser/ShellBrowser.h"
-#include "Tab.h"
-
-TabEventScope TabEventScope::ForBrowser(const BrowserWindow &browser)
-{
-	return TabEventScope(browser);
-}
-
-TabEventScope TabEventScope::Global()
-{
-	return TabEventScope();
-}
-
-TabEventScope::TabEventScope() : m_scope(Scope::Global)
-{
-}
-
-TabEventScope::TabEventScope(const BrowserWindow &browser) :
-	m_scope(Scope::Browser),
-	m_browserId(browser.GetId())
-{
-}
-
-TabEventScope::Scope TabEventScope::GetScope() const
-{
-	return m_scope;
-}
-
-std::optional<int> TabEventScope::GetBrowserId() const
-{
-	return m_browserId;
-}
 
 boost::signals2::connection TabEvents::AddCreatedObserver(const CreatedSignal::slot_type &observer,
 	const TabEventScope &scope, boost::signals2::connect_position position)
@@ -68,19 +35,6 @@ boost::signals2::connection TabEvents::AddRemovedObserver(const RemovedSignal::s
 	const TabEventScope &scope, boost::signals2::connect_position position)
 {
 	return m_removedSignal.connect(MakeFilteredObserver(observer, scope), position);
-}
-
-bool TabEvents::DoesEventMatchScope(const TabEventScope &scope, const Tab &tab)
-{
-	switch (scope.GetScope())
-	{
-	case TabEventScope::Scope::Browser:
-		return tab.GetBrowser()->GetId() == scope.GetBrowserId();
-
-	case TabEventScope::Scope::Global:
-	default:
-		return true;
-	}
 }
 
 void TabEvents::NotifyCreated(const Tab &tab, bool selected)
