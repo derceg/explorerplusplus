@@ -86,12 +86,9 @@ boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
 	return m_tabsInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void Explorerplusplus::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{

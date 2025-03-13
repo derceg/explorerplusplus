@@ -334,7 +334,7 @@ private:
 	void CreateNewTab(NavigateParams &navigateParams, bool selected) override;
 	void SelectTabById(int tabId) override;
 
-	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request);
 
 	// ShellBrowserEmbedder
 	void OnShellBrowserCreated(ShellBrowser *shellBrowser) override;
@@ -404,13 +404,10 @@ private:
 	void SetStatusBarParts();
 	void UpdateStatusBarMinHeight();
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStartedStatusBar(const ShellBrowser *shellBrowser,
-		const NavigationRequest *request);
+	void OnNavigationStartedStatusBar(const NavigationRequest *request);
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
-	void OnNavigationFailedStatusBar(const ShellBrowser *shellBrowser,
-		const NavigationRequest *request);
-	void OnNavigationCancelledStatusBar(const ShellBrowser *shellBrowser,
-		const NavigationRequest *request);
+	void OnNavigationFailedStatusBar(const NavigationRequest *request);
+	void OnNavigationCancelledStatusBar(const NavigationRequest *request);
 	void OnNavigationsStoppedStatusBar(const ShellBrowser *shellBrowser);
 	void UpdateStatusBarText(const Tab &tab);
 	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);

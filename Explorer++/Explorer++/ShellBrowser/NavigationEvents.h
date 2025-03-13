@@ -5,11 +5,10 @@
 #pragma once
 
 #include "EventScope.h"
+#include "NavigationRequest.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
-#include <utility>
 
-class NavigationRequest;
 class ShellBrowser;
 
 using NavigationEventScope = EventScope<EventScopeMinimumLevel::ShellBrowser>;
@@ -56,8 +55,7 @@ using NavigationEventScope = EventScope<EventScopeMinimumLevel::ShellBrowser>;
 class NavigationEvents : private boost::noncopyable
 {
 public:
-	using NavigationSignal = boost::signals2::signal<void(const ShellBrowser *shellBrowser,
-		const NavigationRequest *request)>;
+	using NavigationSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
 	using StoppedSignal = boost::signals2::signal<void(const ShellBrowser *shellBrowser)>;
 
@@ -116,27 +114,40 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
 
-	void NotifyStarted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
-	void NotifyWillCommit(const ShellBrowser *shellBrowser, const NavigationRequest *request);
-	void NotifyCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
-	void NotifyFailed(const ShellBrowser *shellBrowser, const NavigationRequest *request);
-	void NotifyCancelled(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void NotifyStarted(const NavigationRequest *request);
+	void NotifyWillCommit(const NavigationRequest *request);
+	void NotifyCommitted(const NavigationRequest *request);
+	void NotifyFailed(const NavigationRequest *request);
+	void NotifyCancelled(const NavigationRequest *request);
 
 	void NotifyStopped(const ShellBrowser *shellBrowser);
 
 private:
-	template <typename Observer>
-	static auto MakeFilteredObserver(Observer &&observer, const NavigationEventScope &scope)
+	static auto MakeFilteredObserver(const NavigationSignal::slot_type &observer,
+		const NavigationEventScope &scope)
 	{
-		return [observer = std::forward<Observer>(observer),
-				   scope]<typename... Args>(const ShellBrowser *shellBrowser, Args &&...args)
+		return [observer, scope](const NavigationRequest *request)
+		{
+			if (!scope.DoesEventSourceMatch(*request->GetShellBrowser()))
+			{
+				return;
+			}
+
+			observer(request);
+		};
+	}
+
+	static auto MakeFilteredObserver(const StoppedSignal::slot_type &observer,
+		const NavigationEventScope &scope)
+	{
+		return [observer, scope](const ShellBrowser *shellBrowser)
 		{
 			if (!scope.DoesEventSourceMatch(*shellBrowser))
 			{
 				return;
 			}
 
-			observer(shellBrowser, std::forward<Args>(args)...);
+			observer(shellBrowser);
 		};
 	}
 

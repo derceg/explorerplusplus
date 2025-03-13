@@ -29,12 +29,9 @@
 #include <propvarutil.h>
 #include <list>
 
-void ShellBrowserImpl::OnNavigationStarted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void ShellBrowserImpl::OnNavigationStarted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	DCHECK(shellBrowser == this);
+	CHECK(request->GetShellBrowser() == this);
 
 	RecalcWindowCursor(m_hListView);
 }
@@ -448,12 +445,9 @@ HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellF
 	return hr;
 }
 
-void ShellBrowserImpl::OnNavigationWillCommit(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void ShellBrowserImpl::OnNavigationWillCommit(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	DCHECK(shellBrowser == this);
+	CHECK(request->GetShellBrowser() == this);
 
 	// The folder is going to change, so update the set of selected items before the current
 	// navigation entry changes.
@@ -462,10 +456,9 @@ void ShellBrowserImpl::OnNavigationWillCommit(const ShellBrowser *shellBrowser,
 	SetNavigationState(NavigationState::WillCommit);
 }
 
-void ShellBrowserImpl::OnNavigationComitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request)
 {
-	DCHECK(shellBrowser == this);
+	CHECK(request->GetShellBrowser() == this);
 
 	ChangeFolders(request->GetNavigateParams().pidl);
 

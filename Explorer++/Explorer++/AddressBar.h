@@ -57,7 +57,7 @@ private:
 	void OnEscapePressed();
 	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const Tab &tab);
 	void UpdateTextAndIcon(const Tab &tab,
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);

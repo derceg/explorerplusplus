@@ -604,6 +604,9 @@
     <ClInclude Include="NavigationRequestTestHelper.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="NavigationRequestDelegateMock.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

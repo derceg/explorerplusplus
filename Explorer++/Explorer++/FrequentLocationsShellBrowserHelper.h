@@ -19,7 +19,7 @@ public:
 		NavigationEvents *navigationEvents);
 
 private:
-	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request);
 
 	FrequentLocationsModel *const m_model;
 	std::vector<boost::signals2::scoped_connection> m_connections;

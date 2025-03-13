@@ -151,12 +151,9 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnNavigationStartedStatusBar(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void Explorerplusplus::OnNavigationStartedStatusBar(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
@@ -188,12 +185,9 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
 }
 
-void Explorerplusplus::OnNavigationFailedStatusBar(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void Explorerplusplus::OnNavigationFailedStatusBar(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
@@ -201,12 +195,9 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const ShellBrowser *shellBrow
 	}
 }
 
-void Explorerplusplus::OnNavigationCancelledStatusBar(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void Explorerplusplus::OnNavigationCancelledStatusBar(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{

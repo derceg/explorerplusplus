@@ -300,12 +300,11 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	auto params = NavigateParams::Normal(pidl1.Raw());
 
-	MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>
-		navigationStartedCallback;
+	MockFunction<void(const NavigationRequest *request)> navigationStartedCallback;
 	m_navigationEvents.AddStartedObserver(navigationStartedCallback.AsStdFunction(),
 		NavigationEventScope::ForShellBrowser(m_shellBrowser));
 
-	EXPECT_CALL(navigationStartedCallback, Call(&m_shellBrowser, NavigateParamsMatch(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params)));
 
 	// By default, all navigations should proceed in the current tab.
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
@@ -326,8 +325,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 
 	// Although the navigation mode has been set, the navigation is an implicit refresh and should
 	// always proceed in the same tab.
-	EXPECT_CALL(navigationStartedCallback,
-		Call(&m_shellBrowser, NavigateParamsMatch(expectedParams)));
+	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(expectedParams)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	navigationController->Navigate(params);
@@ -336,7 +334,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 	params = NavigateParams::Normal(pidl2.Raw());
 
 	// This is a navigation to a different directory, so the navigation mode above should now apply.
-	EXPECT_CALL(navigationStartedCallback, Call(&m_shellBrowser, _)).Times(0);
+	EXPECT_CALL(navigationStartedCallback, Call(_)).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params), _));
 
 	navigationController->Navigate(params);
@@ -347,7 +345,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 
 	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
 	// the tab, even though a navigation mode was applied above.
-	EXPECT_CALL(navigationStartedCallback, Call(&m_shellBrowser, NavigateParamsMatch(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	navigationController->Navigate(params);
@@ -361,14 +359,13 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	auto params = NavigateParams::Normal(pidl1.Raw());
 
-	MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>
-		navigationStartedCallback;
+	MockFunction<void(const NavigationRequest *request)> navigationStartedCallback;
 	m_navigationEvents.AddStartedObserver(navigationStartedCallback.AsStdFunction(),
 		NavigationEventScope::ForShellBrowser(m_shellBrowser));
 
 	// The first navigation in a tab should always take place within that tab, regardless of the
 	// navigation mode in effect.
-	EXPECT_CALL(navigationStartedCallback, Call(&m_shellBrowser, NavigateParamsMatch(params)));
+	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	navigationController->Navigate(params);
@@ -377,8 +374,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 	auto params2 = NavigateParams::Normal(pidl2.Raw());
 
 	// Subsequent navigations should then open in a new tab when necessary.
-	EXPECT_CALL(navigationStartedCallback, Call(&m_shellBrowser, NavigateParamsMatch(params2)))
-		.Times(0);
+	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params2))).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params2), _));
 
 	navigationController->Navigate(params2);
@@ -466,13 +462,11 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 
 TEST_F(ShellNavigationControllerTest, SlotOrdering)
 {
-	MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>
-		navigationCommittedCallback;
-	ON_CALL(navigationCommittedCallback, Call(_, _))
+	MockFunction<void(const NavigationRequest *request)> navigationCommittedCallback;
+	ON_CALL(navigationCommittedCallback, Call(_))
 		.WillByDefault(
-			[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
+			[this](const NavigationRequest *request)
 			{
-				UNREFERENCED_PARAMETER(shellBrowser);
 				UNREFERENCED_PARAMETER(request);
 
 				auto *navigationController = GetNavigationController();
@@ -488,7 +482,7 @@ TEST_F(ShellNavigationControllerTest, SlotOrdering)
 
 	m_navigationEvents.AddCommittedObserver(navigationCommittedCallback.AsStdFunction(),
 		NavigationEventScope::ForShellBrowser(m_shellBrowser), boost::signals2::at_front);
-	EXPECT_CALL(navigationCommittedCallback, Call(&m_shellBrowser, _));
+	EXPECT_CALL(navigationCommittedCallback, Call(_));
 
 	m_shellBrowser.NavigateToPath(L"C:\\Fake");
 }

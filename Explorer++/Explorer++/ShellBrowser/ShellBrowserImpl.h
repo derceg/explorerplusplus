@@ -401,7 +401,7 @@ private:
 	void VerifySortMode();
 
 	/* Browsing support. */
-	void OnNavigationStarted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationStarted(const NavigationRequest *request);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	void ChangeFolders(const PidlAbsolute &directory);
@@ -409,8 +409,8 @@ private:
 	void ClearPendingResults();
 	void StoreCurrentlySelectedItems();
 	void ResetFolderState();
-	void OnNavigationWillCommit(const ShellBrowser *shellBrowser, const NavigationRequest *request);
-	void OnNavigationComitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationWillCommit(const NavigationRequest *request);
+	void OnNavigationComitted(const NavigationRequest *request);
 	void AddNavigationItems(const NavigationRequest *request,
 		const std::vector<PidlChild> &itemPidls);
 	std::vector<ItemInfo_t> GetItemInformationFromPidls(const NavigationRequest *request,

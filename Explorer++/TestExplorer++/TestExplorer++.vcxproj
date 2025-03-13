@@ -365,6 +365,7 @@
     <ClInclude Include="MainRebarStorageTestHelper.h" />
     <ClInclude Include="MessageLoop.h" />
     <ClInclude Include="MovableModelHelper.h" />
+    <ClInclude Include="NavigationRequestDelegateMock.h" />
     <ClInclude Include="NavigationRequestTestHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PopupMenuViewTestHelper.h" />

@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "ShellBrowser/NavigationRequest.h"
+#include "NavigationRequestDelegateMock.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/NavigationRequestDelegate.h"
 #include "ShellEnumeratorFake.h"
@@ -12,20 +13,6 @@
 #include <gtest/gtest.h>
 
 using namespace testing;
-
-namespace
-{
-
-class NavigationRequestDelegateMock : public NavigationRequestDelegate
-{
-public:
-	MOCK_METHOD(void, OnEnumerationCompleted, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnEnumerationFailed, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnEnumerationStopped, (NavigationRequest * request), (override));
-	MOCK_METHOD(void, OnFinished, (NavigationRequest * request), (override));
-};
-
-}
 
 class NavigationRequestTest : public Test
 {
@@ -161,21 +148,11 @@ protected:
 		return &m_strictDelegate;
 	}
 
-	StrictMock<
-		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
-		m_navigationStartedCallback;
-	StrictMock<
-		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
-		m_navigationWillCommitCallback;
-	StrictMock<
-		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
-		m_navigationCommittedCallback;
-	StrictMock<
-		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
-		m_navigationFailedCallback;
-	StrictMock<
-		MockFunction<void(const ShellBrowser *shellBrowser, const NavigationRequest *request)>>
-		m_navigationCancelledCallback;
+	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationStartedCallback;
+	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationWillCommitCallback;
+	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationCommittedCallback;
+	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationFailedCallback;
+	StrictMock<MockFunction<void(const NavigationRequest *request)>> m_navigationCancelledCallback;
 
 	StrictMock<NavigationRequestDelegateMock> m_strictDelegate;
 };
@@ -190,10 +167,10 @@ TEST_F(NavigationRequestSignalTest, CommittedNavigation)
 	{
 		InSequence seq;
 
-		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationStartedCallback, Call(request.get()));
 		EXPECT_CALL(m_strictDelegate, OnEnumerationCompleted(request.get()));
-		EXPECT_CALL(m_navigationWillCommitCallback, Call(nullptr, request.get()));
-		EXPECT_CALL(m_navigationCommittedCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationWillCommitCallback, Call(request.get()));
+		EXPECT_CALL(m_navigationCommittedCallback, Call(request.get()));
 		EXPECT_CALL(m_strictDelegate, OnFinished(request.get()));
 	}
 
@@ -213,9 +190,9 @@ TEST_F(NavigationRequestSignalTest, FailedNavigation)
 	{
 		InSequence seq;
 
-		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationStartedCallback, Call(request.get()));
 		EXPECT_CALL(m_strictDelegate, OnEnumerationFailed(request.get()));
-		EXPECT_CALL(m_navigationFailedCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationFailedCallback, Call(request.get()));
 		EXPECT_CALL(m_strictDelegate, OnFinished(request.get()));
 	}
 
@@ -236,9 +213,9 @@ TEST_F(NavigationRequestSignalTest, CancelledNavigation)
 	{
 		InSequence seq;
 
-		EXPECT_CALL(m_navigationStartedCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationStartedCallback, Call(request.get()));
 		EXPECT_CALL(m_strictDelegate, OnEnumerationStopped(request.get()));
-		EXPECT_CALL(m_navigationCancelledCallback, Call(nullptr, request.get()));
+		EXPECT_CALL(m_navigationCancelledCallback, Call(request.get()));
 		EXPECT_CALL(m_strictDelegate, OnFinished(request.get()));
 	}
 

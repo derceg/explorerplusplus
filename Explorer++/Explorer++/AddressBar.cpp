@@ -258,12 +258,9 @@ void AddressBar::OnTabSelected(const Tab &tab)
 	UpdateTextAndIcon(tab);
 }
 
-void AddressBar::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void AddressBar::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
 	{

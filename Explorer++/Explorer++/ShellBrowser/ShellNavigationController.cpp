@@ -58,18 +58,8 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void ShellNavigationController::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(shellBrowser);
-
-	// `request` may be null in tests.
-	if (!request)
-	{
-		CHECK(IsInTest());
-		return;
-	}
-
 	auto historyEntryType = request->GetNavigateParams().historyEntryType;
 
 	auto *currentEntry = GetCurrentEntry();

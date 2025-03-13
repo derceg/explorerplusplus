@@ -53,34 +53,29 @@ boost::signals2::connection NavigationEvents::AddStoppedObserver(
 		MakeFilteredObserver(observer, scope), position);
 }
 
-void NavigationEvents::NotifyStarted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void NavigationEvents::NotifyStarted(const NavigationRequest *request)
 {
-	m_startedSignal(shellBrowser, request);
+	m_startedSignal(request);
 }
 
-void NavigationEvents::NotifyWillCommit(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void NavigationEvents::NotifyWillCommit(const NavigationRequest *request)
 {
-	m_willCommitSignal(shellBrowser, request);
+	m_willCommitSignal(request);
 }
 
-void NavigationEvents::NotifyCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void NavigationEvents::NotifyCommitted(const NavigationRequest *request)
 {
-	m_committedSignal(shellBrowser, request);
+	m_committedSignal(request);
 }
 
-void NavigationEvents::NotifyFailed(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void NavigationEvents::NotifyFailed(const NavigationRequest *request)
 {
-	m_failedSignal(shellBrowser, request);
+	m_failedSignal(request);
 }
 
-void NavigationEvents::NotifyCancelled(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void NavigationEvents::NotifyCancelled(const NavigationRequest *request)
 {
-	m_cancelledSignal(shellBrowser, request);
+	m_cancelledSignal(request);
 }
 
 void NavigationEvents::NotifyStopped(const ShellBrowser *shellBrowser)

@@ -62,7 +62,7 @@ private:
 
 	void Navigate(const HistoryEntry *entry) override;
 
-	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request);
 
 	NavigationManager *const m_navigationManager;
 

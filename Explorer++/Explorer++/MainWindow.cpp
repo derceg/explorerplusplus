@@ -75,12 +75,9 @@ LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void MainWindow::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void MainWindow::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
 	{

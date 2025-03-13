@@ -46,6 +46,7 @@ public:
 
 	State GetState() const;
 	const NavigateParams &GetNavigateParams() const;
+	const ShellBrowser *GetShellBrowser() const;
 
 	// This will return the set of enumerated items, to be used when the navigation is in the
 	// `WillCommit` or `Committed` state.

@@ -867,12 +867,9 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void MainToolbar::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
 	{

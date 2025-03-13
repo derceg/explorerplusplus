@@ -18,10 +18,7 @@ FrequentLocationsShellBrowserHelper::FrequentLocationsShellBrowserHelper(ShellBr
 		NavigationEventScope::ForShellBrowser(*shellBrowser)));
 }
 
-void FrequentLocationsShellBrowserHelper::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void FrequentLocationsShellBrowserHelper::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(shellBrowser);
-
 	m_model->RegisterLocationVisit(request->GetNavigateParams().pidl);
 }

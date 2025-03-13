@@ -693,12 +693,9 @@ void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 	}
 }
 
-void TabContainer::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void TabContainer::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(request);
-
-	const auto *tab = shellBrowser->GetTab();
+	const auto *tab = request->GetShellBrowser()->GetTab();
 
 	UpdateTabNameInWindow(*tab);
 	SetTabIcon(*tab);

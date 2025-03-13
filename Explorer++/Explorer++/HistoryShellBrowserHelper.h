@@ -18,7 +18,7 @@ public:
 		NavigationEvents *navigationEvents);
 
 private:
-	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request);
 
 	HistoryModel *const m_historyModel;
 	std::vector<boost::signals2::scoped_connection> m_connections;

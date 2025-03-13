@@ -18,10 +18,7 @@ HistoryShellBrowserHelper::HistoryShellBrowserHelper(ShellBrowser *shellBrowser,
 		NavigationEventScope::ForShellBrowser(*shellBrowser)));
 }
 
-void HistoryShellBrowserHelper::OnNavigationCommitted(const ShellBrowser *shellBrowser,
-	const NavigationRequest *request)
+void HistoryShellBrowserHelper::OnNavigationCommitted(const NavigationRequest *request)
 {
-	UNREFERENCED_PARAMETER(shellBrowser);
-
 	m_historyModel->AddHistoryItem(request->GetNavigateParams().pidl);
 }

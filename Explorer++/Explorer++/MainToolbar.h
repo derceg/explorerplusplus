@@ -83,7 +83,7 @@ private:
 	POINT GetMenuPositionForButton(MainToolbarButton button);
 
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const ShellBrowser *shellBrowser, const NavigationRequest *request);
+	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnFocusChanged();
 
 	void UpdateToolbarButtonImageIndexes();

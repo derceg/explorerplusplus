@@ -36,10 +36,10 @@ void NavigationRequest::Start()
 void NavigationRequest::Commit()
 {
 	SetState(State::WillCommit);
-	m_navigationEvents->NotifyWillCommit(m_shellBrowser, this);
+	m_navigationEvents->NotifyWillCommit(this);
 
 	SetState(State::Committed);
-	m_navigationEvents->NotifyCommitted(m_shellBrowser, this);
+	m_navigationEvents->NotifyCommitted(this);
 
 	m_delegate->OnFinished(this);
 }
@@ -48,7 +48,7 @@ void NavigationRequest::Fail()
 {
 	SetState(State::Failed);
 
-	m_navigationEvents->NotifyFailed(m_shellBrowser, this);
+	m_navigationEvents->NotifyFailed(this);
 
 	m_delegate->OnFinished(this);
 }
@@ -57,7 +57,7 @@ void NavigationRequest::Cancel()
 {
 	SetState(State::Cancelled);
 
-	m_navigationEvents->NotifyCancelled(m_shellBrowser, this);
+	m_navigationEvents->NotifyCancelled(this);
 
 	m_delegate->OnFinished(this);
 }
@@ -70,6 +70,11 @@ NavigationRequest::State NavigationRequest::GetState() const
 const NavigateParams &NavigationRequest::GetNavigateParams() const
 {
 	return m_navigateParams;
+}
+
+const ShellBrowser *NavigationRequest::GetShellBrowser() const
+{
+	return m_shellBrowser;
 }
 
 const std::vector<PidlChild> &NavigationRequest::GetItems() const
@@ -92,7 +97,7 @@ concurrencpp::null_result NavigationRequest::StartInternal(WeakPtr<NavigationReq
 	auto navigateParams = weakSelf->m_navigateParams;
 	auto stopToken = weakSelf->m_stopToken;
 
-	weakSelf->m_navigationEvents->NotifyStarted(weakSelf->m_shellBrowser, weakSelf.Get());
+	weakSelf->m_navigationEvents->NotifyStarted(weakSelf.Get());
 
 	co_await concurrencpp::resume_on(enumerationExecutor);
 

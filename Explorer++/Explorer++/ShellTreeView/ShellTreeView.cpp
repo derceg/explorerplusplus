@@ -111,11 +111,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		m_config->showFolders.addObserver(std::bind(&ShellTreeView::UpdateSelection, this)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
-		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
+		[this](const NavigationRequest *request)
 		{
-			UNREFERENCED_PARAMETER(request);
-
-			const auto *tab = shellBrowser->GetTab();
+			const auto *tab = request->GetShellBrowser()->GetTab();
 
 			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 			{
@@ -125,11 +123,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
-		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
+		[this](const NavigationRequest *request)
 		{
-			UNREFERENCED_PARAMETER(request);
-
-			const auto *tab = shellBrowser->GetTab();
+			const auto *tab = request->GetShellBrowser()->GetTab();
 
 			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 			{
@@ -142,11 +138,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		NavigationEventScope::ForBrowser(*m_browserWindow)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCancelledObserver(
-		[this](const ShellBrowser *shellBrowser, const NavigationRequest *request)
+		[this](const NavigationRequest *request)
 		{
-			UNREFERENCED_PARAMETER(request);
-
-			const auto *tab = shellBrowser->GetTab();
+			const auto *tab = request->GetShellBrowser()->GetTab();
 
 			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 			{
