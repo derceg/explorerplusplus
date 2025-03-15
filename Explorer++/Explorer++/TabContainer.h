@@ -129,8 +129,6 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChangedSignal;
-
 	SignalWrapper<TabContainer, void()> sizeUpdatedSignal;
 
 private:

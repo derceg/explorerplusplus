@@ -13,7 +13,6 @@
 #include "ServiceProvider.h"
 #include "ShellBrowser.h"
 #include "ShellChangeWatcher.h"
-#include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/ScopedStopSource.h"
@@ -178,9 +177,6 @@ public:
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
 	void AutoSizeColumns();
-
-	// Signals
-	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
 
 protected:
 	NavigationManager *GetNavigationManager() override;

@@ -964,9 +964,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	tab.GetShellBrowserImpl()->columnsChanged.AddObserver(
-		[this, &tab]() { tabColumnsChangedSignal.m_signal(tab); });
-
 	// There's no need to manually disconnect this. Either it will be
 	// disconnected when the tab is closed and the tab object (and
 	// associated signal) is destroyed or when the tab is destroyed

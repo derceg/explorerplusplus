@@ -1033,8 +1033,6 @@ void ShellBrowserImpl::SetCurrentColumns(const std::vector<Column_t> &columns)
 	{
 		SortFolder();
 	}
-
-	columnsChanged.m_signal();
 }
 
 void ShellBrowserImpl::GetColumnInternal(ColumnType columnType, Column_t *pci) const
