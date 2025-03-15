@@ -52,7 +52,7 @@ private:
 	wil::unique_hbitmap GetTabLivePreviewBitmap(const Tab &tab);
 	void OnTabSelectionChanged(const Tab &tab);
 	void OnNavigationCommitted(const NavigationRequest *request);
-	void OnDirectoryPropertiesChanged(const Tab &tab);
+	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
 	void UpdateTaskbarThumbnailTitle(const Tab &tab);

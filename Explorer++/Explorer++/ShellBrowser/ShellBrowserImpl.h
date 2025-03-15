@@ -180,11 +180,6 @@ public:
 	void AutoSizeColumns();
 
 	// Signals
-
-	// Signaled when the properties of the directory itself change. For example, when the icon for
-	// the directory changes, or the directory is renamed (if the directory is virtual).
-	SignalWrapper<ShellBrowserImpl, void()> directoryPropertiesChanged;
-
 	SignalWrapper<ShellBrowserImpl, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
 

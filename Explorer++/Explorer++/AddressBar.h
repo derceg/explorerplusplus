@@ -58,7 +58,7 @@ private:
 	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const NavigationRequest *request);
-	void OnDirectoryPropertiesChanged(const Tab &tab);
+	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 	void UpdateTextAndIcon(const Tab &tab,
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);
 	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> self,

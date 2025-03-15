@@ -73,17 +73,13 @@ void AddressBar::Initialize(HWND parent)
 		std::bind_front(&AddressBar::OnTabSelected, this),
 		TabEventScope::ForBrowser(*m_browserWindow)));
 
+	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
+		std::bind_front(&AddressBar::OnDirectoryPropertiesChanged, this),
+		ShellBrowserEventScope::ForBrowser(*m_browserWindow)));
+
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browserWindow)));
-
-	m_coreInterface->AddTabsInitializedObserver(
-		[this]
-		{
-			m_connections.push_back(
-				m_coreInterface->GetTabContainer()->tabDirectoryPropertiesChangedSignal.AddObserver(
-					std::bind_front(&AddressBar::OnDirectoryPropertiesChanged, this)));
-		});
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&AddressBar::OnFontOrDpiUpdated, this));
 }
@@ -268,13 +264,15 @@ void AddressBar::OnNavigationCommitted(const NavigationRequest *request)
 	}
 }
 
-void AddressBar::OnDirectoryPropertiesChanged(const Tab &tab)
+void AddressBar::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
 	{
 		// Since the directory properties have changed, it's possible that the icon has changed.
 		// Therefore, the updated icon should always be retrieved.
-		UpdateTextAndIcon(tab, IconUpdateType::AlwaysFetch);
+		UpdateTextAndIcon(*tab, IconUpdateType::AlwaysFetch);
 	}
 }
 

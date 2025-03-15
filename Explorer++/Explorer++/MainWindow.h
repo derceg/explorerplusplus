@@ -28,7 +28,7 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnNavigationCommitted(const NavigationRequest *request);
-	void OnDirectoryPropertiesChanged(const Tab &tab);
+	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 	void OnTabSelected(const Tab &tab);
 
 	void OnShowFullTitlePathUpdated(BOOL newValue);

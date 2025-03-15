@@ -17,6 +17,8 @@ using namespace testing;
 class ShellBrowserEventsTest : public Test
 {
 protected:
+	using CallBackMock = StrictMock<MockFunction<void(const ShellBrowser *shellBrowser)>>;
+
 	ShellBrowserEventsTest() :
 		m_tab1(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
 			&m_browser1),
@@ -39,8 +41,8 @@ protected:
 	NiceMock<TabNavigationMock> m_tabNavigation3;
 	Tab m_tab3;
 
-	StrictMock<MockFunction<void(const ShellBrowser *shellBrowser)>>
-		m_directoryContentsChangedCallback;
+	CallBackMock m_directoryContentsChangedCallback;
+	CallBackMock m_directoryPropertiesChangedCallback;
 };
 
 TEST_F(ShellBrowserEventsTest, Signals)
@@ -51,9 +53,19 @@ TEST_F(ShellBrowserEventsTest, Signals)
 	EXPECT_CALL(m_directoryContentsChangedCallback, Call(m_tab2.GetShellBrowser()));
 	EXPECT_CALL(m_directoryContentsChangedCallback, Call(m_tab3.GetShellBrowser()));
 
+	m_shellBrowserEvents.AddDirectoryPropertiesChangedObserver(
+		m_directoryPropertiesChangedCallback.AsStdFunction(), ShellBrowserEventScope::Global());
+	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab1.GetShellBrowser()));
+	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab2.GetShellBrowser()));
+	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab3.GetShellBrowser()));
+
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab3.GetShellBrowser());
+
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab1.GetShellBrowser());
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab2.GetShellBrowser());
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab3.GetShellBrowser());
 }
 
 TEST_F(ShellBrowserEventsTest, SignalsFilteredByBrowser)
@@ -64,9 +76,18 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByBrowser)
 	EXPECT_CALL(m_directoryContentsChangedCallback, Call(m_tab1.GetShellBrowser()));
 	EXPECT_CALL(m_directoryContentsChangedCallback, Call(m_tab2.GetShellBrowser()));
 
+	m_shellBrowserEvents.AddDirectoryPropertiesChangedObserver(
+		m_directoryPropertiesChangedCallback.AsStdFunction(),
+		ShellBrowserEventScope::ForBrowser(m_browser2));
+	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab3.GetShellBrowser()));
+
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab3.GetShellBrowser());
+
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab1.GetShellBrowser());
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab2.GetShellBrowser());
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab3.GetShellBrowser());
 }
 
 TEST_F(ShellBrowserEventsTest, SignalsFilteredByShellBrowser)
@@ -76,7 +97,16 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByShellBrowser)
 		ShellBrowserEventScope::ForShellBrowser(*m_tab1.GetShellBrowser()));
 	EXPECT_CALL(m_directoryContentsChangedCallback, Call(m_tab1.GetShellBrowser()));
 
+	m_shellBrowserEvents.AddDirectoryPropertiesChangedObserver(
+		m_directoryPropertiesChangedCallback.AsStdFunction(),
+		ShellBrowserEventScope::ForShellBrowser(*m_tab2.GetShellBrowser()));
+	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab2.GetShellBrowser()));
+
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab3.GetShellBrowser());
+
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab1.GetShellBrowser());
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab2.GetShellBrowser());
+	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab3.GetShellBrowser());
 }

@@ -22,7 +22,14 @@ public:
 		const Signal::slot_type &observer, const ShellBrowserEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
+	// Signaled when the properties of the directory itself change. For example, when the icon for
+	// the directory changes, or the directory is renamed (if the directory is virtual).
+	boost::signals2::connection AddDirectoryPropertiesChangedObserver(
+		const Signal::slot_type &observer, const ShellBrowserEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
+
 	void NotifyDirectoryContentsChanged(const ShellBrowser *shellBrowser);
+	void NotifyDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 
 private:
 	static auto MakeFilteredObserver(const Signal::slot_type &observer,
@@ -40,4 +47,5 @@ private:
 	}
 
 	Signal m_directoryContentsChangedSignal;
+	Signal m_directoryPropertiesChangedSignal;
 };
