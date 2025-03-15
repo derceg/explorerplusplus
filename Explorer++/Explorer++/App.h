@@ -18,6 +18,7 @@
 #include "ProcessManager.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
+#include "ShellBrowser/ShellBrowserEvents.h"
 #include "TabEvents.h"
 #include "TabRestorer.h"
 #include "ThemeManager.h"
@@ -63,6 +64,7 @@ public:
 	IconResourceLoader *GetIconResourceLoader() const;
 	HINSTANCE GetResourceInstance() const;
 	TabEvents *GetTabEvents();
+	ShellBrowserEvents *GetShellBrowserEvents();
 	NavigationEvents *GetNavigationEvents();
 	TabRestorer *GetTabRestorer();
 	DarkModeManager *GetDarkModeManager();
@@ -113,6 +115,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	ProcessManager m_processManager;
 	TabEvents m_tabEvents;
+	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
 	TabRestorer m_tabRestorer;
 	DarkModeManager m_darkModeManager;

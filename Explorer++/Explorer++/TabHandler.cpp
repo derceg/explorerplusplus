@@ -45,9 +45,9 @@ void Explorerplusplus::InitializeTabs()
 		std::bind_front(&Explorerplusplus::OnNavigationsStoppedStatusBar, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
 
-	tabContainer->tabDirectoryContentsChangedSignal.AddObserver(
+	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryContentsChangedObserver(
 		std::bind_front(&Explorerplusplus::OnDirectoryContentsChanged, this),
-		boost::signals2::at_front);
+		ShellBrowserEventScope::ForBrowser(*this), boost::signals2::at_front));
 	tabContainer->tabListViewSelectionChangedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabListViewSelectionChanged, this),
 		boost::signals2::at_front);

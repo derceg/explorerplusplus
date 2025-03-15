@@ -420,6 +420,11 @@ TabEvents *App::GetTabEvents()
 	return &m_tabEvents;
 }
 
+ShellBrowserEvents *App::GetShellBrowserEvents()
+{
+	return &m_shellBrowserEvents;
+}
+
 NavigationEvents *App::GetNavigationEvents()
 {
 	return &m_navigationEvents;

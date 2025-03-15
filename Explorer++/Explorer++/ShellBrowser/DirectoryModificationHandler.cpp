@@ -61,7 +61,7 @@ void ShellBrowserImpl::ProcessShellChangeNotifications(
 		ProcessShellChangeNotification(change);
 	}
 
-	directoryContentsChanged.m_signal();
+	m_app->GetShellBrowserEvents()->NotifyDirectoryContentsChanged(this);
 }
 
 void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotification &change)
@@ -214,7 +214,7 @@ void ShellBrowserImpl::DirectoryAltered()
 		}
 	}
 
-	directoryContentsChanged.m_signal();
+	m_app->GetShellBrowserEvents()->NotifyDirectoryContentsChanged(this);
 
 	m_AlteredList.clear();
 

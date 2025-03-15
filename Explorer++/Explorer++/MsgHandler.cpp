@@ -771,12 +771,14 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	clipboardWriter.WriteText(strColumnInfo);
 }
 
-void Explorerplusplus::OnDirectoryContentsChanged(const Tab &tab)
+void Explorerplusplus::OnDirectoryContentsChanged(const ShellBrowser *shellBrowser)
 {
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	const auto *tab = shellBrowser->GetTab();
+
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
-		UpdateStatusBarText(tab);
-		UpdateDisplayWindow(tab);
+		UpdateStatusBarText(*tab);
+		UpdateDisplayWindow(*tab);
 	}
 }
 

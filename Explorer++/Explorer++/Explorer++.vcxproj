@@ -1033,6 +1033,7 @@
     <ClCompile Include="HistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="ShellBrowser\NavigationEvents.cpp" />
+    <ClCompile Include="ShellBrowser\ShellBrowserEvents.cpp" />
     <ClCompile Include="TabEvents.cpp" />
     <ClCompile Include="LanguageHelper.cpp" />
     <ClCompile Include="LayoutDefaults.cpp" />
@@ -1339,6 +1340,7 @@
     <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
     <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />
     <ClInclude Include="LocationVisitInfo.h" />

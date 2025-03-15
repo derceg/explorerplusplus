@@ -961,9 +961,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	tab.GetShellBrowserImpl()->directoryContentsChanged.AddObserver(
-		[this, &tab]() { tabDirectoryContentsChangedSignal.m_signal(tab); });
-
 	tab.GetShellBrowserImpl()->directoryPropertiesChanged.AddObserver(
 		[this, &tab]() { tabDirectoryPropertiesChangedSignal.m_signal(tab); });
 

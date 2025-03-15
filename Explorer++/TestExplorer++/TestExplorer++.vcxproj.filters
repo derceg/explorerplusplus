@@ -376,6 +376,9 @@
     <ClCompile Include="NavigationEventsTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowserEventsTest.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

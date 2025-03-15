@@ -239,6 +239,7 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />
+    <ClCompile Include="ShellBrowserEventsTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />

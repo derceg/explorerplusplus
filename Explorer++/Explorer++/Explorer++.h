@@ -238,7 +238,7 @@ private:
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnFocusNextWindow(FocusChangeDirection direction);
 	void OnAppCommand(UINT cmd);
-	void OnDirectoryContentsChanged(const Tab &tab);
+	void OnDirectoryContentsChanged(const ShellBrowser *shellBrowser);
 	void OnAssocChanged();
 	void OnSelectTabByIndex(int iTab);
 	void OnChangeMainFontSize(FontSizeType sizeType);
