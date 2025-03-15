@@ -180,7 +180,6 @@ public:
 	void AutoSizeColumns();
 
 	// Signals
-	SignalWrapper<ShellBrowserImpl, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
 
 protected:

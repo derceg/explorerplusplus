@@ -651,7 +651,7 @@ void ShellBrowserImpl::OnListViewItemChanged(const NMLISTVIEW *changeData)
 
 	UpdateFileSelectionInfo(static_cast<int>(changeData->lParam), currentlySelected);
 
-	listViewSelectionChanged.m_signal();
+	m_app->GetShellBrowserEvents()->NotifySelectionChanged(this);
 }
 
 void ShellBrowserImpl::UpdateFileSelectionInfo(int internalIndex, BOOL selected)

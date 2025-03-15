@@ -21,6 +21,13 @@ boost::signals2::connection ShellBrowserEvents::AddDirectoryPropertiesChangedObs
 		position);
 }
 
+boost::signals2::connection ShellBrowserEvents::AddSelectionChangedObserver(
+	const Signal::slot_type &observer, const ShellBrowserEventScope &scope,
+	boost::signals2::connect_position position)
+{
+	return m_selectionChangedSignal.connect(MakeFilteredObserver(observer, scope), position);
+}
+
 void ShellBrowserEvents::NotifyDirectoryContentsChanged(const ShellBrowser *shellBrowser)
 {
 	m_directoryContentsChangedSignal(shellBrowser);
@@ -29,4 +36,9 @@ void ShellBrowserEvents::NotifyDirectoryContentsChanged(const ShellBrowser *shel
 void ShellBrowserEvents::NotifyDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	m_directoryPropertiesChangedSignal(shellBrowser);
+}
+
+void ShellBrowserEvents::NotifySelectionChanged(const ShellBrowser *shellBrowser)
+{
+	m_selectionChangedSignal(shellBrowser);
 }

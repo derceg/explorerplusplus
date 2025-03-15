@@ -328,7 +328,7 @@ private:
 	void CreateInitialTabs(const WindowStorageData *storageData);
 	void CreateTabsFromStorageData(const WindowStorageData &storageData);
 	void CreateCommandLineTabs();
-	void OnTabListViewSelectionChanged(const Tab &tab);
+	void OnTabListViewSelectionChanged(const ShellBrowser *shellBrowser);
 
 	/* TabNavigationInterface methods. */
 	void CreateNewTab(NavigateParams &navigateParams, bool selected) override;

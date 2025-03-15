@@ -964,9 +964,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	tab.GetShellBrowserImpl()->listViewSelectionChanged.AddObserver(
-		[this, &tab]() { tabListViewSelectionChangedSignal.m_signal(tab); });
-
 	tab.GetShellBrowserImpl()->columnsChanged.AddObserver(
 		[this, &tab]() { tabColumnsChangedSignal.m_signal(tab); });
 

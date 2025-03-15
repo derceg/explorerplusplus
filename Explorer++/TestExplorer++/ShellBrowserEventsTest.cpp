@@ -43,6 +43,7 @@ protected:
 
 	CallBackMock m_directoryContentsChangedCallback;
 	CallBackMock m_directoryPropertiesChangedCallback;
+	CallBackMock m_selectionChangedCallback;
 };
 
 TEST_F(ShellBrowserEventsTest, Signals)
@@ -59,6 +60,12 @@ TEST_F(ShellBrowserEventsTest, Signals)
 	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab2.GetShellBrowser()));
 	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab3.GetShellBrowser()));
 
+	m_shellBrowserEvents.AddSelectionChangedObserver(m_selectionChangedCallback.AsStdFunction(),
+		ShellBrowserEventScope::Global());
+	EXPECT_CALL(m_selectionChangedCallback, Call(m_tab1.GetShellBrowser()));
+	EXPECT_CALL(m_selectionChangedCallback, Call(m_tab2.GetShellBrowser()));
+	EXPECT_CALL(m_selectionChangedCallback, Call(m_tab3.GetShellBrowser()));
+
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab3.GetShellBrowser());
@@ -66,6 +73,10 @@ TEST_F(ShellBrowserEventsTest, Signals)
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab3.GetShellBrowser());
+
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab1.GetShellBrowser());
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab2.GetShellBrowser());
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab3.GetShellBrowser());
 }
 
 TEST_F(ShellBrowserEventsTest, SignalsFilteredByBrowser)
@@ -81,6 +92,11 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByBrowser)
 		ShellBrowserEventScope::ForBrowser(m_browser2));
 	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab3.GetShellBrowser()));
 
+	m_shellBrowserEvents.AddSelectionChangedObserver(m_selectionChangedCallback.AsStdFunction(),
+		ShellBrowserEventScope::ForBrowser(m_browser1));
+	EXPECT_CALL(m_selectionChangedCallback, Call(m_tab1.GetShellBrowser()));
+	EXPECT_CALL(m_selectionChangedCallback, Call(m_tab2.GetShellBrowser()));
+
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab3.GetShellBrowser());
@@ -88,6 +104,10 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByBrowser)
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab3.GetShellBrowser());
+
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab1.GetShellBrowser());
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab2.GetShellBrowser());
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab3.GetShellBrowser());
 }
 
 TEST_F(ShellBrowserEventsTest, SignalsFilteredByShellBrowser)
@@ -102,6 +122,10 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByShellBrowser)
 		ShellBrowserEventScope::ForShellBrowser(*m_tab2.GetShellBrowser()));
 	EXPECT_CALL(m_directoryPropertiesChangedCallback, Call(m_tab2.GetShellBrowser()));
 
+	m_shellBrowserEvents.AddSelectionChangedObserver(m_selectionChangedCallback.AsStdFunction(),
+		ShellBrowserEventScope::ForShellBrowser(*m_tab3.GetShellBrowser()));
+	EXPECT_CALL(m_selectionChangedCallback, Call(m_tab3.GetShellBrowser()));
+
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryContentsChanged(m_tab3.GetShellBrowser());
@@ -109,4 +133,8 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByShellBrowser)
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab1.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab2.GetShellBrowser());
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(m_tab3.GetShellBrowser());
+
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab1.GetShellBrowser());
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab2.GetShellBrowser());
+	m_shellBrowserEvents.NotifySelectionChanged(m_tab3.GetShellBrowser());
 }

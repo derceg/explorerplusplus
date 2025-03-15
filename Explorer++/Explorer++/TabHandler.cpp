@@ -48,9 +48,9 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryContentsChangedObserver(
 		std::bind_front(&Explorerplusplus::OnDirectoryContentsChanged, this),
 		ShellBrowserEventScope::ForBrowser(*this), boost::signals2::at_front));
-	tabContainer->tabListViewSelectionChangedSignal.AddObserver(
+	m_connections.push_back(m_app->GetShellBrowserEvents()->AddSelectionChangedObserver(
 		std::bind_front(&Explorerplusplus::OnTabListViewSelectionChanged, this),
-		boost::signals2::at_front);
+		ShellBrowserEventScope::ForBrowser(*this), boost::signals2::at_front));
 
 	tabContainer->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); });
 
@@ -324,21 +324,23 @@ void Explorerplusplus::HideTabBar()
 	UpdateLayout();
 }
 
-void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
+void Explorerplusplus::OnTabListViewSelectionChanged(const ShellBrowser *shellBrowser)
 {
+	const auto *tab = shellBrowser->GetTab();
+
 	/* The selection for this tab has changed, so invalidate any
 	folder size calculations that are occurring for this tab
 	(applies only to folder sizes that will be shown in the display
 	window). */
 	for (auto &item : m_DWFolderSizes)
 	{
-		if (item.iTabId == tab.GetId())
+		if (item.iTabId == tab->GetId())
 		{
 			item.bValid = FALSE;
 		}
 	}
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
 		SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT,
 			nullptr);

@@ -28,8 +28,14 @@ public:
 		const Signal::slot_type &observer, const ShellBrowserEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
+	// Signaled when the listview selection changes.
+	boost::signals2::connection AddSelectionChangedObserver(const Signal::slot_type &observer,
+		const ShellBrowserEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
+
 	void NotifyDirectoryContentsChanged(const ShellBrowser *shellBrowser);
 	void NotifyDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
+	void NotifySelectionChanged(const ShellBrowser *shellBrowser);
 
 private:
 	static auto MakeFilteredObserver(const Signal::slot_type &observer,
@@ -48,4 +54,5 @@ private:
 
 	Signal m_directoryContentsChangedSignal;
 	Signal m_directoryPropertiesChangedSignal;
+	Signal m_selectionChangedSignal;
 };
