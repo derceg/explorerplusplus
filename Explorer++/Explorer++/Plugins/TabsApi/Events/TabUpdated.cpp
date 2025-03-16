@@ -5,22 +5,25 @@
 #include "stdafx.h"
 #include "Plugins/TabsApi/Events/TabUpdated.h"
 #include "Plugins/TabsApi/TabsApi.h"
-#include "TabContainer.h"
+#include "TabEvents.h"
 #include <sol/sol.hpp>
 
-Plugins::TabUpdated::TabUpdated(TabContainer *tabContainer) : m_tabContainer(tabContainer)
+namespace Plugins
+{
+
+TabUpdated::TabUpdated(TabEvents *tabEvents) : m_tabEvents(tabEvents)
 {
 }
 
-boost::signals2::connection Plugins::TabUpdated::connectObserver(sol::protected_function observer,
+boost::signals2::connection TabUpdated::connectObserver(sol::protected_function observer,
 	sol::this_state state)
 {
-	return m_tabContainer->tabUpdatedSignal.AddObserver(
+	return m_tabEvents->AddUpdatedObserver(
 		[this, observer, state](const Tab &tab, Tab::PropertyType propertyType)
-		{ onTabUpdated(observer, state, tab, propertyType); });
+		{ onTabUpdated(observer, state, tab, propertyType); }, TabEventScope::Global());
 }
 
-void Plugins::TabUpdated::onTabUpdated(sol::protected_function observer, sol::this_state state,
+void TabUpdated::onTabUpdated(sol::protected_function observer, sol::this_state state,
 	const Tab &tab, Tab::PropertyType propertyType)
 {
 	sol::state_view existingState = state;
@@ -41,4 +44,6 @@ void Plugins::TabUpdated::onTabUpdated(sol::protected_function observer, sol::th
 	TabsApi::Tab tabData(tab);
 
 	observer(tab.GetId(), changeInfo, tabData);
+}
+
 }

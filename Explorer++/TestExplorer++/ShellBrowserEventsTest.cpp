@@ -8,6 +8,7 @@
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowserFake.h"
 #include "Tab.h"
+#include "TabEvents.h"
 #include "TabNavigationMock.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -21,14 +22,15 @@ protected:
 
 	ShellBrowserEventsTest() :
 		m_tab1(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1),
+			&m_browser1, &m_tabEvents),
 		m_tab2(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1),
+			&m_browser1, &m_tabEvents),
 		m_tab3(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation3),
-			&m_browser2)
+			&m_browser2, &m_tabEvents)
 	{
 	}
 
+	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
 

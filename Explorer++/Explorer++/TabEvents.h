@@ -5,10 +5,9 @@
 #pragma once
 
 #include "EventScope.h"
+#include "Tab.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
-
-class Tab;
 
 using TabEventScope = EventScope<EventScopeMinimumLevel::Browser>;
 
@@ -37,6 +36,9 @@ public:
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
 	using RemovedSignal = boost::signals2::signal<void(const Tab &tab)>;
 
+	using UpdatedSignal =
+		boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)>;
+
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
@@ -53,11 +55,17 @@ public:
 		const TabEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
+	boost::signals2::connection AddUpdatedObserver(const UpdatedSignal::slot_type &observer,
+		const TabEventScope &scope,
+		boost::signals2::connect_position position = boost::signals2::at_back);
+
 	void NotifyCreated(const Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
 	void NotifyMoved(const Tab &tab, int fromIndex, int toIndex);
 	void NotifyPreRemoval(const Tab &tab, int index);
 	void NotifyRemoved(const Tab &tab);
+
+	void NotifyUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 private:
 	template <typename Observer>
@@ -80,4 +88,6 @@ private:
 	MovedSignal m_movedSignal;
 	PreRemovalSignal m_preRemovalSignal;
 	RemovedSignal m_removedSignal;
+
+	UpdatedSignal m_updatedSignal;
 };

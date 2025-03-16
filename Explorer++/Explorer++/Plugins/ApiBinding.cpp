@@ -67,7 +67,7 @@ void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabEvents *tab
 	BindObserverMethods(state, tabsMetaTable, "onMoved", tabMoved);
 
 	std::shared_ptr<Plugins::TabUpdated> tabUpdated =
-		std::make_shared<Plugins::TabUpdated>(tabContainer);
+		std::make_shared<Plugins::TabUpdated>(tabEvents);
 	BindObserverMethods(state, tabsMetaTable, "onUpdated", tabUpdated);
 
 	std::shared_ptr<Plugins::TabRemoved> tabRemoved =

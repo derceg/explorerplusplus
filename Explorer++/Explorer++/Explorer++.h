@@ -313,14 +313,11 @@ private:
 
 	/* Tab backing. */
 	void CreateTabBacking();
-	void OnTabsInitialized();
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabToolbar();
 
 	/* Tabs. */
 	void InitializeTabs();
-	boost::signals2::connection AddTabsInitializedObserver(
-		const TabsInitializedSignal::slot_type &observer) override;
 	void OnTabCreated(const Tab &tab, bool selected);
 	void OnTabSelected(const Tab &tab);
 	void ShowTabBar() override;
@@ -596,7 +593,6 @@ private:
 	/* Tabs. */
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
-	TabsInitializedSignal m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal m_toolbarContextMenuSignal;
 	ToolbarContextMenuSelectedSignal m_toolbarContextMenuSelectedSignal;

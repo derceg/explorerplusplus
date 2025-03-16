@@ -110,6 +110,9 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 
+	m_connections.push_back(m_app->GetTabEvents()->AddUpdatedObserver(
+		std::bind_front(&TabContainer::OnTabUpdated, this), TabEventScope::ForBrowser(*m_browser)));
+
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
 		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this),
 		ShellBrowserEventScope::ForBrowser(*m_browser)));
@@ -722,8 +725,6 @@ void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 		UpdateTabNameInWindow(tab);
 		break;
 	}
-
-	tabUpdatedSignal.m_signal(tab, propertyType);
 }
 
 void TabContainer::UpdateTabNameInWindow(const Tab &tab)
@@ -860,10 +861,13 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
 		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
 		preservedTab.history, preservedTab.currentEntry, preservedTab.preservedFolderState);
-	auto tabTemp = std::make_unique<Tab>(preservedTab, std::move(shellBrowser), m_browser);
-	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
-
-	Tab &tab = *item.first->second;
+	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
+		.customName = preservedTab.customName,
+		.lockState = preservedTab.lockState };
+	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, m_app->GetTabEvents(),
+		initialTabData);
+	auto *rawTab = tab.get();
+	m_tabs.insert({ tab->GetId(), std::move(tab) });
 
 	int finalIndex;
 
@@ -883,7 +887,7 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 	auto navigateParams =
 		NavigateParams::Normal(entry->GetPidl().Raw(), HistoryEntryType::ReplaceCurrentEntry);
-	return SetUpNewTab(tab, navigateParams, tabSettings);
+	return SetUpNewTab(*rawTab, navigateParams, tabSettings);
 }
 
 Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSettings &tabSettings,
@@ -903,22 +907,26 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
 		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
 		navigateParams.pidl, folderSettingsFinal, initialColumns);
-	auto tabTemp = std::make_unique<Tab>(std::move(shellBrowser), m_browser);
-	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
-	Tab &tab = *item.first->second;
+	Tab::InitialData initialTabData;
 
 	if (tabSettings.lockState)
 	{
-		tab.SetLockState(*tabSettings.lockState);
+		initialTabData.lockState = *tabSettings.lockState;
 	}
 
 	if (tabSettings.name)
 	{
-		tab.SetCustomName(*tabSettings.name);
+		initialTabData.useCustomName = true;
+		initialTabData.customName = *tabSettings.name;
 	}
 
-	return SetUpNewTab(tab, navigateParams, tabSettings);
+	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, m_app->GetTabEvents(),
+		initialTabData);
+	auto *rawTab = tab.get();
+	m_tabs.insert({ tab->GetId(), std::move(tab) });
+
+	return SetUpNewTab(*rawTab, navigateParams, tabSettings);
 }
 
 Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
@@ -963,12 +971,6 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		// a selected tab), regardless of what the caller passes in.
 		selected = true;
 	}
-
-	// There's no need to manually disconnect this. Either it will be
-	// disconnected when the tab is closed and the tab object (and
-	// associated signal) is destroyed or when the tab is destroyed
-	// during application shutdown.
-	tab.AddTabUpdatedObserver(std::bind_front(&TabContainer::OnTabUpdated, this));
 
 	if (selected)
 	{

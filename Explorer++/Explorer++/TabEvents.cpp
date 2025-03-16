@@ -37,6 +37,12 @@ boost::signals2::connection TabEvents::AddRemovedObserver(const RemovedSignal::s
 	return m_removedSignal.connect(MakeFilteredObserver(observer, scope), position);
 }
 
+boost::signals2::connection TabEvents::AddUpdatedObserver(const UpdatedSignal::slot_type &observer,
+	const TabEventScope &scope, boost::signals2::connect_position position)
+{
+	return m_updatedSignal.connect(MakeFilteredObserver(observer, scope), position);
+}
+
 void TabEvents::NotifyCreated(const Tab &tab, bool selected)
 {
 	m_createdSignal(tab, selected);
@@ -60,4 +66,9 @@ void TabEvents::NotifyPreRemoval(const Tab &tab, int index)
 void TabEvents::NotifyRemoved(const Tab &tab)
 {
 	m_removedSignal(tab);
+}
+
+void TabEvents::NotifyUpdated(const Tab &tab, Tab::PropertyType propertyType)
+{
+	m_updatedSignal(tab, propertyType);
 }

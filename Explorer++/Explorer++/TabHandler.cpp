@@ -63,8 +63,6 @@ void Explorerplusplus::InitializeTabs()
 
 	m_connections.push_back(m_config->showTabBarAtBottom.addObserver(updateLayoutObserverMethod));
 	m_connections.push_back(m_config->extendTabControl.addObserver(updateLayoutObserverMethod));
-
-	m_tabsInitializedSignal();
 }
 
 void Explorerplusplus::OnTabCreated(const Tab &tab, bool selected)
@@ -78,12 +76,6 @@ void Explorerplusplus::OnTabCreated(const Tab &tab, bool selected)
 	// A tab has been created, so this call is needed in order to set the size and position of the
 	// tab's listview control.
 	UpdateLayout();
-}
-
-boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
-	const TabsInitializedSignal::slot_type &observer)
-{
-	return m_tabsInitializedSignal.connect(observer);
 }
 
 void Explorerplusplus::OnNavigationCommitted(const NavigationRequest *request)

@@ -67,13 +67,8 @@ void Explorerplusplus::CreateTabBacking()
 		},
 		TabEventScope::ForBrowser(*this)));
 
-	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
-}
-
-void Explorerplusplus::OnTabsInitialized()
-{
-	GetActivePane()->GetTabContainer()->tabUpdatedSignal.AddObserver(
-		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
+	m_connections.push_back(m_app->GetTabEvents()->AddUpdatedObserver(
+		std::bind_front(&Explorerplusplus::OnTabUpdated, this), TabEventScope::ForBrowser(*this)));
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)

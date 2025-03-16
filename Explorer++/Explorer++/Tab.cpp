@@ -5,13 +5,11 @@
 #include "stdafx.h"
 #include "Tab.h"
 #include "Config.h"
-#include "CoreInterface.h"
-#include "PreservedTab.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "TabEvents.h"
 #include "TabStorage.h"
-#include <wil/resource.h>
 
 // Note the use of std::dynamic_pointer_cast below. There are a number of places where the caller
 // needs to be able to retrieve the ShellBrowser implementation class (ShellBrowserImpl), so that's
@@ -29,26 +27,16 @@
 // If the ShellBrowser interface expands to cover all the necessary functionality, or
 // ShellBrowserImpl is simplified enough to make it usable in tests, the casting here can be
 // removed.
-Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser) :
+Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabEvents *tabEvents,
+	const InitialData &initialData) :
 	m_id(idCounter++),
 	m_shellBrowser(std::move(shellBrowser)),
 	m_shellBrowserImpl(dynamic_cast<ShellBrowserImpl *>(m_shellBrowser.get())),
 	m_browser(browser),
-	m_useCustomName(false),
-	m_lockState(LockState::NotLocked)
-{
-	Initialize();
-}
-
-Tab::Tab(const PreservedTab &preservedTab, std::unique_ptr<ShellBrowser> shellBrowser,
-	BrowserWindow *browser) :
-	m_id(idCounter++),
-	m_shellBrowser(std::move(shellBrowser)),
-	m_shellBrowserImpl(dynamic_cast<ShellBrowserImpl *>(m_shellBrowser.get())),
-	m_browser(browser),
-	m_useCustomName(preservedTab.useCustomName),
-	m_customName(preservedTab.customName),
-	m_lockState(preservedTab.lockState)
+	m_tabEvents(tabEvents),
+	m_useCustomName(initialData.useCustomName),
+	m_customName(initialData.customName),
+	m_lockState(initialData.lockState)
 {
 	Initialize();
 }
@@ -106,7 +94,7 @@ void Tab::SetCustomName(const std::wstring &name)
 	m_useCustomName = true;
 	m_customName = name;
 
-	m_tabUpdatedSignal(*this, PropertyType::Name);
+	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
 }
 
 void Tab::ClearCustomName()
@@ -114,7 +102,7 @@ void Tab::ClearCustomName()
 	m_useCustomName = false;
 	m_customName.erase();
 
-	m_tabUpdatedSignal(*this, PropertyType::Name);
+	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
 }
 
 Tab::LockState Tab::GetLockState() const
@@ -136,17 +124,12 @@ void Tab::SetLockState(LockState lockState)
 		: NavigationTargetMode::Normal;
 	m_shellBrowser->GetNavigationController()->SetNavigationTargetMode(navigationTargetMode);
 
-	m_tabUpdatedSignal(*this, PropertyType::LockState);
+	m_tabEvents->NotifyUpdated(*this, PropertyType::LockState);
 }
 
 bool Tab::IsLocked() const
 {
 	return m_lockState == LockState::Locked || m_lockState == LockState::AddressLocked;
-}
-
-boost::signals2::connection Tab::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
-{
-	return m_tabUpdatedSignal.connect(observer);
 }
 
 TabStorageData Tab::GetStorageData() const

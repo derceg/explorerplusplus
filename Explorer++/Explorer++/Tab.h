@@ -5,18 +5,12 @@
 #pragma once
 
 #include <boost/core/noncopyable.hpp>
-#include <boost/signals2.hpp>
 #include <memory>
 
 class BrowserWindow;
-class CoreInterface;
-class FileActionHandler;
-struct FolderColumns;
-struct FolderSettings;
-struct PreservedTab;
 class ShellBrowser;
 class ShellBrowserImpl;
-class TabNavigationInterface;
+class TabEvents;
 struct TabStorageData;
 
 class Tab : private boost::noncopyable
@@ -41,12 +35,15 @@ public:
 		AddressLocked
 	};
 
-	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)>
-		TabUpdatedSignal;
+	struct InitialData
+	{
+		bool useCustomName = false;
+		std::wstring customName;
+		LockState lockState = LockState::NotLocked;
+	};
 
-	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser);
-	Tab(const PreservedTab &preservedTab, std::unique_ptr<ShellBrowser> shellBrowser,
-		BrowserWindow *browser);
+	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabEvents *tabEvents,
+		const InitialData &initialData = {});
 
 	int GetId() const;
 
@@ -65,8 +62,6 @@ public:
 
 	// Returns true if the tab is locked, or address locked.
 	bool IsLocked() const;
-
-	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 
 	TabStorageData GetStorageData() const;
 
@@ -87,10 +82,9 @@ private:
 	ShellBrowserImpl *const m_shellBrowserImpl;
 
 	BrowserWindow *const m_browser;
+	TabEvents *const m_tabEvents;
 
 	bool m_useCustomName;
 	std::wstring m_customName;
 	LockState m_lockState;
-
-	TabUpdatedSignal m_tabUpdatedSignal;
 };

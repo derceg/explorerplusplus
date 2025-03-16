@@ -34,6 +34,7 @@ class NavigationRequest;
 struct PreservedTab;
 class ShellBrowser;
 class ShellBrowserEmbedder;
+class TabNavigationInterface;
 
 BOOST_PARAMETER_NAME(name)
 BOOST_PARAMETER_NAME(index)
@@ -126,9 +127,6 @@ public:
 	std::vector<TabStorageData> GetStorageData() const;
 
 	// Signals
-	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
-		tabUpdatedSignal;
-
 	SignalWrapper<TabContainer, void()> sizeUpdatedSignal;
 
 private:

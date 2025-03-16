@@ -38,8 +38,8 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_coreInterface->GetTabContainer()->tabUpdatedSignal.AddObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this)));
+	m_connections.push_back(m_app->GetTabEvents()->AddUpdatedObserver(
+		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 	m_connections.push_back(m_app->GetTabEvents()->AddMovedObserver(
 		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
 	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(

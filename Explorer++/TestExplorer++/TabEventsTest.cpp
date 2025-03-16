@@ -17,9 +17,9 @@ class TabEventsTest : public Test
 protected:
 	TabEventsTest() :
 		m_tab1(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1),
+			&m_browser1, &m_tabEvents),
 		m_tab2(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation2),
-			&m_browser2)
+			&m_browser2, &m_tabEvents)
 	{
 	}
 
@@ -33,25 +33,27 @@ protected:
 	NiceMock<BrowserWindowMock> m_browser2;
 	NiceMock<TabNavigationMock> m_tabNavigation2;
 	Tab m_tab2;
-};
 
-class TabEventsTabSignalTest : public TabEventsTest
-{
-protected:
 	StrictMock<MockFunction<void(const Tab &tab, bool selected)>> m_tabCreatedCallback;
+	StrictMock<MockFunction<void(const Tab &tab, Tab::PropertyType propertyType)>>
+		m_tabUpdatedCallback;
 	StrictMock<MockFunction<void(const Tab &tab)>> m_tabSelectedCallback;
 	StrictMock<MockFunction<void(const Tab &tab, int fromIndex, int toIndex)>> m_tabMovedCallback;
 	StrictMock<MockFunction<void(const Tab &tab, int index)>> m_tabPreRemovalCallback;
 	StrictMock<MockFunction<void(const Tab &tab)>> m_tabRemovedCallback;
 };
 
-TEST_F(TabEventsTabSignalTest, Signals)
+TEST_F(TabEventsTest, Signals)
 {
 	InSequence seq;
 
 	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), true));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab2), false));
+
+	m_tabEvents.AddUpdatedObserver(m_tabUpdatedCallback.AsStdFunction(), TabEventScope::Global());
+	EXPECT_CALL(m_tabUpdatedCallback, Call(Ref(m_tab1), Tab::PropertyType::Name));
+	EXPECT_CALL(m_tabUpdatedCallback, Call(Ref(m_tab2), Tab::PropertyType::LockState));
 
 	m_tabEvents.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabSelectedCallback, Call(Ref(m_tab1)));
@@ -69,6 +71,8 @@ TEST_F(TabEventsTabSignalTest, Signals)
 
 	m_tabEvents.NotifyCreated(m_tab1, true);
 	m_tabEvents.NotifyCreated(m_tab2, false);
+	m_tabEvents.NotifyUpdated(m_tab1, Tab::PropertyType::Name);
+	m_tabEvents.NotifyUpdated(m_tab2, Tab::PropertyType::LockState);
 	m_tabEvents.NotifySelected(m_tab1);
 	m_tabEvents.NotifyMoved(m_tab2, 1, 2);
 	m_tabEvents.NotifyPreRemoval(m_tab2, 0);
@@ -76,7 +80,7 @@ TEST_F(TabEventsTabSignalTest, Signals)
 	m_tabEvents.NotifyRemoved(m_tab1);
 }
 
-TEST_F(TabEventsTabSignalTest, SignalsFilteredByBrowser)
+TEST_F(TabEventsTest, SignalsFilteredByBrowser)
 {
 	InSequence seq;
 
@@ -85,6 +89,10 @@ TEST_F(TabEventsTabSignalTest, SignalsFilteredByBrowser)
 	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(m_browser1));
 	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(m_tab1), false));
+
+	m_tabEvents.AddUpdatedObserver(m_tabUpdatedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(m_browser2));
+	EXPECT_CALL(m_tabUpdatedCallback, Call(Ref(m_tab2), Tab::PropertyType::LockState));
 
 	m_tabEvents.AddSelectedObserver(m_tabSelectedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(m_browser1));
@@ -105,6 +113,9 @@ TEST_F(TabEventsTabSignalTest, SignalsFilteredByBrowser)
 
 	m_tabEvents.NotifyCreated(m_tab1, false);
 	m_tabEvents.NotifyCreated(m_tab2, false);
+
+	m_tabEvents.NotifyUpdated(m_tab1, Tab::PropertyType::Name);
+	m_tabEvents.NotifyUpdated(m_tab2, Tab::PropertyType::LockState);
 
 	m_tabEvents.NotifySelected(m_tab1);
 	m_tabEvents.NotifySelected(m_tab2);

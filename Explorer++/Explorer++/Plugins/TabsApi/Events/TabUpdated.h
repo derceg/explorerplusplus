@@ -7,14 +7,15 @@
 #include "Plugins/Event.h"
 #include "Tab.h"
 
-class TabContainer;
+class TabEvents;
 
 namespace Plugins
 {
+
 class TabUpdated : public Event
 {
 public:
-	TabUpdated(TabContainer *tabContainer);
+	TabUpdated(TabEvents *tabEvents);
 
 protected:
 	boost::signals2::connection connectObserver(sol::protected_function observer,
@@ -24,6 +25,7 @@ private:
 	void onTabUpdated(sol::protected_function observer, sol::this_state state, const Tab &tab,
 		Tab::PropertyType propertyType);
 
-	TabContainer *m_tabContainer;
+	TabEvents *const m_tabEvents;
 };
+
 }

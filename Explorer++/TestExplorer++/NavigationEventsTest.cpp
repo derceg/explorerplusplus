@@ -9,6 +9,7 @@
 #include "ShellBrowserFake.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
+#include "TabEvents.h"
 #include "TabNavigationMock.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -22,11 +23,11 @@ protected:
 
 	NavigationEventsTest() :
 		m_tab1(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1),
+			&m_browser1, &m_tabEvents),
 		m_tab2(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1),
+			&m_browser1, &m_tabEvents),
 		m_tab3(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation3),
-			&m_browser2),
+			&m_browser2, &m_tabEvents),
 		m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
 		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
@@ -45,6 +46,7 @@ protected:
 			m_stopSource.get_token() };
 	}
 
+	TabEvents m_tabEvents;
 	NavigationEvents m_navigationEvents;
 
 	NiceMock<BrowserWindowMock> m_browser1;
