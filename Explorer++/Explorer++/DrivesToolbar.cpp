@@ -259,9 +259,7 @@ void DrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0].Raw()));
-		auto navigateParams = NavigateParams::Normal(pidl.get());
-		m_coreInterface->GetTabContainer()->CreateNewTab(navigateParams,
-			TabSettings(_selected = m_coreInterface->GetConfig()->openTabsInForeground));
+		m_browserWindow->OpenItem(pidl.get(), OpenFolderDisposition::NewTabDefault);
 	}
 	break;
 	}
