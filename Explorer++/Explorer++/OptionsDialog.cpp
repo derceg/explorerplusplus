@@ -137,7 +137,7 @@ void OptionsDialog::AddPages()
 		m_app->GetDarkModeManager(), GetThemeManager()));
 	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
-		m_app->GetDarkModeManager()));
+		m_app->GetDarkModeManager(), m_app->GetResourceLoader()));
 	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, GetResourceInstance(), m_config,

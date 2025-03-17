@@ -12,6 +12,7 @@ class BookmarkTree;
 class CoreInterface;
 class IconResourceLoader;
 class MenuView;
+class ResourceLoader;
 class TabContainerImpl;
 class TabRestorer;
 class ThemeManager;
@@ -22,10 +23,11 @@ public:
 	TabContainerBackgroundContextMenu(MenuView *menuView,
 		const AcceleratorManager *acceleratorManager, TabContainerImpl *tabContainerImpl,
 		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager);
+		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+		ThemeManager *themeManager);
 
 private:
-	void BuildMenu();
+	void BuildMenu(const ResourceLoader *resourceLoader);
 	void OnMenuItemSelected(UINT menuItemId);
 
 	TabContainerImpl *const m_tabContainerImpl;

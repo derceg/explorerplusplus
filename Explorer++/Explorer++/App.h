@@ -33,6 +33,7 @@ class AsyncIconFetcher;
 class CachedIcons;
 class ColorRuleModel;
 class IconResourceLoader;
+class ResourceLoader;
 struct WindowStorageData;
 
 class App : private boost::noncopyable
@@ -61,8 +62,9 @@ public:
 	BookmarkTree *GetBookmarkTree();
 	ColorRuleModel *GetColorRuleModel() const;
 	Applications::ApplicationModel *GetApplicationModel();
-	IconResourceLoader *GetIconResourceLoader() const;
 	HINSTANCE GetResourceInstance() const;
+	ResourceLoader *GetResourceLoader() const;
+	IconResourceLoader *GetIconResourceLoader() const;
 	TabEvents *GetTabEvents();
 	ShellBrowserEvents *GetShellBrowserEvents();
 	NavigationEvents *GetNavigationEvents();
@@ -111,8 +113,9 @@ private:
 	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
-	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 	HINSTANCE m_resourceInstance;
+	std::unique_ptr<ResourceLoader> m_resourceLoader;
+	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 	ProcessManager m_processManager;
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;

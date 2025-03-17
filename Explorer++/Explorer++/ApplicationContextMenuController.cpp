@@ -11,17 +11,19 @@
 #include "ApplicationModel.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ResourceManager.h"
+#include "ResourceLoader.h"
 
 namespace Applications
 {
 
 ApplicationContextMenuController::ApplicationContextMenuController(ApplicationModel *model,
 	Application *application, ApplicationExecutor *applicationExecutor,
-	CoreInterface *coreInterface, ThemeManager *themeManager) :
+	const ResourceLoader *resourceLoader, CoreInterface *coreInterface,
+	ThemeManager *themeManager) :
 	m_model(model),
 	m_application(application),
 	m_applicationExecutor(applicationExecutor),
+	m_resourceLoader(resourceLoader),
 	m_coreInterface(coreInterface),
 	m_themeManager(themeManager)
 {
@@ -71,7 +73,7 @@ void ApplicationContextMenuController::OnNew()
 
 void ApplicationContextMenuController::OnDelete()
 {
-	std::wstring message = Resources::LoadString(IDS_APPLICATIONBUTTON_DELETE);
+	std::wstring message = m_resourceLoader->LoadString(IDS_APPLICATIONBUTTON_DELETE);
 	int messageBoxReturn = MessageBox(m_coreInterface->GetMainWindow(), message.c_str(),
 		App::APP_NAME, MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 

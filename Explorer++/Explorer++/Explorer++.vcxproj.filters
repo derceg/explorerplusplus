@@ -649,9 +649,6 @@
     <ClCompile Include="Win32ResourceLoader.cpp">
       <Filter>Core\Resource Loading</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Core\Resource Loading</Filter>
-    </ClCompile>
     <ClCompile Include="ShellIconLoaderImpl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1483,9 +1480,6 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="Win32ResourceLoader.h">
-      <Filter>Core\Resource Loading</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
       <Filter>Core\Resource Loading</Filter>
     </ClInclude>
     <ClInclude Include="ResourceLoader.h">

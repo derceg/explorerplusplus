@@ -1066,7 +1066,6 @@
     <ClCompile Include="MenuView.cpp" />
     <ClCompile Include="PasteSymLinksClient.cpp" />
     <ClCompile Include="PasteSymLinksServer.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="ShellIconLoaderImpl.cpp" />
     <ClCompile Include="ShellIconModel.cpp" />
     <ClCompile Include="TabContainerBackgroundContextMenu.cpp" />
@@ -1377,7 +1376,6 @@
     <ClInclude Include="PasteSymLinksServer.h" />
     <ClInclude Include="PasteSymLinksServerClientBase.h" />
     <ClInclude Include="ResourceLoader.h" />
-    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShellIconLoader.h" />
     <ClInclude Include="ShellIconLoaderImpl.h" />
     <ClInclude Include="ShellIconModel.h" />

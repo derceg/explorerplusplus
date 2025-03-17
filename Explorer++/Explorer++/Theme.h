@@ -7,6 +7,8 @@
 #include "../Helper/BetterEnumsWrapper.h"
 #include <string>
 
+class ResourceLoader;
+
 // clang-format off
 BETTER_ENUM(Theme, int,
 	Light = 0,
@@ -15,4 +17,4 @@ BETTER_ENUM(Theme, int,
 )
 // clang-format on
 
-std::wstring GetThemeText(Theme theme);
+std::wstring GetThemeText(Theme theme, const ResourceLoader *resourceLoader);

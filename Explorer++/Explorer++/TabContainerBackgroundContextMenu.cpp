@@ -8,14 +8,15 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "MenuView.h"
-#include "ResourceManager.h"
+#include "ResourceLoader.h"
 #include "TabContainerImpl.h"
 #include "TabRestorer.h"
 
 TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, TabContainerImpl *tabContainerImpl,
 	TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager) :
+	const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+	ThemeManager *themeManager) :
 	MenuBase(menuView, acceleratorManager),
 	m_tabContainerImpl(tabContainerImpl),
 	m_tabRestorer(tabRestorer),
@@ -24,22 +25,22 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 	m_iconResourceLoader(iconResourceLoader),
 	m_themeManager(themeManager)
 {
-	BuildMenu();
+	BuildMenu(resourceLoader);
 
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(std::bind(
 		&TabContainerBackgroundContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
 }
 
-void TabContainerBackgroundContextMenu::BuildMenu()
+void TabContainerBackgroundContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_NEW_TAB,
-		Resources::LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
+		resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
 		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
-		Resources::LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
+		resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
 		GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
-		Resources::LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
+		resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
 	if (m_tabRestorer->IsEmpty())

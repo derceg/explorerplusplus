@@ -7,7 +7,7 @@
 #include "App.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ResourceManager.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
 #include "../Helper/ListViewHelper.h"
@@ -139,7 +139,7 @@ std::wstring SearchTabsDialog::GetColumnText(ColumnType columnType)
 		__assume(0);
 	}
 
-	return Resources::LoadString(stringId);
+	return m_app->GetResourceLoader()->LoadString(stringId);
 }
 
 void SearchTabsDialog::RefreshTabList(SelectionOption selectionOption)
@@ -224,7 +224,8 @@ void SearchTabsDialog::SetupEditControl()
 	m_editSubclass = std::make_unique<WindowSubclass>(edit,
 		std::bind_front(&SearchTabsDialog::EditWndProc, this));
 
-	auto placeHolderText = Resources::LoadString(IDS_SEARCH_TABS_SEARCH_TERM_PLACEHOLDER_TEXT);
+	auto placeHolderText =
+		m_app->GetResourceLoader()->LoadString(IDS_SEARCH_TABS_SEARCH_TERM_PLACEHOLDER_TEXT);
 	SendMessage(edit, EM_SETCUEBANNER, true, reinterpret_cast<LPARAM>(placeHolderText.c_str()));
 
 	SetWindowText(edit, m_filter.c_str());

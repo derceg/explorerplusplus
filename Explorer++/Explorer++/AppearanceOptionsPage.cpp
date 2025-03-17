@@ -7,19 +7,19 @@
 #include "Config.h"
 #include "DarkModeManager.h"
 #include "MainResource.h"
-#include "ResourceManager.h"
+#include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <glog/logging.h>
 
-std::wstring GetIconSetText(IconSet iconSet);
-
 AppearanceOptionsPage::AppearanceOptionsPage(HWND parent, HINSTANCE resourceInstance,
 	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow, const DarkModeManager *darkModeManager) :
+	HWND tooltipWindow, const DarkModeManager *darkModeManager,
+	const ResourceLoader *resourceLoader) :
 	OptionsPage(IDD_OPTIONS_APPEARANCE, IDS_OPTIONS_APPEARANCE_TITLE, parent, resourceInstance,
 		config, coreInterface, settingChangedCallback, tooltipWindow),
-	m_darkModeManager(darkModeManager)
+	m_darkModeManager(darkModeManager),
+	m_resourceLoader(resourceLoader)
 {
 }
 
@@ -74,14 +74,14 @@ void AppearanceOptionsPage::InitializeControls()
 
 	for (auto theme : Theme::_values())
 	{
-		themeItems.emplace_back(theme, GetThemeText(theme));
+		themeItems.emplace_back(theme, GetThemeText(theme, m_resourceLoader));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), themeItems,
 		m_config->theme.get());
 }
 
-std::wstring GetIconSetText(IconSet iconSet)
+std::wstring AppearanceOptionsPage::GetIconSetText(IconSet iconSet)
 {
 	UINT stringId;
 
@@ -112,7 +112,7 @@ std::wstring GetIconSetText(IconSet iconSet)
 		__assume(0);
 	}
 
-	return Resources::LoadString(stringId);
+	return m_resourceLoader->LoadString(stringId);
 }
 
 void AppearanceOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)

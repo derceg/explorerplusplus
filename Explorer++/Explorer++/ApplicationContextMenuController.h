@@ -5,6 +5,7 @@
 #pragma once
 
 class CoreInterface;
+class ResourceLoader;
 class ThemeManager;
 
 namespace Applications
@@ -18,8 +19,8 @@ class ApplicationContextMenuController
 {
 public:
 	ApplicationContextMenuController(ApplicationModel *model, Application *application,
-		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
-		ThemeManager *themeManager);
+		ApplicationExecutor *applicationExecutor, const ResourceLoader *resourceLoader,
+		CoreInterface *coreInterface, ThemeManager *themeManager);
 
 	void OnMenuItemSelected(UINT menuItemId);
 
@@ -32,6 +33,7 @@ private:
 	ApplicationModel *const m_model;
 	Application *const m_application;
 	ApplicationExecutor *const m_applicationExecutor;
+	const ResourceLoader *const m_resourceLoader;
 	CoreInterface *const m_coreInterface;
 	ThemeManager *const m_themeManager;
 };

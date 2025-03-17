@@ -15,7 +15,6 @@
 #include "MainResource.h"
 #include "MenuRanges.h"
 #include "ResourceHelper.h"
-#include "ResourceManager.h"
 #include "TabRestorerMenu.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
@@ -102,7 +101,7 @@ void Explorerplusplus::InitializeMainMenu()
 		[this](MenuView *menuView)
 		{
 			return std::make_unique<TabRestorerMenu>(menuView, m_app->GetAcceleratorManager(),
-				m_app->GetTabRestorer(), &m_shellIconLoader, ResourceManager::GetResourceLoader(),
+				m_app->GetTabRestorer(), &m_shellIconLoader, m_app->GetResourceLoader(),
 				MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 		});
 
@@ -401,7 +400,8 @@ std::optional<std::wstring> Explorerplusplus::MaybeGetMenuItemHelperText(HMENU m
 Explorerplusplus::MainMenuSubMenu *Explorerplusplus::MaybeGetMainMenuSubMenuFromId(UINT id)
 {
 	auto submenu = std::ranges::find_if(m_mainMenuSubMenus,
-		[id](const auto &submenu) {
+		[id](const auto &submenu)
+		{
 			return id >= submenu.menu->GetIdRange().startId
 				&& id < submenu.menu->GetIdRange().endId;
 		});

@@ -20,7 +20,6 @@
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
 #include "ResourceHelper.h"
-#include "ResourceManager.h"
 #include "TabStorage.h"
 #include "UIThreadExecutor.h"
 #include "Win32ResourceLoader.h"
@@ -246,7 +245,7 @@ void App::SetUpLanguageResourceInstance()
 		SetProcessDefaultLayout(LAYOUT_RTL);
 	}
 
-	ResourceManager::Initialize(std::make_unique<Win32ResourceLoader>(m_resourceInstance));
+	m_resourceLoader = std::make_unique<Win32ResourceLoader>(m_resourceInstance);
 }
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
@@ -405,14 +404,19 @@ Applications::ApplicationModel *App::GetApplicationModel()
 	return &m_applicationModel;
 }
 
-IconResourceLoader *App::GetIconResourceLoader() const
-{
-	return m_iconResourceLoader.get();
-}
-
 HINSTANCE App::GetResourceInstance() const
 {
 	return m_resourceInstance;
+}
+
+ResourceLoader *App::GetResourceLoader() const
+{
+	return m_resourceLoader.get();
+}
+
+IconResourceLoader *App::GetIconResourceLoader() const
+{
+	return m_iconResourceLoader.get();
 }
 
 TabEvents *App::GetTabEvents()
@@ -494,8 +498,9 @@ bool App::ConfirmExit()
 	auto *browser = m_browserList.GetLastActive();
 	CHECK(browser);
 
-	std::wstring message = fmt::format(fmt::runtime(Resources::LoadString(IDS_CLOSE_ALL_WINDOWS)),
-		fmt::arg(L"num_windows", numWindows));
+	std::wstring message =
+		fmt::format(fmt::runtime(m_resourceLoader->LoadString(IDS_CLOSE_ALL_WINDOWS)),
+			fmt::arg(L"num_windows", numWindows));
 	int response =
 		MessageBox(browser->GetHWND(), message.c_str(), APP_NAME, MB_ICONINFORMATION | MB_YESNO);
 

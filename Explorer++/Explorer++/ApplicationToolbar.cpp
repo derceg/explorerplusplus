@@ -170,7 +170,7 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 
 	PopupMenuView popupMenu;
 	ApplicationContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_model, application,
-		&m_applicationExecutor, m_coreInterface, m_themeManager);
+		&m_applicationExecutor, m_app->GetResourceLoader(), m_coreInterface, m_themeManager);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 
