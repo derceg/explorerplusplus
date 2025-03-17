@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "AcceleratorHelper.h"
+#include "App.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
@@ -17,10 +18,11 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
 
-BookmarksMainMenu::BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-	ThemeManager *themeManager, BookmarkTree *bookmarkTree,
+BookmarksMainMenu::BookmarksMainMenu(App *app, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, ThemeManager *themeManager, BookmarkTree *bookmarkTree,
 	const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
+	m_app(app),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bookmarkTree(bookmarkTree),
@@ -97,7 +99,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	AddOtherBookmarksToMenu(menu.get(), { menuInfo.nextMenuId, m_menuIdRange.endId },
 		GetMenuItemCount(menu.get()), menuImages, menuInfo);
 
-	UpdateMenuAcceleratorStrings(menu.get(), m_coreInterface->GetAcceleratorManager());
+	UpdateMenuAcceleratorStrings(menu.get(), m_app->GetAcceleratorManager());
 
 	return menu;
 }

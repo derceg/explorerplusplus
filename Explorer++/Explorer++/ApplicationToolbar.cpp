@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ApplicationToolbar.h"
+#include "App.h"
 #include "Application.h"
 #include "ApplicationContextMenu.h"
 #include "ApplicationEditorDialog.h"
@@ -69,16 +70,17 @@ private:
 };
 
 ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
-	ApplicationModel *model, CoreInterface *coreInterface, ThemeManager *themeManager)
+	ApplicationModel *model, App *app, CoreInterface *coreInterface, ThemeManager *themeManager)
 {
-	return new ApplicationToolbar(view, model, coreInterface, themeManager);
+	return new ApplicationToolbar(view, model, app, coreInterface, themeManager);
 }
 
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-	CoreInterface *coreInterface, ThemeManager *themeManager) :
+	App *app, CoreInterface *coreInterface, ThemeManager *themeManager) :
 	m_view(view),
 	m_model(model),
 	m_applicationExecutor(coreInterface),
+	m_app(app),
 	m_coreInterface(coreInterface),
 	m_themeManager(themeManager)
 {
@@ -167,8 +169,8 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
 	PopupMenuView popupMenu;
-	ApplicationContextMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(), m_model,
-		application, &m_applicationExecutor, m_coreInterface, m_themeManager);
+	ApplicationContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_model, application,
+		&m_applicationExecutor, m_coreInterface, m_themeManager);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 

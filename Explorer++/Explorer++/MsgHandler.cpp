@@ -981,11 +981,6 @@ HINSTANCE Explorerplusplus::GetResourceInstance() const
 	return m_app->GetResourceInstance();
 }
 
-AcceleratorManager *Explorerplusplus::GetAcceleratorManager() const
-{
-	return m_app->GetAcceleratorManager();
-}
-
 HWND Explorerplusplus::GetMainWindow() const
 {
 	return m_hContainer;

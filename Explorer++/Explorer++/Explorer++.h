@@ -479,7 +479,6 @@ private:
 	/* CoreInterface methods. */
 	const Config *GetConfig() const override;
 	HINSTANCE GetResourceInstance() const override;
-	AcceleratorManager *GetAcceleratorManager() const override;
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainerImpl *GetTabContainerImpl() const override;

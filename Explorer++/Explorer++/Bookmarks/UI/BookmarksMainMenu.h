@@ -9,6 +9,7 @@
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 
+class App;
 class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
@@ -19,7 +20,7 @@ class ThemeManager;
 class BookmarksMainMenu
 {
 public:
-	BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	BookmarksMainMenu(App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
 		ThemeManager *themeManager, BookmarkTree *bookmarkTree,
 		const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
@@ -41,9 +42,10 @@ private:
 	bool OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	bool OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt);
 
-	CoreInterface *m_coreInterface = nullptr;
+	App *const m_app;
+	CoreInterface *const m_coreInterface;
 	const IconResourceLoader *const m_iconResourceLoader;
-	BookmarkTree *m_bookmarkTree = nullptr;
+	BookmarkTree *const m_bookmarkTree;
 	const BookmarkMenuBuilder::MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;
 

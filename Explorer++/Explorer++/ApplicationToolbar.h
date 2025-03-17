@@ -12,6 +12,7 @@
 #include <wil/com.h>
 #include <vector>
 
+class App;
 class CoreInterface;
 struct MouseEvent;
 class ThemeManager;
@@ -27,7 +28,7 @@ class ApplicationToolbar : private DropTargetInternal
 {
 public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
-		CoreInterface *coreInterface, ThemeManager *themeManager);
+		App *app, CoreInterface *coreInterface, ThemeManager *themeManager);
 
 	ApplicationToolbar(const ApplicationToolbar &) = delete;
 	ApplicationToolbar(ApplicationToolbar &&) = delete;
@@ -61,7 +62,7 @@ private:
 		std::unique_ptr<ApplicationDropper> m_applicationDropper;
 	};
 
-	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
+	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model, App *app,
 		CoreInterface *coreInterface, ThemeManager *themeManager);
 
 	void Initialize();
@@ -95,7 +96,8 @@ private:
 	ApplicationToolbarView *m_view;
 	ApplicationModel *m_model;
 	ApplicationExecutorImpl m_applicationExecutor;
-	CoreInterface *m_coreInterface;
+	App *const m_app;
+	CoreInterface *const m_coreInterface;
 	ThemeManager *const m_themeManager;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

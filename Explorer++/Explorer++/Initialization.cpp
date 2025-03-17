@@ -27,7 +27,7 @@
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
 	m_bookmarksMainMenu =
-		std::make_unique<BookmarksMainMenu>(this, this, m_app->GetIconResourceLoader(),
+		std::make_unique<BookmarksMainMenu>(m_app, this, this, m_app->GetIconResourceLoader(),
 			&m_iconFetcher, m_app->GetThemeManager(), m_app->GetBookmarkTree(),
 			BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 

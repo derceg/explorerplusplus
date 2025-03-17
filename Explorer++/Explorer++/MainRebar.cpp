@@ -386,7 +386,7 @@ void Explorerplusplus::CreateApplicationToolbar()
 		Applications::ApplicationToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
 
 	m_applicationToolbar = Applications::ApplicationToolbar::Create(applicationToolbarView,
-		m_app->GetApplicationModel(), this, m_app->GetThemeManager());
+		m_app->GetApplicationModel(), m_app, this, m_app->GetThemeManager());
 	m_applicationToolbar->GetView()->AddToolbarSizeUpdatedObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
 			m_applicationToolbar->GetView()->GetHWND()));
