@@ -75,7 +75,7 @@ void MainWindow::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
+	if (tab->GetTabContainer()->IsTabSelected(*tab))
 	{
 		UpdateWindowText();
 	}
@@ -85,7 +85,7 @@ void MainWindow::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
 
-	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
+	if (tab->GetTabContainer()->IsTabSelected(*tab))
 	{
 		UpdateWindowText();
 	}

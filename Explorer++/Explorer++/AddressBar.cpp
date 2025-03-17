@@ -258,7 +258,7 @@ void AddressBar::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
+	if (tab->GetTabContainer()->IsTabSelected(*tab))
 	{
 		UpdateTextAndIcon(*tab);
 	}
@@ -268,7 +268,7 @@ void AddressBar::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
 
-	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
+	if (tab->GetTabContainer()->IsTabSelected(*tab))
 	{
 		// Since the directory properties have changed, it's possible that the icon has changed.
 		// Therefore, the updated icon should always be retrieved.

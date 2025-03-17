@@ -165,7 +165,7 @@ void SearchTabsDialog::AddTabs(SelectionOption selectionOption)
 		switch (selectionOption)
 		{
 		case SearchTabsDialog::SelectionOption::SelectActiveTab:
-			if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(tab))
+			if (tab.GetTabContainer()->IsTabSelected(tab))
 			{
 				ListViewHelper::SelectItem(listView, index, true);
 			}
