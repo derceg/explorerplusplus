@@ -19,7 +19,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "ShellView.h"
 #include "SortMenuBuilder.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ClipboardHelper.h"
@@ -58,10 +58,10 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 	case WM_CONTEXTMENU:
 		if (reinterpret_cast<HWND>(wParam)
 			== GetActivePane()
-				   ->GetTabContainer()
-				   ->GetSelectedTab()
-				   .GetShellBrowserImpl()
-				   ->GetListView())
+				->GetTabContainerImpl()
+				->GetSelectedTab()
+				.GetShellBrowserImpl()
+				->GetListView())
 		{
 			OnShowListViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 			return 0;
@@ -126,7 +126,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 			m_pActiveShellBrowser->SetCurrentColumns(currentColumns);
 
-			Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+			Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 			tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 
 			return TRUE;
@@ -176,7 +176,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto &item : GetActivePane()->GetTabContainer()->GetAllTabs())
+	for (auto &item : GetActivePane()->GetTabContainerImpl()->GetAllTabs())
 	{
 		if (item.second->GetShellBrowserImpl()->GetListView() == hListView)
 		{
@@ -198,7 +198,7 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 		keyboardGenerated = true;
 	}
 
-	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 	if (ListView_GetSelectedCount(tab.GetShellBrowserImpl()->GetListView()) == 0)
 	{
@@ -239,7 +239,7 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 
 void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 {
-	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this, m_pStatusBar);
@@ -408,7 +408,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 void Explorerplusplus::OnListViewSetFileAttributes() const
 {
-	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->SetFileAttributesForSelection();
 }
 
@@ -422,7 +422,7 @@ void Explorerplusplus::OnListViewPaste()
 		return;
 	}
 
-	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	auto directory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(), PasteType::Normal))

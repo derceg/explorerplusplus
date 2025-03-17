@@ -21,7 +21,7 @@ class BrowserWindow;
 class CoreInterface;
 class IconResourceLoader;
 class SearchDialog;
-class TabContainer;
+class TabContainerImpl;
 
 /* Manages settings for the search dialog. */
 class SearchDialogPersistentSettings : public DialogSettings
@@ -139,7 +139,7 @@ class SearchDialog : public ThemedDialog, private ShellContextMenuHandler
 public:
 	SearchDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
 		std::wstring_view searchDirectory, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, TabContainer *tabContainer,
+		CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl,
 		const IconResourceLoader *iconResourceLoader);
 	~SearchDialog();
 
@@ -188,7 +188,7 @@ private:
 	std::wstring m_searchDirectory;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
-	TabContainer *m_tabContainer = nullptr;
+	TabContainerImpl *m_tabContainerImpl = nullptr;
 	const IconResourceLoader *const m_iconResourceLoader;
 	wil::unique_hicon m_directoryIcon;
 	BOOL m_bSearching;

@@ -11,7 +11,7 @@
 #include "Explorer++.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 
 void Explorerplusplus::OnCopyItemPath() const
 {
@@ -51,7 +51,7 @@ void Explorerplusplus::OnCopy(BOOL bCopy)
 
 	if (hFocus == m_hActiveListView)
 	{
-		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		selectedTab.GetShellBrowserImpl()->CopySelectedItemsToClipboard(bCopy);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -66,7 +66,7 @@ void Explorerplusplus::OnFileRename()
 
 	if (hFocus == m_hActiveListView)
 	{
-		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		selectedTab.GetShellBrowserImpl()->StartRenamingSelectedItems();
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -83,7 +83,7 @@ void Explorerplusplus::OnFileDelete(bool permanent)
 
 	if (hFocus == m_hActiveListView)
 	{
-		Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		tab.GetShellBrowserImpl()->DeleteSelectedItems(permanent);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -116,7 +116,7 @@ void Explorerplusplus::OnShowFileProperties() const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		selectedTab.GetShellBrowserImpl()->ShowPropertiesForSelectedFiles();
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())

@@ -6,7 +6,7 @@
 
 class AcceleratorUpdater;
 class CoreInterface;
-class TabContainer;
+class TabContainerImpl;
 class TabEvents;
 class UiTheming;
 
@@ -25,7 +25,7 @@ public:
 
 	virtual CoreInterface *GetCoreInterface() = 0;
 	virtual TabEvents *GetTabEvents() = 0;
-	virtual TabContainer *GetTabContainer() = 0;
+	virtual TabContainerImpl *GetTabContainerImpl() = 0;
 	virtual Plugins::PluginMenuManager *GetPluginMenuManager() = 0;
 	virtual UiTheming *GetUiTheming() = 0;
 	virtual AcceleratorUpdater *GetAccleratorUpdater() = 0;

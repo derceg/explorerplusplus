@@ -11,7 +11,7 @@
 class BookmarkTree;
 class CoreInterface;
 class IconResourceLoader;
-class TabContainer;
+class TabContainerImpl;
 class ThemeManager;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;

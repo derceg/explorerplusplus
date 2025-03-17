@@ -54,7 +54,7 @@ struct Config;
 __interface IDirectoryMonitor;
 class ShellBrowserImpl;
 class StatusBar;
-class TabContainer;
+class TabContainerImpl;
 
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
@@ -72,7 +72,7 @@ public:
 
 	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;
 
-	virtual TabContainer *GetTabContainer() const = 0;
+	virtual TabContainerImpl *GetTabContainerImpl() const = 0;
 	virtual IDirectoryMonitor *GetDirectoryMonitor() const = 0;
 
 	virtual CachedIcons *GetCachedIcons() = 0;

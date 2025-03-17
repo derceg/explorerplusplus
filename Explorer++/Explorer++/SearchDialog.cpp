@@ -12,7 +12,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
@@ -60,12 +60,12 @@ const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern
 
 SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
 	std::wstring_view searchDirectory, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	TabContainer *tabContainer, const IconResourceLoader *iconResourceLoader) :
+	TabContainerImpl *tabContainerImpl, const IconResourceLoader *iconResourceLoader) :
 	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both, themeManager),
 	m_searchDirectory(searchDirectory),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_tabContainer(tabContainer),
+	m_tabContainerImpl(tabContainerImpl),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
@@ -626,7 +626,7 @@ void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlParent);
-		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
+		m_tabContainerImpl->CreateNewTab(navigateParams, TabSettings(_selected = true));
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		m_coreInterface->GetActiveShellBrowserImpl()->SelectItems({ pidlComplete.get() });

@@ -11,7 +11,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
 	HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,

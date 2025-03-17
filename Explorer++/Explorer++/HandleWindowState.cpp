@@ -13,7 +13,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "SortMenuBuilder.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/MenuHelper.h"
 
 void Explorerplusplus::UpdateWindowStates(const Tab &tab)
@@ -28,7 +28,7 @@ void Explorerplusplus::UpdateWindowStates(const Tab &tab)
  */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 	ViewMode viewMode = tab.GetShellBrowserImpl()->GetViewMode();
 	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();

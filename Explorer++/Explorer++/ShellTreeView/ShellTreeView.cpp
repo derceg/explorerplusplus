@@ -28,7 +28,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTreeNode.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/Controls.h"
@@ -115,7 +115,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		{
 			const auto *tab = request->GetShellBrowser()->GetTab();
 
-			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+			if (m_browserWindow->GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 			{
 				UpdateSelection();
 			}
@@ -127,7 +127,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		{
 			const auto *tab = request->GetShellBrowser()->GetTab();
 
-			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+			if (m_browserWindow->GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 			{
 				// When manually selecting an item in the treeview, a navigation will be initiated.
 				// It's possible that navigation may fail, in which case, the selection will be
@@ -142,7 +142,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		{
 			const auto *tab = request->GetShellBrowser()->GetTab();
 
-			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+			if (m_browserWindow->GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 			{
 				UpdateSelection();
 			}
@@ -1770,7 +1770,7 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 ShellBrowserImpl *ShellTreeView::GetSelectedShellBrowser() const
 {
 	return m_browserWindow->GetActivePane()
-		->GetTabContainer()
+		->GetTabContainerImpl()
 		->GetSelectedTab()
 		.GetShellBrowserImpl();
 }

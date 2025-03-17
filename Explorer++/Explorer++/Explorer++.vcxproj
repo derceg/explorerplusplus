@@ -1247,7 +1247,7 @@
     </ClCompile>
     <ClCompile Include="Tab.cpp" />
     <ClCompile Include="TabBackingHandler.cpp" />
-    <ClCompile Include="TabContainer.cpp" />
+    <ClCompile Include="TabContainerImpl.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabMoved.cpp" />
@@ -1341,6 +1341,7 @@
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
+    <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />
     <ClInclude Include="LocationVisitInfo.h" />
@@ -1535,7 +1536,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />
     <ClInclude Include="TabBacking.h" />
-    <ClInclude Include="TabContainer.h" />
+    <ClInclude Include="TabContainerImpl.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabMoved.h" />
     <ClInclude Include="TabNavigationInterface.h" />

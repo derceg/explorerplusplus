@@ -24,13 +24,13 @@ protected:
 	Tab BuildTab()
 	{
 		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
-			&m_browser, &m_tabEvents);
+			&m_browser, nullptr, &m_tabEvents);
 	}
 
 	Tab BuildTab(BrowserWindow *browser)
 	{
 		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
-			browser, &m_tabEvents);
+			browser, nullptr, &m_tabEvents);
 	}
 
 	TabEvents m_tabEvents;

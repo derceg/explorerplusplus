@@ -13,7 +13,7 @@
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "TabStorage.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -91,8 +91,8 @@ void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD d
 	pDirectoryAltered = (DirectoryAltered *) pData;
 	pContainer = (Explorerplusplus *) pDirectoryAltered->pData;
 
-	Tab *tab =
-		pContainer->GetActivePane()->GetTabContainer()->GetTabOptional(pDirectoryAltered->iIndex);
+	Tab *tab = pContainer->GetActivePane()->GetTabContainerImpl()->GetTabOptional(
+		pDirectoryAltered->iIndex);
 
 	if (tab)
 	{
@@ -139,7 +139,7 @@ void Explorerplusplus::OnSelectColumns()
 {
 	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceInstance(), m_hContainer,
 		m_app->GetThemeManager(),
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl(),
+		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl(),
 		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();
 }

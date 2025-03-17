@@ -24,7 +24,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SplitFileDialog.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
 #include "../Helper/Helper.h"
@@ -109,12 +109,12 @@ void Explorerplusplus::OnSearch()
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchDialog",
 		[this]
 		{
-			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+			Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
 
 			return new SearchDialog(m_app->GetResourceInstance(), m_hContainer,
 				m_app->GetThemeManager(), currentDirectory, this, this,
-				GetActivePane()->GetTabContainer(), m_app->GetIconResourceLoader());
+				GetActivePane()->GetTabContainerImpl(), m_app->GetIconResourceLoader());
 		});
 }
 
@@ -243,7 +243,7 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, std::size(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(szPath,
+			Tab &newTab = GetActivePane()->GetTabContainerImpl()->CreateNewTab(szPath,
 				TabSettings(_selected = true));
 
 			if (newTab.GetShellBrowserImpl()->GetDirectory() == szPath)
@@ -274,13 +274,13 @@ void Explorerplusplus::OnResolveLink()
 
 void Explorerplusplus::OnGoToOffset(int offset)
 {
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
 }
 
 void Explorerplusplus::OnGoHome()
 {
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
 		m_config->defaultTabDirectory);
 }

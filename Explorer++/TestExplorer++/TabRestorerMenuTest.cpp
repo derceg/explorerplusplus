@@ -34,7 +34,7 @@ protected:
 	Tab BuildTab()
 	{
 		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
-			&m_browser, &m_tabEvents);
+			&m_browser, nullptr, &m_tabEvents);
 	}
 
 	void NavigateTab(Tab &tab, const PidlAbsolute &pidl)

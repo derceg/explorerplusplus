@@ -13,7 +13,7 @@
 #include "NavigationHelper.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/NavigateParams.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <ShlObj.h>

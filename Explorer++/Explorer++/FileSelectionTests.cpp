@@ -8,7 +8,7 @@
 #include "DirectoryOperationsHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/ClipboardHelper.h"
 
 BOOL Explorerplusplus::AnyItemsSelected() const
@@ -17,7 +17,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 		if (ListView_GetSelectedCount(selectedTab.GetShellBrowserImpl()->GetListView()) > 0)
 		{
@@ -37,7 +37,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 
 bool Explorerplusplus::CanCreate() const
 {
-	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 	return CanCreateInDirectory(pidlDirectory.get());
 }
@@ -90,7 +90,7 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		hr = selectedTab.GetShellBrowserImpl()->GetListViewSelectionAttributes(pItemAttributes);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())

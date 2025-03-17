@@ -15,13 +15,13 @@ class App;
 class BrowserWindow;
 class NavigationRequest;
 class ShellBrowser;
-class TabContainer;
+class TabContainerImpl;
 class WindowSubclass;
 
 class TaskbarThumbnails : private boost::noncopyable
 {
 public:
-	TaskbarThumbnails(App *app, BrowserWindow *browser, TabContainer *tabContainer);
+	TaskbarThumbnails(App *app, BrowserWindow *browser, TabContainerImpl *tabContainerImpl);
 	~TaskbarThumbnails();
 
 private:
@@ -59,7 +59,7 @@ private:
 
 	App *const m_app;
 	BrowserWindow *const m_browser;
-	TabContainer *const m_tabContainer;
+	TabContainerImpl *const m_tabContainerImpl;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::unique_ptr<WindowSubclass> m_mainWindowSubclass;
 

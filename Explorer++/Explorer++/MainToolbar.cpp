@@ -16,7 +16,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "TabParentItemsMenu.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -578,7 +578,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, L"");
 
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 
 	if (ptbgit->iItem == MainToolbarButton::Back)
 	{
@@ -623,7 +623,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 // contains the name of the folder.
 std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 {
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	auto currentPidl = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	unique_pidl_absolute parentPidl;
@@ -678,7 +678,7 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 {
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	const auto *navigationController = tab.GetShellBrowserImpl()->GetNavigationController();
 
 	if ((historyType == TabHistoryMenu::MenuType::Back && !navigationController->CanGoBack())
@@ -750,7 +750,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 		return;
 	}
 
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
 		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoBack());
@@ -871,7 +871,7 @@ void MainToolbar::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
+	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateToolbarButtonStates();
 	}

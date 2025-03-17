@@ -10,7 +10,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/ShellHelper.h"
 
 BrowserCommandController::BrowserCommandController(BrowserWindow *browserWindow) :
@@ -192,7 +192,7 @@ ShellBrowser *BrowserCommandController::GetSelectedShellBrowser() const
 	}
 
 	return m_browserWindow->GetActivePane()
-		->GetTabContainer()
+		->GetTabContainerImpl()
 		->GetSelectedTab()
 		.GetShellBrowserImpl();
 }

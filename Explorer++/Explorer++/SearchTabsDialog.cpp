@@ -9,7 +9,7 @@
 #include "MainResource.h"
 #include "ResourceManager.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/WindowHelper.h"
@@ -156,7 +156,7 @@ void SearchTabsDialog::AddTabs(SelectionOption selectionOption)
 	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
 	int index = 0;
 
-	for (auto tabRef : m_coreInterface->GetTabContainer()->GetAllTabsInOrder()
+	for (auto tabRef : m_coreInterface->GetTabContainerImpl()->GetAllTabsInOrder()
 			| std::views::filter([this](const auto &tab) { return TabFilter(tab, m_filter); }))
 	{
 		auto &tab = tabRef.get();
@@ -165,7 +165,7 @@ void SearchTabsDialog::AddTabs(SelectionOption selectionOption)
 		switch (selectionOption)
 		{
 		case SearchTabsDialog::SelectionOption::SelectActiveTab:
-			if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
+			if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(tab))
 			{
 				ListViewHelper::SelectItem(listView, index, true);
 			}
@@ -296,7 +296,7 @@ void SearchTabsDialog::OnListViewDoubleClick(const NMITEMACTIVATE *itemActivate)
 	}
 
 	Tab &tab = GetTabFromListView(itemActivate->iItem);
-	m_coreInterface->GetTabContainer()->SelectTab(tab);
+	m_coreInterface->GetTabContainerImpl()->SelectTab(tab);
 
 	DestroyWindow(m_hDlg);
 }
@@ -395,7 +395,7 @@ void SearchTabsDialog::OnOk()
 	if (selectedItemIndex != -1)
 	{
 		Tab &tab = GetTabFromListView(selectedItemIndex);
-		m_coreInterface->GetTabContainer()->SelectTab(tab);
+		m_coreInterface->GetTabContainerImpl()->SelectTab(tab);
 	}
 
 	DestroyWindow(m_hDlg);
@@ -410,7 +410,7 @@ Tab &SearchTabsDialog::GetTabFromListView(int index)
 	BOOL res = ListView_GetItem(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST), &lvItem);
 	CHECK(res);
 
-	return m_coreInterface->GetTabContainer()->GetTab(static_cast<int>(lvItem.lParam));
+	return m_coreInterface->GetTabContainerImpl()->GetTab(static_cast<int>(lvItem.lParam));
 }
 
 void SearchTabsDialog::OnCancel()

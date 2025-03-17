@@ -23,7 +23,7 @@
 #include "MainToolbar.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
@@ -408,7 +408,7 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	std::vector<HistoryEntry *> history;
 	int iBase;
 
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 	if (bBack)
 	{

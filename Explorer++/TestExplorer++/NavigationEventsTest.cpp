@@ -23,11 +23,11 @@ protected:
 
 	NavigationEventsTest() :
 		m_tab1(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1, &m_tabEvents),
+			&m_browser1, nullptr, &m_tabEvents),
 		m_tab2(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
-			&m_browser1, &m_tabEvents),
+			&m_browser1, nullptr, &m_tabEvents),
 		m_tab3(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation3),
-			&m_browser2, &m_tabEvents),
+			&m_browser2, nullptr, &m_tabEvents),
 		m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
 		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),

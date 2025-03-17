@@ -8,11 +8,11 @@
 #include "CoreInterface.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 
-UiTheming::UiTheming(App *app, CoreInterface *coreInterface, TabContainer *tabContainer) :
+UiTheming::UiTheming(App *app, CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl) :
 	m_coreInterface(coreInterface),
-	m_tabContainer(tabContainer),
+	m_tabContainerImpl(tabContainerImpl),
 	m_customListViewColorsApplied(false)
 {
 	m_connections.emplace_back(app->GetTabEvents()->AddCreatedObserver(
@@ -44,7 +44,7 @@ bool UiTheming::ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF
 {
 	bool overallResult = true;
 
-	for (const auto &item : m_tabContainer->GetAllTabs())
+	for (const auto &item : m_tabContainerImpl->GetAllTabs())
 	{
 		bool res = ApplyListViewColorsForTab(*item.second, backgroundColor, textColor);
 

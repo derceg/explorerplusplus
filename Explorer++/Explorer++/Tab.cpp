@@ -27,12 +27,13 @@
 // If the ShellBrowser interface expands to cover all the necessary functionality, or
 // ShellBrowserImpl is simplified enough to make it usable in tests, the casting here can be
 // removed.
-Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabEvents *tabEvents,
-	const InitialData &initialData) :
+Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
+	TabContainer *tabContainer, TabEvents *tabEvents, const InitialData &initialData) :
 	m_id(idCounter++),
 	m_shellBrowser(std::move(shellBrowser)),
 	m_shellBrowserImpl(dynamic_cast<ShellBrowserImpl *>(m_shellBrowser.get())),
 	m_browser(browser),
+	m_tabContainer(tabContainer),
 	m_tabEvents(tabEvents),
 	m_useCustomName(initialData.useCustomName),
 	m_customName(initialData.customName),
@@ -64,6 +65,11 @@ ShellBrowserImpl *Tab::GetShellBrowserImpl() const
 BrowserWindow *Tab::GetBrowser() const
 {
 	return m_browser;
+}
+
+TabContainer *Tab::GetTabContainer() const
+{
+	return m_tabContainer;
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

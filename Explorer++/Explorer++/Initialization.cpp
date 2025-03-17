@@ -16,7 +16,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "TaskbarThumbnails.h"
 #include "ThemeManager.h"
 #include "ThemeWindowTracker.h"
@@ -54,7 +54,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	UpdateLayout();
 
 	m_taskbarThumbnails =
-		std::make_unique<TaskbarThumbnails>(m_app, this, GetActivePane()->GetTabContainer());
+		std::make_unique<TaskbarThumbnails>(m_app, this, GetActivePane()->GetTabContainerImpl());
 
 	CreateInitialTabs(storageData);
 
@@ -68,7 +68,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	SetFocus(m_hActiveListView);
 
-	m_uiTheming = std::make_unique<UiTheming>(m_app, this, GetActivePane()->GetTabContainer());
+	m_uiTheming = std::make_unique<UiTheming>(m_app, this, GetActivePane()->GetTabContainerImpl());
 
 	InitializePlugins();
 
@@ -94,7 +94,7 @@ wil::unique_hmenu Explorerplusplus::BuildViewsMenu()
 	wil::unique_hmenu viewsMenu(CreatePopupMenu());
 	AddViewModesToMenu(viewsMenu.get(), 0, TRUE);
 
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	ViewMode currentViewMode = tab.GetShellBrowserImpl()->GetViewMode();
 
 	CheckMenuRadioItem(viewsMenu.get(), IDM_VIEW_EXTRALARGEICONS, IDM_VIEW_TILES,

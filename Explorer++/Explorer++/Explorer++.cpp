@@ -155,7 +155,7 @@ boost::signals2::connection Explorerplusplus::AddBrowserInitializedObserver(
 
 void Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	GetActivePane()->GetTabContainer()->CreateNewTab(*tab);
+	GetActivePane()->GetTabContainerImpl()->CreateNewTab(*tab);
 }
 
 HWND Explorerplusplus::GetHWND() const
@@ -170,12 +170,12 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 	BOOL res = GetWindowPlacement(m_hContainer, &placement);
 	CHECK(res);
 
-	const auto *tabContainer = GetActivePane()->GetTabContainer();
+	const auto *tabContainerImpl = GetActivePane()->GetTabContainerImpl();
 
 	return { .bounds = placement.rcNormalPosition,
 		.showState = NativeShowStateToShowState(placement.showCmd),
-		.tabs = tabContainer->GetStorageData(),
-		.selectedTab = tabContainer->GetSelectedTabIndex(),
+		.tabs = tabContainerImpl->GetStorageData(),
+		.selectedTab = tabContainerImpl->GetSelectedTabIndex(),
 		.mainRebarInfo = m_mainRebarView->GetStorageData(),
 		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
 		.treeViewWidth = m_treeViewWidth,
@@ -210,7 +210,7 @@ bool Explorerplusplus::ConfirmClose()
 		return true;
 	}
 
-	auto numTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
+	auto numTabs = GetActivePane()->GetTabContainerImpl()->GetNumTabs();
 
 	if (numTabs == 1)
 	{
@@ -255,7 +255,7 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 {
-	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl();
+	return GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl();
 }
 
 void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)

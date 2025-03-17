@@ -7,7 +7,7 @@
     <ClCompile Include="TabBackingHandler.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainer.cpp">
+    <ClCompile Include="TabContainerImpl.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="TabHandler.cpp">
@@ -810,7 +810,7 @@
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="TabContainer.h">
+    <ClInclude Include="TabContainerImpl.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="AboutDialog.h">
@@ -1667,6 +1667,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContainer.h">
+      <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -75,7 +75,7 @@ void MainWindow::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
+	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateWindowText();
 	}
@@ -85,7 +85,7 @@ void MainWindow::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
+	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateWindowText();
 	}
@@ -121,7 +121,7 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 
 void MainWindow::UpdateWindowText()
 {
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	std::wstring folderDisplayName;

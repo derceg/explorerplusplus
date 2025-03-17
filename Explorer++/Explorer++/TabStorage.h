@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/FolderSettings.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/PidlHelper.h"
 
 struct TabStorageData

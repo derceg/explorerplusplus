@@ -13,7 +13,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabBacking.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "ToolbarHelper.h"
 
 void Explorerplusplus::CreateTabBacking()
@@ -79,7 +79,7 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		/* If the tab that was locked/unlocked is the
 		currently selected tab, then the tab close
 		button on the toolbar will need to be updated. */
-		if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+		if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(tab))
 		{
 			UpdateTabToolbar();
 		}
@@ -89,9 +89,9 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 
 void Explorerplusplus::UpdateTabToolbar()
 {
-	const int nTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
+	const int nTabs = GetActivePane()->GetTabContainerImpl()->GetNumTabs();
 
-	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 	if (nTabs > 1 && selectedTab.GetLockState() == Tab::LockState::NotLocked)
 	{

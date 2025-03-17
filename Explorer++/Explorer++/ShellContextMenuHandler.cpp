@@ -14,7 +14,7 @@
 #include "ShellTreeView/ShellTreeView.h"
 #include "SortMenuBuilder.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "ViewModeHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
@@ -46,7 +46,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 
 	SortMenuBuilder sortMenuBuilder(m_app->GetResourceInstance());
 	auto sortMenus =
-		sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainer()->GetSelectedTab());
+		sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainerImpl()->GetSelectedTab());
 	text = ResourceHelper::LoadString(m_app->GetResourceInstance(),
 		IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
 	MenuHelper::AddSubMenuItem(menu, 0, text, std::move(sortMenus.sortByMenu), position++, true);
@@ -193,14 +193,14 @@ bool Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	}
 	else if (verb == L"copy")
 	{
-		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		selectedTab.GetShellBrowserImpl()->CopySelectedItemsToClipboard(true);
 
 		return true;
 	}
 	else if (verb == L"cut")
 	{
-		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 		selectedTab.GetShellBrowserImpl()->CopySelectedItemsToClipboard(false);
 
 		return true;
@@ -221,7 +221,7 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		auto navigateParams = NavigateParams::Normal(pidlComplete.get());
-		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
+		GetActivePane()->GetTabContainerImpl()->CreateNewTab(navigateParams,
 			TabSettings(_selected = m_config->openTabsInForeground));
 	}
 	break;

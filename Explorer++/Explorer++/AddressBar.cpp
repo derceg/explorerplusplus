@@ -13,7 +13,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DragDropHelper.h"
@@ -145,7 +145,7 @@ void AddressBar::OnEnterPressed()
 {
 	std::wstring path = GetWindowString(m_hwnd);
 
-	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
 
 	// When entering a path in the address bar in Windows Explorer, environment variables will be
@@ -202,7 +202,7 @@ void AddressBar::OnEscapePressed()
 
 void AddressBar::OnBeginDrag()
 {
-	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	SFGAOF attributes = SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK;
@@ -258,7 +258,7 @@ void AddressBar::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
+	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateTextAndIcon(*tab);
 	}
@@ -268,7 +268,7 @@ void AddressBar::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
 
-	if (m_coreInterface->GetTabContainer()->IsTabSelected(*tab))
+	if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		// Since the directory properties have changed, it's possible that the icon has changed.
 		// Therefore, the updated icon should always be retrieved.

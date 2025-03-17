@@ -73,7 +73,7 @@ struct RebarBandStorageInfo;
 class Runtime;
 class ShellBrowserImpl;
 class ShellTreeView;
-class TabContainer;
+class TabContainerImpl;
 class TabRestorerMenu;
 struct TabSettings;
 class TaskbarThumbnails;
@@ -339,7 +339,7 @@ private:
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;
 	TabEvents *GetTabEvents() override;
-	TabContainer *GetTabContainer() override;
+	TabContainerImpl *GetTabContainerImpl() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;
 	UiTheming *GetUiTheming() override;
 	AcceleratorUpdater *GetAccleratorUpdater() override;
@@ -482,7 +482,7 @@ private:
 	AcceleratorManager *GetAcceleratorManager() const override;
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
-	TabContainer *GetTabContainer() const override;
+	TabContainerImpl *GetTabContainerImpl() const override;
 	HWND GetTreeView() const override;
 	IDirectoryMonitor *GetDirectoryMonitor() const override;
 	CachedIcons *GetCachedIcons() override;

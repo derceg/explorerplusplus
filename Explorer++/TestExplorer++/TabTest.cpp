@@ -22,7 +22,7 @@ protected:
 	Tab BuildTab(const Tab::InitialData &initialData = {})
 	{
 		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
-			&m_browser, &m_tabEvents, initialData);
+			&m_browser, nullptr, &m_tabEvents, initialData);
 	}
 
 	NavigationEvents m_navigationEvents;

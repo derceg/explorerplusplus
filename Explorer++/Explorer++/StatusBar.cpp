@@ -10,7 +10,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/NavigationRequest.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"
 #include <fmt/format.h>
@@ -155,7 +155,7 @@ void Explorerplusplus::OnNavigationStartedStatusBar(const NavigationRequest *req
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateStatusBarText(*tab);
 	}
@@ -189,7 +189,7 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const NavigationRequest *requ
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateStatusBarText(*tab);
 	}
@@ -199,7 +199,7 @@ void Explorerplusplus::OnNavigationCancelledStatusBar(const NavigationRequest *r
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		UpdateStatusBarText(*tab);
 	}
@@ -209,7 +209,7 @@ void Explorerplusplus::OnNavigationsStoppedStatusBar(const ShellBrowser *shellBr
 {
 	const auto *tab = shellBrowser->GetTab();
 
-	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
 	{
 		// All pending navigations have been stopped, so it's possible there are no longer any
 		// active navigations, in which case, the status bar text will need to be updated.

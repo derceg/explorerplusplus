@@ -13,7 +13,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <glog/logging.h>
@@ -141,7 +141,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HINSTANCE resou
 
 	size_t index = 0;
 
-	for (auto tabRef : coreInterface->GetTabContainer()->GetAllTabsInOrder())
+	for (auto tabRef : coreInterface->GetTabContainerImpl()->GetAllTabsInOrder())
 	{
 		auto &tab = tabRef.get();
 		auto *entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
@@ -164,7 +164,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 
 	if (type == BookmarkItem::Type::Bookmark)
 	{
-		const Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
+		const Tab &selectedTab = coreInterface->GetTabContainerImpl()->GetSelectedTab();
 		auto *entry =
 			selectedTab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
 
@@ -266,7 +266,7 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 		return;
 	}
 
-	Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
 
 	if (bookmarkItem->IsFolder())

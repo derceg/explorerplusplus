@@ -9,7 +9,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/RegistrySettings.h"
@@ -122,7 +122,7 @@ void WildcardSelectDialog::OnOk()
 
 void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
 {
-	const auto &tab = m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const auto &tab = m_browserWindow->GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	HWND hListView = tab.GetShellBrowserImpl()->GetListView();
 
 	int nItems = ListView_GetItemCount(hListView);

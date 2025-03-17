@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabContainer.h"
+#include "TabContainerImpl.h"
 #include "App.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "BrowserWindow.h"
@@ -50,19 +50,19 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 // clang-format on
 
-TabContainer *TabContainer::Create(HWND parent, BrowserWindow *browser,
+TabContainerImpl *TabContainerImpl::Create(HWND parent, BrowserWindow *browser,
 	ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation, App *app,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, const Config *config)
 {
-	return new TabContainer(parent, browser, embedder, tabNavigation, app, coreInterface,
+	return new TabContainerImpl(parent, browser, embedder, tabNavigation, app, coreInterface,
 		fileActionHandler, cachedIcons, bookmarkTree, resourceInstance, config);
 }
 
-TabContainer::TabContainer(HWND parent, BrowserWindow *browser, ShellBrowserEmbedder *embedder,
-	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, const Config *config) :
+TabContainerImpl::TabContainerImpl(HWND parent, BrowserWindow *browser,
+	ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation, App *app,
+	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, const Config *config) :
 	ShellDropTargetWindow(CreateTabControl(parent)),
 	m_browser(browser),
 	m_embedder(embedder),
@@ -84,12 +84,12 @@ TabContainer::TabContainer(HWND parent, BrowserWindow *browser, ShellBrowserEmbe
 	Initialize(parent);
 }
 
-HWND TabContainer::CreateTabControl(HWND parent)
+HWND TabContainerImpl::CreateTabControl(HWND parent)
 {
 	return ::CreateTabControl(parent, TAB_CONTROL_STYLES);
 }
 
-void TabContainer::Initialize(HWND parent)
+void TabContainerImpl::Initialize(HWND parent)
 {
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconSystemImageListIndex));
 
@@ -105,29 +105,31 @@ void TabContainer::Initialize(HWND parent)
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
 
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TabContainer::WndProc, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
+		std::bind_front(&TabContainerImpl::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
-		std::bind_front(&TabContainer::ParentWndProc, this)));
+		std::bind_front(&TabContainerImpl::ParentWndProc, this)));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddUpdatedObserver(
-		std::bind_front(&TabContainer::OnTabUpdated, this), TabEventScope::ForBrowser(*m_browser)));
+		std::bind_front(&TabContainerImpl::OnTabUpdated, this),
+		TabEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
-		std::bind_front(&TabContainer::OnDirectoryPropertiesChanged, this),
+		std::bind_front(&TabContainerImpl::OnDirectoryPropertiesChanged, this),
 		ShellBrowserEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
-		std::bind_front(&TabContainer::OnNavigationCommitted, this),
+		std::bind_front(&TabContainerImpl::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
-		std::bind_front(&TabContainer::OnAlwaysShowTabBarUpdated, this)));
+		std::bind_front(&TabContainerImpl::OnAlwaysShowTabBarUpdated, this)));
 
-	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&TabContainer::OnFontUpdated, this));
+	m_fontSetter.fontUpdatedSignal.AddObserver(
+		std::bind_front(&TabContainerImpl::OnFontUpdated, this));
 }
 
-void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
+void TabContainerImpl::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 	wil::unique_hbitmap bitmap = m_app->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock,
@@ -139,7 +141,7 @@ void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 		m_defaultFolderIconSystemImageListIndex);
 }
 
-bool TabContainer::IsDefaultIcon(int iconIndex)
+bool TabContainerImpl::IsDefaultIcon(int iconIndex)
 {
 	if (iconIndex == m_tabIconLockIndex || iconIndex == m_defaultFolderIconIndex)
 	{
@@ -149,7 +151,7 @@ bool TabContainer::IsDefaultIcon(int iconIndex)
 	return false;
 }
 
-LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -224,7 +226,7 @@ LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void TabContainer::OnTabCtrlLButtonDown(POINT *pt)
+void TabContainerImpl::OnTabCtrlLButtonDown(POINT *pt)
 {
 	TCHITTESTINFO info;
 	info.pt = *pt;
@@ -245,7 +247,7 @@ void TabContainer::OnTabCtrlLButtonDown(POINT *pt)
 	}
 }
 
-void TabContainer::OnTabCtrlLButtonUp()
+void TabContainerImpl::OnTabCtrlLButtonUp()
 {
 	if (!m_bTabBeenDragged)
 	{
@@ -263,7 +265,7 @@ void TabContainer::OnTabCtrlLButtonUp()
 	}
 }
 
-void TabContainer::OnTabCtrlMouseMove(POINT *pt)
+void TabContainerImpl::OnTabCtrlMouseMove(POINT *pt)
 {
 	if (!m_bTabBeenDragged)
 	{
@@ -321,7 +323,7 @@ void TabContainer::OnTabCtrlMouseMove(POINT *pt)
 	}
 }
 
-void TabContainer::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys)
+void TabContainerImpl::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(xPos);
@@ -336,7 +338,7 @@ void TabContainer::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT k
 	}
 }
 
-void TabContainer::OnLButtonDoubleClick(const POINT &pt)
+void TabContainerImpl::OnLButtonDoubleClick(const POINT &pt)
 {
 	TCHITTESTINFO info;
 	info.pt = pt;
@@ -349,7 +351,7 @@ void TabContainer::OnLButtonDoubleClick(const POINT &pt)
 	}
 }
 
-void TabContainer::OnTabCtrlMButtonUp(POINT *pt)
+void TabContainerImpl::OnTabCtrlMButtonUp(POINT *pt)
 {
 	TCHITTESTINFO htInfo;
 	htInfo.pt = *pt;
@@ -364,7 +366,7 @@ void TabContainer::OnTabCtrlMButtonUp(POINT *pt)
 	}
 }
 
-void TabContainer::OnTabCtrlRButtonUp(POINT *pt)
+void TabContainerImpl::OnTabCtrlRButtonUp(POINT *pt)
 {
 	TCHITTESTINFO tcHitTest;
 	tcHitTest.pt = *pt;
@@ -388,7 +390,7 @@ void TabContainer::OnTabCtrlRButtonUp(POINT *pt)
 	CreateTabContextMenu(tab, ptCopy);
 }
 
-void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
+void TabContainerImpl::CreateTabContextMenu(Tab &tab, const POINT &pt)
 {
 	auto parentMenu =
 		wil::unique_hmenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
@@ -417,7 +419,7 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	ProcessTabCommand(command, tab);
 }
 
-void TabContainer::AddImagesToTabContextMenu(HMENU menu,
+void TabContainerImpl::AddImagesToTabContextMenu(HMENU menu,
 	std::vector<wil::unique_hbitmap> &menuImages)
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
@@ -429,7 +431,7 @@ void TabContainer::AddImagesToTabContextMenu(HMENU menu,
 	}
 }
 
-void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
+void TabContainerImpl::ProcessTabCommand(UINT uMenuID, Tab &tab)
 {
 	switch (uMenuID)
 	{
@@ -480,7 +482,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 	}
 }
 
-void TabContainer::OnOpenParentInNewTab(const Tab &tab)
+void TabContainerImpl::OnOpenParentInNewTab(const Tab &tab)
 {
 	auto pidlCurrent = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
@@ -494,12 +496,12 @@ void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 	}
 }
 
-void TabContainer::OnRefreshTab(Tab &tab)
+void TabContainerImpl::OnRefreshTab(Tab &tab)
 {
 	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
-void TabContainer::OnRefreshAllTabs()
+void TabContainerImpl::OnRefreshAllTabs()
 {
 	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
@@ -507,13 +509,13 @@ void TabContainer::OnRefreshAllTabs()
 	}
 }
 
-void TabContainer::OnRenameTab(Tab &tab)
+void TabContainerImpl::OnRenameTab(Tab &tab)
 {
 	RenameTabDialog renameTabDialog(m_coreInterface->GetMainWindow(), m_app, &tab);
 	renameTabDialog.ShowModalDialog();
 }
 
-void TabContainer::OnLockTab(Tab &tab)
+void TabContainerImpl::OnLockTab(Tab &tab)
 {
 	if (tab.GetLockState() == Tab::LockState::Locked)
 	{
@@ -525,7 +527,7 @@ void TabContainer::OnLockTab(Tab &tab)
 	}
 }
 
-void TabContainer::OnLockTabAndAddress(Tab &tab)
+void TabContainerImpl::OnLockTabAndAddress(Tab &tab)
 {
 	if (tab.GetLockState() == Tab::LockState::AddressLocked)
 	{
@@ -537,7 +539,7 @@ void TabContainer::OnLockTabAndAddress(Tab &tab)
 	}
 }
 
-void TabContainer::OnCloseOtherTabs(int index)
+void TabContainerImpl::OnCloseOtherTabs(int index)
 {
 	const int nTabs = GetNumTabs();
 
@@ -553,7 +555,7 @@ void TabContainer::OnCloseOtherTabs(int index)
 	}
 }
 
-void TabContainer::OnCloseTabsToRight(int index)
+void TabContainerImpl::OnCloseTabsToRight(int index)
 {
 	int nTabs = GetNumTabs();
 
@@ -564,7 +566,7 @@ void TabContainer::OnCloseTabsToRight(int index)
 	}
 }
 
-LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TabContainerImpl::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -608,7 +610,7 @@ LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
+void TabContainerImpl::ShowBackgroundContextMenu(const POINT &ptClient)
 {
 	POINT ptScreen = ptClient;
 	ClientToScreen(m_hwnd, &ptScreen);
@@ -620,7 +622,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 
-void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
+void TabContainerImpl::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 {
 	HWND toolTipControl = TabCtrl_GetToolTips(m_hwnd);
 
@@ -646,7 +648,7 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 	dispInfo->lpszText = tabToolTip;
 }
 
-void TabContainer::OnTabCreated(const Tab &tab, bool selected)
+void TabContainerImpl::OnTabCreated(const Tab &tab, bool selected)
 {
 	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() > 1))
 	{
@@ -656,7 +658,7 @@ void TabContainer::OnTabCreated(const Tab &tab, bool selected)
 	m_app->GetTabEvents()->NotifyCreated(tab, selected);
 }
 
-void TabContainer::OnTabRemoved(const Tab &tab)
+void TabContainerImpl::OnTabRemoved(const Tab &tab)
 {
 	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() == 1))
 	{
@@ -666,7 +668,7 @@ void TabContainer::OnTabRemoved(const Tab &tab)
 	m_app->GetTabEvents()->NotifyRemoved(tab);
 }
 
-void TabContainer::OnTabSelected(const Tab &tab)
+void TabContainerImpl::OnTabSelected(const Tab &tab)
 {
 	if (m_iPreviousTabSelectionId != -1)
 	{
@@ -678,7 +680,7 @@ void TabContainer::OnTabSelected(const Tab &tab)
 	m_app->GetTabEvents()->NotifySelected(tab);
 }
 
-void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
+void TabContainerImpl::OnAlwaysShowTabBarUpdated(BOOL newValue)
 {
 	if (newValue)
 	{
@@ -697,7 +699,7 @@ void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 	}
 }
 
-void TabContainer::OnNavigationCommitted(const NavigationRequest *request)
+void TabContainerImpl::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
 
@@ -705,7 +707,7 @@ void TabContainer::OnNavigationCommitted(const NavigationRequest *request)
 	SetTabIcon(*tab);
 }
 
-void TabContainer::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
+void TabContainerImpl::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
 
@@ -713,7 +715,7 @@ void TabContainer::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser
 	SetTabIcon(*tab);
 }
 
-void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
+void TabContainerImpl::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 {
 	switch (propertyType)
 	{
@@ -727,7 +729,7 @@ void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 	}
 }
 
-void TabContainer::UpdateTabNameInWindow(const Tab &tab)
+void TabContainerImpl::UpdateTabNameInWindow(const Tab &tab)
 {
 	std::wstring name = tab.GetName();
 	boost::replace_all(name, L"&", L"&&");
@@ -736,7 +738,7 @@ void TabContainer::UpdateTabNameInWindow(const Tab &tab)
 	TabCtrl_SetItemText(m_hwnd, index, name.c_str());
 }
 
-void TabContainer::SetTabIcon(const Tab &tab)
+void TabContainerImpl::SetTabIcon(const Tab &tab)
 {
 	/* If the tab is locked, use a lock icon. */
 	if (tab.GetLockState() == Tab::LockState::Locked
@@ -783,7 +785,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	}
 }
 
-void TabContainer::SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex)
+void TabContainerImpl::SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex)
 {
 	if (systemIconIndex == m_defaultFolderIconSystemImageListIndex)
 	{
@@ -796,7 +798,7 @@ void TabContainer::SetTabIconFromSystemImageList(const Tab &tab, int systemIconI
 	SetTabIconFromImageList(tab, index);
 }
 
-void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)
+void TabContainerImpl::SetTabIconFromImageList(const Tab &tab, int imageIndex)
 {
 	int tabIndex = GetTabIndex(tab);
 
@@ -826,7 +828,7 @@ void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)
 	}
 }
 
-void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
+void TabContainerImpl::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
 {
 	CreateNewTab(m_config->defaultTabDirectory, tabSettings);
 }
@@ -836,7 +838,7 @@ void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings
 // user may not have access to it, or the path may be temporarily unavailable (e.g. because a
 // network location has been disconnected). Therefore, it's not safe to make any assumptions about
 // the actual directory the tab is in once it's been created.
-Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings,
+Tab &TabContainerImpl::CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
 	unique_pidl_absolute pidl;
@@ -856,7 +858,7 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 	return CreateNewTab(navigateParams, tabSettings, folderSettings, initialColumns);
 }
 
-Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
+Tab &TabContainerImpl::CreateNewTab(const PreservedTab &preservedTab)
 {
 	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
 		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
@@ -864,8 +866,8 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
 		.customName = preservedTab.customName,
 		.lockState = preservedTab.lockState };
-	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, m_app->GetTabEvents(),
-		initialTabData);
+	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, this,
+		m_app->GetTabEvents(), initialTabData);
 	auto *rawTab = tab.get();
 	m_tabs.insert({ tab->GetId(), std::move(tab) });
 
@@ -890,7 +892,7 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 	return SetUpNewTab(*rawTab, navigateParams, tabSettings);
 }
 
-Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSettings &tabSettings,
+Tab &TabContainerImpl::CreateNewTab(NavigateParams &navigateParams, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
 	FolderSettings folderSettingsFinal;
@@ -921,15 +923,15 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 		initialTabData.customName = *tabSettings.name;
 	}
 
-	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, m_app->GetTabEvents(),
-		initialTabData);
+	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, this,
+		m_app->GetTabEvents(), initialTabData);
 	auto *rawTab = tab.get();
 	m_tabs.insert({ tab->GetId(), std::move(tab) });
 
 	return SetUpNewTab(*rawTab, navigateParams, tabSettings);
 }
 
-Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
+Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	const TabSettings &tabSettings)
 {
 	int index;
@@ -989,7 +991,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	return tab;
 }
 
-int TabContainer::InsertNewTab(const Tab &tab, const NavigateParams &navigateParams,
+int TabContainerImpl::InsertNewTab(const Tab &tab, const NavigateParams &navigateParams,
 	const TabSettings &tabSettings, int index)
 {
 	std::wstring name;
@@ -1016,7 +1018,7 @@ int TabContainer::InsertNewTab(const Tab &tab, const NavigateParams &navigatePar
 	return insertedIndex;
 }
 
-bool TabContainer::CloseTab(const Tab &tab)
+bool TabContainerImpl::CloseTab(const Tab &tab)
 {
 	const int nTabs = GetNumTabs();
 
@@ -1064,7 +1066,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 	return true;
 }
 
-void TabContainer::RemoveTabFromControl(const Tab &tab)
+void TabContainerImpl::RemoveTabFromControl(const Tab &tab)
 {
 	m_tabSelectionHistory.erase(
 		std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()),
@@ -1121,14 +1123,14 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 	}
 }
 
-Tab &TabContainer::GetTab(int tabId)
+Tab &TabContainerImpl::GetTab(int tabId) const
 {
 	auto *tab = GetTabOptional(tabId);
 	CHECK(tab);
 	return *tab;
 }
 
-Tab *TabContainer::GetTabOptional(int tabId)
+Tab *TabContainerImpl::GetTabOptional(int tabId) const
 {
 	auto itr = m_tabs.find(tabId);
 
@@ -1140,13 +1142,13 @@ Tab *TabContainer::GetTabOptional(int tabId)
 	return itr->second.get();
 }
 
-void TabContainer::SelectTab(const Tab &tab)
+void TabContainerImpl::SelectTab(const Tab &tab)
 {
 	int index = GetTabIndex(tab);
 	SelectTabAtIndex(index);
 }
 
-void TabContainer::SelectAdjacentTab(BOOL bNextTab)
+void TabContainerImpl::SelectAdjacentTab(BOOL bNextTab)
 {
 	int nTabs = GetNumTabs();
 	int newIndex = GetSelectedTabIndex();
@@ -1181,7 +1183,7 @@ void TabContainer::SelectAdjacentTab(BOOL bNextTab)
 	SelectTabAtIndex(newIndex);
 }
 
-void TabContainer::SelectTabAtIndex(int index)
+void TabContainerImpl::SelectTabAtIndex(int index)
 {
 	CHECK(index >= 0 && index < GetNumTabs());
 
@@ -1190,20 +1192,20 @@ void TabContainer::SelectTabAtIndex(int index)
 	OnTabSelected(GetTabByIndex(index));
 }
 
-Tab &TabContainer::GetSelectedTab()
+Tab &TabContainerImpl::GetSelectedTab() const
 {
 	int index = GetSelectedTabIndex();
 	return GetTabByIndex(index);
 }
 
-int TabContainer::GetSelectedTabIndex() const
+int TabContainerImpl::GetSelectedTabIndex() const
 {
 	int index = TabCtrl_GetCurSel(m_hwnd);
 	CHECK_NE(index, -1) << "No selected tab";
 	return index;
 }
 
-std::optional<int> TabContainer::GetSelectedTabIndexOptional() const
+std::optional<int> TabContainerImpl::GetSelectedTabIndexOptional() const
 {
 	int index = TabCtrl_GetCurSel(m_hwnd);
 
@@ -1215,13 +1217,13 @@ std::optional<int> TabContainer::GetSelectedTabIndexOptional() const
 	return index;
 }
 
-bool TabContainer::IsTabSelected(const Tab &tab)
+bool TabContainerImpl::IsTabSelected(const Tab &tab) const
 {
 	const Tab &selectedTab = GetSelectedTab();
 	return tab.GetId() == selectedTab.GetId();
 }
 
-Tab &TabContainer::GetTabByIndex(int index)
+Tab &TabContainerImpl::GetTabByIndex(int index) const
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
@@ -1231,7 +1233,7 @@ Tab &TabContainer::GetTabByIndex(int index)
 	return GetTab(static_cast<int>(tcItem.lParam));
 }
 
-int TabContainer::GetTabIndex(const Tab &tab) const
+int TabContainerImpl::GetTabIndex(const Tab &tab) const
 {
 	int numTabs = TabCtrl_GetItemCount(m_hwnd);
 
@@ -1251,28 +1253,28 @@ int TabContainer::GetTabIndex(const Tab &tab) const
 	LOG(FATAL) << "Couldn't determine index for tab";
 }
 
-int TabContainer::GetNumTabs() const
+int TabContainerImpl::GetNumTabs() const
 {
 	return static_cast<int>(m_tabs.size());
 }
 
-int TabContainer::MoveTab(const Tab &tab, int newIndex)
+int TabContainerImpl::MoveTab(const Tab &tab, int newIndex)
 {
 	int index = GetTabIndex(tab);
 	return TabCtrl_MoveItem(m_hwnd, index, newIndex);
 }
 
-std::unordered_map<int, std::unique_ptr<Tab>> &TabContainer::GetTabs()
+std::unordered_map<int, std::unique_ptr<Tab>> &TabContainerImpl::GetTabs()
 {
 	return m_tabs;
 }
 
-const std::unordered_map<int, std::unique_ptr<Tab>> &TabContainer::GetAllTabs() const
+const std::unordered_map<int, std::unique_ptr<Tab>> &TabContainerImpl::GetAllTabs() const
 {
 	return m_tabs;
 }
 
-std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder() const
+std::vector<std::reference_wrapper<const Tab>> TabContainerImpl::GetAllTabsInOrder() const
 {
 	std::vector<std::reference_wrapper<const Tab>> sortedTabs;
 
@@ -1299,7 +1301,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 	return sortedTabs;
 }
 
-void TabContainer::DuplicateTab(const Tab &tab)
+void TabContainerImpl::DuplicateTab(const Tab &tab)
 {
 	auto folderSettings = tab.GetShellBrowserImpl()->GetFolderSettings();
 	auto folderColumns = tab.GetShellBrowserImpl()->ExportAllColumns();
@@ -1308,7 +1310,7 @@ void TabContainer::DuplicateTab(const Tab &tab)
 	CreateNewTab(navigateParams, {}, &folderSettings, &folderColumns);
 }
 
-int TabContainer::GetDropTargetItem(const POINT &pt)
+int TabContainerImpl::GetDropTargetItem(const POINT &pt)
 {
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hwnd, &ptClient);
@@ -1323,7 +1325,7 @@ int TabContainer::GetDropTargetItem(const POINT &pt)
 	return TabCtrl_HitTest(m_hwnd, &hitTestInfo);
 }
 
-unique_pidl_absolute TabContainer::GetPidlForTargetItem(int targetItem)
+unique_pidl_absolute TabContainerImpl::GetPidlForTargetItem(int targetItem)
 {
 	if (targetItem == -1)
 	{
@@ -1334,14 +1336,14 @@ unique_pidl_absolute TabContainer::GetPidlForTargetItem(int targetItem)
 	return tab.GetShellBrowserImpl()->GetDirectoryIdl();
 }
 
-IUnknown *TabContainer::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
+IUnknown *TabContainerImpl::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 {
 	UNREFERENCED_PARAMETER(targetItemPidl);
 
 	return nullptr;
 }
 
-bool TabContainer::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
+bool TabContainerImpl::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
 {
 	UNREFERENCED_PARAMETER(targetItem);
 	UNREFERENCED_PARAMETER(dataObject);
@@ -1349,13 +1351,13 @@ bool TabContainer::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
 	return false;
 }
 
-void TabContainer::UpdateUiForDrop(int targetItem, const POINT &pt)
+void TabContainerImpl::UpdateUiForDrop(int targetItem, const POINT &pt)
 {
 	UpdateUiForTargetItem(targetItem);
 	ScrollTabControlForDrop(pt);
 }
 
-void TabContainer::UpdateUiForTargetItem(int targetItem)
+void TabContainerImpl::UpdateUiForTargetItem(int targetItem)
 {
 	if (!m_dropTargetContext)
 	{
@@ -1369,13 +1371,13 @@ void TabContainer::UpdateUiForTargetItem(int targetItem)
 	else if (m_dropTargetContext->targetIndex != targetItem)
 	{
 		m_dropTargetContext->switchTabTimer.Start(500ms,
-			std::bind(&TabContainer::OnDropSwitchTabTimer, this));
+			std::bind(&TabContainerImpl::OnDropSwitchTabTimer, this));
 	}
 
 	m_dropTargetContext->targetIndex = targetItem;
 }
 
-void TabContainer::ScrollTabControlForDrop(const POINT &pt)
+void TabContainerImpl::ScrollTabControlForDrop(const POINT &pt)
 {
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hwnd, &ptClient);
@@ -1417,16 +1419,16 @@ void TabContainer::ScrollTabControlForDrop(const POINT &pt)
 	{
 		m_dropTargetContext->scrollDirection = scrollDirection;
 		m_dropTargetContext->scrollTimer.Start(1s,
-			std::bind(&TabContainer::OnDropScrollTimer, this));
+			std::bind(&TabContainerImpl::OnDropScrollTimer, this));
 	}
 }
 
-void TabContainer::ResetDropUiState()
+void TabContainerImpl::ResetDropUiState()
 {
 	m_dropTargetContext.reset();
 }
 
-void TabContainer::OnDropSwitchTabTimer()
+void TabContainerImpl::OnDropSwitchTabTimer()
 {
 	CHECK(m_dropTargetContext);
 	CHECK_NE(m_dropTargetContext->targetIndex, -1);
@@ -1437,7 +1439,7 @@ void TabContainer::OnDropSwitchTabTimer()
 	}
 }
 
-void TabContainer::OnDropScrollTimer()
+void TabContainerImpl::OnDropScrollTimer()
 {
 	CHECK(m_dropTargetContext);
 	CHECK(m_dropTargetContext->scrollDirection);
@@ -1446,7 +1448,7 @@ void TabContainer::OnDropScrollTimer()
 	m_dropTargetContext->scrollDirection.reset();
 }
 
-void TabContainer::ScrollTabControl(ScrollDirection direction)
+void TabContainerImpl::ScrollTabControl(ScrollDirection direction)
 {
 	HWND upDownControl = FindWindowEx(m_hwnd, nullptr, UPDOWN_CLASS, nullptr);
 
@@ -1489,12 +1491,12 @@ void TabContainer::ScrollTabControl(ScrollDirection direction)
 	SendMessage(m_hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), NULL);
 }
 
-void TabContainer::OnFontUpdated()
+void TabContainerImpl::OnFontUpdated()
 {
 	sizeUpdatedSignal.m_signal();
 }
 
-std::vector<TabStorageData> TabContainer::GetStorageData() const
+std::vector<TabStorageData> TabContainerImpl::GetStorageData() const
 {
 	std::vector<TabStorageData> tabListStorageData;
 
