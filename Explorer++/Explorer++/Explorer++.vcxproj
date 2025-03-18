@@ -1029,6 +1029,7 @@
     <ClCompile Include="FrequentLocationsMenu.cpp" />
     <ClCompile Include="FrequentLocationsModel.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorage.cpp" />
+    <ClCompile Include="FrequentLocationsTracker.cpp" />
     <ClCompile Include="FrequentLocationsXmlStorage.cpp" />
     <ClCompile Include="HistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
@@ -1051,7 +1052,6 @@
     <ClCompile Include="RegistryAppStorageFactory.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
-    <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp" />
     <ClCompile Include="ShellBrowser\NavigationManager.cpp" />
     <ClCompile Include="ShellBrowser\NavigationRequest.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
@@ -1335,6 +1335,7 @@
     <ClInclude Include="FrequentLocationsModel.h" />
     <ClInclude Include="FrequentLocationsRegistryStorage.h" />
     <ClInclude Include="FrequentLocationsStorageHelper.h" />
+    <ClInclude Include="FrequentLocationsTracker.h" />
     <ClInclude Include="FrequentLocationsXmlStorage.h" />
     <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
@@ -1357,7 +1358,6 @@
     <ClInclude Include="RegistryAppStorageFactory.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="RuntimeHelper.h" />
-    <ClInclude Include="FrequentLocationsShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\NavigationManager.h" />
     <ClInclude Include="ShellBrowser\NavigationRequest.h" />
     <ClInclude Include="ShellBrowser\NavigationRequestDelegate.h" />

@@ -235,6 +235,7 @@
     <ClCompile Include="FrequentLocationsModelTest.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorageTest.cpp" />
     <ClCompile Include="FrequentLocationsStorageTestHelper.cpp" />
+    <ClCompile Include="FrequentLocationsTrackerTest.cpp" />
     <ClCompile Include="FrequentLocationsXmlStorageTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
@@ -257,7 +258,6 @@
     <ClCompile Include="RuntimeHelperTest.cpp" />
     <ClCompile Include="RuntimeTest.cpp" />
     <ClCompile Include="RuntimeTestHelper.cpp" />
-    <ClCompile Include="FrequentLocationsShellBrowserHelperTest.cpp" />
     <ClCompile Include="ScopedRedrawDisablerTest.cpp" />
     <ClCompile Include="ScopedStopSourceTest.cpp" />
     <ClCompile Include="ShellEnumeratorFake.cpp" />

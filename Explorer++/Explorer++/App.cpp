@@ -49,6 +49,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_darkModeManager(&m_config),
 	m_themeManager(&m_darkModeManager),
 	m_frequentLocationsModel(&m_systemClock),
+	m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.

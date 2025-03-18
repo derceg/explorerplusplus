@@ -26,7 +26,7 @@ protected:
 			&m_browser1, nullptr, &m_tabEvents),
 		m_tab2(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation1),
 			&m_browser1, nullptr, &m_tabEvents),
-		m_tab3(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation3),
+		m_tab3(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation2),
 			&m_browser2, nullptr, &m_tabEvents),
 		m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
@@ -55,7 +55,7 @@ protected:
 	Tab m_tab2;
 
 	NiceMock<BrowserWindowMock> m_browser2;
-	NiceMock<TabNavigationMock> m_tabNavigation3;
+	NiceMock<TabNavigationMock> m_tabNavigation2;
 	Tab m_tab3;
 
 	NiceMock<NavigationRequestDelegateMock> m_requestDelegate;

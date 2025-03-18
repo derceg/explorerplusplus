@@ -754,9 +754,6 @@
     <ClCompile Include="FrequentLocationsXmlStorage.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
-    <ClCompile Include="FrequentLocationsShellBrowserHelper.cpp">
-      <Filter>Frequent Locations</Filter>
-    </ClCompile>
     <ClCompile Include="HistoryMenu.cpp">
       <Filter>History\UI</Filter>
     </ClCompile>
@@ -801,6 +798,9 @@
     </ClCompile>
     <ClCompile Include="ShellBrowser\ShellBrowserEvents.cpp">
       <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="FrequentLocationsTracker.cpp">
+      <Filter>Frequent Locations</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1614,9 +1614,6 @@
     <ClInclude Include="FrequentLocationsStorageHelper.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
-    <ClInclude Include="FrequentLocationsShellBrowserHelper.h">
-      <Filter>Frequent Locations</Filter>
-    </ClInclude>
     <ClInclude Include="HistoryMenu.h">
       <Filter>History\UI</Filter>
     </ClInclude>
@@ -1664,6 +1661,9 @@
     </ClInclude>
     <ClInclude Include="TabContainer.h">
       <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="FrequentLocationsTracker.h">
+      <Filter>Frequent Locations</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,7 @@
 #include "DarkModeManager.h"
 #include "FeatureList.h"
 #include "FrequentLocationsModel.h"
+#include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
@@ -125,7 +126,9 @@ private:
 	ThemeManager m_themeManager;
 	HistoryModel m_historyModel;
 	SystemClockImpl m_systemClock;
+
 	FrequentLocationsModel m_frequentLocationsModel;
+	FrequentLocationsTracker m_frequentLocationsTracker;
 
 	concurrencpp::timer m_saveSettingsTimer;
 

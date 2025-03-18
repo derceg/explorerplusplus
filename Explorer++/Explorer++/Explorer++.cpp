@@ -11,7 +11,6 @@
 #include "BrowserTracker.h"
 #include "Config.h"
 #include "FrequentLocationsMenu.h"
-#include "FrequentLocationsShellBrowserHelper.h"
 #include "HistoryMenu.h"
 #include "HistoryShellBrowserHelper.h"
 #include "MainFontSetter.h"
@@ -262,6 +261,4 @@ void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
 {
 	HistoryShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser, m_app->GetHistoryModel(),
 		m_app->GetNavigationEvents());
-	FrequentLocationsShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser,
-		m_app->GetFrequentLocationsModel(), m_app->GetNavigationEvents());
 }

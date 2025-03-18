@@ -4,19 +4,17 @@
 
 #pragma once
 
-#include "ShellBrowser/ShellBrowserHelper.h"
 #include <boost/signals2.hpp>
 #include <vector>
 
 class FrequentLocationsModel;
 class NavigationEvents;
+class NavigationRequest;
 
-class FrequentLocationsShellBrowserHelper :
-	public ShellBrowserHelper<FrequentLocationsShellBrowserHelper>
+class FrequentLocationsTracker
 {
 public:
-	FrequentLocationsShellBrowserHelper(ShellBrowser *shellBrowser, FrequentLocationsModel *model,
-		NavigationEvents *navigationEvents);
+	FrequentLocationsTracker(FrequentLocationsModel *model, NavigationEvents *navigationEvents);
 
 private:
 	void OnNavigationCommitted(const NavigationRequest *request);
