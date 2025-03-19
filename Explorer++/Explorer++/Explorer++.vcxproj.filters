@@ -559,12 +559,6 @@
     <ClCompile Include="HistoryModel.cpp">
       <Filter>History</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryShellBrowserHelper.cpp">
-      <Filter>History</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ShellEnumeratorImpl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -801,6 +795,9 @@
     </ClCompile>
     <ClCompile Include="FrequentLocationsTracker.cpp">
       <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryTracker.cpp">
+      <Filter>History</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1371,15 +1368,6 @@
     <ClInclude Include="HistoryModel.h">
       <Filter>History</Filter>
     </ClInclude>
-    <ClInclude Include="HistoryShellBrowserHelper.h">
-      <Filter>History</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBrowser\ShellBrowserHelper.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="ShellEnumeratorImpl.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -1664,6 +1652,9 @@
     </ClInclude>
     <ClInclude Include="FrequentLocationsTracker.h">
       <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryTracker.h">
+      <Filter>History</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

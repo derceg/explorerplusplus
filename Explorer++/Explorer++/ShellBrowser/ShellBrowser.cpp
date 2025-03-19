@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "NavigationManager.h"
-#include "ShellBrowserHelper.h"
 
 ShellBrowser::ShellBrowser() : m_id(idCounter++)
 {
@@ -26,11 +25,6 @@ void ShellBrowser::SetTab(const Tab *tab)
 {
 	CHECK(!m_tab);
 	m_tab = tab;
-}
-
-void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
-{
-	m_helpers.push_back(std::move(helper));
 }
 
 const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const

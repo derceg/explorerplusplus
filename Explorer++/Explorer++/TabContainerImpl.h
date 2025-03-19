@@ -34,7 +34,6 @@ struct NavigateParams;
 class NavigationRequest;
 struct PreservedTab;
 class ShellBrowser;
-class ShellBrowserEmbedder;
 class TabNavigationInterface;
 
 BOOST_PARAMETER_NAME(name)
@@ -88,10 +87,9 @@ class TabContainerImpl : public TabContainer, public ShellDropTargetWindow<int>
 {
 public:
 	static TabContainerImpl *Create(HWND parent, BrowserWindow *browser,
-		ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation, App *app,
-		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		const Config *config);
+		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		HINSTANCE resourceInstance, const Config *config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -157,10 +155,10 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainerImpl(HWND parent, BrowserWindow *browser, ShellBrowserEmbedder *embedder,
-		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE resourceInstance, const Config *config);
+	TabContainerImpl(HWND parent, BrowserWindow *browser, TabNavigationInterface *tabNavigation,
+		App *app, CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
+		const Config *config);
 
 	static HWND CreateTabControl(HWND parent);
 
@@ -235,7 +233,6 @@ private:
 	void OnFontUpdated();
 
 	BrowserWindow *const m_browser;
-	ShellBrowserEmbedder *m_embedder = nullptr;
 	TabNavigationInterface *m_tabNavigation;
 	App *const m_app;
 	CoreInterface *m_coreInterface;

@@ -4,18 +4,17 @@
 
 #pragma once
 
-#include "ShellBrowser/ShellBrowserHelper.h"
 #include <boost/signals2.hpp>
 #include <vector>
 
 class HistoryModel;
 class NavigationEvents;
+class NavigationRequest;
 
-class HistoryShellBrowserHelper : public ShellBrowserHelper<HistoryShellBrowserHelper>
+class HistoryTracker
 {
 public:
-	HistoryShellBrowserHelper(ShellBrowser *shellBrowser, HistoryModel *historyModel,
-		NavigationEvents *navigationEvents);
+	HistoryTracker(HistoryModel *historyModel, NavigationEvents *navigationEvents);
 
 private:
 	void OnNavigationCommitted(const NavigationRequest *request);

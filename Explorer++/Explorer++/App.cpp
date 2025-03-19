@@ -48,6 +48,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_tabRestorer(&m_tabEvents, &m_browserList),
 	m_darkModeManager(&m_config),
 	m_themeManager(&m_darkModeManager),
+	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(&m_systemClock),
 	m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),

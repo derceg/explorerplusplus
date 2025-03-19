@@ -117,9 +117,6 @@
     <ClCompile Include="ShellBrowserFake.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryShellBrowserHelperTest.cpp">
-      <Filter>History</Filter>
-    </ClCompile>
     <ClCompile Include="MainRebarRegistryStorageTest.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
@@ -379,6 +376,9 @@
     <ClCompile Include="FrequentLocationsTrackerTest.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryTrackerTest.cpp">
+      <Filter>History</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -587,9 +587,6 @@
     </ClInclude>
     <ClInclude Include="FrequentLocationsStorageTestHelper.h">
       <Filter>Frequent Locations</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBrowserHelperTestBase.h">
-      <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="FakeSystemClock.h">
       <Filter>Helper\Miscellaneous</Filter>

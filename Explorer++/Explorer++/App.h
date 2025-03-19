@@ -15,6 +15,7 @@
 #include "FrequentLocationsModel.h"
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
+#include "HistoryTracker.h"
 #include "ModelessDialogList.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
@@ -124,8 +125,10 @@ private:
 	TabRestorer m_tabRestorer;
 	DarkModeManager m_darkModeManager;
 	ThemeManager m_themeManager;
-	HistoryModel m_historyModel;
 	SystemClockImpl m_systemClock;
+
+	HistoryModel m_historyModel;
+	HistoryTracker m_historyTracker;
 
 	FrequentLocationsModel m_frequentLocationsModel;
 	FrequentLocationsTracker m_frequentLocationsTracker;

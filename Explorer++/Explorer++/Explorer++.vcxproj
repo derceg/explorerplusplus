@@ -1033,6 +1033,7 @@
     <ClCompile Include="FrequentLocationsXmlStorage.cpp" />
     <ClCompile Include="HistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
+    <ClCompile Include="HistoryTracker.cpp" />
     <ClCompile Include="ShellBrowser\NavigationEvents.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserEvents.cpp" />
     <ClCompile Include="TabEvents.cpp" />
@@ -1082,8 +1083,6 @@
     <ClCompile Include="OneShotTimerManager.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
     <ClCompile Include="MainRebarRegistryStorage.cpp" />
-    <ClCompile Include="HistoryShellBrowserHelper.cpp" />
-    <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp" />
     <ClCompile Include="ShellEnumeratorImpl.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
@@ -1339,6 +1338,7 @@
     <ClInclude Include="FrequentLocationsXmlStorage.h" />
     <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
+    <ClInclude Include="HistoryTracker.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
     <ClInclude Include="TabContainer.h" />
@@ -1396,9 +1396,6 @@
     <ClInclude Include="OneShotTimerManager.h" />
     <ClInclude Include="PopupMenuView.h" />
     <ClInclude Include="MainRebarRegistryStorage.h" />
-    <ClInclude Include="HistoryShellBrowserHelper.h" />
-    <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h" />
-    <ClInclude Include="ShellBrowser\ShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellEnumeratorImpl.h" />
     <ClInclude Include="ShellItemsMenu.h" />

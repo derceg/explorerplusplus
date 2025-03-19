@@ -19,7 +19,6 @@
 #include "Plugins/PluginMenuManager.h"
 #include "RebarView.h"
 #include "ShellBrowser/Columns.h"
-#include "ShellBrowser/ShellBrowserEmbedder.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
@@ -95,7 +94,6 @@ class Explorerplusplus :
 	public BrowserWindow,
 	public CoreInterface,
 	public PluginInterface,
-	private ShellBrowserEmbedder,
 	private ShellContextMenuHandler,
 	public TabNavigationInterface
 {
@@ -332,9 +330,6 @@ private:
 	void SelectTabById(int tabId) override;
 
 	void OnNavigationCommitted(const NavigationRequest *request);
-
-	// ShellBrowserEmbedder
-	void OnShellBrowserCreated(ShellBrowser *shellBrowser) override;
 
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;

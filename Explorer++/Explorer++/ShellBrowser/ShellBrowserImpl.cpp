@@ -16,8 +16,6 @@
 #include "MassRenameDialog.h"
 #include "PreservedFolderState.h"
 #include "ServiceProvider.h"
-#include "ShellBrowserEmbedder.h"
-#include "ShellBrowserHelper.h"
 #include "ShellEnumeratorImpl.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
@@ -33,12 +31,11 @@
 #include <wil/com.h>
 #include <list>
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
-	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler,
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
+	ShellBrowserImpl(hOwner, app, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
@@ -47,12 +44,12 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	ChangeToInitialFolder();
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
-	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
-	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
-	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
-		folderSettings, initialColumns)
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
+	const FolderColumns *initialColumns) :
+	ShellBrowserImpl(hOwner, app, coreInterface, tabNavigation, fileActionHandler, folderSettings,
+		initialColumns)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
 		m_app->GetNavigationEvents(), tabNavigation, initialPidl);
@@ -60,10 +57,9 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 	ChangeToInitialFolder();
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
-	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-	const FolderColumns *initialColumns) :
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
 	m_hOwner(hOwner),
@@ -144,8 +140,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, 
 		std::bind_front(&ShellBrowserImpl::OnDeviceChange, this)));
 
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
-
-	embedder->OnShellBrowserCreated(this);
 }
 
 ShellBrowserImpl::~ShellBrowserImpl()

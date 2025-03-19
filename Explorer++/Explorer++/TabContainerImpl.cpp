@@ -51,21 +51,20 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 // clang-format on
 
 TabContainerImpl *TabContainerImpl::Create(HWND parent, BrowserWindow *browser,
-	ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation, App *app,
-	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
-	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, const Config *config)
+	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
+	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	HINSTANCE resourceInstance, const Config *config)
 {
-	return new TabContainerImpl(parent, browser, embedder, tabNavigation, app, coreInterface,
+	return new TabContainerImpl(parent, browser, tabNavigation, app, coreInterface,
 		fileActionHandler, cachedIcons, bookmarkTree, resourceInstance, config);
 }
 
 TabContainerImpl::TabContainerImpl(HWND parent, BrowserWindow *browser,
-	ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation, App *app,
-	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
-	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, const Config *config) :
+	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
+	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	HINSTANCE resourceInstance, const Config *config) :
 	ShellDropTargetWindow(CreateTabControl(parent)),
 	m_browser(browser),
-	m_embedder(embedder),
 	m_tabNavigation(tabNavigation),
 	m_app(app),
 	m_coreInterface(coreInterface),
@@ -860,9 +859,9 @@ Tab &TabContainerImpl::CreateNewTab(const std::wstring &directory, const TabSett
 
 Tab &TabContainerImpl::CreateNewTab(const PreservedTab &preservedTab)
 {
-	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
-		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
-		preservedTab.history, preservedTab.currentEntry, preservedTab.preservedFolderState);
+	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(), m_app,
+		m_coreInterface, m_tabNavigation, m_fileActionHandler, preservedTab.history,
+		preservedTab.currentEntry, preservedTab.preservedFolderState);
 	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
 		.customName = preservedTab.customName,
 		.lockState = preservedTab.lockState };
@@ -906,9 +905,9 @@ Tab &TabContainerImpl::CreateNewTab(NavigateParams &navigateParams, const TabSet
 		folderSettingsFinal = m_app->GetConfig()->defaultFolderSettings;
 	}
 
-	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(),
-		m_embedder, m_app, m_coreInterface, m_tabNavigation, m_fileActionHandler,
-		navigateParams.pidl, folderSettingsFinal, initialColumns);
+	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(), m_app,
+		m_coreInterface, m_tabNavigation, m_fileActionHandler, navigateParams.pidl,
+		folderSettingsFinal, initialColumns);
 
 	Tab::InitialData initialTabData;
 

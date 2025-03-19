@@ -239,6 +239,7 @@
     <ClCompile Include="FrequentLocationsXmlStorageTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
+    <ClCompile Include="HistoryTrackerTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
@@ -282,7 +283,6 @@
     <ClCompile Include="MainToolbarStorageTest.cpp" />
     <ClCompile Include="ResourceHelperTest.cpp" />
     <ClCompile Include="ServiceProviderTest.cpp" />
-    <ClCompile Include="HistoryShellBrowserHelperTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="MovableModelTest.cpp" />
     <ClCompile Include="OneShotTimerTest.cpp" />
@@ -372,7 +372,6 @@
     <ClInclude Include="PopupMenuViewTestHelper.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
-    <ClInclude Include="ShellBrowserHelperTestBase.h" />
     <ClInclude Include="ShellEnumeratorFake.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />

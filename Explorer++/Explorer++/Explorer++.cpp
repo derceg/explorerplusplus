@@ -12,7 +12,6 @@
 #include "Config.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
-#include "HistoryShellBrowserHelper.h"
 #include "MainFontSetter.h"
 #include "MainMenuSubMenuView.h"
 #include "MainRebarStorage.h"
@@ -255,10 +254,4 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 {
 	return GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl();
-}
-
-void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
-{
-	HistoryShellBrowserHelper::CreateAndAttachToShellBrowser(shellBrowser, m_app->GetHistoryModel(),
-		m_app->GetNavigationEvents());
 }

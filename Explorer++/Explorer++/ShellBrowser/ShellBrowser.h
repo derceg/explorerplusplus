@@ -10,7 +10,6 @@
 struct FolderSettings;
 class NavigationManager;
 class NavigationRequest;
-class ShellBrowserHelperBase;
 class ShellNavigationController;
 class Tab;
 
@@ -28,7 +27,6 @@ public:
 	const Tab *GetTab() const;
 	void SetTab(const Tab *tab);
 
-	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper);
 	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
 
 protected:
@@ -39,6 +37,5 @@ private:
 	static inline int idCounter = 1;
 	const int m_id;
 
-	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 	const Tab *m_tab = nullptr;
 };

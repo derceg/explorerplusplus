@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "ShellBrowserFake.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/ShellBrowserHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
