@@ -46,6 +46,12 @@ Set-Location $env:APPVEYOR_BUILD_FOLDER\Explorer++\TestExplorer++\$env:platform\
 # Run the tests.
 .\TestExplorer++.exe --gtest_output=xml:TestExplorer++Output.xml
 
+$testExitCode = $LASTEXITCODE
+
 # Upload results to AppVeyor.
 $wc = New-Object "System.Net.WebClient"
 $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestExplorer++Output.xml))
+
+if ($testExitCode -ne 0) {
+    throw "Tests failed"
+}
