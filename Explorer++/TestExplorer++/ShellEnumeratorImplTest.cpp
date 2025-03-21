@@ -60,7 +60,8 @@ protected:
 		for (const auto &item : items)
 		{
 			std::wstring name;
-			ASSERT_HRESULT_SUCCEEDED(GetDisplayName(parent.get(), item.Raw(), SHGDN_NORMAL, name));
+			ASSERT_HRESULT_SUCCEEDED(
+				GetDisplayName(parent.get(), item.Raw(), SHGDN_INFOLDER | SHGDN_FORPARSING, name));
 
 			itemNames.push_back(name);
 		}
