@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
+#include "AddressBarView.h"
 #include "App.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
@@ -56,12 +57,12 @@ std::vector<RebarView::Band> Explorerplusplus::InitializeMainRebarBands(
 		std::bind_front(&RebarView::ShowBand, m_mainRebarView, m_mainToolbar->GetHWND())));
 
 	CreateAddressBar();
-	band = InitializeNonToolbarBand(REBAR_BAND_ID_ADDRESS_BAR, m_addressBar->GetHWND(),
+	band = InitializeNonToolbarBand(REBAR_BAND_ID_ADDRESS_BAR, m_addressBar->GetView()->GetHWND(),
 		m_config->showAddressBar.get());
 	mainRebarBands.push_back(band);
 
-	m_rebarConnections.push_back(m_config->showAddressBar.addObserver(
-		std::bind_front(&RebarView::ShowBand, m_mainRebarView, m_addressBar->GetHWND())));
+	m_rebarConnections.push_back(m_config->showAddressBar.addObserver(std::bind_front(
+		&RebarView::ShowBand, m_mainRebarView, m_addressBar->GetView()->GetHWND())));
 
 	CreateBookmarksToolbar();
 	band = InitializeToolbarBand(REBAR_BAND_ID_BOOKMARKS_TOOLBAR,
@@ -333,16 +334,18 @@ boost::signals2::connection Explorerplusplus::AddToolbarContextMenuSelectedObser
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBar = AddressBar::Create(m_mainRebarView->GetHWND(), m_app, this, this);
-	m_addressBar->sizeUpdatedSignal.AddObserver(
+	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), m_config, this);
+	addressBarView->sizeUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnAddressBarSizeUpdated, this));
+
+	m_addressBar = AddressBar::Create(addressBarView, m_app, this, this);
 }
 
 void Explorerplusplus::OnAddressBarSizeUpdated()
 {
 	RECT rect;
-	GetWindowRect(m_addressBar->GetHWND(), &rect);
-	m_mainRebarView->UpdateBandSize(m_addressBar->GetHWND(), 0, GetRectHeight(&rect));
+	GetWindowRect(m_addressBar->GetView()->GetHWND(), &rect);
+	m_mainRebarView->UpdateBandSize(m_addressBar->GetView()->GetHWND(), 0, GetRectHeight(&rect));
 }
 
 void Explorerplusplus::CreateMainToolbar(

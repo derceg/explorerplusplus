@@ -16,7 +16,6 @@ HWND CreateListView(HWND hParent, DWORD dwStyle);
 HWND CreateTreeView(HWND hParent, DWORD dwStyle);
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle);
-HWND CreateComboBox(HWND parent, DWORD dwStyle);
 HWND CreateTabControl(HWND hParent, DWORD dwStyle);
 HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance);
 BOOL PinStatusBar(HWND hStatusBar, int width, int height);

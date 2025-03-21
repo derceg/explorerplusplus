@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include "MainFontSetter.h"
-#include "ShellBrowser/HistoryEntry.h"
-#include "SignalWrapper.h"
-#include "../Helper/BaseWindow.h"
+#include "AddressBarDelegate.h"
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
-#include "../Helper/WindowSubclass.h"
+#include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
+#include <vector>
 
+class AddressBarView;
 class App;
 class AsyncIconFetcher;
 class BrowserWindow;
@@ -24,14 +24,13 @@ class Runtime;
 class ShellBrowser;
 class Tab;
 
-class AddressBar : public BaseWindow
+class AddressBar : private AddressBarDelegate
 {
 public:
-	static AddressBar *Create(HWND parent, App *app, BrowserWindow *browserWindow,
+	static AddressBar *Create(AddressBarView *view, App *app, BrowserWindow *browserWindow,
 		CoreInterface *coreInterface);
 
-	// Signals
-	SignalWrapper<AddressBar, void()> sizeUpdatedSignal;
+	AddressBarView *GetView() const;
 
 private:
 	enum class IconUpdateType
@@ -43,19 +42,18 @@ private:
 		AlwaysFetch
 	};
 
-	AddressBar(HWND parent, App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface);
+	AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface);
 	~AddressBar() = default;
 
-	static HWND CreateAddressBar(HWND parent);
+	void Initialize();
 
-	LRESULT ComboBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	LRESULT EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	// AddressBarDelegate
+	bool OnKeyPressed(UINT key) override;
+	void OnBeginDrag() override;
 
-	void Initialize(HWND parent);
 	void OnEnterPressed();
 	void OnEscapePressed();
-	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
@@ -64,19 +62,13 @@ private:
 	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
 		PidlAbsolute pidl, std::shared_ptr<AsyncIconFetcher> iconFetcher, Runtime *runtime,
 		std::stop_token stopToken);
-	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
-	void RevertTextInUI();
-	void OnFontOrDpiUpdated();
+	void OnWindowDestroyed();
 
+	AddressBarView *const m_view;
 	App *const m_app;
 	BrowserWindow *const m_browserWindow;
 	CoreInterface *const m_coreInterface;
 
-	MainFontSetter m_fontSetter;
-
-	std::wstring m_currentText;
-
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;

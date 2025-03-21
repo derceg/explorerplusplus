@@ -217,9 +217,6 @@
     <ClCompile Include="Plugins\TabsApi\TabProperties.cpp">
       <Filter>Plugins\TabsApi</Filter>
     </ClCompile>
-    <ClCompile Include="AddressBar.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="StatusBar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -799,6 +796,12 @@
     <ClCompile Include="HistoryTracker.cpp">
       <Filter>History</Filter>
     </ClCompile>
+    <ClCompile Include="AddressBar.cpp">
+      <Filter>Address Bar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="AddressBarView.cpp">
+      <Filter>Address Bar\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -967,9 +970,6 @@
       <Filter>Plugins\TabsApi</Filter>
     </ClInclude>
     <ClInclude Include="TaskbarThumbnails.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="AddressBar.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeHelper.h">
@@ -1656,6 +1656,15 @@
     <ClInclude Include="HistoryTracker.h">
       <Filter>History</Filter>
     </ClInclude>
+    <ClInclude Include="AddressBar.h">
+      <Filter>Address Bar\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="AddressBarView.h">
+      <Filter>Address Bar\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="AddressBarDelegate.h">
+      <Filter>Address Bar\UI\Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1850,6 +1859,15 @@
     </Filter>
     <Filter Include="Dialogs\Options">
       <UniqueIdentifier>{2904c500-a16e-431c-a86d-9c687bb0bb42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Address Bar">
+      <UniqueIdentifier>{a74f53e8-acb1-4bca-9965-f0ac3561022d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Address Bar\UI">
+      <UniqueIdentifier>{75b4830b-c5be-48a1-bdff-4c84dec30c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Address Bar\UI\Views">
+      <UniqueIdentifier>{53f10996-cecf-4cb8-af6d-c609c309b4ae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

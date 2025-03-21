@@ -80,14 +80,6 @@ HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
 	return hToolbar;
 }
 
-HWND CreateComboBox(HWND parent, DWORD dwStyle)
-{
-	HWND hComboBox = CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX, L"", dwStyle, 0, 0, 0, 200,
-		parent, nullptr, GetModuleHandle(nullptr), nullptr);
-
-	return hComboBox;
-}
-
 HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 {
 	HWND hTabControl = CreateWindowEx(0, WC_TABCONTROL, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
+#include "AddressBarView.h"
 #include "App.h"
 #include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
@@ -14,60 +15,35 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabContainerImpl.h"
-#include "../Helper/Controls.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 #include <wil/com.h>
 #include <wil/common.h>
 
-AddressBar *AddressBar::Create(HWND parent, App *app, BrowserWindow *browserWindow,
+AddressBar *AddressBar::Create(AddressBarView *view, App *app, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface)
 {
-	return new AddressBar(parent, app, browserWindow, coreInterface);
+	return new AddressBar(view, app, browserWindow, coreInterface);
 }
 
-AddressBar::AddressBar(HWND parent, App *app, BrowserWindow *browserWindow,
+AddressBar::AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface) :
-	BaseWindow(CreateAddressBar(parent)),
+	m_view(view),
 	m_app(app),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_fontSetter(m_hwnd, app->GetConfig()),
 	m_weakPtrFactory(this)
 {
-	Initialize(parent);
+	Initialize();
 }
 
-HWND AddressBar::CreateAddressBar(HWND parent)
+void AddressBar::Initialize()
 {
-	return CreateComboBox(parent,
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_CLIPSIBLINGS
-			| WS_CLIPCHILDREN);
-}
-
-void AddressBar::Initialize(HWND parent)
-{
-	HIMAGELIST smallIcons;
-	Shell_GetImageLists(nullptr, &smallIcons);
-	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
-		std::bind_front(&AddressBar::ComboBoxSubclass, this)));
-
-	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(hEdit, std::bind_front(&AddressBar::EditSubclass, this)));
-
-	/* Turn on auto complete for the edit control within the combobox.
-	This will let the os complete paths as they are typed. */
-	SHAutoComplete(hEdit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
-		std::bind_front(&AddressBar::ParentWndProc, this)));
+	m_view->SetDelegate(this);
+	m_view->windowDestroyedSignal.AddObserver(
+		std::bind_front(&AddressBar::OnWindowDestroyed, this));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&AddressBar::OnTabSelected, this),
@@ -80,70 +56,32 @@ void AddressBar::Initialize(HWND parent)
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browserWindow)));
-
-	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&AddressBar::OnFontOrDpiUpdated, this));
 }
 
-LRESULT AddressBar::ComboBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+AddressBarView *AddressBar::GetView() const
 {
-	switch (msg)
-	{
-	case WM_DPICHANGED_AFTERPARENT:
-		OnFontOrDpiUpdated();
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
+	return m_view;
 }
 
-LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool AddressBar::OnKeyPressed(UINT key)
 {
-	switch (msg)
+	switch (key)
 	{
-	case WM_KEYDOWN:
-		switch (wParam)
-		{
-		case VK_RETURN:
-			OnEnterPressed();
-			return 0;
+	case VK_RETURN:
+		OnEnterPressed();
+		return true;
 
-		case VK_ESCAPE:
-			OnEscapePressed();
-			return 0;
-		}
-		break;
-
-	case WM_SETFOCUS:
-		m_coreInterface->FocusChanged();
-		break;
+	case VK_ESCAPE:
+		OnEscapePressed();
+		return true;
 	}
 
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-LRESULT AddressBar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
-		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case CBEN_DRAGBEGIN:
-				OnBeginDrag();
-				break;
-			}
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+	return false;
 }
 
 void AddressBar::OnEnterPressed()
 {
-	std::wstring path = GetWindowString(m_hwnd);
+	std::wstring path = m_view->GetText();
 
 	const Tab &selectedTab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
@@ -175,7 +113,7 @@ void AddressBar::OnEnterPressed()
 	// navigation commits.
 	// Note that if the above call to TransformUserEnteredPathToAbsolutePathAndNormalize() fails,
 	// the text won't be reverted. That gives the user the chance to update the text and try again.
-	RevertTextInUI();
+	m_view->RevertText();
 
 	m_browserWindow->OpenItem(*absolutePath,
 		DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
@@ -184,15 +122,10 @@ void AddressBar::OnEnterPressed()
 
 void AddressBar::OnEscapePressed()
 {
-	HWND edit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
-
-	auto modified = SendMessage(edit, EM_GETMODIFY, 0, 0);
-
-	if (modified)
+	if (m_view->IsTextModified())
 	{
-		RevertTextInUI();
-
-		SendMessage(edit, EM_SETSEL, 0, -1);
+		m_view->RevertText();
+		m_view->SelectAllText();
 	}
 	else
 	{
@@ -246,7 +179,7 @@ void AddressBar::OnBeginDrag()
 	}
 
 	DWORD effect;
-	SHDoDragDrop(m_hwnd, dataObject.get(), nullptr, allowedEffects, &effect);
+	SHDoDragDrop(nullptr, dataObject.get(), nullptr, allowedEffects, &effect);
 }
 
 void AddressBar::OnTabSelected(const Tab &tab)
@@ -303,7 +236,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab, IconUpdateType iconUpdateType
 	}
 
 	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(entry->GetPidl().Raw());
-	UpdateTextAndIconInUI(&fullPathForDisplay, iconIndex);
+	m_view->UpdateTextAndIcon(fullPathForDisplay, iconIndex);
 }
 
 concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
@@ -324,35 +257,10 @@ concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> se
 		co_return;
 	}
 
-	self->UpdateTextAndIconInUI(nullptr, iconInfo->iconIndex);
+	self->m_view->UpdateTextAndIcon(std::nullopt, iconInfo->iconIndex);
 }
 
-void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
+void AddressBar::OnWindowDestroyed()
 {
-	COMBOBOXEXITEM cbItem;
-	cbItem.mask = CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_INDENT;
-	cbItem.iItem = -1;
-	cbItem.iImage = iconIndex;
-	cbItem.iSelectedImage = iconIndex;
-	cbItem.iIndent = 1;
-
-	if (text)
-	{
-		WI_SetFlag(cbItem.mask, CBEIF_TEXT);
-		cbItem.pszText = text->data();
-
-		m_currentText = *text;
-	}
-
-	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
-}
-
-void AddressBar::RevertTextInUI()
-{
-	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(m_currentText.c_str()));
-}
-
-void AddressBar::OnFontOrDpiUpdated()
-{
-	sizeUpdatedSignal.m_signal();
+	delete this;
 }

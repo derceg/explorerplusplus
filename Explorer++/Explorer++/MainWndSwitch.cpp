@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
+#include "AddressBarView.h"
 #include "App.h"
 #include "Application.h"
 #include "ApplicationEditorDialog.h"
@@ -1307,12 +1308,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDA_ADDRESSBAR:
-		SetFocus(m_addressBar->GetHWND());
+		SetFocus(m_addressBar->GetView()->GetHWND());
 		break;
 
 	case IDA_COMBODROPDOWN:
-		SetFocus(m_addressBar->GetHWND());
-		SendMessage(m_addressBar->GetHWND(), CB_SHOWDROPDOWN, TRUE, 0);
+		SetFocus(m_addressBar->GetView()->GetHWND());
+		SendMessage(m_addressBar->GetView()->GetHWND(), CB_SHOWDROPDOWN, TRUE, 0);
 		break;
 
 	case IDA_PREVIOUSWINDOW:
@@ -1411,7 +1412,7 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, UINT notification
 	switch (notificationCode)
 	{
 	case CBN_DROPDOWN:
-		AddPathsToComboBoxEx(m_addressBar->GetHWND(),
+		AddPathsToComboBoxEx(m_addressBar->GetView()->GetHWND(),
 			m_pActiveShellBrowser->GetDirectory().c_str());
 		break;
 	}

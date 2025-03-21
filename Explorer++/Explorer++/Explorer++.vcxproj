@@ -985,6 +985,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="AcceleratorManager.cpp" />
+    <ClCompile Include="AddressBarView.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
@@ -1281,6 +1282,8 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorManager.h" />
     <ClInclude Include="AcceleratorMappings.h" />
+    <ClInclude Include="AddressBarDelegate.h" />
+    <ClInclude Include="AddressBarView.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
