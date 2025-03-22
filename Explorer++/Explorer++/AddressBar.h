@@ -18,7 +18,6 @@ class AddressBarView;
 class App;
 class AsyncIconFetcher;
 class BrowserWindow;
-class CoreInterface;
 class NavigationRequest;
 class Runtime;
 class ShellBrowser;
@@ -27,8 +26,7 @@ class Tab;
 class AddressBar : private AddressBarDelegate
 {
 public:
-	static AddressBar *Create(AddressBarView *view, App *app, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface);
+	static AddressBar *Create(AddressBarView *view, App *app, BrowserWindow *browserWindow);
 
 	AddressBarView *GetView() const;
 
@@ -42,8 +40,7 @@ private:
 		AlwaysFetch
 	};
 
-	AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface);
+	AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow);
 	~AddressBar() = default;
 
 	void Initialize();
@@ -67,7 +64,6 @@ private:
 	AddressBarView *const m_view;
 	App *const m_app;
 	BrowserWindow *const m_browserWindow;
-	CoreInterface *const m_coreInterface;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

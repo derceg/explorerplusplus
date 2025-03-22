@@ -8,7 +8,6 @@
 #include "App.h"
 #include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
-#include "CoreInterface.h"
 #include "NavigationHelper.h"
 #include "RuntimeHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -22,18 +21,15 @@
 #include <wil/com.h>
 #include <wil/common.h>
 
-AddressBar *AddressBar::Create(AddressBarView *view, App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface)
+AddressBar *AddressBar::Create(AddressBarView *view, App *app, BrowserWindow *browserWindow)
 {
-	return new AddressBar(view, app, browserWindow, coreInterface);
+	return new AddressBar(view, app, browserWindow);
 }
 
-AddressBar::AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface) :
+AddressBar::AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow) :
 	m_view(view),
 	m_app(app),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface),
 	m_weakPtrFactory(this)
 {
 	Initialize();
@@ -83,8 +79,10 @@ void AddressBar::OnEnterPressed()
 {
 	std::wstring path = m_view->GetText();
 
-	const Tab &selectedTab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
-	std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
+	auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
+	std::wstring currentDirectory =
+		GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING);
 
 	// When entering a path in the address bar in Windows Explorer, environment variables will be
 	// expanded. The behavior here is designed to match that.
@@ -135,11 +133,12 @@ void AddressBar::OnEscapePressed()
 
 void AddressBar::OnBeginDrag()
 {
-	const Tab &selectedTab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
+	auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
+	auto pidlDirectory = currentEntry->GetPidl();
 
 	SFGAOF attributes = SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK;
-	HRESULT hr = GetItemAttributes(pidlDirectory.get(), &attributes);
+	HRESULT hr = GetItemAttributes(pidlDirectory.Raw(), &attributes);
 
 	if (FAILED(hr)
 		|| WI_AreAllFlagsClear(attributes, SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK))
@@ -150,7 +149,7 @@ void AddressBar::OnBeginDrag()
 	}
 
 	wil::com_ptr_nothrow<IDataObject> dataObject;
-	std::vector<PCIDLIST_ABSOLUTE> items = { pidlDirectory.get() };
+	std::vector<PCIDLIST_ABSOLUTE> items = { pidlDirectory.Raw() };
 	hr = CreateDataObjectForShellTransfer(items, &dataObject);
 
 	if (FAILED(hr))
@@ -215,7 +214,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab, IconUpdateType iconUpdateType
 	// ignored once they complete.
 	m_scopedStopSource = std::make_unique<ScopedStopSource>();
 
-	auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
+	auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
 	auto cachedIconIndex = m_app->GetIconFetcher()->MaybeGetCachedIconIndex(entry->GetPidl().Raw());
 	int iconIndex;

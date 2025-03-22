@@ -338,7 +338,7 @@ void Explorerplusplus::CreateAddressBar()
 	addressBarView->sizeUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnAddressBarSizeUpdated, this));
 
-	m_addressBar = AddressBar::Create(addressBarView, m_app, this, this);
+	m_addressBar = AddressBar::Create(addressBarView, m_app, this);
 }
 
 void Explorerplusplus::OnAddressBarSizeUpdated()
