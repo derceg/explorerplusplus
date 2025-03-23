@@ -54,7 +54,7 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
-	void UpdateTextAndIcon(const Tab &tab,
+	void UpdateTextAndIcon(const ShellBrowser *shellBrowser,
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);
 	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
 		PidlAbsolute pidl, std::shared_ptr<AsyncIconFetcher> iconFetcher, Runtime *runtime,

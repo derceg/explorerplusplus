@@ -66,6 +66,11 @@ public:
 		return nullptr;
 	}
 
+	const ShellBrowser *GetActiveShellBrowser() const
+	{
+		return nullptr;
+	}
+
 	WindowStorageData GetStorageData() const override
 	{
 		return { {}, WindowShowState::Normal };

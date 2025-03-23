@@ -22,7 +22,9 @@ class TabHistoryMenuTest : public Test
 protected:
 	TabHistoryMenuTest() : m_shellBrowser(&m_navigationEvents, &m_tabNavigation)
 	{
-		ON_CALL(m_browserWindow, GetActiveShellBrowser)
+		ON_CALL(m_browserWindow, GetActiveShellBrowser())
+			.WillByDefault([this]() { return &m_shellBrowser; });
+		ON_CALL(Const(m_browserWindow), GetActiveShellBrowser())
 			.WillByDefault([this]() { return &m_shellBrowser; });
 	}
 

@@ -30,7 +30,10 @@ public:
 	virtual BrowserPane *GetActivePane() const = 0;
 	virtual void FocusActiveTab() = 0;
 	virtual void CreateTabFromPreservedTab(const PreservedTab *tab) = 0;
+
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
+	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;
+	bool IsShellBrowserActive(const ShellBrowser *shellBrowser) const;
 
 	virtual WindowStorageData GetStorageData() const = 0;
 

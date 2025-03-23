@@ -182,38 +182,34 @@ void AddressBar::OnBeginDrag()
 
 void AddressBar::OnTabSelected(const Tab &tab)
 {
-	UpdateTextAndIcon(tab);
+	UpdateTextAndIcon(tab.GetShellBrowser());
 }
 
 void AddressBar::OnNavigationCommitted(const NavigationRequest *request)
 {
-	const auto *tab = request->GetShellBrowser()->GetTab();
-
-	if (tab->GetTabContainer()->IsTabSelected(*tab))
+	if (m_browser->IsShellBrowserActive(request->GetShellBrowser()))
 	{
-		UpdateTextAndIcon(*tab);
+		UpdateTextAndIcon(request->GetShellBrowser());
 	}
 }
 
 void AddressBar::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
-	const auto *tab = shellBrowser->GetTab();
-
-	if (tab->GetTabContainer()->IsTabSelected(*tab))
+	if (m_browser->IsShellBrowserActive(shellBrowser))
 	{
 		// Since the directory properties have changed, it's possible that the icon has changed.
 		// Therefore, the updated icon should always be retrieved.
-		UpdateTextAndIcon(*tab, IconUpdateType::AlwaysFetch);
+		UpdateTextAndIcon(shellBrowser, IconUpdateType::AlwaysFetch);
 	}
 }
 
-void AddressBar::UpdateTextAndIcon(const Tab &tab, IconUpdateType iconUpdateType)
+void AddressBar::UpdateTextAndIcon(const ShellBrowser *shellBrowser, IconUpdateType iconUpdateType)
 {
 	// Resetting this here ensures that any previous icon requests that are still ongoing will be
 	// ignored once they complete.
 	m_scopedStopSource = std::make_unique<ScopedStopSource>();
 
-	auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+	auto entry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 
 	auto cachedIconIndex = m_app->GetIconFetcher()->MaybeGetCachedIconIndex(entry->GetPidl().Raw());
 	int iconIndex;

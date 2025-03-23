@@ -127,6 +127,7 @@ public:
 	// exist.
 	ShellBrowser *GetActiveShellBrowser() override;
 
+	const ShellBrowser *GetActiveShellBrowser() const override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;

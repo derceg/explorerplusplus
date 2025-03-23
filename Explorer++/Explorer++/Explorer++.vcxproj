@@ -987,6 +987,7 @@
     <ClCompile Include="AcceleratorManager.cpp" />
     <ClCompile Include="AddressBarView.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="BrowserWindow.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />

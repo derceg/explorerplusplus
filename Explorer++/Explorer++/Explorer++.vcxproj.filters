@@ -802,6 +802,9 @@
     <ClCompile Include="AddressBarView.cpp">
       <Filter>Address Bar\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserWindow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
