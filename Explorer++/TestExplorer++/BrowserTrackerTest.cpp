@@ -14,19 +14,15 @@
 
 using namespace testing;
 
+namespace
+{
+
 // The only thing this class does is register itself with the provided BrowserList.
-class BrowserWindowFake : public BrowserWindow
+class BrowserWindowTrackerFake : public BrowserWindow
 {
 public:
-	BrowserWindowFake(BrowserList *browserList) :
-		m_id(idCounter++),
-		m_browserTracker(browserList, this)
+	BrowserWindowTrackerFake(BrowserList *browserList) : m_browserTracker(browserList, this)
 	{
-	}
-
-	int GetId() const override
-	{
-		return m_id;
 	}
 
 	HWND GetHWND() const override
@@ -116,19 +112,19 @@ public:
 	}
 
 private:
-	static inline int idCounter = 1;
-	const int m_id;
 	BrowserTracker m_browserTracker;
 };
+
+}
 
 TEST(BrowserTrackerTest, AddRemove)
 {
 	BrowserList browserList;
 
-	auto browser1 = std::make_unique<BrowserWindowFake>(&browserList);
+	auto browser1 = std::make_unique<BrowserWindowTrackerFake>(&browserList);
 	EXPECT_THAT(GeneratorToVector(browserList.GetList()), UnorderedElementsAre(browser1.get()));
 
-	auto browser2 = std::make_unique<BrowserWindowFake>(&browserList);
+	auto browser2 = std::make_unique<BrowserWindowTrackerFake>(&browserList);
 	EXPECT_THAT(GeneratorToVector(browserList.GetList()),
 		UnorderedElementsAre(browser1.get(), browser2.get()));
 

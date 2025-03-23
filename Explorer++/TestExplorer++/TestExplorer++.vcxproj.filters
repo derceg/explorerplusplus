@@ -313,9 +313,6 @@
     <ClCompile Include="FrequentLocationsMenuTest.cpp">
       <Filter>Frequent Locations\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserWindowMock.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="TabRestorerMenuTest.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
@@ -378,6 +375,15 @@
     </ClCompile>
     <ClCompile Include="HistoryTrackerTest.cpp">
       <Filter>History</Filter>
+    </ClCompile>
+    <ClCompile Include="AddressBarTest.cpp">
+      <Filter>Address Bar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserWindowFake.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserTestBase.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -498,6 +504,12 @@
     <Filter Include="Startup">
       <UniqueIdentifier>{968bad65-061e-4000-b384-22aac11db15a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Address Bar">
+      <UniqueIdentifier>{18d3221e-e70c-4203-9b72-41d521c1e2a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Address Bar\UI">
+      <UniqueIdentifier>{6c73ac98-1cc0-4623-a442-9c888d81bba3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -606,6 +618,12 @@
     </ClInclude>
     <ClInclude Include="NavigationRequestDelegateMock.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserWindowFake.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserTestBase.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

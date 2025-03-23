@@ -184,6 +184,7 @@
     <ClCompile Include="AcceleratorHelperTest.cpp" />
     <ClCompile Include="AcceleratorManagerTest.cpp" />
     <ClCompile Include="AcceleratorTestHelper.cpp" />
+    <ClCompile Include="AddressBarTest.cpp" />
     <ClCompile Include="ApplicationDropperTest.cpp" />
     <ClCompile Include="ApplicationTest.cpp" />
     <ClCompile Include="ApplicationHelperTest.cpp" />
@@ -196,7 +197,8 @@
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="BrowserCommandControllerTest.cpp" />
     <ClCompile Include="BrowserListTest.cpp" />
-    <ClCompile Include="BrowserWindowMock.cpp" />
+    <ClCompile Include="BrowserTestBase.cpp" />
+    <ClCompile Include="BrowserWindowFake.cpp" />
     <ClCompile Include="ClipboardTest.cpp" />
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
     <ClCompile Include="ColorRulesStorageTestHelper.cpp" />
@@ -351,6 +353,8 @@
     <ClInclude Include="ApplicationToolbarStorageTestHelper.h" />
     <ClInclude Include="BookmarkStorageTestHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
+    <ClInclude Include="BrowserTestBase.h" />
+    <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowMock.h" />
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />

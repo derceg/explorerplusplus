@@ -13,10 +13,7 @@
 class BrowserWindowMock : public BrowserWindow
 {
 public:
-	BrowserWindowMock();
-
 	// BrowserWindow
-	MOCK_METHOD(int, GetId, (), (const, override));
 	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 	MOCK_METHOD(boost::signals2::connection, AddBrowserInitializedObserver,
 		(const BrowserInitializedSignal::slot_type &observer), (override));
@@ -39,8 +36,4 @@ public:
 		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(void, OpenItem,
 		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
-
-private:
-	static inline int idCounter = 1;
-	const int m_id;
 };

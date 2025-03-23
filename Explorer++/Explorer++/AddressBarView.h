@@ -33,6 +33,9 @@ public:
 	void UpdateTextAndIcon(const std::optional<std::wstring> &optionalText, int iconIndex);
 	void RevertText();
 
+	AddressBarDelegate *GetDelegateForTesting();
+	void SetTextForTesting(const std::wstring &text);
+
 private:
 	AddressBarView(HWND parent, BrowserWindow *browser, const Config *config);
 

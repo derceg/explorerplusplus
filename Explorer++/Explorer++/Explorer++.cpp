@@ -41,7 +41,6 @@ Explorerplusplus *Explorerplusplus::Create(App *app, const WindowStorageData *st
 }
 
 Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageData) :
-	m_id(idCounter++),
 	m_app(app),
 	m_hContainer(CreateMainWindow(storageData)),
 	m_commandController(this),
@@ -234,11 +233,6 @@ void Explorerplusplus::Close()
 	m_browserTracker.reset();
 
 	DestroyWindow(m_hContainer);
-}
-
-int Explorerplusplus::GetId() const
-{
-	return m_id;
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

@@ -6,6 +6,7 @@
 #include "AddressBarView.h"
 #include "AddressBarDelegate.h"
 #include "BrowserWindow.h"
+#include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -176,4 +177,17 @@ void AddressBarView::OnNcDestroy()
 	windowDestroyedSignal.m_signal();
 
 	delete this;
+}
+
+AddressBarDelegate *AddressBarView::GetDelegateForTesting()
+{
+	CHECK(IsInTest());
+	return m_delegate;
+}
+
+void AddressBarView::SetTextForTesting(const std::wstring &text)
+{
+	CHECK(IsInTest());
+	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text.c_str()));
+	SendMessage(GetEditControl(), EM_SETMODIFY, TRUE, 0);
 }

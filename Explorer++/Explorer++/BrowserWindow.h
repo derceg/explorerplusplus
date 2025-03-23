@@ -19,9 +19,11 @@ class BrowserWindow : public Navigator
 public:
 	using BrowserInitializedSignal = boost::signals2::signal<void()>;
 
+	BrowserWindow();
 	virtual ~BrowserWindow() = default;
 
-	virtual int GetId() const = 0;
+	int GetId() const;
+
 	virtual HWND GetHWND() const = 0;
 	virtual boost::signals2::connection AddBrowserInitializedObserver(
 		const BrowserInitializedSignal::slot_type &observer) = 0;
@@ -44,4 +46,8 @@ public:
 
 	virtual void TryClose() = 0;
 	virtual void Close() = 0;
+
+private:
+	static inline int idCounter = 1;
+	const int m_id;
 };

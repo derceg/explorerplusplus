@@ -5,15 +5,16 @@
 #include "stdafx.h"
 #include "AddressBar.h"
 #include "AddressBarView.h"
-#include "App.h"
 #include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "NavigationHelper.h"
 #include "RuntimeHelper.h"
+#include "ShellBrowser/NavigationEvents.h"
+#include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
-#include "TabContainerImpl.h"
+#include "TabEvents.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
@@ -21,34 +22,41 @@
 #include <wil/com.h>
 #include <wil/common.h>
 
-AddressBar *AddressBar::Create(AddressBarView *view, App *app, BrowserWindow *browser)
+AddressBar *AddressBar::Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
+	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	const Runtime *runtime, std::shared_ptr<AsyncIconFetcher> iconFetcher)
 {
-	return new AddressBar(view, app, browser);
+	return new AddressBar(view, browser, tabEvents, shellBrowserEvents, navigationEvents, runtime,
+		iconFetcher);
 }
 
-AddressBar::AddressBar(AddressBarView *view, App *app, BrowserWindow *browser) :
+AddressBar::AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
+	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	const Runtime *runtime, std::shared_ptr<AsyncIconFetcher> iconFetcher) :
 	m_view(view),
-	m_app(app),
 	m_browser(browser),
+	m_runtime(runtime),
+	m_iconFetcher(iconFetcher),
 	m_weakPtrFactory(this)
 {
-	Initialize();
+	Initialize(tabEvents, shellBrowserEvents, navigationEvents);
 }
 
-void AddressBar::Initialize()
+void AddressBar::Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
+	NavigationEvents *navigationEvents)
 {
 	m_view->SetDelegate(this);
 	m_view->windowDestroyedSignal.AddObserver(
 		std::bind_front(&AddressBar::OnWindowDestroyed, this));
 
-	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
+	m_connections.push_back(tabEvents->AddSelectedObserver(
 		std::bind_front(&AddressBar::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
 
-	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
+	m_connections.push_back(shellBrowserEvents->AddDirectoryPropertiesChangedObserver(
 		std::bind_front(&AddressBar::OnDirectoryPropertiesChanged, this),
 		ShellBrowserEventScope::ForBrowser(*m_browser)));
 
-	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
+	m_connections.push_back(navigationEvents->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browser)));
 }
@@ -211,7 +219,7 @@ void AddressBar::UpdateTextAndIcon(const ShellBrowser *shellBrowser, IconUpdateT
 
 	auto entry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 
-	auto cachedIconIndex = m_app->GetIconFetcher()->MaybeGetCachedIconIndex(entry->GetPidl().Raw());
+	auto cachedIconIndex = m_iconFetcher->MaybeGetCachedIconIndex(entry->GetPidl().Raw());
 	int iconIndex;
 
 	if (cachedIconIndex)
@@ -220,23 +228,25 @@ void AddressBar::UpdateTextAndIcon(const ShellBrowser *shellBrowser, IconUpdateT
 	}
 	else
 	{
-		iconIndex = m_app->GetIconFetcher()->GetDefaultIconIndex(entry->GetPidl().Raw());
+		iconIndex = m_iconFetcher->GetDefaultIconIndex(entry->GetPidl().Raw());
 	}
 
 	if (iconUpdateType == IconUpdateType::AlwaysFetch || !cachedIconIndex)
 	{
-		RetrieveUpdatedIcon(m_weakPtrFactory.GetWeakPtr(), entry->GetPidl(),
-			m_app->GetIconFetcher(), m_app->GetRuntime(), m_scopedStopSource->GetToken());
+		RetrieveUpdatedIcon(m_weakPtrFactory.GetWeakPtr(), entry->GetPidl());
 	}
 
 	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(entry->GetPidl().Raw());
 	m_view->UpdateTextAndIcon(fullPathForDisplay, iconIndex);
 }
 
-concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
-	PidlAbsolute pidl, std::shared_ptr<AsyncIconFetcher> iconFetcher, Runtime *runtime,
-	std::stop_token stopToken)
+concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> weakSelf,
+	PidlAbsolute pidl)
 {
+	auto *runtime = weakSelf->m_runtime;
+	auto iconFetcher = weakSelf->m_iconFetcher;
+	auto stopToken = weakSelf->m_scopedStopSource->GetToken();
+
 	auto iconInfo = co_await iconFetcher->GetIconIndexAsync(pidl.Raw(), stopToken);
 
 	if (!iconInfo)
@@ -246,12 +256,12 @@ concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> se
 
 	co_await ResumeOnUiThread(runtime);
 
-	if (stopToken.stop_requested() || !self)
+	if (stopToken.stop_requested() || !weakSelf)
 	{
 		co_return;
 	}
 
-	self->m_view->UpdateTextAndIcon(std::nullopt, iconInfo->iconIndex);
+	weakSelf->m_view->UpdateTextAndIcon(std::nullopt, iconInfo->iconIndex);
 }
 
 void AddressBar::OnWindowDestroyed()

@@ -15,18 +15,22 @@
 #include <vector>
 
 class AddressBarView;
-class App;
 class AsyncIconFetcher;
 class BrowserWindow;
+class NavigationEvents;
 class NavigationRequest;
 class Runtime;
 class ShellBrowser;
+class ShellBrowserEvents;
 class Tab;
+class TabEvents;
 
 class AddressBar : private AddressBarDelegate
 {
 public:
-	static AddressBar *Create(AddressBarView *view, App *app, BrowserWindow *browser);
+	static AddressBar *Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		const Runtime *runtime, std::shared_ptr<AsyncIconFetcher> iconFetcher);
 
 	AddressBarView *GetView() const;
 
@@ -40,10 +44,13 @@ private:
 		AlwaysFetch
 	};
 
-	AddressBar(AddressBarView *view, App *app, BrowserWindow *browser);
+	AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		const Runtime *runtime, std::shared_ptr<AsyncIconFetcher> iconFetcher);
 	~AddressBar() = default;
 
-	void Initialize();
+	void Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
+		NavigationEvents *navigationEvents);
 
 	// AddressBarDelegate
 	bool OnKeyPressed(UINT key) override;
@@ -56,14 +63,14 @@ private:
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 	void UpdateTextAndIcon(const ShellBrowser *shellBrowser,
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);
-	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> self,
-		PidlAbsolute pidl, std::shared_ptr<AsyncIconFetcher> iconFetcher, Runtime *runtime,
-		std::stop_token stopToken);
+	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> weakSelf,
+		PidlAbsolute pidl);
 	void OnWindowDestroyed();
 
 	AddressBarView *const m_view;
-	App *const m_app;
 	BrowserWindow *const m_browser;
+	const Runtime *const m_runtime;
+	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

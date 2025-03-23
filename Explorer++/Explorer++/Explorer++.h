@@ -111,7 +111,6 @@ public:
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 	// BrowserWindow
-	int GetId() const override;
 	HWND GetHWND() const override;
 	boost::signals2::connection AddBrowserInitializedObserver(
 		const BrowserInitializedSignal::slot_type &observer) override;
@@ -528,9 +527,6 @@ private:
 		PULARGE_INTEGER lTotalFolderSize);
 
 	bool ConfirmClose();
-
-	static inline int idCounter = 1;
-	const int m_id;
 
 	App *const m_app;
 	HWND m_hContainer;
