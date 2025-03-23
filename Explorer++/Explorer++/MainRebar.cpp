@@ -334,7 +334,7 @@ boost::signals2::connection Explorerplusplus::AddToolbarContextMenuSelectedObser
 
 void Explorerplusplus::CreateAddressBar()
 {
-	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), m_config, this);
+	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), this, m_config);
 	addressBarView->sizeUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnAddressBarSizeUpdated, this));
 

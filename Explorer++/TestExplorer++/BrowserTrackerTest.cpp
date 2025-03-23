@@ -29,6 +29,11 @@ public:
 		return m_id;
 	}
 
+	HWND GetHWND() const override
+	{
+		return nullptr;
+	}
+
 	boost::signals2::connection AddBrowserInitializedObserver(
 		const BrowserInitializedSignal::slot_type &observer) override
 	{
@@ -61,11 +66,6 @@ public:
 		return nullptr;
 	}
 
-	HWND GetHWND() const override
-	{
-		return nullptr;
-	}
-
 	WindowStorageData GetStorageData() const override
 	{
 		return { {}, WindowShowState::Normal };
@@ -77,6 +77,10 @@ public:
 	}
 
 	void Activate() override
+	{
+	}
+
+	void FocusChanged() override
 	{
 	}
 

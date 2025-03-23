@@ -12,8 +12,8 @@
 #include <vector>
 
 class AddressBarDelegate;
+class BrowserWindow;
 struct Config;
-class CoreInterface;
 class WindowSubclass;
 
 class AddressBarView
@@ -23,7 +23,7 @@ public:
 	SignalWrapper<AddressBarView, void()> sizeUpdatedSignal;
 	SignalWrapper<AddressBarView, void()> windowDestroyedSignal;
 
-	static AddressBarView *Create(HWND parent, const Config *config, CoreInterface *coreInterface);
+	static AddressBarView *Create(HWND parent, BrowserWindow *browser, const Config *config);
 
 	void SetDelegate(AddressBarDelegate *delegate);
 	HWND GetHWND() const;
@@ -34,7 +34,7 @@ public:
 	void RevertText();
 
 private:
-	AddressBarView(HWND parent, const Config *config, CoreInterface *coreInterface);
+	AddressBarView(HWND parent, BrowserWindow *browser, const Config *config);
 
 	static HWND CreateAddressBar(HWND parent);
 
@@ -47,9 +47,9 @@ private:
 	void OnNcDestroy();
 
 	const HWND m_hwnd;
+	BrowserWindow *const m_browser;
 	AddressBarDelegate *m_delegate = nullptr;
 	MainFontSetter m_fontSetter;
-	CoreInterface *const m_coreInterface;
 	std::wstring m_currentText;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

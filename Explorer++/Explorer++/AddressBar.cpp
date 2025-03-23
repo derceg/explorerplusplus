@@ -21,15 +21,15 @@
 #include <wil/com.h>
 #include <wil/common.h>
 
-AddressBar *AddressBar::Create(AddressBarView *view, App *app, BrowserWindow *browserWindow)
+AddressBar *AddressBar::Create(AddressBarView *view, App *app, BrowserWindow *browser)
 {
-	return new AddressBar(view, app, browserWindow);
+	return new AddressBar(view, app, browser);
 }
 
-AddressBar::AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow) :
+AddressBar::AddressBar(AddressBarView *view, App *app, BrowserWindow *browser) :
 	m_view(view),
 	m_app(app),
-	m_browserWindow(browserWindow),
+	m_browser(browser),
 	m_weakPtrFactory(this)
 {
 	Initialize();
@@ -42,16 +42,15 @@ void AddressBar::Initialize()
 		std::bind_front(&AddressBar::OnWindowDestroyed, this));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
-		std::bind_front(&AddressBar::OnTabSelected, this),
-		TabEventScope::ForBrowser(*m_browserWindow)));
+		std::bind_front(&AddressBar::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
 		std::bind_front(&AddressBar::OnDirectoryPropertiesChanged, this),
-		ShellBrowserEventScope::ForBrowser(*m_browserWindow)));
+		ShellBrowserEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),
-		NavigationEventScope::ForBrowser(*m_browserWindow)));
+		NavigationEventScope::ForBrowser(*m_browser)));
 }
 
 AddressBarView *AddressBar::GetView() const
@@ -79,7 +78,7 @@ void AddressBar::OnEnterPressed()
 {
 	std::wstring path = m_view->GetText();
 
-	auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 	std::wstring currentDirectory =
 		GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING);
@@ -113,9 +112,9 @@ void AddressBar::OnEnterPressed()
 	// the text won't be reverted. That gives the user the chance to update the text and try again.
 	m_view->RevertText();
 
-	m_browserWindow->OpenItem(*absolutePath,
+	m_browser->OpenItem(*absolutePath,
 		DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
-	m_browserWindow->FocusActiveTab();
+	m_browser->FocusActiveTab();
 }
 
 void AddressBar::OnEscapePressed()
@@ -127,13 +126,13 @@ void AddressBar::OnEscapePressed()
 	}
 	else
 	{
-		m_browserWindow->FocusActiveTab();
+		m_browser->FocusActiveTab();
 	}
 }
 
 void AddressBar::OnBeginDrag()
 {
-	auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 	auto pidlDirectory = currentEntry->GetPidl();
 

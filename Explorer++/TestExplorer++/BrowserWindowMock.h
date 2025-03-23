@@ -17,6 +17,7 @@ public:
 
 	// BrowserWindow
 	MOCK_METHOD(int, GetId, (), (const, override));
+	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 	MOCK_METHOD(boost::signals2::connection, AddBrowserInitializedObserver,
 		(const BrowserInitializedSignal::slot_type &observer), (override));
 	MOCK_METHOD(BrowserCommandController *, GetCommandController, (), (override));
@@ -24,10 +25,10 @@ public:
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
 	MOCK_METHOD(void, CreateTabFromPreservedTab, (const PreservedTab *tab), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
-	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
 	MOCK_METHOD(bool, IsActive, (), (const, override));
 	MOCK_METHOD(void, Activate, (), (override));
+	MOCK_METHOD(void, FocusChanged, (), (override));
 	MOCK_METHOD(void, TryClose, (), (override));
 	MOCK_METHOD(void, Close, (), (override));
 

@@ -187,7 +187,7 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	switch (msg)
 	{
 	case WM_SETFOCUS:
-		m_coreInterface->FocusChanged();
+		m_browserWindow->FocusChanged();
 		break;
 
 	case WM_RBUTTONDOWN:

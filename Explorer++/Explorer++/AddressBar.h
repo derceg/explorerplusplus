@@ -26,7 +26,7 @@ class Tab;
 class AddressBar : private AddressBarDelegate
 {
 public:
-	static AddressBar *Create(AddressBarView *view, App *app, BrowserWindow *browserWindow);
+	static AddressBar *Create(AddressBarView *view, App *app, BrowserWindow *browser);
 
 	AddressBarView *GetView() const;
 
@@ -40,7 +40,7 @@ private:
 		AlwaysFetch
 	};
 
-	AddressBar(AddressBarView *view, App *app, BrowserWindow *browserWindow);
+	AddressBar(AddressBarView *view, App *app, BrowserWindow *browser);
 	~AddressBar() = default;
 
 	void Initialize();
@@ -63,7 +63,7 @@ private:
 
 	AddressBarView *const m_view;
 	App *const m_app;
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

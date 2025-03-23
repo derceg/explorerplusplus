@@ -112,10 +112,11 @@ public:
 
 	// BrowserWindow
 	int GetId() const override;
+	HWND GetHWND() const override;
 	boost::signals2::connection AddBrowserInitializedObserver(
 		const BrowserInitializedSignal::slot_type &observer) override;
-	BrowserPane *GetActivePane() const override;
 	BrowserCommandController *GetCommandController() override;
+	BrowserPane *GetActivePane() const override;
 	void FocusActiveTab() override;
 	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
 
@@ -126,10 +127,10 @@ public:
 	// exist.
 	ShellBrowser *GetActiveShellBrowser() override;
 
-	HWND GetHWND() const override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;
+	void FocusChanged() override;
 	void TryClose() override;
 	void Close() override;
 
@@ -480,7 +481,6 @@ private:
 	HWND GetTreeView() const override;
 	IDirectoryMonitor *GetDirectoryMonitor() const override;
 	CachedIcons *GetCachedIcons() override;
-	void FocusChanged() override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
 	boost::signals2::connection AddDeviceChangeObserver(
