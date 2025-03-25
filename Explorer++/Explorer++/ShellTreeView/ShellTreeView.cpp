@@ -111,43 +111,19 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		m_config->showFolders.addObserver(std::bind(&ShellTreeView::UpdateSelection, this)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
-		[this](const NavigationRequest *request)
-		{
-			const auto *tab = request->GetShellBrowser()->GetTab();
+		std::bind(&ShellTreeView::UpdateSelection, this),
+		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
 
-			if (m_browserWindow->GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-			{
-				UpdateSelection();
-			}
-		},
-		NavigationEventScope::ForBrowser(*m_browserWindow)));
-
+	// When manually selecting an item in the treeview, a navigation will be initiated. It's
+	// possible that navigation may fail, in which case, the selection will be reset by this
+	// observer.
 	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
-		[this](const NavigationRequest *request)
-		{
-			const auto *tab = request->GetShellBrowser()->GetTab();
-
-			if (m_browserWindow->GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-			{
-				// When manually selecting an item in the treeview, a navigation will be initiated.
-				// It's possible that navigation may fail, in which case, the selection will be
-				// reset here.
-				UpdateSelection();
-			}
-		},
-		NavigationEventScope::ForBrowser(*m_browserWindow)));
+		std::bind(&ShellTreeView::UpdateSelection, this),
+		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCancelledObserver(
-		[this](const NavigationRequest *request)
-		{
-			const auto *tab = request->GetShellBrowser()->GetTab();
-
-			if (m_browserWindow->GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-			{
-				UpdateSelection();
-			}
-		},
-		NavigationEventScope::ForBrowser(*m_browserWindow)));
+		std::bind(&ShellTreeView::UpdateSelection, this),
+		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
 
 	m_connections.push_back(
 		m_app->GetTabEvents()->AddSelectedObserver(std::bind(&ShellTreeView::UpdateSelection, this),

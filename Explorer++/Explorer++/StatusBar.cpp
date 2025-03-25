@@ -154,11 +154,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 void Explorerplusplus::OnNavigationStartedStatusBar(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
-
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-	{
-		UpdateStatusBarText(*tab);
-	}
+	UpdateStatusBarText(*tab);
 }
 
 void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
@@ -188,33 +184,21 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 void Explorerplusplus::OnNavigationFailedStatusBar(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
-
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-	{
-		UpdateStatusBarText(*tab);
-	}
+	UpdateStatusBarText(*tab);
 }
 
 void Explorerplusplus::OnNavigationCancelledStatusBar(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
-
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-	{
-		UpdateStatusBarText(*tab);
-	}
+	UpdateStatusBarText(*tab);
 }
 
 void Explorerplusplus::OnNavigationsStoppedStatusBar(const ShellBrowser *shellBrowser)
 {
+	// All pending navigations have been stopped, so it's possible there are no longer any active
+	// navigations, in which case, the status bar text will need to be updated.
 	const auto *tab = shellBrowser->GetTab();
-
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-	{
-		// All pending navigations have been stopped, so it's possible there are no longer any
-		// active navigations, in which case, the status bar text will need to be updated.
-		UpdateStatusBarText(*tab);
-	}
+	UpdateStatusBarText(*tab);
 }
 
 void Explorerplusplus::UpdateStatusBarText(const Tab &tab)

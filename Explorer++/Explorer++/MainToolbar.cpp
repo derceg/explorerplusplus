@@ -145,7 +145,7 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&MainToolbar::OnNavigationCommitted, this),
-		NavigationEventScope::ForBrowser(*m_browserWindow)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
 
 	m_connections.push_back(m_coreInterface->AddFocusChangeObserver(
 		std::bind_front(&MainToolbar::OnFocusChanged, this)));
@@ -869,12 +869,9 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 
 void MainToolbar::OnNavigationCommitted(const NavigationRequest *request)
 {
-	const auto *tab = request->GetShellBrowser()->GetTab();
+	UNREFERENCED_PARAMETER(request);
 
-	if (tab->GetTabContainer()->IsTabSelected(*tab))
-	{
-		UpdateToolbarButtonStates();
-	}
+	UpdateToolbarButtonStates();
 }
 
 void MainToolbar::OnFocusChanged()

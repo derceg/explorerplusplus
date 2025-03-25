@@ -385,6 +385,9 @@
     <ClCompile Include="BrowserTestBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="EventScopeTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

@@ -54,11 +54,11 @@ void AddressBar::Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrows
 
 	m_connections.push_back(shellBrowserEvents->AddDirectoryPropertiesChangedObserver(
 		std::bind_front(&AddressBar::OnDirectoryPropertiesChanged, this),
-		ShellBrowserEventScope::ForBrowser(*m_browser)));
+		ShellBrowserEventScope::ForActiveShellBrowser(*m_browser)));
 
 	m_connections.push_back(navigationEvents->AddCommittedObserver(
 		std::bind_front(&AddressBar::OnNavigationCommitted, this),
-		NavigationEventScope::ForBrowser(*m_browser)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 }
 
 AddressBarView *AddressBar::GetView() const
@@ -195,20 +195,14 @@ void AddressBar::OnTabSelected(const Tab &tab)
 
 void AddressBar::OnNavigationCommitted(const NavigationRequest *request)
 {
-	if (m_browser->IsShellBrowserActive(request->GetShellBrowser()))
-	{
-		UpdateTextAndIcon(request->GetShellBrowser());
-	}
+	UpdateTextAndIcon(request->GetShellBrowser());
 }
 
 void AddressBar::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
-	if (m_browser->IsShellBrowserActive(shellBrowser))
-	{
-		// Since the directory properties have changed, it's possible that the icon has changed.
-		// Therefore, the updated icon should always be retrieved.
-		UpdateTextAndIcon(shellBrowser, IconUpdateType::AlwaysFetch);
-	}
+	// Since the directory properties have changed, it's possible that the icon has changed.
+	// Therefore, the updated icon should always be retrieved.
+	UpdateTextAndIcon(shellBrowser, IconUpdateType::AlwaysFetch);
 }
 
 void AddressBar::UpdateTextAndIcon(const ShellBrowser *shellBrowser, IconUpdateType iconUpdateType)

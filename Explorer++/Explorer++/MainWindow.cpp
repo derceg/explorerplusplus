@@ -35,11 +35,11 @@ MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterfac
 
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
 		std::bind_front(&MainWindow::OnDirectoryPropertiesChanged, this),
-		NavigationEventScope::ForBrowser(*browser)));
+		NavigationEventScope::ForActiveShellBrowser(*browser)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&MainWindow::OnNavigationCommitted, this),
-		NavigationEventScope::ForBrowser(*browser)));
+		NavigationEventScope::ForActiveShellBrowser(*browser)));
 
 	m_connections.push_back(m_app->GetConfig()->showFullTitlePath.addObserver(
 		std::bind_front(&MainWindow::OnShowFullTitlePathUpdated, this)));
@@ -73,22 +73,16 @@ LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void MainWindow::OnNavigationCommitted(const NavigationRequest *request)
 {
-	const auto *tab = request->GetShellBrowser()->GetTab();
+	UNREFERENCED_PARAMETER(request);
 
-	if (tab->GetTabContainer()->IsTabSelected(*tab))
-	{
-		UpdateWindowText();
-	}
+	UpdateWindowText();
 }
 
 void MainWindow::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
-	const auto *tab = shellBrowser->GetTab();
+	UNREFERENCED_PARAMETER(shellBrowser);
 
-	if (tab->GetTabContainer()->IsTabSelected(*tab))
-	{
-		UpdateWindowText();
-	}
+	UpdateWindowText();
 }
 
 void MainWindow::OnTabSelected(const Tab &tab)

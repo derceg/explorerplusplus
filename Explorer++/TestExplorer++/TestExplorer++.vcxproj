@@ -229,6 +229,7 @@
     <ClCompile Include="BookmarkItemTest.cpp" />
     <ClCompile Include="BookmarkTreeTest.cpp" />
     <ClCompile Include="CachedIconsTest.cpp" />
+    <ClCompile Include="EventScopeTest.cpp" />
     <ClCompile Include="ExecutorTestHelper.cpp" />
     <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="FakeSystemClock.cpp" />

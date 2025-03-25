@@ -775,12 +775,8 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 void Explorerplusplus::OnDirectoryContentsChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
-
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-	{
-		UpdateStatusBarText(*tab);
-		UpdateDisplayWindow(*tab);
-	}
+	UpdateStatusBarText(*tab);
+	UpdateDisplayWindow(*tab);
 }
 
 /* A file association has changed. Rather
