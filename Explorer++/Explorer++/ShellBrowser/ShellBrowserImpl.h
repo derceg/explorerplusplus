@@ -39,7 +39,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#define WM_USER_UPDATEWINDOWS (WM_APP + 17)
 #define WM_USER_FILESADDED (WM_APP + 51)
 
 class AcceleratorManager;

@@ -17,9 +17,10 @@ class ShellBrowserEvents : private boost::noncopyable
 public:
 	using Signal = boost::signals2::signal<void(const ShellBrowser *shellBrowser)>;
 
-	// Signaled when the contents of the directory change (e.g. when an item is added).
-	boost::signals2::connection AddDirectoryContentsChangedObserver(
-		const Signal::slot_type &observer, const ShellBrowserEventScope &scope,
+	// Signaled when the displayed items change. That can occur when the contents of the underlying
+	// directory change, as well as when items are filtered/unfiltered.
+	boost::signals2::connection AddItemsChangedObserver(const Signal::slot_type &observer,
+		const ShellBrowserEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	// Signaled when the properties of the directory itself change. For example, when the icon for
@@ -33,7 +34,7 @@ public:
 		const ShellBrowserEventScope &scope,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 
-	void NotifyDirectoryContentsChanged(const ShellBrowser *shellBrowser);
+	void NotifyItemsChanged(const ShellBrowser *shellBrowser);
 	void NotifyDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 	void NotifySelectionChanged(const ShellBrowser *shellBrowser);
 
@@ -52,7 +53,7 @@ private:
 		};
 	}
 
-	Signal m_directoryContentsChangedSignal;
+	Signal m_itemsChangedSignal;
 	Signal m_directoryPropertiesChangedSignal;
 	Signal m_selectionChangedSignal;
 };

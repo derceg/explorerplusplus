@@ -5,12 +5,11 @@
 #include "stdafx.h"
 #include "ShellBrowserEvents.h"
 
-boost::signals2::connection ShellBrowserEvents::AddDirectoryContentsChangedObserver(
+boost::signals2::connection ShellBrowserEvents::AddItemsChangedObserver(
 	const Signal::slot_type &observer, const ShellBrowserEventScope &scope,
 	boost::signals2::connect_position position)
 {
-	return m_directoryContentsChangedSignal.connect(MakeFilteredObserver(observer, scope),
-		position);
+	return m_itemsChangedSignal.connect(MakeFilteredObserver(observer, scope), position);
 }
 
 boost::signals2::connection ShellBrowserEvents::AddDirectoryPropertiesChangedObserver(
@@ -28,9 +27,9 @@ boost::signals2::connection ShellBrowserEvents::AddSelectionChangedObserver(
 	return m_selectionChangedSignal.connect(MakeFilteredObserver(observer, scope), position);
 }
 
-void ShellBrowserEvents::NotifyDirectoryContentsChanged(const ShellBrowser *shellBrowser)
+void ShellBrowserEvents::NotifyItemsChanged(const ShellBrowser *shellBrowser)
 {
-	m_directoryContentsChangedSignal(shellBrowser);
+	m_itemsChangedSignal(shellBrowser);
 }
 
 void ShellBrowserEvents::NotifyDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)

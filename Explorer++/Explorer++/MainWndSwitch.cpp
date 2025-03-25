@@ -103,10 +103,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		break;
 
-	case WM_USER_UPDATEWINDOWS:
-		UpdateWindowStates(GetActivePane()->GetTabContainerImpl()->GetSelectedTab());
-		break;
-
 	case WM_USER_FILESADDED:
 	{
 		Tab *tab = GetActivePane()->GetTabContainerImpl()->GetTabOptional(static_cast<int>(wParam));

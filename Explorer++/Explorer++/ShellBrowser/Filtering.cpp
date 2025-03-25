@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "App.h"
 #include "MainResource.h"
 #include "../Helper/ListViewHelper.h"
 
@@ -80,7 +81,7 @@ void ShellBrowserImpl::RemoveFilteredItems()
 		}
 	}
 
-	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
+	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
 }
 
 void ShellBrowserImpl::RemoveFilteredItem(int iItem, int iItemInternal)
@@ -132,7 +133,7 @@ void ShellBrowserImpl::UnfilterAllItems()
 	}
 
 	m_directoryState.filteredItemsList.clear();
-	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
+	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
 }
 
 void ShellBrowserImpl::UnfilterItem(int internalIndex)
@@ -141,7 +142,7 @@ void ShellBrowserImpl::UnfilterItem(int internalIndex)
 
 	RestoreFilteredItem(internalIndex);
 	m_directoryState.filteredItemsList.erase(internalIndex);
-	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
+	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
 }
 
 void ShellBrowserImpl::RestoreFilteredItem(int internalIndex)
