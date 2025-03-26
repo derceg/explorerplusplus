@@ -145,6 +145,14 @@ void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	}
 }
 
+boost::signals2::connection BrowserWindowFake::AddMenuHelpTextRequestObserver(
+	const MenuHelpTextRequestSignal::slot_type &observer)
+{
+	UNREFERENCED_PARAMETER(observer);
+
+	return {};
+}
+
 Tab *BrowserWindowFake::AddTab()
 {
 	auto tab = std::make_unique<Tab>(

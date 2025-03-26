@@ -990,9 +990,6 @@
     <ClInclude Include="CommandLine.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="SignalWrapper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="TabBacking.h">
       <Filter>Tabs</Filter>
     </ClInclude>

@@ -38,6 +38,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/StatusBar.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include <boost/range/adaptor/map.hpp>

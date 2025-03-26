@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SignalWrapper.h"
+#include "../Helper/SignalWrapper.h"
 #include <optional>
 
 struct Config;

@@ -111,6 +111,14 @@ public:
 		UNREFERENCED_PARAMETER(openFolderDisposition);
 	}
 
+	boost::signals2::connection AddMenuHelpTextRequestObserver(
+		const MenuHelpTextRequestSignal::slot_type &observer) override
+	{
+		UNREFERENCED_PARAMETER(observer);
+
+		return {};
+	}
+
 private:
 	BrowserTracker m_browserTracker;
 };

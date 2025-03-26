@@ -36,4 +36,8 @@ public:
 		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(void, OpenItem,
 		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
+
+	// MenuHelpTextRequest
+	MOCK_METHOD(boost::signals2::connection, AddMenuHelpTextRequestObserver,
+		(const MenuHelpTextRequestSignal::slot_type &observer), (override));
 };

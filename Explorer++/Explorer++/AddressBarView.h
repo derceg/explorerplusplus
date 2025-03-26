@@ -5,7 +5,7 @@
 #pragma once
 
 #include "MainFontSetter.h"
-#include "SignalWrapper.h"
+#include "../Helper/SignalWrapper.h"
 #include <memory>
 #include <optional>
 #include <string>

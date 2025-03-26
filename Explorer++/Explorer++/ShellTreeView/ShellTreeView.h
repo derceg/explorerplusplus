@@ -6,11 +6,11 @@
 
 #include "MainFontSetter.h"
 #include "ShellChangeWatcher.h"
-#include "SignalWrapper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"

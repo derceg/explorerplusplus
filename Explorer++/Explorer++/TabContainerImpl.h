@@ -9,11 +9,11 @@
 #include "OneShotTimer.h"
 #include "OneShotTimerManager.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
+#include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include "SignalWrapper.h"
+#include "../Helper/SignalWrapper.h"
 #include <tchar.h>
 
 class BookmarkTree

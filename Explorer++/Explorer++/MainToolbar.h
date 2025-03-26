@@ -9,10 +9,10 @@
 #include "IconResourceLoader.h"
 #include "MainFontSetter.h"
 #include "MainToolbarStorage.h"
-#include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabHistoryMenu.h"
 #include "../Helper/BaseWindow.h"
+#include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/com.h>
 #include <wil/resource.h>

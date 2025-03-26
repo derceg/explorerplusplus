@@ -5,11 +5,12 @@
 #pragma once
 
 #include "PidlHelper.h"
-#include "StatusBar.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/com.h>
 #include <optional>
 #include <vector>
+
+class MenuHelpTextRequest;
 
 class ShellContextMenuHandler
 {
@@ -48,7 +49,7 @@ public:
 	static const int MAX_SHELL_MENU_ID = 1000;
 
 	ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems,
-		ShellContextMenuHandler *handler, StatusBar *statusBar);
+		ShellContextMenuHandler *handler, MenuHelpTextRequest *menuHelpTextRequest);
 
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);
 
@@ -58,10 +59,12 @@ private:
 
 	LRESULT ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	std::optional<std::wstring> MaybeGetMenuHelpText(HMENU shellContextMenu, HMENU menu, int id);
+
 	const PidlAbsolute m_pidlParent;
 	const std::vector<PidlChild> m_pidlItems;
 	ShellContextMenuHandler *const m_handler;
-	StatusBar *const m_statusBar;
+	MenuHelpTextRequest *const m_menuHelpTextRequest;
 	wil::com_ptr_nothrow<IContextMenu> m_contextMenu;
 };
 

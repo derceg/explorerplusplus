@@ -4,19 +4,19 @@
 
 #include "stdafx.h"
 #include "ShellContextMenu.h"
+#include "MenuHelpTextRequest.h"
 #include "MenuHelper.h"
 #include "ShellHelper.h"
-#include "StatusBar.h"
 #include "StringHelper.h"
 #include "WindowSubclass.h"
 
 ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent,
 	const std::vector<PCITEMID_CHILD> &pidlItems, ShellContextMenuHandler *handler,
-	StatusBar *statusBar) :
+	MenuHelpTextRequest *menuHelpTextRequest) :
 	m_pidlParent(pidlParent),
 	m_pidlItems(pidlItems.begin(), pidlItems.end()),
 	m_handler(handler),
-	m_statusBar(statusBar)
+	m_menuHelpTextRequest(menuHelpTextRequest)
 {
 }
 
@@ -75,8 +75,13 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ShellContextMenu::ParentWindowSubclass, this));
 
+	auto helpTextConnection = m_menuHelpTextRequest->AddMenuHelpTextRequestObserver(
+		std::bind_front(&ShellContextMenu::MaybeGetMenuHelpText, this, menu.get()));
+
 	UINT cmd =
 		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, hwnd, nullptr);
+
+	helpTextConnection.disconnect();
 
 	// When the selected command is invoked below, it could potentially do anything, including show
 	// another menu. It doesn't make sense for the subclass to be called in that situation and
@@ -94,9 +99,9 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 		// indicates that the application has incorrectly added items within this range.
 		CHECK(m_contextMenu);
 
-		TCHAR verb[64] = _T("");
+		wchar_t verb[64] = _T("");
 		HRESULT hr = m_contextMenu->GetCommandString(cmd - MIN_SHELL_MENU_ID, GCS_VERB, nullptr,
-			reinterpret_cast<LPSTR>(verb), static_cast<UINT>(std::size(verb)));
+			reinterpret_cast<LPSTR>(verb), std::size(verb));
 
 		bool handled = false;
 
@@ -250,56 +255,34 @@ LRESULT ShellContextMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wPara
 			contextMenu2->HandleMenuMsg(msg, wParam, lParam);
 		}
 		break;
-
-	case WM_MENUSELECT:
-	{
-		if (!m_statusBar)
-		{
-			break;
-		}
-
-		if (HIWORD(wParam) == 0xFFFF && lParam == 0)
-		{
-			m_statusBar->HandleStatusBarMenuClose();
-		}
-		else
-		{
-			m_statusBar->HandleStatusBarMenuOpen();
-
-			UINT menuItemId = LOWORD(wParam);
-
-			if (WI_IsAnyFlagSet(HIWORD(wParam), MF_POPUP | MF_SEPARATOR))
-			{
-				m_statusBar->SetPartText(0, L"");
-			}
-			else if (menuItemId >= MIN_SHELL_MENU_ID && menuItemId <= MAX_SHELL_MENU_ID)
-			{
-				CHECK(m_contextMenu);
-
-				TCHAR helpString[512];
-				HRESULT hr = m_contextMenu->GetCommandString(menuItemId - MIN_SHELL_MENU_ID,
-					GCS_HELPTEXT, nullptr, reinterpret_cast<LPSTR>(helpString),
-					static_cast<UINT>(std::size(helpString)));
-
-				if (FAILED(hr))
-				{
-					StringCchCopy(helpString, std::size(helpString), L"");
-				}
-
-				m_statusBar->SetPartText(0, helpString);
-			}
-			else
-			{
-				std::wstring helpString = m_handler->GetHelpTextForItem(menuItemId);
-				m_statusBar->SetPartText(0, helpString.c_str());
-			}
-		}
-
-		// Prevent the message from been passed onto the original window.
-		return 0;
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+std::optional<std::wstring> ShellContextMenu::MaybeGetMenuHelpText(HMENU shellContextMenu,
+	HMENU menu, int id)
+{
+	if (!MenuHelper::IsPartOfMenu(shellContextMenu, menu))
+	{
+		return std::nullopt;
+	}
+
+	if (id >= MIN_SHELL_MENU_ID && id <= MAX_SHELL_MENU_ID)
+	{
+		CHECK(m_contextMenu);
+
+		wchar_t helpText[512];
+		HRESULT hr = m_contextMenu->GetCommandString(id - MIN_SHELL_MENU_ID, GCS_HELPTEXT, nullptr,
+			reinterpret_cast<LPSTR>(helpText), std::size(helpText));
+
+		if (FAILED(hr))
+		{
+			StringCchCopy(helpText, std::size(helpText), L"");
+		}
+
+		return helpText;
+	}
+
+	return m_handler->GetHelpTextForItem(id);
 }

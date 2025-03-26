@@ -718,7 +718,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						ILRemoveLastID(pidlDirectory.get());
 
 						ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this,
-							m_coreInterface->GetStatusBar());
+							m_browserWindow);
 
 						DWORD dwCursorPos = GetMessagePos();
 

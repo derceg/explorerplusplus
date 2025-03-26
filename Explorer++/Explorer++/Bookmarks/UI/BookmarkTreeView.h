@@ -8,7 +8,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "ResourceHelper.h"
-#include "SignalWrapper.h"
+#include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>

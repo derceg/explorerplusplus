@@ -1470,8 +1470,7 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this,
-		m_coreInterface->GetStatusBar());
+	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this, m_browserWindow);
 	shellContextMenu.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
 
 	if (highlightTargetItem)

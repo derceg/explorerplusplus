@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "SignalWrapper.h"
 #include "../Helper/Helper.h"
+#include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>

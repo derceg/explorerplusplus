@@ -201,8 +201,7 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this,
-		m_coreInterface->GetStatusBar());
+	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this, m_browserWindow);
 	shellContextMenu.ShowMenu(m_view->GetHWND(), &ptScreen, nullptr, flags);
 }
 

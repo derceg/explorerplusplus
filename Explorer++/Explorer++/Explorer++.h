@@ -72,6 +72,7 @@ struct RebarBandStorageInfo;
 class Runtime;
 class ShellBrowserImpl;
 class ShellTreeView;
+class StatusBar;
 class TabContainerImpl;
 class TabRestorerMenu;
 struct TabSettings;
@@ -133,6 +134,9 @@ public:
 	void FocusChanged() override;
 	void TryClose() override;
 	void Close() override;
+
+	boost::signals2::connection AddMenuHelpTextRequestObserver(
+		const MenuHelpTextRequestSignal::slot_type &observer) override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -509,14 +513,11 @@ private:
 	boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) override;
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
-	boost::signals2::connection AddGetMenuItemHelperTextObserver(
-		const GetMenuItemHelperTextSignal::slot_type &observer) override;
-	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
+	std::optional<std::wstring> MaybeGetMenuHelpText(HMENU menu, int id);
 	MainMenuSubMenu *MaybeGetMainMenuSubMenuFromId(UINT id);
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
-	StatusBar *GetStatusBar() override;
 	void StartDirectoryMonitoringForTab(const Tab &tab);
 	void StopDirectoryMonitoringForTab(const Tab &tab);
 	int DetermineListViewObjectIndex(HWND hListView);
@@ -568,8 +569,9 @@ private:
 	MainMenuItemMiddleClickedSignal m_mainMenuItemMiddleClickedSignal;
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
 	bool m_mainMenuShowing = false;
-	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
 	std::vector<MainMenuSubMenu> m_mainMenuSubMenus;
+
+	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
 
 	FocusChangedSignal m_focusChangedSignal;
 	bool m_browserClosing = false;

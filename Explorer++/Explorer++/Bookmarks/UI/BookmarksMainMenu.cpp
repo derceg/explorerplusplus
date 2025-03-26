@@ -33,8 +33,8 @@ BookmarksMainMenu::BookmarksMainMenu(App *app, BrowserWindow *browserWindow,
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
-	m_connections.push_back(coreInterface->AddGetMenuItemHelperTextObserver(
-		std::bind_front(&BookmarksMainMenu::MaybeGetMenuItemHelperText, this)));
+	m_connections.push_back(browserWindow->AddMenuHelpTextRequestObserver(
+		std::bind_front(&BookmarksMainMenu::MaybeGetMenuHelpText, this)));
 	m_connections.push_back(coreInterface->AddMainMenuItemMiddleClickedObserver(
 		std::bind_front(&BookmarksMainMenu::OnMenuItemMiddleClicked, this)));
 	m_connections.push_back(coreInterface->AddMainMenuItemRightClickedObserver(
@@ -146,7 +146,7 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu,
 		{ otherBookmarksFolder, BookmarkMenuBuilder::MenuItemType::BookmarkItem } });
 }
 
-std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU menu, UINT id)
+std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuHelpText(HMENU menu, UINT id)
 {
 	if (!MenuHelper::IsPartOfMenu(m_bookmarksMenu.get(), menu))
 	{

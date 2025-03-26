@@ -12,6 +12,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
 #include "../Helper/Controls.h"
+#include "../Helper/StatusBar.h"
 #include "../Helper/WindowHelper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
@@ -129,7 +130,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 			HMENU menu = reinterpret_cast<HMENU>(lParam);
 			UINT menuItemId = LOWORD(wParam);
 
-			helperText = m_getMenuItemHelperTextSignal(menu, menuItemId);
+			helperText = m_menuHelpTextRequestSignal(menu, menuItemId);
 
 			if (!helperText)
 			{

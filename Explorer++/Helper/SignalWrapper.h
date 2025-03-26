@@ -6,14 +6,11 @@
 
 #include <boost/signals2.hpp>
 
-// This class wraps a signal object and is designed to be embedded as a public
-// data member within another class. It has the following functionality:
+// This class wraps a signal object and is designed to be embedded as a public data member within
+// another class. It has the following functionality:
 //
-// 1. It adds an AddObserver() method, to allow outside code to connect a slot
-// to the signal.
-// 2. It allows the embedding class to access the internal signal variable.
-// 3. It disables the assignment operator for the class itself, to stop
-// modifications from outside code.
+// - It adds an AddObserver() method, to allow outside code to connect a slot to the signal.
+// - It allows the embedding class to access the internal signal variable.
 template <class EmbeddingClassType, typename SignalSignature>
 class SignalWrapper
 {

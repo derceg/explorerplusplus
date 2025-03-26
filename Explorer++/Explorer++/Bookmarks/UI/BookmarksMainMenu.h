@@ -38,7 +38,7 @@ private:
 	void AddOtherBookmarksToMenu(HMENU menu, const BookmarkMenuBuilder::MenuIdRange &menuIdRange,
 		int position, std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::MenuInfo &menuInfo);
-	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, UINT id);
+	std::optional<std::wstring> MaybeGetMenuHelpText(HMENU menu, UINT id);
 	bool OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	bool OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt);
 

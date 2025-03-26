@@ -747,9 +747,12 @@
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
+    <ClInclude Include="MenuHelpTextRequest.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />
     <ClInclude Include="ScopedStopSource.h" />
+    <ClInclude Include="SignalHelper.h" />
+    <ClInclude Include="SignalWrapper.h" />
     <ClInclude Include="SystemClock.h" />
     <ClInclude Include="SystemClockImpl.h" />
     <ClInclude Include="UniqueResources.h" />

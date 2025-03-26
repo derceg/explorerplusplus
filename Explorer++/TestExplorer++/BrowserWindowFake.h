@@ -42,6 +42,10 @@ public:
 		OpenFolderDisposition openFolderDisposition) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
+	// MenuHelpTextRequest
+	boost::signals2::connection AddMenuHelpTextRequestObserver(
+		const MenuHelpTextRequestSignal::slot_type &observer) override;
+
 	Tab *AddTab();
 	void ActivateTabAtIndex(size_t index);
 

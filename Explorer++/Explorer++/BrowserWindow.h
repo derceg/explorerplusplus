@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Navigator.h"
+#include "../Helper/MenuHelpTextRequest.h"
 #include <boost/signals2.hpp>
 
 class BrowserCommandController;
@@ -14,7 +15,7 @@ class ShellBrowser;
 struct WindowStorageData;
 
 // Each browser window contains one or more browser panes, with each pane containing a set of tabs.
-class BrowserWindow : public Navigator
+class BrowserWindow : public Navigator, public MenuHelpTextRequest
 {
 public:
 	using BrowserInitializedSignal = boost::signals2::signal<void()>;

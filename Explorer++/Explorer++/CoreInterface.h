@@ -5,31 +5,8 @@
 #pragma once
 
 #include "../Helper/ClipboardHelper.h"
+#include "../Helper/SignalHelper.h"
 #include <boost/signals2.hpp>
-
-// Stops signal propagation after the first successful handler (i.e. the first handler that returns
-// a result that evaluates to true).
-template <typename T>
-struct FirstSuccessfulRequestCombiner
-{
-	typedef T result_type;
-
-	template <typename InputIterator>
-	T operator()(InputIterator first, InputIterator last) const
-	{
-		while (first != last)
-		{
-			if (T fullfilled = *first)
-			{
-				return fullfilled;
-			}
-
-			++first;
-		}
-
-		return T();
-	}
-};
 
 using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
 using MainMenuItemRightClickedSignal =
@@ -38,9 +15,6 @@ using MainMenuItemRightClickedSignal =
 using MainMenuItemMiddleClickedSignal =
 	boost::signals2::signal<bool(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown),
 		FirstSuccessfulRequestCombiner<bool>>;
-using GetMenuItemHelperTextSignal =
-	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, UINT id),
-		FirstSuccessfulRequestCombiner<std::optional<std::wstring>>>;
 using ToolbarContextMenuSignal =
 	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
 using ToolbarContextMenuSelectedSignal =
@@ -52,7 +26,6 @@ class CachedIcons;
 struct Config;
 __interface IDirectoryMonitor;
 class ShellBrowserImpl;
-class StatusBar;
 class TabContainerImpl;
 
 /* Basic interface between Explorerplusplus
@@ -77,8 +50,6 @@ public:
 
 	virtual HWND GetTreeView() const = 0;
 
-	virtual StatusBar *GetStatusBar() = 0;
-
 	virtual void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) = 0;
 	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters) = 0;
 
@@ -101,8 +72,6 @@ public:
 		const MainMenuItemMiddleClickedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddGetMenuItemHelperTextObserver(
-		const GetMenuItemHelperTextSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuSelectedObserver(

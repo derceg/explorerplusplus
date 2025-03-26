@@ -143,8 +143,3 @@ void Explorerplusplus::OnSelectColumns()
 		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();
 }
-
-StatusBar *Explorerplusplus::GetStatusBar()
-{
-	return m_pStatusBar;
-}

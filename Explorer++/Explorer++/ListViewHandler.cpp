@@ -242,7 +242,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
-	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this, m_pStatusBar);
+	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this, this);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -295,7 +295,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 			WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 		}
 
-		ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this, m_pStatusBar);
+		ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this, this);
 		shellContextMenu.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
 	}
 }

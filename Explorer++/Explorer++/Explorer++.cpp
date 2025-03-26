@@ -254,3 +254,9 @@ const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowser();
 }
+
+boost::signals2::connection Explorerplusplus::AddMenuHelpTextRequestObserver(
+	const MenuHelpTextRequestSignal::slot_type &observer)
+{
+	return m_menuHelpTextRequestSignal.connect(observer);
+}

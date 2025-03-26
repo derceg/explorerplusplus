@@ -399,6 +399,15 @@
     <ClInclude Include="ScopedRedrawDisabler.h">
       <Filter>Control Support</Filter>
     </ClInclude>
+    <ClInclude Include="SignalWrapper.h">
+      <Filter>Signals</Filter>
+    </ClInclude>
+    <ClInclude Include="SignalHelper.h">
+      <Filter>Signals</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuHelpTextRequest.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
@@ -433,6 +442,9 @@
     </Filter>
     <Filter Include="Memory">
       <UniqueIdentifier>{9ca19408-c4a1-49a1-9672-ec8017ecabc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Signals">
+      <UniqueIdentifier>{3df411e3-c5d3-4d69-b183-e478238937e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
