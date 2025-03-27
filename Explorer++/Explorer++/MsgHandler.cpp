@@ -24,6 +24,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "StatusBar.h"
+#include "StatusBarView.h"
 #include "Storage.h"
 #include "SystemFontHelper.h"
 #include "TabContainerImpl.h"
@@ -337,7 +338,7 @@ void Explorerplusplus::UpdateLayout()
 	if (m_config->showStatusBar)
 	{
 		RECT statusBarRect;
-		GetWindowRect(m_statusBar->GetHWND(), &statusBarRect);
+		GetWindowRect(m_statusBar->GetView()->GetHWND(), &statusBarRect);
 		indentBottom += GetRectHeight(&statusBarRect);
 	}
 
@@ -492,11 +493,11 @@ void Explorerplusplus::UpdateLayout()
 	/* <---- Status bar ----> */
 
 	RECT statusBarRect;
-	GetWindowRect(m_statusBar->GetHWND(), &statusBarRect);
+	GetWindowRect(m_statusBar->GetView()->GetHWND(), &statusBarRect);
 
 	UINT statusBarShowFlags =
 		(m_config->showStatusBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
-	SetWindowPos(m_statusBar->GetHWND(), nullptr, 0,
+	SetWindowPos(m_statusBar->GetView()->GetHWND(), nullptr, 0,
 		mainWindowHeight - GetRectHeight(&statusBarRect), mainWindowWidth,
 		GetRectHeight(&statusBarRect), statusBarShowFlags);
 }

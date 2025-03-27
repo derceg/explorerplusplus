@@ -1038,6 +1038,7 @@
     <ClCompile Include="HistoryTracker.cpp" />
     <ClCompile Include="ShellBrowser\NavigationEvents.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserEvents.cpp" />
+    <ClCompile Include="StatusBarView.cpp" />
     <ClCompile Include="TabEvents.cpp" />
     <ClCompile Include="LanguageHelper.cpp" />
     <ClCompile Include="LayoutDefaults.cpp" />
@@ -1346,6 +1347,7 @@
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
     <ClInclude Include="StatusBar.h" />
+    <ClInclude Include="StatusBarView.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />

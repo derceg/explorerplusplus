@@ -217,9 +217,6 @@
     <ClCompile Include="Plugins\TabsApi\TabProperties.cpp">
       <Filter>Plugins\TabsApi</Filter>
     </ClCompile>
-    <ClCompile Include="StatusBar.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -804,6 +801,12 @@
     </ClCompile>
     <ClCompile Include="BrowserWindow.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusBarView.cpp">
+      <Filter>Core\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusBar.cpp">
+      <Filter>Core\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1665,8 +1668,11 @@
     <ClInclude Include="AddressBarDelegate.h">
       <Filter>Address Bar\UI\Views</Filter>
     </ClInclude>
+    <ClInclude Include="StatusBarView.h">
+      <Filter>Core\UI\Views</Filter>
+    </ClInclude>
     <ClInclude Include="StatusBar.h">
-      <Filter>Core</Filter>
+      <Filter>Core\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
