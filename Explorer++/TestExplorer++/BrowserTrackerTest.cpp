@@ -62,9 +62,17 @@ public:
 		return nullptr;
 	}
 
-	const ShellBrowser *GetActiveShellBrowser() const
+	const ShellBrowser *GetActiveShellBrowser() const override
 	{
 		return nullptr;
+	}
+
+	std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const override
+	{
+		UNREFERENCED_PARAMETER(menu);
+		UNREFERENCED_PARAMETER(id);
+
+		return std::nullopt;
 	}
 
 	WindowStorageData GetStorageData() const override

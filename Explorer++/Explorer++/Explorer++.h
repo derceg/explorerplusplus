@@ -128,6 +128,7 @@ public:
 	ShellBrowser *GetActiveShellBrowser() override;
 
 	const ShellBrowser *GetActiveShellBrowser() const override;
+	std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;
@@ -395,20 +396,6 @@ private:
 	void OnTreeViewHolderResized(int newWidth);
 	void ToggleDualPane();
 
-	// Status bar
-	void CreateStatusBar();
-	LRESULT StatusBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void SetStatusBarParts();
-	void UpdateStatusBarMinHeight();
-	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStartedStatusBar(const NavigationRequest *request);
-	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
-	void OnNavigationFailedStatusBar(const NavigationRequest *request);
-	void OnNavigationCancelledStatusBar(const NavigationRequest *request);
-	void OnNavigationsStoppedStatusBar(const ShellBrowser *shellBrowser);
-	void UpdateStatusBarText(const Tab &tab);
-	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);
-
 	/* File operations. */
 	void CopyToFolder(bool move);
 	void OpenAllSelectedItems(
@@ -535,7 +522,6 @@ private:
 
 	BrowserCommandController m_commandController;
 
-	HWND m_hStatusBar;
 	HWND m_hTabBacking;
 
 	HWND m_hTabWindowToolbar;
@@ -558,6 +544,7 @@ private:
 
 	MainWindow *m_mainWindow = nullptr;
 	AddressBar *m_addressBar = nullptr;
+	StatusBar *m_statusBar = nullptr;
 
 	DisplayWindow *m_displayWindow = nullptr;
 	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
@@ -652,10 +639,6 @@ private:
 
 	// WM_DEVICECHANGE notifications
 	DeviceChangeSignal m_deviceChangeSignal;
-
-	// Status bar
-	StatusBar *m_pStatusBar = nullptr;
-	std::unique_ptr<MainFontSetter> m_statusBarFontSetter;
 
 	WeakPtrFactory<Explorerplusplus> m_weakPtrFactory;
 };

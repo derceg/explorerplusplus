@@ -22,9 +22,6 @@
     <ClCompile Include="ListViewHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
-    <ClCompile Include="StatusBar.cpp">
-      <Filter>Control Support</Filter>
-    </ClCompile>
     <ClCompile Include="RegistrySettings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
@@ -202,9 +199,6 @@
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="ListViewHelper.h">
-      <Filter>Control Support</Filter>
-    </ClInclude>
-    <ClInclude Include="StatusBar.h">
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="DropHandler.h">

@@ -15,6 +15,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ViewModes.h"
+#include "StatusBar.h"
 #include "Tab.h"
 #include "TabContainerImpl.h"
 #include "TaskbarThumbnails.h"
@@ -37,7 +38,9 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	CreateDirectoryMonitor(&m_pDirMon);
 
-	CreateStatusBar();
+	m_statusBar = StatusBar::Create(m_hContainer, this, m_config, m_app->GetTabEvents(),
+		m_app->GetShellBrowserEvents(), m_app->GetNavigationEvents(), m_app->GetResourceLoader());
+
 	CreateMainRebarAndChildren(storageData);
 	InitializeDisplayWindow();
 	InitializeTabs();

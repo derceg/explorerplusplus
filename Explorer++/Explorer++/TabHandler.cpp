@@ -29,21 +29,9 @@ void Explorerplusplus::InitializeTabs()
 		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(*this),
 		boost::signals2::at_front));
 
-	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(
-		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
-		NavigationEventScope::ForActiveShellBrowser(*this), boost::signals2::at_front));
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
-	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
-		std::bind_front(&Explorerplusplus::OnNavigationFailedStatusBar, this),
-		NavigationEventScope::ForActiveShellBrowser(*this), boost::signals2::at_front));
-	m_connections.push_back(m_app->GetNavigationEvents()->AddCancelledObserver(
-		std::bind_front(&Explorerplusplus::OnNavigationCancelledStatusBar, this),
-		NavigationEventScope::ForActiveShellBrowser(*this), boost::signals2::at_front));
-	m_connections.push_back(m_app->GetNavigationEvents()->AddStoppedObserver(
-		std::bind_front(&Explorerplusplus::OnNavigationsStoppedStatusBar, this),
-		NavigationEventScope::ForActiveShellBrowser(*this), boost::signals2::at_front));
 
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddItemsChangedObserver(
 		std::bind_front(&Explorerplusplus::OnDirectoryContentsChanged, this),

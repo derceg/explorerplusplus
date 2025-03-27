@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 // The advantage of this interface is that it completely separates the task of loading a resource
@@ -14,4 +15,5 @@ public:
 	virtual ~ResourceLoader() = default;
 
 	virtual std::wstring LoadString(UINT stringId) const = 0;
+	virtual std::optional<std::wstring> MaybeLoadString(UINT stringId) const = 0;
 };

@@ -1345,6 +1345,7 @@
     <ClInclude Include="HistoryTracker.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
+    <ClInclude Include="StatusBar.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />

@@ -18,7 +18,6 @@ HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle);
 HWND CreateTabControl(HWND hParent, DWORD dwStyle);
 HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance);
-BOOL PinStatusBar(HWND hStatusBar, int width, int height);
 BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path);
 
 /* Dialog. */

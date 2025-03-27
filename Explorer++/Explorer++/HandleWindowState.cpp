@@ -18,7 +18,6 @@
 
 void Explorerplusplus::UpdateWindowStates(const Tab &tab)
 {
-	UpdateStatusBarText(tab);
 	UpdateDisplayWindow(tab);
 }
 

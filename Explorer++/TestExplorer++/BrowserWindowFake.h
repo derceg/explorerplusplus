@@ -29,6 +29,7 @@ public:
 	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
 	ShellBrowser *GetActiveShellBrowser() override;
 	const ShellBrowser *GetActiveShellBrowser() const override;
+	std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;

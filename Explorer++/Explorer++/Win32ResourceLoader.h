@@ -13,6 +13,7 @@ public:
 	Win32ResourceLoader(HINSTANCE resourceInstance);
 
 	std::wstring LoadString(UINT stringId) const override;
+	std::optional<std::wstring> MaybeLoadString(UINT stringId) const override;
 
 private:
 	const HINSTANCE m_resourceInstance;

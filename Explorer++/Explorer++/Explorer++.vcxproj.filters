@@ -1665,6 +1665,9 @@
     <ClInclude Include="AddressBarDelegate.h">
       <Filter>Address Bar\UI\Views</Filter>
     </ClInclude>
+    <ClInclude Include="StatusBar.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

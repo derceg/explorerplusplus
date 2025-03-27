@@ -32,6 +32,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
+#include "StatusBar.h"
 #include "TabBacking.h"
 #include "TabContainerImpl.h"
 #include "TabRestorer.h"
@@ -69,7 +70,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		break;
 
 	case WM_MENUSELECT:
-		StatusBarMenuSelect(wParam, lParam);
+		m_statusBar->OnMenuSelect(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
 		break;
 
 	case WM_MBUTTONUP:
@@ -96,7 +97,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 			Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 			UpdateDisplayWindow(selectedTab);
-			UpdateStatusBarText(selectedTab);
 			m_mainToolbar->UpdateToolbarButtonStates();
 
 			KillTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID);
@@ -454,7 +454,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case IDM_VIEW_STATUSBAR:
 		m_config->showStatusBar = !m_config->showStatusBar;
-		lShowWindow(m_hStatusBar, m_config->showStatusBar);
 		UpdateLayout();
 		break;
 

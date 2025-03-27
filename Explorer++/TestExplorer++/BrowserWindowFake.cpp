@@ -95,6 +95,14 @@ const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
 	return m_tabs[m_activeTabIndex]->GetShellBrowser();
 }
 
+std::optional<std::wstring> BrowserWindowFake::RequestMenuHelpText(HMENU menu, UINT id) const
+{
+	UNREFERENCED_PARAMETER(menu);
+	UNREFERENCED_PARAMETER(id);
+
+	return std::nullopt;
+}
+
 WindowStorageData BrowserWindowFake::GetStorageData() const
 {
 	return { {}, WindowShowState::Normal };

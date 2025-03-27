@@ -688,7 +688,6 @@
     <ClCompile Include="SetDefaultFileManager.cpp" />
     <ClCompile Include="ShellDropTargetWindow.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
-    <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-Asan|Win32'">Create</PrecompiledHeader>
@@ -784,7 +783,6 @@
     <ClInclude Include="SetDefaultFileManager.h" />
     <ClInclude Include="ShellDropTargetWindow.h" />
     <ClInclude Include="ShellHelper.h" />
-    <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TabHelper.h" />

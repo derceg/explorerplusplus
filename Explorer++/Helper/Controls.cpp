@@ -98,21 +98,6 @@ HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance)
 	return tipWnd;
 }
 
-BOOL PinStatusBar(HWND hStatusBar, int width, int height)
-{
-	RECT rc;
-	BOOL bRet = GetWindowRect(hStatusBar, &rc);
-
-	if (bRet)
-	{
-		/* Pin the status bar to the bottom of the window. */
-		bRet = SetWindowPos(hStatusBar, nullptr, 0, height - GetRectHeight(&rc), width,
-			GetRectHeight(&rc), SWP_NOZORDER);
-	}
-
-	return bRet;
-}
-
 BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 {
 	HIMAGELIST smallIcons;

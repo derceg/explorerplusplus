@@ -21,6 +21,7 @@
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabRestorer.h"
 #include "TabRestorerMenu.h"
@@ -56,7 +57,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 {
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
-	m_hStatusBar = nullptr;
 	m_hTabBacking = nullptr;
 	m_hTabWindowToolbar = nullptr;
 	m_lastActiveWindow = nullptr;
@@ -259,4 +259,16 @@ boost::signals2::connection Explorerplusplus::AddMenuHelpTextRequestObserver(
 	const MenuHelpTextRequestSignal::slot_type &observer)
 {
 	return m_menuHelpTextRequestSignal.connect(observer);
+}
+
+std::optional<std::wstring> Explorerplusplus::RequestMenuHelpText(HMENU menu, UINT id) const
+{
+	auto helpText = m_menuHelpTextRequestSignal(menu, id);
+
+	if (!helpText)
+	{
+		helpText = m_app->GetResourceLoader()->MaybeLoadString(id);
+	}
+
+	return helpText;
 }

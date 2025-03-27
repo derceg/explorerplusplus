@@ -23,6 +23,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
+#include "StatusBar.h"
 #include "Storage.h"
 #include "SystemFontHelper.h"
 #include "TabContainerImpl.h"
@@ -38,7 +39,6 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/StatusBar.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include <boost/range/adaptor/map.hpp>
@@ -337,7 +337,7 @@ void Explorerplusplus::UpdateLayout()
 	if (m_config->showStatusBar)
 	{
 		RECT statusBarRect;
-		GetWindowRect(m_hStatusBar, &statusBarRect);
+		GetWindowRect(m_statusBar->GetHWND(), &statusBarRect);
 		indentBottom += GetRectHeight(&statusBarRect);
 	}
 
@@ -491,7 +491,14 @@ void Explorerplusplus::UpdateLayout()
 
 	/* <---- Status bar ----> */
 
-	PinStatusBar(m_hStatusBar, mainWindowWidth, mainWindowHeight);
+	RECT statusBarRect;
+	GetWindowRect(m_statusBar->GetHWND(), &statusBarRect);
+
+	UINT statusBarShowFlags =
+		(m_config->showStatusBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
+	SetWindowPos(m_statusBar->GetHWND(), nullptr, 0,
+		mainWindowHeight - GetRectHeight(&statusBarRect), mainWindowWidth,
+		GetRectHeight(&statusBarRect), statusBarShowFlags);
 }
 
 void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
@@ -550,8 +557,6 @@ int Explorerplusplus::OnDestroy()
 	// This class depends on the TabContainerImpl instance and needs to be destroyed before the
 	// TabContainerImpl instance is destroyed.
 	m_taskbarThumbnails.reset();
-
-	delete m_pStatusBar;
 
 	return 0;
 }
@@ -776,7 +781,6 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 void Explorerplusplus::OnDirectoryContentsChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
-	UpdateStatusBarText(*tab);
 	UpdateDisplayWindow(*tab);
 }
 

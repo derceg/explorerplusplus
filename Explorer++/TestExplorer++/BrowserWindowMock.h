@@ -23,6 +23,8 @@ public:
 	MOCK_METHOD(void, CreateTabFromPreservedTab, (const PreservedTab *tab), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(const ShellBrowser *, GetActiveShellBrowser, (), (const, override));
+	MOCK_METHOD(std::optional<std::wstring>, RequestMenuHelpText, (HMENU menu, UINT id),
+		(const, override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
 	MOCK_METHOD(bool, IsActive, (), (const, override));
 	MOCK_METHOD(void, Activate, (), (override));
