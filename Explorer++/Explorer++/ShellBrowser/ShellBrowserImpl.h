@@ -39,8 +39,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#define WM_USER_FILESADDED (WM_APP + 51)
-
 class AcceleratorManager;
 class App;
 struct BasicItemInfo_t;
@@ -91,6 +89,7 @@ public:
 	/* Get/Set current state. */
 	unique_pidl_absolute GetDirectoryIdl() const;
 	std::wstring GetDirectory() const;
+	int GetUniqueFolderId() const;
 	bool GetAutoArrange() const;
 	void SetAutoArrange(bool autoArrange);
 	ViewMode GetViewMode() const;
@@ -110,14 +109,6 @@ public:
 	int GetNumSelectedFiles() const;
 	int GetNumSelectedFolders() const;
 	int GetNumSelected() const;
-
-	/* Directory modification support. */
-	void FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
-	void DirectoryAltered();
-	void SetDirMonitorId(int dirMonitorId);
-	void ClearDirMonitorId();
-	std::optional<int> GetDirMonitorId() const;
-	int GetUniqueFolderId() const;
 
 	/* Item information. */
 	WIN32_FIND_DATA GetItemFileFindData(int index) const;
@@ -172,7 +163,6 @@ public:
 	void ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
-	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
 	void AutoSizeColumns();
 
 protected:
@@ -204,13 +194,6 @@ private:
 		ItemInfo_t() : wfd({}), isFindDataValid(false), bDrive(FALSE)
 		{
 		}
-	};
-
-	struct AlteredFile_t
-	{
-		TCHAR szFileName[MAX_PATH];
-		DWORD dwAction;
-		int iFolderIndex;
 	};
 
 	struct AwaitingAdd_t
@@ -496,10 +479,6 @@ private:
 	std::optional<int> GetColumnIndexByType(ColumnType columnType) const;
 	std::optional<ColumnType> GetColumnTypeByIndex(int index) const;
 
-	/* Device change support. */
-	void UpdateDriveIcon(const TCHAR *szDrive);
-	void RemoveDrive(const TCHAR *szDrive);
-
 	/* Directory altered support. */
 	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
 	void ProcessShellChangeNotifications(
@@ -668,7 +647,6 @@ private:
 	const HINSTANCE m_resourceInstance;
 	AcceleratorManager *const m_acceleratorManager;
 	bool m_folderVisited = false;
-	std::optional<int> m_dirMonitorId;
 	int m_iFolderIcon;
 	int m_iFileIcon;
 
@@ -683,13 +661,6 @@ private:
 
 	// Directory monitoring
 	ShellChangeWatcher m_shellChangeWatcher;
-	unique_pidl_absolute m_renamedItemOldPidl;
-
-	/* Stores information on files that
-	have been modified (i.e. created, deleted,
-	renamed, etc). */
-	CRITICAL_SECTION m_csDirectoryAltered;
-	std::list<AlteredFile_t> m_AlteredList;
 
 	int m_middleButtonItem;
 

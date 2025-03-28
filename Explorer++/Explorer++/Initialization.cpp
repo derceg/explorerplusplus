@@ -24,7 +24,6 @@
 #include "ThemeWindowTracker.h"
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
-#include "../Helper/iDirectoryMonitor.h"
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 {
@@ -36,8 +35,6 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	m_mainWindow = MainWindow::Create(m_hContainer, m_app, this, this);
 
 	InitializeMainMenu();
-
-	CreateDirectoryMonitor(&m_pDirMon);
 
 	auto *statusBarView = StatusBarView::Create(m_hContainer, m_config);
 	m_statusBar = StatusBar::Create(statusBarView, this, m_config, m_app->GetTabEvents(),

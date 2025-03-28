@@ -1509,9 +1509,6 @@
     <ClInclude Include="StartupCommandLineProcessor.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShellChangeNotificationType.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="BrowserTracker.h">
       <Filter>Core</Filter>
     </ClInclude>

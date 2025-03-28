@@ -34,9 +34,6 @@
     <ClCompile Include="FolderSize.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="iDirectoryMonitor.cpp">
-      <Filter>Shell</Filter>
-    </ClCompile>
     <ClCompile Include="ShellHelper.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
@@ -241,9 +238,6 @@
       <Filter>Shell</Filter>
     </ClInclude>
     <ClInclude Include="FolderSize.h">
-      <Filter>Shell</Filter>
-    </ClInclude>
-    <ClInclude Include="iDirectoryMonitor.h">
       <Filter>Shell</Filter>
     </ClInclude>
     <ClInclude Include="ShellHelper.h">

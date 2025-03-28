@@ -32,7 +32,6 @@
 #include "WindowStorage.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
@@ -87,11 +86,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	UpdateWindow(m_hContainer);
 
 	m_browserTracker = std::make_unique<BrowserTracker>(app->GetBrowserList(), this);
-}
-
-Explorerplusplus::~Explorerplusplus()
-{
-	m_pDirMon->Release();
 }
 
 HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)

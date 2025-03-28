@@ -56,56 +56,6 @@ void Explorerplusplus::CopyToFolder(bool move)
 	FileOperations::CopyFilesToFolder(m_hContainer, title, pidls, move);
 }
 
-void Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)
-{
-	m_deviceChangeSignal(static_cast<UINT>(wParam), lParam);
-}
-
-boost::signals2::connection Explorerplusplus::AddDeviceChangeObserver(
-	const DeviceChangeSignal::slot_type &observer)
-{
-	return m_deviceChangeSignal.connect(observer);
-}
-
-/*
-RUNS IN CONTEXT OF DIRECTORY MOINTORING WORKER THREAD.
-Possible bugs:
- - The tab may exist at the point of call that checks
-   whether or not the tab index has been freed. However,
-   it's possible it may not exist directly after.
-   Therefore, use a critical section to ensure a tab cannot
-   be freed until at least this call completes.
-
-   If this runs before the tab is freed, the tab existence
-   check will succeed, the shell browser function will be called
-   and this function will exit.
-   If this runs after the tab is freed, the tab existence
-   check will fail, and the shell browser function won't be called.
-*/
-void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction,
-	void *pData)
-{
-	DirectoryAltered *pDirectoryAltered = nullptr;
-	Explorerplusplus *pContainer = nullptr;
-
-	pDirectoryAltered = (DirectoryAltered *) pData;
-	pContainer = (Explorerplusplus *) pDirectoryAltered->pData;
-
-	Tab *tab = pContainer->GetActivePane()->GetTabContainerImpl()->GetTabOptional(
-		pDirectoryAltered->iIndex);
-
-	if (tab)
-	{
-		std::wstring directory = tab->GetShellBrowserImpl()->GetDirectory();
-		LOG(INFO) << "Directory change notification received for \"" << wstrToUtf8Str(directory)
-				  << "\", Action = " << dwAction << ", Filename = \"" << wstrToUtf8Str(szFileName)
-				  << "\"";
-
-		tab->GetShellBrowserImpl()->FilesModified(dwAction, szFileName, pDirectoryAltered->iIndex,
-			pDirectoryAltered->iFolderIndex);
-	}
-}
-
 void Explorerplusplus::FolderSizeCallbackStub(int nFolders, int nFiles,
 	PULARGE_INTEGER lTotalFolderSize, LPVOID pData)
 {

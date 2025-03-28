@@ -114,13 +114,7 @@ void ShellBrowserImpl::ResetFolderState()
 
 	m_directoryState = DirectoryState();
 
-	EnterCriticalSection(&m_csDirectoryAltered);
-	m_AlteredList.clear();
-	LeaveCriticalSection(&m_csDirectoryAltered);
-
 	m_itemInfoMap.clear();
-
-	m_renamedItemOldPidl.reset();
 }
 
 void ShellBrowserImpl::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
@@ -466,6 +460,8 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request)
 
 	RecalcWindowCursor(m_hListView);
 
+	StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
+
 	AddNavigationItems(request, request->GetItems());
 
 	SetNavigationState(NavigationState::Committed);
@@ -501,13 +497,6 @@ void ShellBrowserImpl::AddNavigationItems(const NavigationRequest *request,
 	if (request->GetNavigateParams().navigationType == NavigationType::Up)
 	{
 		SelectItems({ request->GetNavigateParams().originalPidl });
-	}
-
-	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All
-		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
-			&& m_directoryState.virtualFolder))
-	{
-		StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
 	}
 }
 

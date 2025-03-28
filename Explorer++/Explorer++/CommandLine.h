@@ -6,7 +6,6 @@
 
 #include "CrashHandlerHelper.h"
 #include "Feature.h"
-#include "ShellChangeNotificationType.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include <optional>
 #include <variant>
@@ -18,7 +17,6 @@ struct Settings
 {
 	bool enableLogging = false;
 	std::set<Feature> featuresToEnable;
-	std::optional<ShellChangeNotificationType> shellChangeNotificationType;
 	std::wstring language;
 	bool clearRegistrySettings = false;
 	bool removeAsDefault = false;

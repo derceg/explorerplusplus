@@ -20,11 +20,9 @@ using ToolbarContextMenuSignal =
 using ToolbarContextMenuSelectedSignal =
 	boost::signals2::signal<void(HWND sourceWindow, int menuItemId)>;
 using FocusChangedSignal = boost::signals2::signal<void()>;
-using DeviceChangeSignal = boost::signals2::signal<void(UINT eventType, LONG_PTR eventData)>;
 
 class CachedIcons;
 struct Config;
-__interface IDirectoryMonitor;
 class ShellBrowserImpl;
 class TabContainerImpl;
 
@@ -44,7 +42,6 @@ public:
 	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;
 
 	virtual TabContainerImpl *GetTabContainerImpl() const = 0;
-	virtual IDirectoryMonitor *GetDirectoryMonitor() const = 0;
 
 	virtual CachedIcons *GetCachedIcons() = 0;
 
@@ -78,6 +75,4 @@ public:
 		const ToolbarContextMenuSelectedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddDeviceChangeObserver(
-		const DeviceChangeSignal::slot_type &observer) = 0;
 };

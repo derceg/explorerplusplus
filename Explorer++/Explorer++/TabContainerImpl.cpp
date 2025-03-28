@@ -32,7 +32,6 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
@@ -1044,13 +1043,6 @@ bool TabContainerImpl::CloseTab(const Tab &tab)
 	m_app->GetTabEvents()->NotifyPreRemoval(tab, GetTabIndex(tab));
 
 	RemoveTabFromControl(tab);
-
-	auto dirMonitorId = tab.GetShellBrowserImpl()->GetDirMonitorId();
-
-	if (dirMonitorId)
-	{
-		m_coreInterface->GetDirectoryMonitor()->StopDirectoryMonitor(*dirMonitorId);
-	}
 
 	// Taking ownership of the tab here will ensure it's still live when the observers are notified
 	// below.

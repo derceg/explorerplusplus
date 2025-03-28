@@ -129,15 +129,10 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInt
 
 	m_PreviousSortColumnExists = false;
 
-	InitializeCriticalSection(&m_csDirectoryAltered);
-
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_iFolderIcon));
 	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_iFileIcon));
 
 	AddClipboardFormatListener(m_hListView);
-
-	m_connections.push_back(coreInterface->AddDeviceChangeObserver(
-		std::bind_front(&ShellBrowserImpl::OnDeviceChange, this)));
 
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 }
@@ -161,8 +156,6 @@ ShellBrowserImpl::~ShellBrowserImpl()
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
-
-	DeleteCriticalSection(&m_csDirectoryAltered);
 }
 
 HWND ShellBrowserImpl::CreateListView(HWND parent)
@@ -736,21 +729,6 @@ BOOL ShellBrowserImpl::CanCreate() const
 	return bCanCreate;
 }
 
-void ShellBrowserImpl::SetDirMonitorId(int dirMonitorId)
-{
-	m_dirMonitorId = dirMonitorId;
-}
-
-void ShellBrowserImpl::ClearDirMonitorId()
-{
-	m_dirMonitorId.reset();
-}
-
-std::optional<int> ShellBrowserImpl::GetDirMonitorId() const
-{
-	return m_dirMonitorId;
-}
-
 BOOL ShellBrowserImpl::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	std::wstring parsingPath;
@@ -947,191 +925,6 @@ void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	}
 
 	m_directoryState.queuedRenameItem = pidlItem;
-}
-
-void ShellBrowserImpl::OnDeviceChange(UINT eventType, LONG_PTR eventData)
-{
-	// If shell change notifications are enabled, drive additions/removals will be handled through
-	// that.
-	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All
-		|| m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem)
-	{
-		return;
-	}
-
-	/* Note changes made here may have no effect. Since
-	the icon for the cd/dvd/etc. may not have been
-	updated by the time this function is called, it's
-	possible this may not change anything. */
-
-	/* If we are currently not in my computer, this
-	message can be safely ignored (drives are only
-	shown in my computer). */
-	if (CompareVirtualFolders(CSIDL_DRIVES))
-	{
-		switch (eventType)
-		{
-			/* Device has being added/inserted into the system. Update the
-			drives toolbar as necessary. */
-		case DBT_DEVICEARRIVAL:
-		{
-			DEV_BROADCAST_HDR *dbh = nullptr;
-
-			dbh = (DEV_BROADCAST_HDR *) eventData;
-
-			if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
-			{
-				DEV_BROADCAST_VOLUME *pdbv = nullptr;
-				TCHAR chDrive;
-				TCHAR szDrive[4];
-
-				pdbv = (DEV_BROADCAST_VOLUME *) dbh;
-
-				/* Build a string that will form the drive name. */
-				chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-				StringCchPrintf(szDrive, std::size(szDrive), _T("%c:\\"), chDrive);
-
-				if (pdbv->dbcv_flags & DBTF_MEDIA)
-				{
-					UpdateDriveIcon(szDrive);
-				}
-				else
-				{
-					PidlAbsolute simplePidl;
-					HRESULT hr = CreateSimplePidl(szDrive, simplePidl);
-
-					if (SUCCEEDED(hr))
-					{
-						OnItemAdded(simplePidl.Raw());
-					}
-				}
-			}
-		}
-		break;
-
-		case DBT_DEVICEREMOVECOMPLETE:
-		{
-			DEV_BROADCAST_HDR *dbh = nullptr;
-
-			dbh = (DEV_BROADCAST_HDR *) eventData;
-
-			if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
-			{
-				DEV_BROADCAST_VOLUME *pdbv = nullptr;
-				TCHAR chDrive;
-				TCHAR szDrive[4];
-
-				pdbv = (DEV_BROADCAST_VOLUME *) dbh;
-
-				/* Build a string that will form the drive name. */
-				chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-				StringCchPrintf(szDrive, std::size(szDrive), _T("%c:\\"), chDrive);
-
-				/* The device was removed from the system.
-				Remove it from the listview (only if the drive
-				was actually removed - the drive may not have
-				been removed, for example, if a cd/dvd was
-				changed). */
-				if (pdbv->dbcv_flags & DBTF_MEDIA)
-				{
-					UpdateDriveIcon(szDrive);
-				}
-				else
-				{
-					/* At this point, the drive has been completely removed
-					from the system. Therefore, its display name cannot be
-					queried. Need to search for the drive using ONLY its
-					drive letter/name. Once its index in the listview has
-					been determined, it can simply be removed. */
-					RemoveDrive(szDrive);
-				}
-			}
-		}
-		break;
-		}
-	}
-}
-
-void ShellBrowserImpl::UpdateDriveIcon(const TCHAR *szDrive)
-{
-	LVITEM lvItem;
-	SHFILEINFO shfi;
-	HRESULT hr;
-	int iItem = -1;
-	int iItemInternal = -1;
-	int i = 0;
-
-	/* Look for the item using its display name, NOT
-	its drive letter/name. */
-	std::wstring displayName;
-	GetDisplayName(szDrive, SHGDN_INFOLDER, displayName);
-
-	unique_pidl_absolute pidlDrive;
-	hr = SHParseDisplayName(szDrive, nullptr, wil::out_param(pidlDrive), 0, nullptr);
-
-	if (SUCCEEDED(hr))
-	{
-		for (i = 0; i < m_directoryState.numItems; i++)
-		{
-			lvItem.mask = LVIF_PARAM;
-			lvItem.iItem = i;
-			lvItem.iSubItem = 0;
-			ListView_GetItem(m_hListView, &lvItem);
-
-			if (ArePidlsEquivalent(pidlDrive.get(),
-					m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.Raw()))
-			{
-				iItem = i;
-				iItemInternal = (int) lvItem.lParam;
-
-				break;
-			}
-		}
-	}
-
-	if (iItem != -1)
-	{
-		SHGetFileInfo(szDrive, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-
-		m_itemInfoMap.at(iItemInternal).displayName = displayName;
-
-		/* Update the drives icon and display name. */
-		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
-		lvItem.iImage = shfi.iIcon;
-		lvItem.iItem = iItem;
-		lvItem.iSubItem = 0;
-		lvItem.pszText = displayName.data();
-		ListView_SetItem(m_hListView, &lvItem);
-	}
-}
-
-void ShellBrowserImpl::RemoveDrive(const TCHAR *szDrive)
-{
-	LVITEM lvItem;
-	int iItemInternal = -1;
-	int i = 0;
-
-	for (i = 0; i < m_directoryState.numItems; i++)
-	{
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = i;
-		lvItem.iSubItem = 0;
-		ListView_GetItem(m_hListView, &lvItem);
-
-		if (m_itemInfoMap.at((int) lvItem.lParam).bDrive)
-		{
-			if (lstrcmp(szDrive, m_itemInfoMap.at((int) lvItem.lParam).szDrive) == 0)
-			{
-				iItemInternal = (int) lvItem.lParam;
-				break;
-			}
-		}
-	}
-
-	if (iItemInternal != -1)
-	{
-		RemoveItem(iItemInternal);
-	}
 }
 
 int ShellBrowserImpl::GetUniqueFolderId() const

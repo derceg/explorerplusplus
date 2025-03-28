@@ -12,7 +12,6 @@
 #include "LanguageHelper.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
-#include "ShellChangeNotificationType.h"
 #include "Theme.h"
 #include "ValueWrapper.h"
 #include "../Helper/BetterEnumsWrapper.h"
@@ -66,7 +65,6 @@ struct Config
 	bool confirmCloseTabs = false;
 	ValueWrapper<bool> synchronizeTreeview = true;
 	bool displayWindowVertical = false;
-	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;
 
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =

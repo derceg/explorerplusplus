@@ -98,13 +98,6 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 		   "Allows incomplete features that are disabled by default to be enabled")
 		->transform(CLI::CheckedTransformer(featureMap));
 
-	app.add_option("--shell-change-notification-type", settings.shellChangeNotificationType,
-		   "Watch for directory changes through SHChangeNotifyRegister")
-		->transform(CLI::CheckedTransformer(CLI::TransformPairs<ShellChangeNotificationType>{
-			{ "disabled", ShellChangeNotificationType::Disabled },
-			{ "non-filesystem", ShellChangeNotificationType::NonFilesystem },
-			{ "all", ShellChangeNotificationType::All } }));
-
 	app.add_option("--language", settings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
 		"FR, RU, etc).");

@@ -1368,7 +1368,6 @@
     <ClInclude Include="ShellBrowser\NavigationManager.h" />
     <ClInclude Include="ShellBrowser\NavigationRequest.h" />
     <ClInclude Include="ShellBrowser\NavigationRequestDelegate.h" />
-    <ClInclude Include="ShellChangeNotificationType.h" />
     <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
     <ClInclude Include="StartupFoldersRegistryStorage.h" />

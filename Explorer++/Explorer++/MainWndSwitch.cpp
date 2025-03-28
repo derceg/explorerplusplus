@@ -87,10 +87,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	}
 	break;
 
-	case WM_DEVICECHANGE:
-		OnDeviceChange(wParam, lParam);
-		break;
-
 	case WM_TIMER:
 		if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
 		{
@@ -102,17 +98,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 			KillTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID);
 		}
 		break;
-
-	case WM_USER_FILESADDED:
-	{
-		Tab *tab = GetActivePane()->GetTabContainerImpl()->GetTabOptional(static_cast<int>(wParam));
-
-		if (tab)
-		{
-			tab->GetShellBrowserImpl()->DirectoryAltered();
-		}
-	}
-	break;
 
 	case WM_USER_DISPLAYWINDOWRESIZED:
 		OnDisplayWindowResized(wParam);

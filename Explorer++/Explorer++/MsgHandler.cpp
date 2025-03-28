@@ -41,7 +41,6 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
 #include <wil/resource.h>
@@ -562,51 +561,6 @@ int Explorerplusplus::OnDestroy()
 	return 0;
 }
 
-void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
-{
-	if (tab.GetShellBrowserImpl()->InVirtualFolder())
-	{
-		return;
-	}
-
-	DirectoryAltered *directoryAltered = (DirectoryAltered *) malloc(sizeof(DirectoryAltered));
-
-	directoryAltered->iIndex = tab.GetId();
-	directoryAltered->iFolderIndex = tab.GetShellBrowserImpl()->GetUniqueFolderId();
-	directoryAltered->pData = this;
-
-	std::wstring directoryToWatch = tab.GetShellBrowserImpl()->GetDirectory();
-
-	/* Start monitoring the directory that was opened. */
-	LOG(INFO) << "Starting directory monitoring for \"" << wstrToUtf8Str(directoryToWatch) << "\"";
-	auto dirMonitorId = m_pDirMon->WatchDirectory(directoryToWatch.c_str(),
-		FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_DIR_NAME
-			| FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_LAST_WRITE
-			| FILE_NOTIFY_CHANGE_LAST_ACCESS | FILE_NOTIFY_CHANGE_CREATION
-			| FILE_NOTIFY_CHANGE_SECURITY,
-		DirectoryAlteredCallback, FALSE, (void *) directoryAltered);
-
-	if (!dirMonitorId)
-	{
-		return;
-	}
-
-	tab.GetShellBrowserImpl()->SetDirMonitorId(*dirMonitorId);
-}
-
-void Explorerplusplus::StopDirectoryMonitoringForTab(const Tab &tab)
-{
-	auto dirMonitorId = tab.GetShellBrowserImpl()->GetDirMonitorId();
-
-	if (!dirMonitorId)
-	{
-		return;
-	}
-
-	m_pDirMon->StopDirectoryMonitor(*dirMonitorId);
-	tab.GetShellBrowserImpl()->ClearDirMonitorId();
-}
-
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical)
@@ -1011,11 +965,6 @@ TabContainerImpl *Explorerplusplus::GetTabContainerImpl() const
 HWND Explorerplusplus::GetTreeView() const
 {
 	return m_shellTreeView->GetHWND();
-}
-
-IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const
-{
-	return m_pDirMon;
 }
 
 CachedIcons *Explorerplusplus::GetCachedIcons()

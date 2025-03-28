@@ -31,7 +31,7 @@ void Explorerplusplus::InitializeTabs()
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
-		NavigationEventScope::ForBrowser(*this), boost::signals2::at_front));
+		NavigationEventScope::ForActiveShellBrowser(*this), boost::signals2::at_front));
 
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddItemsChangedObserver(
 		std::bind_front(&Explorerplusplus::OnDirectoryContentsChanged, this),
@@ -69,20 +69,7 @@ void Explorerplusplus::OnTabCreated(const Tab &tab, bool selected)
 void Explorerplusplus::OnNavigationCommitted(const NavigationRequest *request)
 {
 	const auto *tab = request->GetShellBrowser()->GetTab();
-
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
-	{
-		UpdateWindowStates(*tab);
-	}
-
-	StopDirectoryMonitoringForTab(*tab);
-
-	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::Disabled
-		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
-			&& !tab->GetShellBrowserImpl()->InVirtualFolder()))
-	{
-		StartDirectoryMonitoringForTab(*tab);
-	}
+	UpdateWindowStates(*tab);
 }
 
 /* Creates a new tab. If a folder is selected, that folder is opened in a new

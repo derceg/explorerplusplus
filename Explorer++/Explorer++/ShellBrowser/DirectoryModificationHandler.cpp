@@ -19,10 +19,6 @@
 
 void ShellBrowserImpl::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 {
-	// Shouldn't be monitoring the same directory with both directory modification notifications and
-	// shell change notifications.
-	assert(!m_dirMonitorId);
-
 	m_shellChangeWatcher.StartWatching(pidl,
 		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
 			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM | SHCNE_DRIVEADD
@@ -148,105 +144,6 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		}
 		break;
 	}
-}
-
-void ShellBrowserImpl::DirectoryAltered()
-{
-	ScopedRedrawDisabler redrawDisabler(m_hListView);
-
-	EnterCriticalSection(&m_csDirectoryAltered);
-
-	// Note that directory change notifications are received asynchronously. That means that, in
-	// each of the cases below, it's not reasonable to assume that the file being referenced
-	// actually exists (since it may have been renamed or deleted since the original notification
-	// was sent).
-	for (const auto &af : m_AlteredList)
-	{
-		// Only undertake the modification if the unique folder index on the modified item and
-		// current folder match up (i.e. ensure the directory has not changed since these files were
-		// modified).
-		if (af.iFolderIndex != m_uniqueFolderId)
-		{
-			continue;
-		}
-
-		wil::com_ptr_nothrow<IShellFolder> parent;
-		HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.Raw(), nullptr,
-			IID_PPV_ARGS(&parent));
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		PidlAbsolute simplePidl;
-		hr = CreateSimplePidl(af.szFileName, simplePidl, parent.get());
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		switch (af.dwAction)
-		{
-		case FILE_ACTION_ADDED:
-			OnItemAdded(simplePidl.Raw());
-			break;
-
-		case FILE_ACTION_RENAMED_OLD_NAME:
-			assert(!m_renamedItemOldPidl);
-			m_renamedItemOldPidl.reset(ILCloneFull(simplePidl.Raw()));
-			break;
-
-		case FILE_ACTION_RENAMED_NEW_NAME:
-			OnItemRenamed(m_renamedItemOldPidl.get(), simplePidl.Raw());
-
-			m_renamedItemOldPidl.reset();
-			break;
-
-		case FILE_ACTION_MODIFIED:
-			OnItemModified(simplePidl.Raw());
-			break;
-
-		case FILE_ACTION_REMOVED:
-			OnItemRemoved(simplePidl.Raw());
-			break;
-		}
-	}
-
-	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
-
-	m_AlteredList.clear();
-
-	LeaveCriticalSection(&m_csDirectoryAltered);
-}
-
-void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
-{
-	UNREFERENCED_PARAMETER(uMsg);
-	UNREFERENCED_PARAMETER(dwTime);
-
-	KillTimer(hwnd, idEvent);
-
-	SendMessage(hwnd, WM_USER_FILESADDED, idEvent, 0);
-}
-
-void ShellBrowserImpl::FilesModified(DWORD Action, const TCHAR *FileName, int EventId,
-	int iFolderIndex)
-{
-	EnterCriticalSection(&m_csDirectoryAltered);
-
-	SetTimer(m_hOwner, EventId, 200, TimerProc);
-
-	AlteredFile_t af;
-
-	StringCchCopy(af.szFileName, std::size(af.szFileName), FileName);
-	af.dwAction = Action;
-	af.iFolderIndex = iFolderIndex;
-
-	m_AlteredList.push_back(af);
-
-	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
 void ShellBrowserImpl::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)

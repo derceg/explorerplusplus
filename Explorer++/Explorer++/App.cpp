@@ -67,11 +67,6 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 
 	m_browserList.willRemoveBrowserSignal.AddObserver(std::bind(&App::OnWillRemoveBrowser, this));
 	m_browserList.browserRemovedSignal.AddObserver(std::bind(&App::OnBrowserRemoved, this));
-
-	if (m_commandLineSettings->shellChangeNotificationType)
-	{
-		m_config.shellChangeNotificationType = *m_commandLineSettings->shellChangeNotificationType;
-	}
 }
 
 App::~App() = default;

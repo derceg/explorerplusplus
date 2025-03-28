@@ -55,7 +55,6 @@ class DrivesToolbar;
 class FrequentLocationsMenu;
 class HistoryMenu;
 class HolderWindow;
-__interface IDirectoryMonitor;
 class ILoadSave;
 class LoadSaveRegistry;
 class LoadSaveXML;
@@ -105,11 +104,6 @@ public:
 	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
 
 	static Explorerplusplus *Create(App *app, const WindowStorageData *storageData = nullptr);
-
-	~Explorerplusplus();
-
-	/* Directory modification. */
-	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 	// BrowserWindow
 	HWND GetHWND() const override;
@@ -168,13 +162,6 @@ private:
 	static const int FONT_SIZE_CHANGE_DELTA = 1_pt;
 
 	static constexpr wchar_t PLUGIN_FOLDER_NAME[] = L"plugins";
-
-	struct DirectoryAltered
-	{
-		int iIndex;
-		int iFolderIndex;
-		void *pData;
-	};
 
 	struct DWFolderSizeCompletion
 	{
@@ -239,7 +226,6 @@ private:
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	int OnDestroy();
-	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnFocusNextWindow(FocusChangeDirection direction);
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryContentsChanged(const ShellBrowser *shellBrowser);
@@ -470,12 +456,9 @@ private:
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainerImpl *GetTabContainerImpl() const override;
 	HWND GetTreeView() const override;
-	IDirectoryMonitor *GetDirectoryMonitor() const override;
 	CachedIcons *GetCachedIcons() override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
-	boost::signals2::connection AddDeviceChangeObserver(
-		const DeviceChangeSignal::slot_type &observer) override;
 
 	/* Menus. */
 	void InitializeMainMenu();
@@ -505,8 +488,6 @@ private:
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
-	void StartDirectoryMonitoringForTab(const Tab &tab);
-	void StopDirectoryMonitoringForTab(const Tab &tab);
 	int DetermineListViewObjectIndex(HWND hListView);
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
@@ -526,8 +507,6 @@ private:
 
 	HWND m_hTabWindowToolbar;
 	wil::unique_himagelist m_tabWindowToolbarImageList;
-
-	IDirectoryMonitor *m_pDirMon;
 
 	/** Internal state. **/
 	HWND m_lastActiveWindow;
@@ -636,9 +615,6 @@ private:
 	/* Display window folder sizes. */
 	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
-
-	// WM_DEVICECHANGE notifications
-	DeviceChangeSignal m_deviceChangeSignal;
 
 	WeakPtrFactory<Explorerplusplus> m_weakPtrFactory;
 };

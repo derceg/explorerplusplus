@@ -12,7 +12,6 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
