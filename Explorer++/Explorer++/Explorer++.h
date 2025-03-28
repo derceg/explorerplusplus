@@ -488,7 +488,6 @@ private:
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
-	int DetermineListViewObjectIndex(HWND hListView);
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
 		LPVOID pData);

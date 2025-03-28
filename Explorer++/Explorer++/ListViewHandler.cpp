@@ -174,19 +174,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	return 0;
 }
 
-int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
-{
-	for (auto &item : GetActivePane()->GetTabContainerImpl()->GetAllTabs())
-	{
-		if (item.second->GetShellBrowserImpl()->GetListView() == hListView)
-		{
-			return item.first;
-		}
-	}
-
-	return -1;
-}
-
 void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 {
 	POINT finalPoint = ptScreen;
