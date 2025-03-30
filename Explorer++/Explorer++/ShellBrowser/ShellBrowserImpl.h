@@ -7,6 +7,7 @@
 #include "ClipboardOperations.h"
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
+#include "FileSystemChangeWatcher.h"
 #include "FolderSettings.h"
 #include "MainFontSetter.h"
 #include "NavigationManager.h"
@@ -303,6 +304,8 @@ private:
 		into the listview. */
 		std::vector<AwaitingAdd_t> awaitingAddList;
 
+		std::unique_ptr<FileSystemChangeWatcher> fileSystemChangeWatcher;
+
 		std::unordered_set<int> filteredItemsList;
 
 		// When an item is pasted or dropped, it will be selected. However, the item may not exist
@@ -479,11 +482,15 @@ private:
 	std::optional<int> GetColumnIndexByType(ColumnType columnType) const;
 	std::optional<ColumnType> GetColumnTypeByIndex(int index) const;
 
-	/* Directory altered support. */
-	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
+	// Directory change handling
+	void StartDirectoryMonitoring();
+	void StartDirectoryMonitoringViaShellChangeWatcher();
+	void StartDirectoryMonitoringViaFileSystemChangeWatcher();
 	void ProcessShellChangeNotifications(
 		const std::vector<ShellChangeNotification> &shellChangeNotifications);
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+		const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void AddItem(PCIDLIST_ABSOLUTE pidl);
 	void RemoveItem(int iItemInternal);

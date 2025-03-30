@@ -27,6 +27,8 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
+#define PATHCCH_NO_DEPRECATE
+
 #include "DisableUnaligned.h"
 
 // Windows Header Files:

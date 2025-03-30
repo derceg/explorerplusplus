@@ -29,6 +29,21 @@
       ]
     },
     {
+      "Id": "142a5743-07c0-4640-bba9-dc93000e1b4c",
+      "Command": "Directory change notify mode",
+      "ExclusiveMode": true,
+      "Items": [
+        {
+          "Id": "a58fedc0-f67b-4ada-a2d8-7056bd8951f4",
+          "Command": "--change-notify-mode shell"
+        },
+        {
+          "Id": "9c0c10c8-b1a0-48df-b075-a55b5b6eac77",
+          "Command": "--change-notify-mode filesystem"
+        }
+      ]
+    },
+    {
       "Id": "10037857-7723-4579-a4d2-9ab1b32334d6",
       "Command": "--enable-logging"
     },

@@ -234,6 +234,7 @@
     <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="FakeSystemClock.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
+    <ClCompile Include="FileSystemChangeWatcherTest.cpp" />
     <ClCompile Include="FrequentLocationsMenuTest.cpp" />
     <ClCompile Include="FrequentLocationsModelTest.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorageTest.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
     <ClCompile Include="HistoryTrackerTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />
+    <ClCompile Include="ScopedTestDir.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
@@ -363,6 +365,7 @@
     <ClInclude Include="DragDropTestHelper.h" />
     <ClInclude Include="ExecutorTestHelper.h" />
     <ClInclude Include="ExecutorTestBase.h" />
+    <ClInclude Include="ExecutorWrapper.h" />
     <ClInclude Include="FakeSystemClock.h" />
     <ClInclude Include="FrequentLocationsStorageTestHelper.h" />
     <ClInclude Include="GeneratorTestHelper.h" />
@@ -377,6 +380,7 @@
     <ClInclude Include="PopupMenuViewTestHelper.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
+    <ClInclude Include="ScopedTestDir.h" />
     <ClInclude Include="ShellEnumeratorFake.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />

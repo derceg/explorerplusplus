@@ -67,6 +67,15 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 
 	m_browserList.willRemoveBrowserSignal.AddObserver(std::bind(&App::OnWillRemoveBrowser, this));
 	m_browserList.browserRemovedSignal.AddObserver(std::bind(&App::OnBrowserRemoved, this));
+
+	if (m_commandLineSettings->changeNotifyMode)
+	{
+		m_config.changeNotifyMode = *m_commandLineSettings->changeNotifyMode;
+	}
+	else if (IsWindowsPE())
+	{
+		m_config.changeNotifyMode = ChangeNotifyMode::Filesystem;
+	}
 }
 
 App::~App() = default;

@@ -808,6 +808,9 @@
     <ClCompile Include="StatusBar.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystemChangeWatcher.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1670,6 +1673,12 @@
     </ClInclude>
     <ClInclude Include="StatusBar.h">
       <Filter>Core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystemChangeWatcher.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeNotifyMode.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

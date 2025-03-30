@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ChangeNotifyMode.h"
 #include "CustomFont.h"
 #include "DefaultColumns.h"
 #include "DisplayWindowDefaults.h"
@@ -45,6 +46,7 @@ struct Config
 	ValueWrapper<Theme> theme = +Theme::Light;
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
+	ChangeNotifyMode changeNotifyMode = ChangeNotifyMode::Shell;
 	bool dualPane = false;
 	bool showStatusBar = true;
 	ValueWrapper<bool> showDisplayWindow = true;

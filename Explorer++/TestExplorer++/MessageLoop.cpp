@@ -4,9 +4,29 @@
 
 #include "pch.h"
 #include "MessageLoop.h"
+#include "UIThreadExecutor.h"
 
-MessageLoop::MessageLoop() : m_initialThreadId(UniqueThreadId::GetForCurrentThread())
+using namespace std::chrono_literals;
+
+MessageLoop::MessageLoop() :
+	m_initialThreadId(UniqueThreadId::GetForCurrentThread()),
+	m_timerQueue(std::make_shared<concurrencpp::timer_queue>(120s))
 {
+}
+
+void MessageLoop::RunWithTimeout(std::chrono::milliseconds timeout,
+	std::shared_ptr<UIThreadExecutor> uiThreadExecutor)
+{
+	DCHECK(UniqueThreadId::GetForCurrentThread() == m_initialThreadId);
+
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4244) // 'argument': conversion from '_Rep' to 'size_t', possible loss of data
+	m_timeoutTimer = m_timerQueue->make_one_shot_timer(timeout, uiThreadExecutor,
+		std::bind_front(&MessageLoop::Stop, this));
+#pragma warning(pop)
+
+	Run();
 }
 
 void MessageLoop::RunUntilIdle()

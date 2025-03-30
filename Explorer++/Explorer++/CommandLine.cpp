@@ -98,6 +98,12 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 		   "Allows incomplete features that are disabled by default to be enabled")
 		->transform(CLI::CheckedTransformer(featureMap));
 
+	app.add_option("--change-notify-mode", settings.changeNotifyMode,
+		   "Allows the directory change implementation to be selected")
+		->transform(CLI::CheckedTransformer(
+			CLI::TransformPairs<ChangeNotifyMode>{ { "shell", ChangeNotifyMode::Shell },
+				{ "filesystem", ChangeNotifyMode::Filesystem } }));
+
 	app.add_option("--language", settings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
 		"FR, RU, etc).");

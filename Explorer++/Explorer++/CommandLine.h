@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ChangeNotifyMode.h"
 #include "CrashHandlerHelper.h"
 #include "Feature.h"
 #include "../Helper/SetDefaultFileManager.h"
@@ -17,6 +18,7 @@ struct Settings
 {
 	bool enableLogging = false;
 	std::set<Feature> featuresToEnable;
+	std::optional<ChangeNotifyMode> changeNotifyMode;
 	std::wstring language;
 	bool clearRegistrySettings = false;
 	bool removeAsDefault = false;

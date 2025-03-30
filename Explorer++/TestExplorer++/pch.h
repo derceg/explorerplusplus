@@ -10,6 +10,8 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
+#define PATHCCH_NO_DEPRECATE
+
 #include "../Helper/DisableUnaligned.h"
 
 // Third-party Header Files:

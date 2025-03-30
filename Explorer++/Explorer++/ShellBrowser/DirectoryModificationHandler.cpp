@@ -17,9 +17,21 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-void ShellBrowserImpl::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
+void ShellBrowserImpl::StartDirectoryMonitoring()
 {
-	m_shellChangeWatcher.StartWatching(pidl,
+	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
+	{
+		StartDirectoryMonitoringViaShellChangeWatcher();
+	}
+	else
+	{
+		StartDirectoryMonitoringViaFileSystemChangeWatcher();
+	}
+}
+
+void ShellBrowserImpl::StartDirectoryMonitoringViaShellChangeWatcher()
+{
+	m_shellChangeWatcher.StartWatching(m_directoryState.pidlDirectory.Raw(),
 		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
 			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM | SHCNE_DRIVEADD
 			| SHCNE_DRIVEREMOVED);
@@ -45,6 +57,14 @@ void ShellBrowserImpl::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 		// no longer exists.
 		m_shellChangeWatcher.StartWatching(rootPidl.get(), SHCNE_RMDIR | SHCNE_UPDATEDIR, true);
 	}
+}
+
+void ShellBrowserImpl::StartDirectoryMonitoringViaFileSystemChangeWatcher()
+{
+	m_directoryState.fileSystemChangeWatcher =
+		FileSystemChangeWatcher::MaybeCreate(m_directoryState.pidlDirectory.Raw(),
+			wil::FolderChangeEvents::All, m_app->GetRuntime()->GetUiThreadExecutor(),
+			std::bind_front(&ShellBrowserImpl::ProcessFileSystemChangeNotification, this));
 }
 
 void ShellBrowserImpl::ProcessShellChangeNotifications(
@@ -144,6 +164,31 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		}
 		break;
 	}
+}
+
+void ShellBrowserImpl::ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+	const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2)
+{
+	switch (event)
+	{
+	case FileSystemChangeWatcher::Event::Added:
+		OnItemAdded(simplePidl1.Raw());
+		break;
+
+	case FileSystemChangeWatcher::Event::Modified:
+		OnItemModified(simplePidl1.Raw());
+		break;
+
+	case FileSystemChangeWatcher::Event::Renamed:
+		OnItemRenamed(simplePidl1.Raw(), simplePidl2.Raw());
+		break;
+
+	case FileSystemChangeWatcher::Event::Removed:
+		OnItemRemoved(simplePidl1.Raw());
+		break;
+	}
+
+	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
 }
 
 void ShellBrowserImpl::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)

@@ -388,6 +388,10 @@
     <ClCompile Include="EventScopeTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystemChangeWatcherTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedTestDir.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -627,6 +631,10 @@
     </ClInclude>
     <ClInclude Include="BrowserTestBase.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedTestDir.h" />
+    <ClInclude Include="ExecutorWrapper.h">
+      <Filter>Async\Executors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -460,7 +460,7 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request)
 
 	RecalcWindowCursor(m_hListView);
 
-	StartDirectoryMonitoring(m_directoryState.pidlDirectory.Raw());
+	StartDirectoryMonitoring();
 
 	AddNavigationItems(request, request->GetItems());
 

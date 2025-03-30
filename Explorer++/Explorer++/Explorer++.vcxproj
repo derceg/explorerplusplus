@@ -1027,6 +1027,7 @@
     <ClCompile Include="DirectoryOperationsHelper.cpp" />
     <ClCompile Include="EventScope.cpp" />
     <ClCompile Include="FeatureList.cpp" />
+    <ClCompile Include="FileSystemChangeWatcher.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="FrequentLocationsMenu.cpp" />
     <ClCompile Include="FrequentLocationsModel.cpp" />
@@ -1288,6 +1289,7 @@
     <ClInclude Include="AddressBarView.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="AppStorage.h" />
+    <ClInclude Include="ChangeNotifyMode.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
@@ -1334,6 +1336,7 @@
     <ClInclude Include="ExitCode.h" />
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
+    <ClInclude Include="FileSystemChangeWatcher.h" />
     <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="FrequentLocationsMenu.h" />
     <ClInclude Include="FrequentLocationsModel.h" />
