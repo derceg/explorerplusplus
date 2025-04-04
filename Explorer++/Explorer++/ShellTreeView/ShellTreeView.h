@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "FileSystemChangeWatcher.h"
 #include "MainFontSetter.h"
 #include "ShellChangeWatcher.h"
 #include "../Helper/DropHandler.h"
@@ -170,6 +171,8 @@ private:
 	void ProcessShellChangeNotifications(
 		const std::vector<ShellChangeNotification> &shellChangeNotifications);
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+		const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl, PCIDLIST_ABSOLUTE simpleUpdatedPidl);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);

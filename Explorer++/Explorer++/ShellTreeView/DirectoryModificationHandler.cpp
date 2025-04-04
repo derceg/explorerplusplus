@@ -13,6 +13,11 @@
 // in the parent folder.
 void ShellTreeView::StartDirectoryMonitoringForDrives()
 {
+	if (m_config->changeNotifyMode != ChangeNotifyMode::Shell)
+	{
+		return;
+	}
+
 	// A pidl is needed in order to start monitoring, though in this case it's not relevant, since
 	// only drive events are monitored. Therefore, the pidl for the root folder (which should always
 	// be available) is used.
@@ -25,20 +30,30 @@ void ShellTreeView::StartDirectoryMonitoringForDrives()
 
 void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(node->GetFullPidl().get(),
-		SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
-			| SHCNE_UPDATEITEM));
+	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
+	{
+		node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(node->GetFullPidl().get(),
+			SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
+				| SHCNE_UPDATEITEM));
+	}
+	else
+	{
+		node->SetFileSystemChangeWatcher(
+			FileSystemChangeWatcher::MaybeCreate(node->GetFullPidl().get(),
+				wil::FolderChangeEvents::DirectoryName | wil::FolderChangeEvents::Attributes
+					| wil::FolderChangeEvents::LastWriteTime,
+				m_app->GetRuntime()->GetUiThreadExecutor(),
+				std::bind_front(&ShellTreeView::ProcessFileSystemChangeNotification, this)));
+	}
 }
 
 void ShellTreeView::StopDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if (node->GetChangeNotifyId() == 0)
+	if (node->GetChangeNotifyId() != 0)
 	{
-		return;
+		m_shellChangeWatcher.StopWatching(node->GetChangeNotifyId());
+		node->ResetChangeNotifyId();
 	}
-
-	m_shellChangeWatcher.StopWatching(node->GetChangeNotifyId());
-	node->ResetChangeNotifyId();
 }
 
 void ShellTreeView::StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node)
@@ -67,8 +82,12 @@ void ShellTreeView::RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *
 
 void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if (node->GetChangeNotifyId() == 0)
+	if ((m_config->changeNotifyMode == ChangeNotifyMode::Shell && node->GetChangeNotifyId() == 0)
+		|| (m_config->changeNotifyMode == ChangeNotifyMode::Filesystem
+			&& !node->GetFileSystemChangeWatcher()))
 	{
+		// Directory monitoring should only be restarted if it's already in place. If it's not in
+		// place (e.g. because the node isn't expanded), there's no need to try to restart it.
 		return;
 	}
 
@@ -111,6 +130,29 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 
 	case SHCNE_UPDATEDIR:
 		OnDirectoryUpdated(change.pidl1.get());
+		break;
+	}
+}
+
+void ShellTreeView::ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+	const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2)
+{
+	switch (event)
+	{
+	case FileSystemChangeWatcher::Event::Added:
+		OnItemAdded(simplePidl1.Raw());
+		break;
+
+	case FileSystemChangeWatcher::Event::Modified:
+		OnItemUpdated(simplePidl1.Raw(), nullptr);
+		break;
+
+	case FileSystemChangeWatcher::Event::Renamed:
+		OnItemUpdated(simplePidl1.Raw(), simplePidl2.Raw());
+		break;
+
+	case FileSystemChangeWatcher::Event::Removed:
+		OnItemRemoved(simplePidl1.Raw());
 		break;
 	}
 }

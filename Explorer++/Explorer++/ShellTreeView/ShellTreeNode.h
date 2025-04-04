@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+class FileSystemChangeWatcher;
 class ShellTreeNode;
 
 using ShellTreeNodes = std::vector<std::unique_ptr<ShellTreeNode>>;
@@ -38,6 +39,10 @@ public:
 	ULONG GetChangeNotifyId() const;
 	void SetChangeNotifyId(ULONG changeNotifyId);
 	void ResetChangeNotifyId();
+
+	const FileSystemChangeWatcher *GetFileSystemChangeWatcher() const;
+	void SetFileSystemChangeWatcher(
+		std::unique_ptr<FileSystemChangeWatcher> fileSystemChangeWatcher);
 
 	ShellTreeNode *GetParent();
 
@@ -77,6 +82,8 @@ private:
 	// This will be non-zero if the directory associated with this item is being monitored for
 	// changes.
 	ULONG m_changeNotifyId = 0;
+
+	std::unique_ptr<FileSystemChangeWatcher> m_fileSystemChangeWatcher;
 
 	ShellTreeNode *m_parent = nullptr;
 	ShellTreeNodes m_children;

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeNode.h"
+#include "FileSystemChangeWatcher.h"
 
 ShellTreeNode::ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl,
 	IShellItem2 *shellItem) :
@@ -144,6 +145,17 @@ void ShellTreeNode::SetChangeNotifyId(ULONG changeNotifyId)
 void ShellTreeNode::ResetChangeNotifyId()
 {
 	m_changeNotifyId = 0;
+}
+
+const FileSystemChangeWatcher *ShellTreeNode::GetFileSystemChangeWatcher() const
+{
+	return m_fileSystemChangeWatcher.get();
+}
+
+void ShellTreeNode::SetFileSystemChangeWatcher(
+	std::unique_ptr<FileSystemChangeWatcher> fileSystemChangeWatcher)
+{
+	m_fileSystemChangeWatcher = std::move(fileSystemChangeWatcher);
 }
 
 ShellTreeNode *ShellTreeNode::GetParent()
