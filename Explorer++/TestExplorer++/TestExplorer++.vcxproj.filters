@@ -388,10 +388,10 @@
     <ClCompile Include="EventScopeTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystemChangeWatcherTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ScopedTestDir.cpp" />
+    <ClCompile Include="FileSystemChangeWatcherTest.cpp">
+      <Filter>Directory Change Watching</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -516,6 +516,9 @@
     </Filter>
     <Filter Include="Address Bar\UI">
       <UniqueIdentifier>{6c73ac98-1cc0-4623-a442-9c888d81bba3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Directory Change Watching">
+      <UniqueIdentifier>{8b1f57ff-8a2e-4dd6-a57c-e8cdbb41507c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
