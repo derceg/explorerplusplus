@@ -9,16 +9,16 @@
 #include <string>
 
 class BrowserWindow;
-class CoreInterface;
 class DriveModel;
 class DrivesToolbarView;
 struct MouseEvent;
+class ResourceLoader;
 
 class DrivesToolbar : private ShellContextMenuHandler
 {
 public:
 	static DrivesToolbar *Create(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface);
+		BrowserWindow *browserWindow, const ResourceLoader *resourceLoader);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
 	DrivesToolbar(DrivesToolbar &&) = delete;
@@ -31,7 +31,7 @@ private:
 	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface);
+		BrowserWindow *browserWindow, const ResourceLoader *resourceLoader);
 	~DrivesToolbar();
 
 	void Initialize();
@@ -60,8 +60,8 @@ private:
 
 	void OnWindowDestroyed();
 
-	DrivesToolbarView *m_view = nullptr;
-	std::unique_ptr<DriveModel> m_driveModel;
-	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
+	DrivesToolbarView *const m_view;
+	const std::unique_ptr<DriveModel> m_driveModel;
+	BrowserWindow *const m_browserWindow;
+	const ResourceLoader *const m_resourceLoader;
 };

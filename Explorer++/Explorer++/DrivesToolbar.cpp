@@ -6,12 +6,12 @@
 #include "DrivesToolbar.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "MainResource.h"
 #include "NavigationHelper.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "TabContainerImpl.h"
 #include "../Helper/MenuHelper.h"
@@ -73,17 +73,17 @@ private:
 
 DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view,
 	std::unique_ptr<DriveModel> driveModel, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface)
+	const ResourceLoader *resourceLoader)
 {
-	return new DrivesToolbar(view, std::move(driveModel), browserWindow, coreInterface);
+	return new DrivesToolbar(view, std::move(driveModel), browserWindow, resourceLoader);
 }
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface) :
+	BrowserWindow *browserWindow, const ResourceLoader *resourceLoader) :
 	m_view(view),
 	m_driveModel(std::move(driveModel)),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface)
+	m_resourceLoader(resourceLoader)
 {
 	Initialize();
 }
@@ -212,8 +212,7 @@ void DrivesToolbar::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(contextMenu);
 
-	std::wstring openInNewTabText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
+	std::wstring openInNewTabText = m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB);
 	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, TRUE);
 }
 
@@ -222,8 +221,7 @@ std::wstring DrivesToolbar::GetHelpTextForItem(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
-		return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
+		return m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
 
 	default:
 		DCHECK(false);
