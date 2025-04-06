@@ -11,6 +11,8 @@
 #include "CommandLine.h"
 #include "Config.h"
 #include "DarkModeManager.h"
+#include "DriveModel.h"
+#include "DriveWatcherImpl.h"
 #include "EventWindow.h"
 #include "FeatureList.h"
 #include "FrequentLocationsModel.h"
@@ -76,6 +78,7 @@ public:
 	ThemeManager *GetThemeManager();
 	HistoryModel *GetHistoryModel();
 	FrequentLocationsModel *GetFrequentLocationsModel();
+	DriveModel *GetDriveModel();
 
 	void TryExit();
 	void SessionEnding();
@@ -134,6 +137,9 @@ private:
 
 	FrequentLocationsModel m_frequentLocationsModel;
 	FrequentLocationsTracker m_frequentLocationsTracker;
+
+	DriveWatcherImpl m_driveWatcher;
+	DriveModel m_driveModel;
 
 	concurrencpp::timer m_saveSettingsTimer;
 

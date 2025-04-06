@@ -4,29 +4,26 @@
 
 #include "stdafx.h"
 #include "DriveWatcherImpl.h"
+#include "EventWindow.h"
 #include "../Helper/DriveInfo.h"
 #include <format>
 
-DriveWatcherImpl::DriveWatcherImpl(HWND topLevelWindow)
+DriveWatcherImpl::DriveWatcherImpl(EventWindow *eventWindow)
 {
-	// WM_DEVICECHANGE is only sent to top-level windows.
-	auto style = GetWindowLongPtr(topLevelWindow, GWL_STYLE);
-	DCHECK(style && WI_IsFlagClear(style, WS_CHILD));
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(topLevelWindow,
-		std::bind_front(&DriveWatcherImpl::WndProc, this)));
+	m_connections.push_back(eventWindow->windowMessageSignal.AddObserver(
+		std::bind_front(&DriveWatcherImpl::OnEventWindowMessage, this)));
 }
 
-LRESULT DriveWatcherImpl::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+void DriveWatcherImpl::OnEventWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	switch (msg)
 	{
 	case WM_DEVICECHANGE:
 		OnDeviceChange(wParam, lParam);
 		break;
 	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 void DriveWatcherImpl::OnDeviceChange(WPARAM wParam, LPARAM lParam)

@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <vector>
 
 class DriveEnumerator;
 class DriveWatcher;
@@ -21,8 +22,7 @@ public:
 	using DriveRemovedSignal =
 		boost::signals2::signal<void(const std::wstring &path, size_t oldIndex)>;
 
-	DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator,
-		std::unique_ptr<DriveWatcher> driveWatcher);
+	DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator, DriveWatcher *driveWatcher);
 	~DriveModel();
 
 	DriveModel(const DriveModel &) = delete;
@@ -48,9 +48,9 @@ private:
 	void RemoveDrive(const std::wstring &path);
 
 	std::set<std::wstring> m_drives;
-	std::unique_ptr<DriveWatcher> m_driveWatcher;
 
 	DriveAddedSignal m_driveAddedSignal;
 	DriveUpdatedSignal m_driveUpdatedSignal;
 	DriveRemovedSignal m_driveRemovedSignal;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

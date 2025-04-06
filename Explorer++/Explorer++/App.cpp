@@ -12,6 +12,7 @@
 #include "ColumnStorage.h"
 #include "ComStaThreadPoolExecutor.h"
 #include "DefaultAccelerators.h"
+#include "DriveEnumeratorImpl.h"
 #include "ExitCode.h"
 #include "IconResourceLoader.h"
 #include "LanguageHelper.h"
@@ -51,6 +52,8 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(&m_systemClock),
 	m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
+	m_driveWatcher(&m_eventWindow),
+	m_driveModel(std::make_unique<DriveEnumeratorImpl>(), &m_driveWatcher),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
@@ -463,6 +466,11 @@ HistoryModel *App::GetHistoryModel()
 FrequentLocationsModel *App::GetFrequentLocationsModel()
 {
 	return &m_frequentLocationsModel;
+}
+
+DriveModel *App::GetDriveModel()
+{
+	return &m_driveModel;
 }
 
 void App::OnWillRemoveBrowser()

@@ -5,15 +5,15 @@
 #pragma once
 
 #include "DriveWatcher.h"
-#include "../Helper/WindowSubclass.h"
 #include <Dbt.h>
-#include <memory>
 #include <vector>
+
+class EventWindow;
 
 class DriveWatcherImpl : public DriveWatcher
 {
 public:
-	DriveWatcherImpl(HWND topLevelWindow);
+	DriveWatcherImpl(EventWindow *eventWindow);
 
 	DriveWatcherImpl(const DriveWatcherImpl &) = delete;
 	DriveWatcherImpl(DriveWatcherImpl &&) = delete;
@@ -35,14 +35,13 @@ private:
 		Removal
 	};
 
-	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnEventWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnDeviceArrivedOrRemoved(DeviceChangeType deviceChangeType,
 		const DEV_BROADCAST_HDR *deviceBroadcast);
 
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-
 	DriveAddedSignal m_driveAddedSignal;
 	DriveUpdatedSignal m_driveUpdatedSignal;
 	DriveRemovedSignal m_driveRemovedSignal;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

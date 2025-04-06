@@ -5,8 +5,9 @@
 #pragma once
 
 #include "../Helper/ShellContextMenu.h"
-#include <memory>
+#include <boost/signals2.hpp>
 #include <string>
+#include <vector>
 
 class BrowserWindow;
 class DriveModel;
@@ -17,7 +18,7 @@ class ResourceLoader;
 class DrivesToolbar : private ShellContextMenuHandler
 {
 public:
-	static DrivesToolbar *Create(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
+	static DrivesToolbar *Create(DrivesToolbarView *view, DriveModel *driveModel,
 		BrowserWindow *browserWindow, const ResourceLoader *resourceLoader);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
@@ -30,8 +31,8 @@ public:
 private:
 	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
-	DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-		BrowserWindow *browserWindow, const ResourceLoader *resourceLoader);
+	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browserWindow,
+		const ResourceLoader *resourceLoader);
 	~DrivesToolbar();
 
 	void Initialize();
@@ -61,7 +62,8 @@ private:
 	void OnWindowDestroyed();
 
 	DrivesToolbarView *const m_view;
-	const std::unique_ptr<DriveModel> m_driveModel;
+	DriveModel *const m_driveModel;
 	BrowserWindow *const m_browserWindow;
 	const ResourceLoader *const m_resourceLoader;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

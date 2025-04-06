@@ -7,9 +7,7 @@
 #include "DriveEnumerator.h"
 #include "DriveWatcher.h"
 
-DriveModel::DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator,
-	std::unique_ptr<DriveWatcher> driveWatcher) :
-	m_driveWatcher(std::move(driveWatcher))
+DriveModel::DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator, DriveWatcher *driveWatcher)
 {
 	auto drivesResult = driveEnumerator->GetDrives();
 
@@ -20,11 +18,12 @@ DriveModel::DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator,
 		m_drives = drivesResult.value();
 	}
 
-	// There's no need to disconnect these observers, as the DriveWatcher instance has the same
-	// lifetime as this class.
-	m_driveWatcher->AddDriveAddedObserver(std::bind_front(&DriveModel::OnDriveAdded, this));
-	m_driveWatcher->AddDriveUpdatedObserver(std::bind_front(&DriveModel::OnDriveUpdated, this));
-	m_driveWatcher->AddDriveRemovedObserver(std::bind_front(&DriveModel::OnDriveRemoved, this));
+	m_connections.push_back(
+		driveWatcher->AddDriveAddedObserver(std::bind_front(&DriveModel::OnDriveAdded, this)));
+	m_connections.push_back(
+		driveWatcher->AddDriveUpdatedObserver(std::bind_front(&DriveModel::OnDriveUpdated, this)));
+	m_connections.push_back(
+		driveWatcher->AddDriveRemovedObserver(std::bind_front(&DriveModel::OnDriveRemoved, this)));
 }
 
 DriveModel::~DriveModel() = default;

@@ -71,17 +71,16 @@ private:
 	std::wstring m_path;
 };
 
-DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view,
-	std::unique_ptr<DriveModel> driveModel, BrowserWindow *browserWindow,
-	const ResourceLoader *resourceLoader)
+DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view, DriveModel *driveModel,
+	BrowserWindow *browserWindow, const ResourceLoader *resourceLoader)
 {
-	return new DrivesToolbar(view, std::move(driveModel), browserWindow, resourceLoader);
+	return new DrivesToolbar(view, driveModel, browserWindow, resourceLoader);
 }
 
-DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
+DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
 	BrowserWindow *browserWindow, const ResourceLoader *resourceLoader) :
 	m_view(view),
-	m_driveModel(std::move(driveModel)),
+	m_driveModel(driveModel),
 	m_browserWindow(browserWindow),
 	m_resourceLoader(resourceLoader)
 {
@@ -94,9 +93,12 @@ void DrivesToolbar::Initialize()
 {
 	AddDrives();
 
-	m_driveModel->AddDriveAddedObserver(std::bind_front(&DrivesToolbar::OnDriveAdded, this));
-	m_driveModel->AddDriveUpdatedObserver(std::bind_front(&DrivesToolbar::OnDriveUpdated, this));
-	m_driveModel->AddDriveRemovedObserver(std::bind_front(&DrivesToolbar::OnDriveRemoved, this));
+	m_connections.push_back(
+		m_driveModel->AddDriveAddedObserver(std::bind_front(&DrivesToolbar::OnDriveAdded, this)));
+	m_connections.push_back(m_driveModel->AddDriveUpdatedObserver(
+		std::bind_front(&DrivesToolbar::OnDriveUpdated, this)));
+	m_connections.push_back(m_driveModel->AddDriveRemovedObserver(
+		std::bind_front(&DrivesToolbar::OnDriveRemoved, this)));
 
 	m_view->AddWindowDestroyedObserver(std::bind_front(&DrivesToolbar::OnWindowDestroyed, this));
 }
