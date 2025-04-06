@@ -46,7 +46,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
-	m_darkModeManager(&m_config),
+	m_darkModeManager(&m_eventWindow, &m_config),
 	m_themeManager(&m_darkModeManager),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(&m_systemClock),

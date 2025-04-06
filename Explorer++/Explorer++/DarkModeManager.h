@@ -9,7 +9,7 @@
 #include <memory>
 
 struct Config;
-class WindowSubclass;
+class EventWindow;
 
 // Based on the code contained within:
 // https://github.com/ysc3839/win32-darkmode/blob/bb241c369fee7b56440420179654bb487f7259cd/win32-darkmode/DarkMode.h
@@ -79,7 +79,7 @@ public:
 	// The color of the hot item (i.e. the item that's selected/under the mouse).
 	static constexpr COLORREF HOT_ITEM_HIGHLIGHT_COLOR = RGB(71, 71, 71);
 
-	DarkModeManager(const Config *config);
+	DarkModeManager(EventWindow *eventWindow, const Config *config);
 
 	bool IsDarkModeSupported() const;
 	bool IsDarkModeEnabled() const;
@@ -112,8 +112,7 @@ private:
 	// Windows 10 1903
 	using SetPreferredAppModeType = PreferredAppMode(WINAPI *)(PreferredAppMode appMode);
 
-	void CreateEventWindow();
-	LRESULT EventWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnEventWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnSettingChange(const wchar_t *systemParameter);
 	void OnThemeUpdated();
 	void UpdateAppDarkModeStatus();
@@ -149,6 +148,4 @@ private:
 	bool m_darkModeEnabled = false;
 	wil::unique_hbrush m_backgroundBrush;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-	wil::unique_hwnd m_eventWindow;
-	std::unique_ptr<WindowSubclass> m_eventWindowSubclass;
 };

@@ -5,14 +5,14 @@
 #include "stdafx.h"
 #include "DarkModeManager.h"
 #include "Config.h"
+#include "EventWindow.h"
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
-#include "../Helper/WindowSubclass.h"
 #include <detours/detours.h>
 #include <wil/common.h>
 
-DarkModeManager::DarkModeManager(const Config *config) :
+DarkModeManager::DarkModeManager(EventWindow *eventWindow, const Config *config) :
 	m_config(config),
 	m_backgroundBrush(CreateSolidBrush(BACKGROUND_COLOR))
 {
@@ -69,7 +69,8 @@ DarkModeManager::DarkModeManager(const Config *config) :
 	m_SetWindowCompositionAttribute = reinterpret_cast<SetWindowCompositionAttributeType>(
 		GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetWindowCompositionAttribute"));
 
-	CreateEventWindow();
+	m_connections.push_back(eventWindow->windowMessageSignal.AddObserver(
+		std::bind_front(&DarkModeManager::OnEventWindowMessage, this)));
 
 	m_connections.push_back(
 		m_config->theme.addObserver(std::bind(&DarkModeManager::OnThemeUpdated, this)));
@@ -89,42 +90,17 @@ bool DarkModeManager::IsDarkModeEnabled() const
 	return m_darkModeEnabled;
 }
 
-void DarkModeManager::CreateEventWindow()
+void DarkModeManager::OnEventWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (m_eventWindow)
-	{
-		return;
-	}
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(wParam);
 
-	static constexpr wchar_t className[] = L"Explorer++EventWindowClass";
-
-	WNDCLASS windowClass = {};
-	windowClass.lpfnWndProc = DefWindowProc;
-	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	windowClass.lpszClassName = className;
-	windowClass.hInstance = GetModuleHandle(nullptr);
-	windowClass.style = 0;
-	auto atom = RegisterClass(&windowClass);
-	CHECK(atom);
-
-	m_eventWindow.reset(CreateWindow(className, L"", WS_DISABLED, CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, GetModuleHandle(nullptr), nullptr));
-	CHECK(m_eventWindow);
-
-	m_eventWindowSubclass = std::make_unique<WindowSubclass>(m_eventWindow.get(),
-		std::bind_front(&DarkModeManager::EventWindowSubclass, this));
-}
-
-LRESULT DarkModeManager::EventWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
 	switch (msg)
 	{
 	case WM_SETTINGCHANGE:
 		OnSettingChange(reinterpret_cast<const wchar_t *>(lParam));
 		break;
 	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 void DarkModeManager::OnSettingChange(const wchar_t *systemParameter)

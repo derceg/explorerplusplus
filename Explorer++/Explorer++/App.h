@@ -11,6 +11,7 @@
 #include "CommandLine.h"
 #include "Config.h"
 #include "DarkModeManager.h"
+#include "EventWindow.h"
 #include "FeatureList.h"
 #include "FrequentLocationsModel.h"
 #include "FrequentLocationsTracker.h"
@@ -105,6 +106,7 @@ private:
 	const CommandLine::Settings *const m_commandLineSettings;
 	bool m_savePreferencesToXmlFile = false;
 	Runtime m_runtime;
+	EventWindow m_eventWindow;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;

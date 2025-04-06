@@ -811,6 +811,9 @@
     <ClCompile Include="FileSystemChangeWatcher.cpp">
       <Filter>Directory Change Watching</Filter>
     </ClCompile>
+    <ClCompile Include="EventWindow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1679,6 +1682,9 @@
     </ClInclude>
     <ClInclude Include="FileSystemChangeWatcher.h">
       <Filter>Directory Change Watching</Filter>
+    </ClInclude>
+    <ClInclude Include="EventWindow.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
