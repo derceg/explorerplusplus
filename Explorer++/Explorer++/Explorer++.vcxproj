@@ -1025,6 +1025,7 @@
     <ClCompile Include="DefaultColumnRegistryStorage.cpp" />
     <ClCompile Include="DefaultColumnXmlStorage.cpp" />
     <ClCompile Include="DirectoryOperationsHelper.cpp" />
+    <ClCompile Include="DriveWatcher.cpp" />
     <ClCompile Include="EventScope.cpp" />
     <ClCompile Include="EventWindow.cpp" />
     <ClCompile Include="FeatureList.cpp" />

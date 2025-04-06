@@ -4,72 +4,14 @@
 
 #include "pch.h"
 #include "DriveModel.h"
-#include "DriveEnumerator.h"
-#include "DriveWatcher.h"
+#include "DriveEnumeratorFake.h"
+#include "DriveWatcherFake.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <set>
 #include <string>
 
 using namespace testing;
-
-class DriveEnumeratorFake : public DriveEnumerator
-{
-public:
-	DriveEnumeratorFake(const std::set<std::wstring> &drives) : m_drives(drives)
-	{
-	}
-
-	outcome::std_result<std::set<std::wstring>> GetDrives() override
-	{
-		return m_drives;
-	}
-
-private:
-	std::set<std::wstring> m_drives;
-};
-
-class DriveWatcherFake : public DriveWatcher
-{
-public:
-	boost::signals2::connection AddDriveAddedObserver(
-		const DriveAddedSignal::slot_type &observer) override
-	{
-		return m_driveAddedSignal.connect(observer);
-	}
-
-	boost::signals2::connection AddDriveUpdatedObserver(
-		const DriveUpdatedSignal::slot_type &observer) override
-	{
-		return m_driveUpdatedSignal.connect(observer);
-	}
-
-	boost::signals2::connection AddDriveRemovedObserver(
-		const DriveRemovedSignal::slot_type &observer) override
-	{
-		return m_driveRemovedSignal.connect(observer);
-	}
-
-	void AddDrive(const std::wstring &path)
-	{
-		m_driveAddedSignal(path);
-	}
-
-	void UpdateDrive(const std::wstring &path)
-	{
-		m_driveUpdatedSignal(path);
-	}
-
-	void RemoveDrive(const std::wstring &path)
-	{
-		m_driveRemovedSignal(path);
-	}
-
-private:
-	DriveAddedSignal m_driveAddedSignal;
-	DriveUpdatedSignal m_driveUpdatedSignal;
-	DriveRemovedSignal m_driveRemovedSignal;
-};
 
 class DriveModelObserverMock
 {

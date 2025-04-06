@@ -236,9 +236,15 @@ void ToolbarView::RemoveButton(size_t index)
 	m_toolbarSizeUpdatedSignal();
 }
 
+const std::vector<std::unique_ptr<ToolbarButton>> &ToolbarView::GetButtons() const
+{
+	return m_buttons;
+}
+
 ToolbarButton *ToolbarView::GetButton(size_t index) const
 {
-	return m_buttons.at(index).get();
+	CHECK_LT(index, m_buttons.size());
+	return m_buttons[index].get();
 }
 
 LRESULT ToolbarView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

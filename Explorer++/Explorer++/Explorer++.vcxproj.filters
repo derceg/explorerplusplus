@@ -814,6 +814,9 @@
     <ClCompile Include="EventWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="DriveWatcher.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">

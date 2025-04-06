@@ -30,14 +30,7 @@ public:
 
 	std::wstring GetText() const override
 	{
-		std::wstring displayText = m_path;
-
-		if (displayText.ends_with(L"\\"))
-		{
-			displayText.pop_back();
-		}
-
-		return displayText;
+		return m_path.substr(0, 1);
 	}
 
 	std::wstring GetTooltipText() const override

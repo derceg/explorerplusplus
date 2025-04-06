@@ -142,6 +142,7 @@ public:
 	void UpdateButton(const ToolbarButton *button);
 	void UpdateButton(size_t index);
 	void RemoveButton(size_t index);
+	const std::vector<std::unique_ptr<ToolbarButton>> &GetButtons() const;
 	ToolbarButton *GetButton(size_t index) const;
 
 	DropLocation GetDropLocation(const POINT &ptScreen);

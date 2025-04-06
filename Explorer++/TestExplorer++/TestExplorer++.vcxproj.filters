@@ -392,6 +392,15 @@
     <ClCompile Include="FileSystemChangeWatcherTest.cpp">
       <Filter>Directory Change Watching</Filter>
     </ClCompile>
+    <ClCompile Include="DriveEnumeratorFake.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="DriveWatcherFake.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivesToolbarTest.cpp">
+      <Filter>Drives Toolbar\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -520,6 +529,9 @@
     <Filter Include="Directory Change Watching">
       <UniqueIdentifier>{8b1f57ff-8a2e-4dd6-a57c-e8cdbb41507c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Drives Toolbar\UI">
+      <UniqueIdentifier>{6b63741e-00c8-4e5e-b404-820a4aa03f6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -638,6 +650,12 @@
     <ClInclude Include="ScopedTestDir.h" />
     <ClInclude Include="ExecutorWrapper.h">
       <Filter>Async\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveEnumeratorFake.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveWatcherFake.h">
+      <Filter>Drives Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -68,22 +68,3 @@ void DriveWatcherImpl::OnDeviceArrivedOrRemoved(DeviceChangeType deviceChangeTyp
 		}
 	}
 }
-
-// DriveWatcher
-boost::signals2::connection DriveWatcherImpl::AddDriveAddedObserver(
-	const DriveAddedSignal::slot_type &observer)
-{
-	return m_driveAddedSignal.connect(observer);
-}
-
-boost::signals2::connection DriveWatcherImpl::AddDriveUpdatedObserver(
-	const DriveUpdatedSignal::slot_type &observer)
-{
-	return m_driveUpdatedSignal.connect(observer);
-}
-
-boost::signals2::connection DriveWatcherImpl::AddDriveRemovedObserver(
-	const DriveRemovedSignal::slot_type &observer)
-{
-	return m_driveRemovedSignal.connect(observer);
-}

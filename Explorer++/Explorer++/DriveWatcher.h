@@ -16,10 +16,14 @@ public:
 
 	virtual ~DriveWatcher() = default;
 
-	virtual boost::signals2::connection AddDriveAddedObserver(
-		const DriveAddedSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddDriveUpdatedObserver(
-		const DriveUpdatedSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddDriveRemovedObserver(
-		const DriveRemovedSignal::slot_type &observer) = 0;
+	boost::signals2::connection AddDriveAddedObserver(const DriveAddedSignal::slot_type &observer);
+	boost::signals2::connection AddDriveUpdatedObserver(
+		const DriveUpdatedSignal::slot_type &observer);
+	boost::signals2::connection AddDriveRemovedObserver(
+		const DriveRemovedSignal::slot_type &observer);
+
+protected:
+	DriveAddedSignal m_driveAddedSignal;
+	DriveUpdatedSignal m_driveUpdatedSignal;
+	DriveRemovedSignal m_driveRemovedSignal;
 };

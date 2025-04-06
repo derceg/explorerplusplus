@@ -20,14 +20,6 @@ public:
 	DriveWatcherImpl &operator=(const DriveWatcherImpl &) = delete;
 	DriveWatcherImpl &operator=(DriveWatcherImpl &&) = delete;
 
-	// DriveWatcher
-	boost::signals2::connection AddDriveAddedObserver(
-		const DriveAddedSignal::slot_type &observer) override;
-	boost::signals2::connection AddDriveUpdatedObserver(
-		const DriveUpdatedSignal::slot_type &observer) override;
-	boost::signals2::connection AddDriveRemovedObserver(
-		const DriveRemovedSignal::slot_type &observer) override;
-
 private:
 	enum class DeviceChangeType
 	{
@@ -40,8 +32,5 @@ private:
 	void OnDeviceArrivedOrRemoved(DeviceChangeType deviceChangeType,
 		const DEV_BROADCAST_HDR *deviceBroadcast);
 
-	DriveAddedSignal m_driveAddedSignal;
-	DriveUpdatedSignal m_driveUpdatedSignal;
-	DriveRemovedSignal m_driveRemovedSignal;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };
