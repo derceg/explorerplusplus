@@ -43,7 +43,7 @@ Explorerplusplus *Explorerplusplus::Create(App *app, const WindowStorageData *st
 Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageData) :
 	m_app(app),
 	m_hContainer(CreateMainWindow(storageData)),
-	m_commandController(this),
+	m_commandController(this, app->GetConfig()),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_pluginMenuManager(m_hContainer, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
 	m_acceleratorUpdater(app->GetAcceleratorManager()),
@@ -247,6 +247,11 @@ ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowser();
+}
+
+void Explorerplusplus::StartMainToolbarCustomization()
+{
+	m_mainToolbar->StartCustomization();
 }
 
 boost::signals2::connection Explorerplusplus::AddMenuHelpTextRequestObserver(

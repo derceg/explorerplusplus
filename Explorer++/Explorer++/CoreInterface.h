@@ -15,10 +15,6 @@ using MainMenuItemRightClickedSignal =
 using MainMenuItemMiddleClickedSignal =
 	boost::signals2::signal<bool(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown),
 		FirstSuccessfulRequestCombiner<bool>>;
-using ToolbarContextMenuSignal =
-	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
-using ToolbarContextMenuSelectedSignal =
-	boost::signals2::signal<void(HWND sourceWindow, int menuItemId)>;
 using FocusChangedSignal = boost::signals2::signal<void()>;
 
 class CachedIcons;
@@ -69,10 +65,6 @@ public:
 		const MainMenuItemMiddleClickedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddToolbarContextMenuObserver(
-		const ToolbarContextMenuSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddToolbarContextMenuSelectedObserver(
-		const ToolbarContextMenuSelectedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) = 0;
 };

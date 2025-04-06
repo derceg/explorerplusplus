@@ -817,6 +817,9 @@
     <ClCompile Include="DriveWatcher.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="ToolbarContextMenu.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1688,6 +1691,9 @@
     </ClInclude>
     <ClInclude Include="EventWindow.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarContextMenu.h">
+      <Filter>Core\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

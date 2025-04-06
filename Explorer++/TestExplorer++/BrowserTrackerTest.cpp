@@ -67,6 +67,10 @@ public:
 		return nullptr;
 	}
 
+	void StartMainToolbarCustomization() override
+	{
+	}
+
 	std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const override
 	{
 		UNREFERENCED_PARAMETER(menu);

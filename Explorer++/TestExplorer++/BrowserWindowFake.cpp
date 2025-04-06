@@ -95,6 +95,10 @@ const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
 	return m_tabs[m_activeTabIndex]->GetShellBrowser();
 }
 
+void BrowserWindowFake::StartMainToolbarCustomization()
+{
+}
+
 std::optional<std::wstring> BrowserWindowFake::RequestMenuHelpText(HMENU menu, UINT id) const
 {
 	UNREFERENCED_PARAMETER(menu);

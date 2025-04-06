@@ -113,6 +113,16 @@ void MenuView::EnableItem(UINT id, bool enable)
 	MenuHelper::EnableItem(GetMenu(), id, enable);
 }
 
+void MenuView::CheckItem(UINT id, bool check)
+{
+	MenuHelper::CheckItem(GetMenu(), id, check);
+}
+
+void MenuView::RemoveTrailingSeparators()
+{
+	MenuHelper::RemoveTrailingSeparators(GetMenu());
+}
+
 void MenuView::ClearMenu()
 {
 	for (int i = GetMenuItemCount(GetMenu()) - 1; i >= 0; i--)

@@ -70,12 +70,6 @@ private:
 	void OnButtonMiddleClicked(const BookmarkItem *bookmarkItem, const MouseEvent &event);
 	void OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
 
-	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
-	void OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId);
-
-	void OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex);
-	void OnPaste(size_t targetIndex);
-
 	void OnWindowDestroyed();
 
 	void OnButtonDragStarted(const BookmarkItem *bookmarkItem);
@@ -97,8 +91,6 @@ private:
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	BookmarkContextMenu m_contextMenu;
 	BookmarkMenu m_bookmarkMenu;
-
-	std::optional<POINT> m_contextMenuLocation;
 
 	// Drag and drop
 	BookmarkItem *m_dropTargetFolder = nullptr;

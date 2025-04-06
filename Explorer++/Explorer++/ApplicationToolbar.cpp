@@ -7,7 +7,6 @@
 #include "App.h"
 #include "Application.h"
 #include "ApplicationContextMenu.h"
-#include "ApplicationEditorDialog.h"
 #include "ApplicationHelper.h"
 #include "ApplicationModel.h"
 #include "ApplicationToolbarView.h"
@@ -16,7 +15,6 @@
 #include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/MenuHelper.h"
 #include <glog/logging.h>
 
 namespace Applications
@@ -98,11 +96,6 @@ void ApplicationToolbar::Initialize()
 	m_connections.push_back(m_model->AddItemRemovedObserver(
 		std::bind_front(&ApplicationToolbar::OnApplicationRemoved, this)));
 
-	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
-		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuPreShow, this)));
-	m_connections.push_back(m_coreInterface->AddToolbarContextMenuSelectedObserver(
-		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuItemSelected, this)));
-
 	m_dropTargetWindow = winrt::make_self<DropTargetWindow>(m_view->GetHWND(),
 		static_cast<DropTargetInternal *>(this));
 
@@ -172,42 +165,6 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	ApplicationContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_model, application,
 		&m_applicationExecutor, m_app->GetResourceLoader(), m_coreInterface, m_themeManager);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
-}
-
-void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
-{
-	UNREFERENCED_PARAMETER(pt);
-
-	if (sourceWindow != m_view->GetHWND())
-	{
-		return;
-	}
-
-	std::wstring newText = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-		IDS_APPLICATIONBUTTON_NEW);
-	MenuHelper::AddStringItem(menu, IDM_APPLICATION_CONTEXT_MENU_NEW, newText,
-		IDM_TOOLBARS_CUSTOMIZE, FALSE);
-}
-
-void ApplicationToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId)
-{
-	if (sourceWindow != m_view->GetHWND())
-	{
-		return;
-	}
-
-	switch (menuItemId)
-	{
-	case IDM_APPLICATION_CONTEXT_MENU_NEW:
-	{
-		ApplicationEditorDialog editorDialog(m_view->GetHWND(),
-			m_coreInterface->GetResourceInstance(), m_themeManager, m_model,
-			ApplicationEditorDialog::EditDetails::AddNewApplication(
-				std::make_unique<Application>(L"", L"")));
-		editorDialog.ShowModalDialog();
-	}
-	break;
-	}
 }
 
 void ApplicationToolbar::OnWindowDestroyed()

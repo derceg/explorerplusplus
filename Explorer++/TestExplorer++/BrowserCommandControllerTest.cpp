@@ -6,6 +6,7 @@
 #include "BrowserCommandController.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "Config.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -20,7 +21,7 @@ protected:
 	BrowserCommandControllerTest() :
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab()),
-		m_commandController(m_browser)
+		m_commandController(m_browser, &m_config)
 	{
 		m_browser->ActivateTabAtIndex(0);
 	}
@@ -31,6 +32,8 @@ protected:
 		auto navigateParams = NavigateParams::Normal(pidl.Raw());
 		tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	}
+
+	Config m_config;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;

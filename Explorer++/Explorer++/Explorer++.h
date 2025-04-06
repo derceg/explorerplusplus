@@ -122,6 +122,7 @@ public:
 	ShellBrowser *GetActiveShellBrowser() override;
 
 	const ShellBrowser *GetActiveShellBrowser() const override;
+	void StartMainToolbarCustomization() override;
 	std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
@@ -250,7 +251,6 @@ private:
 	void OnPasteShortcut();
 	void OnWildcardSelect(BOOL bSelect);
 	void OnResolveLink();
-	void OnToggleLockToolbars();
 	void OnChangeDisplayColors();
 	void OnFilterResults();
 	void OnSortBy(SortMode sortMode);
@@ -357,21 +357,8 @@ private:
 	void CreateApplicationToolbar();
 	void OnAddressBarSizeUpdated();
 	void OnRebarToolbarSizeUpdated(HWND toolbar);
-	boost::signals2::connection AddToolbarContextMenuObserver(
-		const ToolbarContextMenuSignal::slot_type &observer) override;
-	boost::signals2::connection AddToolbarContextMenuSelectedObserver(
-		const ToolbarContextMenuSelectedSignal::slot_type &observer) override;
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
-
-	/* Main toolbar private message handlers. */
-	void OnToolbarRClick(HWND sourceWindow);
-	void OnToolbarMenuItemSelected(HWND sourceWindow, int menuItemId);
-	void OnToggleAddressBar();
-	void OnToggleMainToolbar();
-	void OnToggleBookmarksToolbar();
-	void OnToggleDrivesToolbar();
-	void OnToggleApplicationToolbar();
-	void OnCustomizeMainToolbar();
+	bool OnToolbarRightClick(const NMMOUSE *mouseInfo);
 
 	/* Settings. */
 	void ApplyDisplayWindowPosition();
@@ -551,9 +538,6 @@ private:
 	/* Tabs. */
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
-
-	ToolbarContextMenuSignal m_toolbarContextMenuSignal;
-	ToolbarContextMenuSelectedSignal m_toolbarContextMenuSelectedSignal;
 
 	/* Theming. */
 	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;

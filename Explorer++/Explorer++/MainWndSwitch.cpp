@@ -457,32 +457,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		UpdateLayout();
 		break;
 
-	case IDM_TOOLBARS_ADDRESSBAR:
-		OnToggleAddressBar();
-		break;
-
-	case IDM_TOOLBARS_MAINTOOLBAR:
-		OnToggleMainToolbar();
-		break;
-
-	case IDM_TOOLBARS_BOOKMARKSTOOLBAR:
-		OnToggleBookmarksToolbar();
-		break;
-
-	case IDM_TOOLBARS_DRIVES:
-		OnToggleDrivesToolbar();
-		break;
-
-	case IDM_TOOLBARS_APPLICATIONTOOLBAR:
-		OnToggleApplicationToolbar();
-		break;
-
-	case IDM_TOOLBARS_LOCKTOOLBARS:
-		OnToggleLockToolbars();
-		break;
-
-	case IDM_TOOLBARS_CUSTOMIZE:
-		OnCustomizeMainToolbar();
+	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
+	case IDM_VIEW_TOOLBARS_MAIN_TOOLBAR:
+	case IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR:
+	case IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR:
+	case IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR:
+	case IDM_VIEW_TOOLBARS_LOCK_TOOLBARS:
+	case IDM_VIEW_TOOLBARS_CUSTOMIZE:
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_VIEW_DECREASE_TEXT_SIZE:

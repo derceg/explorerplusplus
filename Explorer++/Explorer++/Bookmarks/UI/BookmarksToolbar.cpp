@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "BookmarksToolbar.h"
-#include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
@@ -13,12 +12,9 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "MainResource.h"
 #include "NavigationHelper.h"
-#include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
-#include "../Helper/MenuHelper.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowHelper.h"
@@ -172,11 +168,6 @@ void BookmarksToolbar::Initialize(IconFetcher *iconFetcher)
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemPreRemoval, this)));
 
-	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
-		std::bind_front(&BookmarksToolbar::OnToolbarContextMenuPreShow, this)));
-	m_connections.push_back(m_coreInterface->AddToolbarContextMenuSelectedObserver(
-		std::bind_front(&BookmarksToolbar::OnToolbarContextMenuItemSelected, this)));
-
 	m_view->AddWindowDestroyedObserver(std::bind_front(&BookmarksToolbar::OnWindowDestroyed, this));
 }
 
@@ -316,78 +307,6 @@ void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const Mo
 
 	m_contextMenu.ShowMenu(m_view->GetHWND(), bookmarkItem->GetParent(), { bookmarkItem },
 		ptScreen);
-}
-
-void BookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
-{
-	if (sourceWindow != m_view->GetHWND())
-	{
-		return;
-	}
-
-	std::wstring newBookmark = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-		IDS_BOOKMARKS_TOOLBAR_NEW_BOOKMARK);
-	MenuHelper::AddStringItem(menu, IDM_BT_NEWBOOKMARK, newBookmark, IDM_TOOLBARS_CUSTOMIZE, FALSE);
-
-	std::wstring newBookmarkFolder = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceInstance(), IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER);
-	MenuHelper::AddStringItem(menu, IDM_BT_NEWFOLDER, newBookmarkFolder, IDM_TOOLBARS_CUSTOMIZE,
-		FALSE);
-
-	std::wstring paste = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-		IDS_BOOKMARKS_TOOLBAR_PASTE);
-	MenuHelper::AddStringItem(menu, IDM_BT_PASTE, paste, IDM_TOOLBARS_CUSTOMIZE, FALSE);
-
-	if (!IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()))
-	{
-		MenuHelper::EnableItem(menu, IDM_BT_PASTE, FALSE);
-	}
-
-	m_contextMenuLocation = pt;
-}
-
-void BookmarksToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId)
-{
-	if (sourceWindow != m_view->GetHWND())
-	{
-		return;
-	}
-
-	CHECK(m_contextMenuLocation);
-
-	POINT ptClient = *m_contextMenuLocation;
-	ScreenToClient(m_view->GetHWND(), &ptClient);
-	size_t targetIndex = m_view->FindNextButtonIndex(ptClient);
-
-	switch (menuItemId)
-	{
-	case IDM_BT_NEWBOOKMARK:
-		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, targetIndex);
-		break;
-
-	case IDM_BT_NEWFOLDER:
-		OnNewBookmarkItem(BookmarkItem::Type::Folder, targetIndex);
-		break;
-
-	case IDM_BT_PASTE:
-		OnPaste(targetIndex);
-		break;
-	}
-
-	m_contextMenuLocation.reset();
-}
-
-void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex)
-{
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type,
-		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_view->GetHWND(), m_themeManager,
-		m_coreInterface, m_iconResourceLoader);
-}
-
-void BookmarksToolbar::OnPaste(size_t targetIndex)
-{
-	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_bookmarkTree->GetBookmarksToolbarFolder(),
-		targetIndex);
 }
 
 BookmarksToolbarView *BookmarksToolbar::GetView() const

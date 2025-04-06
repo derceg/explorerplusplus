@@ -38,6 +38,8 @@ public:
 	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;
 	bool IsShellBrowserActive(const ShellBrowser *shellBrowser) const;
 
+	virtual void StartMainToolbarCustomization() = 0;
+
 	virtual std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const = 0;
 
 	virtual WindowStorageData GetStorageData() const = 0;

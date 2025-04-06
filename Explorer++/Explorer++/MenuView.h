@@ -28,6 +28,8 @@ public:
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
 	void AppendSeparator();
 	void EnableItem(UINT id, bool enable);
+	void CheckItem(UINT id, bool check);
+	void RemoveTrailingSeparators();
 	void ClearMenu();
 	std::wstring GetHelpTextForItem(UINT id) const;
 

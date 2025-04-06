@@ -5,13 +5,15 @@
 #include "stdafx.h"
 #include "BrowserCommandController.h"
 #include "BrowserWindow.h"
+#include "Config.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/ShellHelper.h"
 
-BrowserCommandController::BrowserCommandController(BrowserWindow *browserWindow) :
-	m_browserWindow(browserWindow)
+BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Config *config) :
+	m_browser(browser),
+	m_config(config)
 {
 }
 
@@ -19,6 +21,34 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 {
 	switch (command)
 	{
+	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
+		m_config->showAddressBar = !m_config->showAddressBar.get();
+		break;
+
+	case IDM_VIEW_TOOLBARS_MAIN_TOOLBAR:
+		m_config->showMainToolbar = !m_config->showMainToolbar.get();
+		break;
+
+	case IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR:
+		m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar.get();
+		break;
+
+	case IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR:
+		m_config->showDrivesToolbar = !m_config->showDrivesToolbar.get();
+		break;
+
+	case IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR:
+		m_config->showApplicationToolbar = !m_config->showApplicationToolbar.get();
+		break;
+
+	case IDM_VIEW_TOOLBARS_LOCK_TOOLBARS:
+		m_config->lockToolbars = !m_config->lockToolbars.get();
+		break;
+
+	case IDM_VIEW_TOOLBARS_CUSTOMIZE:
+		m_browser->StartMainToolbarCustomization();
+		break;
+
 	case IDM_GO_BACK:
 		GoBack(disposition);
 		break;
@@ -106,7 +136,7 @@ void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
 			return;
 		}
 
-		m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
+		m_browser->OpenItem(entry->GetPidl().Raw(), disposition);
 	}
 }
 
@@ -127,7 +157,7 @@ void BrowserCommandController::GoForward(OpenFolderDisposition disposition)
 			return;
 		}
 
-		m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
+		m_browser->OpenItem(entry->GetPidl().Raw(), disposition);
 	}
 }
 
@@ -152,13 +182,13 @@ void BrowserCommandController::GoUp(OpenFolderDisposition disposition)
 			return;
 		}
 
-		m_browserWindow->OpenItem(pidlParent.get(), disposition);
+		m_browser->OpenItem(pidlParent.get(), disposition);
 	}
 }
 
 void BrowserCommandController::GoToPath(const std::wstring &path, OpenFolderDisposition disposition)
 {
-	m_browserWindow->OpenItem(path, disposition);
+	m_browser->OpenItem(path, disposition);
 }
 
 void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
@@ -173,10 +203,10 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 		return;
 	}
 
-	m_browserWindow->OpenItem(pidl.get(), disposition);
+	m_browser->OpenItem(pidl.get(), disposition);
 }
 
 ShellBrowser *BrowserCommandController::GetActiveShellBrowser() const
 {
-	return m_browserWindow->GetActiveShellBrowser();
+	return m_browser->GetActiveShellBrowser();
 }

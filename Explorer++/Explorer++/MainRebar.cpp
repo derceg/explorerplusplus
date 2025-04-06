@@ -19,9 +19,11 @@
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "PopupMenuView.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
+#include "ToolbarContextMenu.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
@@ -187,11 +189,11 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		switch (((LPNMHDR) lParam)->code)
 		{
 		case NM_RCLICK:
-		{
-			auto pnmm = reinterpret_cast<LPNMMOUSE>(lParam);
-			OnToolbarRClick(pnmm->hdr.hwndFrom);
-		}
-			return TRUE;
+			if (OnToolbarRightClick(reinterpret_cast<NMMOUSE *>(lParam)))
+			{
+				return TRUE;
+			}
+			break;
 		}
 		break;
 
@@ -203,130 +205,48 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
+bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 {
-	auto parentMenu = wil::unique_hmenu(
-		LoadMenu(m_app->GetResourceInstance(), MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
-
-	if (!parentMenu)
+	if (mouseInfo->dwItemSpec != -1)
 	{
-		return;
+		return false;
 	}
 
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+	ToolbarContextMenu::Source source = ToolbarContextMenu::Source::MainToolbar;
 
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar.get());
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_MAINTOOLBAR, m_config->showMainToolbar.get());
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_BOOKMARKSTOOLBAR,
-		m_config->showBookmarksToolbar.get());
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar.get());
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_APPLICATIONTOOLBAR,
-		m_config->showApplicationToolbar.get());
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars.get());
-
-	DWORD dwPos = GetMessagePos();
-
-	POINT ptCursor;
-	ptCursor.x = GET_X_LPARAM(dwPos);
-	ptCursor.y = GET_Y_LPARAM(dwPos);
-
-	// Give any observers a chance to modify the menu.
-	m_toolbarContextMenuSignal(menu, sourceWindow, ptCursor);
-
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptCursor.x, ptCursor.y, 0,
-		m_mainRebarView->GetHWND(), nullptr);
-
-	if (menuItemId == 0)
+	if (mouseInfo->hdr.hwndFrom == m_addressBar->GetView()->GetHWND())
 	{
-		return;
+		source = ToolbarContextMenu::Source::AddressBar;
+	}
+	else if (mouseInfo->hdr.hwndFrom == m_mainToolbar->GetHWND())
+	{
+		source = ToolbarContextMenu::Source::MainToolbar;
+	}
+	else if (mouseInfo->hdr.hwndFrom == m_bookmarksToolbar->GetView()->GetHWND())
+	{
+		source = ToolbarContextMenu::Source::BookmarksToolbar;
+	}
+	else if (mouseInfo->hdr.hwndFrom == m_drivesToolbar->GetView()->GetHWND())
+	{
+		source = ToolbarContextMenu::Source::DrivesToolbar;
+	}
+	else if (mouseInfo->hdr.hwndFrom == m_applicationToolbar->GetView()->GetHWND())
+	{
+		source = ToolbarContextMenu::Source::ApplicationToolbar;
+	}
+	else
+	{
+		DCHECK(false);
 	}
 
-	OnToolbarMenuItemSelected(sourceWindow, menuItemId);
-}
+	POINT ptScreen = mouseInfo->pt;
+	ClientToScreen(mouseInfo->hdr.hwndFrom, &ptScreen);
 
-void Explorerplusplus::OnToolbarMenuItemSelected(HWND sourceWindow, int menuItemId)
-{
-	switch (menuItemId)
-	{
-	case IDM_TOOLBARS_ADDRESSBAR:
-		OnToggleAddressBar();
-		break;
+	PopupMenuView popupMenu;
+	ToolbarContextMenu toolbarContextMenu(&popupMenu, source, m_app, this, this);
+	popupMenu.Show(m_hContainer, ptScreen);
 
-	case IDM_TOOLBARS_MAINTOOLBAR:
-		OnToggleMainToolbar();
-		break;
-
-	case IDM_TOOLBARS_BOOKMARKSTOOLBAR:
-		OnToggleBookmarksToolbar();
-		break;
-
-	case IDM_TOOLBARS_DRIVES:
-		OnToggleDrivesToolbar();
-		break;
-
-	case IDM_TOOLBARS_APPLICATIONTOOLBAR:
-		OnToggleApplicationToolbar();
-		break;
-
-	case IDM_TOOLBARS_LOCKTOOLBARS:
-		OnToggleLockToolbars();
-		break;
-
-	case IDM_TOOLBARS_CUSTOMIZE:
-		OnCustomizeMainToolbar();
-		break;
-
-	default:
-		m_toolbarContextMenuSelectedSignal(sourceWindow, menuItemId);
-		break;
-	}
-}
-
-void Explorerplusplus::OnToggleAddressBar()
-{
-	m_config->showAddressBar = !m_config->showAddressBar.get();
-}
-
-void Explorerplusplus::OnToggleMainToolbar()
-{
-	m_config->showMainToolbar = !m_config->showMainToolbar.get();
-}
-
-void Explorerplusplus::OnToggleBookmarksToolbar()
-{
-	m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar.get();
-}
-
-void Explorerplusplus::OnToggleDrivesToolbar()
-{
-	m_config->showDrivesToolbar = !m_config->showDrivesToolbar.get();
-}
-
-void Explorerplusplus::OnToggleApplicationToolbar()
-{
-	m_config->showApplicationToolbar = !m_config->showApplicationToolbar.get();
-}
-
-void Explorerplusplus::OnToggleLockToolbars()
-{
-	m_config->lockToolbars = !m_config->lockToolbars.get();
-}
-
-void Explorerplusplus::OnCustomizeMainToolbar()
-{
-	m_mainToolbar->StartCustomization();
-}
-
-boost::signals2::connection Explorerplusplus::AddToolbarContextMenuObserver(
-	const ToolbarContextMenuSignal::slot_type &observer)
-{
-	return m_toolbarContextMenuSignal.connect(observer);
-}
-
-boost::signals2::connection Explorerplusplus::AddToolbarContextMenuSelectedObserver(
-	const ToolbarContextMenuSelectedSignal::slot_type &observer)
-{
-	return m_toolbarContextMenuSelectedSignal.connect(observer);
+	return true;
 }
 
 void Explorerplusplus::CreateAddressBar()

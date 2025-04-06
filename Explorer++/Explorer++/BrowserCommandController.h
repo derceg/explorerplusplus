@@ -8,12 +8,13 @@
 #include <boost/core/noncopyable.hpp>
 
 class BrowserWindow;
+struct Config;
 class ShellBrowser;
 
 class BrowserCommandController : private boost::noncopyable
 {
 public:
-	BrowserCommandController(BrowserWindow *browserWindow);
+	BrowserCommandController(BrowserWindow *browser, Config *config);
 
 	void ExecuteCommand(int command,
 		OpenFolderDisposition disposition = OpenFolderDisposition::CurrentTab);
@@ -27,5 +28,6 @@ private:
 
 	ShellBrowser *GetActiveShellBrowser() const;
 
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
+	Config *const m_config;
 };

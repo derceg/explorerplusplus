@@ -77,9 +77,6 @@ private:
 	void OnButtonClicked(const Application *application, const MouseEvent &event);
 	void OnButtonRightClicked(Application *application, const MouseEvent &event);
 
-	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
-	void OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId);
-
 	void OnWindowDestroyed();
 
 	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
