@@ -190,6 +190,7 @@
     <ClCompile Include="ApplicationHelperTest.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorageTest.cpp" />
     <ClCompile Include="ApplicationToolbarStorageTestHelper.cpp" />
+    <ClCompile Include="ApplicationToolbarTest.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
@@ -356,6 +357,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AcceleratorTestHelper.h" />
+    <ClInclude Include="ApplicationExecutorMock.h" />
     <ClInclude Include="ApplicationToolbarStorageTestHelper.h" />
     <ClInclude Include="BookmarkStorageTestHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />

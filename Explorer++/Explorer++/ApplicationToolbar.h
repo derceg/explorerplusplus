@@ -5,22 +5,23 @@
 #pragma once
 
 #include "ApplicationDropper.h"
-#include "ApplicationExecutorImpl.h"
 #include "ToolbarView.h"
 #include "../Helper/DropTargetWindow.h"
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <vector>
 
-class App;
+class AcceleratorManager;
 class CoreInterface;
 struct MouseEvent;
+class ResourceLoader;
 class ThemeManager;
 
 namespace Applications
 {
 
 class Application;
+class ApplicationExecutor;
 class ApplicationModel;
 class ApplicationToolbarView;
 
@@ -28,7 +29,9 @@ class ApplicationToolbar : private DropTargetInternal
 {
 public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
-		App *app, CoreInterface *coreInterface, ThemeManager *themeManager);
+		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		ThemeManager *themeManager);
 
 	ApplicationToolbar(const ApplicationToolbar &) = delete;
 	ApplicationToolbar(ApplicationToolbar &&) = delete;
@@ -36,6 +39,8 @@ public:
 	ApplicationToolbar &operator=(ApplicationToolbar &&) = delete;
 
 	ApplicationToolbarView *GetView() const;
+
+	DWORD SimulateDropForTest(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect);
 
 private:
 	class DragData
@@ -62,8 +67,10 @@ private:
 		std::unique_ptr<ApplicationDropper> m_applicationDropper;
 	};
 
-	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model, App *app,
-		CoreInterface *coreInterface, ThemeManager *themeManager);
+	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
+		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		ThemeManager *themeManager);
 
 	void Initialize();
 
@@ -92,9 +99,10 @@ private:
 
 	ApplicationToolbarView *m_view;
 	ApplicationModel *m_model;
-	ApplicationExecutorImpl m_applicationExecutor;
-	App *const m_app;
+	ApplicationExecutor *const m_applicationExecutor;
 	CoreInterface *const m_coreInterface;
+	const AcceleratorManager *const m_acceleratorManager;
+	const ResourceLoader *const m_resourceLoader;
 	ThemeManager *const m_themeManager;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

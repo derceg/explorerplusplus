@@ -4,16 +4,17 @@
 
 #include "stdafx.h"
 #include "ApplicationToolbar.h"
-#include "App.h"
 #include "Application.h"
 #include "ApplicationContextMenu.h"
+#include "ApplicationExecutor.h"
 #include "ApplicationHelper.h"
 #include "ApplicationModel.h"
 #include "ApplicationToolbarView.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "PopupMenuView.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
+#include "TestHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include <glog/logging.h>
 
@@ -68,18 +69,24 @@ private:
 };
 
 ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
-	ApplicationModel *model, App *app, CoreInterface *coreInterface, ThemeManager *themeManager)
+	ApplicationModel *model, ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	ThemeManager *themeManager)
 {
-	return new ApplicationToolbar(view, model, app, coreInterface, themeManager);
+	return new ApplicationToolbar(view, model, applicationExecutor, coreInterface,
+		acceleratorManager, resourceLoader, themeManager);
 }
 
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-	App *app, CoreInterface *coreInterface, ThemeManager *themeManager) :
+	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	ThemeManager *themeManager) :
 	m_view(view),
 	m_model(model),
-	m_applicationExecutor(coreInterface),
-	m_app(app),
+	m_applicationExecutor(applicationExecutor),
 	m_coreInterface(coreInterface),
+	m_acceleratorManager(acceleratorManager),
+	m_resourceLoader(resourceLoader),
 	m_themeManager(themeManager)
 {
 	Initialize();
@@ -153,7 +160,7 @@ void ApplicationToolbar::OnButtonClicked(const Application *application, const M
 {
 	UNREFERENCED_PARAMETER(event);
 
-	m_applicationExecutor.Execute(application);
+	m_applicationExecutor->Execute(application);
 }
 
 void ApplicationToolbar::OnButtonRightClicked(Application *application, const MouseEvent &event)
@@ -162,8 +169,8 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
 	PopupMenuView popupMenu;
-	ApplicationContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_model, application,
-		&m_applicationExecutor, m_app->GetResourceLoader(), m_coreInterface, m_themeManager);
+	ApplicationContextMenu menu(&popupMenu, m_acceleratorManager, m_model, application,
+		m_applicationExecutor, m_resourceLoader, m_coreInterface, m_themeManager);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 
@@ -179,7 +186,7 @@ DWORD ApplicationToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POI
 
 	DCHECK(!m_dragData);
 	m_dragData = DragData(dataObject,
-		std::make_unique<ApplicationDropper>(dataObject, effect, m_model, &m_applicationExecutor));
+		std::make_unique<ApplicationDropper>(dataObject, effect, m_model, m_applicationExecutor));
 
 	return OnDragOver(pt);
 }
@@ -240,8 +247,8 @@ DWORD ApplicationToolbar::OnDragOver(POINT pt)
 		auto applicationInfo =
 			ApplicationHelper::ParseCommandString(dropTarget.GetApplication()->GetCommand());
 
-		auto openWithTemplate = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_APPLICATION_TOOLBAR_DRAG_OPEN_WITH);
+		auto openWithTemplate =
+			m_resourceLoader->LoadString(IDS_APPLICATION_TOOLBAR_DRAG_OPEN_WITH);
 		SetDropDescription(dragData.GetDataObject(), DROPIMAGE_COPY, openWithTemplate,
 			applicationInfo.application);
 	}
@@ -264,6 +271,15 @@ const ApplicationToolbar::DragData &ApplicationToolbar::GetDragData() const
 {
 	CHECK(m_dragData);
 	return *m_dragData;
+}
+
+DWORD ApplicationToolbar::SimulateDropForTest(IDataObject *dataObject, DWORD keyState, POINT pt,
+	DWORD effect)
+{
+	CHECK(IsInTest());
+
+	DragEnter(dataObject, keyState, pt, effect);
+	return Drop(dataObject, keyState, pt, effect);
 }
 
 }

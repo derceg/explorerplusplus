@@ -133,7 +133,8 @@ public:
 
 	ItemType *GetItemAtIndex(size_t index) const
 	{
-		return m_items.at(index).get();
+		CHECK_LT(index, m_items.size());
+		return m_items[index].get();
 	}
 
 	[[nodiscard]] boost::signals2::connection AddItemAddedObserver(

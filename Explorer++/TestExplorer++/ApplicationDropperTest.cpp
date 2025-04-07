@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "ApplicationDropper.h"
-#include "ApplicationExecutor.h"
+#include "ApplicationExecutorMock.h"
 #include "ApplicationHelper.h"
 #include "ApplicationModel.h"
 #include "DragDropTestHelper.h"
@@ -15,13 +15,6 @@
 
 using namespace Applications;
 using namespace testing;
-
-class ApplicationExecutorMock : public ApplicationExecutor
-{
-public:
-	MOCK_METHOD(void, Execute, (const Application *application, std::wstring extraParameters),
-		(override));
-};
 
 // Tests dropping a shell item.
 class ApplicationDropperShellItemTest : public TestWithParam<ShellItemType>

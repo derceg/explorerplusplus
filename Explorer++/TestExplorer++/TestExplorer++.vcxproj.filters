@@ -401,6 +401,9 @@
     <ClCompile Include="DrivesToolbarTest.cpp">
       <Filter>Drives Toolbar\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationToolbarTest.cpp">
+      <Filter>Application Toolbar\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -532,6 +535,9 @@
     <Filter Include="Drives Toolbar\UI">
       <UniqueIdentifier>{6b63741e-00c8-4e5e-b404-820a4aa03f6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Application Toolbar\UI">
+      <UniqueIdentifier>{c63279f3-bdd7-424f-8160-ac4fcc9f9f7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -656,6 +662,9 @@
     </ClInclude>
     <ClInclude Include="DriveWatcherFake.h">
       <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationExecutorMock.h">
+      <Filter>Application Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

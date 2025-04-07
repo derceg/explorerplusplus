@@ -27,7 +27,7 @@ public:
 	void Execute(const Application *application, std::wstring extraParameters) override;
 
 private:
-	CoreInterface *m_coreInterface = nullptr;
+	CoreInterface *const m_coreInterface;
 };
 
 }

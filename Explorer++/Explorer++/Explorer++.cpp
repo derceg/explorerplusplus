@@ -52,6 +52,7 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	m_config(app->GetConfig()),
 	m_iconFetcher(m_hContainer, m_app->GetCachedIcons()),
 	m_shellIconLoader(&m_iconFetcher),
+	m_applicationExecutor(this),
 	m_weakPtrFactory(this)
 {
 	m_bShowTabBar = true;

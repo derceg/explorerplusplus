@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
+#include "ApplicationExecutorImpl.h"
 #include "BrowserCommandController.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
@@ -593,6 +594,7 @@ private:
 	/* Toolbars. */
 	MainToolbar *m_mainToolbar;
 	DrivesToolbar *m_drivesToolbar = nullptr;
+	Applications::ApplicationExecutorImpl m_applicationExecutor;
 	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
 
 	/* Display window folder sizes. */
