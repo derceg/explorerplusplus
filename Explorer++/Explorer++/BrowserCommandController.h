@@ -15,9 +15,6 @@ class BrowserCommandController : private boost::noncopyable
 public:
 	BrowserCommandController(BrowserWindow *browserWindow);
 
-	// Only used in tests.
-	BrowserCommandController(ShellBrowser *shellBrowser);
-
 	void ExecuteCommand(int command,
 		OpenFolderDisposition disposition = OpenFolderDisposition::CurrentTab);
 
@@ -28,10 +25,7 @@ private:
 	void GoToPath(const std::wstring &path, OpenFolderDisposition disposition);
 	void GoToKnownFolder(REFKNOWNFOLDERID knownFolderId, OpenFolderDisposition disposition);
 
-	ShellBrowser *GetSelectedShellBrowser() const;
+	ShellBrowser *GetActiveShellBrowser() const;
 
-	BrowserWindow *m_browserWindow = nullptr;
-
-	// Only used in tests.
-	ShellBrowser *m_testShellBrowser = nullptr;
+	BrowserWindow *const m_browserWindow;
 };

@@ -4,22 +4,14 @@
 
 #include "stdafx.h"
 #include "BrowserCommandController.h"
-#include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "Tab.h"
-#include "TabContainerImpl.h"
 #include "../Helper/ShellHelper.h"
 
 BrowserCommandController::BrowserCommandController(BrowserWindow *browserWindow) :
 	m_browserWindow(browserWindow)
-{
-}
-
-BrowserCommandController::BrowserCommandController(ShellBrowser *shellBrowser) :
-	m_testShellBrowser(shellBrowser)
 {
 }
 
@@ -99,7 +91,7 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
 {
-	auto *shellBrowser = GetSelectedShellBrowser();
+	auto *shellBrowser = GetActiveShellBrowser();
 
 	if (disposition == OpenFolderDisposition::CurrentTab)
 	{
@@ -120,7 +112,7 @@ void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
 
 void BrowserCommandController::GoForward(OpenFolderDisposition disposition)
 {
-	auto *shellBrowser = GetSelectedShellBrowser();
+	auto *shellBrowser = GetActiveShellBrowser();
 
 	if (disposition == OpenFolderDisposition::CurrentTab)
 	{
@@ -141,7 +133,7 @@ void BrowserCommandController::GoForward(OpenFolderDisposition disposition)
 
 void BrowserCommandController::GoUp(OpenFolderDisposition disposition)
 {
-	auto *shellBrowser = GetSelectedShellBrowser();
+	auto *shellBrowser = GetActiveShellBrowser();
 
 	if (disposition == OpenFolderDisposition::CurrentTab)
 	{
@@ -184,15 +176,7 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	m_browserWindow->OpenItem(pidl.get(), disposition);
 }
 
-ShellBrowser *BrowserCommandController::GetSelectedShellBrowser() const
+ShellBrowser *BrowserCommandController::GetActiveShellBrowser() const
 {
-	if (m_testShellBrowser)
-	{
-		return m_testShellBrowser;
-	}
-
-	return m_browserWindow->GetActivePane()
-		->GetTabContainerImpl()
-		->GetSelectedTab()
-		.GetShellBrowserImpl();
+	return m_browserWindow->GetActiveShellBrowser();
 }
