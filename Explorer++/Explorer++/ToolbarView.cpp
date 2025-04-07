@@ -495,7 +495,6 @@ ToolbarView::DropLocation ToolbarView::GetDropLocation(const POINT &ptScreen)
 	DCHECK(res);
 
 	auto index = MaybeGetIndexOfButtonAtPoint(ptClient);
-	;
 
 	if (index)
 	{
