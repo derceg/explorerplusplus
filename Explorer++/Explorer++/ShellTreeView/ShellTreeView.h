@@ -23,7 +23,6 @@ class App;
 class BrowserWindow;
 class CachedIcons;
 struct Config;
-class CoreInterface;
 class FileActionHandler;
 class ShellBrowserImpl;
 class ShellTreeNode;
@@ -32,8 +31,7 @@ class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public ShellConte
 {
 public:
 	static ShellTreeView *Create(HWND hParent, App *app, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
-		CachedIcons *cachedIcons);
+		FileActionHandler *fileActionHandler);
 
 	/* User functions. */
 	unique_pidl_absolute GetSelectedNodePidl() const;
@@ -122,8 +120,7 @@ private:
 	};
 
 	ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
-		CachedIcons *cachedIcons);
+		FileActionHandler *fileActionHandler);
 	~ShellTreeView();
 
 	static HWND CreateTreeView(HWND parent);
@@ -225,8 +222,7 @@ private:
 
 	HWND m_hTreeView;
 	App *const m_app;
-	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
+	BrowserWindow *const m_browserWindow;
 	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

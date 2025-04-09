@@ -20,10 +20,9 @@
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -45,19 +44,17 @@
 #include <propkey.h>
 
 ShellTreeView *ShellTreeView::Create(HWND hParent, App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons)
+	FileActionHandler *fileActionHandler)
 {
-	return new ShellTreeView(hParent, app, browserWindow, coreInterface, fileActionHandler,
-		cachedIcons);
+	return new ShellTreeView(hParent, app, browserWindow, fileActionHandler);
 }
 
 ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
+	FileActionHandler *fileActionHandler) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
 	m_app(app),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface),
 	m_config(app->GetConfig()),
 	m_fileActionHandler(fileActionHandler),
 	m_fontSetter(GetHWND(), app->GetConfig()),
@@ -67,7 +64,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 	m_subfoldersThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_subfoldersResultIDCounter(0),
-	m_cachedIcons(cachedIcons),
+	m_cachedIcons(app->GetCachedIcons()),
 	m_dropExpandItem(nullptr),
 	m_shellChangeWatcher(GetHWND(),
 		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this))
@@ -1486,8 +1483,8 @@ void ShellTreeView::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(contextMenu);
 
-	std::wstring openInNewTabText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
+	std::wstring openInNewTabText =
+		m_app->GetResourceLoader()->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB);
 	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, true);
 }
 
@@ -1496,8 +1493,7 @@ std::wstring ShellTreeView::GetHelpTextForItem(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
-		return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
+		return m_app->GetResourceLoader()->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
 
 	default:
 		DCHECK(false);

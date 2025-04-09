@@ -32,8 +32,8 @@ void Explorerplusplus::CreateFolderControls()
 	m_treeViewHolder->SetResizedCallback(
 		std::bind_front(&Explorerplusplus::OnTreeViewHolderResized, this));
 
-	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), m_app, this, this,
-		&m_FileActionHandler, m_app->GetCachedIcons());
+	m_shellTreeView =
+		ShellTreeView::Create(m_treeViewHolder->GetHWND(), m_app, this, &m_FileActionHandler);
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
 }
 
