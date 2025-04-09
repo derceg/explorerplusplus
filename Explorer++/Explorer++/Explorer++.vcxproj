@@ -1040,6 +1040,7 @@
     <ClCompile Include="HistoryMenu.cpp" />
     <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="HistoryTracker.cpp" />
+    <ClCompile Include="ShellBrowser\ColumnHelper.cpp" />
     <ClCompile Include="ShellBrowser\NavigationEvents.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserEvents.cpp" />
     <ClCompile Include="StatusBarView.cpp" />
@@ -1353,6 +1354,7 @@
     <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="HistoryTracker.h" />
+    <ClInclude Include="ShellBrowser\ColumnHelper.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
     <ClInclude Include="StatusBar.h" />

@@ -10,7 +10,7 @@
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/WindowHelper.h"
 
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
@@ -176,7 +176,7 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 		}
 	}
 
-	return ResourceHelper::LoadString(GetResourceInstance(), stringId);
+	return m_resourceLoader->LoadString(stringId);
 }
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const

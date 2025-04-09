@@ -7,7 +7,7 @@
 #include "App.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
@@ -115,23 +115,22 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 	LVCOLUMN lvColumn;
 
-	auto fileText = ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_FILES_COLUMN_FILE);
+	auto fileText = m_resourceLoader->LoadString(IDS_MERGE_FILES_COLUMN_FILE);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = fileText.data();
 	ListView_InsertColumn(hListView, 0, &lvColumn);
 
-	auto typeText = ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_FILES_COLUMN_TYPE);
+	auto typeText = m_resourceLoader->LoadString(IDS_MERGE_FILES_COLUMN_TYPE);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = typeText.data();
 	ListView_InsertColumn(hListView, 1, &lvColumn);
 
-	auto sizeText = ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_FILES_COLUMN_SIZE);
+	auto sizeText = m_resourceLoader->LoadString(IDS_MERGE_FILES_COLUMN_SIZE);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = sizeText.data();
 	ListView_InsertColumn(hListView, 2, &lvColumn);
 
-	auto dateModifiedText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_FILES_COLUMN_DATE_MODIFIED);
+	auto dateModifiedText = m_resourceLoader->LoadString(IDS_MERGE_FILES_COLUMN_DATE_MODIFIED);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = dateModifiedText.data();
 	ListView_InsertColumn(hListView, 3, &lvColumn);
@@ -272,8 +271,7 @@ INT_PTR MergeFilesDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 
 	case NMergeFilesDialog::WM_APP_OUTPUTFILEINVALID:
 	{
-		auto errorMessage =
-			ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_FILES_OUTPUTFILEINVALID);
+		auto errorMessage = m_resourceLoader->LoadString(IDS_MERGE_FILES_OUTPUTFILEINVALID);
 		MessageBox(m_hDlg, errorMessage.c_str(), App::APP_NAME, MB_ICONWARNING | MB_OK);
 
 		assert(m_pMergeFiles != nullptr);
@@ -306,8 +304,7 @@ void MergeFilesDialog::OnOk()
 
 		if (GetWindowTextLength(hOutputFileName) == 0)
 		{
-			auto errorMessage =
-				ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_OUTPUTINVALID);
+			auto errorMessage = m_resourceLoader->LoadString(IDS_MERGE_OUTPUTINVALID);
 			MessageBox(m_hDlg, errorMessage.c_str(), App::APP_NAME, MB_ICONWARNING | MB_OK);
 			return;
 		}
@@ -320,7 +317,7 @@ void MergeFilesDialog::OnOk()
 
 		GetDlgItemText(m_hDlg, IDOK, m_szOk, static_cast<int>(std::size(m_szOk)));
 
-		auto cancelText = ResourceHelper::LoadString(GetResourceInstance(), IDS_CANCEL);
+		auto cancelText = m_resourceLoader->LoadString(IDS_CANCEL);
 		SetDlgItemText(m_hDlg, IDOK, cancelText.c_str());
 
 		m_bMergingFiles = true;
@@ -355,7 +352,7 @@ void MergeFilesDialog::OnCancel()
 
 void MergeFilesDialog::OnChangeOutputDirectory()
 {
-	auto title = ResourceHelper::LoadString(GetResourceInstance(), IDS_MERGE_SELECTDESTINATION);
+	auto title = m_resourceLoader->LoadString(IDS_MERGE_SELECTDESTINATION);
 
 	unique_pidl_absolute pidl;
 	BOOL bSucceeded = FileOperations::CreateBrowseDialog(m_hDlg, title, wil::out_param(pidl));

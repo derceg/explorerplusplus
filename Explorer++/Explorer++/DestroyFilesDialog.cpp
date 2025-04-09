@@ -6,7 +6,7 @@
 #include "DestroyFilesDialog.h"
 #include "App.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/StringHelper.h"
@@ -46,26 +46,22 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 
 	LVCOLUMN lvColumn;
 
-	auto fileText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_FILE);
+	auto fileText = m_resourceLoader->LoadString(IDS_DESTROY_FILES_COLUMN_FILE);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = fileText.data();
 	ListView_InsertColumn(hListView, 0, &lvColumn);
 
-	auto typeText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_TYPE);
+	auto typeText = m_resourceLoader->LoadString(IDS_DESTROY_FILES_COLUMN_TYPE);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = typeText.data();
 	ListView_InsertColumn(hListView, 1, &lvColumn);
 
-	auto sizeText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_SIZE);
+	auto sizeText = m_resourceLoader->LoadString(IDS_DESTROY_FILES_COLUMN_SIZE);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = sizeText.data();
 	ListView_InsertColumn(hListView, 2, &lvColumn);
 
-	auto dateModifiedText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED);
+	auto dateModifiedText = m_resourceLoader->LoadString(IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = dateModifiedText.data();
 	ListView_InsertColumn(hListView, 3, &lvColumn);
@@ -188,8 +184,7 @@ void DestroyFilesDialog::SaveState()
 
 void DestroyFilesDialog::OnOk()
 {
-	auto confirmation =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_CONFIRMATION);
+	auto confirmation = m_resourceLoader->LoadString(IDS_DESTROY_FILES_CONFIRMATION);
 
 	/* The default button in this message box will be the second
 	button (i.e. the no button). */

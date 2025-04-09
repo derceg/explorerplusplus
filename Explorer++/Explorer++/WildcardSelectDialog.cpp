@@ -7,7 +7,7 @@
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
 #include "../Helper/ListViewHelper.h"
@@ -47,8 +47,7 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 
 	if (!m_bSelect)
 	{
-		std::wstring deselectTitle =
-			ResourceHelper::LoadString(GetResourceInstance(), IDS_WILDCARDDESELECTION);
+		std::wstring deselectTitle = m_resourceLoader->LoadString(IDS_WILDCARDDESELECTION);
 		SetWindowText(m_hDlg, deselectTitle.c_str());
 	}
 

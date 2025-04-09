@@ -6,7 +6,7 @@
 #include "DisplayColoursDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
@@ -109,14 +109,13 @@ void DisplayColoursDialog::InitializePreviewWindow()
 
 	DisplayWindow_ClearTextBuffer(m_previewDisplayWindow->GetHWND());
 
-	auto fileName = ResourceHelper::LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILENAME);
+	auto fileName = m_resourceLoader->LoadString(IDS_DISPLAYCOLORS_FILENAME);
 	DisplayWindow_BufferText(m_previewDisplayWindow->GetHWND(), fileName.c_str());
 
-	auto fileType = ResourceHelper::LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILE_TYPE);
+	auto fileType = m_resourceLoader->LoadString(IDS_DISPLAYCOLORS_FILE_TYPE);
 	DisplayWindow_BufferText(m_previewDisplayWindow->GetHWND(), fileType.c_str());
 
-	auto modificationDate =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_MODIFICATION_DATE);
+	auto modificationDate = m_resourceLoader->LoadString(IDS_DISPLAYCOLORS_MODIFICATION_DATE);
 	DisplayWindow_BufferText(m_previewDisplayWindow->GetHWND(), modificationDate.c_str());
 
 	RECT rc;

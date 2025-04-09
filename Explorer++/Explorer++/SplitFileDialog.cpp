@@ -6,7 +6,7 @@
 #include "SplitFileDialog.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
@@ -99,23 +99,21 @@ INT_PTR SplitFileDialog::OnInitDialog()
 	HWND hComboBox = GetDlgItem(m_hDlg, IDC_SPLIT_COMBOBOX_SIZES);
 	int iPos;
 
-	TCHAR szTemp[64];
-
-	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_BYTES, szTemp, std::size(szTemp));
+	auto text = m_resourceLoader->LoadString(IDS_SPLIT_FILE_SIZE_BYTES);
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szTemp)));
+		reinterpret_cast<LPARAM>(text.c_str())));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::Bytes));
-	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_KB, szTemp, std::size(szTemp));
+	text = m_resourceLoader->LoadString(IDS_SPLIT_FILE_SIZE_KB);
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szTemp)));
+		reinterpret_cast<LPARAM>(text.c_str())));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::KB));
-	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_MB, szTemp, std::size(szTemp));
+	text = m_resourceLoader->LoadString(IDS_SPLIT_FILE_SIZE_MB);
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szTemp)));
+		reinterpret_cast<LPARAM>(text.c_str())));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::MB));
-	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_GB, szTemp, std::size(szTemp));
+	text = m_resourceLoader->LoadString(IDS_SPLIT_FILE_SIZE_GB);
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szTemp)));
+		reinterpret_cast<LPARAM>(text.c_str())));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::GB));
 
 	SendMessage(hComboBox, CB_SELECTSTRING, static_cast<WPARAM>(-1),
@@ -282,10 +280,8 @@ INT_PTR SplitFileDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 	case NSplitFileDialog::WM_APP_INPUTFILEINVALID:
 	{
-		TCHAR szTemp[128];
-		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_INPUTFILEINVALID, szTemp,
-			std::size(szTemp));
-		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+		auto errorMessage = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_INPUTFILEINVALID);
+		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
 		assert(m_pSplitFile != nullptr);
 
@@ -313,12 +309,9 @@ void SplitFileDialog::OnOk()
 
 		if (GetWindowTextLength(hOutputFilename) == 0)
 		{
-			TCHAR szTemp[128];
-
-			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_OUTPUTFILENAMEERROR, szTemp,
-				std::size(szTemp));
-
-			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+			auto errorMessage =
+				m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_OUTPUTFILENAMEERROR);
+			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
 			m_CurrentError = ErrorType::OutputFilenameEmpty;
 
@@ -333,12 +326,9 @@ void SplitFileDialog::OnOk()
 		the same. */
 		if (strOutputFilename.find(NSplitFileDialog::COUNTER_PATTERN) == std::wstring::npos)
 		{
-			TCHAR szTemp[128];
-
-			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_OUTPUTFILENAMECONSTANTERROR,
-				szTemp, std::size(szTemp));
-
-			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+			auto errorMessage =
+				m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_OUTPUTFILENAMECONSTANTERROR);
+			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
 			m_CurrentError = ErrorType::OutputFilenameConstant;
 
@@ -350,12 +340,9 @@ void SplitFileDialog::OnOk()
 
 		if (GetWindowTextLength(hEditOutputDirectory) == 0)
 		{
-			TCHAR szTemp[128];
-
-			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_OUTPUTDIRECTORYERROR, szTemp,
-				std::size(szTemp));
-
-			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+			auto errorMessage =
+				m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_OUTPUTDIRECTORYERROR);
+			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
 			m_CurrentError = ErrorType::OutputDirectoryEmpty;
 
@@ -370,12 +357,8 @@ void SplitFileDialog::OnOk()
 
 		if (!bTranslated)
 		{
-			TCHAR szTemp[128];
-
-			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_SIZEERROR, szTemp,
-				std::size(szTemp));
-
-			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+			auto errorMessage = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_SIZEERROR);
+			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
 			m_CurrentError = ErrorType::SplitSize;
 
@@ -416,17 +399,16 @@ void SplitFileDialog::OnOk()
 
 		GetDlgItemText(m_hDlg, IDOK, m_szOk, static_cast<int>(std::size(m_szOk)));
 
-		TCHAR szTemp[64];
-		LoadString(GetResourceInstance(), IDS_STOP, szTemp, std::size(szTemp));
-		SetDlgItemText(m_hDlg, IDOK, szTemp);
+		auto stopText = m_resourceLoader->LoadString(IDS_STOP);
+		SetDlgItemText(m_hDlg, IDOK, stopText.c_str());
 
 		m_bSplittingFile = true;
 
 		m_uElapsedTime = 0;
 		SetTimer(m_hDlg, ELPASED_TIMER_ID, ELPASED_TIMER_TIMEOUT, nullptr);
 
-		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_SPLITTING, szTemp, std::size(szTemp));
-		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+		auto splittingText = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_SPLITTING);
+		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, splittingText.c_str());
 
 		HANDLE hThread = CreateThread(nullptr, 0, NSplitFileDialog::SplitFileThreadProcStub,
 			reinterpret_cast<LPVOID>(m_pSplitFile), 0, nullptr);
@@ -458,12 +440,10 @@ void SplitFileDialog::OnCancel()
 
 void SplitFileDialog::OnChangeOutputDirectory()
 {
-	TCHAR szTitle[128];
-	LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_DIRECTORYTITLE, szTitle,
-		std::size(szTitle));
+	auto title = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_DIRECTORYTITLE);
 
 	unique_pidl_absolute pidl;
-	BOOL bSucceeded = FileOperations::CreateBrowseDialog(m_hDlg, szTitle, wil::out_param(pidl));
+	BOOL bSucceeded = FileOperations::CreateBrowseDialog(m_hDlg, title, wil::out_param(pidl));
 
 	if (!bSucceeded)
 	{
@@ -483,18 +463,18 @@ void SplitFileDialog::OnChangeOutputDirectory()
 
 void SplitFileDialog::OnSplitFinished()
 {
-	TCHAR szTemp[64];
+	std::wstring message;
 
 	if (!m_bStopSplitting)
 	{
-		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_FINISHED, szTemp, std::size(szTemp));
+		message = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_FINISHED);
 	}
 	else
 	{
-		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_CANCELLED, szTemp, std::size(szTemp));
+		message = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_CANCELLED);
 	}
 
-	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
+	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, message.c_str());
 
 	assert(m_pSplitFile != nullptr);
 

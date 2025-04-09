@@ -6,6 +6,7 @@
 #include "ShellBrowserImpl.h"
 #include "App.h"
 #include "ColorRuleModel.h"
+#include "ColumnHelper.h"
 #include "Config.h"
 #include "IconFetcher.h"
 #include "ItemData.h"
@@ -856,8 +857,7 @@ void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_STRING | MIIM_STATE | MIIM_ID;
 
-		std::wstring columnText = ResourceHelper::LoadString(m_resourceInstance,
-			LookupColumnNameStringIndex(column.type));
+		std::wstring columnName = GetColumnName(m_app->GetResourceLoader(), column.type);
 
 		if (column.checked)
 		{
@@ -884,7 +884,7 @@ void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)
 
 		int id = totalInserted + 1;
 
-		mii.dwTypeData = columnText.data();
+		mii.dwTypeData = columnName.data();
 		mii.wID = id;
 		InsertMenuItem(headerMenu, currentPosition, TRUE, &mii);
 

@@ -14,6 +14,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ListViewHelper.h"
@@ -120,8 +121,7 @@ void ManageBookmarksDialog::SetupToolbar()
 
 	TBBUTTON tbb;
 
-	std::wstring text =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK);
+	std::wstring text = m_resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Back);
 	tbb.idCommand = TOOLBAR_ID_BACK;
@@ -131,7 +131,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 0, reinterpret_cast<LPARAM>(&tbb));
 
-	text = ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD);
+	text = m_resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Forward);
 	tbb.idCommand = TOOLBAR_ID_FORWARD;
@@ -141,7 +141,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 1, reinterpret_cast<LPARAM>(&tbb));
 
-	text = ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE);
+	text = m_resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Copy);
 	tbb.idCommand = TOOLBAR_ID_ORGANIZE;
@@ -151,7 +151,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 2, reinterpret_cast<LPARAM>(&tbb));
 
-	text = ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS);
+	text = m_resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Views);
 	tbb.idCommand = TOOLBAR_ID_VIEWS;

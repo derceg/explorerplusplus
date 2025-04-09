@@ -12,7 +12,7 @@
 #include "stdafx.h"
 #include "UpdateCheckDialog.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "Version.h"
 #include "VersionHelper.h"
 #include <boost/algorithm/string.hpp>
@@ -40,7 +40,7 @@ INT_PTR UpdateCheckDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION,
 		VersionHelper::GetVersion().GetString().c_str());
 
-	auto status = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS);
+	auto status = m_resourceLoader->LoadString(IDS_UPDATE_CHECK_STATUS);
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, status.c_str());
 
 	SetTimer(m_hDlg, 0, STATUS_TIMER_ELAPSED, nullptr);
@@ -180,7 +180,7 @@ INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void UpdateCheckDialog::OnUpdateCheckError()
 {
-	auto error = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_ERROR);
+	auto error = m_resourceLoader->LoadString(IDS_UPDATE_CHECK_ERROR);
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, error.c_str());
 }
 
@@ -191,14 +191,14 @@ void UpdateCheckDialog::OnUpdateCheckSuccess(Version *availableVersion)
 
 	if (*availableVersion > currentVersion)
 	{
-		std::wstring statusTemplate = ResourceHelper::LoadString(GetResourceInstance(),
-			IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE);
+		std::wstring statusTemplate =
+			m_resourceLoader->LoadString(IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE);
 		status = fmt::format(fmt::runtime(statusTemplate),
 			fmt::arg(L"available_version", availableVersion->GetString()));
 	}
 	else
 	{
-		status = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_UP_TO_DATE);
+		status = m_resourceLoader->LoadString(IDS_UPDATE_CHECK_UP_TO_DATE);
 	}
 
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, status.c_str());
@@ -233,7 +233,7 @@ INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 
 	static int step = 0;
 
-	auto updateStatus = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS);
+	auto updateStatus = m_resourceLoader->LoadString(IDS_UPDATE_CHECK_STATUS);
 	updateStatus += std::wstring(step, '.');
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, updateStatus.c_str());
 

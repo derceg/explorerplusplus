@@ -17,7 +17,7 @@
 #include "MassRenameDialog.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
@@ -61,14 +61,12 @@ INT_PTR MassRenameDialog::OnInitDialog()
 
 	LVCOLUMN lvCol;
 
-	std::wstring currentNameText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_MASS_RENAME_CURRENT_NAME);
+	std::wstring currentNameText = m_resourceLoader->LoadString(IDS_MASS_RENAME_CURRENT_NAME);
 	lvCol.mask = LVCF_TEXT;
 	lvCol.pszText = currentNameText.data();
 	ListView_InsertColumn(hListView, 1, &lvCol);
 
-	std::wstring previewNameText =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_MASS_RENAME_PREVIEW_NAME);
+	std::wstring previewNameText = m_resourceLoader->LoadString(IDS_MASS_RENAME_PREVIEW_NAME);
 	lvCol.mask = LVCF_TEXT;
 	lvCol.pszText = previewNameText.data();
 	ListView_InsertColumn(hListView, 2, &lvCol);

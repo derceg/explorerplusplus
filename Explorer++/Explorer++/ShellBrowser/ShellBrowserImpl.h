@@ -125,8 +125,6 @@ public:
 	std::vector<Column_t> GetCurrentColumns();
 	void SetCurrentColumns(const std::vector<Column_t> &columns);
 	static SortMode DetermineColumnSortMode(ColumnType columnType);
-	static int LookupColumnNameStringIndex(ColumnType columnType);
-	static int LookupColumnDescriptionStringIndex(ColumnType columnType);
 
 	/* Filtering. */
 	std::wstring GetFilterText() const;

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ThirdPartyCreditsDialog.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
@@ -21,8 +21,7 @@ INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETEVENTMASK, 0, ENM_LINK);
 
-	std::wstring credits =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_THIRD_PARTY_CREDITS);
+	std::wstring credits = m_resourceLoader->LoadString(IDS_THIRD_PARTY_CREDITS);
 	SetDlgItemText(m_hDlg, IDC_CREDITS, credits.c_str());
 
 	CenterWindow(GetParent(m_hDlg), m_hDlg);

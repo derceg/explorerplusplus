@@ -10,7 +10,7 @@
 #include "ColorRuleModel.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -196,8 +196,7 @@ void CustomizeColorsDialog::OnDelete()
 		return;
 	}
 
-	std::wstring deleteMessage =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_COLOR_RULE_DELETE);
+	std::wstring deleteMessage = m_resourceLoader->LoadString(IDS_COLOR_RULE_DELETE);
 	int confirmResult = MessageBox(m_hDlg, deleteMessage.c_str(), App::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
@@ -213,8 +212,7 @@ void CustomizeColorsDialog::OnDelete()
 
 void CustomizeColorsDialog::OnDeleteAll()
 {
-	std::wstring deleteAllMessage =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_COLOR_RULE_DELETE_ALL);
+	std::wstring deleteAllMessage = m_resourceLoader->LoadString(IDS_COLOR_RULE_DELETE_ALL);
 	int confirmResult = MessageBox(m_hDlg, deleteAllMessage.c_str(), App::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 

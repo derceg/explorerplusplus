@@ -5,7 +5,8 @@
 #include "stdafx.h"
 #include "SetDefaultColumnsDialog.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
+#include "ShellBrowser/ColumnHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/RegistrySettings.h"
@@ -44,7 +45,7 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	m_FolderMap.insert(
 		std::unordered_map<int, FolderType>::value_type(pos, FolderType::ControlPanel));
 
-	folderName = ResourceHelper::LoadString(GetResourceInstance(), IDS_DEFAULTCOLUMNS_GENERAL);
+	folderName = m_resourceLoader->LoadString(IDS_DEFAULTCOLUMNS_GENERAL);
 	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(folderName.c_str())));
 	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(pos, FolderType::General));
@@ -262,15 +263,13 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 
 	for (const auto &column : columns)
 	{
-		TCHAR szText[64];
-		LoadString(GetResourceInstance(),
-			ShellBrowserImpl::LookupColumnNameStringIndex(column.type), szText, std::size(szText));
+		auto name = GetColumnName(m_resourceLoader, column.type);
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
 		lvItem.iItem = iItem;
 		lvItem.iSubItem = 0;
-		lvItem.pszText = szText;
+		lvItem.pszText = name.data();
 		lvItem.lParam = static_cast<LPARAM>(column.type);
 		ListView_InsertItem(hListView, &lvItem);
 
@@ -327,13 +326,9 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		auto columnType =
 			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
 		CHECK(columnType);
-		int iDescriptionStringIndex =
-			ShellBrowserImpl::LookupColumnDescriptionStringIndex(*columnType);
 
-		TCHAR szColumnDescription[128];
-		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,
-			std::size(szColumnDescription));
-		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
+		auto columnDescription = GetColumnDescription(m_resourceLoader, *columnType);
+		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, columnDescription.c_str());
 	}
 }
 

@@ -7,7 +7,7 @@
 #include "ColorRule.h"
 #include "ColorRuleModel.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -33,8 +33,7 @@ INT_PTR ColorRuleEditorDialog::OnInitDialog()
 {
 	if (m_editDetails->type == EditDetails::Type::ExistingItem)
 	{
-		std::wstring editText =
-			ResourceHelper::LoadString(GetResourceInstance(), IDS_EDIT_COLOR_RULE);
+		std::wstring editText = m_resourceLoader->LoadString(IDS_EDIT_COLOR_RULE);
 		SetWindowText(m_hDlg, editText.c_str());
 	}
 

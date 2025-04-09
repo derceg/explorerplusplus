@@ -18,6 +18,7 @@
 #include "MainToolbar.h"
 #include "Plugins/PluginManager.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/ColumnHelper.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -696,9 +697,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	{
 		if (column.checked)
 		{
-			auto columnName = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-				ShellBrowserImpl::LookupColumnNameStringIndex(column.type));
-			strColumnInfo += columnName + L"\t";
+			strColumnInfo += GetColumnName(m_app->GetResourceLoader(), column.type) + L"\t";
 
 			nActiveColumns++;
 		}

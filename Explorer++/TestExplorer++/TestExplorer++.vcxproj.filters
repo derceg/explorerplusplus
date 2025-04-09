@@ -404,6 +404,9 @@
     <ClCompile Include="ApplicationToolbarTest.cpp">
       <Filter>Application Toolbar\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ColumnHelperTest.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

@@ -6,7 +6,8 @@
 #include "SelectColumnsDialog.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
+#include "ShellBrowser/ColumnHelper.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -46,14 +47,13 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	for (const auto &column : currentColumns)
 	{
-		std::wstring text = ResourceHelper::LoadString(GetResourceInstance(),
-			ShellBrowserImpl::LookupColumnNameStringIndex(column.type));
+		std::wstring name = GetColumnName(m_resourceLoader, column.type);
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
 		lvItem.iItem = iItem;
 		lvItem.iSubItem = 0;
-		lvItem.pszText = text.data();
+		lvItem.pszText = name.data();
 		lvItem.lParam = static_cast<LPARAM>(column.type);
 		ListView_InsertItem(hListView, &lvItem);
 
@@ -96,15 +96,10 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 		return false;
 	}
 
-	TCHAR column1Text[64];
-	LoadString(GetResourceInstance(), ShellBrowserImpl::LookupColumnNameStringIndex(column1.type),
-		column1Text, std::size(column1Text));
+	auto column1Name = GetColumnName(m_resourceLoader, column1.type);
+	auto column2Name = GetColumnName(m_resourceLoader, column2.type);
 
-	TCHAR column2Text[64];
-	LoadString(GetResourceInstance(), ShellBrowserImpl::LookupColumnNameStringIndex(column2.type),
-		column2Text, std::size(column2Text));
-
-	int ret = StrCmpLogicalW(column1Text, column2Text);
+	int ret = StrCmpLogicalW(column1Name.c_str(), column2Name.c_str());
 
 	if (ret == -1)
 	{
@@ -292,13 +287,9 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 		auto columnType =
 			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
 		CHECK(columnType);
-		int iDescriptionStringIndex =
-			ShellBrowserImpl::LookupColumnDescriptionStringIndex(*columnType);
 
-		TCHAR szColumnDescription[128];
-		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,
-			std::size(szColumnDescription));
-		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
+		auto columnDescription = GetColumnDescription(m_resourceLoader, *columnType);
+		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, columnDescription.c_str());
 	}
 }
 

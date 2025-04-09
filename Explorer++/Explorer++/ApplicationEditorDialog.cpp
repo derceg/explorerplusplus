@@ -6,7 +6,7 @@
 #include "ApplicationEditorDialog.h"
 #include "ApplicationModel.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"
 
@@ -27,8 +27,7 @@ INT_PTR ApplicationEditorDialog::OnInitDialog()
 {
 	if (m_editDetails->type == EditDetails::Type::NewItem)
 	{
-		std::wstring newText =
-			ResourceHelper::LoadString(GetResourceInstance(), IDS_GENERAL_NEWAPPLICATIONBUTTON);
+		std::wstring newText = m_resourceLoader->LoadString(IDS_GENERAL_NEWAPPLICATIONBUTTON);
 		SetWindowText(m_hDlg, newText.c_str());
 	}
 

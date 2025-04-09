@@ -9,7 +9,7 @@
 #include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
@@ -107,7 +107,7 @@ INT_PTR SearchDialog::OnInitDialog()
 
 	for (const auto &ci : m_persistentSettings->m_Columns)
 	{
-		auto columnName = ResourceHelper::LoadString(GetResourceInstance(), ci.uStringID);
+		auto columnName = m_resourceLoader->LoadString(ci.uStringID);
 
 		LVCOLUMN lvColumn;
 		lvColumn.mask = LVCF_TEXT;
@@ -216,7 +216,7 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		TCHAR szDirectory[MAX_PATH];
 		TCHAR szDisplayName[MAX_PATH];
 
-		auto title = ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCHDIALOG_TITLE);
+		auto title = m_resourceLoader->LoadString(IDS_SEARCHDIALOG_TITLE);
 
 		GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szDirectory, std::size(szDirectory));
 
@@ -378,7 +378,7 @@ void SearchDialog::StartSearching()
 	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton,
 		static_cast<int>(std::size(m_szSearchButton)));
 
-	auto stopText = ResourceHelper::LoadString(GetResourceInstance(), IDS_STOP);
+	auto stopText = m_resourceLoader->LoadString(IDS_STOP);
 	SetDlgItemText(m_hDlg, IDSEARCH, stopText.c_str());
 
 	m_bSearching = TRUE;
@@ -571,13 +571,11 @@ void SearchDialog::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 
 	if ((itemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
 	{
-		openLocationText =
-			ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FOLDER_LOCATION);
+		openLocationText = m_resourceLoader->LoadString(IDS_SEARCH_OPEN_FOLDER_LOCATION);
 	}
 	else
 	{
-		openLocationText =
-			ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FILE_LOCATION);
+		openLocationText = m_resourceLoader->LoadString(IDS_SEARCH_OPEN_FILE_LOCATION);
 	}
 
 	MENUITEMINFO mii;
@@ -593,8 +591,7 @@ std::wstring SearchDialog::GetHelpTextForItem(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
-		return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_SEARCH_OPEN_ITEM_LOCATION_HELP_TEXT);
+		return m_resourceLoader->LoadString(IDS_SEARCH_OPEN_ITEM_LOCATION_HELP_TEXT);
 
 	default:
 		DCHECK(false);
@@ -813,8 +810,7 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			auto cancelledMessage =
-				ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCH_CANCELLED_MESSAGE);
+			auto cancelledMessage = m_resourceLoader->LoadString(IDS_SEARCH_CANCELLED_MESSAGE);
 			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, cancelledMessage.c_str());
 		}
 
@@ -853,8 +849,7 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		/* The regular expression passed to the search
 		thread was invalid. Show the user an error message. */
-		auto errorMessage = ResourceHelper::LoadString(GetResourceInstance(),
-			IDS_SEARCH_REGULAR_EXPRESSION_INVALID);
+		auto errorMessage = m_resourceLoader->LoadString(IDS_SEARCH_REGULAR_EXPRESSION_INVALID);
 		SetDlgItemText(m_hDlg, IDC_LINK_STATUS, errorMessage.c_str());
 
 		assert(m_pSearch != nullptr);

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "AboutDialog.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ThirdPartyCreditsDialog.h"
 #include "Version.h"
 #include "VersionHelper.h"
@@ -35,23 +35,22 @@ INT_PTR AboutDialog::OnInitDialog()
 	SendDlgItemMessage(m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON,
 		reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
 
-	std::wstring versionTemplate =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_VERSION);
+	std::wstring versionTemplate = m_resourceLoader->LoadString(IDS_ABOUT_VERSION);
 	std::wstring platform;
 
 	// Indicate which platform we are building for in the version string.
 	switch (VersionHelper::GetPlatform())
 	{
 	case VersionHelper::Platform::x86:
-		platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_32BIT_BUILD);
+		platform = m_resourceLoader->LoadString(IDS_ABOUT_32BIT_BUILD);
 		break;
 
 	case VersionHelper::Platform::x64:
-		platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_64BIT_BUILD);
+		platform = m_resourceLoader->LoadString(IDS_ABOUT_64BIT_BUILD);
 		break;
 
 	case VersionHelper::Platform::Arm64:
-		platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_ARM64_BUILD);
+		platform = m_resourceLoader->LoadString(IDS_ABOUT_ARM64_BUILD);
 		break;
 	}
 
@@ -65,11 +64,11 @@ INT_PTR AboutDialog::OnInitDialog()
 		break;
 
 	case VersionHelper::Channel::Beta:
-		releaseMode = ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_BETA);
+		releaseMode = m_resourceLoader->LoadString(IDS_RELEASE_MODE_BETA);
 		break;
 
 	case VersionHelper::Channel::Dev:
-		releaseMode = ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_DEV);
+		releaseMode = m_resourceLoader->LoadString(IDS_RELEASE_MODE_DEV);
 		break;
 	}
 
@@ -81,8 +80,7 @@ INT_PTR AboutDialog::OnInitDialog()
 	std::wstring version = fmt::format(fmt::runtime(versionTemplate),
 		fmt::arg(L"version_string", versionAndReleaseMode), fmt::arg(L"platform", platform));
 
-	std::wstring buildDateTemplate =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_BUILD_DATE);
+	std::wstring buildDateTemplate = m_resourceLoader->LoadString(IDS_ABOUT_BUILD_DATE);
 	std::wstring buildDate = fmt::format(fmt::runtime(buildDateTemplate),
 		fmt::arg(L"build_date", VersionHelper::GetBuildDate()));
 
