@@ -14,9 +14,11 @@
 #include "TabContainerImpl.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager) :
+	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	ThemeManager *themeManager) :
 	m_bookmarkTree(bookmarkTree),
+	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
@@ -108,7 +110,7 @@ void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex, HWND parentWindow)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		parentWindow, m_themeManager, m_coreInterface, m_iconResourceLoader);
+		parentWindow, m_themeManager, m_coreInterface, m_resourceLoader, m_iconResourceLoader);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
@@ -132,6 +134,6 @@ void BookmarkContextMenuController::OnDelete(const RawBookmarkItems &bookmarkIte
 void BookmarkContextMenuController::OnEditBookmarkItem(BookmarkItem *bookmarkItem,
 	HWND parentWindow)
 {
-	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceInstance, parentWindow,
-		m_themeManager, m_iconResourceLoader);
+	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceLoader,
+		m_resourceInstance, parentWindow, m_themeManager, m_iconResourceLoader);
 }

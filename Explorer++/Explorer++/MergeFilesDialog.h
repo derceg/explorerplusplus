@@ -51,9 +51,10 @@ private:
 class MergeFilesDialog : public ThemedDialog
 {
 public:
-	MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		const IconResourceLoader *iconResourceLoader, const std::wstring &strOutputDirectory,
-		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
+	MergeFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+		ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
+		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
+		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
 
 protected:

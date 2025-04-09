@@ -23,7 +23,7 @@ SearchTabsDialog *SearchTabsDialog::Create(App *app, HWND parent, CoreInterface 
 }
 
 SearchTabsDialog::SearchTabsDialog(App *app, HWND parent, CoreInterface *coreInterface) :
-	ThemedDialog(app->GetResourceInstance(), IDD_SEARCH_TABS, parent,
+	ThemedDialog(app->GetResourceLoader(), app->GetResourceInstance(), IDD_SEARCH_TABS, parent,
 		BaseDialog::DialogSizingType::Both, app->GetThemeManager()),
 	m_app(app),
 	m_coreInterface(coreInterface),

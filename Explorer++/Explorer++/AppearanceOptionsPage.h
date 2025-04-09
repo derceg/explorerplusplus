@@ -8,15 +8,14 @@
 #include "OptionsPage.h"
 
 class DarkModeManager;
-class ResourceLoader;
 
 class AppearanceOptionsPage : public OptionsPage
 {
 public:
-	AppearanceOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow, const DarkModeManager *darkModeManager,
-		const ResourceLoader *resourceLoader);
+	AppearanceOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+		const DarkModeManager *darkModeManager);
 
 	void SaveSettings() override;
 
@@ -28,5 +27,4 @@ private:
 	void OnCommand(WPARAM wParam, LPARAM lParam) override;
 
 	const DarkModeManager *const m_darkModeManager;
-	const ResourceLoader *const m_resourceLoader;
 };

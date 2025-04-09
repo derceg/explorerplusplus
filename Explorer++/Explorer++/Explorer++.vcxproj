@@ -987,6 +987,7 @@
     <ClCompile Include="AcceleratorManager.cpp" />
     <ClCompile Include="AddressBarView.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BrowserWindow.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
@@ -1292,6 +1293,7 @@
     <ClInclude Include="AddressBarView.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="AppStorage.h" />
+    <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="ConfigRegistryStorage.h" />

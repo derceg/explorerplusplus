@@ -820,6 +820,9 @@
     <ClCompile Include="ToolbarContextMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
+    <ClCompile Include="BaseDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1694,6 +1697,9 @@
     </ClInclude>
     <ClInclude Include="ToolbarContextMenu.h">
       <Filter>Core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseDialog.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -34,8 +34,9 @@ private:
 class CustomizeColorsDialog : public ThemedDialog
 {
 public:
-	CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager,
-		ColorRuleModel *model, const IconResourceLoader *iconResourceLoader);
+	CustomizeColorsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND parent, ThemeManager *themeManager, ColorRuleModel *model,
+		const IconResourceLoader *iconResourceLoader);
 	~CustomizeColorsDialog();
 
 protected:

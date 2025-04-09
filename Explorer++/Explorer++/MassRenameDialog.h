@@ -45,9 +45,9 @@ private:
 class MassRenameDialog : public ThemedDialog
 {
 public:
-	MassRenameDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
-		FileActionHandler *pFileActionHandler);
+	MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+		ThemeManager *themeManager, const std::list<std::wstring> &FullFilenameList,
+		IconResourceLoader *iconResourceLoader, FileActionHandler *pFileActionHandler);
 
 protected:
 	INT_PTR OnInitDialog() override;

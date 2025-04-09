@@ -11,6 +11,7 @@
 struct Config;
 class CoreInterface;
 class ResizableDialogHelper;
+class ResourceLoader;
 
 class OptionsPage
 {
@@ -18,8 +19,9 @@ public:
 	using SettingChangedCallback = std::function<void()>;
 
 	OptionsPage(UINT dialogResourceId, UINT titleResourceId, HWND parent,
-		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
-		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
+		const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, Config *config,
+		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+		HWND tooltipWindow);
 	virtual ~OptionsPage();
 
 	void InitializeDialog();
@@ -32,6 +34,7 @@ public:
 protected:
 	Config *const m_config;
 	CoreInterface *const m_coreInterface;
+	const ResourceLoader *const m_resourceLoader;
 	const HINSTANCE m_resourceInstance;
 	const HWND m_tooltipWindow;
 

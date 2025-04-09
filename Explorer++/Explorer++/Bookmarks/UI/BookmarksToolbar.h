@@ -20,14 +20,16 @@ class CoreInterface;
 class IconFetcher;
 class IconResourceLoader;
 struct MouseEvent;
+class ResourceLoader;
 class ThemeManager;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
 	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager);
+		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
+		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree, ThemeManager *themeManager);
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
 	BookmarksToolbar(BookmarksToolbar &&) = delete;
@@ -52,8 +54,9 @@ private:
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
 	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager);
+		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
+		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree, ThemeManager *themeManager);
 
 	void Initialize(IconFetcher *iconFetcher);
 	void AddBookmarkItems();

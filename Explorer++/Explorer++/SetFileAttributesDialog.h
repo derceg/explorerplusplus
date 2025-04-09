@@ -40,7 +40,8 @@ private:
 class SetFileAttributesDialog : public ThemedDialog
 {
 public:
-	SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+	SetFileAttributesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager,
 		const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList);
 
 protected:

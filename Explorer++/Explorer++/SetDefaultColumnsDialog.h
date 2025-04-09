@@ -54,8 +54,8 @@ private:
 class SetDefaultColumnsDialog : public ThemedDialog
 {
 public:
-	SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		FolderColumns &folderColumns);
+	SetDefaultColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager, FolderColumns &folderColumns);
 
 protected:
 	INT_PTR OnInitDialog() override;

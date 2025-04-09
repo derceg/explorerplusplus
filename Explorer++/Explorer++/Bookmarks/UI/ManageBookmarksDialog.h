@@ -50,10 +50,10 @@ private:
 class ManageBookmarksDialog : public ThemedDialog
 {
 public:
-	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree);
+	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:

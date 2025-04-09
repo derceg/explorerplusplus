@@ -13,7 +13,6 @@
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
-#include "../Helper/BaseDialog.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -58,10 +57,12 @@ const TCHAR SearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("SortA
 const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
-SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-	std::wstring_view searchDirectory, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	TabContainerImpl *tabContainerImpl, const IconResourceLoader *iconResourceLoader) :
-	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both, themeManager),
+SearchDialog::SearchDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+	HWND hParent, ThemeManager *themeManager, std::wstring_view searchDirectory,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl,
+	const IconResourceLoader *iconResourceLoader) :
+	ThemedDialog(resourceLoader, resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both,
+		themeManager),
 	m_searchDirectory(searchDirectory),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),

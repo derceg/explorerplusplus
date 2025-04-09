@@ -87,8 +87,8 @@ void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolde
 
 void Explorerplusplus::OnSelectColumns()
 {
-	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceInstance(), m_hContainer,
-		m_app->GetThemeManager(),
+	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(),
+		m_app->GetResourceInstance(), m_hContainer, m_app->GetThemeManager(),
 		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl(),
 		m_app->GetIconResourceLoader());
 	selectColumnsDialog.ShowModalDialog();

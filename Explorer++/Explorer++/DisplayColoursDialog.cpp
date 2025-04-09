@@ -10,10 +10,10 @@
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
-DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent,
-	ThemeManager *themeManager, Config *config) :
-	ThemedDialog(resourceInstance, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None,
-		themeManager),
+DisplayColoursDialog::DisplayColoursDialog(const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager, Config *config) :
+	ThemedDialog(resourceLoader, resourceInstance, IDD_DISPLAYCOLOURS, hParent,
+		DialogSizingType::None, themeManager),
 	m_config(config)
 {
 	m_pdcdps = &DisplayColoursDialogPersistentSettings::GetInstance();

@@ -12,6 +12,7 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconResourceLoader;
+class ResourceLoader;
 class TabContainerImpl;
 class ThemeManager;
 
@@ -35,17 +36,17 @@ bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
-void BookmarkAllTabs(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, HWND parentWindow,
-	ThemeManager *themeManager, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader);
+void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager,
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	ThemeManager *themeManager, CoreInterface *coreInterface,
+	ThemeManager *themeManager, CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 	const IconResourceLoader *iconResourceLoader,
 	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager,
-	const IconResourceLoader *iconResourceLoader);
+	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND parentWindow,
+	ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser);
 

@@ -11,13 +11,14 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconResourceLoader;
+class ResourceLoader;
 class ThemeManager;
 
 class BookmarkContextMenuController
 {
 public:
-	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	BookmarkContextMenuController(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager);
 
 	void OnMenuItemSelected(UINT menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
@@ -32,10 +33,11 @@ private:
 	void OnDelete(const RawBookmarkItems &bookmarkItems);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow);
 
-	BookmarkTree *m_bookmarkTree = nullptr;
+	BookmarkTree *const m_bookmarkTree;
+	const ResourceLoader *const m_resourceLoader;
 	HINSTANCE m_resourceInstance;
-	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
+	BrowserWindow *const m_browserWindow;
+	CoreInterface *const m_coreInterface;
 	const IconResourceLoader *const m_iconResourceLoader;
 	ThemeManager *const m_themeManager;
 };

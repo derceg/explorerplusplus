@@ -9,7 +9,8 @@
 class ThirdPartyCreditsDialog : public ThemedDialog
 {
 public:
-	ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager);
+	ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND parent, ThemeManager *themeManager);
 
 protected:
 	INT_PTR OnInitDialog() override;

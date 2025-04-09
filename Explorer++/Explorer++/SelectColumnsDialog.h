@@ -32,8 +32,9 @@ private:
 class SelectColumnsDialog : public ThemedDialog
 {
 public:
-	SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		ShellBrowserImpl *shellBrowser, IconResourceLoader *iconResourceLoader);
+	SelectColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager, ShellBrowserImpl *shellBrowser,
+		IconResourceLoader *iconResourceLoader);
 
 protected:
 	INT_PTR OnInitDialog() override;

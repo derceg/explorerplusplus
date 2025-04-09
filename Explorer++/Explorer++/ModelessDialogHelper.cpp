@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "ModelessDialogHelper.h"
+#include "BaseDialog.h"
 #include "ModelessDialogList.h"
-#include "../Helper/BaseDialog.h"
 
 void CreateOrSwitchToModelessDialog(ModelessDialogList *modelessDialogList, const std::wstring &id,
 	std::function<BaseDialog *()> dialogCreator)

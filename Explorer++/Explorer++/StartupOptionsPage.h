@@ -18,9 +18,10 @@ class WindowSubclass;
 class StartupOptionsPage : public OptionsPage
 {
 public:
-	StartupOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow, DarkModeManager *darkModeManager, ThemeManager *themeManager);
+	StartupOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+		DarkModeManager *darkModeManager, ThemeManager *themeManager);
 
 	void SaveSettings() override;
 

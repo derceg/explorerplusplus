@@ -11,8 +11,8 @@
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
 RenameTabDialog::RenameTabDialog(HWND parent, App *app, Tab *tab) :
-	ThemedDialog(app->GetResourceInstance(), IDD_RENAMETAB, parent, DialogSizingType::None,
-		app->GetThemeManager()),
+	ThemedDialog(app->GetResourceLoader(), app->GetResourceInstance(), IDD_RENAMETAB, parent,
+		DialogSizingType::None, app->GetThemeManager()),
 	m_tab(tab)
 {
 	m_prtdps = &RenameTabDialogPersistentSettings::GetInstance();

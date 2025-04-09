@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "MessageForwarder.h"
-#include "ReferenceCount.h"
-#include "ResizableDialogHelper.h"
+#include "../Helper/MessageForwarder.h"
+#include "../Helper/ResizableDialogHelper.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
 #include <functional>
+
+class ResourceLoader;
 
 /* Provides a degree of abstraction off a standard dialog.
 For instance, provides the ability for a class to manage
@@ -37,8 +38,8 @@ public:
 	HWND ShowModelessDialog(std::function<void()> dialogDestroyedObserver);
 
 protected:
-	BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent,
-		DialogSizingType dialogSizingType);
+	BaseDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, int iResource,
+		HWND hParent, DialogSizingType dialogSizingType);
 
 	virtual void OnInitDialogBase();
 
@@ -52,6 +53,8 @@ protected:
 	int m_iMinHeight;
 
 	HWND m_tipWnd;
+
+	const ResourceLoader *const m_resourceLoader;
 
 private:
 	INT_PTR CALLBACK BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);

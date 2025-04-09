@@ -11,9 +11,10 @@ class ThemeManager;
 class DefaultSettingsOptionsPage : public OptionsPage
 {
 public:
-	DefaultSettingsOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow, ThemeManager *themeManager);
+	DefaultSettingsOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+		ThemeManager *themeManager);
 
 	void SaveSettings() override;
 

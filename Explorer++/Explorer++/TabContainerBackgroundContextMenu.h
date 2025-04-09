@@ -27,13 +27,14 @@ public:
 		ThemeManager *themeManager);
 
 private:
-	void BuildMenu(const ResourceLoader *resourceLoader);
+	void BuildMenu();
 	void OnMenuItemSelected(UINT menuItemId);
 
 	TabContainerImpl *const m_tabContainerImpl;
 	TabRestorer *const m_tabRestorer;
 	BookmarkTree *const m_bookmarkTree;
 	CoreInterface *const m_coreInterface;
+	const ResourceLoader *const m_resourceLoader;
 	const IconResourceLoader *const m_iconResourceLoader;
 	ThemeManager *const m_themeManager;
 	std::vector<boost::signals2::scoped_connection> m_connections;

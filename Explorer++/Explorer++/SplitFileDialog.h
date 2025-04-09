@@ -69,8 +69,9 @@ private:
 class SplitFileDialog : public ThemedDialog
 {
 public:
-	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		const IconResourceLoader *iconResourceLoader, const std::wstring &strFullFilename);
+	SplitFileDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+		ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
+		const std::wstring &strFullFilename);
 	~SplitFileDialog();
 
 protected:

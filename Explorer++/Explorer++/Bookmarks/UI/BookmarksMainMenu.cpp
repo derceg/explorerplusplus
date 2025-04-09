@@ -28,8 +28,8 @@ BookmarksMainMenu::BookmarksMainMenu(App *app, BrowserWindow *browserWindow,
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(iconResourceLoader, iconFetcher, coreInterface->GetResourceInstance()),
-	m_controller(bookmarkTree, browserWindow, coreInterface, iconResourceLoader,
-		coreInterface->GetMainWindow(), themeManager)
+	m_controller(bookmarkTree, browserWindow, coreInterface, app->GetResourceLoader(),
+		iconResourceLoader, coreInterface->GetMainWindow(), themeManager)
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));

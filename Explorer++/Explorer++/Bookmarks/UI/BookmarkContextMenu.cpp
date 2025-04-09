@@ -13,13 +13,14 @@
 #include <glog/logging.h>
 #include <wil/resource.h>
 
-BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager) :
+BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree,
+	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	ThemeManager *themeManager) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceInstance(resourceInstance),
-	m_controller(bookmarkTree, resourceInstance, browserWindow, coreInterface, iconResourceLoader,
-		themeManager),
+	m_controller(bookmarkTree, resourceLoader, resourceInstance, browserWindow, coreInterface,
+		iconResourceLoader, themeManager),
 	m_showingMenu(false)
 {
 }
@@ -85,7 +86,8 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 			targetParentFolder = parentFolder;
 
 			auto lastItem = std::max_element(bookmarkItems.begin(), bookmarkItems.end(),
-				[targetParentFolder](BookmarkItem *first, BookmarkItem *second) {
+				[targetParentFolder](BookmarkItem *first, BookmarkItem *second)
+				{
 					return targetParentFolder->GetChildIndex(first)
 						< targetParentFolder->GetChildIndex(second);
 				});

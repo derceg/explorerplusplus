@@ -13,9 +13,10 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
-ColorRuleListView::ColorRuleListView(HWND listView, HINSTANCE resourceInstance,
-	ThemeManager *themeManager, ColorRuleModel *model) :
+ColorRuleListView::ColorRuleListView(HWND listView, const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, ThemeManager *themeManager, ColorRuleModel *model) :
 	m_listView(listView),
+	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
 	m_themeManager(themeManager),
 	m_model(model)
@@ -87,8 +88,8 @@ void ColorRuleListView::OnDoubleClick(const NMITEMACTIVATE *itemActivate)
 
 	auto *colorRule = m_model->GetItemAtIndex(itemActivate->iItem);
 
-	ColorRuleEditorDialog editorDialog(m_resourceInstance, GetParent(m_listView), m_themeManager,
-		m_model, ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
+	ColorRuleEditorDialog editorDialog(m_resourceLoader, m_resourceInstance, GetParent(m_listView),
+		m_themeManager, m_model, ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
 	editorDialog.ShowModalDialog();
 }
 

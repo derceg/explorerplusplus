@@ -4,11 +4,11 @@
 
 #include "stdafx.h"
 #include "BaseDialog.h"
-#include "Controls.h"
-#include "DpiCompatibility.h"
-#include "Helper.h"
-#include "ResourceHelper.h"
-#include "WindowHelper.h"
+#include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
+#include "../Helper/Helper.h"
+#include "../Helper/ResourceHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 #include <unordered_map>
 
@@ -19,8 +19,9 @@ std::unordered_map<HWND, BaseDialog *> g_windowMap;
 
 }
 
-BaseDialog::BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent,
-	DialogSizingType dialogSizingType) :
+BaseDialog::BaseDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+	int iResource, HWND hParent, DialogSizingType dialogSizingType) :
+	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
 	m_iResource(iResource),
 	m_hParent(hParent),

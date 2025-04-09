@@ -22,25 +22,26 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 	m_tabRestorer(tabRestorer),
 	m_bookmarkTree(bookmarkTree),
 	m_coreInterface(coreInterface),
+	m_resourceLoader(resourceLoader),
 	m_iconResourceLoader(iconResourceLoader),
 	m_themeManager(themeManager)
 {
-	BuildMenu(resourceLoader);
+	BuildMenu();
 
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(std::bind(
 		&TabContainerBackgroundContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
 }
 
-void TabContainerBackgroundContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
+void TabContainerBackgroundContextMenu::BuildMenu()
 {
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_NEW_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
+		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
 		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
+		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
 		GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
-		resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
+		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
 	if (m_tabRestorer->IsEmpty())
@@ -62,9 +63,9 @@ void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
 		break;
 
 	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_coreInterface->GetResourceInstance(),
-			m_coreInterface->GetMainWindow(), m_themeManager, m_coreInterface,
-			m_iconResourceLoader);
+		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_resourceLoader,
+			m_coreInterface->GetResourceInstance(), m_coreInterface->GetMainWindow(),
+			m_themeManager, m_coreInterface, m_iconResourceLoader);
 		break;
 
 	default:

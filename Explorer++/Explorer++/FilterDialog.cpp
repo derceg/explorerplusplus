@@ -18,9 +18,11 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader) :
-	ThemedDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal, themeManager),
+FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+	HWND hParent, ThemeManager *themeManager, CoreInterface *coreInterface,
+	const IconResourceLoader *iconResourceLoader) :
+	ThemedDialog(resourceLoader, resourceInstance, IDD_FILTER, hParent,
+		DialogSizingType::Horizontal, themeManager),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader)
 {
@@ -108,7 +110,7 @@ void FilterDialog::OnOk()
 	simply move the existing entry to the start.
 	Otherwise, insert it at the start. */
 	for (auto itr = m_persistentSettings->m_FilterList.begin();
-		 itr != m_persistentSettings->m_FilterList.end(); itr++)
+		itr != m_persistentSettings->m_FilterList.end(); itr++)
 	{
 		if (filter == *itr)
 		{

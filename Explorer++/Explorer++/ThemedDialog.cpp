@@ -7,9 +7,10 @@
 #include "ThemeManager.h"
 #include "ThemeWindowTracker.h"
 
-ThemedDialog::ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWND parent,
-	DialogSizingType dialogSizingType, ThemeManager *themeManager) :
-	BaseDialog(resourceInstance, dialogResourceId, parent, dialogSizingType),
+ThemedDialog::ThemedDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+	int dialogResourceId, HWND parent, DialogSizingType dialogSizingType,
+	ThemeManager *themeManager) :
+	BaseDialog(resourceLoader, resourceInstance, dialogResourceId, parent, dialogSizingType),
 	m_themeManager(themeManager)
 {
 }

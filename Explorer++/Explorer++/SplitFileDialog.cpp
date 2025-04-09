@@ -34,10 +34,11 @@ const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
-SplitFileDialog::SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
-	ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
+SplitFileDialog::SplitFileDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+	HWND hParent, ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
 	const std::wstring &strFullFilename) :
-	ThemedDialog(resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None, themeManager),
+	ThemedDialog(resourceLoader, resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None,
+		themeManager),
 	m_iconResourceLoader(iconResourceLoader),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),

@@ -11,9 +11,9 @@
 class AdvancedOptionsPage : public OptionsPage
 {
 public:
-	AdvancedOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow);
+	AdvancedOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
 
 	void SaveSettings() override;
 

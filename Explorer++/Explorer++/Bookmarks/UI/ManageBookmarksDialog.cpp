@@ -23,12 +23,13 @@
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
-ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
-	ThemeManager *themeManager, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
-	ThemedDialog(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both,
-		themeManager),
+	ThemedDialog(resourceLoader, resourceInstance, IDD_MANAGE_BOOKMARKS, hParent,
+		DialogSizingType::Both, themeManager),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_iconResourceLoader(iconResourceLoader),
@@ -193,8 +194,8 @@ void ManageBookmarksDialog::SetupListView()
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	m_bookmarkListView = new BookmarkListView(hListView, GetResourceInstance(), m_bookmarkTree,
-		m_browserWindow, m_coreInterface, m_iconResourceLoader, m_iconFetcher, GetThemeManager(),
-		m_persistentSettings->m_listViewColumns);
+		m_browserWindow, m_coreInterface, m_resourceLoader, m_iconResourceLoader, m_iconFetcher,
+		GetThemeManager(), m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
@@ -620,7 +621,7 @@ void ManageBookmarksDialog::OnNewBookmark()
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
 		m_currentBookmarkFolder, targetIndex, focus, GetThemeManager(), m_coreInterface,
-		m_iconResourceLoader);
+		m_resourceLoader, m_iconResourceLoader);
 
 	if (!bookmark || focus != listView || bookmark->GetParent() != m_currentBookmarkFolder)
 	{

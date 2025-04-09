@@ -8,11 +8,11 @@
 #include "MainResource.h"
 #include "../Helper/ResizableDialogHelper.h"
 
-WindowOptionsPage::WindowOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
-	OptionsPage(IDD_OPTIONS_WINDOW, IDS_OPTIONS_WINDOW_TITLE, parent, resourceInstance, config,
-		coreInterface, settingChangedCallback, tooltipWindow)
+WindowOptionsPage::WindowOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
+	OptionsPage(IDD_OPTIONS_WINDOW, IDS_OPTIONS_WINDOW_TITLE, parent, resourceLoader,
+		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
 {
 }
 

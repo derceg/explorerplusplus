@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "BaseDialog.h"
 
 class ThemeManager;
 class ThemeWindowTracker;
@@ -12,8 +12,9 @@ class ThemeWindowTracker;
 class ThemedDialog : public BaseDialog
 {
 public:
-	ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWND parent,
-		DialogSizingType dialogSizingType, ThemeManager *themeManager);
+	ThemedDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		int dialogResourceId, HWND parent, DialogSizingType dialogSizingType,
+		ThemeManager *themeManager);
 	~ThemedDialog();
 
 protected:

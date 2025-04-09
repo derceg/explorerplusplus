@@ -637,7 +637,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="BulkClipboardWriter.cpp" />
     <ClCompile Include="CachedIcons.cpp" />
@@ -724,7 +723,6 @@
   <ItemGroup>
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="Base64Wrapper.h" />
-    <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="BulkClipboardWriter.h" />

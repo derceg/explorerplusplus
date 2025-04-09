@@ -9,14 +9,15 @@
 
 class ColorRule;
 class ColorRuleModel;
+class ResourceLoader;
 class ThemeManager;
 class WindowSubclass;
 
 class ColorRuleListView
 {
 public:
-	ColorRuleListView(HWND listView, HINSTANCE resourceInstance, ThemeManager *themeManager,
-		ColorRuleModel *model);
+	ColorRuleListView(HWND listView, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, ThemeManager *themeManager, ColorRuleModel *model);
 
 	ColorRule *MaybeGetSelectedColorRule();
 
@@ -39,6 +40,7 @@ private:
 	void OnAllColorRulesRemoved();
 
 	HWND m_listView;
+	const ResourceLoader *const m_resourceLoader;
 	HINSTANCE m_resourceInstance;
 	ThemeManager *const m_themeManager;
 	ColorRuleModel *m_model;

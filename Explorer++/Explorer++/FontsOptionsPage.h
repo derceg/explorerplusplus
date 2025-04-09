@@ -13,8 +13,8 @@
 class FontsOptionsPage : public OptionsPage
 {
 public:
-	FontsOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+	FontsOptionsPage(HWND parent, const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
 		HWND tooltipWindow);
 
 	void SaveSettings() override;

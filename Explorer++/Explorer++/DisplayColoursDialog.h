@@ -31,8 +31,8 @@ private:
 class DisplayColoursDialog : public ThemedDialog
 {
 public:
-	DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		Config *config);
+	DisplayColoursDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager, Config *config);
 
 protected:
 	INT_PTR OnInitDialog() override;

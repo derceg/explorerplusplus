@@ -15,9 +15,9 @@ class App;
 class GeneralOptionsPage : public OptionsPage
 {
 public:
-	GeneralOptionsPage(HWND parent, HINSTANCE resourceInstance, App *app, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow);
+	GeneralOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, App *app, Config *config, CoreInterface *coreInterface,
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
 
 	void SaveSettings() override;
 

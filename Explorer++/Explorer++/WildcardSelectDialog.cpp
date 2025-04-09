@@ -10,7 +10,6 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
-#include "../Helper/BaseDialog.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/WindowHelper.h"
@@ -21,10 +20,11 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("Wildcar
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
-WildcardSelectDialog::WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent,
-	ThemeManager *themeManager, BOOL bSelect, BrowserWindow *browserWindow) :
-	ThemedDialog(resourceInstance, IDD_WILDCARDSELECT, hParent, DialogSizingType::Horizontal,
-		themeManager),
+WildcardSelectDialog::WildcardSelectDialog(const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager, BOOL bSelect,
+	BrowserWindow *browserWindow) :
+	ThemedDialog(resourceLoader, resourceInstance, IDD_WILDCARDSELECT, hParent,
+		DialogSizingType::Horizontal, themeManager),
 	m_bSelect(bSelect),
 	m_browserWindow(browserWindow)
 {

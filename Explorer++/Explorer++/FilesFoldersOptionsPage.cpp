@@ -20,10 +20,10 @@
 std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
 	HINSTANCE resourceInstance);
 
-FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, HINSTANCE resourceInstance,
-	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
-	OptionsPage(IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, parent,
+FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
+	OptionsPage(IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, parent, resourceLoader,
 		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
 {
 }

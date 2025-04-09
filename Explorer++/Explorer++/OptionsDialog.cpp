@@ -28,8 +28,8 @@
 
 OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent, App *app, Config *config,
 	CoreInterface *coreInterface) :
-	ThemedDialog(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both,
-		app->GetThemeManager()),
+	ThemedDialog(app->GetResourceLoader(), resourceInstance, IDD_OPTIONS, parent,
+		DialogSizingType::Both, app->GetThemeManager()),
 	m_app(app),
 	m_config(config),
 	m_resourceInstance(resourceInstance),
@@ -130,27 +130,29 @@ std::vector<ResizableDialogControl> OptionsDialog::GetResizableControls()
 
 void OptionsDialog::AddPages()
 {
-	AddPage(std::make_unique<GeneralOptionsPage>(m_hDlg, GetResourceInstance(), m_app, m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<StartupOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
+	AddPage(std::make_unique<GeneralOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_app, m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this),
+		m_tipWnd));
+	AddPage(std::make_unique<StartupOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
 		m_app->GetDarkModeManager(), GetThemeManager()));
-	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
-		m_app->GetDarkModeManager(), m_app->GetResourceLoader()));
-	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<WindowOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<TabsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<DefaultSettingsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
-		GetThemeManager()));
-	AddPage(std::make_unique<AdvancedOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
-		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd,
+		m_app->GetDarkModeManager()));
+	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, m_resourceLoader,
+		GetResourceInstance(), m_config, m_coreInterface,
+		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<WindowOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<TabsOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<DefaultSettingsOptionsPage>(m_hDlg, m_resourceLoader,
+		GetResourceInstance(), m_config, m_coreInterface,
+		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd, GetThemeManager()));
+	AddPage(std::make_unique<AdvancedOptionsPage>(m_hDlg, m_resourceLoader, GetResourceInstance(),
+		m_config, m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 }
 
 void OptionsDialog::AddPage(std::unique_ptr<OptionsPage> page)

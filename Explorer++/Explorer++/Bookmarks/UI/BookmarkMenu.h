@@ -15,6 +15,7 @@ class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
 class IconResourceLoader;
+class ResourceLoader;
 class ThemeManager;
 
 // Although it's not necessary, this class is effectively designed to be held
@@ -24,8 +25,8 @@ class ThemeManager;
 class BookmarkMenu
 {
 public:
-	BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	BookmarkMenu(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher, HWND parentWindow,
 		ThemeManager *themeManager);
 

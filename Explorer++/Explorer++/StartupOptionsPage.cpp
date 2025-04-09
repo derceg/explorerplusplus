@@ -16,11 +16,12 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
-StartupOptionsPage::StartupOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+StartupOptionsPage::StartupOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
+	SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
 	DarkModeManager *darkModeManager, ThemeManager *themeManager) :
-	OptionsPage(IDD_OPTIONS_STARTUP, IDS_OPTIONS_STARTUP_TITLE, parent, resourceInstance, config,
-		coreInterface, settingChangedCallback, tooltipWindow),
+	OptionsPage(IDD_OPTIONS_STARTUP, IDS_OPTIONS_STARTUP_TITLE, parent, resourceLoader,
+		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow),
 	m_darkModeManager(darkModeManager),
 	m_themeManager(themeManager),
 	m_listViewDisabledBackgroundBrush(

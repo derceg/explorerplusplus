@@ -40,10 +40,10 @@ private:
 class AddBookmarkDialog : public ThemedDialog
 {
 public:
-	AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
-		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
-		const IconResourceLoader *iconResourceLoader,
+	AddBookmarkDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager, BookmarkTree *bookmarkTree,
+		BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
+		BookmarkItem **selectedParentFolder, const IconResourceLoader *iconResourceLoader,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:

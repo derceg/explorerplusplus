@@ -26,7 +26,8 @@ private:
 class UpdateCheckDialog : public ThemedDialog
 {
 public:
-	UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager);
+	UpdateCheckDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, ThemeManager *themeManager);
 
 protected:
 	INT_PTR OnInitDialog() override;
