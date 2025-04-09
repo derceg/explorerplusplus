@@ -36,7 +36,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(UINT menuItemId,
 		DCHECK(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
 
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0],
-			OpenFolderDisposition::CurrentTab, m_coreInterface, m_browserWindow);
+			OpenFolderDisposition::CurrentTab, m_browserWindow);
 	}
 	break;
 
@@ -46,7 +46,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(UINT menuItemId,
 			m_coreInterface->GetConfig()->openTabsInForeground
 				? OpenFolderDisposition::ForegroundTab
 				: OpenFolderDisposition::BackgroundTab,
-			m_coreInterface, m_browserWindow);
+			m_browserWindow);
 		break;
 
 	case IDM_BOOKMARKS_OPEN_ALL:
@@ -98,8 +98,7 @@ void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkIt
 
 	for (auto *bookmarkItem : bookmarkItems)
 	{
-		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_coreInterface,
-			m_browserWindow);
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_browserWindow);
 
 		disposition = OpenFolderDisposition::BackgroundTab;
 	}

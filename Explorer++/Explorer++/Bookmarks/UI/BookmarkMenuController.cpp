@@ -28,16 +28,14 @@ void BookmarkMenuController::OnMenuItemSelected(const BookmarkItem *bookmarkItem
 	DCHECK(bookmarkItem->IsBookmark());
 
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown), m_coreInterface,
-		m_browserWindow);
+		DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown), m_browserWindow);
 }
 
 void BookmarkMenuController::OnMenuItemMiddleClicked(const BookmarkItem *bookmarkItem,
 	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		DetermineOpenDisposition(true, isCtrlKeyDown, isShiftKeyDown), m_coreInterface,
-		m_browserWindow);
+		DetermineOpenDisposition(true, isCtrlKeyDown, isShiftKeyDown), m_browserWindow);
 }
 
 void BookmarkMenuController::OnMenuItemRightClicked(BookmarkItem *bookmarkItem, const POINT &pt)

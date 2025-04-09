@@ -83,7 +83,6 @@ private:
 
 	BookmarksToolbarView *m_view = nullptr;
 	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
 	const IconResourceLoader *const m_iconResourceLoader;
 	BookmarkTree *m_bookmarkTree = nullptr;
 	ThemeManager *const m_themeManager;

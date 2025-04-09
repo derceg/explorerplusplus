@@ -5,10 +5,11 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include "Navigator.h"
+#include "NavigationHelper.h"
 #include <optional>
 
 class BookmarkTree;
+class BrowserWindow;
 class CoreInterface;
 class IconResourceLoader;
 class TabContainerImpl;
@@ -46,7 +47,7 @@ void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager,
 	const IconResourceLoader *iconResourceLoader);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
-	OpenFolderDisposition disposition, CoreInterface *coreInterface, Navigator *navigator);
+	OpenFolderDisposition disposition, BrowserWindow *browser);
 
 bool CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut);
 void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index);
