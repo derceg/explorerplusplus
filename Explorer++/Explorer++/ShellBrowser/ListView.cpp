@@ -14,6 +14,7 @@
 #include "MainResource.h"
 #include "NavigateParams.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "SelectColumnsDialog.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellNavigationController.h"
@@ -483,8 +484,7 @@ BOOL ShellBrowserImpl::OnListViewGetEmptyMarkup(NMLVEMPTYMARKUP *emptyMarkup)
 {
 	emptyMarkup->dwFlags = EMF_CENTERED;
 
-	auto folderEmptyText =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_LISTVIEW_FOLDER_EMPTY);
+	auto folderEmptyText = m_app->GetResourceLoader()->LoadString(IDS_LISTVIEW_FOLDER_EMPTY);
 	StringCchCopy(emptyMarkup->szMarkup, std::size(emptyMarkup->szMarkup), folderEmptyText.c_str());
 
 	return TRUE;
