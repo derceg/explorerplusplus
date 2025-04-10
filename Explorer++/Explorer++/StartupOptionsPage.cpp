@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "DarkModeManager.h"
 #include "MainResource.h"
+#include "ResourceLoader.h"
 #include "ThemeManager.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
@@ -49,7 +50,7 @@ void StartupOptionsPage::InitializeControls()
 	CheckDlgButton(GetDialog(), MapStartupModeToControlId(m_config->startupMode), BST_CHECKED);
 
 	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_STARTUP_CUSTOM_FOLDERS),
-		m_resourceInstance, IDS_OPTIONS_CUSTOM_FOLDERS_TOOLTIP, TooltipType::Control);
+		m_resourceLoader->LoadString(IDS_OPTIONS_CUSTOM_FOLDERS_TOOLTIP), TooltipType::Control);
 
 	SetUpListView();
 

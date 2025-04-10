@@ -8,6 +8,7 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
@@ -153,7 +154,7 @@ void FilesFoldersOptionsPage::InitializeControls()
 	}
 
 	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_USE_NATURAL_SORT_ORDER),
-		m_resourceInstance, IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
+		m_resourceLoader->LoadString(IDS_USE_NATURAL_SORT_ORDER_TOOLTIP));
 
 	HWND fileSizesComboBox = GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES);
 	std::vector<ComboBoxItem> fileSizeItems;

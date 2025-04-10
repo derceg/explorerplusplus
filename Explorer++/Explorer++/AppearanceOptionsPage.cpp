@@ -43,15 +43,15 @@ void AppearanceOptionsPage::InitializeControls()
 	// Adding the tooltip based on the control rectangle, while leaving out the SS_NOTIFY style,
 	// will work in both cases.
 	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_OPTIONS_THEME_LABEL),
-		m_resourceInstance, IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
+		m_resourceLoader->LoadString(IDS_OPTIONS_THEME_TOOLTIP), TooltipType::Rectangle);
 
 	// These calls add a tooltip both to the combobox control and to the control rectangle. The
 	// first tooltip will activate when the control is enabled, while the second will activate
 	// when the control is disabled.
 	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_OPTIONS_THEME),
-		m_resourceInstance, IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Control);
+		m_resourceLoader->LoadString(IDS_OPTIONS_THEME_TOOLTIP), TooltipType::Control);
 	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_OPTIONS_THEME),
-		m_resourceInstance, IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
+		m_resourceLoader->LoadString(IDS_OPTIONS_THEME_TOOLTIP), TooltipType::Rectangle);
 
 	if (!m_darkModeManager->IsDarkModeSupported())
 	{

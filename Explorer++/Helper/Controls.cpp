@@ -297,23 +297,13 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 		MulDiv(defaultHeight, dpi, USER_DEFAULT_SCREEN_DPI) };
 }
 
-bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
-	int stringResourceId, TooltipType tooltipType)
+void AddTooltipForControl(HWND tipWnd, HWND control, const std::wstring &tooltip,
+	TooltipType tooltipType)
 {
-	// Note that the lpszText field of the TOOLINFO struct can be set to the identifier of the
-	// appropriate string resource. However, in that case, the maximum text length is 80 characters,
-	// which is why the string is instead manually loaded here.
-	WCHAR *rawString;
-	int numCharacters =
-		LoadString(resourceInstance, stringResourceId, reinterpret_cast<LPWSTR>(&rawString), 0);
-	CHECK_NE(numCharacters, 0) << "String resource not found";
-
-	std::wstring string(rawString, numCharacters);
-
 	TOOLINFO toolInfo = {};
 	toolInfo.cbSize = sizeof(toolInfo);
 	toolInfo.uFlags = TTF_SUBCLASS;
-	toolInfo.lpszText = string.data();
+	toolInfo.lpszText = const_cast<wchar_t *>(tooltip.c_str());
 
 	if (tooltipType == TooltipType::Control)
 	{
@@ -332,7 +322,8 @@ bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
 		toolInfo.rect = controlRect;
 	}
 
-	return SendMessage(tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
+	auto res = SendMessage(tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
+	DCHECK(res);
 }
 
 void AddItemsToComboBox(HWND comboBox, const std::vector<ComboBoxItem> &items, int currentItemId)

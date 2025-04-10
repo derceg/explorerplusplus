@@ -31,8 +31,8 @@ INT_PTR ApplicationEditorDialog::OnInitDialog()
 		SetWindowText(m_hDlg, newText.c_str());
 	}
 
-	AddTooltipForControl(m_tipWnd, GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND), GetResourceInstance(),
-		IDS_APP_EDIT_COMMAND_TOOLTIP);
+	AddTooltipForControl(m_tipWnd, GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND),
+		m_resourceLoader->LoadStringW(IDS_APP_EDIT_COMMAND_TOOLTIP));
 
 	const Application *targetApplication = m_editDetails->type == EditDetails::Type::NewItem
 		? m_editDetails->newApplication.get()

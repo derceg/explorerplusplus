@@ -30,8 +30,8 @@ SIZE GetCheckboxSize(HWND hwnd);
 SIZE GetRadioButtonSize(HWND hwnd);
 SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int defaultHeight);
 
-bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
-	int stringResourceId, TooltipType tooltipType = TooltipType::Control);
+void AddTooltipForControl(HWND tipWnd, HWND control, const std::wstring &tooltip,
+	TooltipType tooltipType = TooltipType::Control);
 
 struct ComboBoxItem
 {
