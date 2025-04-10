@@ -31,11 +31,11 @@
 #include <wil/com.h>
 #include <list>
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserImpl(hOwner, app, coreInterface, tabNavigation, fileActionHandler,
+	ShellBrowserImpl(hOwner, app, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
@@ -44,12 +44,10 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInt
 	ChangeToInitialFolder();
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
-	const FolderColumns *initialColumns) :
-	ShellBrowserImpl(hOwner, app, coreInterface, tabNavigation, fileActionHandler, folderSettings,
-		initialColumns)
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
+	ShellBrowserImpl(hOwner, app, tabNavigation, fileActionHandler, folderSettings, initialColumns)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
 		m_app->GetNavigationEvents(), tabNavigation, initialPidl);
@@ -57,9 +55,9 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInt
 	ChangeToInitialFolder();
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+	const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
 	m_hOwner(hOwner),
@@ -83,14 +81,14 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInt
 	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_columnResultIDCounter(0),
-	m_cachedIcons(coreInterface->GetCachedIcons()),
+	m_cachedIcons(app->GetCachedIcons()),
 	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_infoTipResultIDCounter(0),
-	m_resourceInstance(coreInterface->GetResourceInstance()),
+	m_resourceInstance(app->GetResourceInstance()),
 	m_acceleratorManager(app->GetAcceleratorManager()),
 	m_config(app->GetConfig()),
 	m_folderSettings(folderSettings),

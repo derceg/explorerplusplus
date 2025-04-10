@@ -444,7 +444,6 @@ private:
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainerImpl *GetTabContainerImpl() const override;
 	HWND GetTreeView() const override;
-	CachedIcons *GetCachedIcons() override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
 

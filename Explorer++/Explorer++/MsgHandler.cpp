@@ -961,11 +961,6 @@ HWND Explorerplusplus::GetTreeView() const
 	return m_shellTreeView->GetHWND();
 }
 
-CachedIcons *Explorerplusplus::GetCachedIcons()
-{
-	return m_app->GetCachedIcons();
-}
-
 void Explorerplusplus::OnShowHiddenFiles()
 {
 	Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();

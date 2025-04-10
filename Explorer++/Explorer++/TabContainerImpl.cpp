@@ -817,8 +817,8 @@ Tab &TabContainerImpl::CreateNewTab(const std::wstring &directory, const TabSett
 Tab &TabContainerImpl::CreateNewTab(const PreservedTab &preservedTab)
 {
 	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(), m_app,
-		m_coreInterface, m_tabNavigation, m_fileActionHandler, preservedTab.history,
-		preservedTab.currentEntry, preservedTab.preservedFolderState);
+		m_tabNavigation, m_fileActionHandler, preservedTab.history, preservedTab.currentEntry,
+		preservedTab.preservedFolderState);
 	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
 		.customName = preservedTab.customName,
 		.lockState = preservedTab.lockState };
@@ -862,9 +862,9 @@ Tab &TabContainerImpl::CreateNewTab(NavigateParams &navigateParams, const TabSet
 		folderSettingsFinal = m_app->GetConfig()->defaultFolderSettings;
 	}
 
-	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(), m_app,
-		m_coreInterface, m_tabNavigation, m_fileActionHandler, navigateParams.pidl,
-		folderSettingsFinal, initialColumns);
+	auto shellBrowser =
+		std::make_unique<ShellBrowserImpl>(m_coreInterface->GetMainWindow(), m_app, m_tabNavigation,
+			m_fileActionHandler, navigateParams.pidl, folderSettingsFinal, initialColumns);
 
 	Tab::InitialData initialTabData;
 

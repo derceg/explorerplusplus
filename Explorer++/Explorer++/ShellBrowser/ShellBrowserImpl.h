@@ -45,7 +45,6 @@ class App;
 struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
-class CoreInterface;
 class FileActionHandler;
 class IconFetcher;
 class NavigationRequest;
@@ -69,14 +68,13 @@ class ShellBrowserImpl :
 	private boost::noncopyable
 {
 public:
-	ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
+	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
@@ -356,9 +354,9 @@ private:
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
-	ShellBrowserImpl(HWND hOwner, App *app, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
+	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();

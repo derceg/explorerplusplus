@@ -17,7 +17,6 @@ using MainMenuItemMiddleClickedSignal =
 		FirstSuccessfulRequestCombiner<bool>>;
 using FocusChangedSignal = boost::signals2::signal<void()>;
 
-class CachedIcons;
 struct Config;
 class ShellBrowserImpl;
 class TabContainerImpl;
@@ -38,8 +37,6 @@ public:
 	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;
 
 	virtual TabContainerImpl *GetTabContainerImpl() const = 0;
-
-	virtual CachedIcons *GetCachedIcons() = 0;
 
 	virtual HWND GetTreeView() const = 0;
 
