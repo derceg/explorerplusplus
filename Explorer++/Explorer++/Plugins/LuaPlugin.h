@@ -8,15 +8,17 @@
 #include "Plugins/Manifest.h"
 #include <sol/forward.hpp>
 
+struct Config;
+
 namespace Plugins
 {
-// Wraps a Lua state object and binds in all plugin API methods
-// during construction.
+
+// Wraps a Lua state object and binds in all plugin API methods during construction.
 class LuaPlugin
 {
 public:
 	LuaPlugin(const std::wstring &directory, const Manifest &manifest,
-		PluginInterface *pluginInterface);
+		PluginInterface *pluginInterface, const Config *config);
 
 	int GetId() const;
 	std::wstring GetDirectory() const;
@@ -40,4 +42,5 @@ public:
 	{
 	}
 };
+
 }

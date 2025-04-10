@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Plugins/TabsApi/TabsApi.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "Plugins/TabsApi/TabProperties.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/NavigateParams.h"
@@ -63,9 +62,9 @@ std::wstring Plugins::TabsApi::Tab::toString()
 	// clang-format on
 }
 
-Plugins::TabsApi::TabsApi(CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl) :
-	m_coreInterface(coreInterface),
-	m_tabContainerImpl(tabContainerImpl)
+Plugins::TabsApi::TabsApi(TabContainerImpl *tabContainerImpl, const Config *config) :
+	m_tabContainerImpl(tabContainerImpl),
+	m_config(config)
 {
 }
 
@@ -116,7 +115,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		return -1;
 	}
 
-	::FolderSettings folderSettings = m_coreInterface->GetConfig()->defaultFolderSettings;
+	::FolderSettings folderSettings = m_config->defaultFolderSettings;
 
 	sol::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
 

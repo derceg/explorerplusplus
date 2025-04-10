@@ -7,6 +7,8 @@
 #include "PluginInterface.h"
 #include "Plugins/LuaPlugin.h"
 
+struct Config;
+
 namespace std
 {
 namespace filesystem
@@ -20,7 +22,7 @@ namespace Plugins
 class PluginManager
 {
 public:
-	PluginManager(PluginInterface *pluginInterface);
+	PluginManager(PluginInterface *pluginInterface, const Config *config);
 
 	void loadAllPlugins(const std::filesystem::path &pluginDirectory);
 
@@ -31,6 +33,7 @@ private:
 	bool registerPlugin(const std::filesystem::path &directory, const Manifest &manifest);
 
 	PluginInterface *m_pluginInterface;
+	const Config *const m_config;
 
 	std::vector<std::unique_ptr<Plugins::LuaPlugin>> m_plugins;
 };

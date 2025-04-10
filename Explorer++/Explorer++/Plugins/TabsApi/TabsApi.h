@@ -10,7 +10,7 @@
 #include <sol/forward.hpp>
 #include <optional>
 
-class CoreInterface;
+struct Config;
 struct FolderSettings;
 class ShellBrowserImpl;
 class TabContainerImpl;
@@ -52,7 +52,7 @@ public:
 		std::wstring toString();
 	};
 
-	TabsApi(CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl);
+	TabsApi(TabContainerImpl *tabContainerImpl, const Config *config);
 
 	std::vector<Tab> getAll();
 	std::optional<Tab> get(int tabId);
@@ -67,7 +67,7 @@ private:
 	void extractFolderSettingsForCreation(sol::table folderSettingsTable,
 		::FolderSettings &folderSettings);
 
-	CoreInterface *m_coreInterface;
-	TabContainerImpl *m_tabContainerImpl;
+	TabContainerImpl *const m_tabContainerImpl;
+	const Config *const m_config;
 };
 }

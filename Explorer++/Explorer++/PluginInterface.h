@@ -5,7 +5,6 @@
 #pragma once
 
 class AcceleratorUpdater;
-class CoreInterface;
 class TabContainerImpl;
 class TabEvents;
 class UiTheming;
@@ -23,7 +22,6 @@ class PluginInterface
 public:
 	virtual ~PluginInterface() = default;
 
-	virtual CoreInterface *GetCoreInterface() = 0;
 	virtual TabEvents *GetTabEvents() = 0;
 	virtual TabContainerImpl *GetTabContainerImpl() = 0;
 	virtual Plugins::PluginMenuManager *GetPluginMenuManager() = 0;

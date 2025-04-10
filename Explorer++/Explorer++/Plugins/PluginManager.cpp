@@ -15,8 +15,9 @@ const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 std::vector<ShortcutKey> convertPluginShortcutKeys(
 	const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys);
 
-Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface) :
-	m_pluginInterface(pluginInterface)
+Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface, const Config *config) :
+	m_pluginInterface(pluginInterface),
+	m_config(config)
 {
 }
 
@@ -57,7 +58,8 @@ bool Plugins::PluginManager::attemptToLoadPlugin(const std::filesystem::path &di
 bool Plugins::PluginManager::registerPlugin(const std::filesystem::path &directory,
 	const Manifest &manifest)
 {
-	auto plugin = std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_pluginInterface);
+	auto plugin =
+		std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_pluginInterface, m_config);
 
 	for (auto library : manifest.libraries)
 	{

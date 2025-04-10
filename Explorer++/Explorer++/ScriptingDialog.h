@@ -1,14 +1,16 @@
 #pragma once
 
-#include "PluginInterface.h"
 #include "Plugins/LuaPlugin.h"
 #include "ThemedDialog.h"
+
+struct Config;
+class PluginInterface;
 
 class ScriptingDialog : public ThemedDialog
 {
 public:
 	ScriptingDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager, PluginInterface *pluginInterface);
+		ThemeManager *themeManager, PluginInterface *pluginInterface, const Config *config);
 
 protected:
 	INT_PTR OnInitDialog() override;

@@ -12,13 +12,13 @@ int Plugins::LuaPlugin::idCounter = 1;
 inline int onPanic(lua_State *L);
 
 Plugins::LuaPlugin::LuaPlugin(const std::wstring &directory, const Manifest &manifest,
-	PluginInterface *pluginInterface) :
+	PluginInterface *pluginInterface, const Config *config) :
 	m_directory(directory),
 	m_manifest(manifest),
 	m_lua(onPanic),
 	m_id(idCounter++)
 {
-	BindAllApiMethods(m_id, m_lua, pluginInterface);
+	BindAllApiMethods(m_id, m_lua, pluginInterface, config);
 }
 
 int Plugins::LuaPlugin::GetId() const

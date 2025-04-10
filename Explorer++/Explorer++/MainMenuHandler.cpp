@@ -132,7 +132,7 @@ void Explorerplusplus::OnRunScript()
 		[this]
 		{
 			return new ScriptingDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-				m_hContainer, m_app->GetThemeManager(), this);
+				m_hContainer, m_app->GetThemeManager(), this, m_config);
 		});
 }
 

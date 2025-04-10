@@ -7,7 +7,12 @@
 #include "PluginInterface.h"
 #include <sol/forward.hpp>
 
+struct Config;
+
 namespace Plugins
 {
-void BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface);
+
+void BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface,
+	const Config *config);
+
 }

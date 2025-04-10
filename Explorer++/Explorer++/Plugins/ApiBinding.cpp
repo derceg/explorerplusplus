@@ -19,8 +19,8 @@
 #include "UiTheming.h"
 #include <sol/sol.hpp>
 
-void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabEvents *tabEvents,
-	TabContainerImpl *tabContainerImpl);
+void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainerImpl *tabContainerImpl,
+	const Config *config);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state,
@@ -33,20 +33,21 @@ void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
-void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface)
+void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface,
+	const Config *config)
 {
-	BindTabsAPI(state, pluginInterface->GetCoreInterface(), pluginInterface->GetTabEvents(),
-		pluginInterface->GetTabContainerImpl());
+	BindTabsAPI(state, pluginInterface->GetTabEvents(), pluginInterface->GetTabContainerImpl(),
+		config);
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
 	BindUiApi(state, pluginInterface->GetUiTheming());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabEvents *tabEvents,
-	TabContainerImpl *tabContainerImpl)
+void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainerImpl *tabContainerImpl,
+	const Config *config)
 {
 	std::shared_ptr<Plugins::TabsApi> tabsApi =
-		std::make_shared<Plugins::TabsApi>(coreInterface, tabContainerImpl);
+		std::make_shared<Plugins::TabsApi>(tabContainerImpl, config);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);

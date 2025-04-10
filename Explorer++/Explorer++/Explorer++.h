@@ -326,7 +326,6 @@ private:
 	void OnNavigationCommitted(const NavigationRequest *request);
 
 	/* PluginInterface. */
-	CoreInterface *GetCoreInterface() override;
 	TabEvents *GetTabEvents() override;
 	TabContainerImpl *GetTabContainerImpl() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;

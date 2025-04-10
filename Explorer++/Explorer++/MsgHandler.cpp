@@ -946,11 +946,6 @@ ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowserImpl() const
 	return m_pActiveShellBrowser;
 }
 
-CoreInterface *Explorerplusplus::GetCoreInterface()
-{
-	return this;
-}
-
 TabEvents *Explorerplusplus::GetTabEvents()
 {
 	return m_app->GetTabEvents();
