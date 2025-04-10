@@ -16,7 +16,7 @@
 #include "Icon.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "StartupOptionsPage.h"
 #include "TabsOptionsPage.h"
 #include "WindowOptionsPage.h"
@@ -65,8 +65,7 @@ void OptionsDialog::SetupSearchField()
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(searchField,
 		std::bind_front(&OptionsDialog::SearchFieldWndProc, this)));
 
-	auto placeholderText = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-		IDS_OPTIONS_SEARCH_PLACEHOLDER_TEXT);
+	auto placeholderText = m_resourceLoader->LoadString(IDS_OPTIONS_SEARCH_PLACEHOLDER_TEXT);
 	SendMessage(searchField, EM_SETCUEBANNER, true,
 		reinterpret_cast<LPARAM>(placeholderText.c_str()));
 }
