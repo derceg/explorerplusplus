@@ -6,6 +6,8 @@
 
 #include "../Helper/BetterEnumsWrapper.h"
 
+class ResourceLoader;
+
 // clang-format off
 BETTER_ENUM(ViewMode, int,
 	Icons = 1,
@@ -24,4 +26,4 @@ BETTER_ENUM(ViewMode, int,
 bool IsThumbnailsViewMode(ViewMode viewMode);
 
 UINT GetViewModeMenuId(ViewMode viewMode);
-std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance);
+std::wstring GetViewModeMenuText(const ResourceLoader *resourceLoader, ViewMode viewMode);

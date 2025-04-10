@@ -70,7 +70,7 @@ void DefaultSettingsOptionsPage::InitializeControls()
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		viewModeItems.emplace_back(viewMode, GetViewModeMenuText(viewMode, m_resourceInstance));
+		viewModeItems.emplace_back(viewMode, GetViewModeMenuText(m_resourceLoader, viewMode));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_DEFAULT_VIEW), viewModeItems,

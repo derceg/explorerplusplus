@@ -111,7 +111,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		std::wstring text = GetViewModeMenuText(viewMode, m_app->GetResourceInstance());
+		std::wstring text = GetViewModeMenuText(m_app->GetResourceLoader(), viewMode);
 
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(itemInfo);

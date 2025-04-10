@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -17,9 +16,6 @@
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
-
-std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
-	HINSTANCE resourceInstance);
 
 FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
@@ -166,8 +162,7 @@ void FilesFoldersOptionsPage::InitializeControls()
 			continue;
 		}
 
-		fileSizeItems.emplace_back(static_cast<int>(size),
-			GetSizeDisplayFormatText(size, m_resourceInstance));
+		fileSizeItems.emplace_back(static_cast<int>(size), GetSizeDisplayFormatText(size));
 	}
 
 	AddItemsToComboBox(fileSizesComboBox, fileSizeItems,
@@ -267,8 +262,7 @@ void FilesFoldersOptionsPage::SetFolderSizeControlState()
 	EnableWindow(folderSizesNetworkRemovable, enable);
 }
 
-std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
-	HINSTANCE resourceInstance)
+std::wstring FilesFoldersOptionsPage::GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat)
 {
 	UINT stringId;
 
@@ -298,15 +292,15 @@ std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
 		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_PB;
 		break;
 
-	// SizeDisplayFormat::None isn't an option that's displayed to the user, so there should
-	// never be a string lookup for that item.
+	// SizeDisplayFormat::None isn't an option that's displayed to the user, so there should never
+	// be a string lookup for that item.
 	case SizeDisplayFormat::None:
 	default:
 		LOG(FATAL) << "SizeDisplayFormat value not found or invalid";
 		__assume(0);
 	}
 
-	return ResourceHelper::LoadString(resourceInstance, stringId);
+	return m_resourceLoader->LoadString(stringId);
 }
 
 void FilesFoldersOptionsPage::SaveSettings()

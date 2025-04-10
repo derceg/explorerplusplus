@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ViewModes.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include <glog/logging.h>
 
 bool IsThumbnailsViewMode(ViewMode viewMode)
@@ -53,7 +53,7 @@ UINT GetViewModeMenuId(ViewMode viewMode)
 	}
 }
 
-std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance)
+std::wstring GetViewModeMenuText(const ResourceLoader *resourceLoader, ViewMode viewMode)
 {
 	UINT stringId;
 
@@ -104,5 +104,5 @@ std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance)
 		__assume(0);
 	}
 
-	return ResourceHelper::LoadString(resourceInstance, stringId);
+	return resourceLoader->LoadString(stringId);
 }

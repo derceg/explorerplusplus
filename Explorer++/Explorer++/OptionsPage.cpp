@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "OptionsPage.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -53,7 +53,7 @@ HWND OptionsPage::GetDialog() const
 
 std::wstring OptionsPage::GetTitle() const
 {
-	return ResourceHelper::LoadString(m_resourceInstance, m_titleResourceId);
+	return m_resourceLoader->LoadString(m_titleResourceId);
 }
 
 INT_PTR CALLBACK OptionsPage::DialogProcStub(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)

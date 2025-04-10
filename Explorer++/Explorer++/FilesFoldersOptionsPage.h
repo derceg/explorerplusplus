@@ -5,6 +5,7 @@
 #pragma once
 
 #include "OptionsPage.h"
+#include "../Helper/StringHelper.h"
 
 class FilesFoldersOptionsPage : public OptionsPage
 {
@@ -23,4 +24,5 @@ private:
 
 	void SetInfoTipControlStates();
 	void SetFolderSizeControlState();
+	std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat);
 };

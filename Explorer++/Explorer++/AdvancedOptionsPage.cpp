@@ -6,7 +6,7 @@
 #include "AdvancedOptionsPage.h"
 #include "Config.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/RichEditHelper.h"
@@ -46,16 +46,14 @@ void AdvancedOptionsPage::InitializeControls()
 		AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(GetDialog(), IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETEVENTMASK, 0, ENM_LINK);
 
-	std::wstring valueColumnText =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_ADVANCED_OPTION_VALUE);
+	std::wstring valueColumnText = m_resourceLoader->LoadString(IDS_ADVANCED_OPTION_VALUE);
 
 	LV_COLUMN lvColumn;
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = valueColumnText.data();
 	ListView_InsertColumn(listView, 0, &lvColumn);
 
-	std::wstring optionColumnText =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_ADVANCED_OPTION);
+	std::wstring optionColumnText = m_resourceLoader->LoadString(IDS_ADVANCED_OPTION);
 
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = optionColumnText.data();
@@ -82,31 +80,29 @@ std::vector<AdvancedOptionsPage::AdvancedOption> AdvancedOptionsPage::Initialize
 
 	AdvancedOption option;
 	option.id = AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree;
-	option.name = ResourceHelper::LoadString(m_resourceInstance,
-		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
+	option.name =
+		m_resourceLoader->LoadString(IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
 	option.type = AdvancedOptionType::Boolean;
-	option.description = ResourceHelper::LoadString(m_resourceInstance,
+	option.description = m_resourceLoader->LoadString(
 		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
 	advancedOptions.push_back(option);
 
 	option.id = AdvancedOptionId::OpenTabsInForeground;
-	option.name = ResourceHelper::LoadString(m_resourceInstance,
-		IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
+	option.name = m_resourceLoader->LoadString(IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
 	option.type = AdvancedOptionType::Boolean;
-	option.description = ResourceHelper::LoadString(m_resourceInstance,
-		IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
+	option.description =
+		m_resourceLoader->LoadString(IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
 	advancedOptions.push_back(option);
 
 	option.id = AdvancedOptionId::GoUpOnDoubleClick;
-	option.name = ResourceHelper::LoadString(m_resourceInstance,
-		IDS_ADVANCED_OPTION_GO_UP_ON_DOUBLE_CLICK_NAME);
+	option.name = m_resourceLoader->LoadString(IDS_ADVANCED_OPTION_GO_UP_ON_DOUBLE_CLICK_NAME);
 	option.type = AdvancedOptionType::Boolean;
 	option.description = {};
 	advancedOptions.push_back(option);
 
 	option.id = AdvancedOptionId::QuickAccessInTreeView;
-	option.name = ResourceHelper::LoadString(m_resourceInstance,
-		IDS_ADVANCED_OPTION_SHOW_QUICK_ACCESS_IN_TREEVIEW_NAME);
+	option.name =
+		m_resourceLoader->LoadString(IDS_ADVANCED_OPTION_SHOW_QUICK_ACCESS_IN_TREEVIEW_NAME);
 	option.type = AdvancedOptionType::Boolean;
 	option.description = {};
 	advancedOptions.push_back(option);

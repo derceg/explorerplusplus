@@ -10,7 +10,7 @@
 #include "Explorer++_internal.h"
 #include "LanguageHelper.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
@@ -243,8 +243,7 @@ void GeneralOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void GeneralOptionsPage::OnNewTabDirectoryButtonPressed()
 {
-	std::wstring helperText =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_DEFAULTSETTINGS_NEWTAB);
+	std::wstring helperText = m_resourceLoader->LoadString(IDS_DEFAULTSETTINGS_NEWTAB);
 
 	TCHAR szNewTabDir[MAX_PATH];
 	GetDlgItemText(GetDialog(), IDC_DEFAULT_NEWTABDIR_EDIT, szNewTabDir, std::size(szNewTabDir));
@@ -380,8 +379,8 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 	if (updatedReplaceMode != +ReplaceExplorerMode::None
 		&& m_config->replaceExplorerMode == +ReplaceExplorerMode::None)
 	{
-		std::wstring warningMessage = ResourceHelper::LoadString(m_resourceInstance,
-			IDS_OPTIONS_DIALOG_REPLACE_EXPLORER_WARNING);
+		std::wstring warningMessage =
+			m_resourceLoader->LoadString(IDS_OPTIONS_DIALOG_REPLACE_EXPLORER_WARNING);
 
 		int selectedButton = MessageBox(GetDialog(), warningMessage.c_str(), App::APP_NAME,
 			MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
@@ -393,8 +392,7 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 	}
 
 	LSTATUS res = ERROR_SUCCESS;
-	std::wstring menuText =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_OPEN_IN_EXPLORERPLUSPLUS);
+	std::wstring menuText = m_resourceLoader->LoadString(IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
 	switch (updatedReplaceMode)
 	{
@@ -448,14 +446,12 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 		}
 		else
 		{
-			std::wstring errorCodeTemplate =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_ERROR_CODE);
+			std::wstring errorCodeTemplate = m_resourceLoader->LoadString(IDS_ERROR_CODE);
 			finalSystemErrorMessage =
 				fmt::format(fmt::runtime(errorCodeTemplate), fmt::arg(L"error_code", res));
 		}
 
-		std::wstring errorMessage =
-			ResourceHelper::LoadString(m_resourceInstance, IDS_ERROR_REPLACE_EXPLORER_SETTING)
+		std::wstring errorMessage = m_resourceLoader->LoadString(IDS_ERROR_REPLACE_EXPLORER_SETTING)
 			+ L"\n\n" + finalSystemErrorMessage;
 
 		MessageBox(GetDialog(), errorMessage.c_str(), App::APP_NAME, MB_ICONWARNING);

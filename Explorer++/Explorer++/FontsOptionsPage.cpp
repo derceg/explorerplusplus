@@ -7,7 +7,7 @@
 #include "Config.h"
 #include "FontHelper.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "SystemFontHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -50,8 +50,7 @@ void FontsOptionsPage::InitializeFontsControl()
 {
 	HWND fontsControl = GetDlgItem(GetDialog(), IDC_OPTIONS_FONTS);
 
-	auto automaticText =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_OPTIONS_FONTS_AUTOMATIC);
+	auto automaticText = m_resourceLoader->LoadString(IDS_OPTIONS_FONTS_AUTOMATIC);
 	m_defaultItemIndex = ComboBox_AddString(fontsControl, automaticText.c_str());
 	assert(m_defaultItemIndex != CB_ERR);
 
