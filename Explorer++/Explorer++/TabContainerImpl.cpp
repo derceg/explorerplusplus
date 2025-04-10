@@ -120,9 +120,6 @@ void TabContainerImpl::Initialize(HWND parent)
 		std::bind_front(&TabContainerImpl::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browser)));
 
-	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
-		std::bind_front(&TabContainerImpl::OnAlwaysShowTabBarUpdated, this)));
-
 	m_fontSetter.fontUpdatedSignal.AddObserver(
 		std::bind_front(&TabContainerImpl::OnFontUpdated, this));
 }
@@ -646,26 +643,6 @@ void TabContainerImpl::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 	dispInfo->lpszText = tabToolTip;
 }
 
-void TabContainerImpl::OnTabCreated(const Tab &tab, bool selected)
-{
-	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() > 1))
-	{
-		m_coreInterface->ShowTabBar();
-	}
-
-	m_app->GetTabEvents()->NotifyCreated(tab, selected);
-}
-
-void TabContainerImpl::OnTabRemoved(const Tab &tab)
-{
-	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() == 1))
-	{
-		m_coreInterface->HideTabBar();
-	}
-
-	m_app->GetTabEvents()->NotifyRemoved(tab);
-}
-
 void TabContainerImpl::OnTabSelected(const Tab &tab)
 {
 	if (m_iPreviousTabSelectionId != -1)
@@ -676,25 +653,6 @@ void TabContainerImpl::OnTabSelected(const Tab &tab)
 	m_iPreviousTabSelectionId = tab.GetId();
 
 	m_app->GetTabEvents()->NotifySelected(tab);
-}
-
-void TabContainerImpl::OnAlwaysShowTabBarUpdated(BOOL newValue)
-{
-	if (newValue)
-	{
-		m_coreInterface->ShowTabBar();
-	}
-	else
-	{
-		if (GetNumTabs() > 1)
-		{
-			m_coreInterface->ShowTabBar();
-		}
-		else
-		{
-			m_coreInterface->HideTabBar();
-		}
-	}
 }
 
 void TabContainerImpl::OnNavigationCommitted(const NavigationRequest *request)
@@ -977,7 +935,7 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		TabCtrl_SetCurSel(m_hwnd, index);
 	}
 
-	OnTabCreated(tab, selected);
+	m_app->GetTabEvents()->NotifyCreated(tab, selected);
 
 	if (selected)
 	{
@@ -1052,7 +1010,7 @@ bool TabContainerImpl::CloseTab(const Tab &tab)
 
 	m_tabs.erase(itr);
 
-	OnTabRemoved(tab);
+	m_app->GetTabEvents()->NotifyRemoved(tab);
 
 	return true;
 }

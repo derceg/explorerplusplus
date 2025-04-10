@@ -196,12 +196,7 @@ private:
 	void ShowBackgroundContextMenu(const POINT &ptClient);
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
-	void OnTabCreated(const Tab &tab, bool selected);
-	void OnTabRemoved(const Tab &tab);
-
 	void OnTabSelected(const Tab &tab);
-
-	void OnAlwaysShowTabBarUpdated(BOOL newValue);
 
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);

@@ -22,6 +22,15 @@ void Explorerplusplus::InitializeTabs()
 		m_app->GetResourceInstance(), m_config);
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
 
+	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
+		std::bind(&Explorerplusplus::MaybeUpdateTabBarVisibility, this)));
+	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
+		std::bind(&Explorerplusplus::MaybeUpdateTabBarVisibility, this),
+		TabEventScope::ForBrowser(*this)));
+	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
+		std::bind(&Explorerplusplus::MaybeUpdateTabBarVisibility, this),
+		TabEventScope::ForBrowser(*this)));
+
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
 		std::bind_front(&Explorerplusplus::OnTabCreated, this), TabEventScope::ForBrowser(*this),
 		boost::signals2::at_front));
@@ -51,6 +60,19 @@ void Explorerplusplus::InitializeTabs()
 
 	m_connections.push_back(m_config->showTabBarAtBottom.addObserver(updateLayoutObserverMethod));
 	m_connections.push_back(m_config->extendTabControl.addObserver(updateLayoutObserverMethod));
+}
+
+void Explorerplusplus::MaybeUpdateTabBarVisibility()
+{
+	if (!m_config->alwaysShowTabBar.get()
+		&& (GetActivePane()->GetTabContainerImpl()->GetNumTabs() == 1))
+	{
+		HideTabBar();
+	}
+	else
+	{
+		ShowTabBar();
+	}
 }
 
 void Explorerplusplus::OnTabCreated(const Tab &tab, bool selected)

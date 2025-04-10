@@ -56,9 +56,6 @@ public:
 	virtual BOOL CanShowFileProperties() const = 0;
 	virtual BOOL CanPaste(PasteType pasteType) const = 0;
 
-	virtual void ShowTabBar() = 0;
-	virtual void HideTabBar() = 0;
-
 	virtual boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemMiddleClickedObserver(

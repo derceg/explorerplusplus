@@ -309,10 +309,11 @@ private:
 
 	/* Tabs. */
 	void InitializeTabs();
+	void MaybeUpdateTabBarVisibility();
 	void OnTabCreated(const Tab &tab, bool selected);
 	void OnTabSelected(const Tab &tab);
-	void ShowTabBar() override;
-	void HideTabBar() override;
+	void ShowTabBar();
+	void HideTabBar();
 	void CreateInitialTabs(const WindowStorageData *storageData);
 	void CreateTabsFromStorageData(const WindowStorageData &storageData);
 	void CreateCommandLineTabs();
