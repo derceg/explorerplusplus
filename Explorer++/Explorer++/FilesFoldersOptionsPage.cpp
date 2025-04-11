@@ -44,8 +44,8 @@ std::unique_ptr<ResizableDialogHelper> FilesFoldersOptionsPage::InitializeResize
 		SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE),
 		MovingType::None, SizingType::Horizontal);
-	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_ZIPFILES), MovingType::None,
-		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_CONTAINER_FILES),
+		MovingType::None, SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_FRIENDLYDATES),
 		MovingType::None, SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTIONS_CHECK_SHOWINFOTIPS), MovingType::None,
@@ -115,9 +115,9 @@ void FilesFoldersOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_FORCESIZE, BST_CHECKED);
 	}
 
-	if (m_config->handleZipFiles)
+	if (m_config->openContainerFiles)
 	{
-		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_ZIPFILES, BST_CHECKED);
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_CONTAINER_FILES, BST_CHECKED);
 	}
 
 	if (m_config->globalFolderSettings.showFriendlyDates)
@@ -198,7 +198,7 @@ void FilesFoldersOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_SETTINGS_CHECK_INSERTSORTED:
 		case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
 		case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
-		case IDC_SETTINGS_CHECK_ZIPFILES:
+		case IDC_SETTINGS_CHECK_CONTAINER_FILES:
 		case IDC_SETTINGS_CHECK_FRIENDLYDATES:
 		case IDC_OPTIONS_HOVER_TIME:
 		case IDC_DISPLAY_MIXED_FILES_AND_FOLDERS:
@@ -340,8 +340,8 @@ void FilesFoldersOptionsPage::SaveSettings()
 	m_config->globalFolderSettings.forceSize =
 		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FORCESIZE) == BST_CHECKED);
 
-	m_config->handleZipFiles =
-		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_ZIPFILES) == BST_CHECKED);
+	m_config->openContainerFiles =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_CONTAINER_FILES) == BST_CHECKED);
 
 	m_config->globalFolderSettings.showFriendlyDates =
 		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FRIENDLYDATES) == BST_CHECKED);

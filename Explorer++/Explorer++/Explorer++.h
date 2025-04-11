@@ -386,7 +386,6 @@ private:
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
 	void OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition);
-	bool ShouldOpenContainerFile(PCIDLIST_ABSOLUTE pidlItem);
 
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);

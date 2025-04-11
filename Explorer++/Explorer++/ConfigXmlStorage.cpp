@@ -157,7 +157,14 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"DoubleClickTabClose", config.doubleClickTabClose);
 	GetBoolSetting(settingsNode, L"ExtendTabControl", config.extendTabControl);
 	GetBoolSetting(settingsNode, L"ForceSize", config.globalFolderSettings.forceSize);
-	GetBoolSetting(settingsNode, L"HandleZipFiles", config.handleZipFiles);
+
+	HRESULT hr = GetBoolSetting(settingsNode, L"OpenContainerFiles", config.openContainerFiles);
+
+	if (hr != S_OK)
+	{
+		GetBoolSetting(settingsNode, L"HandleZipFiles", config.openContainerFiles);
+	}
+
 	GetBoolSetting(settingsNode, L"HideLinkExtensionGlobal",
 		config.globalFolderSettings.hideLinkExtension);
 	GetBoolSetting(settingsNode, L"HideSystemFilesGlobal",
@@ -165,7 +172,7 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"InsertSorted", config.globalFolderSettings.insertSorted);
 
 	DWORD language;
-	HRESULT hr = GetIntSetting(settingsNode, L"Language", language);
+	hr = GetIntSetting(settingsNode, L"Language", language);
 
 	if (hr == S_OK)
 	{
@@ -349,7 +356,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"ForceSize",
 		XMLSettings::EncodeBoolValue(config.globalFolderSettings.forceSize));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"HandleZipFiles", XMLSettings::EncodeBoolValue(config.handleZipFiles));
+		L"OpenContainerFiles", XMLSettings::EncodeBoolValue(config.openContainerFiles));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"HideLinkExtensionGlobal",
 		XMLSettings::EncodeBoolValue(config.globalFolderSettings.hideLinkExtension));

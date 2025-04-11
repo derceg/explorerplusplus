@@ -82,8 +82,18 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.globalFolderSettings.oneClickActivateHoverTime);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DoubleClickTabClose",
 		config.doubleClickTabClose);
-	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"HandleZipFiles",
-		config.handleZipFiles);
+
+	auto res = RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"OpenContainerFiles",
+		config.openContainerFiles);
+
+	if (res != ERROR_SUCCESS)
+	{
+		// Previously, there was a single option used to indicate whether zip files should be opened
+		// in Explorer++.
+		RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"HandleZipFiles",
+			config.openContainerFiles);
+	}
+
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"InsertSorted",
 		config.globalFolderSettings.insertSorted);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"CheckBoxSelection",
@@ -108,7 +118,7 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.showQuickAccessInTreeView);
 
 	auto theme = config.theme.get();
-	auto res = RegistrySettings::ReadBetterEnumValue(settingsKey, L"Theme", theme);
+	res = RegistrySettings::ReadBetterEnumValue(settingsKey, L"Theme", theme);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -265,7 +275,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"OneClickActivateHoverTime",
 		config.globalFolderSettings.oneClickActivateHoverTime.get());
 	RegistrySettings::SaveDword(settingsKey, L"DoubleClickTabClose", config.doubleClickTabClose);
-	RegistrySettings::SaveDword(settingsKey, L"HandleZipFiles", config.handleZipFiles);
+	RegistrySettings::SaveDword(settingsKey, L"OpenContainerFiles", config.openContainerFiles);
 	RegistrySettings::SaveDword(settingsKey, L"InsertSorted",
 		config.globalFolderSettings.insertSorted);
 	RegistrySettings::SaveDword(settingsKey, L"ShowPrivilegeLevelInTitleBar",

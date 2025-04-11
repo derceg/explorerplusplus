@@ -221,6 +221,13 @@ Misc:
   better. See #144.
 - Dropping on a non-folder target (e.g. an executable or zip
   file) should now work. See #75 and #297.
+- Previously, Explorer++ allowed the user to select whether they
+  wanted to open zip files in Explorer++ or externally. That
+  option is now more generic and applies to all container files
+  (e.g. .7z, .rar, .xz, .zip).
+  If the option is set, any container file that can be opened in
+  Explorer++ will be opened that way. If not set, all such
+  container files will be opened externally. See #483 and #533.
 - The items shown on the "Go" menu have been updated.
 - The ability to play a navigation sound has been removed.
 - The option to use fixed width tabs has been removed, as it

@@ -60,7 +60,6 @@ struct Config
 	bool allowMultipleInstances = true;
 	bool doubleClickTabClose = true;
 	ValueWrapper<bool> useLargeToolbarIcons = false;
-	bool handleZipFiles = false;
 	bool overwriteExistingFilesConfirmation = true;
 	ValueWrapper<bool> checkBoxSelection = false;
 	bool closeMainWindowOnTabClose = true;
@@ -68,6 +67,10 @@ struct Config
 	ValueWrapper<bool> synchronizeTreeview = true;
 	bool displayWindowVertical = false;
 	bool goUpOnDoubleClick = true;
+
+	// Indicates whether container files (e.g. .7z, .cab, .rar, .zip) will be opened in Explorer++,
+	// or externally.
+	bool openContainerFiles = false;
 
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =
 		DefaultFileManager::ReplaceExplorerMode::None;

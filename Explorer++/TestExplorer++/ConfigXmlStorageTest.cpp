@@ -6,6 +6,7 @@
 #include "ConfigXmlStorage.h"
 #include "Config.h"
 #include "ConfigStorageTestHelper.h"
+#include "ResourceTestHelper.h"
 #include "XmlStorageTestHelper.h"
 #include <gtest/gtest.h>
 
@@ -24,4 +25,15 @@ TEST_F(ConfigXmlStorageTest, SaveLoad)
 	ConfigXmlStorage::Load(xmlDocumentData.rootNode.get(), loadedConfig);
 
 	EXPECT_EQ(loadedConfig, referenceConfig);
+}
+
+TEST_F(ConfigXmlStorageTest, OpenZipFilesSettingMigration)
+{
+	std::wstring xmlFilePath = GetResourcePath(L"config-migration-config.xml");
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
+
+	Config loadedConfig;
+	ConfigXmlStorage::Load(xmlDocumentData.rootNode.get(), loadedConfig);
+
+	EXPECT_TRUE(loadedConfig.openContainerFiles);
 }

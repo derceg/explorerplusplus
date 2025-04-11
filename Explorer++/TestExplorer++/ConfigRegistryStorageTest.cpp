@@ -23,3 +23,13 @@ TEST_F(ConfigRegistryStorageTest, SaveLoad)
 
 	EXPECT_EQ(loadedConfig, referenceConfig);
 }
+
+TEST_F(ConfigRegistryStorageTest, OpenZipFilesSettingMigration)
+{
+	ImportRegistryResource(L"config-migration.reg");
+
+	Config loadedConfig;
+	ConfigRegistryStorage::Load(m_applicationTestKey.get(), loadedConfig);
+
+	EXPECT_TRUE(loadedConfig.openContainerFiles);
+}

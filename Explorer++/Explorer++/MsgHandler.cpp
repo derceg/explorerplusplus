@@ -84,7 +84,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		// - .search-ms
 		// - .zip
 
-		if (ShouldOpenContainerFile(pidlItem))
+		if (m_config->openContainerFiles)
 		{
 			OpenFolderItem(pidlItem, openFolderDisposition);
 		}
@@ -132,7 +132,7 @@ void Explorerplusplus::OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem,
 		bool isContainerFile = WI_IsFlagSet(targetAttributes, SFGAO_FOLDER)
 			&& WI_IsFlagSet(targetAttributes, SFGAO_STREAM);
 
-		openAsFolder = isFolder || (isContainerFile && ShouldOpenContainerFile(target.get()));
+		openAsFolder = isFolder || (isContainerFile && m_config->openContainerFiles);
 	}
 
 	if (openAsFolder)
@@ -155,22 +155,6 @@ void Explorerplusplus::OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem,
 		// when opening the shortcut. That won't be the case if the target is executed directly.
 		OpenFileItem(pidlItem, L"");
 	}
-}
-
-// Returns true if the specified container file should be opened as a folder. If false, the file
-// should be opened via the shell.
-bool Explorerplusplus::ShouldOpenContainerFile(PCIDLIST_ABSOLUTE pidlItem)
-{
-	std::wstring parsingPath;
-	HRESULT hr = GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	bool isZipFile = (SUCCEEDED(hr) && parsingPath.ends_with(L".zip"));
-	return (isZipFile && m_config->handleZipFiles) || !isZipFile;
 }
 
 void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,

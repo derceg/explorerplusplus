@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Settings>
+		<Setting name="HandleZipFiles">yes</Setting>
+	</Settings>
+</ExplorerPlusPlus>
