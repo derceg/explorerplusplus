@@ -9,7 +9,7 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
@@ -51,8 +51,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 		pidlPtrs.push_back(std::move(pidlPtr));
 	}
 
-	auto title =
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_GENERAL_COPY_TO_FOLDER_TITLE);
+	auto title = m_app->GetResourceLoader()->LoadString(IDS_GENERAL_COPY_TO_FOLDER_TITLE);
 	FileOperations::CopyFilesToFolder(m_hContainer, title, pidls, move);
 }
 

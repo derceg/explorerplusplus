@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "HolderWindow.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -23,10 +23,9 @@ void Explorerplusplus::CreateFolderControls()
 	}
 
 	m_treeViewHolder = HolderWindow::Create(m_hContainer,
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_FOLDERS_WINDOW_TEXT),
-		holderStyle,
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_HIDE_FOLDERS_PANE),
-		m_app->GetConfig(), m_app->GetIconResourceLoader(), m_app->GetDarkModeManager());
+		m_app->GetResourceLoader()->LoadString(IDS_FOLDERS_WINDOW_TEXT), holderStyle,
+		m_app->GetResourceLoader()->LoadString(IDS_HIDE_FOLDERS_PANE), m_app->GetConfig(),
+		m_app->GetIconResourceLoader(), m_app->GetDarkModeManager());
 	m_treeViewHolder->SetCloseButtonClickedCallback(
 		std::bind(&Explorerplusplus::ToggleFolders, this));
 	m_treeViewHolder->SetResizedCallback(

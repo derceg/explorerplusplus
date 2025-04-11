@@ -17,7 +17,7 @@
 #include "MergeFilesDialog.h"
 #include "ModelessDialogHelper.h"
 #include "OptionsDialog.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ScriptingDialog.h"
 #include "SearchDialog.h"
 #include "SearchTabsDialog.h"
@@ -211,14 +211,12 @@ void Explorerplusplus::OnCreateNewFolder()
 			m_pActiveShellBrowser->QueueRename(pidl);
 		});
 
-	auto newFolderName =
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_NEW_FOLDER_NAME);
+	auto newFolderName = m_app->GetResourceLoader()->LoadString(IDS_NEW_FOLDER_NAME);
 	hr = FileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
 
 	if (FAILED(hr))
 	{
-		auto errorMessage =
-			ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_NEWFOLDERERROR);
+		auto errorMessage = m_app->GetResourceLoader()->LoadString(IDS_NEWFOLDERERROR);
 		MessageBox(m_hContainer, errorMessage.c_str(), App::APP_NAME, MB_ICONERROR | MB_OK);
 	}
 }

@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "DirectoryOperationsHelper.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
@@ -40,38 +40,32 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 	UINT position = 0;
 
 	auto viewsMenu = BuildViewsMenu();
-	std::wstring text =
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_BACKGROUND_CONTEXT_MENU_VIEW);
+	std::wstring text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_VIEW);
 	MenuHelper::AddSubMenuItem(menu, 0, text, std::move(viewsMenu), position++, true);
 
 	SortMenuBuilder sortMenuBuilder(m_app->GetResourceInstance());
 	auto sortMenus =
 		sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainerImpl()->GetSelectedTab());
-	text = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-		IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
+	text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
 	MenuHelper::AddSubMenuItem(menu, 0, text, std::move(sortMenus.sortByMenu), position++, true);
 
-	text = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-		IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
+	text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
 	MenuHelper::AddSubMenuItem(menu, 0, text, std::move(sortMenus.groupByMenu), position++, true);
 
-	text = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-		IDS_BACKGROUND_CONTEXT_MENU_REFRESH);
+	text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_REFRESH);
 	MenuHelper::AddStringItem(menu, IDM_BACKGROUND_CONTEXT_MENU_REFRESH, text, position++, true);
 
 	MenuHelper::AddSeparator(menu, position++, true);
 
 	if (CanCustomizeDirectory(folderPidl))
 	{
-		text = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-			IDS_BACKGROUND_CONTEXT_MENU_CUSTOMIZE);
+		text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_CUSTOMIZE);
 		MenuHelper::AddStringItem(menu, IDM_BACKGROUND_CONTEXT_MENU_CUSTOMIZE, text, position++,
 			true);
 		MenuHelper::AddSeparator(menu, position++, true);
 	}
 
-	text =
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_BACKGROUND_CONTEXT_MENU_PASTE);
+	text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE);
 	MenuHelper::AddStringItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE, text, position++, true);
 
 	if (!CanPasteInDirectory(folderPidl, PasteType::Normal))
@@ -79,8 +73,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 		MenuHelper::EnableItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE, false);
 	}
 
-	text = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-		IDS_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT);
+	text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT);
 	MenuHelper::AddStringItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, text, position++,
 		true);
 
@@ -161,7 +154,7 @@ void Explorerplusplus::UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlP
 	if (addNewTabMenuItem)
 	{
 		std::wstring openInNewTabText =
-			ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
+			m_app->GetResourceLoader()->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB);
 
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
@@ -257,7 +250,7 @@ std::wstring Explorerplusplus::GetHelpTextForItem(UINT menuItemId)
 		break;
 	}
 
-	auto helpText = ResourceHelper::MaybeLoadString(m_app->GetResourceInstance(), menuHelpTextId);
+	auto helpText = m_app->GetResourceLoader()->MaybeLoadString(menuHelpTextId);
 
 	if (helpText)
 	{

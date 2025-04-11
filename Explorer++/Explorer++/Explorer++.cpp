@@ -20,7 +20,6 @@
 #include "MainToolbar.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
-#include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabRestorer.h"
@@ -209,9 +208,9 @@ bool Explorerplusplus::ConfirmClose()
 		return true;
 	}
 
-	std::wstring message = fmt::format(
-		fmt::runtime(ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_CLOSE_ALL_TABS)),
-		fmt::arg(L"num_tabs", numTabs));
+	std::wstring message =
+		fmt::format(fmt::runtime(m_app->GetResourceLoader()->LoadString(IDS_CLOSE_ALL_TABS)),
+			fmt::arg(L"num_tabs", numTabs));
 	int response =
 		MessageBox(m_hContainer, message.c_str(), App::APP_NAME, MB_ICONINFORMATION | MB_YESNO);
 
