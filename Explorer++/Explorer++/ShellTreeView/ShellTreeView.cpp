@@ -963,7 +963,21 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREE
 	{
 		// It's not expected for the SHCreateItemFromIDList() call to fail, so it would be useful to
 		// know if it does.
-		assert(false);
+		DCHECK(false);
+		return nullptr;
+	}
+
+	SFGAOF attributes = SFGAO_FOLDER;
+	hr = shellItem->GetAttributes(attributes, &attributes);
+
+	if (FAILED(hr))
+	{
+		DCHECK(false);
+		return nullptr;
+	}
+
+	if (WI_IsFlagClear(attributes, SFGAO_FOLDER))
+	{
 		return nullptr;
 	}
 
@@ -975,7 +989,7 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREE
 
 	if (FAILED(hr))
 	{
-		assert(false);
+		DCHECK(false);
 		return nullptr;
 	}
 
@@ -1007,8 +1021,8 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREE
 	tvInsertData.hParent = parent;
 	tvInsertData.itemex = tvItem;
 
-	[[maybe_unused]] auto item = TreeView_InsertItem(m_hTreeView, &tvInsertData);
-	assert(item);
+	auto item = TreeView_InsertItem(m_hTreeView, &tvInsertData);
+	CHECK(item);
 
 	return item;
 }

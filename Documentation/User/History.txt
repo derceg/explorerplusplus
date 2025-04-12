@@ -131,6 +131,15 @@ Bug fixes:
   multiple paths are being passed in and more than one path
   contains spaces (and therefore more than one path will need to
   be enclosed in double quotes).
+- The treeview can display both folders and certain container
+  files that act like folders (e.g. .7z, .rar, .zip). Previously,
+  file changes weren't being monitored, which meant those files
+  wouldn't be updated.
+  Now, file changes are observed in addition to folder changes.
+  That means that if a container file is added, it will also be
+  added to the treeview. Similarly, if a container file is
+  updated, the corresponding item in the treeview will be
+  updated.
 - If a folder had an overlay icon, the icon for the folder itself
   would fail to show up in a variety of places (e.g. in the tab
   control, the manage bookmarks dialog, various menus).

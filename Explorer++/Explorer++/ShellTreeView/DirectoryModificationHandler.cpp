@@ -30,18 +30,21 @@ void ShellTreeView::StartDirectoryMonitoringForDrives()
 
 void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
+	// Note that both folders and files are monitored for changes. Although this class displays
+	// folders, certain types of container files (e.g. .7z, .cab, .rar, .zip) act like folders as
+	// well. Those items will be displayed and need to be updated when necessary.
 	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
 	{
 		node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(node->GetFullPidl().get(),
-			SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
-				| SHCNE_UPDATEITEM));
+			SHCNE_CREATE | SHCNE_MKDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_ATTRIBUTES
+				| SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_DELETE | SHCNE_RMDIR));
 	}
 	else
 	{
 		node->SetFileSystemChangeWatcher(
 			FileSystemChangeWatcher::MaybeCreate(node->GetFullPidl().get(),
-				wil::FolderChangeEvents::DirectoryName | wil::FolderChangeEvents::Attributes
-					| wil::FolderChangeEvents::LastWriteTime,
+				wil::FolderChangeEvents::FileName | wil::FolderChangeEvents::DirectoryName
+					| wil::FolderChangeEvents::Attributes | wil::FolderChangeEvents::LastWriteTime,
 				m_app->GetRuntime()->GetUiThreadExecutor(),
 				std::bind_front(&ShellTreeView::ProcessFileSystemChangeNotification, this)));
 	}
@@ -112,10 +115,12 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 	{
 	case SHCNE_DRIVEADD:
 	case SHCNE_MKDIR:
+	case SHCNE_CREATE:
 		OnItemAdded(change.pidl1.get());
 		break;
 
 	case SHCNE_RENAMEFOLDER:
+	case SHCNE_RENAMEITEM:
 		OnItemUpdated(change.pidl1.get(), change.pidl2.get());
 		break;
 
@@ -125,6 +130,7 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 
 	case SHCNE_DRIVEREMOVED:
 	case SHCNE_RMDIR:
+	case SHCNE_DELETE:
 		OnItemRemoved(change.pidl1.get());
 		break;
 
