@@ -70,7 +70,7 @@ TEST_F(CustomFontXmlStorageTest, Load)
 {
 	CustomFont referenceFont = BuildLoadSaveReferenceFont();
 
-	std::wstring xmlFilePath = GetResourcePath(L"custom-font-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"custom-font.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainFontNode;

@@ -19,7 +19,7 @@ TEST_F(StartupFoldersXmlStorageTest, Load)
 {
 	auto referenceStartupFolders = StartupFoldersStorageTestHelper::BuildReference();
 
-	auto xmlDocumentData = LoadXmlDocument(GetResourcePath(L"startup-folders-config.xml"));
+	auto xmlDocumentData = LoadXmlDocument(GetResourcePath(L"startup-folders.xml"));
 
 	wil::com_ptr_nothrow<IXMLDOMNode> startupFoldersNode;
 	HRESULT hr = xmlDocumentData.rootNode->selectSingleNode(

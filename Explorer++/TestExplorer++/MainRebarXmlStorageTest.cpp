@@ -22,7 +22,7 @@ TEST_F(MainRebarXmlStorageTest, Load)
 {
 	auto referenceRebarStorageInfo = BuildMainRebarLoadSaveReference();
 
-	std::wstring xmlFilePath = GetResourcePath(L"main-rebar-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"main-rebar.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;

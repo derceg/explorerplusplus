@@ -18,7 +18,7 @@ TEST_F(DefaultColumnXmlStorageTest, Load)
 {
 	auto referenceColumns = BuildFolderColumnsLoadSaveReference();
 
-	std::wstring xmlFilePath = GetResourcePath(L"default-columns-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"default-columns.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	FolderColumns loadedColumns;

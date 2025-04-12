@@ -23,7 +23,7 @@ TEST_F(ColumnXmlStorageTest, Load)
 {
 	auto referenceColumns = BuildFolderColumnsLoadSaveReference();
 
-	std::wstring xmlFilePath = GetResourcePath(L"columns-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"columns.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> columnsNode;

@@ -34,7 +34,7 @@ TEST_F(BookmarkXmlStorageTest, V2Load)
 	BookmarkTree referenceBookmarkTree;
 	BuildV2LoadSaveReferenceTree(&referenceBookmarkTree);
 
-	PerformLoadTest(L"bookmarks-v2-config.xml", &referenceBookmarkTree, true);
+	PerformLoadTest(L"bookmarks-v2.xml", &referenceBookmarkTree, true);
 }
 
 TEST_F(BookmarkXmlStorageTest, V2Save)
@@ -58,7 +58,7 @@ TEST_F(BookmarkXmlStorageTest, V1BasicLoad)
 	BookmarkTree referenceBookmarkTree;
 	BuildV1BasicLoadReferenceTree(&referenceBookmarkTree);
 
-	PerformLoadTest(L"bookmarks-v1-config.xml", &referenceBookmarkTree, false);
+	PerformLoadTest(L"bookmarks-v1.xml", &referenceBookmarkTree, false);
 }
 
 TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
@@ -66,6 +66,5 @@ TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
 	BookmarkTree referenceBookmarkTree;
 	BuildV1NestedShowOnToolbarLoadReferenceTree(&referenceBookmarkTree);
 
-	PerformLoadTest(L"bookmarks-v1-config-nested-show-on-toolbar.xml", &referenceBookmarkTree,
-		false);
+	PerformLoadTest(L"bookmarks-v1-nested-show-on-toolbar.xml", &referenceBookmarkTree, false);
 }

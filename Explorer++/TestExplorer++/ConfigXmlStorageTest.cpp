@@ -29,7 +29,7 @@ TEST_F(ConfigXmlStorageTest, SaveLoad)
 
 TEST_F(ConfigXmlStorageTest, OpenZipFilesSettingMigration)
 {
-	std::wstring xmlFilePath = GetResourcePath(L"config-migration-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"config-migration.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	Config loadedConfig;

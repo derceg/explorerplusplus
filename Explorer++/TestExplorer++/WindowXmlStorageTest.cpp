@@ -23,7 +23,7 @@ TEST_F(WindowXmlStorageTest, V2Load)
 {
 	auto referenceWindows = BuildV2ReferenceWindows(TestStorageType::Xml);
 
-	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"windows-v2.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());
@@ -35,7 +35,7 @@ TEST_F(WindowXmlStorageTest, V2LoadFallback)
 {
 	auto referenceWindow = BuildV2FallbackReferenceWindow(TestStorageType::Xml);
 
-	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-fallback-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"windows-v2-fallback.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());
@@ -61,7 +61,7 @@ TEST_F(WindowXmlStorageTest, V1Load)
 {
 	auto referenceWindow = BuildV1ReferenceWindow(TestStorageType::Xml);
 
-	std::wstring xmlFilePath = GetResourcePath(L"windows-v1-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"windows-v1.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	auto loadedWindows = WindowXmlStorage::Load(xmlDocumentData.rootNode.get());

@@ -22,7 +22,7 @@ TEST_F(FrequentLocationsXmlStorageTest, Load)
 	FrequentLocationsModel referenceModel(&m_systemClock);
 	FrequentLocationsStorageTestHelper::BuildReferenceModel(&referenceModel);
 
-	std::wstring xmlFilePath = GetResourcePath(L"frequent-locations-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"frequent-locations.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	FrequentLocationsModel loadedModel(&m_systemClock);

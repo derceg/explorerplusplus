@@ -102,7 +102,7 @@ TEST_F(MainToolbarXmlStorageTest, Load)
 {
 	auto referenceButtons = BuildMainToolbarLoadSaveReference();
 
-	std::wstring xmlFilePath = GetResourcePath(L"main-toolbar-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"main-toolbar.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainToolbarNode;

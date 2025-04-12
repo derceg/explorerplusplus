@@ -23,7 +23,7 @@ TEST_F(TabXmlStorageTest, Load)
 	std::vector<TabStorageData> referenceTabs;
 	BuildTabStorageLoadSaveReference(referenceTabs, TestStorageType::Xml);
 
-	std::wstring xmlFilePath = GetResourcePath(L"tabs-config.xml");
+	std::wstring xmlFilePath = GetResourcePath(L"tabs.xml");
 	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> tabsNode;
