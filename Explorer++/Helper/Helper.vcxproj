@@ -642,6 +642,7 @@
     <ClCompile Include="CachedIcons.cpp" />
     <ClCompile Include="Clipboard.cpp" />
     <ClCompile Include="ClipboardHelper.cpp" />
+    <ClCompile Include="ClipboardWatcher.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ComboBoxHelper.cpp" />
     <ClCompile Include="Console.cpp" />
@@ -655,6 +656,7 @@
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
+    <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
     <ClCompile Include="ScopedStopSource.cpp" />
@@ -729,6 +731,7 @@
     <ClInclude Include="CachedIcons.h" />
     <ClInclude Include="Clipboard.h" />
     <ClInclude Include="ClipboardHelper.h" />
+    <ClInclude Include="ClipboardWatcher.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="Console.h" />
@@ -744,6 +747,7 @@
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="MenuHelpTextRequest.h" />
+    <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />
     <ClInclude Include="ScopedStopSource.h" />

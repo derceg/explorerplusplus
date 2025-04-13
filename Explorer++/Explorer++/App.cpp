@@ -363,6 +363,11 @@ Runtime *App::GetRuntime()
 	return &m_runtime;
 }
 
+ClipboardWatcher *App::GetClipboardWatcher()
+{
+	return &m_clipboardWatcher;
+}
+
 FeatureList *App::GetFeatureList()
 {
 	return &m_featureList;

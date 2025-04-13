@@ -407,6 +407,9 @@
     <ClCompile Include="ColumnHelperTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ClipboardWatcherTest.cpp">
+      <Filter>Helper\Data Exchange\Clipboard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

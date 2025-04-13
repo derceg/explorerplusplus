@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/ScopedRedrawDisabler.h"
-#include "MessageWindowHelper.h"
+#include "../Helper/MessageWindowHelper.h"
 #include <gtest/gtest.h>
 #include <VersionHelpers.h>
 

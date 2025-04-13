@@ -9,7 +9,7 @@
 namespace MessageWindowHelper
 {
 
-inline constexpr wchar_t MESSAGE_CLASS_NAME[] = L"Explorer++MessageClass";
+inline constexpr wchar_t MESSAGE_CLASS_NAME[] = L"MessageWindowClass";
 
 wil::unique_hwnd CreateMessageOnlyWindow(const std::wstring &windowName = L"");
 

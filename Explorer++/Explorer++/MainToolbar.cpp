@@ -154,15 +154,11 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 	m_connections.push_back(m_app->GetConfig()->showFolders.addObserver(
 		std::bind_front(&MainToolbar::OnShowFoldersUpdated, this)));
 
-	AddClipboardFormatListener(m_hwnd);
+	m_connections.push_back(m_app->GetClipboardWatcher()->updateSignal.AddObserver(
+		std::bind_front(&MainToolbar::OnClipboardUpdate, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(
 		std::bind_front(&MainToolbar::OnFontOrDpiUpdated, this));
-}
-
-MainToolbar::~MainToolbar()
-{
-	RemoveClipboardFormatListener(m_hwnd);
 }
 
 void MainToolbar::SetTooolbarImageList()
@@ -215,10 +211,6 @@ LRESULT MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		HANDLE_MSG(hwnd, WM_MBUTTONDOWN, OnMButtonDown);
 		HANDLE_MSG(hwnd, WM_MBUTTONUP, OnMButtonUp);
-
-	case WM_CLIPBOARDUPDATE:
-		OnClipboardUpdate();
-		return 0;
 
 	case WM_DPICHANGED_AFTERPARENT:
 		OnFontOrDpiUpdated();

@@ -201,6 +201,7 @@
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
     <ClCompile Include="ClipboardTest.cpp" />
+    <ClCompile Include="ClipboardWatcherTest.cpp" />
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
     <ClCompile Include="ColorRulesStorageTestHelper.cpp" />
     <ClCompile Include="ColorRuleTest.cpp" />

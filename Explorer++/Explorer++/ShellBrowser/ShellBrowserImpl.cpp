@@ -115,6 +115,9 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface
 		NavigationEventScope::ForShellBrowser(*this), boost::signals2::at_front,
 		NavigationEvents::SlotGroup::HighPriority));
 
+	m_connections.push_back(m_app->GetClipboardWatcher()->updateSignal.AddObserver(
+		std::bind_front(&ShellBrowserImpl::OnClipboardUpdate, this)));
+
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
 	m_performingDrag = false;
@@ -130,8 +133,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_iFolderIcon));
 	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_iFileIcon));
 
-	AddClipboardFormatListener(m_hListView);
-
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 }
 
@@ -146,8 +147,6 @@ ShellBrowserImpl::~ShellBrowserImpl()
 		// here.
 		OleFlushClipboard();
 	}
-
-	RemoveClipboardFormatListener(m_hListView);
 
 	DestroyWindow(m_hListView);
 

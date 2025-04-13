@@ -48,7 +48,6 @@ private:
 	MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		const IconResourceLoader *iconResourceLoader, ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
-	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
 

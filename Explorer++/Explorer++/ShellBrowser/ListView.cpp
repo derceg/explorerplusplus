@@ -124,10 +124,6 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 		}
 		break;
 
-	case WM_CLIPBOARDUPDATE:
-		OnClipboardUpdate();
-		return 0;
-
 	case WM_APP_COLUMN_RESULT_READY:
 		ProcessColumnResult(static_cast<int>(wParam));
 		break;

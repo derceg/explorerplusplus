@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "UIThreadExecutor.h"
-#include "MessageWindowHelper.h"
+#include "../Helper/MessageWindowHelper.h"
 #include "../Helper/WindowHelper.h"
 
 UIThreadExecutor::UIThreadExecutor() :

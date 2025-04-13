@@ -715,9 +715,6 @@
     <ClCompile Include="ConfigXmlStorage.cpp">
       <Filter>Config</Filter>
     </ClCompile>
-    <ClCompile Include="MessageWindowHelper.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ProcessManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1591,9 +1588,6 @@
       <Filter>Config</Filter>
     </ClInclude>
     <ClInclude Include="ProcessManager.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageWindowHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TestHelper.h">

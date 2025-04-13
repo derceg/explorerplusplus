@@ -86,8 +86,6 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
-	AddClipboardFormatListener(m_hTreeView);
-
 	StartDirectoryMonitoringForDrives();
 
 	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(
@@ -125,6 +123,9 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 	m_connections.push_back(
 		m_app->GetTabEvents()->AddSelectedObserver(std::bind(&ShellTreeView::UpdateSelection, this),
 			TabEventScope::ForBrowser(*m_browserWindow)));
+
+	m_connections.push_back(m_app->GetClipboardWatcher()->updateSignal.AddObserver(
+		std::bind_front(&ShellTreeView::OnClipboardUpdate, this)));
 
 	m_connections.push_back(m_cutCopiedItemManager.cutItemChangedSignal.AddObserver(
 		std::bind_front(&ShellTreeView::OnCutItemChanged, this)));
@@ -248,20 +249,12 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	}
 	break;
 
-	case WM_CLIPBOARDUPDATE:
-		OnClipboardUpdate();
-		return 0;
-
 	case WM_APP_ICON_RESULT_READY:
 		ProcessIconResult(static_cast<int>(wParam));
 		break;
 
 	case WM_APP_SUBFOLDERS_RESULT_READY:
 		ProcessSubfoldersResult(static_cast<int>(wParam));
-		break;
-
-	case WM_DESTROY:
-		RemoveClipboardFormatListener(m_hTreeView);
 		break;
 
 	case WM_NCDESTROY:

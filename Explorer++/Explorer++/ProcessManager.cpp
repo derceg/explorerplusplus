@@ -8,10 +8,10 @@
 #include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "Config.h"
-#include "MessageWindowHelper.h"
 #include "TestHelper.h"
 #include "Version.h"
 #include "VersionHelper.h"
+#include "../Helper/MessageWindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
 ProcessManager::ProcessManager(const BrowserList *browserList) : m_browserList(browserList)

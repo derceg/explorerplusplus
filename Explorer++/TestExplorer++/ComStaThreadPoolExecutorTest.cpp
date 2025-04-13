@@ -6,7 +6,7 @@
 #include "ComStaThreadPoolExecutor.h"
 #include "ExecutorTestBase.h"
 #include "ExecutorTestHelper.h"
-#include "MessageWindowHelper.h"
+#include "../Helper/MessageWindowHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <gtest/gtest.h>
 

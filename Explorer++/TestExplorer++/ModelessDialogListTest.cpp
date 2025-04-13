@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "ModelessDialogList.h"
 #include "GeneratorTestHelper.h"
-#include "MessageWindowHelper.h"
+#include "../Helper/MessageWindowHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <gtest/gtest.h>
 
