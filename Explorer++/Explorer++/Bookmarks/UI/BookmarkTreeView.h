@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkTreeViewContextMenu.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
@@ -16,15 +17,19 @@
 #include <unordered_map>
 #include <unordered_set>
 
+class AcceleratorManager;
 class BookmarkTree;
 class IconResourceLoader;
+class ResourceLoader;
 
-class BookmarkTreeView : private BookmarkDropTargetWindow
+class BookmarkTreeView :
+	private BookmarkDropTargetWindow,
+	private BookmarkTreeViewContextMenuDelegate
 {
 public:
-	BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
-		const IconResourceLoader *iconResourceLoader, BookmarkTree *bookmarkTree,
-		const std::unordered_set<std::wstring> &setExpansion,
+	BookmarkTreeView(HWND hTreeView, const AcceleratorManager *acceleratorManager,
+		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 
 	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem);
@@ -42,7 +47,6 @@ private:
 
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	LRESULT TreeViewProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	LRESULT TreeViewParentProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -63,7 +67,11 @@ private:
 	void OnSelChanged(const NMTREEVIEW *treeView);
 	void OnBeginDrag(const NMTREEVIEW *treeView);
 
-	void OnRClick(const NMHDR *pnmhdr);
+	void OnShowContextMenu(const POINT &ptScreen);
+
+	// BookmarkTreeViewContextMenuDelegate
+	void StartRenamingFolder(BookmarkItem *folder) override;
+	void CreateNewFolder(BookmarkItem *parentFolder) override;
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
@@ -83,17 +91,13 @@ private:
 	void RemoveDropHighlight();
 
 	HWND m_hTreeView;
+	const AcceleratorManager *const m_acceleratorManager;
+	const ResourceLoader *const m_resourceLoader;
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
-
-	HINSTANCE m_resourceInstance;
-
-	BookmarkTree *m_bookmarkTree;
+	BookmarkTree *const m_bookmarkTree;
 
 	ItemMap_t m_mapItem;
-
-	bool m_bNewFolderCreated;
-	std::wstring m_NewFolderGUID;
 
 	std::optional<HTREEITEM> m_previousDropItem;
 

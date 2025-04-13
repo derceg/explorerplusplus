@@ -9,6 +9,7 @@
 #include "../Helper/WinRTBaseWrapper.h"
 #include "../Helper/WindowSubclass.h"
 
+class AcceleratorManager;
 class BookmarkItem;
 class BookmarkTree;
 class BrowserWindow;
@@ -27,8 +28,8 @@ class BookmarkMenu
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher, HWND parentWindow,
-		ThemeManager *themeManager);
+		const AcceleratorManager *acceleratorManager, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, HWND parentWindow, ThemeManager *themeManager);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

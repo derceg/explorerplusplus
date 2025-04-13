@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+class AcceleratorManager;
 class BookmarkIconManager;
 class BookmarksToolbarView;
 class BookmarkTree;
@@ -27,9 +28,9 @@ class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
 	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
-		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, ThemeManager *themeManager);
+		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager);
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
 	BookmarksToolbar(BookmarksToolbar &&) = delete;
@@ -54,9 +55,9 @@ private:
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
 	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
-		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, ThemeManager *themeManager);
+		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager);
 
 	void Initialize(IconFetcher *iconFetcher);
 	void AddBookmarkItems();

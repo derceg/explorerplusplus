@@ -11,6 +11,7 @@
 #include <optional>
 #include <unordered_set>
 
+class AcceleratorManager;
 class AddBookmarkDialog;
 class BookmarkItem;
 class BookmarkTree;
@@ -43,7 +44,8 @@ public:
 	AddBookmarkDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 		HWND hParent, ThemeManager *themeManager, BookmarkTree *bookmarkTree,
 		BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-		BookmarkItem **selectedParentFolder, const IconResourceLoader *iconResourceLoader,
+		BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
+		const IconResourceLoader *iconResourceLoader,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:
@@ -73,6 +75,7 @@ private:
 	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_bookmarkItem;
 	BookmarkItem **m_selectedParentFolder;
+	const AcceleratorManager *const m_acceleratorManager;
 	const IconResourceLoader *const m_iconResourceLoader;
 	std::optional<std::wstring> m_customDialogTitle;
 

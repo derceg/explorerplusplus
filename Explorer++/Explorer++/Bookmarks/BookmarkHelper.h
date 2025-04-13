@@ -8,6 +8,7 @@
 #include "NavigationHelper.h"
 #include <optional>
 
+class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
@@ -38,15 +39,18 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager,
-	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader);
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	const IconResourceLoader *iconResourceLoader);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	ThemeManager *themeManager, CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
+	ThemeManager *themeManager, CoreInterface *coreInterface,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	const IconResourceLoader *iconResourceLoader,
 	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND parentWindow,
-	ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader);
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager,
+	const IconResourceLoader *iconResourceLoader);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser);
 

@@ -15,6 +15,7 @@
 #include <wil/resource.h>
 #include <optional>
 
+class AcceleratorManager;
 class BookmarkIconManager;
 class BookmarkTree;
 class BrowserWindow;
@@ -36,9 +37,9 @@ public:
 
 	BookmarkListView(HWND hListView, HINSTANCE resourceInstance, BookmarkTree *bookmarkTree,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
-		IconFetcher *iconFetcher, ThemeManager *themeManager,
-		const std::vector<Column> &initialColumns);
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+		ThemeManager *themeManager, const std::vector<Column> &initialColumns);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
 		const BookmarkHistoryEntry *entry = nullptr) override;
@@ -137,6 +138,7 @@ private:
 	BookmarkTree *const m_bookmarkTree;
 	BrowserWindow *const m_browserWindow;
 	CoreInterface *const m_coreInterface;
+	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	const IconResourceLoader *const m_iconResourceLoader;
 	ThemeManager *const m_themeManager;

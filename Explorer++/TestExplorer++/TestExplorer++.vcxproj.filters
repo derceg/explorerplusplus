@@ -410,6 +410,9 @@
     <ClCompile Include="ClipboardWatcherTest.cpp">
       <Filter>Helper\Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkTreeViewContextMenuTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -543,6 +546,9 @@
     </Filter>
     <Filter Include="Application Toolbar\UI">
       <UniqueIdentifier>{c63279f3-bdd7-424f-8160-ac4fcc9f9f7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bookmarks\UI">
+      <UniqueIdentifier>{d672b10c-eb54-4426-a364-03693c2b0e71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

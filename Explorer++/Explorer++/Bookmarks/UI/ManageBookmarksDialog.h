@@ -12,6 +12,7 @@
 #include <boost/signals2.hpp>
 #include <unordered_set>
 
+class AcceleratorManager;
 class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreeView;
@@ -52,8 +53,9 @@ class ManageBookmarksDialog : public ThemedDialog
 public:
 	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 		HWND hParent, ThemeManager *themeManager, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:
@@ -119,12 +121,13 @@ private:
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
 
-	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
+	BrowserWindow *const m_browserWindow;
+	CoreInterface *const m_coreInterface;
+	const AcceleratorManager *const m_acceleratorManager;
 	const IconResourceLoader *const m_iconResourceLoader;
-	IconFetcher *m_iconFetcher = nullptr;
+	IconFetcher *const m_iconFetcher;
 
-	BookmarkTree *m_bookmarkTree = nullptr;
+	BookmarkTree *const m_bookmarkTree;
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 

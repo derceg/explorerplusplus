@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 
+class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
@@ -19,7 +20,8 @@ class BookmarkContextMenuController
 public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager);
+		const AcceleratorManager *acceleratorManager, const IconResourceLoader *iconResourceLoader,
+		ThemeManager *themeManager);
 
 	void OnMenuItemSelected(UINT menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);
@@ -38,6 +40,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	BrowserWindow *const m_browserWindow;
 	CoreInterface *const m_coreInterface;
+	const AcceleratorManager *const m_acceleratorManager;
 	const IconResourceLoader *const m_iconResourceLoader;
 	ThemeManager *const m_themeManager;
 };

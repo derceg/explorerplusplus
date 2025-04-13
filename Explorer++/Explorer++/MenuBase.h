@@ -42,11 +42,11 @@ protected:
 	std::optional<std::wstring> GetAcceleratorTextForId(UINT id) const;
 
 	MenuView *const m_menuView;
+	const AcceleratorManager *const m_acceleratorManager;
 
 private:
 	void OnViewDestroyed();
 
-	const AcceleratorManager *const m_acceleratorManager;
 	const IdRange m_idRange;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

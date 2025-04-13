@@ -121,18 +121,18 @@ private:
 };
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
-	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, ThemeManager *themeManager)
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager)
 {
-	return new BookmarksToolbar(view, browserWindow, coreInterface, resourceLoader,
-		iconResourceLoader, iconFetcher, bookmarkTree, themeManager);
+	return new BookmarksToolbar(view, browserWindow, coreInterface, acceleratorManager,
+		resourceLoader, iconResourceLoader, iconFetcher, bookmarkTree, themeManager);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
-	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, ThemeManager *themeManager) :
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_browserWindow(browserWindow),
@@ -140,10 +140,10 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 	m_bookmarkTree(bookmarkTree),
 	m_themeManager(themeManager),
 	m_contextMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(), browserWindow,
-		coreInterface, iconResourceLoader, themeManager),
+		coreInterface, acceleratorManager, iconResourceLoader, themeManager),
 	m_bookmarkMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(),
-		browserWindow, coreInterface, iconResourceLoader, iconFetcher, view->GetHWND(),
-		themeManager)
+		browserWindow, coreInterface, acceleratorManager, iconResourceLoader, iconFetcher,
+		view->GetHWND(), themeManager)
 {
 	Initialize(iconFetcher);
 }

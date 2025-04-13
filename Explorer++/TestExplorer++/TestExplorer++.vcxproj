@@ -195,6 +195,7 @@
     <ClCompile Include="BookmarkDropperTest.cpp" />
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
     <ClCompile Include="BookmarkStorageTestHelper.cpp" />
+    <ClCompile Include="BookmarkTreeViewContextMenuTest.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="BrowserCommandControllerTest.cpp" />
     <ClCompile Include="BrowserListTest.cpp" />

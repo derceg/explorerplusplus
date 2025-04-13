@@ -6,6 +6,7 @@
 
 #include "BookmarkContextMenu.h"
 
+class AcceleratorManager;
 class BookmarkItem;
 class BookmarkTree;
 class BrowserWindow;
@@ -18,9 +19,9 @@ class BookmarkMenuController
 {
 public:
 	BookmarkMenuController(BookmarkTree *bookmarkTree, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
-		const IconResourceLoader *iconResourceLoader, HWND parentWindow,
-		ThemeManager *themeManager);
+		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
+		HWND parentWindow, ThemeManager *themeManager);
 
 	void OnMenuItemSelected(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
 		bool isShiftKeyDown);

@@ -823,6 +823,9 @@
     <ClCompile Include="ShellBrowser\ColumnHelper.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkTreeViewContextMenu.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1700,6 +1703,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\ColumnHelper.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkTreeViewContextMenu.h">
+      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,13 +18,14 @@ const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmar
 AddBookmarkDialog::AddBookmarkDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder, const IconResourceLoader *iconResourceLoader,
-	std::optional<std::wstring> customDialogTitle) :
+	BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
+	const IconResourceLoader *iconResourceLoader, std::optional<std::wstring> customDialogTitle) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_ADD_BOOKMARK, hParent,
 		DialogSizingType::Both, themeManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
+	m_acceleratorManager(acceleratorManager),
 	m_iconResourceLoader(iconResourceLoader),
 	m_customDialogTitle(customDialogTitle)
 {
@@ -79,9 +80,9 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView =
-		new BookmarkTreeView(hTreeView, GetResourceInstance(), m_iconResourceLoader, m_bookmarkTree,
-			m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
+	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, m_acceleratorManager, m_resourceLoader,
+		m_iconResourceLoader, m_bookmarkTree, m_persistentSettings->m_setExpansion,
+		m_persistentSettings->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);

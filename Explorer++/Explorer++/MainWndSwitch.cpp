@@ -1208,14 +1208,15 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case MainToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 		BookmarkHelper::AddBookmarkItem(m_app->GetBookmarkTree(), BookmarkItem::Type::Bookmark,
-			nullptr, std::nullopt, hwnd, m_app->GetThemeManager(), this, m_app->GetResourceLoader(),
+			nullptr, std::nullopt, hwnd, m_app->GetThemeManager(), this,
+			m_app->GetAcceleratorManager(), m_app->GetResourceLoader(),
 			m_app->GetIconResourceLoader());
 		break;
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
 		BookmarkHelper::BookmarkAllTabs(m_app->GetBookmarkTree(), m_app->GetResourceLoader(),
 			m_app->GetResourceInstance(), hwnd, m_app->GetThemeManager(), this,
-			m_app->GetIconResourceLoader());
+			m_app->GetAcceleratorManager(), m_app->GetIconResourceLoader());
 		break;
 
 	case MainToolbarButton::Bookmarks:
@@ -1225,7 +1226,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 			{
 				return new ManageBookmarksDialog(m_app->GetResourceLoader(),
 					m_app->GetResourceInstance(), hwnd, m_app->GetThemeManager(), this, this,
-					m_app->GetIconResourceLoader(), &m_iconFetcher, m_app->GetBookmarkTree());
+					m_app->GetAcceleratorManager(), m_app->GetIconResourceLoader(), &m_iconFetcher,
+					m_app->GetBookmarkTree());
 			});
 		break;
 
