@@ -285,7 +285,9 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 
 			// When opening a set of bookmarks within a folder, only the first item should be
 			// switched to.
-			if (disposition == OpenFolderDisposition::ForegroundTab)
+			if (disposition == OpenFolderDisposition::ForegroundTab
+				|| disposition == OpenFolderDisposition::NewTabDefault
+				|| disposition == OpenFolderDisposition::NewTabAlternate)
 			{
 				disposition = OpenFolderDisposition::BackgroundTab;
 			}

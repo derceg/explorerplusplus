@@ -46,10 +46,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(UINT menuItemId,
 	case IDM_BOOKMARKS_OPEN_IN_NEW_TAB:
 		DCHECK(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0],
-			m_coreInterface->GetConfig()->openTabsInForeground
-				? OpenFolderDisposition::ForegroundTab
-				: OpenFolderDisposition::BackgroundTab,
-			m_browserWindow);
+			OpenFolderDisposition::NewTabDefault, m_browserWindow);
 		break;
 
 	case IDM_BOOKMARKS_OPEN_ALL:
@@ -95,9 +92,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(UINT menuItemId,
 
 void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkItems)
 {
-	OpenFolderDisposition disposition = m_coreInterface->GetConfig()->openTabsInForeground
-		? OpenFolderDisposition::ForegroundTab
-		: OpenFolderDisposition::BackgroundTab;
+	OpenFolderDisposition disposition = OpenFolderDisposition::NewTabDefault;
 
 	for (auto *bookmarkItem : bookmarkItems)
 	{

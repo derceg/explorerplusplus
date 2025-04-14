@@ -1196,15 +1196,10 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 		return;
 	}
 
-	bool switchToNewTab = m_config->openTabsInForeground;
-
-	if (WI_IsFlagSet(keysDown, MK_SHIFT))
-	{
-		switchToNewTab = !switchToNewTab;
-	}
-
 	auto pidl = GetNodePidl(hitTestInfo.hItem);
-	m_browserWindow->OpenItem(pidl.get(), OpenFolderDisposition::ForegroundTab);
+	m_browserWindow->OpenItem(pidl.get(),
+		DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
+			WI_IsFlagSet(keysDown, MK_SHIFT)));
 }
 
 void ShellTreeView::SetShowHidden(BOOL bShowHidden)
@@ -1548,9 +1543,7 @@ void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		auto disposition = m_config->openTabsInForeground ? OpenFolderDisposition::ForegroundTab
-														  : OpenFolderDisposition::BackgroundTab;
-		m_browserWindow->OpenItem(pidlComplete.get(), disposition);
+		m_browserWindow->OpenItem(pidlComplete.get(), OpenFolderDisposition::NewTabDefault);
 	}
 	break;
 	}

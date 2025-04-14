@@ -493,10 +493,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	else
 	{
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-			m_coreInterface->GetConfig()->openTabsInForeground
-				? OpenFolderDisposition::ForegroundTab
-				: OpenFolderDisposition::BackgroundTab,
-			m_browserWindow);
+			OpenFolderDisposition::NewTabDefault, m_browserWindow);
 	}
 }
 
@@ -855,9 +852,7 @@ void BookmarkListView::OnEnterPressed()
 	}
 	else
 	{
-		OpenFolderDisposition disposition = m_coreInterface->GetConfig()->openTabsInForeground
-			? OpenFolderDisposition::ForegroundTab
-			: OpenFolderDisposition::BackgroundTab;
+		OpenFolderDisposition disposition = OpenFolderDisposition::NewTabDefault;
 
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{

@@ -213,9 +213,7 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		DCHECK_EQ(pidlItems.size(), 1u);
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		auto navigateParams = NavigateParams::Normal(pidlComplete.get());
-		GetActivePane()->GetTabContainerImpl()->CreateNewTab(navigateParams,
-			TabSettings(_selected = m_config->openTabsInForeground));
+		OpenFolderItem(pidlComplete.get(), OpenFolderDisposition::NewTabDefault);
 	}
 	break;
 
