@@ -1032,8 +1032,7 @@ void ShellBrowserImpl::StartRenamingMultipleFiles()
 	}
 
 	MassRenameDialog massRenameDialog(m_app->GetResourceLoader(), m_resourceInstance, m_hListView,
-		m_app->GetThemeManager(), fullFilenameList, m_app->GetIconResourceLoader(),
-		m_fileActionHandler);
+		m_app->GetThemeManager(), fullFilenameList, m_fileActionHandler);
 	massRenameDialog.ShowModalDialog();
 }
 

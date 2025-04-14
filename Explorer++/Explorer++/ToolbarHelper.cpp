@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ToolbarHelper.h"
 #include "Icon.h"
-#include "IconResourceLoader.h"
+#include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 
@@ -13,7 +13,7 @@ namespace ToolbarHelper
 {
 
 std::tuple<HWND, wil::unique_himagelist> CreateCloseButtonToolbar(HWND parent, int closeButtonId,
-	const std::wstring &tooltip, const IconResourceLoader *iconResourceLoader)
+	const std::wstring &tooltip, const ResourceLoader *resourceLoader)
 {
 	HWND toolbar = CreateToolbar(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
@@ -23,7 +23,7 @@ std::tuple<HWND, wil::unique_himagelist> CreateCloseButtonToolbar(HWND parent, i
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(toolbar);
 	wil::unique_hbitmap bitmap =
-		iconResourceLoader->LoadBitmapFromPNGForDpi(Icon::CloseButton, 16, 16, dpi);
+		resourceLoader->LoadBitmapFromPNGForDpi(Icon::CloseButton, 16, 16, dpi);
 
 	BITMAP bitmapInfo;
 	[[maybe_unused]] int res = GetObject(bitmap.get(), sizeof(bitmapInfo), &bitmapInfo);

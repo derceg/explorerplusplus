@@ -10,7 +10,6 @@
 
 class BookmarkTree;
 class CoreInterface;
-class IconResourceLoader;
 class MenuView;
 class ResourceLoader;
 class TabContainerImpl;
@@ -23,8 +22,7 @@ public:
 	TabContainerBackgroundContextMenu(MenuView *menuView,
 		const AcceleratorManager *acceleratorManager, TabContainerImpl *tabContainerImpl,
 		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
-		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
-		ThemeManager *themeManager);
+		const ResourceLoader *resourceLoader, ThemeManager *themeManager);
 
 private:
 	void BuildMenu();
@@ -35,7 +33,6 @@ private:
 	BookmarkTree *const m_bookmarkTree;
 	CoreInterface *const m_coreInterface;
 	const ResourceLoader *const m_resourceLoader;
-	const IconResourceLoader *const m_iconResourceLoader;
 	ThemeManager *const m_themeManager;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

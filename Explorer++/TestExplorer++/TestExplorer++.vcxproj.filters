@@ -413,6 +413,9 @@
     <ClCompile Include="BookmarkTreeViewContextMenuTest.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceLoaderFake.cpp">
+      <Filter>Resource Loading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -550,6 +553,9 @@
     <Filter Include="Bookmarks\UI">
       <UniqueIdentifier>{d672b10c-eb54-4426-a364-03693c2b0e71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Loading">
+      <UniqueIdentifier>{880a756a-c24b-44b9-9b6e-2c1078386f82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -677,6 +683,9 @@
     </ClInclude>
     <ClInclude Include="ApplicationExecutorMock.h">
       <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceLoaderFake.h">
+      <Filter>Resource Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

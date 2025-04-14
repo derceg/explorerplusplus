@@ -12,7 +12,6 @@ class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
-class IconResourceLoader;
 class ResourceLoader;
 class ThemeManager;
 
@@ -27,8 +26,7 @@ class BookmarkContextMenu
 public:
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const AcceleratorManager *acceleratorManager, const IconResourceLoader *iconResourceLoader,
-		ThemeManager *themeManager);
+		const AcceleratorManager *acceleratorManager, ThemeManager *themeManager);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
 		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen,

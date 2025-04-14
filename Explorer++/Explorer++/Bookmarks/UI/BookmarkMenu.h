@@ -15,7 +15,6 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
-class IconResourceLoader;
 class ResourceLoader;
 class ThemeManager;
 
@@ -27,9 +26,9 @@ class BookmarkMenu
 {
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const AcceleratorManager *acceleratorManager, const IconResourceLoader *iconResourceLoader,
-		IconFetcher *iconFetcher, HWND parentWindow, ThemeManager *themeManager);
+		BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher, HWND parentWindow,
+		ThemeManager *themeManager);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

@@ -9,7 +9,6 @@
 #include "../Helper/ResizableDialogHelper.h"
 
 struct Column_t;
-class IconResourceLoader;
 class SelectColumnsDialog;
 class ShellBrowserImpl;
 
@@ -33,8 +32,7 @@ class SelectColumnsDialog : public ThemedDialog
 {
 public:
 	SelectColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager, ShellBrowserImpl *shellBrowser,
-		IconResourceLoader *iconResourceLoader);
+		HWND hParent, ThemeManager *themeManager, ShellBrowserImpl *shellBrowser);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -63,7 +61,6 @@ private:
 	void OnMoveColumn(MoveDirection direction);
 
 	ShellBrowserImpl *m_shellBrowser;
-	IconResourceLoader *m_iconResourceLoader;
 	BOOL m_bColumnsSwapped;
 
 	SelectColumnsDialogPersistentSettings *m_persistentSettings;

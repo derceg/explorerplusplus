@@ -19,8 +19,8 @@
 #include <wil/com.h>
 
 BookmarkTreeView::BookmarkTreeView(HWND hTreeView, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
-	BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
+	const ResourceLoader *resourceLoader, BookmarkTree *bookmarkTree,
+	const std::unordered_set<std::wstring> &setExpansion,
 	std::optional<std::wstring> guidSelected) :
 	BookmarkDropTargetWindow(hTreeView, bookmarkTree),
 	m_hTreeView(hTreeView),
@@ -36,7 +36,7 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, const AcceleratorManager *acc
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(
-		iconResourceLoader, iconWidth, iconHeight, { Icon::Folder });
+		m_resourceLoader, iconWidth, iconHeight, { Icon::Folder });
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
 	SetupTreeView(setExpansion, guidSelected);

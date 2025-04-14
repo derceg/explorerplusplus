@@ -43,7 +43,7 @@ void Explorerplusplus::OnChangeDisplayColors()
 void Explorerplusplus::OnFilterResults()
 {
 	FilterDialog filterDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-		m_hContainer, m_app->GetThemeManager(), this, m_app->GetIconResourceLoader());
+		m_hContainer, m_app->GetThemeManager(), this);
 	filterDialog.ShowModalDialog();
 }
 
@@ -61,8 +61,8 @@ void Explorerplusplus::OnMergeFiles()
 	}
 
 	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-		m_hContainer, m_app->GetThemeManager(), m_app->GetIconResourceLoader(), currentDirectory,
-		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+		m_hContainer, m_app->GetThemeManager(), currentDirectory, fullFilenameList,
+		m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
 }
 
@@ -75,7 +75,7 @@ void Explorerplusplus::OnSplitFile()
 		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iSelected);
 
 		SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-			m_hContainer, m_app->GetThemeManager(), m_app->GetIconResourceLoader(), fullFilename);
+			m_hContainer, m_app->GetThemeManager(), fullFilename);
 		splitFileDialog.ShowModalDialog();
 	}
 }
@@ -114,7 +114,7 @@ void Explorerplusplus::OnSearch()
 
 			return new SearchDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
 				m_hContainer, m_app->GetThemeManager(), currentDirectory, this, this,
-				GetActivePane()->GetTabContainerImpl(), m_app->GetIconResourceLoader());
+				GetActivePane()->GetTabContainerImpl());
 		});
 }
 
@@ -122,7 +122,7 @@ void Explorerplusplus::OnCustomizeColors()
 {
 	CustomizeColorsDialog customizeColorsDialog(m_app->GetResourceLoader(),
 		m_app->GetResourceInstance(), m_hContainer, m_app->GetThemeManager(),
-		m_app->GetColorRuleModel(), m_app->GetIconResourceLoader());
+		m_app->GetColorRuleModel());
 	customizeColorsDialog.ShowModalDialog();
 }
 

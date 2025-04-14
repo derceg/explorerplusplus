@@ -16,7 +16,6 @@ class AddBookmarkDialog;
 class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreeView;
-class IconResourceLoader;
 
 class AddBookmarkDialogPersistentSettings : public DialogSettings
 {
@@ -45,7 +44,6 @@ public:
 		HWND hParent, ThemeManager *themeManager, BookmarkTree *bookmarkTree,
 		BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
 		BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
-		const IconResourceLoader *iconResourceLoader,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:
@@ -76,7 +74,6 @@ private:
 	BookmarkItem *m_bookmarkItem;
 	BookmarkItem **m_selectedParentFolder;
 	const AcceleratorManager *const m_acceleratorManager;
-	const IconResourceLoader *const m_iconResourceLoader;
 	std::optional<std::wstring> m_customDialogTitle;
 
 	BookmarkTreeView *m_pBookmarkTreeView;

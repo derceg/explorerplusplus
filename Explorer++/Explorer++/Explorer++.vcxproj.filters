@@ -229,9 +229,6 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="IconResourceLoader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\SortHelper.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -632,7 +629,7 @@
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="Win32ResourceLoader.cpp">
-      <Filter>Core\Resource Loading</Filter>
+      <Filter>Resource Loading</Filter>
     </ClCompile>
     <ClCompile Include="ShellIconLoaderImpl.cpp">
       <Filter>Core</Filter>
@@ -1021,9 +1018,6 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="Icon.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="IconResourceLoader.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\SortHelper.h">
@@ -1486,10 +1480,10 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="Win32ResourceLoader.h">
-      <Filter>Core\Resource Loading</Filter>
+      <Filter>Resource Loading</Filter>
     </ClInclude>
     <ClInclude Include="ResourceLoader.h">
-      <Filter>Core\Resource Loading</Filter>
+      <Filter>Resource Loading</Filter>
     </ClInclude>
     <ClInclude Include="ShellIconModel.h">
       <Filter>Core</Filter>
@@ -1707,6 +1701,9 @@
     <ClInclude Include="BookmarkTreeViewContextMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
+    <ClInclude Include="IconSet.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1857,9 +1854,6 @@
     <Filter Include="Core\Accelerators">
       <UniqueIdentifier>{4a6efb22-1fee-46bd-a375-12e500fe4fda}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Resource Loading">
-      <UniqueIdentifier>{e7f03946-8121-4ea7-a8ea-894d7fc97109}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Async">
       <UniqueIdentifier>{60028131-154b-40db-b067-625afba46c39}</UniqueIdentifier>
     </Filter>
@@ -1913,6 +1907,9 @@
     </Filter>
     <Filter Include="Directory Change Watching">
       <UniqueIdentifier>{f250fc00-1a66-44d8-a30a-9840ad247acd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Loading">
+      <UniqueIdentifier>{e7f03946-8121-4ea7-a8ea-894d7fc97109}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

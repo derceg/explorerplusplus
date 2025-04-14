@@ -14,7 +14,6 @@
 #include "DefaultAccelerators.h"
 #include "DriveEnumeratorImpl.h"
 #include "ExitCode.h"
-#include "IconResourceLoader.h"
 #include "LanguageHelper.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
@@ -41,13 +40,13 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 			static_cast<int>(std::thread::hardware_concurrency()), MIN_COM_STA_THREADPOOL_SIZE))),
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
+	m_darkModeManager(&m_eventWindow, &m_config),
 	m_cachedIcons(std::make_shared<CachedIcons>(MAX_CACHED_ICONS)),
 	m_iconFetcher(std::make_shared<AsyncIconFetcher>(&m_runtime, m_cachedIcons)),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
-	m_darkModeManager(&m_eventWindow, &m_config),
 	m_themeManager(&m_darkModeManager),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(&m_systemClock),
@@ -136,8 +135,6 @@ void App::SetUpSession()
 		return;
 	}
 
-	m_iconResourceLoader =
-		std::make_unique<IconResourceLoader>(m_config.iconSet, &m_darkModeManager);
 	SetUpLanguageResourceInstance();
 
 	RestoreSession(windows);
@@ -254,7 +251,8 @@ void App::SetUpLanguageResourceInstance()
 		SetProcessDefaultLayout(LAYOUT_RTL);
 	}
 
-	m_resourceLoader = std::make_unique<Win32ResourceLoader>(m_resourceInstance);
+	m_resourceLoader = std::make_unique<Win32ResourceLoader>(m_resourceInstance, m_config.iconSet,
+		&m_darkModeManager);
 }
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)
@@ -426,11 +424,6 @@ HINSTANCE App::GetResourceInstance() const
 ResourceLoader *App::GetResourceLoader() const
 {
 	return m_resourceLoader.get();
-}
-
-IconResourceLoader *App::GetIconResourceLoader() const
-{
-	return m_iconResourceLoader.get();
 }
 
 TabEvents *App::GetTabEvents()

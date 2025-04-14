@@ -19,17 +19,17 @@
 #include "../Helper/MenuHelper.h"
 
 BookmarksMainMenu::BookmarksMainMenu(App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
-	IconFetcher *iconFetcher, ThemeManager *themeManager, BookmarkTree *bookmarkTree,
+	CoreInterface *coreInterface, const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
+	ThemeManager *themeManager, BookmarkTree *bookmarkTree,
 	const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
 	m_app(app),
 	m_coreInterface(coreInterface),
-	m_iconResourceLoader(iconResourceLoader),
+	m_resourceLoader(resourceLoader),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(iconResourceLoader, iconFetcher, coreInterface->GetResourceInstance()),
+	m_menuBuilder(resourceLoader, iconFetcher),
 	m_controller(bookmarkTree, browserWindow, coreInterface, app->GetAcceleratorManager(),
-		app->GetResourceLoader(), iconResourceLoader, coreInterface->GetMainWindow(), themeManager)
+		app->GetResourceLoader(), coreInterface->GetMainWindow(), themeManager)
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
@@ -79,8 +79,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_THIS_TAB);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB, bookmarkThisTabText, 0,
 		TRUE);
-	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB,
-		m_iconResourceLoader, Icon::AddBookmark, dpi, menuImages);
+	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB, m_resourceLoader,
+		Icon::AddBookmark, dpi, menuImages);
 
 	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(
 		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_ALL_TABS);
@@ -91,8 +91,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 		m_coreInterface->GetResourceInstance(), IDS_MENU_MANAGE_BOOKMARKS);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS, manageBookmarksText, 2,
 		TRUE);
-	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,
-		m_iconResourceLoader, Icon::Bookmarks, dpi, menuImages);
+	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS, m_resourceLoader,
+		Icon::Bookmarks, dpi, menuImages);
 
 	AddBookmarkItemsToMenu(menu.get(), m_menuIdRange, GetMenuItemCount(menu.get()), menuImages,
 		menuInfo);

@@ -14,7 +14,6 @@
 #include "FontsOptionsPage.h"
 #include "GeneralOptionsPage.h"
 #include "Icon.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "StartupOptionsPage.h"
@@ -106,8 +105,7 @@ void OptionsDialog::AddDynamicControls()
 
 wil::unique_hicon OptionsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_app->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Options, iconWidth,
-		iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::Options, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> OptionsDialog::GetResizableControls()

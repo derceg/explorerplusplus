@@ -14,16 +14,15 @@ class BookmarkTree;
 class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
-class IconResourceLoader;
+class ResourceLoader;
 class ThemeManager;
 
 class BookmarksMainMenu
 {
 public:
 	BookmarksMainMenu(App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-		ThemeManager *themeManager, BookmarkTree *bookmarkTree,
-		const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
+		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, ThemeManager *themeManager,
+		BookmarkTree *bookmarkTree, const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(UINT menuItemId);
@@ -44,7 +43,7 @@ private:
 
 	App *const m_app;
 	CoreInterface *const m_coreInterface;
-	const IconResourceLoader *const m_iconResourceLoader;
+	const ResourceLoader *const m_resourceLoader;
 	BookmarkTree *const m_bookmarkTree;
 	const BookmarkMenuBuilder::MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;

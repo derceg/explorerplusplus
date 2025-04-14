@@ -8,7 +8,6 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/WindowHelper.h"
@@ -19,14 +18,13 @@ AddBookmarkDialog::AddBookmarkDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
 	BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
-	const IconResourceLoader *iconResourceLoader, std::optional<std::wstring> customDialogTitle) :
+	std::optional<std::wstring> customDialogTitle) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_ADD_BOOKMARK, hParent,
 		DialogSizingType::Both, themeManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
 	m_acceleratorManager(acceleratorManager),
-	m_iconResourceLoader(iconResourceLoader),
 	m_customDialogTitle(customDialogTitle)
 {
 	m_persistentSettings = &AddBookmarkDialogPersistentSettings::GetInstance();
@@ -81,8 +79,7 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
 
 	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, m_acceleratorManager, m_resourceLoader,
-		m_iconResourceLoader, m_bookmarkTree, m_persistentSettings->m_setExpansion,
-		m_persistentSettings->m_guidSelected);
+		m_bookmarkTree, m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
@@ -182,7 +179,7 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth, iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> AddBookmarkDialog::GetResizableControls()

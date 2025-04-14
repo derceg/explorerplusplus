@@ -9,7 +9,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ResizableDialogHelper.h"
 
-class IconResourceLoader;
 class MassRenameDialog;
 
 class MassRenameDialogPersistentSettings : public DialogSettings
@@ -47,7 +46,7 @@ class MassRenameDialog : public ThemedDialog
 public:
 	MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
 		ThemeManager *themeManager, const std::list<std::wstring> &FullFilenameList,
-		IconResourceLoader *iconResourceLoader, FileActionHandler *pFileActionHandler);
+		FileActionHandler *pFileActionHandler);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -68,7 +67,6 @@ private:
 
 	std::list<std::wstring> m_FullFilenameList;
 	wil::unique_hicon m_moreIcon;
-	IconResourceLoader *m_iconResourceLoader;
 	FileActionHandler *m_pFileActionHandler;
 
 	MassRenameDialogPersistentSettings *m_persistentSettings;

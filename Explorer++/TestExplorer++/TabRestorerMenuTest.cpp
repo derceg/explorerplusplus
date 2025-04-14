@@ -9,6 +9,7 @@
 #include "BrowserWindowMock.h"
 #include "PopupMenuView.h"
 #include "PopupMenuViewTestHelper.h"
+#include "ResourceLoaderFake.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
@@ -17,7 +18,6 @@
 #include "TabEvents.h"
 #include "TabNavigationMock.h"
 #include "TabRestorer.h"
-#include "Win32ResourceLoader.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -25,9 +25,7 @@ using namespace testing;
 class TabRestorerMenuTest : public Test
 {
 protected:
-	TabRestorerMenuTest() :
-		m_tabRestorer(&m_tabEvents, &m_browserList),
-		m_resourceLoader(GetModuleHandle(nullptr))
+	TabRestorerMenuTest() : m_tabRestorer(&m_tabEvents, &m_browserList)
 	{
 	}
 
@@ -51,7 +49,7 @@ protected:
 	TabRestorer m_tabRestorer;
 
 	ShellIconLoaderFake m_shellIconLoader;
-	Win32ResourceLoader m_resourceLoader;
+	ResourceLoaderFake m_resourceLoader;
 
 	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;

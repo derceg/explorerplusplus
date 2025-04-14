@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MergeFilesDialog.h"
 #include "App.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/FileOperations.h"
@@ -32,12 +31,10 @@ const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles"
 bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
 
 MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
-	const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
-	BOOL bShowFriendlyDates) :
+	HWND hParent, ThemeManager *themeManager, const std::wstring &strOutputDirectory,
+	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both,
 		themeManager),
-	m_iconResourceLoader(iconResourceLoader),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
 	m_bShowFriendlyDates(bShowFriendlyDates),
@@ -188,7 +185,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::MergeFiles, iconWidth, iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::MergeFiles, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> MergeFilesDialog::GetResizableControls()

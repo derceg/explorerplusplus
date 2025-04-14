@@ -16,14 +16,13 @@
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
 	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const IconResourceLoader *iconResourceLoader, ThemeManager *themeManager) :
+	ThemeManager *themeManager) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager),
-	m_iconResourceLoader(iconResourceLoader),
 	m_themeManager(themeManager)
 {
 }
@@ -106,8 +105,7 @@ void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex, HWND parentWindow)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		parentWindow, m_themeManager, m_coreInterface, m_acceleratorManager, m_resourceLoader,
-		m_iconResourceLoader);
+		parentWindow, m_themeManager, m_coreInterface, m_acceleratorManager, m_resourceLoader);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
@@ -132,5 +130,5 @@ void BookmarkContextMenuController::OnEditBookmarkItem(BookmarkItem *bookmarkIte
 	HWND parentWindow)
 {
 	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_acceleratorManager,
-		m_resourceLoader, m_resourceInstance, parentWindow, m_themeManager, m_iconResourceLoader);
+		m_resourceLoader, m_resourceInstance, parentWindow, m_themeManager);
 }

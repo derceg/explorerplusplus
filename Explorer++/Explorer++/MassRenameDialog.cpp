@@ -15,7 +15,6 @@
 
 #include "stdafx.h"
 #include "MassRenameDialog.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
@@ -33,11 +32,10 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("C
 
 MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 	HWND hParent, ThemeManager *themeManager, const std::list<std::wstring> &FullFilenameList,
-	IconResourceLoader *iconResourceLoader, FileActionHandler *pFileActionHandler) :
+	FileActionHandler *pFileActionHandler) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both,
 		themeManager),
 	m_FullFilenameList(FullFilenameList),
-	m_iconResourceLoader(iconResourceLoader),
 	m_pFileActionHandler(pFileActionHandler)
 {
 	m_persistentSettings = &MassRenameDialogPersistentSettings::GetInstance();
@@ -46,7 +44,7 @@ MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HINSTAN
 INT_PTR MassRenameDialog::OnInitDialog()
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
-	m_moreIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
+	m_moreIcon = m_resourceLoader->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_MORE, BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 
@@ -114,7 +112,7 @@ INT_PTR MassRenameDialog::OnInitDialog()
 
 wil::unique_hicon MassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> MassRenameDialog::GetResizableControls()

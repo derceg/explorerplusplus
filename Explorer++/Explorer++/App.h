@@ -38,7 +38,6 @@
 class AsyncIconFetcher;
 class CachedIcons;
 class ColorRuleModel;
-class IconResourceLoader;
 class ResourceLoader;
 struct WindowStorageData;
 
@@ -71,7 +70,6 @@ public:
 	Applications::ApplicationModel *GetApplicationModel();
 	HINSTANCE GetResourceInstance() const;
 	ResourceLoader *GetResourceLoader() const;
-	IconResourceLoader *GetIconResourceLoader() const;
 	TabEvents *GetTabEvents();
 	ShellBrowserEvents *GetShellBrowserEvents();
 	NavigationEvents *GetNavigationEvents();
@@ -116,6 +114,7 @@ private:
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
+	DarkModeManager m_darkModeManager;
 	std::shared_ptr<CachedIcons> m_cachedIcons;
 	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;
 	BrowserList m_browserList;
@@ -125,13 +124,11 @@ private:
 	Applications::ApplicationModel m_applicationModel;
 	HINSTANCE m_resourceInstance;
 	std::unique_ptr<ResourceLoader> m_resourceLoader;
-	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 	ProcessManager m_processManager;
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
 	TabRestorer m_tabRestorer;
-	DarkModeManager m_darkModeManager;
 	ThemeManager m_themeManager;
 	SystemClockImpl m_systemClock;
 

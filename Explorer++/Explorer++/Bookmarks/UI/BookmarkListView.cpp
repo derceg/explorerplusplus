@@ -28,8 +28,8 @@
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
-	ThemeManager *themeManager, const std::vector<Column> &initialColumns) :
+	IconFetcher *iconFetcher, ThemeManager *themeManager,
+	const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceInstance(resourceInstance),
@@ -38,13 +38,12 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
-	m_iconResourceLoader(iconResourceLoader),
 	m_themeManager(themeManager),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
 	m_bookmarkContextMenu(bookmarkTree, resourceLoader, resourceInstance, browserWindow,
-		coreInterface, acceleratorManager, iconResourceLoader, themeManager)
+		coreInterface, acceleratorManager, themeManager)
 {
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP,
@@ -76,8 +75,8 @@ void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_iconResourceLoader, iconFetcher,
-		iconWidth, iconHeight);
+	m_bookmarkIconManager =
+		std::make_unique<BookmarkIconManager>(m_resourceLoader, iconFetcher, iconWidth, iconHeight);
 
 	ListView_SetImageList(m_hListView, m_bookmarkIconManager->GetImageList(), LVSIL_SMALL);
 }
@@ -594,7 +593,7 @@ void BookmarkListView::OnNewBookmark()
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
 		m_currentBookmarkFolder, targetIndex, m_hListView, m_themeManager, m_coreInterface,
-		m_acceleratorManager, m_resourceLoader, m_iconResourceLoader);
+		m_acceleratorManager, m_resourceLoader);
 
 	if (!bookmark)
 	{

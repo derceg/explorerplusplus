@@ -19,7 +19,6 @@
 
 class AcceleratorManager;
 class BookmarkTree;
-class IconResourceLoader;
 class ResourceLoader;
 
 class BookmarkTreeView :
@@ -28,8 +27,8 @@ class BookmarkTreeView :
 {
 public:
 	BookmarkTreeView(HWND hTreeView, const AcceleratorManager *acceleratorManager,
-		const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
-		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
+		const ResourceLoader *resourceLoader, BookmarkTree *bookmarkTree,
+		const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 
 	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem);

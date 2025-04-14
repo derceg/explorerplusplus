@@ -9,7 +9,6 @@
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialogHelper.h"
 
-class IconResourceLoader;
 class MergeFilesDialog;
 
 class MergeFilesDialogPersistentSettings : public DialogSettings
@@ -52,9 +51,8 @@ class MergeFilesDialog : public ThemedDialog
 {
 public:
 	MergeFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
-		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
-		BOOL bShowFriendlyDates);
+		ThemeManager *themeManager, const std::wstring &strOutputDirectory,
+		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
 
 protected:
@@ -75,8 +73,6 @@ private:
 	void OnChangeOutputDirectory();
 	void OnMove(bool bUp);
 	void OnFinished();
-
-	const IconResourceLoader *const m_iconResourceLoader;
 
 	std::wstring m_strOutputDirectory;
 	std::list<std::wstring> m_FullFilenameList;

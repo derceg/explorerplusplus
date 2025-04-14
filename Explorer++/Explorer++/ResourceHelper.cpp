@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include <glog/logging.h>
 
@@ -30,14 +31,14 @@ std::optional<std::wstring> ResourceHelper::MaybeLoadString(HINSTANCE resourceIn
 }
 
 void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId,
-	const IconResourceLoader *iconResourceLoader, Icon icon, int dpi,
+	const ResourceLoader *resourceLoader, Icon icon, int dpi,
 	std::vector<wil::unique_hbitmap> &menuImages)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	wil::unique_hbitmap bitmap =
-		iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+		resourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -53,7 +54,7 @@ void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId,
 }
 
 std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateIconImageList(
-	const IconResourceLoader *iconResourceLoader, int iconWidth, int iconHeight,
+	const ResourceLoader *resourceLoader, int iconWidth, int iconHeight,
 	const std::initializer_list<Icon> &icons)
 {
 	wil::unique_himagelist imageList(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK,
@@ -62,19 +63,18 @@ std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateI
 
 	for (auto icon : icons)
 	{
-		AddIconToImageList(imageList.get(), iconResourceLoader, icon, iconWidth, iconHeight,
+		AddIconToImageList(imageList.get(), resourceLoader, icon, iconWidth, iconHeight,
 			imageListMappings);
 	}
 
 	return { std::move(imageList), imageListMappings };
 }
 
-void ResourceHelper::AddIconToImageList(HIMAGELIST imageList,
-	const IconResourceLoader *iconResourceLoader, Icon icon, int iconWidth, int iconHeight,
-	IconImageListMapping &imageListMappings)
+void ResourceHelper::AddIconToImageList(HIMAGELIST imageList, const ResourceLoader *resourceLoader,
+	Icon icon, int iconWidth, int iconHeight, IconImageListMapping &imageListMappings)
 {
 	wil::unique_hbitmap bitmap =
-		iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+		resourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
 	if (imagePosition == -1)

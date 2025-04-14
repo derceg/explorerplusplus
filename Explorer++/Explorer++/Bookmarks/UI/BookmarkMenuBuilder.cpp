@@ -7,17 +7,17 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include <glog/logging.h>
 #include <wil/common.h>
 #include <format>
 
-BookmarkMenuBuilder::BookmarkMenuBuilder(const IconResourceLoader *iconResourceLoader,
-	IconFetcher *iconFetcher, HINSTANCE resourceInstance) :
-	m_iconResourceLoader(iconResourceLoader),
-	m_iconFetcher(iconFetcher),
-	m_resourceInstance(resourceInstance)
+BookmarkMenuBuilder::BookmarkMenuBuilder(const ResourceLoader *resourceLoader,
+	IconFetcher *iconFetcher) :
+	m_resourceLoader(resourceLoader),
+	m_iconFetcher(iconFetcher)
 {
 }
 
@@ -35,8 +35,7 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	BookmarkIconManager bookmarkIconManager(m_iconResourceLoader, m_iconFetcher, iconWidth,
-		iconHeight);
+	BookmarkIconManager bookmarkIconManager(m_resourceLoader, m_iconFetcher, iconWidth, iconHeight);
 
 	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, bookmarkIconManager, menuImages,
 		menuInfo, true, includePredicate);
@@ -97,8 +96,7 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem 
 		return FALSE;
 	}
 
-	std::wstring bookmarkFolderEmpty =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_FOLDER_EMPTY);
+	std::wstring bookmarkFolderEmpty = m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY);
 	std::wstring menuText = std::format(L"({})", bookmarkFolderEmpty);
 
 	MENUITEMINFO mii;

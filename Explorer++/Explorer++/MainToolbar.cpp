@@ -14,6 +14,7 @@
 #include "NavigationHelper.h"
 #include "PopupMenuView.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
@@ -69,16 +70,16 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 // clang-format on
 
 MainToolbar *MainToolbar::Create(HWND parent, App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	return new MainToolbar(parent, app, browserWindow, coreInterface, iconResourceLoader,
+	return new MainToolbar(parent, app, browserWindow, coreInterface, resourceLoader,
 		shellIconLoader, initialButtons);
 }
 
 MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
 	BaseWindow(CreateMainToolbar(parent)),
@@ -90,7 +91,7 @@ MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow,
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
 		m_app->GetConfig())
 {
-	Initialize(parent, iconResourceLoader, initialButtons);
+	Initialize(parent, resourceLoader, initialButtons);
 }
 
 HWND MainToolbar::CreateMainToolbar(HWND parent)
@@ -102,7 +103,7 @@ HWND MainToolbar::CreateMainToolbar(HWND parent)
 			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 }
 
-void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResourceLoader,
+void MainToolbar::Initialize(HWND parent, const ResourceLoader *resourceLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	// Ideally, this constraint would be checked at compile-time, but the size
@@ -122,9 +123,9 @@ void MainToolbar::Initialize(HWND parent, const IconResourceLoader *iconResource
 	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
 		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(MainToolbarButton::_size() - 1)));
 
-	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), iconResourceLoader,
+	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), resourceLoader,
 		TOOLBAR_IMAGE_SIZE_SMALL, dpi);
-	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), iconResourceLoader,
+	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), resourceLoader,
 		TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
@@ -183,14 +184,14 @@ void MainToolbar::SetTooolbarImageList()
 }
 
 std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList,
-	const IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi)
+	const ResourceLoader *resourceLoader, int iconSize, UINT dpi)
 {
 	std::unordered_map<int, int> imageListMappings;
 
 	for (const auto &mapping : TOOLBAR_BUTTON_ICON_MAPPINGS)
 	{
 		wil::unique_hbitmap bitmap =
-			iconResourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
+			resourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
 
 		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SplitFileDialog.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/FileOperations.h"
@@ -35,11 +34,9 @@ const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
 SplitFileDialog::SplitFileDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, ThemeManager *themeManager, const IconResourceLoader *iconResourceLoader,
-	const std::wstring &strFullFilename) :
+	HWND hParent, ThemeManager *themeManager, const std::wstring &strFullFilename) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None,
 		themeManager),
-	m_iconResourceLoader(iconResourceLoader),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
 	m_bStopSplitting(false),
@@ -152,7 +149,7 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 wil::unique_hicon SplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
 }
 
 INT_PTR SplitFileDialog::OnTimer(int iTimerID)

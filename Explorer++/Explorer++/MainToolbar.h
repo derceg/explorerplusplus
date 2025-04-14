@@ -6,7 +6,6 @@
 
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
-#include "IconResourceLoader.h"
 #include "MainFontSetter.h"
 #include "MainToolbarStorage.h"
 #include "Tab.h"
@@ -21,8 +20,8 @@
 
 class App;
 class BrowserWindow;
-class IconResourceLoader;
 class NavigationRequest;
+class ResourceLoader;
 class ShellBrowser;
 class ShellIconLoader;
 
@@ -30,7 +29,7 @@ class MainToolbar : public BaseWindow
 {
 public:
 	static MainToolbar *Create(HWND parent, App *app, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const IconResourceLoader *iconResourceLoader,
+		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 		ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
@@ -46,7 +45,7 @@ public:
 
 private:
 	MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const IconResourceLoader *iconResourceLoader, ShellIconLoader *shellIconLoader,
+		const ResourceLoader *resourceLoader, ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -54,11 +53,11 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void Initialize(HWND parent, const IconResourceLoader *iconResourceLoader,
+	void Initialize(HWND parent, const ResourceLoader *resourceLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	void SetTooolbarImageList();
 	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
-		const IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
+		const ResourceLoader *resourceLoader, int iconSize, UINT dpi);
 	std::vector<MainToolbarButton> GetDefaultButtons() const;
 	void AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons);
 	void AddButtonToToolbar(MainToolbarButton button);

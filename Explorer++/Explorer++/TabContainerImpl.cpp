@@ -10,12 +10,12 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "Icon.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -127,7 +127,7 @@ void TabContainerImpl::Initialize(HWND parent)
 void TabContainerImpl::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-	wil::unique_hbitmap bitmap = m_app->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock,
+	wil::unique_hbitmap bitmap = m_app->GetResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock,
 		ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 
@@ -421,7 +421,7 @@ void TabContainerImpl::AddImagesToTabContextMenu(HMENU menu,
 
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_app->GetIconResourceLoader(),
+		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_app->GetResourceLoader(),
 			mapping.second, dpi, menuImages);
 	}
 }
@@ -613,7 +613,7 @@ void TabContainerImpl::ShowBackgroundContextMenu(const POINT &ptClient)
 	PopupMenuView popupMenu;
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), this,
 		m_app->GetTabRestorer(), m_bookmarkTree, m_coreInterface, m_app->GetResourceLoader(),
-		m_app->GetIconResourceLoader(), m_app->GetThemeManager());
+		m_app->GetThemeManager());
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

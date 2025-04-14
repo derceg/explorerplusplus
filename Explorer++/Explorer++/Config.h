@@ -9,7 +9,7 @@
 #include "DefaultColumns.h"
 #include "DisplayWindowDefaults.h"
 #include "FontHelper.h"
-#include "IconResourceLoader.h"
+#include "IconSet.h"
 #include "LanguageHelper.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"

@@ -10,14 +10,14 @@
 
 class BookmarkItem;
 class IconFetcher;
-class IconResourceLoader;
+class ResourceLoader;
 
 class BookmarkIconManager
 {
 public:
 	using IconAvailableCallback = std::function<void(int iconIndex)>;
 
-	BookmarkIconManager(const IconResourceLoader *iconResourceLoader, IconFetcher *iconFetcher,
+	BookmarkIconManager(const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
 		int iconWidth, int iconHeight);
 
 	BookmarkIconManager(const BookmarkIconManager &other) = delete;

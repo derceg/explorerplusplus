@@ -271,7 +271,7 @@ void Explorerplusplus::CreateMainToolbar(
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	m_mainToolbar = MainToolbar::Create(m_mainRebarView->GetHWND(), m_app, this, this,
-		m_app->GetIconResourceLoader(), &m_shellIconLoader, initialButtons);
+		m_app->GetResourceLoader(), &m_shellIconLoader, initialButtons);
 	m_mainToolbar->sizeUpdatedSignal.AddObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));
 }
@@ -281,8 +281,8 @@ void Explorerplusplus::CreateBookmarksToolbar()
 	auto bookmarksToolbarView = new BookmarksToolbarView(m_mainRebarView->GetHWND(), m_config);
 
 	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this,
-		m_app->GetAcceleratorManager(), m_app->GetResourceLoader(), m_app->GetIconResourceLoader(),
-		&m_iconFetcher, m_app->GetBookmarkTree(), m_app->GetThemeManager());
+		m_app->GetAcceleratorManager(), m_app->GetResourceLoader(), &m_iconFetcher,
+		m_app->GetBookmarkTree(), m_app->GetThemeManager());
 	m_bookmarksToolbar->GetView()->AddToolbarSizeUpdatedObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
 			m_bookmarksToolbar->GetView()->GetHWND()));

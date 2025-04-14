@@ -14,12 +14,12 @@
 BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree,
 	BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	const IconResourceLoader *iconResourceLoader, HWND parentWindow, ThemeManager *themeManager) :
+	HWND parentWindow, ThemeManager *themeManager) :
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_parentWindow(parentWindow),
 	m_bookmarkContextMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(),
-		browserWindow, coreInterface, acceleratorManager, iconResourceLoader, themeManager)
+		browserWindow, coreInterface, acceleratorManager, themeManager)
 {
 }
 

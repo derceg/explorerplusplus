@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SelectColumnsDialog.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ColumnHelper.h"
@@ -19,11 +18,10 @@ const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectCo
 
 SelectColumnsDialog::SelectColumnsDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-	ShellBrowserImpl *shellBrowser, IconResourceLoader *iconResourceLoader) :
+	ShellBrowserImpl *shellBrowser) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_SELECTCOLUMNS, hParent,
 		DialogSizingType::Both, themeManager),
 	m_shellBrowser(shellBrowser),
-	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
 {
 	m_persistentSettings = &SelectColumnsDialogPersistentSettings::GetInstance();
@@ -74,8 +72,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 wil::unique_hicon SelectColumnsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth,
-		iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
 }
 
 bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)

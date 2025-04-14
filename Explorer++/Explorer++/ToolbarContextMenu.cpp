@@ -158,7 +158,7 @@ void ToolbarContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 	auto *bookmarkTree = m_app->GetBookmarkTree();
 	BookmarkHelper::AddBookmarkItem(bookmarkTree, type, bookmarkTree->GetBookmarksToolbarFolder(),
 		std::nullopt, m_browser->GetHWND(), m_app->GetThemeManager(), m_coreInterface,
-		m_app->GetAcceleratorManager(), m_app->GetResourceLoader(), m_app->GetIconResourceLoader());
+		m_app->GetAcceleratorManager(), m_app->GetResourceLoader());
 }
 
 void ToolbarContextMenu::OnPasteBookmark()

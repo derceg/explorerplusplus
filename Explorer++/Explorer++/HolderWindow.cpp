@@ -18,15 +18,15 @@
 
 HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const IconResourceLoader *iconResourceLoader, const DarkModeManager *darkModeManager)
+	const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager)
 {
-	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, iconResourceLoader,
+	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, resourceLoader,
 		darkModeManager);
 }
 
 HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const IconResourceLoader *iconResourceLoader, const DarkModeManager *darkModeManager) :
+	const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager) :
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_darkModeManager(darkModeManager),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
@@ -38,7 +38,7 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	m_font = m_defaultFont.get();
 
 	std::tie(m_toolbar, m_toolbarImageList) = ToolbarHelper::CreateCloseButtonToolbar(m_hwnd,
-		CLOSE_BUTTON_ID, closeButtonTooltip, iconResourceLoader);
+		CLOSE_BUTTON_ID, closeButtonTooltip, resourceLoader);
 
 	SIZE toolbarSize;
 	[[maybe_unused]] auto sizeRes =

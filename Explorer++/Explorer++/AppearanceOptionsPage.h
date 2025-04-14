@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "IconResourceLoader.h"
+#include "IconSet.h"
 #include "OptionsPage.h"
 
 class DarkModeManager;

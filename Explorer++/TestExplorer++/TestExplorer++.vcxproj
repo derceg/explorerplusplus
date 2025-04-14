@@ -252,6 +252,7 @@
     <ClCompile Include="AsyncIconFetcherTest.cpp" />
     <ClCompile Include="HistoryTrackerTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />
+    <ClCompile Include="ResourceLoaderFake.cpp" />
     <ClCompile Include="ScopedTestDir.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
@@ -389,6 +390,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PopupMenuViewTestHelper.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
+    <ClInclude Include="ResourceLoaderFake.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
     <ClInclude Include="ScopedTestDir.h" />
     <ClInclude Include="ShellEnumeratorFake.h" />

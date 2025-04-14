@@ -8,7 +8,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
 #include "PopupMenuView.h"
-#include "Win32ResourceLoader.h"
+#include "ResourceLoaderFake.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -35,7 +35,7 @@ TEST(BookmarkTreeViewContextMenuTest, Selection)
 	auto *targetFolder = bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksToolbarFolder(),
 		std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt), 0);
 
-	Win32ResourceLoader resourceLoader(GetModuleHandle(nullptr));
+	ResourceLoaderFake resourceLoader;
 
 	PopupMenuView popupMenu;
 	BookmarkTreeViewContextMenu contextMenu(&popupMenu, &acceleratorManager, &delegate,

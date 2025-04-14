@@ -949,7 +949,7 @@ void ShellBrowserImpl::OnListViewHeaderMenuItemSelected(int menuItemId,
 void ShellBrowserImpl::OnShowMoreColumnsSelected()
 {
 	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_resourceInstance,
-		m_hListView, m_app->GetThemeManager(), this, m_app->GetIconResourceLoader());
+		m_hListView, m_app->GetThemeManager(), this);
 	selectColumnsDialog.ShowModalDialog();
 }
 

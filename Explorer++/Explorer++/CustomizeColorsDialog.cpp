@@ -8,7 +8,6 @@
 #include "ColorRuleEditorDialog.h"
 #include "ColorRuleListView.h"
 #include "ColorRuleModel.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/Helper.h"
@@ -19,12 +18,10 @@
 CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
 CustomizeColorsDialog::CustomizeColorsDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager, ColorRuleModel *model,
-	const IconResourceLoader *iconResourceLoader) :
+	HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager, ColorRuleModel *model) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_CUSTOMIZE_COLORS, parent,
 		DialogSizingType::Both, themeManager),
-	m_model(model),
-	m_iconResourceLoader(iconResourceLoader)
+	m_model(model)
 {
 	m_persistentSettings = &CustomizeColorsDialogPersistentSettings::GetInstance();
 }
@@ -53,8 +50,7 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 
 wil::unique_hicon CustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::CustomizeColors, iconWidth,
-		iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::CustomizeColors, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> CustomizeColorsDialog::GetResizableControls()

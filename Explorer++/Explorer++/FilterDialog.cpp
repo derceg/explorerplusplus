@@ -5,9 +5,9 @@
 #include "stdafx.h"
 #include "FilterDialog.h"
 #include "CoreInterface.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/WindowHelper.h"
@@ -19,12 +19,10 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
 FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, ThemeManager *themeManager, CoreInterface *coreInterface,
-	const IconResourceLoader *iconResourceLoader) :
+	HWND hParent, ThemeManager *themeManager, CoreInterface *coreInterface) :
 	ThemedDialog(resourceLoader, resourceInstance, IDD_FILTER, hParent,
 		DialogSizingType::Horizontal, themeManager),
-	m_coreInterface(coreInterface),
-	m_iconResourceLoader(iconResourceLoader)
+	m_coreInterface(coreInterface)
 {
 	m_persistentSettings = &FilterDialogPersistentSettings::GetInstance();
 }
@@ -59,7 +57,7 @@ INT_PTR FilterDialog::OnInitDialog()
 
 wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
+	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> FilterDialog::GetResizableControls()

@@ -122,40 +122,38 @@ private:
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager)
+	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
+	ThemeManager *themeManager)
 {
 	return new BookmarksToolbar(view, browserWindow, coreInterface, acceleratorManager,
-		resourceLoader, iconResourceLoader, iconFetcher, bookmarkTree, themeManager);
+		resourceLoader, iconFetcher, bookmarkTree, themeManager);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, const IconResourceLoader *iconResourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ThemeManager *themeManager) :
+	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
+	ThemeManager *themeManager) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_browserWindow(browserWindow),
-	m_iconResourceLoader(iconResourceLoader),
 	m_bookmarkTree(bookmarkTree),
 	m_themeManager(themeManager),
 	m_contextMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(), browserWindow,
-		coreInterface, acceleratorManager, iconResourceLoader, themeManager),
-	m_bookmarkMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(),
-		browserWindow, coreInterface, acceleratorManager, iconResourceLoader, iconFetcher,
-		view->GetHWND(), themeManager)
+		coreInterface, acceleratorManager, themeManager),
+	m_bookmarkMenu(bookmarkTree, resourceLoader, browserWindow, coreInterface, acceleratorManager,
+		iconFetcher, view->GetHWND(), themeManager)
 {
-	Initialize(iconFetcher);
+	Initialize(iconFetcher, resourceLoader);
 }
 
-void BookmarksToolbar::Initialize(IconFetcher *iconFetcher)
+void BookmarksToolbar::Initialize(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(m_view->GetHWND());
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_iconResourceLoader, iconFetcher,
-		iconWidth, iconHeight);
+	m_bookmarkIconManager =
+		std::make_unique<BookmarkIconManager>(resourceLoader, iconFetcher, iconWidth, iconHeight);
 
 	m_view->SetImageList(m_bookmarkIconManager->GetImageList());
 

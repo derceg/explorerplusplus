@@ -4,12 +4,12 @@
 
 #include "pch.h"
 #include "ShellBrowser/ColumnHelper.h"
-#include "Win32ResourceLoader.h"
+#include "ResourceLoaderFake.h"
 #include <gtest/gtest.h>
 
 TEST(ColumnHelperTest, CheckEveryColumnHasAName)
 {
-	Win32ResourceLoader resourceLoader(GetModuleHandle(nullptr));
+	ResourceLoaderFake resourceLoader;
 
 	// Each column should have a name. `GetColumnName` will trigger a CHECK failure if a particular
 	// column isn't handled, so this test will fail in that case.

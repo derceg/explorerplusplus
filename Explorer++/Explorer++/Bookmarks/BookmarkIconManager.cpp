@@ -7,12 +7,12 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "Icon.h"
 #include "IconFetcher.h"
-#include "IconResourceLoader.h"
+#include "ResourceLoader.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WeakPtr.h"
 
-BookmarkIconManager::BookmarkIconManager(const IconResourceLoader *iconResourceLoader,
+BookmarkIconManager::BookmarkIconManager(const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, int iconWidth, int iconHeight) :
 	m_iconFetcher(iconFetcher),
 	m_weakPtrFactory(this)
@@ -20,7 +20,7 @@ BookmarkIconManager::BookmarkIconManager(const IconResourceLoader *iconResourceL
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
 
 	wil::unique_hbitmap folderIcon =
-		iconResourceLoader->LoadBitmapFromPNGAndScale(Icon::Folder, iconWidth, iconHeight);
+		resourceLoader->LoadBitmapFromPNGAndScale(Icon::Folder, iconWidth, iconHeight);
 	m_bookmarkFolderIconIndex = ImageList_Add(m_imageList.get(), folderIcon.get(), nullptr);
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));

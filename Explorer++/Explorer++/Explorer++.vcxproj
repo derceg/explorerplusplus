@@ -1176,7 +1176,6 @@
     <ClCompile Include="DriveWatcherImpl.cpp" />
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
-    <ClCompile Include="IconResourceLoader.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="MainMenu.cpp" />
@@ -1355,6 +1354,7 @@
     <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="HistoryTracker.h" />
+    <ClInclude Include="IconSet.h" />
     <ClInclude Include="ShellBrowser\ColumnHelper.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h" />
@@ -1493,7 +1493,6 @@
     <ClInclude Include="HolderWindow.h" />
     <ClInclude Include="Icon.h" />
     <ClInclude Include="IconMappings.h" />
-    <ClInclude Include="IconResourceLoader.h" />
     <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="NewMenuClient.h" />
     <ClInclude Include="ServiceProvider.h" />
