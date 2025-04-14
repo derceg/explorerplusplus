@@ -7,7 +7,7 @@
 #include "ColorRuleEditorDialog.h"
 #include "ColorRuleModel.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -95,20 +95,18 @@ void ColorRuleListView::OnDoubleClick(const NMITEMACTIVATE *itemActivate)
 
 void ColorRuleListView::InsertColumns()
 {
-	std::wstring text =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION);
+	std::wstring text = m_resourceLoader->LoadString(IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION);
 	LVCOLUMN lvColumn;
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = text.data();
 	ListView_InsertColumn(m_listView, 0, &lvColumn);
 
-	text = ResourceHelper::LoadString(m_resourceInstance,
-		IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN);
+	text = m_resourceLoader->LoadString(IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = text.data();
 	ListView_InsertColumn(m_listView, 1, &lvColumn);
 
-	text = ResourceHelper::LoadString(m_resourceInstance, IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES);
+	text = m_resourceLoader->LoadString(IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = text.data();
 	ListView_InsertColumn(m_listView, 2, &lvColumn);
