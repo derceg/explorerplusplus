@@ -38,9 +38,8 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const IconResourceLoader *iconResourceLoader);
+	HWND parentWindow, ThemeManager *themeManager, CoreInterface *coreInterface,
+	const AcceleratorManager *acceleratorManager, const IconResourceLoader *iconResourceLoader);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
 	ThemeManager *themeManager, CoreInterface *coreInterface,

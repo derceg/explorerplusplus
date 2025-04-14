@@ -11,7 +11,7 @@
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
@@ -127,12 +127,12 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkIte
 }
 
 void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND parentWindow,
-	ThemeManager *themeManager, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager, const IconResourceLoader *iconResourceLoader)
+	const ResourceLoader *resourceLoader, HWND parentWindow, ThemeManager *themeManager,
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	const IconResourceLoader *iconResourceLoader)
 {
 	std::wstring bookmarkAllTabsText =
-		ResourceHelper::LoadString(resourceInstance, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
+		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr,
 		std::nullopt, parentWindow, themeManager, coreInterface, acceleratorManager, resourceLoader,
 		iconResourceLoader, bookmarkAllTabsText);
@@ -179,9 +179,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	else
 	{
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			ResourceHelper::LoadString(coreInterface->GetResourceInstance(),
-				IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
-			std::nullopt);
+			resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
 	}
 
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
