@@ -11,7 +11,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/DpiCompatibility.h"
@@ -112,7 +112,7 @@ void BookmarkListView::InsertColumn(const Column &column, int index)
 std::wstring BookmarkListView::GetColumnText(BookmarkHelper::ColumnType columnType)
 {
 	UINT resourceId = GetColumnTextResourceId(columnType);
-	return ResourceHelper::LoadString(m_resourceInstance, resourceId);
+	return m_resourceLoader->LoadString(resourceId);
 }
 
 std::vector<BookmarkListView::Column> BookmarkListView::GetColumns()
@@ -645,8 +645,7 @@ void BookmarkListView::SelectItem(const BookmarkItem *bookmarkItem)
 void BookmarkListView::CreateNewFolder()
 {
 	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
-		std::nullopt);
+		m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
 	auto rawBookmarkItem = bookmarkItem.get();
 
 	m_bookmarkTree->AddBookmarkItem(m_currentBookmarkFolder, std::move(bookmarkItem),
