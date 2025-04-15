@@ -7,7 +7,9 @@
 #include "DarkModeManager.h"
 #include "IconMappings.h"
 #include "ResourceHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
+#include "../Helper/ResourceHelper.h"
 
 Win32ResourceLoader::Win32ResourceLoader(HINSTANCE resourceInstance, IconSet iconSet,
 	const DarkModeManager *darkModeManager) :
@@ -160,4 +162,64 @@ std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAn
 	graphics.DrawImage(bitmap.get(), 0, 0);
 
 	return scaledBitmap;
+}
+
+INT_PTR Win32ResourceLoader::CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+	LPARAM initParam) const
+{
+	INT_PTR res;
+
+	if (IsProcessRTL())
+	{
+		// The only legitimate reason this might fail is allocation failure. Given the small amount
+		// of memory involved, that's not very likely to actually happen. If this function does
+		// fail, there's also not any good way of handling it. Therefore, the result is simply
+		// CHECK'd, which will terminate the application if the call fails.
+		auto dialogTemplateEx = MakeRTLDialogTemplate(m_resourceInstance, dialogId);
+		CHECK(dialogTemplateEx);
+
+		res = DialogBoxIndirectParam(m_resourceInstance,
+			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), parent, dialogProc, initParam);
+	}
+	else
+	{
+		res = DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(dialogId), parent, dialogProc,
+			initParam);
+	}
+
+	if (res == -1)
+	{
+		LOG_SYSRESULT(GetLastError());
+		CHECK(false);
+	}
+
+	return res;
+}
+
+HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+	LPARAM initParam) const
+{
+	HWND dialog;
+
+	if (IsProcessRTL())
+	{
+		auto dialogTemplateEx = MakeRTLDialogTemplate(m_resourceInstance, dialogId);
+		CHECK(dialogTemplateEx);
+
+		dialog = CreateDialogIndirectParam(m_resourceInstance,
+			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), parent, dialogProc, initParam);
+	}
+	else
+	{
+		dialog = CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(dialogId), parent,
+			dialogProc, initParam);
+	}
+
+	if (!dialog)
+	{
+		LOG_SYSRESULT(GetLastError());
+		CHECK(false);
+	}
+
+	return dialog;
 }

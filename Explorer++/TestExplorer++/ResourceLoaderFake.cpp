@@ -60,3 +60,25 @@ wil::unique_hicon ResourceLoaderFake::LoadIconFromPNGAndScale(Icon icon, int ico
 
 	return nullptr;
 }
+
+INT_PTR ResourceLoaderFake::CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+	LPARAM initParam) const
+{
+	UNREFERENCED_PARAMETER(dialogId);
+	UNREFERENCED_PARAMETER(parent);
+	UNREFERENCED_PARAMETER(dialogProc);
+	UNREFERENCED_PARAMETER(initParam);
+
+	return 0;
+}
+
+HWND ResourceLoaderFake::CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+	LPARAM initParam) const
+{
+	UNREFERENCED_PARAMETER(dialogId);
+	UNREFERENCED_PARAMETER(parent);
+	UNREFERENCED_PARAMETER(dialogProc);
+	UNREFERENCED_PARAMETER(initParam);
+
+	return nullptr;
+}

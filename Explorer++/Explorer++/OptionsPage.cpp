@@ -42,8 +42,8 @@ void OptionsPage::InitializeDialog()
 		return;
 	}
 
-	CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(m_dialogResourceId), m_parent,
-		DialogProcStub, reinterpret_cast<LPARAM>(this));
+	m_resourceLoader->CreateModelessDialog(m_dialogResourceId, m_parent, DialogProcStub,
+		reinterpret_cast<LPARAM>(this));
 }
 
 HWND OptionsPage::GetDialog() const

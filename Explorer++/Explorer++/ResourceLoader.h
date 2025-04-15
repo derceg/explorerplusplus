@@ -27,4 +27,9 @@ public:
 		int dpi) const = 0;
 	virtual wil::unique_hicon LoadIconFromPNGAndScale(Icon icon, int iconWidth,
 		int iconHeight) const = 0;
+
+	virtual INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+		LPARAM initParam) const = 0;
+	virtual HWND CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+		LPARAM initParam) const = 0;
 };

@@ -20,4 +20,9 @@ public:
 		int dpi) const override;
 	wil::unique_hicon LoadIconFromPNGAndScale(Icon icon, int iconWidth,
 		int iconHeight) const override;
+
+	INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+		LPARAM initParam) const override;
+	HWND CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+		LPARAM initParam) const override;
 };

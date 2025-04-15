@@ -4,10 +4,9 @@
 
 #include "stdafx.h"
 #include "BaseDialog.h"
+#include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ResourceHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 #include <unordered_map>
@@ -213,24 +212,8 @@ INT_PTR BaseDialog::ShowModalDialog()
 		return -1;
 	}
 
-	if (IsProcessRTL())
-	{
-		// The only legitimate reason this might fail is allocation failure. Given the small amount
-		// of memory involved, that's not very likely to actually happen. If this function does
-		// fail, there's also not any good way of handling it. Therefore, the result is simply
-		// CHECK'd, which will terminate the application if the call fails.
-		auto dialogTemplateEx = MakeRTLDialogTemplate(m_resourceInstance, m_iResource);
-		CHECK(dialogTemplateEx);
-
-		return DialogBoxIndirectParam(m_resourceInstance,
-			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), m_hParent, BaseDialogProcStub,
-			reinterpret_cast<LPARAM>(this));
-	}
-	else
-	{
-		return DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
-			BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
-	}
+	return m_resourceLoader->CreateModalDialog(m_iResource, m_hParent, BaseDialogProcStub,
+		reinterpret_cast<LPARAM>(this));
 }
 
 HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserver)
@@ -240,32 +223,11 @@ HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserve
 		return nullptr;
 	}
 
-	HWND dialog = nullptr;
-
-	if (IsProcessRTL())
-	{
-		auto dialogTemplateEx = MakeRTLDialogTemplate(m_resourceInstance, m_iResource);
-		CHECK(dialogTemplateEx);
-
-		dialog = CreateDialogIndirectParam(m_resourceInstance,
-			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), m_hParent, BaseDialogProcStub,
-			reinterpret_cast<LPARAM>(this));
-	}
-	else
-	{
-		dialog = CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
-			BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
-	}
-
-	if (!dialog)
-	{
-		return nullptr;
-	}
-
 	m_showingModelessDialog = true;
 	m_modelessDialogDestroyedObserver = dialogDestroyedObserver;
 
-	return dialog;
+	return m_resourceLoader->CreateModelessDialog(m_iResource, m_hParent, BaseDialogProcStub,
+		reinterpret_cast<LPARAM>(this));
 }
 
 std::vector<ResizableDialogControl> BaseDialog::GetResizableControls()

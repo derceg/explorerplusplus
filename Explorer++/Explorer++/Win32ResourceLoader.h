@@ -29,6 +29,11 @@ public:
 	wil::unique_hicon LoadIconFromPNGAndScale(Icon icon, int iconWidth,
 		int iconHeight) const override;
 
+	INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+		LPARAM initParam) const override;
+	HWND CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
+		LPARAM initParam) const override;
+
 private:
 	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconWidth,
 		int iconHeight, int dpi) const;
