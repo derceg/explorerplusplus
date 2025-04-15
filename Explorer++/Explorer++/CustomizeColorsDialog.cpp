@@ -107,6 +107,10 @@ INT_PTR CustomizeColorsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	case IDOK:
 		OnOk();
 		break;
+
+	case IDCANCEL:
+		OnClose();
+		break;
 	}
 
 	return 0;
