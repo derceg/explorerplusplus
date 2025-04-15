@@ -13,7 +13,6 @@
 #include "MainResource.h"
 #include "NavigationHelper.h"
 #include "PopupMenuView.h"
-#include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -86,12 +85,13 @@ MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow,
 	m_app(app),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
+	m_resourceLoader(resourceLoader),
 	m_shellIconLoader(shellIconLoader),
 	m_fontSetter(m_hwnd, m_app->GetConfig()),
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
 		m_app->GetConfig())
 {
-	Initialize(parent, resourceLoader, initialButtons);
+	Initialize(parent, initialButtons);
 }
 
 HWND MainToolbar::CreateMainToolbar(HWND parent)
@@ -103,7 +103,7 @@ HWND MainToolbar::CreateMainToolbar(HWND parent)
 			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 }
 
-void MainToolbar::Initialize(HWND parent, const ResourceLoader *resourceLoader,
+void MainToolbar::Initialize(HWND parent,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	// Ideally, this constraint would be checked at compile-time, but the size
@@ -123,10 +123,10 @@ void MainToolbar::Initialize(HWND parent, const ResourceLoader *resourceLoader,
 	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
 		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(MainToolbarButton::_size() - 1)));
 
-	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), resourceLoader,
-		TOOLBAR_IMAGE_SIZE_SMALL, dpi);
-	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), resourceLoader,
-		TOOLBAR_IMAGE_SIZE_LARGE, dpi);
+	m_toolbarImageMapSmall =
+		SetUpToolbarImageList(m_imageListSmall.get(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
+	m_toolbarImageMapLarge =
+		SetUpToolbarImageList(m_imageListLarge.get(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
 	AddButtonsToToolbar(initialButtons ? initialButtons->GetButtons() : GetDefaultButtons());
@@ -183,15 +183,15 @@ void MainToolbar::SetTooolbarImageList()
 	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
 }
 
-std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList,
-	const ResourceLoader *resourceLoader, int iconSize, UINT dpi)
+std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList, int iconSize,
+	UINT dpi)
 {
 	std::unordered_map<int, int> imageListMappings;
 
 	for (const auto &mapping : TOOLBAR_BUTTON_ICON_MAPPINGS)
 	{
 		wil::unique_hbitmap bitmap =
-			resourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
+			m_resourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
 
 		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
@@ -339,8 +339,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 
 std::wstring MainToolbar::GetToolbarButtonText(MainToolbarButton button) const
 {
-	return ResourceHelper::LoadString(m_app->GetResourceInstance(),
-		LookupToolbarButtonTextID(button));
+	return m_resourceLoader->LoadString(LookupToolbarButtonTextID(button));
 }
 
 BYTE MainToolbar::LookupToolbarButtonExtraStyles(MainToolbarButton button) const
@@ -579,8 +578,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 		if (entry)
 		{
-			std::wstring infoTipTemplate =
-				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_MAIN_TOOLBAR_BACK);
+			std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_BACK);
 			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
 				fmt::arg(L"folder_name",
 					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
@@ -593,8 +591,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 		if (entry)
 		{
-			std::wstring infoTipTemplate =
-				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_MAIN_TOOLBAR_FORWARD);
+			std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_FORWARD);
 			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
 				fmt::arg(L"folder_name",
 					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
@@ -635,8 +632,7 @@ std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 		return std::nullopt;
 	}
 
-	std::wstring infoTipTemplate =
-		ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
+	std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
 	std::wstring infoTip =
 		fmt::format(fmt::runtime(infoTipTemplate), fmt::arg(L"folder_name", parentName));
 

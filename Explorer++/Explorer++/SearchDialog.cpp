@@ -800,10 +800,9 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			int iFoldersFound = LOWORD(lParam);
 			int iFilesFound = HIWORD(lParam);
 
-			TCHAR szTemp[128];
-			LoadString(GetResourceInstance(), IDS_SEARCH_FINISHED_MESSAGE, szTemp,
-				std::size(szTemp));
-			StringCchPrintf(szStatus, std::size(szStatus), szTemp, iFoldersFound, iFilesFound);
+			auto messageTemplate = m_resourceLoader->LoadString(IDS_SEARCH_FINISHED_MESSAGE);
+			StringCchPrintf(szStatus, std::size(szStatus), messageTemplate.c_str(), iFoldersFound,
+				iFilesFound);
 			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szStatus);
 		}
 		else
@@ -830,9 +829,8 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		pszDirectory = reinterpret_cast<TCHAR *>(wParam);
 
-		TCHAR szTemp[64];
-		LoadString(GetResourceInstance(), IDS_SEARCHING, szTemp, std::size(szTemp));
-		StringCchPrintf(szStatus, std::size(szStatus), szTemp, pszDirectory);
+		auto messageTemplate = m_resourceLoader->LoadString(IDS_SEARCHING);
+		StringCchPrintf(szStatus, std::size(szStatus), messageTemplate.c_str(), pszDirectory);
 		SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szStatus);
 	}
 	break;

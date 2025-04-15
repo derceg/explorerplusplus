@@ -38,6 +38,7 @@ private:
 	void SetMenuItemStates(HMENU menu, const RawBookmarkItems &bookmarkItems);
 
 	BookmarkTree *const m_bookmarkTree;
+	const ResourceLoader *const m_resourceLoader;
 	HINSTANCE m_resourceInstance;
 	BookmarkContextMenuController m_controller;
 	bool m_showingMenu;

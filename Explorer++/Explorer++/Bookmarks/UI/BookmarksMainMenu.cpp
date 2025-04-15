@@ -12,6 +12,7 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
@@ -75,20 +76,17 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_coreInterface->GetMainWindow());
 
-	std::wstring bookmarkThisTabText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_THIS_TAB);
+	std::wstring bookmarkThisTabText = m_resourceLoader->LoadString(IDS_MENU_BOOKMARK_THIS_TAB);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB, bookmarkThisTabText, 0,
 		TRUE);
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB, m_resourceLoader,
 		Icon::AddBookmark, dpi, menuImages);
 
-	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_ALL_TABS);
+	std::wstring bookmarkAllTabsText = m_resourceLoader->LoadString(IDS_MENU_BOOKMARK_ALL_TABS);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_BOOKMARK_ALL_TABS, bookmarkAllTabsText, 1,
 		TRUE);
 
-	std::wstring manageBookmarksText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceInstance(), IDS_MENU_MANAGE_BOOKMARKS);
+	std::wstring manageBookmarksText = m_resourceLoader->LoadString(IDS_MENU_MANAGE_BOOKMARKS);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS, manageBookmarksText, 2,
 		TRUE);
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS, m_resourceLoader,

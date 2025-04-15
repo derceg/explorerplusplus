@@ -8,7 +8,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "../Helper/MenuHelper.h"
 #include <glog/logging.h>
 #include <wil/resource.h>
@@ -18,6 +18,7 @@ BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
 	ThemeManager *themeManager) :
 	m_bookmarkTree(bookmarkTree),
+	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
 	m_controller(bookmarkTree, resourceLoader, resourceInstance, browserWindow, coreInterface,
 		acceleratorManager, themeManager),
@@ -111,8 +112,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 		DeleteMenu(menu, IDM_BOOKMARKS_OPEN, MF_BYCOMMAND);
 		DeleteMenu(menu, IDM_BOOKMARKS_OPEN_IN_NEW_TAB, MF_BYCOMMAND);
 
-		std::wstring openAll =
-			ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_OPEN_ALL);
+		std::wstring openAll = m_resourceLoader->LoadString(IDS_BOOKMARK_OPEN_ALL);
 
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
@@ -149,8 +149,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 		}
 		else
 		{
-			std::wstring openAll =
-				ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_OPEN_ALL);
+			std::wstring openAll = m_resourceLoader->LoadString(IDS_BOOKMARK_OPEN_ALL);
 			openAll += L"\t" + std::to_wstring(totalBookmarks);
 
 			MENUITEMINFO menuItemInfo;

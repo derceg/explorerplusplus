@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
 #include "../Helper/Helper.h"
@@ -154,23 +154,22 @@ void MainWindow::UpdateWindowText()
 
 		if (CheckGroupMembership(GroupType::Administrators))
 		{
-			privilegeLevel = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-				IDS_PRIVILEGE_LEVEL_ADMINISTRATORS);
+			privilegeLevel =
+				m_app->GetResourceLoader()->LoadString(IDS_PRIVILEGE_LEVEL_ADMINISTRATORS);
 		}
 		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
-			privilegeLevel = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-				IDS_PRIVILEGE_LEVEL_POWER_USERS);
+			privilegeLevel =
+				m_app->GetResourceLoader()->LoadString(IDS_PRIVILEGE_LEVEL_POWER_USERS);
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
-			privilegeLevel =
-				ResourceHelper::LoadString(m_app->GetResourceInstance(), IDS_PRIVILEGE_LEVEL_USERS);
+			privilegeLevel = m_app->GetResourceLoader()->LoadString(IDS_PRIVILEGE_LEVEL_USERS);
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
-			privilegeLevel = ResourceHelper::LoadString(m_app->GetResourceInstance(),
-				IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED);
+			privilegeLevel =
+				m_app->GetResourceLoader()->LoadString(IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED);
 		}
 
 		if (m_app->GetConfig()->showUserNameInTitleBar.get())

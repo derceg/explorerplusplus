@@ -53,11 +53,11 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void Initialize(HWND parent, const ResourceLoader *resourceLoader,
+	void Initialize(HWND parent,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	void SetTooolbarImageList();
-	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
-		const ResourceLoader *resourceLoader, int iconSize, UINT dpi);
+	std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList, int iconSize,
+		UINT dpi);
 	std::vector<MainToolbarButton> GetDefaultButtons() const;
 	void AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons);
 	void AddButtonToToolbar(MainToolbarButton button);
@@ -99,6 +99,7 @@ private:
 	App *const m_app;
 	BrowserWindow *const m_browserWindow;
 	CoreInterface *const m_coreInterface;
+	const ResourceLoader *const m_resourceLoader;
 	ShellIconLoader *const m_shellIconLoader;
 	bool m_browserInitialized = false;
 
