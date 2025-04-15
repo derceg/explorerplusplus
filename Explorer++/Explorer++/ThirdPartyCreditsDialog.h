@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 
-class ThirdPartyCreditsDialog : public ThemedDialog
+class ThirdPartyCreditsDialog : public BaseDialog
 {
 public:
 	ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND parent, ThemeManager *themeManager);
+		HWND parent);
 
 protected:
 	INT_PTR OnInitDialog() override;

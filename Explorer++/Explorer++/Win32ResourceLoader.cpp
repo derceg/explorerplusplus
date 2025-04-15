@@ -7,15 +7,17 @@
 #include "DarkModeManager.h"
 #include "IconMappings.h"
 #include "ResourceHelper.h"
+#include "ThemeWindowTracker.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ResourceHelper.h"
 
 Win32ResourceLoader::Win32ResourceLoader(HINSTANCE resourceInstance, IconSet iconSet,
-	const DarkModeManager *darkModeManager) :
+	const DarkModeManager *darkModeManager, ThemeManager *themeManager) :
 	m_resourceInstance(resourceInstance),
 	m_iconSet(iconSet),
-	m_darkModeManager(darkModeManager)
+	m_darkModeManager(darkModeManager),
+	m_themeManager(themeManager)
 {
 }
 
@@ -164,10 +166,12 @@ std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAn
 	return scaledBitmap;
 }
 
-INT_PTR Win32ResourceLoader::CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
-	LPARAM initParam) const
+INT_PTR Win32ResourceLoader::CreateModalDialog(UINT dialogId, HWND parent,
+	DialogProc dialogProc) const
 {
 	INT_PTR res;
+
+	auto *themedDialogWrapper = ThemedDialogWrapper::Create(dialogProc, m_themeManager);
 
 	if (IsProcessRTL())
 	{
@@ -179,12 +183,15 @@ INT_PTR Win32ResourceLoader::CreateModalDialog(UINT dialogId, HWND parent, DLGPR
 		CHECK(dialogTemplateEx);
 
 		res = DialogBoxIndirectParam(m_resourceInstance,
-			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), parent, dialogProc, initParam);
+			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), parent,
+			ThemedDialogWrapper::ThemedDialogProcStub,
+			reinterpret_cast<LPARAM>(themedDialogWrapper));
 	}
 	else
 	{
-		res = DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(dialogId), parent, dialogProc,
-			initParam);
+		res = DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(dialogId), parent,
+			ThemedDialogWrapper::ThemedDialogProcStub,
+			reinterpret_cast<LPARAM>(themedDialogWrapper));
 	}
 
 	if (res == -1)
@@ -196,10 +203,12 @@ INT_PTR Win32ResourceLoader::CreateModalDialog(UINT dialogId, HWND parent, DLGPR
 	return res;
 }
 
-HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
-	LPARAM initParam) const
+HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent,
+	DialogProc dialogProc) const
 {
 	HWND dialog;
+
+	auto *themedDialogWrapper = ThemedDialogWrapper::Create(dialogProc, m_themeManager);
 
 	if (IsProcessRTL())
 	{
@@ -207,12 +216,15 @@ HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent, DLGPR
 		CHECK(dialogTemplateEx);
 
 		dialog = CreateDialogIndirectParam(m_resourceInstance,
-			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), parent, dialogProc, initParam);
+			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), parent,
+			ThemedDialogWrapper::ThemedDialogProcStub,
+			reinterpret_cast<LPARAM>(themedDialogWrapper));
 	}
 	else
 	{
 		dialog = CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(dialogId), parent,
-			dialogProc, initParam);
+			ThemedDialogWrapper::ThemedDialogProcStub,
+			reinterpret_cast<LPARAM>(themedDialogWrapper));
 	}
 
 	if (!dialog)
@@ -222,4 +234,70 @@ HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent, DLGPR
 	}
 
 	return dialog;
+}
+
+Win32ResourceLoader::Win32ResourceLoader::ThemedDialogWrapper *Win32ResourceLoader::
+	ThemedDialogWrapper::Create(DialogProc originalDialogProc, ThemeManager *themeManager)
+{
+	return new ThemedDialogWrapper(originalDialogProc, themeManager);
+}
+
+Win32ResourceLoader::ThemedDialogWrapper::ThemedDialogWrapper(DialogProc originalDialogProc,
+	ThemeManager *themeManager) :
+	m_originalDialogProc(originalDialogProc),
+	m_themeManager(themeManager)
+{
+}
+
+INT_PTR CALLBACK Win32ResourceLoader::ThemedDialogWrapper::ThemedDialogProcStub(HWND dialog,
+	UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	auto *themedDialogWrapper =
+		reinterpret_cast<ThemedDialogWrapper *>(GetWindowLongPtr(dialog, GWLP_USERDATA));
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+	{
+		themedDialogWrapper = reinterpret_cast<ThemedDialogWrapper *>(lParam);
+
+		SetLastError(0);
+		auto res = SetWindowLongPtr(dialog, GWLP_USERDATA,
+			reinterpret_cast<LONG_PTR>(themedDialogWrapper));
+		CHECK(!(res == 0 && GetLastError() != 0));
+	}
+	break;
+
+	case WM_NCDESTROY:
+		SetWindowLongPtr(dialog, GWLP_USERDATA, 0);
+		break;
+	}
+
+	if (!themedDialogWrapper)
+	{
+		return 0;
+	}
+
+	return themedDialogWrapper->ThemedDialogProc(dialog, msg, wParam, lParam);
+}
+
+INT_PTR Win32ResourceLoader::ThemedDialogWrapper::ThemedDialogProc(HWND dialog, UINT msg,
+	WPARAM wParam, LPARAM lParam)
+{
+	auto res = m_originalDialogProc(dialog, msg, wParam, lParam);
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		// This is explicitly done after the original dialog procedure has been invoked, so that any
+		// controls the dialog dynamically creates will be themed.
+		m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(dialog, m_themeManager);
+		break;
+
+	case WM_NCDESTROY:
+		delete this;
+		break;
+	}
+
+	return res;
 }

@@ -115,6 +115,7 @@ private:
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	DarkModeManager m_darkModeManager;
+	ThemeManager m_themeManager;
 	std::shared_ptr<CachedIcons> m_cachedIcons;
 	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;
 	BrowserList m_browserList;
@@ -129,7 +130,6 @@ private:
 	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
 	TabRestorer m_tabRestorer;
-	ThemeManager m_themeManager;
 	SystemClockImpl m_systemClock;
 
 	HistoryModel m_historyModel;

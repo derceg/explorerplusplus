@@ -9,14 +9,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
-#include <unordered_map>
-
-namespace
-{
-
-std::unordered_map<HWND, BaseDialog *> g_windowMap;
-
-}
 
 BaseDialog::BaseDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 	int iResource, HWND hParent, DialogSizingType dialogSizingType) :
@@ -26,40 +18,6 @@ BaseDialog::BaseDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceI
 	m_hParent(hParent),
 	m_dialogSizingType(dialogSizingType)
 {
-}
-
-INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_INITDIALOG:
-	{
-		/* Store a mapping between window handles
-		and objects. This must be done, as each
-		dialog is managed by a separate object,
-		but all window calls come through this
-		function.
-		Since two or more dialogs may be
-		shown at once (as a dialog can be
-		modeless), this function needs to be able
-		to send the specified messages to the
-		correct object.
-		May also use thunks - see
-		http://www.hackcraft.net/cpp/windowsThunk/ */
-		g_windowMap.insert(std::unordered_map<HWND, BaseDialog *>::value_type(hDlg,
-			reinterpret_cast<BaseDialog *>(lParam)));
-	}
-	break;
-	}
-
-	auto itr = g_windowMap.find(hDlg);
-
-	if (itr != g_windowMap.end())
-	{
-		return itr->second->BaseDialogProc(hDlg, uMsg, wParam, lParam);
-	}
-
-	return 0;
 }
 
 INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -115,8 +73,6 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 		{
 			SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 		}
-
-		OnInitDialogBase();
 	}
 	break;
 
@@ -162,10 +118,6 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 		SaveState();
 	}
 	break;
-
-	case WM_NCDESTROY:
-		g_windowMap.erase(g_windowMap.find(hDlg));
-		break;
 	}
 
 	return ForwardMessage(hDlg, uMsg, wParam, lParam);
@@ -181,10 +133,6 @@ wil::unique_hicon BaseDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 	UNREFERENCED_PARAMETER(iconHeight);
 
 	return nullptr;
-}
-
-void BaseDialog::OnInitDialogBase()
-{
 }
 
 INT_PTR BaseDialog::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -212,8 +160,8 @@ INT_PTR BaseDialog::ShowModalDialog()
 		return -1;
 	}
 
-	return m_resourceLoader->CreateModalDialog(m_iResource, m_hParent, BaseDialogProcStub,
-		reinterpret_cast<LPARAM>(this));
+	return m_resourceLoader->CreateModalDialog(m_iResource, m_hParent,
+		std::bind_front(&BaseDialog::BaseDialogProc, this));
 }
 
 HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserver)
@@ -226,8 +174,8 @@ HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserve
 	m_showingModelessDialog = true;
 	m_modelessDialogDestroyedObserver = dialogDestroyedObserver;
 
-	return m_resourceLoader->CreateModelessDialog(m_iResource, m_hParent, BaseDialogProcStub,
-		reinterpret_cast<LPARAM>(this));
+	return m_resourceLoader->CreateModelessDialog(m_iResource, m_hParent,
+		std::bind_front(&BaseDialog::BaseDialogProc, this));
 }
 
 std::vector<ResizableDialogControl> BaseDialog::GetResizableControls()

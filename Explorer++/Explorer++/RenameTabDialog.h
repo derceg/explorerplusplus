@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
 class App;
@@ -27,7 +27,7 @@ private:
 	RenameTabDialogPersistentSettings &operator=(const RenameTabDialogPersistentSettings &);
 };
 
-class RenameTabDialog : public ThemedDialog
+class RenameTabDialog : public BaseDialog
 {
 public:
 	RenameTabDialog(HWND parent, App *app, Tab *tab);

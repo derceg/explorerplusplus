@@ -24,12 +24,11 @@
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_MANAGE_BOOKMARKS, hParent,
-		DialogSizingType::Both, themeManager),
+	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	BaseDialog(resourceLoader, resourceInstance, IDD_MANAGE_BOOKMARKS, hParent,
+		DialogSizingType::Both),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager),
@@ -194,7 +193,7 @@ void ManageBookmarksDialog::SetupListView()
 
 	m_bookmarkListView = new BookmarkListView(hListView, GetResourceInstance(), m_bookmarkTree,
 		m_browserWindow, m_coreInterface, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
-		GetThemeManager(), m_persistentSettings->m_listViewColumns);
+		m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
@@ -619,8 +618,8 @@ void ManageBookmarksDialog::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, focus, GetThemeManager(), m_coreInterface,
-		m_acceleratorManager, m_resourceLoader);
+		m_currentBookmarkFolder, targetIndex, focus, m_coreInterface, m_acceleratorManager,
+		m_resourceLoader);
 
 	if (!bookmark || focus != listView || bookmark->GetParent() != m_currentBookmarkFolder)
 	{

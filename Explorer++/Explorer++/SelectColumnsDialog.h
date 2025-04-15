@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 
@@ -28,11 +28,11 @@ private:
 	SelectColumnsDialogPersistentSettings &operator=(const SelectColumnsDialogPersistentSettings &);
 };
 
-class SelectColumnsDialog : public ThemedDialog
+class SelectColumnsDialog : public BaseDialog
 {
 public:
 	SelectColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager, ShellBrowserImpl *shellBrowser);
+		HWND hParent, ShellBrowserImpl *shellBrowser);
 
 protected:
 	INT_PTR OnInitDialog() override;

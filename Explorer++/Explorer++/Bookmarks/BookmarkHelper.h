@@ -14,7 +14,6 @@ class BrowserWindow;
 class CoreInterface;
 class ResourceLoader;
 class TabContainerImpl;
-class ThemeManager;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
 
@@ -37,16 +36,15 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-	HWND parentWindow, ThemeManager *themeManager, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager);
+	HWND parentWindow, CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	ThemeManager *themeManager, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader,
 	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager);
+	HINSTANCE resourceInstance, HWND parentWindow);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser);
 

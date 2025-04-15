@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Application.h"
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include <memory>
 #include <optional>
 
@@ -14,7 +14,7 @@ namespace Applications
 
 class ApplicationModel;
 
-class ApplicationEditorDialog : public ThemedDialog
+class ApplicationEditorDialog : public BaseDialog
 {
 public:
 	class EditDetails
@@ -63,7 +63,7 @@ public:
 	};
 
 	ApplicationEditorDialog(HWND parent, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, ThemeManager *themeManager, ApplicationModel *model,
+		HINSTANCE resourceInstance, ApplicationModel *model,
 		std::unique_ptr<EditDetails> editDetails);
 
 protected:

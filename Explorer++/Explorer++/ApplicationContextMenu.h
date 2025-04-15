@@ -12,7 +12,6 @@
 class CoreInterface;
 class MenuView;
 class ResourceLoader;
-class ThemeManager;
 
 namespace Applications
 {
@@ -26,8 +25,7 @@ class ApplicationContextMenu : public MenuBase
 public:
 	ApplicationContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		ApplicationModel *model, Application *application, ApplicationExecutor *applicationExecutor,
-		const ResourceLoader *resourceLoader, CoreInterface *coreInterface,
-		ThemeManager *themeManager);
+		const ResourceLoader *resourceLoader, CoreInterface *coreInterface);
 
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);

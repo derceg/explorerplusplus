@@ -6,6 +6,7 @@
 
 #include "Icon.h"
 #include <wil/resource.h>
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -14,6 +15,8 @@
 class ResourceLoader
 {
 public:
+	using DialogProc = std::function<INT_PTR(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam)>;
+
 	virtual ~ResourceLoader() = default;
 
 	virtual std::wstring LoadString(UINT stringId) const = 0;
@@ -28,8 +31,6 @@ public:
 	virtual wil::unique_hicon LoadIconFromPNGAndScale(Icon icon, int iconWidth,
 		int iconHeight) const = 0;
 
-	virtual INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
-		LPARAM initParam) const = 0;
-	virtual HWND CreateModelessDialog(UINT dialogId, HWND parent, DLGPROC dialogProc,
-		LPARAM initParam) const = 0;
+	virtual INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DialogProc dialogProc) const = 0;
+	virtual HWND CreateModelessDialog(UINT dialogId, HWND parent, DialogProc dialogProc) const = 0;
 };

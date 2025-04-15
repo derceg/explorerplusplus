@@ -18,14 +18,12 @@ namespace Applications
 
 ApplicationContextMenuController::ApplicationContextMenuController(ApplicationModel *model,
 	Application *application, ApplicationExecutor *applicationExecutor,
-	const ResourceLoader *resourceLoader, CoreInterface *coreInterface,
-	ThemeManager *themeManager) :
+	const ResourceLoader *resourceLoader, CoreInterface *coreInterface) :
 	m_model(model),
 	m_application(application),
 	m_applicationExecutor(applicationExecutor),
 	m_resourceLoader(resourceLoader),
-	m_coreInterface(coreInterface),
-	m_themeManager(themeManager)
+	m_coreInterface(coreInterface)
 {
 }
 
@@ -65,7 +63,7 @@ void ApplicationContextMenuController::OnNew()
 	auto index = m_model->GetItemIndex(m_application);
 
 	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(), m_resourceLoader,
-		m_coreInterface->GetResourceInstance(), m_themeManager, m_model,
+		m_coreInterface->GetResourceInstance(), m_model,
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Application>(L"", L""), index));
 	editorDialog.ShowModalDialog();
@@ -88,7 +86,7 @@ void ApplicationContextMenuController::OnDelete()
 void ApplicationContextMenuController::OnShowProperties()
 {
 	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(), m_resourceLoader,
-		m_coreInterface->GetResourceInstance(), m_themeManager, m_model,
+		m_coreInterface->GetResourceInstance(), m_model,
 		ApplicationEditorDialog::EditDetails::EditApplication(m_application));
 	editorDialog.ShowModalDialog();
 }

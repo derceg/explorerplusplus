@@ -18,9 +18,9 @@
 CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
 CustomizeColorsDialog::CustomizeColorsDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parent, ThemeManager *themeManager, ColorRuleModel *model) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_CUSTOMIZE_COLORS, parent,
-		DialogSizingType::Both, themeManager),
+	HINSTANCE resourceInstance, HWND parent, ColorRuleModel *model) :
+	BaseDialog(resourceLoader, resourceInstance, IDD_CUSTOMIZE_COLORS, parent,
+		DialogSizingType::Both),
 	m_model(model)
 {
 	m_persistentSettings = &CustomizeColorsDialogPersistentSettings::GetInstance();
@@ -30,7 +30,7 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 {
 	HWND listView = GetDlgItem(m_hDlg, IDC_LISTVIEW_COLOR_RULES);
 	m_colorRuleListView = std::make_unique<ColorRuleListView>(listView, m_resourceLoader,
-		GetResourceInstance(), GetThemeManager(), m_model);
+		GetResourceInstance(), m_model);
 
 	// This object outlives the ColorRuleListView object, so there's no need to remove these
 	// observers.
@@ -131,8 +131,7 @@ void CustomizeColorsDialog::SaveState()
 
 void CustomizeColorsDialog::OnNew()
 {
-	ColorRuleEditorDialog editorDialog(m_resourceLoader, GetResourceInstance(), m_hDlg,
-		GetThemeManager(), m_model,
+	ColorRuleEditorDialog editorDialog(m_resourceLoader, GetResourceInstance(), m_hDlg, m_model,
 		ColorRuleEditorDialog::EditDetails::AddNewColorRule(
 			std::make_unique<ColorRule>(L"", L"", false, 0, DEFAULT_INITIAL_COLOR)));
 	editorDialog.ShowModalDialog();
@@ -147,8 +146,7 @@ void CustomizeColorsDialog::OnEdit()
 		return;
 	}
 
-	ColorRuleEditorDialog editorDialog(m_resourceLoader, GetResourceInstance(), m_hDlg,
-		GetThemeManager(), m_model,
+	ColorRuleEditorDialog editorDialog(m_resourceLoader, GetResourceInstance(), m_hDlg, m_model,
 		ColorRuleEditorDialog::EditDetails::EditColorRule(selectedColorRule));
 	editorDialog.ShowModalDialog();
 }

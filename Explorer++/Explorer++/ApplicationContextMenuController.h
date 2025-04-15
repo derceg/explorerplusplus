@@ -6,7 +6,6 @@
 
 class CoreInterface;
 class ResourceLoader;
-class ThemeManager;
 
 namespace Applications
 {
@@ -20,7 +19,7 @@ class ApplicationContextMenuController
 public:
 	ApplicationContextMenuController(ApplicationModel *model, Application *application,
 		ApplicationExecutor *applicationExecutor, const ResourceLoader *resourceLoader,
-		CoreInterface *coreInterface, ThemeManager *themeManager);
+		CoreInterface *coreInterface);
 
 	void OnMenuItemSelected(UINT menuItemId);
 
@@ -35,7 +34,6 @@ private:
 	ApplicationExecutor *const m_applicationExecutor;
 	const ResourceLoader *const m_resourceLoader;
 	CoreInterface *const m_coreInterface;
-	ThemeManager *const m_themeManager;
 };
 
 }

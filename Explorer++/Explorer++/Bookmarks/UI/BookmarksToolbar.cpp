@@ -122,26 +122,23 @@ private:
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
-	ThemeManager *themeManager)
+	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
 {
 	return new BookmarksToolbar(view, browserWindow, coreInterface, acceleratorManager,
-		resourceLoader, iconFetcher, bookmarkTree, themeManager);
+		resourceLoader, iconFetcher, bookmarkTree);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
-	ThemeManager *themeManager) :
+	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_browserWindow(browserWindow),
 	m_bookmarkTree(bookmarkTree),
-	m_themeManager(themeManager),
 	m_contextMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(), browserWindow,
-		coreInterface, acceleratorManager, themeManager),
+		coreInterface, acceleratorManager),
 	m_bookmarkMenu(bookmarkTree, resourceLoader, browserWindow, coreInterface, acceleratorManager,
-		iconFetcher, view->GetHWND(), themeManager)
+		iconFetcher, view->GetHWND())
 {
 	Initialize(iconFetcher, resourceLoader);
 }

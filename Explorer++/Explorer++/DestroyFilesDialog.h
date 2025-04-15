@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -38,12 +38,11 @@ private:
 	FileOperations::OverwriteMethod m_overwriteMethod;
 };
 
-class DestroyFilesDialog : public ThemedDialog
+class DestroyFilesDialog : public BaseDialog
 {
 public:
 	DestroyFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager, const std::list<std::wstring> &FullFilenameList,
-		BOOL bShowFriendlyDates);
+		HWND hParent, const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
 
 protected:
 	INT_PTR OnInitDialog() override;

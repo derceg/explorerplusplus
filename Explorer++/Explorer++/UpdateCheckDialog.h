@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
 class UpdateCheckDialog;
@@ -23,11 +23,11 @@ private:
 	UpdateCheckDialogPersistentSettings();
 };
 
-class UpdateCheckDialog : public ThemedDialog
+class UpdateCheckDialog : public BaseDialog
 {
 public:
 	UpdateCheckDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager);
+		HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

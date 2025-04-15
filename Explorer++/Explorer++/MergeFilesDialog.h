@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -47,12 +47,12 @@ private:
 	bool m_bstopMerging;
 };
 
-class MergeFilesDialog : public ThemedDialog
+class MergeFilesDialog : public BaseDialog
 {
 public:
 	MergeFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager, const std::wstring &strOutputDirectory,
-		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
+		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
+		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
 
 protected:

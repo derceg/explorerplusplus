@@ -54,8 +54,7 @@ private:
 		}
 	};
 
-	static INT_PTR CALLBACK DialogProcStub(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-	INT_PTR CALLBACK DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
+	INT_PTR DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual std::unique_ptr<ResizableDialogHelper> InitializeResizeDialogHelper() = 0;
 	virtual void InitializeControls() = 0;

@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "BaseDialog.h"
 #include "ColorRule.h"
-#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <memory>
 #include <vector>
@@ -41,7 +41,7 @@ private:
 	COLORREF m_customColors[16];
 };
 
-class ColorRuleEditorDialog : public ThemedDialog
+class ColorRuleEditorDialog : public BaseDialog
 {
 public:
 	class EditDetails
@@ -90,8 +90,7 @@ public:
 	};
 
 	ColorRuleEditorDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND parent, ThemeManager *themeManager, ColorRuleModel *model,
-		std::unique_ptr<EditDetails> editDetails);
+		HWND parent, ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails);
 
 protected:
 	INT_PTR OnInitDialog() override;

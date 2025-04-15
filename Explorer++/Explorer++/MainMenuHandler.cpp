@@ -36,14 +36,14 @@
 void Explorerplusplus::OnChangeDisplayColors()
 {
 	DisplayColoursDialog displayColoursDialog(m_app->GetResourceLoader(),
-		m_app->GetResourceInstance(), m_hContainer, m_app->GetThemeManager(), m_config);
+		m_app->GetResourceInstance(), m_hContainer, m_config);
 	displayColoursDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnFilterResults()
 {
 	FilterDialog filterDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-		m_hContainer, m_app->GetThemeManager(), this);
+		m_hContainer, this);
 	filterDialog.ShowModalDialog();
 }
 
@@ -61,7 +61,7 @@ void Explorerplusplus::OnMergeFiles()
 	}
 
 	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-		m_hContainer, m_app->GetThemeManager(), currentDirectory, fullFilenameList,
+		m_hContainer, currentDirectory, fullFilenameList,
 		m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
 }
@@ -75,7 +75,7 @@ void Explorerplusplus::OnSplitFile()
 		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iSelected);
 
 		SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-			m_hContainer, m_app->GetThemeManager(), fullFilename);
+			m_hContainer, fullFilename);
 		splitFileDialog.ShowModalDialog();
 	}
 }
@@ -92,15 +92,14 @@ void Explorerplusplus::OnDestroyFiles()
 	}
 
 	DestroyFilesDialog destroyFilesDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-		m_hContainer, m_app->GetThemeManager(), fullFilenameList,
-		m_config->globalFolderSettings.showFriendlyDates);
+		m_hContainer, fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
 	WildcardSelectDialog wilcardSelectDialog(m_app->GetResourceLoader(),
-		m_app->GetResourceInstance(), m_hContainer, m_app->GetThemeManager(), bSelect, this);
+		m_app->GetResourceInstance(), m_hContainer, bSelect, this);
 	wilcardSelectDialog.ShowModalDialog();
 }
 
@@ -113,16 +112,14 @@ void Explorerplusplus::OnSearch()
 			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
 
 			return new SearchDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-				m_hContainer, m_app->GetThemeManager(), currentDirectory, this, this,
-				GetActivePane()->GetTabContainerImpl());
+				m_hContainer, currentDirectory, this, this, GetActivePane()->GetTabContainerImpl());
 		});
 }
 
 void Explorerplusplus::OnCustomizeColors()
 {
 	CustomizeColorsDialog customizeColorsDialog(m_app->GetResourceLoader(),
-		m_app->GetResourceInstance(), m_hContainer, m_app->GetThemeManager(),
-		m_app->GetColorRuleModel());
+		m_app->GetResourceInstance(), m_hContainer, m_app->GetColorRuleModel());
 	customizeColorsDialog.ShowModalDialog();
 }
 
@@ -132,7 +129,7 @@ void Explorerplusplus::OnRunScript()
 		[this]
 		{
 			return new ScriptingDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-				m_hContainer, m_app->GetThemeManager(), this, m_config);
+				m_hContainer, this, m_config);
 		});
 }
 
@@ -160,14 +157,13 @@ void Explorerplusplus::OnOpenOnlineDocumentation()
 void Explorerplusplus::OnCheckForUpdates()
 {
 	UpdateCheckDialog updateCheckDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(),
-		m_hContainer, m_app->GetThemeManager());
+		m_hContainer);
 	updateCheckDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnAbout()
 {
-	AboutDialog aboutDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(), m_hContainer,
-		m_app->GetThemeManager());
+	AboutDialog aboutDialog(m_app->GetResourceLoader(), m_app->GetResourceInstance(), m_hContainer);
 	aboutDialog.ShowModalDialog();
 }
 

@@ -11,10 +11,10 @@
 const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
 SetFileAttributesDialog::SetFileAttributesDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager,
+	HINSTANCE resourceInstance, HWND hParent,
 	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_SETFILEATTRIBUTES, hParent,
-		DialogSizingType::None, themeManager)
+	BaseDialog(resourceLoader, resourceInstance, IDD_SETFILEATTRIBUTES, hParent,
+		DialogSizingType::None)
 {
 	assert(!sfaiList.empty());
 

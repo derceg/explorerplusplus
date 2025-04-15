@@ -15,7 +15,6 @@ class AcceleratorManager;
 class CoreInterface;
 struct MouseEvent;
 class ResourceLoader;
-class ThemeManager;
 
 namespace Applications
 {
@@ -30,8 +29,7 @@ class ApplicationToolbar : private DropTargetInternal
 public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
 		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		ThemeManager *themeManager);
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	ApplicationToolbar(const ApplicationToolbar &) = delete;
 	ApplicationToolbar(ApplicationToolbar &&) = delete;
@@ -69,8 +67,7 @@ private:
 
 	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
 		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		ThemeManager *themeManager);
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	void Initialize();
 
@@ -103,7 +100,6 @@ private:
 	CoreInterface *const m_coreInterface;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
-	ThemeManager *const m_themeManager;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

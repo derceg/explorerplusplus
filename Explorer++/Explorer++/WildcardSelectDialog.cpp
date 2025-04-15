@@ -21,10 +21,9 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T(
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
 WildcardSelectDialog::WildcardSelectDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, ThemeManager *themeManager, BOOL bSelect,
-	BrowserWindow *browserWindow) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_WILDCARDSELECT, hParent,
-		DialogSizingType::Horizontal, themeManager),
+	HINSTANCE resourceInstance, HWND hParent, BOOL bSelect, BrowserWindow *browserWindow) :
+	BaseDialog(resourceLoader, resourceInstance, IDD_WILDCARDSELECT, hParent,
+		DialogSizingType::Horizontal),
 	m_bSelect(bSelect),
 	m_browserWindow(browserWindow)
 {

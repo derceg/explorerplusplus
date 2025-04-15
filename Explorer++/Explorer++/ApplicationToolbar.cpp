@@ -70,24 +70,21 @@ private:
 
 ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
 	ApplicationModel *model, ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	ThemeManager *themeManager)
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
 {
 	return new ApplicationToolbar(view, model, applicationExecutor, coreInterface,
-		acceleratorManager, resourceLoader, themeManager);
+		acceleratorManager, resourceLoader);
 }
 
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
 	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	ThemeManager *themeManager) :
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	m_view(view),
 	m_model(model),
 	m_applicationExecutor(applicationExecutor),
 	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager),
-	m_resourceLoader(resourceLoader),
-	m_themeManager(themeManager)
+	m_resourceLoader(resourceLoader)
 {
 	Initialize();
 }
@@ -170,7 +167,7 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 
 	PopupMenuView popupMenu;
 	ApplicationContextMenu menu(&popupMenu, m_acceleratorManager, m_model, application,
-		m_applicationExecutor, m_resourceLoader, m_coreInterface, m_themeManager);
+		m_applicationExecutor, m_resourceLoader, m_coreInterface);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 

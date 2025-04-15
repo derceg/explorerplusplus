@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <list>
 
@@ -37,11 +37,11 @@ private:
 		const SetFileAttributesDialogPersistentSettings &) = delete;
 };
 
-class SetFileAttributesDialog : public ThemedDialog
+class SetFileAttributesDialog : public BaseDialog
 {
 public:
 	SetFileAttributesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager,
+		HWND hParent,
 		const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList);
 
 protected:

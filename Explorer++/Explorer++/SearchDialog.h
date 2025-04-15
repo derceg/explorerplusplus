@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ShellContextMenu.h"
@@ -133,11 +133,11 @@ private:
 	int m_iFilesFound;
 };
 
-class SearchDialog : public ThemedDialog, private ShellContextMenuHandler
+class SearchDialog : public BaseDialog, private ShellContextMenuHandler
 {
 public:
 	SearchDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager, std::wstring_view searchDirectory, BrowserWindow *browserWindow,
+		std::wstring_view searchDirectory, BrowserWindow *browserWindow,
 		CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl);
 	~SearchDialog();
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <boost/signals2.hpp>
 #include <memory>
@@ -29,7 +29,7 @@ private:
 	SearchTabsDialogPersistentSettings();
 };
 
-class SearchTabsDialog : public ThemedDialog
+class SearchTabsDialog : public BaseDialog
 {
 public:
 	static SearchTabsDialog *Create(App *app, HWND parent, CoreInterface *coreInterface);

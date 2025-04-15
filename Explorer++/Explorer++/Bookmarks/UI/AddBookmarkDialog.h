@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
@@ -37,13 +37,13 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class AddBookmarkDialog : public ThemedDialog
+class AddBookmarkDialog : public BaseDialog
 {
 public:
 	AddBookmarkDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager, BookmarkTree *bookmarkTree,
-		BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-		BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
+		HWND hParent, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
+		const AcceleratorManager *acceleratorManager,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:

@@ -94,7 +94,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 			sfaiList.push_back(sfai);
 
 			SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(),
-				m_app->GetResourceInstance(), m_hContainer, m_app->GetThemeManager(), sfaiList);
+				m_app->GetResourceInstance(), m_hContainer, sfaiList);
 			setFileAttributesDialog.ShowModalDialog();
 		}
 	}

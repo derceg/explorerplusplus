@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "BaseDialog.h"
 #include "Bookmarks/UI/BookmarkListView.h"
 #include "ResourceHelper.h"
-#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
@@ -47,13 +47,13 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class ManageBookmarksDialog : public ThemedDialog
+class ManageBookmarksDialog : public BaseDialog
 {
 public:
 	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+		HWND hParent, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:

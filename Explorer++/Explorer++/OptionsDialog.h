@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "BaseDialog.h"
 #include "Literals.h"
-#include "ThemedDialog.h"
 #include <wil/resource.h>
 #include <optional>
 #include <unordered_map>
@@ -16,7 +16,7 @@ class CoreInterface;
 class OptionsPage;
 class WindowSubclass;
 
-class OptionsDialog : public ThemedDialog
+class OptionsDialog : public BaseDialog
 {
 public:
 	OptionsDialog(HINSTANCE resourceInstance, HWND parent, App *app, Config *config,

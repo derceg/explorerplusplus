@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include <wil/resource.h>
 
-class AboutDialog : public ThemedDialog
+class AboutDialog : public BaseDialog
 {
 public:
-	AboutDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager);
+	AboutDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

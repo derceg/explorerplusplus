@@ -13,11 +13,10 @@
 
 DefaultSettingsOptionsPage::DefaultSettingsOptionsPage(HWND parent,
 	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
-	ThemeManager *themeManager) :
+	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+	HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_DEFAULT, IDS_OPTIONS_DEFAULT_TITLE, parent, resourceLoader,
-		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow),
-	m_themeManager(themeManager)
+		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
 {
 }
 
@@ -105,7 +104,7 @@ void DefaultSettingsOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_BUTTON_DEFAULTCOLUMNS:
 		{
 			SetDefaultColumnsDialog setDefaultColumnsDialog(m_resourceLoader, m_resourceInstance,
-				GetDialog(), m_themeManager, m_config->globalFolderSettings.folderColumns);
+				GetDialog(), m_config->globalFolderSettings.folderColumns);
 			setDefaultColumnsDialog.ShowModalDialog();
 		}
 		break;

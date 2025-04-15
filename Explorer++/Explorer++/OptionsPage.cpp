@@ -10,7 +10,6 @@
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <memory>
-#include <unordered_set>
 
 OptionsPage::OptionsPage(UINT dialogResourceId, UINT titleResourceId, HWND parent,
 	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, Config *config,
@@ -42,8 +41,8 @@ void OptionsPage::InitializeDialog()
 		return;
 	}
 
-	m_resourceLoader->CreateModelessDialog(m_dialogResourceId, m_parent, DialogProcStub,
-		reinterpret_cast<LPARAM>(this));
+	m_resourceLoader->CreateModelessDialog(m_dialogResourceId, m_parent,
+		std::bind_front(&OptionsPage::DialogProc, this));
 }
 
 HWND OptionsPage::GetDialog() const
@@ -56,37 +55,7 @@ std::wstring OptionsPage::GetTitle() const
 	return m_resourceLoader->LoadString(m_titleResourceId);
 }
 
-INT_PTR CALLBACK OptionsPage::DialogProcStub(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	auto *optionsDialogPage = reinterpret_cast<OptionsPage *>(GetWindowLongPtr(dlg, GWLP_USERDATA));
-
-	switch (msg)
-	{
-	case WM_INITDIALOG:
-	{
-		optionsDialogPage = reinterpret_cast<OptionsPage *>(lParam);
-
-		SetLastError(0);
-		auto res =
-			SetWindowLongPtr(dlg, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(optionsDialogPage));
-		DCHECK(!(res == 0 && GetLastError() != 0));
-	}
-	break;
-
-	case WM_NCDESTROY:
-		SetWindowLongPtr(dlg, GWLP_USERDATA, 0);
-		return 0;
-	}
-
-	if (!optionsDialogPage)
-	{
-		return 0;
-	}
-
-	return optionsDialogPage->DialogProc(dlg, msg, wParam, lParam);
-}
-
-INT_PTR CALLBACK OptionsPage::DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+INT_PTR OptionsPage::DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{

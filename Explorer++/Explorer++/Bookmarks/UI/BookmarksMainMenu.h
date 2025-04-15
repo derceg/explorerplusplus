@@ -15,14 +15,13 @@ class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
 class ResourceLoader;
-class ThemeManager;
 
 class BookmarksMainMenu
 {
 public:
 	BookmarksMainMenu(App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, ThemeManager *themeManager,
-		BookmarkTree *bookmarkTree, const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
+		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
+		const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(UINT menuItemId);

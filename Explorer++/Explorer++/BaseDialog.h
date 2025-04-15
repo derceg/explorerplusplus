@@ -18,8 +18,6 @@ a dialog without having to handle the dialog procedure
 directly. */
 class BaseDialog : public MessageForwarder, private boost::noncopyable
 {
-	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 public:
 	enum class DialogSizingType
 	{
@@ -40,8 +38,6 @@ public:
 protected:
 	BaseDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, int iResource,
 		HWND hParent, DialogSizingType dialogSizingType);
-
-	virtual void OnInitDialogBase();
 
 	HINSTANCE GetResourceInstance() const;
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;

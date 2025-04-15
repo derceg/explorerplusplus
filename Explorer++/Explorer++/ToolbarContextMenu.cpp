@@ -157,8 +157,8 @@ void ToolbarContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	auto *bookmarkTree = m_app->GetBookmarkTree();
 	BookmarkHelper::AddBookmarkItem(bookmarkTree, type, bookmarkTree->GetBookmarksToolbarFolder(),
-		std::nullopt, m_browser->GetHWND(), m_app->GetThemeManager(), m_coreInterface,
-		m_app->GetAcceleratorManager(), m_app->GetResourceLoader());
+		std::nullopt, m_browser->GetHWND(), m_coreInterface, m_app->GetAcceleratorManager(),
+		m_app->GetResourceLoader());
 }
 
 void ToolbarContextMenu::OnPasteBookmark()
@@ -174,7 +174,7 @@ void ToolbarContextMenu::OnNewApplication()
 	using namespace Applications;
 
 	ApplicationEditorDialog editorDialog(m_browser->GetHWND(), m_app->GetResourceLoader(),
-		m_app->GetResourceInstance(), m_app->GetThemeManager(), m_app->GetApplicationModel(),
+		m_app->GetResourceInstance(), m_app->GetApplicationModel(),
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Applications::Application>(L"", L"")));
 	editorDialog.ShowModalDialog();

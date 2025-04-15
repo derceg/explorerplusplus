@@ -14,11 +14,10 @@
 #include "../Helper/WindowSubclass.h"
 
 ColorRuleListView::ColorRuleListView(HWND listView, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, ThemeManager *themeManager, ColorRuleModel *model) :
+	HINSTANCE resourceInstance, ColorRuleModel *model) :
 	m_listView(listView),
 	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
-	m_themeManager(themeManager),
 	m_model(model)
 {
 	ListView_SetExtendedListViewStyleEx(listView,
@@ -89,7 +88,7 @@ void ColorRuleListView::OnDoubleClick(const NMITEMACTIVATE *itemActivate)
 	auto *colorRule = m_model->GetItemAtIndex(itemActivate->iItem);
 
 	ColorRuleEditorDialog editorDialog(m_resourceLoader, m_resourceInstance, GetParent(m_listView),
-		m_themeManager, m_model, ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
+		m_model, ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
 	editorDialog.ShowModalDialog();
 }
 

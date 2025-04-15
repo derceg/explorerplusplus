@@ -14,10 +14,9 @@ namespace Applications
 {
 
 ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, ThemeManager *themeManager, ApplicationModel *model,
-	std::unique_ptr<EditDetails> editDetails) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_EDITAPPLICATIONBUTTON, parent,
-		DialogSizingType::None, themeManager),
+	HINSTANCE resourceInstance, ApplicationModel *model, std::unique_ptr<EditDetails> editDetails) :
+	BaseDialog(resourceLoader, resourceInstance, IDD_EDITAPPLICATIONBUTTON, parent,
+		DialogSizingType::None),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {

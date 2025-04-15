@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include <string>
@@ -65,11 +65,11 @@ private:
 	bool m_bStopSplitting;
 };
 
-class SplitFileDialog : public ThemedDialog
+class SplitFileDialog : public BaseDialog
 {
 public:
 	SplitFileDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager, const std::wstring &strFullFilename);
+		const std::wstring &strFullFilename);
 	~SplitFileDialog();
 
 protected:

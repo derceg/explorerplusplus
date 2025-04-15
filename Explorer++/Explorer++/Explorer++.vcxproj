@@ -1112,7 +1112,6 @@
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
     <ClCompile Include="TabsOptionsPage.cpp" />
     <ClCompile Include="Theme.cpp" />
-    <ClCompile Include="ThemedDialog.cpp" />
     <ClCompile Include="ThemeWindowTracker.cpp" />
     <ClCompile Include="ToolbarHelper.cpp" />
     <ClCompile Include="ToolbarView.cpp" />
@@ -1439,7 +1438,6 @@
     <ClInclude Include="ShellTreeView\ShellTreeNode.h" />
     <ClInclude Include="TabsOptionsPage.h" />
     <ClInclude Include="Theme.h" />
-    <ClInclude Include="ThemedDialog.h" />
     <ClInclude Include="ThemeWindowTracker.h" />
     <ClInclude Include="ToolbarHelper.h" />
     <ClInclude Include="ToolbarView.h" />

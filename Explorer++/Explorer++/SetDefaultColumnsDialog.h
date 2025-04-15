@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "BaseDialog.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
@@ -51,11 +51,11 @@ private:
 	FolderType m_FolderType;
 };
 
-class SetDefaultColumnsDialog : public ThemedDialog
+class SetDefaultColumnsDialog : public BaseDialog
 {
 public:
 	SetDefaultColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ThemeManager *themeManager, FolderColumns &folderColumns);
+		HWND hParent, FolderColumns &folderColumns);
 
 protected:
 	INT_PTR OnInitDialog() override;

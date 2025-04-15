@@ -127,14 +127,14 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkIte
 }
 
 void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HWND parentWindow, ThemeManager *themeManager,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager)
+	const ResourceLoader *resourceLoader, HWND parentWindow, CoreInterface *coreInterface,
+	const AcceleratorManager *acceleratorManager)
 {
 	std::wstring bookmarkAllTabsText =
 		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
-	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr,
-		std::nullopt, parentWindow, themeManager, coreInterface, acceleratorManager, resourceLoader,
-		bookmarkAllTabsText);
+	auto bookmarkFolder =
+		AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr, std::nullopt,
+			parentWindow, coreInterface, acceleratorManager, resourceLoader, bookmarkAllTabsText);
 
 	if (!bookmarkFolder)
 	{
@@ -159,9 +159,8 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 
 BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	ThemeManager *themeManager, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	std::optional<std::wstring> customDialogTitle)
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader, std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
@@ -185,7 +184,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	BookmarkItem *selectedParentFolder = nullptr;
 
 	AddBookmarkDialog addBookmarkDialog(resourceLoader, coreInterface->GetResourceInstance(),
-		parentWindow, themeManager, bookmarkTree, bookmarkItem.get(), defaultParentSelection,
+		parentWindow, bookmarkTree, bookmarkItem.get(), defaultParentSelection,
 		&selectedParentFolder, acceleratorManager, customDialogTitle);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
@@ -214,7 +213,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 
 void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parentWindow, ThemeManager *themeManager)
+	HINSTANCE resourceInstance, HWND parentWindow)
 {
 	if (bookmarkTree->IsPermanentNode(bookmarkItem))
 	{
@@ -224,8 +223,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 
 	BookmarkItem *selectedParentFolder = nullptr;
 	AddBookmarkDialog addBookmarkDialog(resourceLoader, resourceInstance, parentWindow,
-		themeManager, bookmarkTree, bookmarkItem, nullptr, &selectedParentFolder,
-		acceleratorManager);
+		bookmarkTree, bookmarkItem, nullptr, &selectedParentFolder, acceleratorManager);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)

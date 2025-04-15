@@ -612,8 +612,7 @@ void TabContainerImpl::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	PopupMenuView popupMenu;
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), this,
-		m_app->GetTabRestorer(), m_bookmarkTree, m_coreInterface, m_app->GetResourceLoader(),
-		m_app->GetThemeManager());
+		m_app->GetTabRestorer(), m_bookmarkTree, m_coreInterface, m_app->GetResourceLoader());
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

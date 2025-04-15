@@ -17,9 +17,8 @@
 #pragma warning(default : 4062)
 
 AboutDialog::AboutDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, ThemeManager *themeManager) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None,
-		themeManager)
+	HWND hParent) :
+	BaseDialog(resourceLoader, resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None)
 {
 }
 
@@ -126,7 +125,7 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 		else if (pnmhdr->idFrom == IDC_THIRD_PARTY_CREDITS_LINK)
 		{
 			ThirdPartyCreditsDialog thirdPartyCreditsDialog(m_resourceLoader, GetResourceInstance(),
-				m_hDlg, GetThemeManager());
+				m_hDlg);
 			thirdPartyCreditsDialog.ShowModalDialog();
 		}
 	}

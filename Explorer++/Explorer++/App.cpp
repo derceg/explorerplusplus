@@ -41,13 +41,13 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_darkModeManager(&m_eventWindow, &m_config),
+	m_themeManager(&m_darkModeManager),
 	m_cachedIcons(std::make_shared<CachedIcons>(MAX_CACHED_ICONS)),
 	m_iconFetcher(std::make_shared<AsyncIconFetcher>(&m_runtime, m_cachedIcons)),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
-	m_themeManager(&m_darkModeManager),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(&m_systemClock),
 	m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
@@ -252,7 +252,7 @@ void App::SetUpLanguageResourceInstance()
 	}
 
 	m_resourceLoader = std::make_unique<Win32ResourceLoader>(m_resourceInstance, m_config.iconSet,
-		&m_darkModeManager);
+		&m_darkModeManager, &m_themeManager);
 }
 
 void App::RestoreSession(const std::vector<WindowStorageData> &windows)

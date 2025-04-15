@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemedDialog.h"
+#include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -41,12 +41,11 @@ private:
 	int m_iColumnWidth2;
 };
 
-class MassRenameDialog : public ThemedDialog
+class MassRenameDialog : public BaseDialog
 {
 public:
 	MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		ThemeManager *themeManager, const std::list<std::wstring> &FullFilenameList,
-		FileActionHandler *pFileActionHandler);
+		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
 
 protected:
 	INT_PTR OnInitDialog() override;

@@ -15,13 +15,12 @@
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree,
 	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	ThemeManager *themeManager) :
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
 	m_controller(bookmarkTree, resourceLoader, resourceInstance, browserWindow, coreInterface,
-		acceleratorManager, themeManager),
+		acceleratorManager),
 	m_showingMenu(false)
 {
 }

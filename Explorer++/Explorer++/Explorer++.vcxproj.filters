@@ -487,9 +487,6 @@
     <ClCompile Include="ThemeManager.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
-    <ClCompile Include="ThemedDialog.cpp">
-      <Filter>Dark Mode Support</Filter>
-    </ClCompile>
     <ClCompile Include="ThemeWindowTracker.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
@@ -1303,9 +1300,6 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ThemeManager.h">
-      <Filter>Dark Mode Support</Filter>
-    </ClInclude>
-    <ClInclude Include="ThemedDialog.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="ThemeWindowTracker.h">

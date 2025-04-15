@@ -57,11 +57,9 @@ const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Direc
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
 SearchDialog::SearchDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, ThemeManager *themeManager, std::wstring_view searchDirectory,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	TabContainerImpl *tabContainerImpl) :
-	ThemedDialog(resourceLoader, resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both,
-		themeManager),
+	HWND hParent, std::wstring_view searchDirectory, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl) :
+	BaseDialog(resourceLoader, resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
