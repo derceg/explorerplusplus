@@ -88,10 +88,10 @@ HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 	return hTabControl;
 }
 
-HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance)
+HWND CreateTooltipControl(HWND parent)
 {
 	HWND tipWnd = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, parent, nullptr, resourceInstance, nullptr);
+		CW_USEDEFAULT, CW_USEDEFAULT, parent, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	SetWindowPos(tipWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 

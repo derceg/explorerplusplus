@@ -17,7 +17,7 @@ HWND CreateTreeView(HWND hParent, DWORD dwStyle);
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle);
 HWND CreateTabControl(HWND hParent, DWORD dwStyle);
-HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance);
+HWND CreateTooltipControl(HWND parent);
 BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path);
 
 /* Dialog. */

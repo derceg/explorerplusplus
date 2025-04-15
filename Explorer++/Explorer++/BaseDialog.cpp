@@ -70,7 +70,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 	{
 		m_hDlg = hDlg;
 
-		m_tipWnd = CreateTooltipControl(m_hDlg, m_resourceInstance);
+		m_tipWnd = CreateTooltipControl(m_hDlg);
 
 		AddDynamicControls();
 
