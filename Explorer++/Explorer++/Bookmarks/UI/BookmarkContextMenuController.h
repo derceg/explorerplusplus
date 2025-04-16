@@ -17,7 +17,7 @@ class BookmarkContextMenuController
 {
 public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		const AcceleratorManager *acceleratorManager);
 
 	void OnMenuItemSelected(UINT menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
@@ -34,7 +34,6 @@ private:
 
 	BookmarkTree *const m_bookmarkTree;
 	const ResourceLoader *const m_resourceLoader;
-	HINSTANCE m_resourceInstance;
 	BrowserWindow *const m_browserWindow;
 	CoreInterface *const m_coreInterface;
 	const AcceleratorManager *const m_acceleratorManager;

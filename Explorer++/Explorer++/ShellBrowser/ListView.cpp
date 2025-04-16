@@ -948,8 +948,7 @@ void ShellBrowserImpl::OnListViewHeaderMenuItemSelected(int menuItemId,
 
 void ShellBrowserImpl::OnShowMoreColumnsSelected()
 {
-	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_resourceInstance,
-		m_hListView, this);
+	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_hListView, this);
 	selectColumnsDialog.ShowModalDialog();
 }
 
@@ -995,8 +994,8 @@ void ShellBrowserImpl::SetFileAttributesForSelection()
 		sfaiList.push_back(sfai);
 	}
 
-	SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(), m_resourceInstance,
-		m_hListView, sfaiList);
+	SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(), m_hListView,
+		sfaiList);
 	setFileAttributesDialog.ShowModalDialog();
 }
 

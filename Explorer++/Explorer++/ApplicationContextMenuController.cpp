@@ -63,7 +63,7 @@ void ApplicationContextMenuController::OnNew()
 	auto index = m_model->GetItemIndex(m_application);
 
 	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(), m_resourceLoader,
-		m_coreInterface->GetResourceInstance(), m_model,
+		m_model,
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Application>(L"", L""), index));
 	editorDialog.ShowModalDialog();
@@ -86,8 +86,7 @@ void ApplicationContextMenuController::OnDelete()
 void ApplicationContextMenuController::OnShowProperties()
 {
 	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(), m_resourceLoader,
-		m_coreInterface->GetResourceInstance(), m_model,
-		ApplicationEditorDialog::EditDetails::EditApplication(m_application));
+		m_model, ApplicationEditorDialog::EditDetails::EditApplication(m_application));
 	editorDialog.ShowModalDialog();
 }
 

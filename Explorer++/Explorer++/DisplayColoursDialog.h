@@ -31,8 +31,7 @@ private:
 class DisplayColoursDialog : public BaseDialog
 {
 public:
-	DisplayColoursDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, Config *config);
+	DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND hParent, Config *config);
 
 protected:
 	INT_PTR OnInitDialog() override;

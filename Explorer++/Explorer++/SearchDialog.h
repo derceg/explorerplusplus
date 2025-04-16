@@ -136,7 +136,7 @@ private:
 class SearchDialog : public BaseDialog, private ShellContextMenuHandler
 {
 public:
-	SearchDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+	SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
 		std::wstring_view searchDirectory, BrowserWindow *browserWindow,
 		CoreInterface *coreInterface, TabContainerImpl *tabContainerImpl);
 	~SearchDialog();

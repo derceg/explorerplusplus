@@ -18,9 +18,9 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, CoreInterface *coreInterface) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal),
+FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	CoreInterface *coreInterface) :
+	BaseDialog(resourceLoader, IDD_FILTER, hParent, DialogSizingType::Horizontal),
 	m_coreInterface(coreInterface)
 {
 	m_persistentSettings = &FilterDialogPersistentSettings::GetInstance();

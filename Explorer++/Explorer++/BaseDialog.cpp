@@ -10,10 +10,9 @@
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 
-BaseDialog::BaseDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	int iResource, HWND hParent, DialogSizingType dialogSizingType) :
+BaseDialog::BaseDialog(const ResourceLoader *resourceLoader, int iResource, HWND hParent,
+	DialogSizingType dialogSizingType) :
 	m_resourceLoader(resourceLoader),
-	m_resourceInstance(resourceInstance),
 	m_iResource(iResource),
 	m_hParent(hParent),
 	m_dialogSizingType(dialogSizingType)
@@ -143,11 +142,6 @@ INT_PTR BaseDialog::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, L
 	UNREFERENCED_PARAMETER(lParam);
 
 	return 0;
-}
-
-HINSTANCE BaseDialog::GetResourceInstance() const
-{
-	return m_resourceInstance;
 }
 
 INT_PTR BaseDialog::ShowModalDialog()

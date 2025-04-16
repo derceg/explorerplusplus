@@ -50,7 +50,7 @@ private:
 class MergeFilesDialog : public BaseDialog
 {
 public:
-	MergeFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+	MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
 		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
 		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();

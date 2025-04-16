@@ -183,9 +183,9 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog addBookmarkDialog(resourceLoader, coreInterface->GetResourceInstance(),
-		parentWindow, bookmarkTree, bookmarkItem.get(), defaultParentSelection,
-		&selectedParentFolder, acceleratorManager, customDialogTitle);
+	AddBookmarkDialog addBookmarkDialog(resourceLoader, parentWindow, bookmarkTree,
+		bookmarkItem.get(), defaultParentSelection, &selectedParentFolder, acceleratorManager,
+		customDialogTitle);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
@@ -213,7 +213,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 
 void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parentWindow)
+	HWND parentWindow)
 {
 	if (bookmarkTree->IsPermanentNode(bookmarkItem))
 	{
@@ -222,8 +222,8 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 	}
 
 	BookmarkItem *selectedParentFolder = nullptr;
-	AddBookmarkDialog addBookmarkDialog(resourceLoader, resourceInstance, parentWindow,
-		bookmarkTree, bookmarkItem, nullptr, &selectedParentFolder, acceleratorManager);
+	AddBookmarkDialog addBookmarkDialog(resourceLoader, parentWindow, bookmarkTree, bookmarkItem,
+		nullptr, &selectedParentFolder, acceleratorManager);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)

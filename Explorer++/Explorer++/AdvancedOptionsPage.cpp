@@ -16,10 +16,10 @@ const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 	MakeBimap<bool, std::wstring>({ { true, L"true" }, { false, L"false" } });
 
 AdvancedOptionsPage::AdvancedOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
-	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
-	OptionsPage(IDD_OPTIONS_ADVANCED, IDS_OPTIONS_ADVANCED_TITLE, parent, resourceLoader,
-		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
+	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+	HWND tooltipWindow) :
+	OptionsPage(IDD_OPTIONS_ADVANCED, IDS_OPTIONS_ADVANCED_TITLE, parent, resourceLoader, config,
+		coreInterface, settingChangedCallback, tooltipWindow)
 {
 }
 

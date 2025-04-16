@@ -54,8 +54,8 @@ private:
 class SetDefaultColumnsDialog : public BaseDialog
 {
 public:
-	SetDefaultColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, FolderColumns &folderColumns);
+	SetDefaultColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		FolderColumns &folderColumns);
 
 protected:
 	INT_PTR OnInitDialog() override;

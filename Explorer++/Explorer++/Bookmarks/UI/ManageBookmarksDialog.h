@@ -119,6 +119,7 @@ private:
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
 
+	const HINSTANCE m_resourceInstance;
 	BrowserWindow *const m_browserWindow;
 	CoreInterface *const m_coreInterface;
 	const AcceleratorManager *const m_acceleratorManager;

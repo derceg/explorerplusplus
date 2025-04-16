@@ -12,11 +12,10 @@
 #include "../Helper/ResizableDialogHelper.h"
 
 DefaultSettingsOptionsPage::DefaultSettingsOptionsPage(HWND parent,
-	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
-	OptionsPage(IDD_OPTIONS_DEFAULT, IDS_OPTIONS_DEFAULT_TITLE, parent, resourceLoader,
-		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
+	const ResourceLoader *resourceLoader, Config *config, CoreInterface *coreInterface,
+	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
+	OptionsPage(IDD_OPTIONS_DEFAULT, IDS_OPTIONS_DEFAULT_TITLE, parent, resourceLoader, config,
+		coreInterface, settingChangedCallback, tooltipWindow)
 {
 }
 
@@ -103,8 +102,8 @@ void DefaultSettingsOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDC_BUTTON_DEFAULTCOLUMNS:
 		{
-			SetDefaultColumnsDialog setDefaultColumnsDialog(m_resourceLoader, m_resourceInstance,
-				GetDialog(), m_config->globalFolderSettings.folderColumns);
+			SetDefaultColumnsDialog setDefaultColumnsDialog(m_resourceLoader, GetDialog(),
+				m_config->globalFolderSettings.folderColumns);
 			setDefaultColumnsDialog.ShowModalDialog();
 		}
 		break;

@@ -174,7 +174,7 @@ void ToolbarContextMenu::OnNewApplication()
 	using namespace Applications;
 
 	ApplicationEditorDialog editorDialog(m_browser->GetHWND(), m_app->GetResourceLoader(),
-		m_app->GetResourceInstance(), m_app->GetApplicationModel(),
+		m_app->GetApplicationModel(),
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Applications::Application>(L"", L"")));
 	editorDialog.ShowModalDialog();

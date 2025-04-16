@@ -44,7 +44,7 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parentWindow);
+	HWND parentWindow);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser);
 

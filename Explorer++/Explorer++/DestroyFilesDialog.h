@@ -41,8 +41,8 @@ private:
 class DestroyFilesDialog : public BaseDialog
 {
 public:
-	DestroyFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
+	DestroyFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
 
 protected:
 	INT_PTR OnInitDialog() override;

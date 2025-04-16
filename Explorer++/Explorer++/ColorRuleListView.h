@@ -15,8 +15,7 @@ class WindowSubclass;
 class ColorRuleListView
 {
 public:
-	ColorRuleListView(HWND listView, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, ColorRuleModel *model);
+	ColorRuleListView(HWND listView, const ResourceLoader *resourceLoader, ColorRuleModel *model);
 
 	ColorRule *MaybeGetSelectedColorRule();
 
@@ -40,7 +39,6 @@ private:
 
 	HWND m_listView;
 	const ResourceLoader *const m_resourceLoader;
-	HINSTANCE m_resourceInstance;
 	ColorRuleModel *m_model;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

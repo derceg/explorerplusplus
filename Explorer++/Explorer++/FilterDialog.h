@@ -42,8 +42,7 @@ private:
 class FilterDialog : public BaseDialog
 {
 public:
-	FilterDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		CoreInterface *coreInterface);
+	FilterDialog(const ResourceLoader *resourceLoader, HWND hParent, CoreInterface *coreInterface);
 
 protected:
 	INT_PTR OnInitDialog() override;

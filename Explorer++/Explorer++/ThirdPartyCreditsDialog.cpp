@@ -10,9 +10,8 @@
 #include "../Helper/WindowHelper.h"
 
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND parent) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_THIRD_PARTY_CREDITS, parent,
-		DialogSizingType::None)
+	HWND parent) :
+	BaseDialog(resourceLoader, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
 {
 }
 

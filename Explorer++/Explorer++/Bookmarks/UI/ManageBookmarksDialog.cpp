@@ -27,8 +27,8 @@ ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoade
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
 	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_MANAGE_BOOKMARKS, hParent,
-		DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
+	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager),
@@ -191,7 +191,7 @@ void ManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_bookmarkListView = new BookmarkListView(hListView, GetResourceInstance(), m_bookmarkTree,
+	m_bookmarkListView = new BookmarkListView(hListView, m_resourceInstance, m_bookmarkTree,
 		m_browserWindow, m_coreInterface, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
 		m_persistentSettings->m_listViewColumns);
 
@@ -309,7 +309,7 @@ void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 void ManageBookmarksDialog::ShowViewMenu()
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(GetResourceInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU)));
 
 	if (!parentMenu)
 	{
@@ -484,7 +484,7 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 void ManageBookmarksDialog::ShowOrganizeMenu()
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(GetResourceInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU)));
 
 	if (!parentMenu)
 	{

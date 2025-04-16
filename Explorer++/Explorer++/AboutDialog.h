@@ -10,7 +10,7 @@
 class AboutDialog : public BaseDialog
 {
 public:
-	AboutDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent);
+	AboutDialog(const ResourceLoader *resourceLoader, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

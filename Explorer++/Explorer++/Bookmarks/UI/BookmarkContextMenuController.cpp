@@ -14,11 +14,10 @@
 #include "TabContainerImpl.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
+	const ResourceLoader *resourceLoader, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceLoader(resourceLoader),
-	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager)
@@ -128,5 +127,5 @@ void BookmarkContextMenuController::OnEditBookmarkItem(BookmarkItem *bookmarkIte
 	HWND parentWindow)
 {
 	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_acceleratorManager,
-		m_resourceLoader, m_resourceInstance, parentWindow);
+		m_resourceLoader, parentWindow);
 }

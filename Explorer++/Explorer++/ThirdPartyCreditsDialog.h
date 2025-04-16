@@ -9,8 +9,7 @@
 class ThirdPartyCreditsDialog : public BaseDialog
 {
 public:
-	ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND parent);
+	ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader, HWND parent);
 
 protected:
 	INT_PTR OnInitDialog() override;

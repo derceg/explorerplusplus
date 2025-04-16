@@ -16,10 +16,9 @@
 
 const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
 
-SelectColumnsDialog::SelectColumnsDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, ShellBrowserImpl *shellBrowser) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_SELECTCOLUMNS, hParent,
-		DialogSizingType::Both),
+SelectColumnsDialog::SelectColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	ShellBrowserImpl *shellBrowser) :
+	BaseDialog(resourceLoader, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
 	m_shellBrowser(shellBrowser),
 	m_bColumnsSwapped(FALSE)
 {

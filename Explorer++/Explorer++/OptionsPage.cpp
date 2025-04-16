@@ -12,13 +12,11 @@
 #include <memory>
 
 OptionsPage::OptionsPage(UINT dialogResourceId, UINT titleResourceId, HWND parent,
-	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
+	const ResourceLoader *resourceLoader, Config *config, CoreInterface *coreInterface,
+	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
 	m_config(config),
 	m_coreInterface(coreInterface),
 	m_resourceLoader(resourceLoader),
-	m_resourceInstance(resourceInstance),
 	m_tooltipWindow(tooltipWindow),
 	m_settingChangedCallback(settingChangedCallback),
 	m_dialogResourceId(dialogResourceId),

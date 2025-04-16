@@ -64,6 +64,7 @@ private:
 	void ProcessFileName(const std::wstring &strTarget, const std::wstring &strFilename,
 		int iFileIndex, std::wstring &strOutput);
 
+	const HINSTANCE m_resourceInstance;
 	std::list<std::wstring> m_FullFilenameList;
 	wil::unique_hicon m_moreIcon;
 	FileActionHandler *m_pFileActionHandler;

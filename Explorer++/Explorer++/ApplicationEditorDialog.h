@@ -63,8 +63,7 @@ public:
 	};
 
 	ApplicationEditorDialog(HWND parent, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, ApplicationModel *model,
-		std::unique_ptr<EditDetails> editDetails);
+		ApplicationModel *model, std::unique_ptr<EditDetails> editDetails);
 
 protected:
 	INT_PTR OnInitDialog() override;

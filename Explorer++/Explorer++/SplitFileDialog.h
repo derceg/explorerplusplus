@@ -68,7 +68,7 @@ private:
 class SplitFileDialog : public BaseDialog
 {
 public:
-	SplitFileDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+	SplitFileDialog(const ResourceLoader *resourceLoader, HWND hParent,
 		const std::wstring &strFullFilename);
 	~SplitFileDialog();
 

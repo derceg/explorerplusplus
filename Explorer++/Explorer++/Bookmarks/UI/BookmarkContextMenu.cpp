@@ -19,8 +19,7 @@ BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree,
 	m_bookmarkTree(bookmarkTree),
 	m_resourceLoader(resourceLoader),
 	m_resourceInstance(resourceInstance),
-	m_controller(bookmarkTree, resourceLoader, resourceInstance, browserWindow, coreInterface,
-		acceleratorManager),
+	m_controller(bookmarkTree, resourceLoader, browserWindow, coreInterface, acceleratorManager),
 	m_showingMenu(false)
 {
 }

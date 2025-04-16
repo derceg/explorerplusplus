@@ -12,10 +12,9 @@ class DarkModeManager;
 class AppearanceOptionsPage : public OptionsPage
 {
 public:
-	AppearanceOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
-		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
-		const DarkModeManager *darkModeManager);
+	AppearanceOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
+		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+		HWND tooltipWindow, const DarkModeManager *darkModeManager);
 
 	void SaveSettings() override;
 

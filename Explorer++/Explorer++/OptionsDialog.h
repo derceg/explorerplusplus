@@ -19,8 +19,7 @@ class WindowSubclass;
 class OptionsDialog : public BaseDialog
 {
 public:
-	OptionsDialog(HINSTANCE resourceInstance, HWND parent, App *app, Config *config,
-		CoreInterface *coreInterface);
+	OptionsDialog(HWND parent, App *app, Config *config, CoreInterface *coreInterface);
 
 private:
 	// The amount of horizontal spacing between the navigation controls on the left side of the
@@ -60,7 +59,6 @@ private:
 
 	App *const m_app;
 	Config *const m_config;
-	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

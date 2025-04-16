@@ -48,8 +48,8 @@ private:
 class WildcardSelectDialog : public BaseDialog
 {
 public:
-	WildcardSelectDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, BOOL bSelect, BrowserWindow *browserWindow);
+	WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND hParent, BOOL bSelect,
+		BrowserWindow *browserWindow);
 
 protected:
 	INT_PTR OnInitDialog() override;

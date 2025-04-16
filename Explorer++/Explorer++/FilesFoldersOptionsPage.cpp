@@ -18,10 +18,10 @@
 #include <glog/logging.h>
 
 FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
-	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
+	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+	HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, parent, resourceLoader,
-		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
+		config, coreInterface, settingChangedCallback, tooltipWindow)
 {
 }
 

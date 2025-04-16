@@ -30,10 +30,10 @@ const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles"
 
 bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
 
-MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, const std::wstring &strOutputDirectory,
-	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
+MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
+	BOOL bShowFriendlyDates) :
+	BaseDialog(resourceLoader, IDD_MERGEFILES, hParent, DialogSizingType::Both),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
 	m_bShowFriendlyDates(bShowFriendlyDates),

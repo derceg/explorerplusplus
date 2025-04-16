@@ -33,8 +33,7 @@ private:
 class CustomizeColorsDialog : public BaseDialog
 {
 public:
-	CustomizeColorsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND parent, ColorRuleModel *model);
+	CustomizeColorsDialog(const ResourceLoader *resourceLoader, HWND parent, ColorRuleModel *model);
 	~CustomizeColorsDialog();
 
 protected:

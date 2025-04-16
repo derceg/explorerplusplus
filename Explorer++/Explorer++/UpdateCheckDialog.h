@@ -26,8 +26,7 @@ private:
 class UpdateCheckDialog : public BaseDialog
 {
 public:
-	UpdateCheckDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent);
+	UpdateCheckDialog(const ResourceLoader *resourceLoader, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

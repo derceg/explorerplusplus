@@ -27,11 +27,11 @@ const std::unordered_map<ReplaceExplorerMode, int> REPLACE_EXPLORER_ENUM_CONTROL
 	{ ReplaceExplorerMode::All, IDC_OPTION_REPLACEEXPLORER_ALL }
 };
 
-GeneralOptionsPage::GeneralOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, App *app, Config *config, CoreInterface *coreInterface,
-	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
-	OptionsPage(IDD_OPTIONS_GENERAL, IDS_OPTIONS_GENERAL_TITLE, parent, resourceLoader,
-		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow),
+GeneralOptionsPage::GeneralOptionsPage(HWND parent, const ResourceLoader *resourceLoader, App *app,
+	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+	HWND tooltipWindow) :
+	OptionsPage(IDD_OPTIONS_GENERAL, IDS_OPTIONS_GENERAL_TITLE, parent, resourceLoader, config,
+		coreInterface, settingChangedCallback, tooltipWindow),
 	m_app(app)
 {
 }

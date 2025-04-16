@@ -26,9 +26,8 @@ const TCHAR UpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateChec
 const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] =
 	_T("https://explorerplusplus.com/software/version.txt");
 
-UpdateCheckDialog::UpdateCheckDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_UPDATECHECK, hParent, DialogSizingType::None),
+UpdateCheckDialog::UpdateCheckDialog(const ResourceLoader *resourceLoader, HWND hParent) :
+	BaseDialog(resourceLoader, IDD_UPDATECHECK, hParent, DialogSizingType::None),
 	m_UpdateCheckComplete(false)
 {
 	m_pucdps = &UpdateCheckDialogPersistentSettings::GetInstance();

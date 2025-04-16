@@ -33,7 +33,8 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("C
 MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 	HWND hParent, const std::list<std::wstring> &FullFilenameList,
 	FileActionHandler *pFileActionHandler) :
-	BaseDialog(resourceLoader, resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_MASSRENAME, hParent, DialogSizingType::Both),
+	m_resourceInstance(resourceInstance),
 	m_FullFilenameList(FullFilenameList),
 	m_pFileActionHandler(pFileActionHandler)
 {
@@ -176,8 +177,8 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_MASSRENAME_MORE:
 		{
-			HMENU hMenu = GetSubMenu(
-				LoadMenu(GetResourceInstance(), MAKEINTRESOURCE(IDR_MASSRENAME_MENU)), 0);
+			HMENU hMenu =
+				GetSubMenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MASSRENAME_MENU)), 0);
 
 			RECT rc;
 			GetWindowRect(GetDlgItem(m_hDlg, IDC_MASSRENAME_MORE), &rc);

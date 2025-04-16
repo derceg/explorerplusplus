@@ -40,8 +40,8 @@ private:
 class AddBookmarkDialog : public BaseDialog
 {
 public:
-	AddBookmarkDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+	AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 		const AcceleratorManager *acceleratorManager,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);

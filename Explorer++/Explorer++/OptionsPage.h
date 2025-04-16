@@ -19,9 +19,8 @@ public:
 	using SettingChangedCallback = std::function<void()>;
 
 	OptionsPage(UINT dialogResourceId, UINT titleResourceId, HWND parent,
-		const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow);
+		const ResourceLoader *resourceLoader, Config *config, CoreInterface *coreInterface,
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
 	virtual ~OptionsPage();
 
 	void InitializeDialog();
@@ -35,7 +34,6 @@ protected:
 	Config *const m_config;
 	CoreInterface *const m_coreInterface;
 	const ResourceLoader *const m_resourceLoader;
-	const HINSTANCE m_resourceInstance;
 	const HWND m_tooltipWindow;
 
 	const SettingChangedCallback m_settingChangedCallback;

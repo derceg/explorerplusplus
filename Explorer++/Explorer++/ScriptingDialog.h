@@ -9,7 +9,7 @@ class PluginInterface;
 class ScriptingDialog : public BaseDialog
 {
 public:
-	ScriptingDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+	ScriptingDialog(const ResourceLoader *resourceLoader, HWND hParent,
 		PluginInterface *pluginInterface, const Config *config);
 
 protected:

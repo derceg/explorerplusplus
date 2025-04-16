@@ -10,9 +10,9 @@
 class FilesFoldersOptionsPage : public OptionsPage
 {
 public:
-	FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
-		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
+	FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
+		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+		HWND tooltipWindow);
 
 	void SaveSettings() override;
 

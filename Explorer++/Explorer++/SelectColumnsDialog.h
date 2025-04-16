@@ -31,8 +31,8 @@ private:
 class SelectColumnsDialog : public BaseDialog
 {
 public:
-	SelectColumnsDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, ShellBrowserImpl *shellBrowser);
+	SelectColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		ShellBrowserImpl *shellBrowser);
 
 protected:
 	INT_PTR OnInitDialog() override;
