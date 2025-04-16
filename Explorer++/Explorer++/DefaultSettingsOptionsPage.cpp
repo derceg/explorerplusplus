@@ -12,10 +12,10 @@
 #include "../Helper/ResizableDialogHelper.h"
 
 DefaultSettingsOptionsPage::DefaultSettingsOptionsPage(HWND parent,
-	const ResourceLoader *resourceLoader, Config *config, CoreInterface *coreInterface,
+	const ResourceLoader *resourceLoader, Config *config,
 	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_DEFAULT, IDS_OPTIONS_DEFAULT_TITLE, parent, resourceLoader, config,
-		coreInterface, settingChangedCallback, tooltipWindow)
+		settingChangedCallback, tooltipWindow)
 {
 }
 

@@ -14,10 +14,9 @@
 #include "../Helper/WindowHelper.h"
 
 FontsOptionsPage::FontsOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
+	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_FONTS, IDS_OPTIONS_FONTS_TITLE, parent, resourceLoader, config,
-		coreInterface, settingChangedCallback, tooltipWindow)
+		settingChangedCallback, tooltipWindow)
 {
 }
 

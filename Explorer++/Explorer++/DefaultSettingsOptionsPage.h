@@ -10,8 +10,7 @@ class DefaultSettingsOptionsPage : public OptionsPage
 {
 public:
 	DefaultSettingsOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow);
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
 
 	void SaveSettings() override;
 

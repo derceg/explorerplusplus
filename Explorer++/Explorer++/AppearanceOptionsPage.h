@@ -13,8 +13,8 @@ class AppearanceOptionsPage : public OptionsPage
 {
 public:
 	AppearanceOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow, const DarkModeManager *darkModeManager);
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+		const DarkModeManager *darkModeManager);
 
 	void SaveSettings() override;
 

@@ -28,10 +28,9 @@ const std::unordered_map<ReplaceExplorerMode, int> REPLACE_EXPLORER_ENUM_CONTROL
 };
 
 GeneralOptionsPage::GeneralOptionsPage(HWND parent, const ResourceLoader *resourceLoader, App *app,
-	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
+	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_GENERAL, IDS_OPTIONS_GENERAL_TITLE, parent, resourceLoader, config,
-		coreInterface, settingChangedCallback, tooltipWindow),
+		settingChangedCallback, tooltipWindow),
 	m_app(app)
 {
 }

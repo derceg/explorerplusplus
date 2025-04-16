@@ -9,10 +9,9 @@
 #include "../Helper/ResizableDialogHelper.h"
 
 TabsOptionsPage::TabsOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
-	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow) :
+	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_TABS, IDS_OPTIONS_TABS_TITLE, parent, resourceLoader, config,
-		coreInterface, settingChangedCallback, tooltipWindow)
+		settingChangedCallback, tooltipWindow)
 {
 }
 

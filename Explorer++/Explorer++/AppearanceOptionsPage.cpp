@@ -13,10 +13,10 @@
 #include <glog/logging.h>
 
 AppearanceOptionsPage::AppearanceOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-	HWND tooltipWindow, const DarkModeManager *darkModeManager) :
+	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+	const DarkModeManager *darkModeManager) :
 	OptionsPage(IDD_OPTIONS_APPEARANCE, IDS_OPTIONS_APPEARANCE_TITLE, parent, resourceLoader,
-		config, coreInterface, settingChangedCallback, tooltipWindow),
+		config, settingChangedCallback, tooltipWindow),
 	m_darkModeManager(darkModeManager)
 {
 }

@@ -19,8 +19,8 @@ class StartupOptionsPage : public OptionsPage
 {
 public:
 	StartupOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow, DarkModeManager *darkModeManager, ThemeManager *themeManager);
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
+		DarkModeManager *darkModeManager, ThemeManager *themeManager);
 
 	void SaveSettings() override;
 

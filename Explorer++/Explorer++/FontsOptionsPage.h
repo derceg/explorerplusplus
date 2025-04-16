@@ -14,8 +14,7 @@ class FontsOptionsPage : public OptionsPage
 {
 public:
 	FontsOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
-		CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
-		HWND tooltipWindow);
+		SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
 
 	void SaveSettings() override;
 
