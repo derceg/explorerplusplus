@@ -127,14 +127,14 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkIte
 }
 
 void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HWND parentWindow, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager)
+	const ResourceLoader *resourceLoader, HWND parentWindow, BrowserWindow *browser,
+	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager)
 {
 	std::wstring bookmarkAllTabsText =
 		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder =
 		AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr, std::nullopt,
-			parentWindow, coreInterface, acceleratorManager, resourceLoader, bookmarkAllTabsText);
+			parentWindow, browser, acceleratorManager, resourceLoader, bookmarkAllTabsText);
 
 	if (!bookmarkFolder)
 	{
@@ -159,20 +159,19 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 
 BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader, std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
 	if (type == BookmarkItem::Type::Bookmark)
 	{
-		const Tab &selectedTab = coreInterface->GetTabContainerImpl()->GetSelectedTab();
-		auto *entry =
-			selectedTab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
+		const auto *shellBrowser = browser->GetActiveShellBrowser();
+		const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
-			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_FORPARSING));
+			GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_INFOLDER),
+			GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING));
 	}
 	else
 	{

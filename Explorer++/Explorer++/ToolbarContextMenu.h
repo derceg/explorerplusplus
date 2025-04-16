@@ -11,7 +11,6 @@
 
 class App;
 class BrowserWindow;
-class CoreInterface;
 class ResourceLoader;
 
 class ToolbarContextMenu : public MenuBase
@@ -26,8 +25,7 @@ public:
 		ApplicationToolbar
 	};
 
-	ToolbarContextMenu(MenuView *menuView, Source source, App *app, BrowserWindow *browser,
-		CoreInterface *coreInterface);
+	ToolbarContextMenu(MenuView *menuView, Source source, App *app, BrowserWindow *browser);
 
 private:
 	void BuildMenu(Source source, const ResourceLoader *resourceLoader);
@@ -39,7 +37,6 @@ private:
 
 	App *const m_app;
 	BrowserWindow *const m_browser;
-	CoreInterface *const m_coreInterface;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

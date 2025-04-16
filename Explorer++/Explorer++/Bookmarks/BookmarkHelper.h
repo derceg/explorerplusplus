@@ -36,10 +36,11 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-	HWND parentWindow, CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager);
+	HWND parentWindow, BrowserWindow *browser, CoreInterface *coreInterface,
+	const AcceleratorManager *acceleratorManager);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
+	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader,
 	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,

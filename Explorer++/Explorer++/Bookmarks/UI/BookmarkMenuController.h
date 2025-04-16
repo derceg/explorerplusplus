@@ -28,7 +28,6 @@ public:
 
 private:
 	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
 	HWND m_parentWindow;
 	BookmarkContextMenu m_bookmarkContextMenu;
 };

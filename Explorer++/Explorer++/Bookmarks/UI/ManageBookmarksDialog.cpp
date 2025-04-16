@@ -618,7 +618,7 @@ void ManageBookmarksDialog::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, focus, m_coreInterface, m_acceleratorManager,
+		m_currentBookmarkFolder, targetIndex, focus, m_browserWindow, m_acceleratorManager,
 		m_resourceLoader);
 
 	if (!bookmark || focus != listView || bookmark->GetParent() != m_currentBookmarkFolder)

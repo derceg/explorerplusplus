@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -15,11 +14,10 @@
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
 	const ResourceLoader *resourceLoader, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager) :
+	const AcceleratorManager *acceleratorManager) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceLoader(resourceLoader),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface),
 	m_acceleratorManager(acceleratorManager)
 {
 }
@@ -102,7 +100,7 @@ void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex, HWND parentWindow)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		parentWindow, m_coreInterface, m_acceleratorManager, m_resourceLoader);
+		parentWindow, m_browserWindow, m_acceleratorManager, m_resourceLoader);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)

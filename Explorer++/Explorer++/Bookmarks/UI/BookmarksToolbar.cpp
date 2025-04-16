@@ -136,7 +136,7 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 	m_browserWindow(browserWindow),
 	m_bookmarkTree(bookmarkTree),
 	m_contextMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(), browserWindow,
-		coreInterface, acceleratorManager),
+		acceleratorManager),
 	m_bookmarkMenu(bookmarkTree, resourceLoader, browserWindow, coreInterface, acceleratorManager,
 		iconFetcher, view->GetHWND())
 {

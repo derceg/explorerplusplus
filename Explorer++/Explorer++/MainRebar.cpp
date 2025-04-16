@@ -243,7 +243,7 @@ bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 	ClientToScreen(mouseInfo->hdr.hwndFrom, &ptScreen);
 
 	PopupMenuView popupMenu;
-	ToolbarContextMenu toolbarContextMenu(&popupMenu, source, m_app, this, this);
+	ToolbarContextMenu toolbarContextMenu(&popupMenu, source, m_app, this);
 	popupMenu.Show(m_hContainer, ptScreen);
 
 	return true;

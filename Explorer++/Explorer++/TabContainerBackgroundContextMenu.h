@@ -9,6 +9,7 @@
 #include <vector>
 
 class BookmarkTree;
+class BrowserWindow;
 class CoreInterface;
 class MenuView;
 class ResourceLoader;
@@ -20,8 +21,8 @@ class TabContainerBackgroundContextMenu : public MenuBase
 public:
 	TabContainerBackgroundContextMenu(MenuView *menuView,
 		const AcceleratorManager *acceleratorManager, TabContainerImpl *tabContainerImpl,
-		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
-		const ResourceLoader *resourceLoader);
+		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, BrowserWindow *browser,
+		CoreInterface *coreInterface, const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu();
@@ -30,6 +31,7 @@ private:
 	TabContainerImpl *const m_tabContainerImpl;
 	TabRestorer *const m_tabRestorer;
 	BookmarkTree *const m_bookmarkTree;
+	BrowserWindow *const m_browser;
 	CoreInterface *const m_coreInterface;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;

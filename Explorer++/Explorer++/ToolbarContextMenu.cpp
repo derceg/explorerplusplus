@@ -16,11 +16,10 @@
 #include "ResourceLoader.h"
 
 ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, App *app,
-	BrowserWindow *browser, CoreInterface *coreInterface) :
+	BrowserWindow *browser) :
 	MenuBase(menuView, app->GetAcceleratorManager()),
 	m_app(app),
-	m_browser(browser),
-	m_coreInterface(coreInterface)
+	m_browser(browser)
 {
 	BuildMenu(source, app->GetResourceLoader());
 
@@ -157,7 +156,7 @@ void ToolbarContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	auto *bookmarkTree = m_app->GetBookmarkTree();
 	BookmarkHelper::AddBookmarkItem(bookmarkTree, type, bookmarkTree->GetBookmarksToolbarFolder(),
-		std::nullopt, m_browser->GetHWND(), m_coreInterface, m_app->GetAcceleratorManager(),
+		std::nullopt, m_browser->GetHWND(), m_browser, m_app->GetAcceleratorManager(),
 		m_app->GetResourceLoader());
 }
 
