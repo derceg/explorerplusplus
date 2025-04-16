@@ -9,7 +9,6 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -26,7 +25,7 @@
 #include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
-	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
@@ -34,7 +33,7 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface),
+	m_config(config),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_columns(initialColumns),
@@ -711,7 +710,7 @@ std::wstring BookmarkListView::FormatDate(const FILETIME *date)
 {
 	TCHAR formattedDate[256];
 	BOOL res = CreateFileTimeString(date, formattedDate, std::size(formattedDate),
-		m_coreInterface->GetConfig()->globalFolderSettings.showFriendlyDates);
+		m_config->globalFolderSettings.showFriendlyDates);
 
 	if (res)
 	{

@@ -10,7 +10,6 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "BrowserWindow.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
@@ -24,13 +23,13 @@
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
+	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
+	BookmarkTree *bookmarkTree) :
 	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface),
+	m_config(config),
 	m_acceleratorManager(acceleratorManager),
 	m_iconFetcher(iconFetcher),
 	m_bookmarkTree(bookmarkTree)
@@ -192,7 +191,7 @@ void ManageBookmarksDialog::SetupListView()
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	m_bookmarkListView = new BookmarkListView(hListView, m_resourceInstance, m_bookmarkTree,
-		m_browserWindow, m_coreInterface, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
+		m_browserWindow, m_config, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
 		m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(

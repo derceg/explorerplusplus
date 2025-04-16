@@ -437,7 +437,6 @@ private:
 	void CopyColumnInfoToClipboard();
 
 	/* CoreInterface methods. */
-	const Config *GetConfig() const override;
 	HINSTANCE GetResourceInstance() const override;
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;

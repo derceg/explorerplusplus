@@ -1223,8 +1223,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 			[this, hwnd]
 			{
 				return new ManageBookmarksDialog(m_app->GetResourceLoader(),
-					m_app->GetResourceInstance(), hwnd, this, this, m_app->GetAcceleratorManager(),
-					&m_iconFetcher, m_app->GetBookmarkTree());
+					m_app->GetResourceInstance(), hwnd, this, m_config,
+					m_app->GetAcceleratorManager(), &m_iconFetcher, m_app->GetBookmarkTree());
 			});
 		break;
 

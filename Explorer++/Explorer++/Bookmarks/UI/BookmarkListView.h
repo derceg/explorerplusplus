@@ -19,7 +19,7 @@ class AcceleratorManager;
 class BookmarkIconManager;
 class BookmarkTree;
 class BrowserWindow;
-class CoreInterface;
+struct Config;
 class IconFetcher;
 class ResourceLoader;
 
@@ -34,7 +34,7 @@ public:
 	};
 
 	BookmarkListView(HWND hListView, HINSTANCE resourceInstance, BookmarkTree *bookmarkTree,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		BrowserWindow *browserWindow, const Config *config,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 		IconFetcher *iconFetcher, const std::vector<Column> &initialColumns);
 
@@ -134,7 +134,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	BookmarkTree *const m_bookmarkTree;
 	BrowserWindow *const m_browserWindow;
-	CoreInterface *const m_coreInterface;
+	const Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;

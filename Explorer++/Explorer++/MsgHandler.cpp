@@ -910,11 +910,6 @@ void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 	selectedTab.GetShellBrowserImpl()->SetGroupSortDirection(direction);
 }
 
-const Config *Explorerplusplus::GetConfig() const
-{
-	return m_config;
-}
-
 HINSTANCE Explorerplusplus::GetResourceInstance() const
 {
 	return m_app->GetResourceInstance();

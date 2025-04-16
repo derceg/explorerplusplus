@@ -17,7 +17,6 @@ using MainMenuItemMiddleClickedSignal =
 		FirstSuccessfulRequestCombiner<bool>>;
 using FocusChangedSignal = boost::signals2::signal<void()>;
 
-struct Config;
 class ShellBrowserImpl;
 class TabContainerImpl;
 
@@ -29,7 +28,6 @@ class CoreInterface
 public:
 	virtual ~CoreInterface() = default;
 
-	virtual const Config *GetConfig() const = 0;
 	virtual HINSTANCE GetResourceInstance() const = 0;
 
 	virtual HWND GetMainWindow() const = 0;
