@@ -69,6 +69,12 @@ const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
 }
 
 BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
+	std::unique_ptr<BookmarkItem> bookmarkItem)
+{
+	return AddBookmarkItem(parent, std::move(bookmarkItem), parent->GetChildren().size());
+}
+
+BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
 	std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
 	if (!CanAddChildren(parent))

@@ -28,8 +28,6 @@ class CoreInterface
 public:
 	virtual ~CoreInterface() = default;
 
-	virtual HINSTANCE GetResourceInstance() const = 0;
-
 	virtual HWND GetMainWindow() const = 0;
 
 	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;

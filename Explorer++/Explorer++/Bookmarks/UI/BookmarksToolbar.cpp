@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarksToolbar.h"
+#include "BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
@@ -11,8 +12,8 @@
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "NavigationHelper.h"
+#include "PopupMenuView.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/WeakPtr.h"
@@ -120,25 +121,25 @@ private:
 	BookmarkIconManager *m_bookmarkIconManager;
 };
 
-BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browser,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
 {
-	return new BookmarksToolbar(view, browserWindow, coreInterface, acceleratorManager,
-		resourceLoader, iconFetcher, bookmarkTree);
+	return new BookmarksToolbar(view, browser, acceleratorManager, resourceLoader, iconFetcher,
+		bookmarkTree);
 }
 
-BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
-	m_browserWindow(browserWindow),
+	m_browser(browser),
+	m_acceleratorManager(acceleratorManager),
+	m_resourceLoader(resourceLoader),
 	m_bookmarkTree(bookmarkTree),
-	m_contextMenu(bookmarkTree, resourceLoader, coreInterface->GetResourceInstance(), browserWindow,
-		acceleratorManager),
-	m_bookmarkMenu(bookmarkTree, resourceLoader, browserWindow, coreInterface, acceleratorManager,
-		iconFetcher, view->GetHWND())
+	m_bookmarkMenu(bookmarkTree, resourceLoader, browser, acceleratorManager, iconFetcher,
+		view->GetHWND())
 {
 	Initialize(iconFetcher, resourceLoader);
 }
@@ -266,7 +267,7 @@ void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const Mouse
 	UNREFERENCED_PARAMETER(event);
 
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey), m_browserWindow);
+		DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey), m_browser);
 }
 
 void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
@@ -274,7 +275,7 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 	if (event.ctrlKey)
 	{
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-			DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey), m_browserWindow);
+			DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey), m_browser);
 		return;
 	}
 
@@ -291,7 +292,7 @@ void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 	const MouseEvent &event)
 {
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey), m_browserWindow);
+		DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey), m_browser);
 }
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
@@ -299,8 +300,10 @@ void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	m_contextMenu.ShowMenu(m_view->GetHWND(), bookmarkItem->GetParent(), { bookmarkItem },
-		ptScreen);
+	PopupMenuView popupMenu;
+	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND());
+	popupMenu.Show(m_browser->GetHWND(), ptScreen);
 }
 
 BookmarksToolbarView *BookmarksToolbar::GetView() const

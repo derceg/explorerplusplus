@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "Bookmarks/UI/BookmarkMenu.h"
@@ -17,7 +16,6 @@ class BookmarkIconManager;
 class BookmarksToolbarView;
 class BookmarkTree;
 class BrowserWindow;
-class CoreInterface;
 class IconFetcher;
 struct MouseEvent;
 class ResourceLoader;
@@ -25,9 +23,9 @@ class ResourceLoader;
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
-	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browser,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
 	BookmarksToolbar(BookmarksToolbar &&) = delete;
@@ -51,9 +49,9 @@ private:
 	// main portion of the button.
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager,
-		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
 	void Initialize(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader);
 	void AddBookmarkItems();
@@ -81,12 +79,13 @@ private:
 
 	void RemoveDropHighlight();
 
-	BookmarksToolbarView *m_view = nullptr;
-	BrowserWindow *m_browserWindow = nullptr;
-	BookmarkTree *m_bookmarkTree = nullptr;
+	BookmarksToolbarView *const m_view;
+	BrowserWindow *const m_browser;
+	const AcceleratorManager *const m_acceleratorManager;
+	const ResourceLoader *const m_resourceLoader;
+	BookmarkTree *const m_bookmarkTree;
 
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
-	BookmarkContextMenu m_contextMenu;
 	BookmarkMenu m_bookmarkMenu;
 
 	// Drag and drop

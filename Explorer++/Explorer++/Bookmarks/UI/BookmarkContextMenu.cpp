@@ -6,175 +6,266 @@
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "BrowserWindow.h"
 #include "MainResource.h"
+#include "MenuView.h"
 #include "ResourceLoader.h"
-#include "../Helper/MenuHelper.h"
-#include <glog/logging.h>
-#include <wil/resource.h>
+#include <algorithm>
+#include <ranges>
 
-BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-	const AcceleratorManager *acceleratorManager) :
+BookmarkContextMenu::BookmarkContextMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
+	const RawBookmarkItems &bookmarkItems, const ResourceLoader *resourceLoader,
+	BrowserWindow *browser, HWND parentWindow) :
+	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
+	m_bookmarkItems(bookmarkItems),
 	m_resourceLoader(resourceLoader),
-	m_resourceInstance(resourceInstance),
-	m_controller(bookmarkTree, resourceLoader, browserWindow, acceleratorManager),
-	m_showingMenu(false)
+	m_browser(browser),
+	m_parentWindow(parentWindow)
 {
+	BuildMenu();
+
+	m_connections.push_back(m_menuView->AddItemSelectedObserver(
+		std::bind(&BookmarkContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
 }
 
-BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
-	const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, MenuType menuType)
+void BookmarkContextMenu::BuildMenu()
 {
-	DCHECK(!bookmarkItems.empty());
+	CHECK(AreBookmarkItemsValid());
 
-	wil::unique_hmenu parentMenu;
+	bool singleBookmarkSelected = (m_bookmarkItems.size() == 1) && m_bookmarkItems[0]->IsBookmark();
+	bool permanentNodeSelected =
+		(m_bookmarkItems.size() == 1) && m_bookmarkTree->IsPermanentNode(m_bookmarkItems[0]);
 
-	if (bookmarkItems.size() == 1)
+	if (singleBookmarkSelected)
 	{
-		parentMenu.reset(
-			LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_SINGLE_BOOKMARK_CONTEXT_MENU)));
+		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN,
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN), {},
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_HELP_TEXT));
+		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB,
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB), {},
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB_HELP_TEXT));
+
+		m_menuView->AppendSeparator();
 	}
 	else
 	{
-		parentMenu.reset(
-			LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MULTIPLE_BOOKMARK_CONTEXT_MENU)));
+		size_t totalBookmarks = GetTotalBookmarks();
+
+		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL,
+			std::format(L"{}\t{}", m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_ALL),
+				totalBookmarks),
+			{}, m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_ALL_HELP_TEXT));
+
+		m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL, totalBookmarks > 0);
+
+		m_menuView->AppendSeparator();
 	}
 
-	if (!parentMenu)
+	if (m_bookmarkItems.size() == 1)
 	{
-		return FALSE;
+		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK,
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK), {},
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK_HELP_TEXT));
+		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_NEW_FOLDER,
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_FOLDER), {},
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_FOLDER_HELP_TEXT));
+
+		m_menuView->AppendSeparator();
 	}
 
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_CUT,
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_CUT), {},
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_CUT_HELP_TEXT));
+	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_COPY,
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_COPY), {},
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_COPY_HELP_TEXT));
+	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE,
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PASTE), {},
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PASTE_HELP_TEXT));
 
-	SetUpMenu(menu, bookmarkItems);
+	m_menuView->AppendSeparator();
 
-	UINT flags = TPM_LEFTALIGN | TPM_RETURNCMD;
+	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE,
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_DELETE), {},
+		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_DELETE_HELP_TEXT));
 
-	if (menuType == MenuType::Recursive)
-	{
-		// This flag is needed to show the popup menu when another menu is
-		// already being shown.
-		WI_SetFlag(flags, TPM_RECURSE);
-	}
-
-	m_showingMenu = true;
-
-	UINT menuItemId = TrackPopupMenu(menu, flags, ptScreen.x, ptScreen.y, 0, parentWindow, nullptr);
-
-	m_showingMenu = false;
-
-	if (menuItemId != 0)
-	{
-		// If this menu is being shown on top of another menu, the original menu
-		// should be closed when an item from this menu has been selected.
-		EndMenu();
-
-		BookmarkItem *targetParentFolder;
-		size_t targetIndex;
-
-		if (bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder())
-		{
-			targetParentFolder = bookmarkItems[0];
-			targetIndex = targetParentFolder->GetChildren().size();
-		}
-		else
-		{
-			targetParentFolder = parentFolder;
-
-			auto lastItem = std::max_element(bookmarkItems.begin(), bookmarkItems.end(),
-				[targetParentFolder](BookmarkItem *first, BookmarkItem *second)
-				{
-					return targetParentFolder->GetChildIndex(first)
-						< targetParentFolder->GetChildIndex(second);
-				});
-
-			targetIndex = targetParentFolder->GetChildIndex(*lastItem) + 1;
-		}
-
-		m_controller.OnMenuItemSelected(menuItemId, targetParentFolder, targetIndex, bookmarkItems,
-			parentWindow);
-	}
-
-	return TRUE;
-}
-
-void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmarkItems)
-{
-	bool folderSelected = bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder();
-
-	if (folderSelected)
-	{
-		DeleteMenu(menu, IDM_BOOKMARKS_OPEN, MF_BYCOMMAND);
-		DeleteMenu(menu, IDM_BOOKMARKS_OPEN_IN_NEW_TAB, MF_BYCOMMAND);
-
-		std::wstring openAll = m_resourceLoader->LoadString(IDS_BOOKMARK_OPEN_ALL);
-
-		MENUITEMINFO mii;
-		mii.cbSize = sizeof(mii);
-		mii.fMask = MIIM_STRING | MIIM_ID;
-		mii.wID = IDM_BOOKMARKS_OPEN_ALL;
-		mii.dwTypeData = openAll.data();
-		InsertMenuItem(menu, 0, TRUE, &mii);
-	}
-
-	if (folderSelected || bookmarkItems.size() > 1)
-	{
-		int totalBookmarks = 0;
-
-		for (const auto *bookmarkItem : bookmarkItems)
-		{
-			if (bookmarkItem->IsBookmark())
-			{
-				totalBookmarks++;
-			}
-			else
-			{
-				const auto &children = bookmarkItem->GetChildren();
-
-				auto numChildBookmarks = std::count_if(children.begin(), children.end(),
-					[](auto &child) { return child->IsBookmark(); });
-
-				totalBookmarks += static_cast<int>(numChildBookmarks);
-			}
-		}
-
-		if (totalBookmarks == 0)
-		{
-			MenuHelper::EnableItem(menu, IDM_BOOKMARKS_OPEN_ALL, FALSE);
-		}
-		else
-		{
-			std::wstring openAll = m_resourceLoader->LoadString(IDS_BOOKMARK_OPEN_ALL);
-			openAll += L"\t" + std::to_wstring(totalBookmarks);
-
-			MENUITEMINFO menuItemInfo;
-			menuItemInfo.cbSize = sizeof(menuItemInfo);
-			menuItemInfo.fMask = MIIM_STRING;
-			menuItemInfo.dwTypeData = openAll.data();
-			SetMenuItemInfo(menu, IDM_BOOKMARKS_OPEN_ALL, FALSE, &menuItemInfo);
-		}
-	}
-
-	SetMenuItemStates(menu, bookmarkItems);
-}
-
-void BookmarkContextMenu::SetMenuItemStates(HMENU menu, const RawBookmarkItems &bookmarkItems)
-{
-	if ((bookmarkItems.size() == 1) && m_bookmarkTree->IsPermanentNode(bookmarkItems[0]))
-	{
-		MenuHelper::EnableItem(menu, IDM_BOOKMARKS_CUT, false);
-		MenuHelper::EnableItem(menu, IDM_BOOKMARKS_DELETE, false);
-		MenuHelper::EnableItem(menu, IDM_BOOKMARKS_PROPERTIES, false);
-	}
-
-	MenuHelper::EnableItem(menu, IDM_BOOKMARKS_PASTE,
+	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, !permanentNodeSelected);
+	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE,
 		IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
+	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, !permanentNodeSelected);
+
+	if (m_bookmarkItems.size() == 1)
+	{
+		m_menuView->AppendSeparator();
+
+		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES,
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PROPERTIES), {},
+			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
+
+		m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES, !permanentNodeSelected);
+	}
 }
 
-bool BookmarkContextMenu::IsShowingMenu() const
+bool BookmarkContextMenu::AreBookmarkItemsValid()
 {
-	return m_showingMenu;
+	if (m_bookmarkItems.empty())
+	{
+		return false;
+	}
+
+	// It's expected that all items will be in the same bookmark folder (i.e. they'll all have the
+	// same parent).
+	const BookmarkItem *parentFolder = m_bookmarkItems[0]->GetParent();
+	return std::ranges::all_of(m_bookmarkItems, [parentFolder](const auto *bookmarkItem)
+		{ return bookmarkItem->GetParent() == parentFolder; });
+}
+
+size_t BookmarkContextMenu::GetTotalBookmarks()
+{
+	size_t totalBookmarks = 0;
+
+	for (const auto *bookmarkItem : m_bookmarkItems)
+	{
+		if (bookmarkItem->IsBookmark())
+		{
+			totalBookmarks++;
+		}
+		else
+		{
+			const auto &children = bookmarkItem->GetChildren();
+
+			auto numChildBookmarks = std::count_if(children.begin(), children.end(),
+				[](auto &child) { return child->IsBookmark(); });
+
+			totalBookmarks += numChildBookmarks;
+		}
+	}
+
+	return totalBookmarks;
+}
+
+void BookmarkContextMenu::OnMenuItemSelected(UINT menuItemId)
+{
+	BookmarkItem *targetParentFolder;
+	size_t targetIndex;
+
+	if (m_bookmarkItems.size() == 1 && m_bookmarkItems[0]->IsFolder())
+	{
+		targetParentFolder = m_bookmarkItems[0];
+		targetIndex = targetParentFolder->GetChildren().size();
+	}
+	else
+	{
+		targetParentFolder = m_bookmarkItems[0]->GetParent();
+		targetIndex = std::ranges::max(m_bookmarkItems
+						  | std::views::transform([targetParentFolder](const auto *bookmarkItem)
+							  { return targetParentFolder->GetChildIndex(bookmarkItem); }))
+			+ 1;
+	}
+
+	switch (menuItemId)
+	{
+	case IDM_BOOKMARK_CONTEXT_MENU_OPEN:
+		OnOpen();
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB:
+		OnOpenInNewTab();
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL:
+		OnOpenAll();
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK:
+		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, targetParentFolder, targetIndex);
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_NEW_FOLDER:
+		OnNewBookmarkItem(BookmarkItem::Type::Folder, targetParentFolder, targetIndex);
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_CUT:
+		OnCopy(true);
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_COPY:
+		OnCopy(false);
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_PASTE:
+		OnPaste(targetParentFolder, targetIndex);
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_DELETE:
+		OnDelete();
+		break;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES:
+		OnShowProperties();
+		break;
+
+	default:
+		DCHECK(false);
+		break;
+	}
+}
+
+void BookmarkContextMenu::OnOpen()
+{
+	DCHECK(m_bookmarkItems.size() == 1 && m_bookmarkItems[0]->IsBookmark());
+	BookmarkHelper::OpenBookmarkItemWithDisposition(m_bookmarkItems[0],
+		OpenFolderDisposition::CurrentTab, m_browser);
+}
+
+void BookmarkContextMenu::OnOpenInNewTab()
+{
+	DCHECK(m_bookmarkItems.size() == 1 && m_bookmarkItems[0]->IsBookmark());
+	BookmarkHelper::OpenBookmarkItemWithDisposition(m_bookmarkItems[0],
+		OpenFolderDisposition::NewTabDefault, m_browser);
+}
+
+void BookmarkContextMenu::OnOpenAll()
+{
+	OpenFolderDisposition disposition = OpenFolderDisposition::NewTabDefault;
+
+	for (auto *bookmarkItem : m_bookmarkItems)
+	{
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_browser);
+
+		disposition = OpenFolderDisposition::BackgroundTab;
+	}
+}
+
+void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type,
+	BookmarkItem *targetParentFolder, size_t targetIndex)
+{
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
+		m_parentWindow, m_browser, m_acceleratorManager, m_resourceLoader);
+}
+
+void BookmarkContextMenu::OnCopy(bool cut)
+{
+	BookmarkHelper::CopyBookmarkItems(m_bookmarkTree, m_bookmarkItems, cut);
+}
+
+void BookmarkContextMenu::OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex)
+{
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, targetParentFolder, targetIndex);
+}
+
+void BookmarkContextMenu::OnDelete()
+{
+	for (auto *bookmarkItem : m_bookmarkItems)
+	{
+		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+	}
+}
+
+void BookmarkContextMenu::OnShowProperties()
+{
+	DCHECK_EQ(m_bookmarkItems.size(), 1U);
+	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree, m_acceleratorManager,
+		m_resourceLoader, m_parentWindow);
 }

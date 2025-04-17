@@ -4,12 +4,14 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkListView.h"
+#include "BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -25,22 +27,20 @@
 #include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
-	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, const Config *config,
+	BookmarkTree *bookmarkTree, BrowserWindow *browser, const Config *config,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
-	m_browserWindow(browserWindow),
+	m_browser(browser),
 	m_config(config),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
-	m_sortAscending(true),
-	m_bookmarkContextMenu(bookmarkTree, resourceLoader, resourceInstance, browserWindow,
-		acceleratorManager)
+	m_sortAscending(true)
 {
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP,
@@ -489,7 +489,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	else
 	{
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-			OpenFolderDisposition::NewTabDefault, m_browserWindow);
+			OpenFolderDisposition::NewTabDefault, m_browser);
 	}
 }
 
@@ -530,8 +530,10 @@ void BookmarkListView::OnShowContextMenu(const POINT &ptScreen)
 			ClientToScreen(m_hListView, &finalPoint);
 		}
 
-		m_bookmarkContextMenu.ShowMenu(m_hListView, m_currentBookmarkFolder, rawBookmarkItems,
-			finalPoint);
+		PopupMenuView popupMenu;
+		BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+			rawBookmarkItems, m_resourceLoader, m_browser, m_hListView);
+		popupMenu.Show(m_hListView, finalPoint);
 	}
 }
 
@@ -589,7 +591,7 @@ void BookmarkListView::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, m_hListView, m_browserWindow, m_acceleratorManager,
+		m_currentBookmarkFolder, targetIndex, m_hListView, m_browser, m_acceleratorManager,
 		m_resourceLoader);
 
 	if (!bookmark)
@@ -851,8 +853,7 @@ void BookmarkListView::OnEnterPressed()
 
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
-			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition,
-				m_browserWindow);
+			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_browser);
 
 			disposition = OpenFolderDisposition::BackgroundTab;
 		}

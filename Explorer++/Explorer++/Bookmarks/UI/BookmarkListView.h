@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkNavigatorInterface.h"
-#include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "ResourceHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -34,9 +33,9 @@ public:
 	};
 
 	BookmarkListView(HWND hListView, HINSTANCE resourceInstance, BookmarkTree *bookmarkTree,
-		BrowserWindow *browserWindow, const Config *config,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		IconFetcher *iconFetcher, const std::vector<Column> &initialColumns);
+		BrowserWindow *browser, const Config *config, const AcceleratorManager *acceleratorManager,
+		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
+		const std::vector<Column> &initialColumns);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
 		const BookmarkHistoryEntry *entry = nullptr) override;
@@ -133,7 +132,7 @@ private:
 	HWND m_hListView;
 	HINSTANCE m_resourceInstance;
 	BookmarkTree *const m_bookmarkTree;
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
 	const Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
@@ -144,7 +143,6 @@ private:
 	BookmarkHelper::ColumnType m_sortColumn;
 	bool m_sortAscending;
 	std::optional<BookmarkHelper::ColumnType> m_previousSortColumn;
-	BookmarkContextMenu m_bookmarkContextMenu;
 
 	BookmarkNavigationCompletedSignal m_navigationCompletedSignal;
 

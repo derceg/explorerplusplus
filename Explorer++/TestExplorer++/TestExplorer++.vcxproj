@@ -192,6 +192,7 @@
     <ClCompile Include="ApplicationToolbarStorageTestHelper.cpp" />
     <ClCompile Include="ApplicationToolbarTest.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
+    <ClCompile Include="BookmarkContextMenuTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
     <ClCompile Include="BookmarkStorageTestHelper.cpp" />

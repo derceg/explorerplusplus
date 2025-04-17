@@ -289,9 +289,6 @@
     <ClCompile Include="Bookmarks\BookmarkXmlStorage.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarkContextMenuController.cpp">
-      <Filter>Bookmarks\UI</Filter>
-    </ClCompile>
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
@@ -1094,9 +1091,6 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkStorage.h">
       <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarkContextMenuController.h">
-      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="ShellTreeView\ShellTreeView.h">
       <Filter>ShellTreeView</Filter>

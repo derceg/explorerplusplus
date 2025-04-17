@@ -7,8 +7,135 @@
 #include "BookmarkTreeHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <algorithm>
+#include <ranges>
 
 using namespace testing;
+
+class BookmarkTreeTest : public Test
+{
+protected:
+	BookmarkTree m_bookmarkTree;
+};
+
+TEST_F(BookmarkTreeTest, BasicTests)
+{
+	EXPECT_FALSE(m_bookmarkTree.CanAddChildren(m_bookmarkTree.GetRoot()));
+	EXPECT_TRUE(m_bookmarkTree.CanAddChildren(m_bookmarkTree.GetBookmarksMenuFolder()));
+	EXPECT_TRUE(m_bookmarkTree.CanAddChildren(m_bookmarkTree.GetBookmarksToolbarFolder()));
+	EXPECT_TRUE(m_bookmarkTree.CanAddChildren(m_bookmarkTree.GetOtherBookmarksFolder()));
+
+	EXPECT_TRUE(m_bookmarkTree.IsPermanentNode(m_bookmarkTree.GetRoot()));
+	EXPECT_TRUE(m_bookmarkTree.IsPermanentNode(m_bookmarkTree.GetBookmarksMenuFolder()));
+	EXPECT_TRUE(m_bookmarkTree.IsPermanentNode(m_bookmarkTree.GetBookmarksToolbarFolder()));
+	EXPECT_TRUE(m_bookmarkTree.IsPermanentNode(m_bookmarkTree.GetOtherBookmarksFolder()));
+
+	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+	auto rawBookmark = bookmark.get();
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
+
+	EXPECT_FALSE(m_bookmarkTree.IsPermanentNode(rawBookmark));
+
+	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
+	auto rawFolder = folder.get();
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(folder), 1);
+
+	EXPECT_TRUE(m_bookmarkTree.CanAddChildren(rawFolder));
+	EXPECT_FALSE(m_bookmarkTree.IsPermanentNode(rawFolder));
+}
+
+TEST_F(BookmarkTreeTest, AddChildren)
+{
+	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+
+	for (int i = 0; i < 10; i++)
+	{
+		auto currentBookmark = std::make_unique<BookmarkItem>(std::nullopt,
+			L"Test bookmark " + std::to_wstring(i), L"C:\\");
+		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
+			std::move(currentBookmark), i);
+	}
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+
+	for (int i = 0; i < 10; i++)
+	{
+		auto &currentBookmark = m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().at(i);
+
+		EXPECT_EQ(currentBookmark->GetName(), L"Test bookmark " + std::to_wstring(i));
+	}
+
+	bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+	auto rawBookmark = bookmark.get();
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(), std::move(bookmark),
+		100);
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 1U);
+
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildIndex(rawBookmark), 0U);
+}
+
+TEST_F(BookmarkTreeTest, AddChildrenAtEnd)
+{
+	auto *parentFolder = m_bookmarkTree.GetOtherBookmarksFolder();
+
+	std::vector<BookmarkItem *> addedItems;
+
+	// If no index is provided, the bookmark item should be added at the end.
+	addedItems.push_back(m_bookmarkTree.AddBookmarkItem(parentFolder,
+		std::make_unique<BookmarkItem>(std::nullopt, L"Item 1", L"C:\\")));
+	addedItems.push_back(m_bookmarkTree.AddBookmarkItem(parentFolder,
+		std::make_unique<BookmarkItem>(std::nullopt, L"Item 2", std::nullopt)));
+	addedItems.push_back(m_bookmarkTree.AddBookmarkItem(parentFolder,
+		std::make_unique<BookmarkItem>(std::nullopt, L"Item 3", L"D:\\")));
+
+	EXPECT_TRUE(std::ranges::equal(parentFolder->GetChildren()
+			| std::views::transform([](const auto &bookmark) { return bookmark.get(); }),
+		addedItems));
+}
+
+TEST_F(BookmarkTreeTest, MoveChildren)
+{
+	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+	auto rawBookmark = bookmark.get();
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+
+	m_bookmarkTree.MoveBookmarkItem(rawBookmark, m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+}
+
+TEST_F(BookmarkTreeTest, RemoveChildren)
+{
+	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+	auto rawBookmark = bookmark.get();
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+
+	m_bookmarkTree.RemoveBookmarkItem(rawBookmark);
+
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+}
 
 class BookmarkTreeObserverTest : public Test
 {
@@ -31,113 +158,6 @@ protected:
 	BookmarkItem *m_rawFolder;
 	BookmarkItem *m_rawBookmark;
 };
-
-TEST(BookmarkTreeTest, BasicTests)
-{
-	BookmarkTree bookmarkTree;
-
-	EXPECT_FALSE(bookmarkTree.CanAddChildren(bookmarkTree.GetRoot()));
-	EXPECT_TRUE(bookmarkTree.CanAddChildren(bookmarkTree.GetBookmarksMenuFolder()));
-	EXPECT_TRUE(bookmarkTree.CanAddChildren(bookmarkTree.GetBookmarksToolbarFolder()));
-	EXPECT_TRUE(bookmarkTree.CanAddChildren(bookmarkTree.GetOtherBookmarksFolder()));
-
-	EXPECT_TRUE(bookmarkTree.IsPermanentNode(bookmarkTree.GetRoot()));
-	EXPECT_TRUE(bookmarkTree.IsPermanentNode(bookmarkTree.GetBookmarksMenuFolder()));
-	EXPECT_TRUE(bookmarkTree.IsPermanentNode(bookmarkTree.GetBookmarksToolbarFolder()));
-	EXPECT_TRUE(bookmarkTree.IsPermanentNode(bookmarkTree.GetOtherBookmarksFolder()));
-
-	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
-	auto rawBookmark = bookmark.get();
-	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
-
-	EXPECT_FALSE(bookmarkTree.IsPermanentNode(rawBookmark));
-
-	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
-	auto rawFolder = folder.get();
-	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(folder), 1);
-
-	EXPECT_TRUE(bookmarkTree.CanAddChildren(rawFolder));
-	EXPECT_FALSE(bookmarkTree.IsPermanentNode(rawFolder));
-}
-
-TEST(BookmarkTreeTest, AddChildren)
-{
-	BookmarkTree bookmarkTree;
-
-	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
-	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
-
-	for (int i = 0; i < 10; i++)
-	{
-		auto currentBookmark = std::make_unique<BookmarkItem>(std::nullopt,
-			L"Test bookmark " + std::to_wstring(i), L"C:\\");
-		bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksToolbarFolder(),
-			std::move(currentBookmark), i);
-	}
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
-
-	for (int i = 0; i < 10; i++)
-	{
-		auto &currentBookmark = bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().at(i);
-
-		EXPECT_EQ(currentBookmark->GetName(), L"Test bookmark " + std::to_wstring(i));
-	}
-
-	bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
-	auto rawBookmark = bookmark.get();
-	bookmarkTree.AddBookmarkItem(bookmarkTree.GetOtherBookmarksFolder(), std::move(bookmark), 100);
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 1U);
-
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildIndex(rawBookmark), 0U);
-}
-
-TEST(BookmarkTreeTest, MoveChildren)
-{
-	BookmarkTree bookmarkTree;
-
-	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
-	auto rawBookmark = bookmark.get();
-	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
-
-	bookmarkTree.MoveBookmarkItem(rawBookmark, bookmarkTree.GetBookmarksToolbarFolder(), 0);
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 1U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
-}
-
-TEST(BookmarkTreeTest, RemoveChildren)
-{
-	BookmarkTree bookmarkTree;
-
-	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
-	auto rawBookmark = bookmark.get();
-	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
-
-	bookmarkTree.RemoveBookmarkItem(rawBookmark);
-
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
-}
 
 TEST_F(BookmarkTreeObserverTest, Add)
 {

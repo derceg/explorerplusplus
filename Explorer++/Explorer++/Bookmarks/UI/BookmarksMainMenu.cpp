@@ -28,7 +28,7 @@ BookmarksMainMenu::BookmarksMainMenu(App *app, BrowserWindow *browserWindow,
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(resourceLoader, iconFetcher),
-	m_controller(bookmarkTree, browserWindow, coreInterface, app->GetAcceleratorManager(),
+	m_controller(bookmarkTree, browserWindow, app->GetAcceleratorManager(),
 		app->GetResourceLoader(), coreInterface->GetMainWindow())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
