@@ -278,7 +278,7 @@ void Explorerplusplus::CreateMainToolbar(
 
 void Explorerplusplus::CreateBookmarksToolbar()
 {
-	auto bookmarksToolbarView = new BookmarksToolbarView(m_mainRebarView->GetHWND(), m_config);
+	auto bookmarksToolbarView = BookmarksToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
 
 	m_bookmarksToolbar =
 		BookmarksToolbar::Create(bookmarksToolbarView, this, m_app->GetAcceleratorManager(),
