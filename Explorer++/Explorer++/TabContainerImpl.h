@@ -102,7 +102,7 @@ public:
 
 	Tab &GetTab(int tabId) const;
 	Tab *GetTabOptional(int tabId) const;
-	void SelectTab(const Tab &tab);
+	void SelectTab(const Tab &tab) override;
 	void SelectAdjacentTab(BOOL bNextTab);
 	void SelectTabAtIndex(int index);
 	Tab &GetSelectedTab() const;

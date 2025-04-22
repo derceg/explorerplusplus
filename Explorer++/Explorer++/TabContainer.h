@@ -11,5 +11,6 @@ class TabContainer
 public:
 	virtual ~TabContainer() = default;
 
+	virtual void SelectTab(const Tab &tab) = 0;
 	virtual bool IsTabSelected(const Tab &tab) const = 0;
 };

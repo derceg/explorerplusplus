@@ -10,10 +10,13 @@
 #include <memory>
 #include <vector>
 
-class App;
-class CoreInterface;
+class NavigationEvents;
+class ResourceLoader;
 class SearchTabsDialog;
+class ShellBrowserEvents;
 class Tab;
+class TabEvents;
+class TabList;
 class WindowSubclass;
 
 class SearchTabsDialogPersistentSettings : public DialogSettings
@@ -32,7 +35,9 @@ private:
 class SearchTabsDialog : public BaseDialog
 {
 public:
-	static SearchTabsDialog *Create(App *app, HWND parent, CoreInterface *coreInterface);
+	static SearchTabsDialog *Create(HWND parent, const TabList *tabList, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		const ResourceLoader *resourceLoader);
 
 private:
 	enum class ColumnType
@@ -47,12 +52,6 @@ private:
 		float percentageWidth;
 	};
 
-	enum class SelectionOption
-	{
-		SelectActiveTab,
-		SelectFirst
-	};
-
 	enum class MoveDirection
 	{
 		Up,
@@ -62,7 +61,9 @@ private:
 	static inline const Column COLUMNS[] = { { ColumnType::TabName, 0.3f },
 		{ ColumnType::Path, 0.7f } };
 
-	SearchTabsDialog(App *app, HWND parent, CoreInterface *coreInterface);
+	SearchTabsDialog(HWND parent, const TabList *tabList, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		const ResourceLoader *resourceLoader);
 
 	INT_PTR OnInitDialog() override;
 	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
@@ -71,10 +72,10 @@ private:
 	void InsertColumns();
 	void InsertColumn(const Column &column, int index);
 	std::wstring GetColumnText(ColumnType columnType);
-	void RefreshTabList(SelectionOption selectionOption = SelectionOption::SelectFirst);
-	void AddTabs(SelectionOption selectionOption);
-	void AddTab(const Tab &tab, int index);
-	bool TabFilter(const Tab &tab, const std::wstring &filter);
+	void RefreshTabList();
+	void AddTabs();
+	void AddTab(const Tab *tab, int index);
+	bool TabFilter(const Tab *tab);
 	void SetupEditControl();
 	void OnTabsChanged();
 
@@ -82,19 +83,21 @@ private:
 	INT_PTR OnNotify(NMHDR *nmhdr);
 	void OnListViewDoubleClick(const NMITEMACTIVATE *itemActivate);
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
-	std::wstring GetTabColumnText(const Tab &tab, ColumnType columnType);
+	std::wstring GetTabColumnText(const Tab *tab, ColumnType columnType);
 	LRESULT EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnMoveListViewSelection(MoveDirection direction);
 
 	void OnOk();
-	Tab &GetTabFromListView(int index);
+	Tab *GetTabFromListView(int index);
 	void OnCancel();
 	INT_PTR OnClose() override;
 	void SaveState() override;
 	INT_PTR OnNcDestroy() override;
 
-	App *const m_app;
-	CoreInterface *const m_coreInterface;
+	const TabList *const m_tabList;
+	TabEvents *const m_tabEvents;
+	ShellBrowserEvents *const m_shellBrowserEvents;
+	NavigationEvents *const m_navigationEvents;
 	std::unique_ptr<WindowSubclass> m_editSubclass;
 	static inline std::wstring m_filter;
 	std::vector<boost::signals2::scoped_connection> m_connections;

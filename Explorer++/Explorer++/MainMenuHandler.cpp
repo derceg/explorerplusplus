@@ -134,7 +134,12 @@ void Explorerplusplus::OnShowOptions()
 void Explorerplusplus::OnSearchTabs()
 {
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchTabsDialog",
-		[this] { return SearchTabsDialog::Create(m_app, m_hContainer, this); });
+		[this]
+		{
+			return SearchTabsDialog::Create(m_hContainer, m_app->GetTabList(),
+				m_app->GetTabEvents(), m_app->GetShellBrowserEvents(), m_app->GetNavigationEvents(),
+				m_app->GetResourceLoader());
+		});
 }
 
 void Explorerplusplus::OnOpenOnlineDocumentation()
