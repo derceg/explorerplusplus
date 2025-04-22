@@ -6,6 +6,7 @@
 
 #include "EventScope.h"
 #include "Tab.h"
+#include "../Helper/SignalHelper.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
@@ -30,7 +31,7 @@ using TabEventScope = EventScope<EventScopeMinimumLevel::Browser>;
 class TabEvents : private boost::noncopyable
 {
 public:
-	using CreatedSignal = boost::signals2::signal<void(const Tab &tab, bool selected)>;
+	using CreatedSignal = boost::signals2::signal<void(Tab &tab, bool selected)>;
 	using SelectedSignal = boost::signals2::signal<void(const Tab &tab)>;
 	using MovedSignal = boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
@@ -41,25 +42,31 @@ public:
 
 	boost::signals2::connection AddCreatedObserver(const CreatedSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
 	boost::signals2::connection AddSelectedObserver(const SelectedSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
 	boost::signals2::connection AddMovedObserver(const MovedSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
 	boost::signals2::connection AddPreRemovalObserver(const PreRemovalSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
 	boost::signals2::connection AddRemovedObserver(const RemovedSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
 
 	boost::signals2::connection AddUpdatedObserver(const UpdatedSignal::slot_type &observer,
 		const TabEventScope &scope,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back,
+		SlotGroup slotGroup = SlotGroup::Default);
 
-	void NotifyCreated(const Tab &tab, bool selected);
+	void NotifyCreated(Tab &tab, bool selected);
 	void NotifySelected(const Tab &tab);
 	void NotifyMoved(const Tab &tab, int fromIndex, int toIndex);
 	void NotifyPreRemoval(const Tab &tab, int index);
@@ -72,14 +79,15 @@ private:
 	static auto MakeFilteredObserver(Observer &&observer, const TabEventScope &scope)
 	{
 		return [observer = std::forward<Observer>(observer),
-				   scope]<typename... Args>(const Tab &tab, Args &&...args)
+				   scope]<typename TabRef, typename... Args>(TabRef &&tab, Args &&...args)
+			requires std::same_as<std::remove_cvref_t<TabRef>, Tab>
 		{
 			if (!scope.DoesEventSourceMatch(tab))
 			{
 				return;
 			}
 
-			observer(tab, std::forward<Args>(args)...);
+			observer(std::forward<TabRef>(tab), std::forward<Args>(args)...);
 		};
 	}
 

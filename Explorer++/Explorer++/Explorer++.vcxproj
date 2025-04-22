@@ -1069,6 +1069,7 @@
     <ClCompile Include="StartupFoldersXmlStorage.cpp" />
     <ClCompile Include="StartupOptionsPage.cpp" />
     <ClCompile Include="Storage.cpp" />
+    <ClCompile Include="TabList.cpp" />
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="ToolbarContextMenu.cpp" />
     <ClCompile Include="UIThreadExecutor.cpp" />
@@ -1383,6 +1384,7 @@
     <ClInclude Include="StartupFoldersXmlStorage.h" />
     <ClInclude Include="StartupOptionsPage.h" />
     <ClInclude Include="Storage.h" />
+    <ClInclude Include="TabList.h" />
     <ClInclude Include="TestHelper.h" />
     <ClInclude Include="ToolbarContextMenu.h" />
     <ClInclude Include="UIThreadExecutor.h" />

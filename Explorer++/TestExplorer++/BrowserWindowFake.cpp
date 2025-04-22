@@ -20,6 +20,17 @@ BrowserWindowFake::BrowserWindowFake(TabEvents *tabEvents, NavigationEvents *nav
 {
 }
 
+BrowserWindowFake::~BrowserWindowFake()
+{
+	while (!m_tabs.empty())
+	{
+		auto tab = std::move(m_tabs.back());
+		m_tabs.pop_back();
+
+		m_tabEvents->NotifyRemoved(*tab);
+	}
+}
+
 wil::unique_hwnd BrowserWindowFake::CreateBrowserWindow()
 {
 	static bool classRegistered = false;

@@ -4,6 +4,13 @@
 
 #pragma once
 
+enum class SlotGroup
+{
+	HighestPriority = 0,
+	HighPriority = 1,
+	Default = 2
+};
+
 // Stops signal propagation after the first successful handler (i.e. the first handler that returns
 // a result that evaluates to true).
 template <typename T>

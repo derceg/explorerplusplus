@@ -16,6 +16,7 @@ class BrowserTestBase : public testing::Test
 {
 protected:
 	BrowserWindowFake *AddBrowser();
+	void RemoveBrowser(const BrowserWindowFake *browser);
 
 	TabEvents m_tabEvents;
 	NavigationEvents m_navigationEvents;

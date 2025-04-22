@@ -44,7 +44,8 @@ private:
 
 		BrowserData(BrowserWindow *browser);
 
-		BrowserWindow *GetBrowser() const;
+		const BrowserWindow *GetBrowser() const;
+		BrowserWindow *GetMutableBrowser() const;
 		Clock::time_point GetLastActiveTime() const;
 		void UpdateLastActiveTime();
 
@@ -77,7 +78,7 @@ private:
 			// A non-sorted index of unique browsers.
 			boost::multi_index::hashed_unique<
 				boost::multi_index::tag<ByBrowser>,
-				boost::multi_index::const_mem_fun<BrowserData, BrowserWindow *, &BrowserData::GetBrowser>
+				boost::multi_index::const_mem_fun<BrowserData, const BrowserWindow *, &BrowserData::GetBrowser>
 			>,
 			// A non-sorted index of browsers, based on their unique ID.
 			boost::multi_index::hashed_unique<

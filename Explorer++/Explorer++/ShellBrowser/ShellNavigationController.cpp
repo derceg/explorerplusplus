@@ -41,7 +41,7 @@ void ShellNavigationController::Initialize(const ShellBrowser *shellBrowser,
 	m_connections.push_back(navigationEvents->AddCommittedObserver(
 		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
 		NavigationEventScope::ForShellBrowser(*shellBrowser), boost::signals2::at_front,
-		NavigationEvents::SlotGroup::HighestPriority));
+		SlotGroup::HighestPriority));
 }
 
 std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreservedHistoryEntries(

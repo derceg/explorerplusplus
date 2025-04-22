@@ -109,11 +109,11 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface
 	m_connections.push_back(m_app->GetNavigationEvents()->AddWillCommitObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationWillCommit, this),
 		NavigationEventScope::ForShellBrowser(*this), boost::signals2::at_front,
-		NavigationEvents::SlotGroup::HighPriority));
+		SlotGroup::HighPriority));
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationComitted, this),
 		NavigationEventScope::ForShellBrowser(*this), boost::signals2::at_front,
-		NavigationEvents::SlotGroup::HighPriority));
+		SlotGroup::HighPriority));
 
 	m_connections.push_back(m_app->GetClipboardWatcher()->updateSignal.AddObserver(
 		std::bind_front(&ShellBrowserImpl::OnClipboardUpdate, this)));

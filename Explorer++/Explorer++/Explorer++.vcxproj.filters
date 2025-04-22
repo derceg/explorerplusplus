@@ -817,6 +817,9 @@
     <ClCompile Include="BookmarkTreeViewContextMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="TabList.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1691,6 +1694,9 @@
     </ClInclude>
     <ClInclude Include="IconSet.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TabList.h">
+      <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

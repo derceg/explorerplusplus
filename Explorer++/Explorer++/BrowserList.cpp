@@ -35,7 +35,7 @@ concurrencpp::generator<BrowserWindow *> BrowserList::GetList() const
 {
 	for (const auto &browserData : m_browsers)
 	{
-		co_yield browserData.GetBrowser();
+		co_yield browserData.GetMutableBrowser();
 	}
 }
 
@@ -49,7 +49,7 @@ BrowserWindow *BrowserList::MaybeGetById(int id) const
 		return nullptr;
 	}
 
-	return itr->GetBrowser();
+	return itr->GetMutableBrowser();
 }
 
 BrowserWindow *BrowserList::GetLastActive() const
@@ -60,7 +60,7 @@ BrowserWindow *BrowserList::GetLastActive() const
 	}
 
 	auto &activeTimeIndex = m_browsers.get<ByActiveTime>();
-	return activeTimeIndex.begin()->GetBrowser();
+	return activeTimeIndex.begin()->GetMutableBrowser();
 }
 
 void BrowserList::SetLastActive(BrowserWindow *browser)
@@ -90,7 +90,12 @@ BrowserList::BrowserData::BrowserData(BrowserWindow *browser) : m_browser(browse
 {
 }
 
-BrowserWindow *BrowserList::BrowserData::GetBrowser() const
+const BrowserWindow *BrowserList::BrowserData::GetBrowser() const
+{
+	return m_browser;
+}
+
+BrowserWindow *BrowserList::BrowserData::GetMutableBrowser() const
 {
 	return m_browser;
 }

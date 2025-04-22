@@ -18,6 +18,7 @@ class BrowserWindowFake : public BrowserWindow
 {
 public:
 	BrowserWindowFake(TabEvents *tabEvents, NavigationEvents *navigationEvents);
+	~BrowserWindowFake();
 
 	// BrowserWindow
 	HWND GetHWND() const override;

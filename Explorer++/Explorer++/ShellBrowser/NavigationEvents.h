@@ -6,6 +6,7 @@
 
 #include "EventScope.h"
 #include "NavigationRequest.h"
+#include "../Helper/SignalHelper.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
@@ -58,13 +59,6 @@ public:
 	using NavigationSignal = boost::signals2::signal<void(const NavigationRequest *request)>;
 
 	using StoppedSignal = boost::signals2::signal<void(const ShellBrowser *shellBrowser)>;
-
-	enum class SlotGroup
-	{
-		HighestPriority = 0,
-		HighPriority = 1,
-		Default = 2
-	};
 
 	// Triggered when a navigation is initiated.
 	boost::signals2::connection AddStartedObserver(const NavigationSignal::slot_type &observer,

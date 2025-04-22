@@ -47,6 +47,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_resourceInstance(GetModuleHandle(nullptr)),
 	m_processManager(&m_browserList),
+	m_tabList(&m_tabEvents),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(&m_systemClock),
@@ -439,6 +440,11 @@ ShellBrowserEvents *App::GetShellBrowserEvents()
 NavigationEvents *App::GetNavigationEvents()
 {
 	return &m_navigationEvents;
+}
+
+TabList *App::GetTabList()
+{
+	return &m_tabList;
 }
 
 TabRestorer *App::GetTabRestorer()

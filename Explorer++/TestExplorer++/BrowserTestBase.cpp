@@ -13,3 +13,11 @@ BrowserWindowFake *BrowserTestBase::AddBrowser()
 	m_browsers.push_back(std::move(browser));
 	return rawBrowser;
 }
+
+void BrowserTestBase::RemoveBrowser(const BrowserWindowFake *browser)
+{
+	auto itr = std::ranges::find_if(m_browsers,
+		[browser](const auto &currentBrowser) { return currentBrowser.get() == browser; });
+	ASSERT_TRUE(itr != m_browsers.end());
+	m_browsers.erase(itr);
+}

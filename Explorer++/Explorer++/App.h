@@ -25,6 +25,7 @@
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "TabEvents.h"
+#include "TabList.h"
 #include "TabRestorer.h"
 #include "ThemeManager.h"
 #include "../Helper/ClipboardWatcher.h"
@@ -73,6 +74,7 @@ public:
 	TabEvents *GetTabEvents();
 	ShellBrowserEvents *GetShellBrowserEvents();
 	NavigationEvents *GetNavigationEvents();
+	TabList *GetTabList();
 	TabRestorer *GetTabRestorer();
 	DarkModeManager *GetDarkModeManager();
 	ThemeManager *GetThemeManager();
@@ -129,6 +131,7 @@ private:
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
+	TabList m_tabList;
 	TabRestorer m_tabRestorer;
 	SystemClockImpl m_systemClock;
 
