@@ -256,6 +256,7 @@
     <ClCompile Include="NavigationEventsTest.cpp" />
     <ClCompile Include="ResourceLoaderFake.cpp" />
     <ClCompile Include="ScopedTestDir.cpp" />
+    <ClCompile Include="SearchTabsModelTest.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />

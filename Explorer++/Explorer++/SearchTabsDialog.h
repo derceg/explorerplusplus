@@ -10,13 +10,10 @@
 #include <memory>
 #include <vector>
 
-class NavigationEvents;
 class ResourceLoader;
 class SearchTabsDialog;
-class ShellBrowserEvents;
+class SearchTabsModel;
 class Tab;
-class TabEvents;
-class TabList;
 class WindowSubclass;
 
 class SearchTabsDialogPersistentSettings : public DialogSettings
@@ -30,13 +27,14 @@ private:
 	static const inline std::wstring SETTINGS_KEY = L"SearchTabs";
 
 	SearchTabsDialogPersistentSettings();
+
+	std::wstring m_searchTerm;
 };
 
 class SearchTabsDialog : public BaseDialog
 {
 public:
-	static SearchTabsDialog *Create(HWND parent, const TabList *tabList, TabEvents *tabEvents,
-		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	static SearchTabsDialog *Create(HWND parent, std::unique_ptr<SearchTabsModel> model,
 		const ResourceLoader *resourceLoader);
 
 private:
@@ -61,8 +59,7 @@ private:
 	static inline const Column COLUMNS[] = { { ColumnType::TabName, 0.3f },
 		{ ColumnType::Path, 0.7f } };
 
-	SearchTabsDialog(HWND parent, const TabList *tabList, TabEvents *tabEvents,
-		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	SearchTabsDialog(HWND parent, std::unique_ptr<SearchTabsModel> model,
 		const ResourceLoader *resourceLoader);
 
 	INT_PTR OnInitDialog() override;
@@ -75,9 +72,7 @@ private:
 	void RefreshTabList();
 	void AddTabs();
 	void AddTab(const Tab *tab, int index);
-	bool TabFilter(const Tab *tab);
 	void SetupEditControl();
-	void OnTabsChanged();
 
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnNotify(NMHDR *nmhdr);
@@ -88,18 +83,14 @@ private:
 	void OnMoveListViewSelection(MoveDirection direction);
 
 	void OnOk();
-	Tab *GetTabFromListView(int index);
+	const Tab *GetTabFromListView(int index);
 	void OnCancel();
 	INT_PTR OnClose() override;
 	void SaveState() override;
 	INT_PTR OnNcDestroy() override;
 
-	const TabList *const m_tabList;
-	TabEvents *const m_tabEvents;
-	ShellBrowserEvents *const m_shellBrowserEvents;
-	NavigationEvents *const m_navigationEvents;
+	const std::unique_ptr<SearchTabsModel> m_model;
 	std::unique_ptr<WindowSubclass> m_editSubclass;
-	static inline std::wstring m_filter;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	SearchTabsDialogPersistentSettings *m_persistentSettings;
 };

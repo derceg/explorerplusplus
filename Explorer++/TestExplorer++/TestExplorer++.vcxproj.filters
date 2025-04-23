@@ -425,6 +425,9 @@
     <ClCompile Include="TabListTest.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="SearchTabsModelTest.cpp">
+      <Filter>Dialogs\Search Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -564,6 +567,12 @@
     </Filter>
     <Filter Include="Resource Loading">
       <UniqueIdentifier>{880a756a-c24b-44b9-9b6e-2c1078386f82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{6ae1aa76-8a73-4319-a328-f94753746941}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Search Tabs">
+      <UniqueIdentifier>{1501dbc5-1f4f-4886-8321-953dff50c846}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -6,37 +6,29 @@
 #include "SearchTabsDialog.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/NavigationEvents.h"
-#include "ShellBrowser/ShellBrowserEvents.h"
+#include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "Tab.h"
 #include "TabContainer.h"
-#include "TabEvents.h"
-#include "TabList.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
-#include <boost/algorithm/string/predicate.hpp>
 #include <glog/logging.h>
 
-SearchTabsDialog *SearchTabsDialog::Create(HWND parent, const TabList *tabList,
-	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-	NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader)
+SearchTabsDialog *SearchTabsDialog::Create(HWND parent, std::unique_ptr<SearchTabsModel> model,
+	const ResourceLoader *resourceLoader)
 {
-	return new SearchTabsDialog(parent, tabList, tabEvents, shellBrowserEvents, navigationEvents,
-		resourceLoader);
+	return new SearchTabsDialog(parent, std::move(model), resourceLoader);
 }
 
-SearchTabsDialog::SearchTabsDialog(HWND parent, const TabList *tabList, TabEvents *tabEvents,
-	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+SearchTabsDialog::SearchTabsDialog(HWND parent, std::unique_ptr<SearchTabsModel> model,
 	const ResourceLoader *resourceLoader) :
 	BaseDialog(resourceLoader, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both),
-	m_tabList(tabList),
-	m_tabEvents(tabEvents),
-	m_shellBrowserEvents(shellBrowserEvents),
-	m_navigationEvents(navigationEvents),
+	m_model(std::move(model)),
 	m_persistentSettings(&SearchTabsDialogPersistentSettings::GetInstance())
 {
+	m_model->SetSearchTerm(m_persistentSettings->m_searchTerm);
 }
 
 INT_PTR SearchTabsDialog::OnInitDialog()
@@ -44,22 +36,7 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	SetupListView();
 	SetupEditControl();
 
-	m_connections.push_back(m_tabEvents->AddCreatedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_tabEvents->AddSelectedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_tabEvents->AddUpdatedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_tabEvents->AddMovedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-	m_connections.push_back(m_tabEvents->AddRemovedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), TabEventScope::Global()));
-
-	m_connections.push_back(m_shellBrowserEvents->AddDirectoryPropertiesChangedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), ShellBrowserEventScope::Global()));
-
-	m_connections.push_back(m_navigationEvents->AddCommittedObserver(
-		std::bind(&SearchTabsDialog::OnTabsChanged, this), NavigationEventScope::Global()));
+	m_model->updatedSignal.AddObserver(std::bind_front(&SearchTabsDialog::RefreshTabList, this));
 
 	SendMessage(m_hDlg, WM_NEXTDLGCTL,
 		reinterpret_cast<WPARAM>(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM)), true);
@@ -116,15 +93,15 @@ void SearchTabsDialog::InsertColumn(const Column &column, int index)
 
 	RECT listViewRect;
 	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	[[maybe_unused]] auto res = GetClientRect(listView, &listViewRect);
-	assert(res);
+	auto res = GetClientRect(listView, &listViewRect);
+	CHECK(res);
 
 	LVCOLUMN lvColumn = {};
 	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
 	lvColumn.pszText = columnText.data();
 	lvColumn.cx = static_cast<int>(column.percentageWidth * GetRectWidth(&listViewRect));
-	[[maybe_unused]] int insertedIndex = ListView_InsertColumn(listView, index, &lvColumn);
-	assert(insertedIndex == index);
+	int insertedIndex = ListView_InsertColumn(listView, index, &lvColumn);
+	CHECK(insertedIndex == index);
 }
 
 std::wstring SearchTabsDialog::GetColumnText(ColumnType columnType)
@@ -163,9 +140,7 @@ void SearchTabsDialog::AddTabs()
 	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
 	int index = 0;
 
-	auto tabs = m_tabList->GetAllByLastActiveTime();
-
-	for (auto *tab : tabs | std::views::filter(std::bind_front(&SearchTabsDialog::TabFilter, this)))
+	for (auto *tab : m_model->GetResults())
 	{
 		AddTab(tab, index);
 
@@ -178,26 +153,6 @@ void SearchTabsDialog::AddTabs()
 	}
 }
 
-bool SearchTabsDialog::TabFilter(const Tab *tab)
-{
-	if (m_filter.empty())
-	{
-		return true;
-	}
-
-	if (boost::icontains(tab->GetName(), m_filter))
-	{
-		return true;
-	}
-
-	if (boost::icontains(tab->GetShellBrowserImpl()->GetDirectory(), m_filter))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 void SearchTabsDialog::AddTab(const Tab *tab, int index)
 {
 	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
@@ -207,9 +162,9 @@ void SearchTabsDialog::AddTab(const Tab *tab, int index)
 	item.iItem = index;
 	item.iSubItem = 0;
 	item.pszText = LPSTR_TEXTCALLBACK;
-	item.lParam = tab->GetId();
-	[[maybe_unused]] int finalIndex = ListView_InsertItem(listView, &item);
-	assert(finalIndex == index);
+	item.lParam = reinterpret_cast<LPARAM>(tab);
+	int finalIndex = ListView_InsertItem(listView, &item);
+	CHECK(finalIndex == index);
 }
 
 void SearchTabsDialog::SetupEditControl()
@@ -223,12 +178,7 @@ void SearchTabsDialog::SetupEditControl()
 		m_resourceLoader->LoadString(IDS_SEARCH_TABS_SEARCH_TERM_PLACEHOLDER_TEXT);
 	SendMessage(edit, EM_SETCUEBANNER, true, reinterpret_cast<LPARAM>(placeHolderText.c_str()));
 
-	SetWindowText(edit, m_filter.c_str());
-}
-
-void SearchTabsDialog::OnTabsChanged()
-{
-	RefreshTabList();
+	SetWindowText(edit, m_model->GetSearchTerm().c_str());
 }
 
 INT_PTR SearchTabsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -240,12 +190,9 @@ INT_PTR SearchTabsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (HIWORD(wParam))
 		{
 		case EN_CHANGE:
-		{
-			HWND edit = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM);
-			m_filter = GetWindowString(edit);
-			RefreshTabList();
-		}
-		break;
+			m_model->SetSearchTerm(
+				GetWindowString(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM)));
+			break;
 		}
 	}
 	else
@@ -291,7 +238,7 @@ void SearchTabsDialog::OnListViewDoubleClick(const NMITEMACTIVATE *itemActivate)
 		return;
 	}
 
-	Tab *tab = GetTabFromListView(itemActivate->iItem);
+	const Tab *tab = GetTabFromListView(itemActivate->iItem);
 	tab->GetTabContainer()->SelectTab(*tab);
 
 	DestroyWindow(m_hDlg);
@@ -301,9 +248,9 @@ void SearchTabsDialog::OnGetDispInfo(NMLVDISPINFO *dispInfo)
 {
 	if (WI_IsFlagSet(dispInfo->item.mask, LVIF_TEXT))
 	{
-		Tab *tab = GetTabFromListView(dispInfo->item.iItem);
+		const Tab *tab = GetTabFromListView(dispInfo->item.iItem);
 
-		assert(dispInfo->item.iSubItem >= 0 && dispInfo->item.iSubItem < std::ssize(COLUMNS));
+		CHECK(dispInfo->item.iSubItem >= 0 && dispInfo->item.iSubItem < std::ssize(COLUMNS));
 		auto columnType = COLUMNS[dispInfo->item.iSubItem].type;
 
 		auto text = GetTabColumnText(tab, columnType);
@@ -390,14 +337,14 @@ void SearchTabsDialog::OnOk()
 
 	if (selectedItemIndex != -1)
 	{
-		Tab *tab = GetTabFromListView(selectedItemIndex);
+		const Tab *tab = GetTabFromListView(selectedItemIndex);
 		tab->GetTabContainer()->SelectTab(*tab);
 	}
 
 	DestroyWindow(m_hDlg);
 }
 
-Tab *SearchTabsDialog::GetTabFromListView(int index)
+const Tab *SearchTabsDialog::GetTabFromListView(int index)
 {
 	LVITEM lvItem;
 	lvItem.mask = LVIF_PARAM;
@@ -406,7 +353,7 @@ Tab *SearchTabsDialog::GetTabFromListView(int index)
 	BOOL res = ListView_GetItem(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST), &lvItem);
 	CHECK(res);
 
-	return m_tabList->GetById(static_cast<int>(lvItem.lParam));
+	return reinterpret_cast<const Tab *>(lvItem.lParam);
 }
 
 void SearchTabsDialog::OnCancel()
@@ -423,6 +370,9 @@ INT_PTR SearchTabsDialog::OnClose()
 void SearchTabsDialog::SaveState()
 {
 	m_persistentSettings->SaveDialogPosition(m_hDlg);
+
+	m_persistentSettings->m_searchTerm = m_model->GetSearchTerm();
+
 	m_persistentSettings->m_bStateSaved = TRUE;
 }
 

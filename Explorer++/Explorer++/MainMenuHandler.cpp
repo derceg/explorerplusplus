@@ -21,6 +21,7 @@
 #include "ScriptingDialog.h"
 #include "SearchDialog.h"
 #include "SearchTabsDialog.h"
+#include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SplitFileDialog.h"
@@ -136,8 +137,9 @@ void Explorerplusplus::OnSearchTabs()
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchTabsDialog",
 		[this]
 		{
-			return SearchTabsDialog::Create(m_hContainer, m_app->GetTabList(),
-				m_app->GetTabEvents(), m_app->GetShellBrowserEvents(), m_app->GetNavigationEvents(),
+			return SearchTabsDialog::Create(m_hContainer,
+				std::make_unique<SearchTabsModel>(m_app->GetTabList(), m_app->GetTabEvents(),
+					m_app->GetShellBrowserEvents(), m_app->GetNavigationEvents()),
 				m_app->GetResourceLoader());
 		});
 }

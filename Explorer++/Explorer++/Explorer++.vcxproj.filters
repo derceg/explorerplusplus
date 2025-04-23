@@ -478,9 +478,6 @@
     <ClCompile Include="Theme.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="SearchTabsDialog.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="ThemeManager.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
@@ -819,6 +816,12 @@
     </ClCompile>
     <ClCompile Include="TabList.cpp">
       <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchTabsDialog.cpp">
+      <Filter>Dialogs\Search Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchTabsModel.cpp">
+      <Filter>Dialogs\Search Tabs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1293,9 +1296,6 @@
     <ClInclude Include="Theme.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="SearchTabsDialog.h">
-      <Filter>Dialogs</Filter>
-    </ClInclude>
     <ClInclude Include="ThemeManager.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
@@ -1698,6 +1698,12 @@
     <ClInclude Include="TabList.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="SearchTabsDialog.h">
+      <Filter>Dialogs\Search Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchTabsModel.h">
+      <Filter>Dialogs\Search Tabs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1904,6 +1910,9 @@
     </Filter>
     <Filter Include="Resource Loading">
       <UniqueIdentifier>{e7f03946-8121-4ea7-a8ea-894d7fc97109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Search Tabs">
+      <UniqueIdentifier>{7c950d61-c104-4697-a21e-417ba2696524}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
