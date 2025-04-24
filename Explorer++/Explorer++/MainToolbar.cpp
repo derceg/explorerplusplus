@@ -570,11 +570,11 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, L"");
 
-	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
+	const auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
 
 	if (ptbgit->iItem == MainToolbarButton::Back)
 	{
-		auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetEntry(-1);
+		auto entry = shellBrowser->GetNavigationController()->GetEntry(-1);
 
 		if (entry)
 		{
@@ -587,7 +587,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	}
 	else if (ptbgit->iItem == MainToolbarButton::Forward)
 	{
-		auto entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetEntry(1);
+		auto entry = shellBrowser->GetNavigationController()->GetEntry(1);
 
 		if (entry)
 		{
@@ -613,11 +613,11 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 // contains the name of the folder.
 std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 {
-	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
-	auto currentPidl = tab.GetShellBrowserImpl()->GetDirectoryIdl();
+	const auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 
 	unique_pidl_absolute parentPidl;
-	HRESULT hr = GetVirtualParentPath(currentPidl.get(), wil::out_param(parentPidl));
+	HRESULT hr = GetVirtualParentPath(currentEntry->GetPidl().Raw(), wil::out_param(parentPidl));
 
 	if (FAILED(hr))
 	{
@@ -667,8 +667,8 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 {
-	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
-	const auto *navigationController = tab.GetShellBrowserImpl()->GetNavigationController();
+	const auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *navigationController = shellBrowser->GetNavigationController();
 
 	if ((historyType == TabHistoryMenu::MenuType::Back && !navigationController->CanGoBack())
 		|| (historyType == TabHistoryMenu::MenuType::Forward
