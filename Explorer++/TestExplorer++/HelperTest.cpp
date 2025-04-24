@@ -40,3 +40,15 @@ TEST(IsProcessRTL, CheckValue)
 	SetProcessDefaultLayout(LAYOUT_RTL);
 	EXPECT_EQ(IsProcessRTL(), true);
 }
+
+TEST(HelperTest, GetExpandedEnvironmentVariable)
+{
+	// Nested environment variable expansion.
+	auto set = SetEnvironmentVariable(L"FOO", L"FOO_VALUE");
+	ASSERT_TRUE(set);
+	set = SetEnvironmentVariable(L"BAR", L"%FOO%/BAR_VALUE");
+	ASSERT_TRUE(set);
+	auto bar = GetExpandedEnvironmentVariable(L"BAR");
+	ASSERT_TRUE(bar.has_value());
+	EXPECT_EQ(bar.value(), L"FOO_VALUE/BAR_VALUE");
+}

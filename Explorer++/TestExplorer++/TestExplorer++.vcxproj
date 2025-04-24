@@ -258,6 +258,7 @@
     <ClCompile Include="ScopedTestDir.cpp" />
     <ClCompile Include="SearchTabsModelTest.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
+    <ClCompile Include="StorageTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />

@@ -108,6 +108,8 @@ New features:
   (Brazil) translations.
 - The layout will now be switched to RTL when using the Arabic or
   Hebrew translations.
+- Config file name and location can be specified with the
+  environment variable EXPLORERPP_CONFIG.
 
 Bug fixes:
 - Fixed a crash that could occur on startup when the "Open new

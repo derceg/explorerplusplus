@@ -431,6 +431,9 @@
     <ClCompile Include="TabHelperTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="StorageTest.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

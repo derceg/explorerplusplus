@@ -68,6 +68,8 @@ bool IsWindowsPE();
 bool IsProcessRTL();
 wil::unique_hmodule LoadSystemLibrary(const std::wstring &libraryName);
 
+std::optional<std::wstring> GetExpandedEnvironmentVariable(const std::wstring &name);
+
 template <typename L, typename R>
 boost::bimap<L, R> MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
 {

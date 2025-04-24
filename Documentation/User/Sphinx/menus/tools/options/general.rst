@@ -72,17 +72,23 @@ Run in portable mode
 ~~~~~~~~~~~~~~~~~~~~
 
 +-----------------+------------------------------------+
-| System Default: | No (if no config.xml file present) |
+| System Default: | No (if no config file present)     |
 +-----------------+------------------------------------+
 
 .. _install_folder:
 
 Enabling this option (ie. checking the box) tells **Explorer++** to save
-and fetch all its settings in an XML (**config.xml**) file, located in
-the installation folder, usually ...\\Program Files\\Explorer++ v1.2
-(your version might be different). An XML file is a text file,
-structured hierarchically to enable **Explorer++** to re-construct its
-settings, etc. at program startup.
+and fetch all its settings to an XML file (a text file, structured
+hierarchically to enable **Explorer++** to re-construct its
+settings, etc. at program startup).
+
+By default, the XML file is named config.xml and is located in the
+installation folder, usually ...\\Program Files\\Explorer++ v1.2
+(your version might be different). You can change where the config file
+is found by setting the environment variable ``EXPLORERPP_CONFIG`` to
+the full path to the file where you would like to store yours.  If the
+variable points to an invalid location, the Windows registry will be
+used as a fallback.
 
 .. note::
 
