@@ -12,11 +12,15 @@
 
 [vcpkg](https://vcpkg.io/) is used to manage dependencies. Before you can build Explorer++, you'll first need to initialize vcpkg:
 
-`git clone --recurse-submodules https://github.com/derceg/explorerplusplus.git`
+- Clone this repo with submodules enabled:
+```
+git clone --recurse-submodules https://github.com/derceg/explorerplusplus.git
+cd explorerplusplus
+```
+- Run the vcpkg bootstrapper:
+    - cmd/PowerShell: `.\Explorer++\ThirdParty\vcpkg\bootstrap-vcpkg.bat`
+    - git bash/posix shell: `./Explorer++/ThirdParty/vcpkg/bootstrap-vcpkg.sh`
 
-`cd explorerplusplus`
-
-`.\Explorer++\ThirdParty\vcpkg\bootstrap-vcpkg.bat`
 
 The relevant packages should then be automatically installed during the first build.
 
