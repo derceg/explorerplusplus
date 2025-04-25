@@ -11,13 +11,30 @@
 namespace Storage
 {
 
+std::optional<std::wstring> GetExpandedEnvironmentVariable(const std::wstring &name)
+{
+	wil::unique_hglobal_string value;
+	HRESULT hr = wil::GetEnvironmentVariableW(name.c_str(), value);
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::unique_hglobal_string expandedValue;
+	hr = wil::ExpandEnvironmentStringsW(value.get(), expandedValue);
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+	return std::wstring(expandedValue.get());
+}
+
 std::wstring GetConfigFilePath()
 {
-	wil::unique_hglobal_string configPath;
-	HRESULT hr = wil::GetEnvironmentVariableW(CONFIG_FILE_ENV_VAR_NAME, configPath);
-	if (SUCCEEDED(hr))
+	auto configPath = GetExpandedEnvironmentVariable(CONFIG_FILE_ENV_VAR_NAME);
+	if (configPath)
 	{
-		return std::wstring(configPath.get());
+		return configPath->c_str();
 	}
 
 	wchar_t currentProcessPath[MAX_PATH];
