@@ -82,7 +82,7 @@ and fetch all its settings to an XML file (a text file, structured
 hierarchically to enable **Explorer++** to re-construct its
 settings, etc. at program startup).
 
-By default, the XML file is named .config.xml and is located in the
+By default, the XML file is named config.xml and is located in the
 installation folder, usually ...\\Program Files\\Explorer++ v1.2
 (your version might be different). You can change where the config file
 is found by setting the environment variable ``EXPLORERPP_CONFIG`` to

@@ -5,34 +5,19 @@
 #include "stdafx.h"
 #include "Storage.h"
 #include "../Helper/ProcessHelper.h"
+#include <wil/win32_helpers.h>
 #include <filesystem>
 
 namespace Storage
 {
 
-std::optional<std::wstring> GetEnvironmentVariableWrapper(const std::wstring &name)
-{
-	auto length = GetEnvironmentVariable(name.c_str(), nullptr, 0);
-	if (length == 0)
-	{
-		return std::nullopt;
-	}
-
-	std::wstring value;
-	value.resize(length);
-	length = GetEnvironmentVariable(name.c_str(), value.data(), length);
-	if (length == 0)
-	{
-		return std::nullopt;
-	}
-	return value;
-}
-
 std::wstring GetConfigFilePath()
 {
-	auto configPath = GetEnvironmentVariableWrapper(CONFIG_FILE_ENV_VAR_NAME);
-	if (configPath) {
-		return configPath->c_str();
+	wil::unique_hglobal_string configPath;
+	HRESULT hr = wil::GetEnvironmentVariableW(CONFIG_FILE_ENV_VAR_NAME, configPath);
+	if (SUCCEEDED(hr))
+	{
+		return std::wstring(configPath.get());
 	}
 
 	wchar_t currentProcessPath[MAX_PATH];
