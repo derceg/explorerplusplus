@@ -71,13 +71,24 @@ public:
 	static constexpr COLORREF BACKGROUND_COLOR = RGB(32, 32, 32);
 	static constexpr COLORREF TEXT_COLOR = RGB(255, 255, 255);
 
+	// The text color used for items that are active, but considered to be in the background. For
+	// example, in a tab control, a single item is selected. The text for the other tabs could be
+	// drawn in this color to visually distinguish them from the selected tab.
+	static constexpr COLORREF TEXT_COLOR_BACKGROUND = RGB(180, 180, 180);
+
 	static constexpr COLORREF TEXT_COLOR_DISABLED = RGB(121, 121, 121);
 
 	// The color of foreground elements (e.g. the toolbar insertion mark).
 	static constexpr COLORREF FOREGROUND_COLOR = RGB(255, 255, 255);
 
-	// The color of the hot item (i.e. the item that's selected/under the mouse).
-	static constexpr COLORREF HOT_ITEM_HIGHLIGHT_COLOR = RGB(71, 71, 71);
+	// The background color of the selected item.
+	static constexpr COLORREF SELECTED_ITEM_BACKGROUND_COLOR = RGB(100, 100, 100);
+
+	// The background color of the hot item (i.e. the item that's under the mouse).
+	static constexpr COLORREF HOT_ITEM_BACKGROUND_COLOR = RGB(71, 71, 71);
+
+	// The color of borders (e.g. the borders around an individual tab).
+	static constexpr COLORREF BORDER_COLOR = RGB(120, 120, 120);
 
 	DarkModeManager(EventWindow *eventWindow, const Config *config);
 
@@ -90,6 +101,9 @@ public:
 	static bool IsHighContrast();
 
 	HBRUSH GetBackgroundBrush() const;
+	HBRUSH GetSelectedItemBackgroundBrush() const;
+	HBRUSH GetHotItemBackgroundBrush() const;
+	HBRUSH GetBorderBrush() const;
 
 	SignalWrapper<DarkModeManager, void(bool darkModeEnabled)> darkModeStatusChanged;
 
@@ -146,6 +160,9 @@ private:
 	bool m_isWindows10Version1809 = false;
 	bool m_darkModeSupported = false;
 	bool m_darkModeEnabled = false;
-	wil::unique_hbrush m_backgroundBrush;
+	const wil::unique_hbrush m_backgroundBrush;
+	const wil::unique_hbrush m_selectedItemBackgroundBrush;
+	const wil::unique_hbrush m_hotItemBackgroundBrush;
+	const wil::unique_hbrush m_borderBrush;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

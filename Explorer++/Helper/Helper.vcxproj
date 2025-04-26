@@ -651,6 +651,7 @@
     <ClCompile Include="DataObjectWrapper.cpp" />
     <ClCompile Include="DetoursHelper.cpp" />
     <ClCompile Include="DialogSettings.cpp" />
+    <ClCompile Include="DoubleBufferedPaint.cpp" />
     <ClCompile Include="DpiCompatibility.cpp" />
     <ClCompile Include="DragDropHelper.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
@@ -741,6 +742,7 @@
     <ClInclude Include="DetoursHelper.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DisableUnaligned.h" />
+    <ClInclude Include="DoubleBufferedPaint.h" />
     <ClInclude Include="DpiCompatibility.h" />
     <ClInclude Include="DragDropHelper.h" />
     <ClInclude Include="DriveInfo.h" />

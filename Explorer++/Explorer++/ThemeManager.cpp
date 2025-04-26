@@ -10,15 +10,19 @@
 #include "DarkModeManager.h"
 #include "SystemFontHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DoubleBufferedPaint.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
 #include <wil/resource.h>
 #include <vssym32.h>
 
-ThemeManager::ThemeManager(DarkModeManager *darkModeManager) : m_darkModeManager(darkModeManager)
+ThemeManager::ThemeManager(DarkModeManager *darkModeManager) :
+	m_darkModeManager(darkModeManager),
+	m_tabBackgroundBrush(CreateSolidBrush(TAB_DARK_MODE_BACKGROUND_COLOR))
 {
 	m_connections.push_back(darkModeManager->darkModeStatusChanged.AddObserver(
 		std::bind(&ThemeManager::OnDarkModeStatusChanged, this)));
@@ -129,6 +133,10 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	{
 		ApplyThemeToDialog(hwnd, enableDarkMode);
 	}
+	else if (lstrcmp(className, WC_TABCONTROL) == 0)
+	{
+		ApplyThemeToTabControl(hwnd, enableDarkMode);
+	}
 	else if (lstrcmp(className, WC_LISTVIEW) == 0)
 	{
 		ApplyThemeToListView(hwnd, enableDarkMode);
@@ -176,6 +184,10 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	else if (lstrcmp(className, WC_SCROLLBAR) == 0)
 	{
 		ApplyThemeToScrollBar(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, UPDOWN_CLASS) == 0)
+	{
+		ApplyThemeToUpDownControl(hwnd);
 	}
 }
 
@@ -255,6 +267,15 @@ void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 	{
 		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
 			std::bind_front(&ThemeManager::DialogSubclass, this)));
+	}
+}
+
+void ThemeManager::ApplyThemeToTabControl(HWND hwnd, bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
+			std::bind_front(&ThemeManager::TabControlSubclass, this)));
 	}
 }
 
@@ -500,10 +521,16 @@ void ThemeManager::ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode)
 	}
 }
 
+void ThemeManager::ApplyThemeToUpDownControl(HWND hwnd)
+{
+	// Note that this style is only implemented in Windows 11. That means the control will appear in
+	// its normal light style on Windows 10 when dark mode is enabled.
+	SetWindowTheme(hwnd, L"Explorer", nullptr);
+}
+
 LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static wil::unique_htheme theme(OpenThemeData(hwnd, L"Menu"));
-	static wil::unique_hbrush hotBrush(CreateSolidBrush(DarkModeManager::HOT_ITEM_HIGHLIGHT_COLOR));
 	static constexpr DWORD drawFlagsBase = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
 	static bool alwaysShowAccessKeys = ShouldAlwaysShowAccessKeys();
 
@@ -637,7 +664,8 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		{
 			if (darkModeEnabled)
 			{
-				FillRect(drawItem->hDC, &drawItem->rcItem, hotBrush.get());
+				FillRect(drawItem->hDC, &drawItem->rcItem,
+					m_darkModeManager->GetHotItemBackgroundBrush());
 			}
 			else
 			{
@@ -959,7 +987,7 @@ LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 
 	case CDDS_ITEMPREPAINT:
 		customDraw->clrText = DarkModeManager::TEXT_COLOR;
-		customDraw->clrHighlightHotTrack = DarkModeManager::HOT_ITEM_HIGHLIGHT_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeManager::HOT_ITEM_BACKGROUND_COLOR;
 		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
 	}
 
@@ -993,6 +1021,225 @@ HBRUSH ThemeManager::GetComboBoxExBackgroundBrush()
 	}
 
 	return backgroundBrush.get();
+}
+
+LRESULT ThemeManager::TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_ERASEBKGND:
+		return 1;
+
+	case WM_PAINT:
+	{
+		auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+		// These styles aren't handled and it's not expected that they'll be set.
+		if (WI_IsAnyFlagSet(style, TCS_BUTTONS | TCS_VERTICAL))
+		{
+			DCHECK(false);
+			break;
+		}
+
+		// Conversely, it's expected that these styles will always be set and there is no handling
+		// for any case where they're not set.
+		if (WI_IsAnyFlagClear(style, TCS_FOCUSNEVER | TCS_SINGLELINE))
+		{
+			DCHECK(false);
+			break;
+		}
+
+		DoubleBufferedPaint doubleBufferedPaint(hwnd);
+		HDC memDC = doubleBufferedPaint.GetMemoryDC();
+		RECT paintRect = doubleBufferedPaint.GetPaintRect();
+
+		// Fill in the background from the parent control. This is what the control does normally.
+		DrawThemeParentBackground(hwnd, memDC, &paintRect);
+
+		RECT clientRect;
+		GetClientRect(hwnd, &clientRect);
+		RECT bottomEdgeRect = { clientRect.left, clientRect.bottom - 2, clientRect.right,
+			clientRect.bottom - 1 };
+		FrameRect(memDC, &bottomEdgeRect, m_darkModeManager->GetBorderBrush());
+
+		SetBkMode(memDC, TRANSPARENT);
+
+		auto font = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0, 0));
+		wil::unique_select_object selectFont;
+
+		if (font)
+		{
+			selectFont = wil::SelectObject(memDC, font);
+		}
+
+		int numTabs = TabCtrl_GetItemCount(hwnd);
+
+		for (int i = 0; i < numTabs; i++)
+		{
+			auto itemRect = GetTabRect(hwnd, i);
+
+			RECT intersectionRect;
+			if (!IntersectRect(&intersectionRect, &paintRect, &itemRect))
+			{
+				continue;
+			}
+
+			DrawTab(hwnd, i, memDC);
+		}
+	}
+		return 0;
+
+	case WM_MOUSEMOVE:
+	{
+		POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+
+		TCHITTESTINFO hitTestInfo = {};
+		hitTestInfo.pt = pt;
+		int index = TabCtrl_HitTest(hwnd, &hitTestInfo);
+
+		if (index != -1)
+		{
+			m_hotTabMap.insert_or_assign(hwnd, index);
+		}
+		else
+		{
+			m_hotTabMap.erase(hwnd);
+		}
+	}
+	break;
+
+	case WM_MOUSELEAVE:
+		m_hotTabMap.erase(hwnd);
+		break;
+
+	case WM_PARENTNOTIFY:
+		switch (LOWORD(wParam))
+		{
+		case WM_CREATE:
+			// When the tab control needs to be scrolled to show all tabs, it will create an up-down
+			// control. That control should be themed.
+			auto child = reinterpret_cast<HWND>(lParam);
+			ApplyThemeToWindowAndChildren(child);
+			break;
+		}
+		break;
+
+	case WM_DESTROY:
+		m_hotTabMap.erase(hwnd);
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void ThemeManager::DrawTab(HWND hwnd, int index, HDC hdc)
+{
+	bool isHot = false;
+
+	if (auto itr = m_hotTabMap.find(hwnd); itr != m_hotTabMap.end())
+	{
+		isHot = (index == itr->second);
+	}
+
+	int selectedIndex = TabCtrl_GetCurSel(hwnd);
+	bool isSelected = (index == selectedIndex);
+
+	auto itemRect = GetTabRect(hwnd, index);
+	RECT backgroundRect = itemRect;
+
+	if (isSelected)
+	{
+		// There's a bottom edge drawn directly underneath the tabs. The background for the selected
+		// tab is drawn over that edge.
+		backgroundRect.bottom += 1;
+	}
+
+	auto backgroundBrush = isSelected ? m_darkModeManager->GetSelectedItemBackgroundBrush()
+		: isHot                       ? m_darkModeManager->GetHotItemBackgroundBrush()
+									  : m_tabBackgroundBrush.get();
+	FillRect(hdc, &backgroundRect, backgroundBrush);
+
+	Gdiplus::Graphics graphics(hdc);
+	Gdiplus::Color borderColor;
+	borderColor.SetFromCOLORREF(DarkModeManager::BORDER_COLOR);
+	Gdiplus::Pen borderPen(borderColor);
+
+	if (index == 0)
+	{
+		graphics.DrawLine(&borderPen, static_cast<int>(itemRect.left), itemRect.top, itemRect.left,
+			itemRect.bottom);
+	}
+
+	int rightBorderTop = itemRect.top;
+
+	// If this is the tab before the selected tab, then the border needs to be raised to the top of
+	// the viewport (to match the top and right edge for the selected tab).
+	if (index == (selectedIndex - 1))
+	{
+		rightBorderTop = 0;
+	}
+
+	graphics.DrawLine(&borderPen, static_cast<int>(itemRect.right) - 1, rightBorderTop,
+		itemRect.right - 1, itemRect.bottom);
+
+	graphics.DrawLine(&borderPen, static_cast<int>(itemRect.left), itemRect.top, itemRect.right - 1,
+		itemRect.top);
+
+	auto text = TabHelper::GetItemText(hwnd, index);
+
+	RECT textRect;
+	DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_CALCRECT);
+
+	auto imageList = TabCtrl_GetImageList(hwnd);
+
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_IMAGE;
+	auto res = TabCtrl_GetItem(hwnd, index, &tcItem);
+	CHECK(res);
+
+	RECT drawRect = itemRect;
+
+	if (imageList && tcItem.iImage != -1)
+	{
+		int iconWidth;
+		int iconHeight;
+		res = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
+		CHECK(res);
+
+		// Although a TCM_SETPADDING message exists, there is no corresponding message to retrieve
+		// the padding. Therefore, the padding will be calculated using the same method the control
+		// uses. Note that this implicitly assumes that the padding hasn't been customized.
+		int xPadding = GetSystemMetrics(SM_CXEDGE) * 3;
+
+		int contentWidth = iconWidth + xPadding + GetRectWidth(&textRect);
+		POINT imageOrigin = { drawRect.left + (GetRectWidth(&drawRect) - contentWidth) / 2,
+			drawRect.top + (GetRectHeight(&drawRect) - iconHeight) / 2 };
+		ImageList_Draw(imageList, tcItem.iImage, hdc, imageOrigin.x, imageOrigin.y, ILD_NORMAL);
+
+		drawRect.left += iconWidth + xPadding;
+	}
+
+	SetTextColor(hdc,
+		isSelected ? DarkModeManager::TEXT_COLOR : DarkModeManager::TEXT_COLOR_BACKGROUND);
+	DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &drawRect,
+		DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+}
+
+RECT ThemeManager::GetTabRect(HWND hwnd, int index)
+{
+	RECT itemRect;
+	TabCtrl_GetItemRect(hwnd, index, &itemRect);
+
+	bool isSelected = (index == TabCtrl_GetCurSel(hwnd));
+
+	if (isSelected)
+	{
+		// Each tab in the control is at a slight vertical offset. The selected tab, however, will
+		// align with the top of the viewport.
+		itemRect.top = 0;
+	}
+
+	return itemRect;
 }
 
 LRESULT ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

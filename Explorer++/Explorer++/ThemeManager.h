@@ -5,7 +5,11 @@
 #pragma once
 
 #include <boost/signals2.hpp>
+#include <wil/resource.h>
+#include <commctrl.h>
+#include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 class DarkModeManager;
 class WindowSubclass;
@@ -34,6 +38,9 @@ private:
 	// This is the same background color as used in the Explorer address bar.
 	static constexpr COLORREF COMBO_BOX_EX_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	// This is the background color of each non-selected tab in a tab control when dark is enabled.
+	static constexpr COLORREF TAB_DARK_MODE_BACKGROUND_COLOR = RGB(38, 38, 38);
+
 	static constexpr wchar_t DIALOG_CLASS_NAME[] = L"#32770";
 
 	void OnDarkModeStatusChanged();
@@ -43,6 +50,7 @@ private:
 	BOOL ProcessThreadWindow(HWND hwnd);
 	void ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToDialog(HWND hwnd, bool enableDarkMode);
+	void ApplyThemeToTabControl(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToListView(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToHeader(HWND hwnd);
 	void ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode);
@@ -55,6 +63,7 @@ private:
 	void ApplyThemeToTooltips(HWND hwnd);
 	void ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode);
+	void ApplyThemeToUpDownControl(HWND hwnd);
 
 	LRESULT MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	HBRUSH GetMenuBarBackgroundBrush(bool enableDarkMode);
@@ -66,6 +75,9 @@ private:
 	LRESULT OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
 	LRESULT ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	HBRUSH GetComboBoxExBackgroundBrush();
+	LRESULT TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void DrawTab(HWND hwnd, int index, HDC hdc);
+	RECT GetTabRect(HWND hwnd, int index);
 	LRESULT ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -73,6 +85,10 @@ private:
 
 	DarkModeManager *const m_darkModeManager;
 	std::unordered_set<HWND> m_trackedTopLevelWindows;
+
+	const wil::unique_hbrush m_tabBackgroundBrush;
+	std::unordered_map<HWND, int> m_hotTabMap;
+
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 };

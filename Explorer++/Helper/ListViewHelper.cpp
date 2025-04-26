@@ -375,6 +375,8 @@ std::wstring GetItemText(HWND listView, int item, int subItem)
 			text.resize(length);
 			break;
 		}
+
+		text.resize(text.size() * 2);
 	}
 
 	return text;

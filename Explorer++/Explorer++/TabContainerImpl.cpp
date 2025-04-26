@@ -307,7 +307,7 @@ void TabContainerImpl::OnTabCtrlMouseMove(POINT *pt)
 
 		/* Swap the dragged tab with the tab the cursor
 		finished up on. */
-		TabCtrl_SwapItems(m_hwnd, iSelected, iSwap);
+		TabHelper::SwapItems(m_hwnd, iSelected, iSwap);
 
 		/* The index of the selected tab has now changed
 		(but the actual tab/browser selected remains the
@@ -691,7 +691,7 @@ void TabContainerImpl::UpdateTabNameInWindow(const Tab &tab)
 	boost::replace_all(name, L"&", L"&&");
 
 	int index = GetTabIndex(tab);
-	TabCtrl_SetItemText(m_hwnd, index, name.c_str());
+	TabHelper::SetItemText(m_hwnd, index, name);
 }
 
 void TabContainerImpl::SetTabIcon(const Tab &tab)
@@ -1210,7 +1210,7 @@ int TabContainerImpl::GetNumTabs() const
 int TabContainerImpl::MoveTab(const Tab &tab, int newIndex)
 {
 	int index = GetTabIndex(tab);
-	return TabCtrl_MoveItem(m_hwnd, index, newIndex);
+	return TabHelper::MoveItem(m_hwnd, index, newIndex);
 }
 
 std::unordered_map<int, std::unique_ptr<Tab>> &TabContainerImpl::GetTabs()

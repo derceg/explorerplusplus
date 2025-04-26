@@ -428,6 +428,9 @@
     <ClCompile Include="SearchTabsModelTest.cpp">
       <Filter>Dialogs\Search Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="TabHelperTest.cpp">
+      <Filter>Helper\Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

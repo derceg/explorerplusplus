@@ -4,6 +4,14 @@
 
 #pragma once
 
-BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2);
-int TabCtrl_MoveItem(HWND tabCtrl, int currentIndex, int newIndex);
-BOOL TabCtrl_SetItemText(HWND hTabCtrl, int iItem, const TCHAR *pszText);
+#include <string>
+
+namespace TabHelper
+{
+
+void SwapItems(HWND tabControl, int item1, int item2);
+int MoveItem(HWND tabControl, int currentIndex, int newIndex);
+void SetItemText(HWND tabControl, int item, const std::wstring &text);
+std::wstring GetItemText(HWND tabControl, int item);
+
+}

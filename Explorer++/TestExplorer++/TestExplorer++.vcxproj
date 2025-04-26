@@ -282,6 +282,7 @@
     <ClCompile Include="StartupFoldersRegistryStorageTest.cpp" />
     <ClCompile Include="StartupFoldersStorageTestHelper.cpp" />
     <ClCompile Include="StartupFoldersXmlStorageTest.cpp" />
+    <ClCompile Include="TabHelperTest.cpp" />
     <ClCompile Include="TabListTest.cpp" />
     <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />

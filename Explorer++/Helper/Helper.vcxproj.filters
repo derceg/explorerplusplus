@@ -178,6 +178,9 @@
     <ClCompile Include="MessageWindowHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="DoubleBufferedPaint.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -400,6 +403,9 @@
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
     <ClInclude Include="MessageWindowHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleBufferedPaint.h">
       <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>

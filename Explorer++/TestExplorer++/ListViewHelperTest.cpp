@@ -98,6 +98,15 @@ TEST_F(ListViewHelperTest, GetItemText)
 	CheckListViewItemData(ITEMS);
 }
 
+TEST_F(ListViewHelperTest, GetItemTextLong)
+{
+	std::wstring text(1000, 'a');
+	ListView_SetItemText(m_listView.get(), 0, 0, const_cast<wchar_t *>(text.c_str()));
+
+	auto retrievedText = ListViewHelper::GetItemText(m_listView.get(), 0, 0);
+	EXPECT_EQ(retrievedText, text);
+}
+
 TEST_F(ListViewHelperTest, AddRemoveExtendedStyles)
 {
 	constexpr DWORD style = LVS_EX_CHECKBOXES;

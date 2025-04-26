@@ -4,114 +4,134 @@
 
 #include "stdafx.h"
 #include "TabHelper.h"
+#include <wil/common.h>
 
-BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
+namespace TabHelper
 {
-	TCITEM tcItem;
-	TCHAR szText1[512];
-	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
-	tcItem.pszText = szText1;
-	tcItem.cchTextMax = std::size(szText1);
-	BOOL bRet = TabCtrl_GetItem(hTabCtrl, iItem1, &tcItem);
 
-	if (!bRet)
+void SwapItems(HWND tabControl, int item1, int item2)
+{
+	TCITEM tcItem1 = {};
+	tcItem1.mask = TCIF_PARAM | TCIF_IMAGE;
+	auto res = TabCtrl_GetItem(tabControl, item1, &tcItem1);
+
+	if (!res)
 	{
-		return FALSE;
+		DCHECK(false);
+		return;
 	}
 
-	LPARAM lParam1;
-	int iImage1;
-	lParam1 = tcItem.lParam;
-	iImage1 = tcItem.iImage;
+	auto text1 = GetItemText(tabControl, item1);
 
-	TCHAR szText2[512];
-	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
-	tcItem.pszText = szText2;
-	tcItem.cchTextMax = std::size(szText2);
+	TCITEM tcItem2 = {};
+	tcItem2.mask = TCIF_PARAM | TCIF_IMAGE;
+	res = TabCtrl_GetItem(tabControl, item2, &tcItem2);
 
-	bRet = TabCtrl_GetItem(hTabCtrl, iItem2, &tcItem);
-
-	if (!bRet)
+	if (!res)
 	{
-		return FALSE;
+		DCHECK(false);
+		return;
 	}
 
-	LPARAM lParam2;
-	int iImage2;
-	lParam2 = tcItem.lParam;
-	iImage2 = tcItem.iImage;
+	auto text2 = GetItemText(tabControl, item2);
 
-	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
-	tcItem.pszText = szText1;
-	tcItem.lParam = lParam1;
-	tcItem.iImage = iImage1;
-	bRet = TabCtrl_SetItem(hTabCtrl, iItem2, &tcItem);
+	WI_SetFlag(tcItem1.mask, TCIF_TEXT);
+	tcItem1.pszText = const_cast<wchar_t *>(text1.c_str());
+	res = TabCtrl_SetItem(tabControl, item2, &tcItem1);
+	DCHECK(res);
 
-	if (!bRet)
-	{
-		return FALSE;
-	}
-
-	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
-	tcItem.pszText = szText2;
-	tcItem.lParam = lParam2;
-	tcItem.iImage = iImage2;
-	bRet = TabCtrl_SetItem(hTabCtrl, iItem1, &tcItem);
-
-	if (!bRet)
-	{
-		return FALSE;
-	}
-
-	return TRUE;
+	WI_SetFlag(tcItem2.mask, TCIF_TEXT);
+	tcItem2.pszText = const_cast<wchar_t *>(text2.c_str());
+	res = TabCtrl_SetItem(tabControl, item1, &tcItem2);
+	DCHECK(res);
 }
 
-int TabCtrl_MoveItem(HWND tabCtrl, int currentIndex, int newIndex)
+int MoveItem(HWND tabControl, int currentIndex, int newIndex)
 {
 	if (currentIndex == newIndex)
 	{
 		return currentIndex;
 	}
 
-	TCITEM tcItem;
-	TCHAR szText[512];
-	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
-	tcItem.pszText = szText;
-	tcItem.cchTextMax = std::size(szText);
-	BOOL res = TabCtrl_GetItem(tabCtrl, currentIndex, &tcItem);
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_PARAM | TCIF_IMAGE;
+	BOOL res = TabCtrl_GetItem(tabControl, currentIndex, &tcItem);
 
 	if (!res)
 	{
+		DCHECK(false);
 		return currentIndex;
 	}
 
-	res = TabCtrl_DeleteItem(tabCtrl, currentIndex);
+	auto text = GetItemText(tabControl, currentIndex);
+	WI_SetFlag(tcItem.mask, TCIF_TEXT);
+	tcItem.pszText = const_cast<wchar_t *>(text.c_str());
+
+	res = TabCtrl_DeleteItem(tabControl, currentIndex);
 
 	if (!res)
 	{
+		DCHECK(false);
 		return currentIndex;
 	}
 
-	int insertedIndex = TabCtrl_InsertItem(tabCtrl, newIndex, &tcItem);
+	int insertedIndex = TabCtrl_InsertItem(tabControl, newIndex, &tcItem);
 
 	if (insertedIndex == -1)
 	{
+		DCHECK(false);
 		return currentIndex;
 	}
 
 	return insertedIndex;
 }
 
-BOOL TabCtrl_SetItemText(HWND hTabCtrl, int iItem, const TCHAR *pszText)
+void SetItemText(HWND tabControl, int item, const std::wstring &text)
 {
-	/* The const_cast below isn't
-	particularly good, but is
-	required. Information is only
-	being set, so the function
-	has no reason to modify the
-	string. */
-	TCITEM tcItem;
+	TCITEM tcItem = {};
 	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = const_cast<LPTSTR>(pszText);
-	return TabCtrl_SetItem(hTabCtrl, iItem, &tcItem);
+	tcItem.pszText = const_cast<wchar_t *>(text.c_str());
+	auto res = TabCtrl_SetItem(tabControl, item, &tcItem);
+	DCHECK(res);
+}
+
+std::wstring GetItemText(HWND tabControl, int item)
+{
+	std::wstring text;
+	text.resize(260);
+
+	while (true)
+	{
+		TCITEM tcItem = {};
+		tcItem.mask = TCIF_TEXT;
+		tcItem.pszText = text.data();
+		tcItem.cchTextMax = static_cast<int>(text.size());
+		auto res = TabCtrl_GetItem(tabControl, item, &tcItem);
+
+		if (!res)
+		{
+			DCHECK(false);
+			return L"";
+		}
+
+		if (!tcItem.pszText)
+		{
+			// The item has no text.
+			return L"";
+		}
+
+		auto length = lstrlen(text.c_str());
+
+		if (static_cast<size_t>(length) < (text.size() - 1))
+		{
+			text.resize(length);
+			break;
+		}
+
+		text.resize(text.size() * 2);
+	}
+
+	return text;
+}
+
 }
