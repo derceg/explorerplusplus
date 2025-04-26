@@ -11,6 +11,7 @@
 #include <glog/logging.h>
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <wil/win32_helpers.h>
 #include <WbemIdl.h>
 #include <comutil.h>
 
@@ -843,4 +844,22 @@ wil::unique_hmodule LoadSystemLibrary(const std::wstring &libraryName)
 {
 	return wil::unique_hmodule(
 		LoadLibraryEx(libraryName.c_str(), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32));
+}
+
+std::optional<std::wstring> GetExpandedEnvironmentVariable(const std::wstring &name)
+{
+	wil::unique_hglobal_string value;
+	HRESULT hr = wil::GetEnvironmentVariableW(name.c_str(), value);
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::unique_hglobal_string expandedValue;
+	hr = wil::ExpandEnvironmentStringsW(value.get(), expandedValue);
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+	return std::wstring(expandedValue.get());
 }

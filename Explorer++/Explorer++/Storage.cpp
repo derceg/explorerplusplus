@@ -4,30 +4,12 @@
 
 #include "stdafx.h"
 #include "Storage.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
-#include <wil/win32_helpers.h>
 #include <filesystem>
 
 namespace Storage
 {
-
-std::optional<std::wstring> GetExpandedEnvironmentVariable(const std::wstring &name)
-{
-	wil::unique_hglobal_string value;
-	HRESULT hr = wil::GetEnvironmentVariableW(name.c_str(), value);
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	wil::unique_hglobal_string expandedValue;
-	hr = wil::ExpandEnvironmentStringsW(value.get(), expandedValue);
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-	return std::wstring(expandedValue.get());
-}
 
 std::wstring GetConfigFilePath()
 {

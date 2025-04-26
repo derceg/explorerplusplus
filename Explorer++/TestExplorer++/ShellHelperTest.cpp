@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "../Helper/ShellHelper.h"
 #include "ShellTestHelper.h"
+#include "../Helper/Helper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/com.h>
@@ -64,6 +65,15 @@ TEST_F(TransformPathTest, EnvironmentVariablesExpansion)
 	set = SetEnvironmentVariable(L"ShellFolderPath", L"shell:public");
 	ASSERT_TRUE(set);
 	PerformTest(L"%ShellFolderPath%", currentDirectory, L"shell:public");
+
+	// Nested environment variable expansion.
+	set = SetEnvironmentVariable(L"FOO", L"FOO_VALUE");
+	ASSERT_TRUE(set);
+	set = SetEnvironmentVariable(L"BAR", L"%FOO%/BAR_VALUE");
+	ASSERT_TRUE(set);
+	auto bar = GetExpandedEnvironmentVariable(L"BAR");
+	ASSERT_TRUE(bar.has_value());
+	EXPECT_EQ(bar.value(), L"FOO_VALUE/BAR_VALUE");
 }
 
 TEST_F(TransformPathTest, AbsolutePath)
