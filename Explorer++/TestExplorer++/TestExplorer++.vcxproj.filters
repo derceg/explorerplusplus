@@ -379,6 +379,9 @@
     <ClCompile Include="HistoryTrackerTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
+    <ClCompile Include="StorageTest.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

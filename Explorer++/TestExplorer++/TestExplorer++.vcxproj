@@ -242,6 +242,7 @@
     <ClCompile Include="HistoryTrackerTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
+    <ClCompile Include="StorageTest.cpp" />
     <ClCompile Include="TabEventsTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />
