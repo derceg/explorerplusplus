@@ -44,14 +44,14 @@ void ThemeManager::TrackTopLevelWindow(HWND hwnd)
 {
 	ApplyThemeToWindowAndChildren(hwnd);
 
-	[[maybe_unused]] auto insertionResult = m_trackedTopLevelWindows.insert(hwnd);
-	assert(insertionResult.second);
+	auto [itr, didInsert] = m_trackedTopLevelWindows.insert(hwnd);
+	DCHECK(didInsert);
 }
 
 void ThemeManager::UntrackTopLevelWindow(HWND hwnd)
 {
-	[[maybe_unused]] auto numErased = m_trackedTopLevelWindows.erase(hwnd);
-	assert(numErased == 1);
+	auto numErased = m_trackedTopLevelWindows.erase(hwnd);
+	DCHECK_EQ(numErased, 1u);
 }
 
 void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
@@ -97,7 +97,7 @@ BOOL ThemeManager::ProcessThreadWindow(HWND hwnd)
 
 	if (res == 0)
 	{
-		assert(false);
+		DCHECK(false);
 		return TRUE;
 	}
 
@@ -123,7 +123,7 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 
 	if (res == 0)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -224,8 +224,8 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 		MENUITEMINFO menuItemInfo = {};
 		menuItemInfo.cbSize = sizeof(menuItemInfo);
 		menuItemInfo.fMask = MIIM_FTYPE;
-		[[maybe_unused]] auto res = GetMenuItemInfo(mainMenu, i, true, &menuItemInfo);
-		assert(res);
+		auto res = GetMenuItemInfo(mainMenu, i, true, &menuItemInfo);
+		CHECK(res);
 
 		// Removing the MFT_OWNERDRAW style once it's been applied to the menu bar items appears to
 		// be problematic. The resulting items aren't spaced correctly. Because of that, the menu
@@ -234,7 +234,7 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 		WI_SetFlag(menuItemInfo.fMask, MIIM_DATA);
 		menuItemInfo.dwItemData = i;
 		res = SetMenuItemInfo(mainMenu, i, true, &menuItemInfo);
-		assert(res);
+		CHECK(res);
 	}
 
 	// Turning on owner draw for at least one item in the menu bar will disable visual styles in the
@@ -250,8 +250,8 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 	menuInfo.cbSize = sizeof(menuInfo);
 	menuInfo.fMask = MIM_BACKGROUND;
 	menuInfo.hbrBack = GetMenuBarBackgroundBrush(enableDarkMode);
-	[[maybe_unused]] auto res = SetMenuInfo(mainMenu, &menuInfo);
-	assert(res);
+	auto res = SetMenuInfo(mainMenu, &menuInfo);
+	CHECK(res);
 }
 
 void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
@@ -425,7 +425,7 @@ void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 	SendMessage(hwnd, TB_GETTOOLTIPS, 0, 0);
 
 	HWND parent = GetParent(hwnd);
-	assert(parent);
+	CHECK(parent);
 
 	if (enableDarkMode)
 	{
@@ -452,7 +452,7 @@ void ThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode)
 void ThemeManager::ApplyThemeToComboBox(HWND hwnd)
 {
 	HWND parent = GetParent(hwnd);
-	assert(parent);
+	CHECK(parent);
 
 	WCHAR parentClassName[256];
 	auto parentClassNameResult =
@@ -546,7 +546,7 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		// Only items in the menu bar are owner-drawn, so the menu will always be the menu
 		// associated with the window.
 		auto menu = GetMenu(hwnd);
-		assert(menu);
+		CHECK(menu);
 
 		auto text =
 			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(measureItem->itemData), true);
@@ -560,12 +560,12 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			selectFont = wil::SelectObject(hdc.get(), font.get());
 		}
 
-		assert(selectFont);
+		DCHECK(selectFont);
 
 		RECT textRect;
-		[[maybe_unused]] HRESULT hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM,
-			MBI_NORMAL, text.c_str(), -1, drawFlagsBase, nullptr, &textRect);
-		assert(SUCCEEDED(hr));
+		HRESULT hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM, MBI_NORMAL,
+			text.c_str(), -1, drawFlagsBase, nullptr, &textRect);
+		CHECK(SUCCEEDED(hr));
 
 		measureItem->itemWidth = GetRectWidth(&textRect);
 		measureItem->itemHeight = GetRectHeight(&textRect);
@@ -707,9 +707,9 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			options.crText = textColor;
 		}
 
-		[[maybe_unused]] HRESULT hr = DrawThemeTextEx(theme.get(), drawItem->hDC, MENU_BARITEM,
-			itemState, text.c_str(), -1, drawFlags, &drawItem->rcItem, &options);
-		assert(SUCCEEDED(hr));
+		HRESULT hr = DrawThemeTextEx(theme.get(), drawItem->hDC, MENU_BARITEM, itemState,
+			text.c_str(), -1, drawFlags, &drawItem->rcItem, &options);
+		DCHECK(SUCCEEDED(hr));
 
 		return TRUE;
 	}
@@ -747,13 +747,13 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		auto defWindowProcResult = DefWindowProc(hwnd, msg, wParam, lParam);
 
 		RECT windowRect;
-		[[maybe_unused]] auto res = GetWindowRect(hwnd, &windowRect);
-		assert(res);
+		auto res = GetWindowRect(hwnd, &windowRect);
+		CHECK(res);
 
 		MENUBARINFO barInfo = {};
 		barInfo.cbSize = sizeof(barInfo);
 		res = GetMenuBarInfo(hwnd, OBJID_MENU, 0, &barInfo);
-		assert(res);
+		CHECK(res);
 
 		// The border is drawn directly underneath the menu bar.
 		RECT menuBarBorderRect = { barInfo.rcBar.left, barInfo.rcBar.bottom, barInfo.rcBar.right,
@@ -801,7 +801,7 @@ bool ThemeManager::ShouldAlwaysShowAccessKeys()
 
 	if (!res)
 	{
-		assert(false);
+		DCHECK(false);
 		return false;
 	}
 
@@ -869,7 +869,7 @@ LRESULT ThemeManager::OnCustomDraw(NMCUSTOMDRAW *customDraw)
 
 	if (res == 0)
 	{
-		assert(false);
+		DCHECK(false);
 		return CDRF_DODEFAULT;
 	}
 
@@ -927,7 +927,7 @@ LRESULT ThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
 			elementSize.cx + MulDiv(CHECKBOX_TEXT_SPACING_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 
 		std::wstring text = GetWindowString(customDraw->hdr.hwndFrom);
-		assert(!text.empty());
+		DCHECK(!text.empty());
 
 		COLORREF textColor;
 
@@ -1290,7 +1290,7 @@ LRESULT ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		GetClientRect(hwnd, &rect);
 
 		std::wstring text = GetWindowString(hwnd);
-		assert(!text.empty());
+		DCHECK(!text.empty());
 
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, DarkModeColorProvider::TEXT_COLOR);
