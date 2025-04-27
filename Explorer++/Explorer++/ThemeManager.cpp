@@ -209,10 +209,7 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 	}
 
 	BOOL dark = enableDarkMode;
-	DarkModeManager::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeManager::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-	};
-	m_darkModeManager->SetWindowCompositionAttribute(hwnd, &compositionData);
+	DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ThemeManager::MainWindowSubclass, this)));
@@ -258,10 +255,7 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 {
 	BOOL dark = enableDarkMode;
-	DarkModeManager::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeManager::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-	};
-	m_darkModeManager->SetWindowCompositionAttribute(hwnd, &compositionData);
+	DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
 
 	if (enableDarkMode)
 	{

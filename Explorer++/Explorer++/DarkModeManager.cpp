@@ -69,9 +69,6 @@ DarkModeManager::DarkModeManager(EventWindow *eventWindow, const Config *config)
 	m_OpenNcThemeData = reinterpret_cast<OpenNcThemeDataType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(49)));
 
-	m_SetWindowCompositionAttribute = reinterpret_cast<SetWindowCompositionAttributeType>(
-		GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetWindowCompositionAttribute"));
-
 	m_connections.push_back(eventWindow->windowMessageSignal.AddObserver(
 		std::bind_front(&DarkModeManager::OnEventWindowMessage, this)));
 
@@ -267,14 +264,6 @@ HTHEME WINAPI DarkModeManager::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classL
 	}
 
 	return m_OpenNcThemeData(hwnd, classList);
-}
-
-void DarkModeManager::SetWindowCompositionAttribute(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA *data)
-{
-	if (m_SetWindowCompositionAttribute)
-	{
-		m_SetWindowCompositionAttribute(hwnd, data);
-	}
 }
 
 bool DarkModeManager::IsHighContrast()
