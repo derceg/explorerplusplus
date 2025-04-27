@@ -68,6 +68,7 @@ void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 
 	// Tooltip windows won't be enumerated by EnumChildWindows(). They will, however, be enumerated
 	// by EnumThreadWindows(), which is why that's called here.
+	//
 	// Note that this is explicitly called after EnumChildWindows(). That way, tooltip windows can
 	// be initialized during the call to EnumChildWindows() (since they won't necessarily exist
 	// initially). Those tooltip windows will then be processed as part of the call to
@@ -203,6 +204,7 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 	// gradient that's specified in a bitmap. DrawThemeBackground() can be used to easily draw that
 	// background, however, it appears that Windows only allows you to set the background brush for
 	// the menu bar, rather than providing a DC to paint into.
+	//
 	// 2. Visual styles can be turned off, so the current owner-drawing implementation wouldn't work
 	// in that scenario.
 	if (!m_darkModeManager->IsDarkModeSupported())
@@ -242,6 +244,7 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 	// visual styles doesn't matter and (2) disabling visual styles means that the background brush
 	// here will be used to paint the empty section of the bar (the section behind each item will be
 	// painted when drawing the item).
+	//
 	// Note that the background should really be drawn by DrawThemeBackground(), however, as noted
 	// above, Windows seemingly doesn't provide any documented way of drawing directly into the menu
 	// bar DC. The most you can do is provide a background brush. That's fine on Windows 10 and
@@ -417,11 +420,11 @@ void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 
 	SendMessage(hwnd, TB_SETINSERTMARKCOLOR, 0, insertMarkColor);
 
-	// The tooltips window won't exist until either it's requested using TB_GETTOOLTIPS, or
-	// the tooltip needs to be shown. Therefore, calling TB_GETTOOLTIPS will create the
-	// tooltip control, if appropriate (the toolbar may not have the TBSTYLE_TOOLTIPS style
-	// set, in which case, no tooltip control will be created).
-	// The tooltip window will then be themed by the call to EnumThreadWindows() above.
+	// The tooltips window won't exist until either it's requested using TB_GETTOOLTIPS, or the
+	// tooltip needs to be shown. Therefore, calling TB_GETTOOLTIPS will create the tooltip control,
+	// if appropriate (the toolbar may not have the TBSTYLE_TOOLTIPS style set, in which case, no
+	// tooltip control will be created). The tooltip window will then be themed by the call to
+	// EnumThreadWindows() above.
 	SendMessage(hwnd, TB_GETTOOLTIPS, 0, 0);
 
 	HWND parent = GetParent(hwnd);
@@ -647,12 +650,12 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			// DrawThemeBackground(theme.get(), drawItem->hDC, MENU_BARBACKGROUND, MB_ACTIVE,
 			//   &drawItem->rcItem, nullptr);
 			//
-			// However, if that background isn't simply a flat color, the background underneath
-			// each item will differ from the background shown in the empty space. In Windows
-			// 11, for example, the themed background includes a 1px border at the bottom, so
-			// drawing the themed background here would result in a slight difference. It's also
-			// possible the theme could change in the future. So, the safest thing to do is to
-			// use the same brush to draw the bar background and the item background.
+			// However, if that background isn't simply a flat color, the background underneath each
+			// item will differ from the background shown in the empty space. In Windows 11, for
+			// example, the themed background includes a 1px border at the bottom, so drawing the
+			// themed background here would result in a slight difference. It's also possible the
+			// theme could change in the future. So, the safest thing to do is to use the same brush
+			// to draw the bar background and the item background.
 			FillRect(drawItem->hDC, &drawItem->rcItem, GetMenuBarBackgroundBrush(darkModeEnabled));
 		}
 
@@ -733,8 +736,10 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	// That then means that the	border can look out of place (e.g. it might be drawn in a light
 	// color when the rest of the application is dark). To fix that, the border will be painted over
 	// here.
+	//
 	// This is done in both WM_NCPAINT and WM_NCACTIVATE, since painting over the border in
 	// WM_NCPAINT only will cause it to reappear whenever the window loses focus.
+	//
 	// Also see https://github.com/notepad-plus-plus/notepad-plus-plus/pull/9985.
 	case WM_NCPAINT:
 	case WM_NCACTIVATE:
@@ -898,12 +903,11 @@ LRESULT ThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
 		SIZE elementSize;
 
 		// Although the documentation
-		// (https://learn.microsoft.com/en-au/windows/win32/controls/button-styles#constants)
-		// states that BS_TYPEMASK is out of date and shouldn't be used, it's necessary
-		// here, for the reasons discussed in https://stackoverflow.com/a/7293345. That is,
-		// the type flags from BS_PUSHBUTTON to BS_OWNERDRAW are mutually exclusive and the
-		// values in that range can have multiple bits set. So, checking that a single bit
-		// is set isn't going to work.
+		// (https://learn.microsoft.com/en-au/windows/win32/controls/button-styles#constants) states
+		// that BS_TYPEMASK is out of date and shouldn't be used, it's necessary here, for the
+		// reasons discussed in https://stackoverflow.com/a/7293345. That is, the type flags from
+		// BS_PUSHBUTTON to BS_OWNERDRAW are mutually exclusive and the values in that range can
+		// have multiple bits set. So, checking that a single bit is set isn't going to work.
 		if ((style & BS_TYPEMASK) == BS_AUTOCHECKBOX)
 		{
 			elementSize = GetCheckboxSize(customDraw->hdr.hwndFrom);
