@@ -10,6 +10,7 @@
 #include "BrowserList.h"
 #include "CommandLine.h"
 #include "Config.h"
+#include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
 #include "DriveModel.h"
 #include "DriveWatcherImpl.h"
@@ -77,6 +78,7 @@ public:
 	TabList *GetTabList();
 	TabRestorer *GetTabRestorer();
 	DarkModeManager *GetDarkModeManager();
+	DarkModeColorProvider *GetDarkModeColorProvider();
 	ThemeManager *GetThemeManager();
 	HistoryModel *GetHistoryModel();
 	FrequentLocationsModel *GetFrequentLocationsModel();
@@ -117,6 +119,7 @@ private:
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	DarkModeManager m_darkModeManager;
+	DarkModeColorProvider m_darkModeColorProvider;
 	ThemeManager m_themeManager;
 	std::shared_ptr<CachedIcons> m_cachedIcons;
 	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;

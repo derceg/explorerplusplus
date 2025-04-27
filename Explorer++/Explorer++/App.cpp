@@ -41,7 +41,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_darkModeManager(&m_eventWindow, &m_config),
-	m_themeManager(&m_darkModeManager),
+	m_themeManager(&m_darkModeManager, &m_darkModeColorProvider),
 	m_cachedIcons(std::make_shared<CachedIcons>(MAX_CACHED_ICONS)),
 	m_iconFetcher(std::make_shared<AsyncIconFetcher>(&m_runtime, m_cachedIcons)),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
@@ -455,6 +455,11 @@ TabRestorer *App::GetTabRestorer()
 DarkModeManager *App::GetDarkModeManager()
 {
 	return &m_darkModeManager;
+}
+
+DarkModeColorProvider *App::GetDarkModeColorProvider()
+{
+	return &m_darkModeColorProvider;
 }
 
 ThemeManager *App::GetThemeManager()

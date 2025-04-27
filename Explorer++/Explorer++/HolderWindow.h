@@ -10,6 +10,7 @@
 #include <optional>
 
 struct Config;
+class DarkModeColorProvider;
 class DarkModeManager;
 class MainFontSetter;
 class ResourceLoader;
@@ -22,7 +23,8 @@ public:
 
 	static HolderWindow *Create(HWND parent, const std::wstring &caption, DWORD style,
 		const std::wstring &closeButtonTooltip, const Config *config,
-		const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager);
+		const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager,
+		const DarkModeColorProvider *darkModeColorProvider);
 
 	HWND GetHWND() const;
 	void SetContentChild(HWND contentChild);
@@ -44,7 +46,8 @@ private:
 
 	HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
 		const std::wstring &closeButtonTooltip, const Config *config,
-		const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager);
+		const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager,
+		const DarkModeColorProvider *darkModeColorProvider);
 	HWND CreateHolderWindow(HWND parent, const std::wstring &caption, DWORD style);
 	static ATOM RegisterHolderWindowClass();
 
@@ -76,6 +79,7 @@ private:
 
 	const HWND m_hwnd;
 	const DarkModeManager *const m_darkModeManager;
+	const DarkModeColorProvider *const m_darkModeColorProvider;
 	HWND m_contentChild = nullptr;
 	HFONT m_font = nullptr;
 	wil::unique_hfont m_defaultFont = nullptr;

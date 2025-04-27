@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "HolderWindow.h"
+#include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
 #include "MainFontSetter.h"
 #include "SystemFontHelper.h"
@@ -18,17 +19,20 @@
 
 HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager)
+	const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager,
+	const DarkModeColorProvider *darkModeColorProvider)
 {
 	return new HolderWindow(parent, caption, style, closeButtonTooltip, config, resourceLoader,
-		darkModeManager);
+		darkModeManager, darkModeColorProvider);
 }
 
 HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, const Config *config,
-	const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager) :
+	const ResourceLoader *resourceLoader, const DarkModeManager *darkModeManager,
+	const DarkModeColorProvider *darkModeColorProvider) :
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_darkModeManager(darkModeManager),
+	m_darkModeColorProvider(darkModeColorProvider),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
 	LOGFONT systemFont = GetDefaultSystemFontScaledToWindow(m_hwnd);
@@ -221,7 +225,7 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 
 	if (m_darkModeManager->IsDarkModeEnabled())
 	{
-		backgroundBrush = m_darkModeManager->GetBackgroundBrush();
+		backgroundBrush = m_darkModeColorProvider->GetBackgroundBrush();
 	}
 	else
 	{
@@ -236,7 +240,7 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 
 	if (m_darkModeManager->IsDarkModeEnabled())
 	{
-		SetTextColor(ps.hdc, DarkModeManager::TEXT_COLOR);
+		SetTextColor(ps.hdc, DarkModeColorProvider::TEXT_COLOR);
 	}
 
 	RECT toolbarRect;

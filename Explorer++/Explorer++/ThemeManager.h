@@ -5,12 +5,12 @@
 #pragma once
 
 #include <boost/signals2.hpp>
-#include <wil/resource.h>
 #include <commctrl.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
+class DarkModeColorProvider;
 class DarkModeManager;
 class WindowSubclass;
 
@@ -19,7 +19,8 @@ class WindowSubclass;
 class ThemeManager
 {
 public:
-	ThemeManager(DarkModeManager *darkModeManager);
+	ThemeManager(DarkModeManager *darkModeManager,
+		const DarkModeColorProvider *darkModeColorProvider);
 
 	// This will theme a top-level window, plus all of its nested children. Once a window is
 	// tracked, any changes to the dark mode status will result in the window theme being
@@ -35,12 +36,6 @@ public:
 	void ApplyThemeToWindowAndChildren(HWND hwnd);
 
 private:
-	// This is the same background color as used in the Explorer address bar.
-	static constexpr COLORREF COMBO_BOX_EX_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
-
-	// This is the background color of each non-selected tab in a tab control when dark is enabled.
-	static constexpr COLORREF TAB_DARK_MODE_BACKGROUND_COLOR = RGB(38, 38, 38);
-
 	static constexpr wchar_t DIALOG_CLASS_NAME[] = L"#32770";
 
 	void OnDarkModeStatusChanged();
@@ -74,7 +69,6 @@ private:
 	LRESULT OnButtonCustomDraw(NMCUSTOMDRAW *customDraw);
 	LRESULT OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
 	LRESULT ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	HBRUSH GetComboBoxExBackgroundBrush();
 	LRESULT TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void DrawTab(HWND hwnd, int index, HDC hdc);
 	RECT GetTabRect(HWND hwnd, int index);
@@ -84,11 +78,9 @@ private:
 	LRESULT ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	DarkModeManager *const m_darkModeManager;
+	const DarkModeColorProvider *const m_darkModeColorProvider;
 	std::unordered_set<HWND> m_trackedTopLevelWindows;
-
-	const wil::unique_hbrush m_tabBackgroundBrush;
 	std::unordered_map<HWND, int> m_hotTabMap;
-
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 };

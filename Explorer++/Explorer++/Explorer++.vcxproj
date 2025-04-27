@@ -993,6 +993,7 @@
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
+    <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
     <ClCompile Include="AppearanceOptionsPage.cpp" />
@@ -1299,6 +1300,7 @@
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
+    <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />
     <ClInclude Include="AppearanceOptionsPage.h" />

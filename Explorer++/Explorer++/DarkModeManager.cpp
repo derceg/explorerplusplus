@@ -12,12 +12,7 @@
 #include <detours/detours.h>
 #include <wil/common.h>
 
-DarkModeManager::DarkModeManager(EventWindow *eventWindow, const Config *config) :
-	m_config(config),
-	m_backgroundBrush(CreateSolidBrush(BACKGROUND_COLOR)),
-	m_selectedItemBackgroundBrush(CreateSolidBrush(SELECTED_ITEM_BACKGROUND_COLOR)),
-	m_hotItemBackgroundBrush(CreateSolidBrush(HOT_ITEM_BACKGROUND_COLOR)),
-	m_borderBrush(CreateSolidBrush(BORDER_COLOR))
+DarkModeManager::DarkModeManager(EventWindow *eventWindow, const Config *config) : m_config(config)
 {
 	auto RtlGetVersion = reinterpret_cast<RtlGetVersionType>(
 		GetProcAddress(GetModuleHandle(L"ntdll.dll"), "RtlGetVersion"));
@@ -279,24 +274,4 @@ bool DarkModeManager::IsHighContrast()
 	}
 
 	return WI_IsFlagSet(highContrast.dwFlags, HCF_HIGHCONTRASTON);
-}
-
-HBRUSH DarkModeManager::GetBackgroundBrush() const
-{
-	return m_backgroundBrush.get();
-}
-
-HBRUSH DarkModeManager::GetSelectedItemBackgroundBrush() const
-{
-	return m_selectedItemBackgroundBrush.get();
-}
-
-HBRUSH DarkModeManager::GetHotItemBackgroundBrush() const
-{
-	return m_hotItemBackgroundBrush.get();
-}
-
-HBRUSH DarkModeManager::GetBorderBrush() const
-{
-	return m_borderBrush.get();
 }

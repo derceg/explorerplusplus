@@ -823,6 +823,9 @@
     <ClCompile Include="SearchTabsModel.cpp">
       <Filter>Dialogs\Search Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="DarkModeColorProvider.cpp">
+      <Filter>Dark Mode Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1703,6 +1706,9 @@
     </ClInclude>
     <ClInclude Include="SearchTabsModel.h">
       <Filter>Dialogs\Search Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkModeColorProvider.h">
+      <Filter>Dark Mode Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
