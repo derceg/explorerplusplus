@@ -43,7 +43,8 @@ Explorerplusplus *Explorerplusplus::Create(App *app, const WindowStorageData *st
 Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageData) :
 	m_id(idCounter++),
 	m_app(app),
-	m_hContainer(CreateMainWindow(storageData)),
+	m_hContainer(CreateMainWindow(storageData,
+		app->GetFeatureList()->IsEnabled(Feature::MultipleWindowsPerSession))),
 	m_commandController(this),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_pluginMenuManager(m_hContainer, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
@@ -95,7 +96,8 @@ Explorerplusplus::~Explorerplusplus()
 	m_pDirMon->Release();
 }
 
-HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
+HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData,
+	const bool multipleWindowsPerSession)
 {
 	bool isFirstInstance = IsFirstInstance();
 	static bool mainWindowClassRegistered = false;
@@ -119,8 +121,12 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 	CHECK(res);
 
 	placement.showCmd = SW_HIDE;
-	placement.rcNormalPosition =
-		storageData && isFirstInstance ? storageData->bounds : LayoutDefaults::GetDefaultMainWindowBounds();
+	if (multipleWindowsPerSession)
+		placement.rcNormalPosition =
+			storageData ? storageData->bounds : LayoutDefaults::GetDefaultMainWindowBounds();
+	else
+		placement.rcNormalPosition =
+			storageData && isFirstInstance ? storageData->bounds : LayoutDefaults::GetDefaultMainWindowBounds();
 	SetWindowPlacement(hwnd, &placement);
 
 	return hwnd;
