@@ -195,6 +195,8 @@ Bug fixes:
 - When renaming an item in the listview or treeview,
   Ctrl+Backspace now erases the last word, rather than inserting
   a non-printable character. See #299.
+- Fixed an issue that caused the icons shown in the address bar
+  dropdown to all be the same.
 
 Misc:
 - ARM64 builds are now available.

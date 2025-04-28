@@ -100,22 +100,12 @@ HWND CreateTooltipControl(HWND parent)
 
 BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 {
-	HIMAGELIST smallIcons;
-	BOOL bRet = Shell_GetImageLists(nullptr, &smallIcons);
-
-	if (!bRet)
-	{
-		return FALSE;
-	}
-
-	SendMessage(hComboBoxEx, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
-
 	/* Remove all items that are currently in the list. */
 	SendMessage(hComboBoxEx, CB_RESETCONTENT, 0, 0);
 
 	TCHAR findPath[MAX_PATH];
 	StringCchCopy(findPath, std::size(findPath), path);
-	bRet = PathAppend(findPath, _T("*"));
+	BOOL bRet = PathAppend(findPath, _T("*"));
 
 	if (!bRet)
 	{
@@ -146,17 +136,21 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 				break;
 			}
 
-			SHFILEINFO shfi;
-			SHGetFileInfo(path, NULL, &shfi, NULL, SHGFI_SYSICONINDEX);
-
-			COMBOBOXEXITEM cbItem;
-			cbItem.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+			COMBOBOXEXITEM cbItem = {};
+			cbItem.mask = CBEIF_TEXT | CBEIF_INDENT;
 			cbItem.iItem = -1;
-			cbItem.iImage = shfi.iIcon;
-			cbItem.iSelectedImage = shfi.iIcon;
 			cbItem.iIndent = 1;
-			cbItem.iOverlay = 1;
 			cbItem.pszText = wfd.cFileName;
+
+			SHFILEINFO shfi;
+			auto res = SHGetFileInfo(fullFileName, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
+
+			if (res != 0)
+			{
+				WI_SetAllFlags(cbItem.mask, CBEIF_IMAGE | CBEIF_SELECTEDIMAGE);
+				cbItem.iImage = shfi.iIcon;
+				cbItem.iSelectedImage = shfi.iIcon;
+			}
 
 			LRESULT lRet =
 				SendMessage(hComboBoxEx, CBEM_INSERTITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
