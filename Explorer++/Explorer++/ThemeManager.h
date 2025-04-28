@@ -54,6 +54,7 @@ private:
 	void ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToComboBox(HWND hwnd);
+	void ApplyThemeToEditControl(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToButton(HWND hwnd, bool enableDarkMode);
 	void ApplyThemeToTooltips(HWND hwnd);
 	void ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode);

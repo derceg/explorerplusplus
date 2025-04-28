@@ -94,7 +94,7 @@ BOOL ThemeManager::ProcessChildWindow(HWND hwnd)
 BOOL ThemeManager::ProcessThreadWindow(HWND hwnd)
 {
 	WCHAR className[256];
-	auto res = GetClassName(hwnd, className, static_cast<int>(std::size(className)));
+	auto res = GetClassName(hwnd, className, std::size(className));
 
 	if (res == 0)
 	{
@@ -120,7 +120,7 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	// The maximum length of a class name is 256 characters (see the documentation for lpszClassName
 	// in https://learn.microsoft.com/en-au/windows/win32/api/winuser/ns-winuser-wndclassw).
 	WCHAR className[256];
-	auto res = GetClassName(hwnd, className, static_cast<int>(std::size(className)));
+	auto res = GetClassName(hwnd, className, std::size(className));
 
 	if (res == 0)
 	{
@@ -171,6 +171,10 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	else if (lstrcmp(className, WC_COMBOBOX) == 0)
 	{
 		ApplyThemeToComboBox(hwnd);
+	}
+	else if (lstrcmp(className, WC_EDIT) == 0)
+	{
+		ApplyThemeToEditControl(hwnd, enableDarkMode);
 	}
 	else if (lstrcmp(className, WC_BUTTON) == 0)
 	{
@@ -458,8 +462,7 @@ void ThemeManager::ApplyThemeToComboBox(HWND hwnd)
 	CHECK(parent);
 
 	WCHAR parentClassName[256];
-	auto parentClassNameResult =
-		GetClassName(parent, parentClassName, static_cast<int>(std::size(parentClassName)));
+	auto parentClassNameResult = GetClassName(parent, parentClassName, std::size(parentClassName));
 
 	if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOXEX) == 0)
 	{
@@ -468,6 +471,30 @@ void ThemeManager::ApplyThemeToComboBox(HWND hwnd)
 	else
 	{
 		SetWindowTheme(hwnd, L"CFD", nullptr);
+	}
+}
+
+void ThemeManager::ApplyThemeToEditControl(HWND hwnd, bool enableDarkMode)
+{
+	HWND parent = GetParent(hwnd);
+	CHECK(parent);
+
+	WCHAR parentClassName[256];
+	auto parentClassNameResult = GetClassName(parent, parentClassName, std::size(parentClassName));
+
+	if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOX) == 0)
+	{
+		// The edit control will be themed along with the combobox.
+		return;
+	}
+
+	if (enableDarkMode)
+	{
+		SetWindowTheme(hwnd, L"CFD", nullptr);
+	}
+	else
+	{
+		SetWindowTheme(hwnd, nullptr, nullptr);
 	}
 }
 
@@ -869,8 +896,7 @@ LRESULT ThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 LRESULT ThemeManager::OnCustomDraw(NMCUSTOMDRAW *customDraw)
 {
 	WCHAR className[256];
-	auto res =
-		GetClassName(customDraw->hdr.hwndFrom, className, static_cast<int>(std::size(className)));
+	auto res = GetClassName(customDraw->hdr.hwndFrom, className, std::size(className));
 
 	if (res == 0)
 	{
