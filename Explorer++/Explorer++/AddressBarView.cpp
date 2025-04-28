@@ -46,10 +46,16 @@ AddressBarView::AddressBarView(HWND parent, BrowserWindow *browser, const Config
 
 HWND AddressBarView::CreateAddressBar(HWND parent)
 {
+	// Note that a non 0 height needs to be passed in here. That's because the control will
+	// interpret the height as the combined height of the edit control plus dropdown (see
+	// https://devblogs.microsoft.com/oldnewthing/20060310-17/?p=31973).
+	//
+	// If the height is 0, the edit control will still display normally, but the dropdown will
+	// seemingly never appear, since its height will be 0.
 	return CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX, L"",
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_CLIPSIBLINGS
 			| WS_CLIPCHILDREN,
-		0, 0, 0, 0, parent, nullptr, GetModuleHandle(nullptr), nullptr);
+		0, 0, 0, 200, parent, nullptr, GetModuleHandle(nullptr), nullptr);
 }
 
 LRESULT AddressBarView::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
