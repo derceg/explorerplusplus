@@ -28,6 +28,9 @@ public:
 	// The background color of the hot item (i.e. the item that's under the mouse).
 	static constexpr COLORREF HOT_ITEM_BACKGROUND_COLOR = RGB(71, 71, 71);
 
+	// The background color of a checked toolbar item.
+	static constexpr COLORREF TOOLBAR_CHECKED_BACKGROUND_COLOR = RGB(80, 80, 80);
+
 	// The color of borders (e.g. the borders around an individual tab).
 	static constexpr COLORREF BORDER_COLOR = RGB(120, 120, 120);
 

@@ -986,8 +986,24 @@ LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
+		if (WI_IsFlagSet(customDraw->nmcd.uItemState, CDIS_CHECKED))
+		{
+			// The color used to draw checked items doesn't work very well in dark mode (the color
+			// is too bright and somewhat hard to distinguish from the text). Therefore, checked
+			// items will be drawn as if they're hot.
+			//
+			// Additionally, if the button actually is hot, it will still be drawn in the same
+			// color. That matches the behavior of the control in the default theme.
+			WI_SetFlag(customDraw->nmcd.uItemState, CDIS_HOT);
+			customDraw->clrHighlightHotTrack =
+				DarkModeColorProvider::TOOLBAR_CHECKED_BACKGROUND_COLOR;
+		}
+		else
+		{
+			customDraw->clrHighlightHotTrack = DarkModeColorProvider::HOT_ITEM_BACKGROUND_COLOR;
+		}
+
 		customDraw->clrText = DarkModeColorProvider::TEXT_COLOR;
-		customDraw->clrHighlightHotTrack = DarkModeColorProvider::HOT_ITEM_BACKGROUND_COLOR;
 		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
 	}
 
