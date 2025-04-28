@@ -26,6 +26,7 @@
 
 namespace NSearchDialog
 {
+
 const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
 const int WM_APP_SEARCHFINISHED = WM_APP + 2;
 const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
@@ -34,7 +35,7 @@ const int WM_APP_REGULAREXPRESSIONINVALID = WM_APP + 4;
 int CALLBACK SortResultsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 DWORD WINAPI SearchThread(LPVOID pParam);
-int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
+
 }
 
 const TCHAR SearchDialogPersistentSettings::SETTINGS_KEY[] = _T("Search");
@@ -202,37 +203,13 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 	switch (LOWORD(wParam))
 	{
+	case IDC_BUTTON_DIRECTORY:
+		OnBrowserForFolder();
+		break;
+
 	case IDSEARCH:
 		OnSearch();
 		break;
-
-	case IDC_BUTTON_DIRECTORY:
-	{
-		BROWSEINFO bi;
-		TCHAR szDirectory[MAX_PATH];
-		TCHAR szDisplayName[MAX_PATH];
-
-		auto title = m_resourceLoader->LoadString(IDS_SEARCHDIALOG_TITLE);
-
-		GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szDirectory, std::size(szDirectory));
-
-		bi.hwndOwner = m_hDlg;
-		bi.pidlRoot = nullptr;
-		bi.pszDisplayName = szDisplayName;
-		bi.lpszTitle = title.c_str();
-		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-		bi.lpfn = NSearchDialog::BrowseCallbackProc;
-		bi.lParam = reinterpret_cast<LPARAM>(szDirectory);
-		unique_pidl_absolute pidl(SHBrowseForFolder(&bi));
-
-		if (pidl != nullptr)
-		{
-			std::wstring parsingPath;
-			GetDisplayName(pidl.get(), SHGDN_FORPARSING, parsingPath);
-			SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, parsingPath.c_str());
-		}
-	}
-	break;
 
 	case IDEXIT:
 		DestroyWindow(m_hDlg);
@@ -246,22 +223,40 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-int CALLBACK NSearchDialog::BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
+HRESULT SearchDialog::OnBrowserForFolder()
 {
-	UNREFERENCED_PARAMETER(lParam);
+	auto fileOpenDialog = wil::CoCreateInstanceNoThrow<IFileOpenDialog>(CLSID_FileOpenDialog);
 
-	assert(lpData != NULL);
-
-	auto *szSearchPattern = reinterpret_cast<TCHAR *>(lpData);
-
-	switch (uMsg)
+	if (!fileOpenDialog)
 	{
-	case BFFM_INITIALIZED:
-		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, reinterpret_cast<LPARAM>(szSearchPattern));
-		break;
+		return E_FAIL;
 	}
 
-	return 0;
+	FILEOPENDIALOGOPTIONS options;
+	RETURN_IF_FAILED(fileOpenDialog->GetOptions(&options));
+	RETURN_IF_FAILED(fileOpenDialog->SetOptions(
+		options | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST));
+
+	wchar_t directory[MAX_PATH];
+	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, directory, std::size(directory));
+
+	if (wil::com_ptr_nothrow<IShellItem> defaultItem;
+		SUCCEEDED(SHCreateItemFromParsingName(directory, nullptr, IID_PPV_ARGS(&defaultItem))))
+	{
+		fileOpenDialog->SetDefaultFolder(defaultItem.get());
+	}
+
+	RETURN_IF_FAILED(fileOpenDialog->Show(m_hDlg));
+
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	RETURN_IF_FAILED(fileOpenDialog->GetResult(&shellItem));
+
+	wil::unique_cotaskmem_string parsingPath;
+	RETURN_IF_FAILED(shellItem->GetDisplayName(SIGDN_FILESYSPATH, &parsingPath));
+
+	SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, parsingPath.get());
+
+	return S_OK;
 }
 
 void SearchDialog::OnSearch()

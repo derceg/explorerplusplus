@@ -168,6 +168,7 @@ private:
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
+	HRESULT OnBrowserForFolder();
 	void OnSearch();
 	void StartSearching();
 	void StopSearching();
