@@ -210,7 +210,9 @@ private:
 
 	Explorerplusplus(App *app, const WindowStorageData *storageData);
 
-	static HWND CreateMainWindow(const WindowStorageData *storageData);
+	static HWND CreateMainWindow(const WindowStorageData *storageData,
+		const bool multipleWindowsPerSession);
+	static bool IsFirstInstance();
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
