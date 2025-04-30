@@ -6,6 +6,7 @@
 #include "TestHelper.h"
 #include "../Helper/UniqueResources.h"
 #include <gtest/gtest.h>
+#include <commctrl.h>
 #include <gdiplus.h>
 
 using namespace testing;
@@ -46,6 +47,21 @@ private:
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 };
 
+// Common controls are created in some tests.
+class CommonControlsEnvironment : public Environment
+{
+public:
+	void SetUp() override
+	{
+		INITCOMMONCONTROLSEX commonControls = {};
+		commonControls.dwSize = sizeof(commonControls);
+		commonControls.dwICC = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES
+			| ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES | ICC_TAB_CLASSES;
+		auto res = InitCommonControlsEx(&commonControls);
+		ASSERT_TRUE(res);
+	}
+};
+
 // This listener will ensure that when as ASSERT_* fails in a subroutine, the entire test will fail.
 // See https://google.github.io/googletest/advanced.html#asserting-on-subroutines-with-an-exception.
 class ThrowListener : public EmptyTestEventListener
@@ -66,6 +82,7 @@ int wmain(int argc, wchar_t *argv[])
 
 	AddGlobalTestEnvironment(new ComEnvironment);
 	AddGlobalTestEnvironment(new GdiplusEnvironment);
+	AddGlobalTestEnvironment(new CommonControlsEnvironment);
 	InitGoogleTest(&argc, argv);
 	UnitTest::GetInstance()->listeners().Append(new ThrowListener);
 	return RUN_ALL_TESTS();

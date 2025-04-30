@@ -434,6 +434,9 @@
     <ClCompile Include="StorageTest.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
+    <ClCompile Include="DarkModeTabControlPainterTest.cpp">
+      <Filter>Dark Mode Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -580,6 +583,9 @@
     <Filter Include="Dialogs\Search Tabs">
       <UniqueIdentifier>{1501dbc5-1f4f-4886-8321-953dff50c846}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dark Mode Support">
+      <UniqueIdentifier>{4a4a40d6-f5d8-4b79-b305-c2404f67c67e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -719,5 +725,6 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="compatibility.manifest" />
+    <Manifest Include="common-controls.manifest" />
   </ItemGroup>
 </Project>

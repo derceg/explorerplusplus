@@ -71,8 +71,6 @@ private:
 	LRESULT OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
 	LRESULT ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void DrawTab(HWND hwnd, int index, HDC hdc);
-	RECT GetTabRect(HWND hwnd, int index);
 	LRESULT ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

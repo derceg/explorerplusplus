@@ -9,12 +9,12 @@
 #include "Explorer++.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
+#include "DarkModeTabControlPainter.h"
 #include "SystemFontHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DoubleBufferedPaint.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
@@ -1062,60 +1062,18 @@ LRESULT ThemeManager::TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 
 	case WM_PAINT:
 	{
-		auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
-
-		// These styles aren't handled and it's not expected that they'll be set.
-		if (WI_IsAnyFlagSet(style, TCS_BUTTONS | TCS_VERTICAL))
-		{
-			DCHECK(false);
-			break;
-		}
-
-		// Conversely, it's expected that these styles will always be set and there is no handling
-		// for any case where they're not set.
-		if (WI_IsAnyFlagClear(style, TCS_FOCUSNEVER | TCS_SINGLELINE))
-		{
-			DCHECK(false);
-			break;
-		}
-
 		DoubleBufferedPaint doubleBufferedPaint(hwnd);
 		HDC memDC = doubleBufferedPaint.GetMemoryDC();
 		RECT paintRect = doubleBufferedPaint.GetPaintRect();
 
-		// Fill in the background from the parent control. This is what the control does normally.
-		DrawThemeParentBackground(hwnd, memDC, &paintRect);
+		DarkModeTabControlPainter painter(hwnd, m_darkModeColorProvider);
 
-		RECT clientRect;
-		GetClientRect(hwnd, &clientRect);
-		RECT bottomEdgeRect = { clientRect.left, clientRect.bottom - 2, clientRect.right,
-			clientRect.bottom - 1 };
-		FrameRect(memDC, &bottomEdgeRect, m_darkModeColorProvider->GetBorderBrush());
-
-		SetBkMode(memDC, TRANSPARENT);
-
-		auto font = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0, 0));
-		wil::unique_select_object selectFont;
-
-		if (font)
+		if (auto itr = m_hotTabMap.find(hwnd); itr != m_hotTabMap.end())
 		{
-			selectFont = wil::SelectObject(memDC, font);
+			painter.SetHotItem(itr->second);
 		}
 
-		int numTabs = TabCtrl_GetItemCount(hwnd);
-
-		for (int i = 0; i < numTabs; i++)
-		{
-			auto itemRect = GetTabRect(hwnd, i);
-
-			RECT intersectionRect;
-			if (!IntersectRect(&intersectionRect, &paintRect, &itemRect))
-			{
-				continue;
-			}
-
-			DrawTab(hwnd, i, memDC);
-		}
+		painter.Paint(memDC, paintRect);
 	}
 		return 0;
 
@@ -1160,117 +1118,6 @@ LRESULT ThemeManager::TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-void ThemeManager::DrawTab(HWND hwnd, int index, HDC hdc)
-{
-	bool isHot = false;
-
-	if (auto itr = m_hotTabMap.find(hwnd); itr != m_hotTabMap.end())
-	{
-		isHot = (index == itr->second);
-	}
-
-	int selectedIndex = TabCtrl_GetCurSel(hwnd);
-	bool isSelected = (index == selectedIndex);
-
-	auto itemRect = GetTabRect(hwnd, index);
-	RECT backgroundRect = itemRect;
-
-	if (isSelected)
-	{
-		// There's a bottom edge drawn directly underneath the tabs. The background for the selected
-		// tab is drawn over that edge.
-		backgroundRect.bottom += 1;
-	}
-
-	auto backgroundBrush = isSelected ? m_darkModeColorProvider->GetSelectedItemBackgroundBrush()
-		: isHot                       ? m_darkModeColorProvider->GetHotItemBackgroundBrush()
-									  : m_darkModeColorProvider->GetTabBackgroundBrush();
-	FillRect(hdc, &backgroundRect, backgroundBrush);
-
-	Gdiplus::Graphics graphics(hdc);
-	Gdiplus::Color borderColor;
-	borderColor.SetFromCOLORREF(DarkModeColorProvider::BORDER_COLOR);
-	Gdiplus::Pen borderPen(borderColor);
-
-	if (index == 0)
-	{
-		graphics.DrawLine(&borderPen, static_cast<int>(itemRect.left), itemRect.top, itemRect.left,
-			itemRect.bottom);
-	}
-
-	int rightBorderTop = itemRect.top;
-
-	// If this is the tab before the selected tab, then the border needs to be raised to the top of
-	// the viewport (to match the top and right edge for the selected tab).
-	if (index == (selectedIndex - 1))
-	{
-		rightBorderTop = 0;
-	}
-
-	graphics.DrawLine(&borderPen, static_cast<int>(itemRect.right) - 1, rightBorderTop,
-		itemRect.right - 1, itemRect.bottom);
-
-	graphics.DrawLine(&borderPen, static_cast<int>(itemRect.left), itemRect.top, itemRect.right - 1,
-		itemRect.top);
-
-	auto text = TabHelper::GetItemText(hwnd, index);
-
-	RECT textRect;
-	DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_CALCRECT);
-
-	auto imageList = TabCtrl_GetImageList(hwnd);
-
-	TCITEM tcItem = {};
-	tcItem.mask = TCIF_IMAGE;
-	auto res = TabCtrl_GetItem(hwnd, index, &tcItem);
-	CHECK(res);
-
-	RECT drawRect = itemRect;
-
-	if (imageList && tcItem.iImage != -1)
-	{
-		int iconWidth;
-		int iconHeight;
-		res = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
-		CHECK(res);
-
-		// Although a TCM_SETPADDING message exists, there is no corresponding message to retrieve
-		// the padding. Therefore, the padding will be calculated using the same method the control
-		// uses. Note that this implicitly assumes that the padding hasn't been customized.
-		int xPadding = GetSystemMetrics(SM_CXEDGE) * 3;
-
-		int contentWidth = iconWidth + xPadding + GetRectWidth(&textRect);
-		POINT imageOrigin = { drawRect.left + (GetRectWidth(&drawRect) - contentWidth) / 2,
-			drawRect.top + (GetRectHeight(&drawRect) - iconHeight) / 2 };
-		ImageList_Draw(imageList, tcItem.iImage, hdc, imageOrigin.x, imageOrigin.y, ILD_NORMAL);
-
-		drawRect.left += iconWidth + xPadding;
-	}
-
-	SetTextColor(hdc,
-		isSelected ? DarkModeColorProvider::TEXT_COLOR
-				   : DarkModeColorProvider::TEXT_COLOR_BACKGROUND);
-	DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &drawRect,
-		DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-}
-
-RECT ThemeManager::GetTabRect(HWND hwnd, int index)
-{
-	RECT itemRect;
-	TabCtrl_GetItemRect(hwnd, index, &itemRect);
-
-	bool isSelected = (index == TabCtrl_GetCurSel(hwnd));
-
-	if (isSelected)
-	{
-		// Each tab in the control is at a slight vertical offset. The selected tab, however, will
-		// align with the top of the viewport.
-		itemRect.top = 0;
-	}
-
-	return itemRect;
 }
 
 LRESULT ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
