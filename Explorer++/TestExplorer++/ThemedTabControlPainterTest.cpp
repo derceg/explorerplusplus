@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "DarkModeTabControlPainter.h"
+#include "ThemedTabControlPainter.h"
 #include "DarkModeColorProvider.h"
 #include "ImageTestHelper.h"
 #include "../Helper/Controls.h"
@@ -17,7 +17,7 @@
 
 using namespace testing;
 
-class DarkModeTabControlPainterTest : public Test
+class ThemedTabControlPainterTest : public Test
 {
 protected:
 	enum class ChangeType
@@ -51,8 +51,8 @@ protected:
 		res = MoveWindow(m_tabControl.get(), 0, 0, width, height, false);
 		ASSERT_TRUE(res);
 
-		m_painter = std::make_unique<DarkModeTabControlPainter>(m_tabControl.get(),
-			&m_darkModeColorProvider);
+		m_painter =
+			std::make_unique<ThemedTabControlPainter>(m_tabControl.get(), &m_darkModeColorProvider);
 	}
 
 	void AddInitialTabs()
@@ -107,7 +107,7 @@ protected:
 	DarkModeColorProvider m_darkModeColorProvider;
 	wil::unique_hwnd m_parentWindow;
 	wil::unique_hwnd m_tabControl;
-	std::unique_ptr<DarkModeTabControlPainter> m_painter;
+	std::unique_ptr<ThemedTabControlPainter> m_painter;
 	std::unique_ptr<Gdiplus::Bitmap> m_previousBitmap;
 };
 
@@ -131,7 +131,7 @@ protected:
 // functions that are being called are executing correctly.
 //
 // There is also some verification that what's drawn changes as the state of the control changes.
-TEST_F(DarkModeTabControlPainterTest, Paint)
+TEST_F(ThemedTabControlPainterTest, Paint)
 {
 	PerformPaintTest(ChangeType::ChangeExpected);
 

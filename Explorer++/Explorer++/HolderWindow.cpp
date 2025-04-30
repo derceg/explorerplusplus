@@ -240,7 +240,7 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 
 	if (m_darkModeManager->IsDarkModeEnabled())
 	{
-		SetTextColor(ps.hdc, DarkModeColorProvider::TEXT_COLOR);
+		SetTextColor(ps.hdc, m_darkModeColorProvider->GetTextColor());
 	}
 
 	RECT toolbarRect;

@@ -9,8 +9,8 @@
 #include "Explorer++.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
-#include "DarkModeTabControlPainter.h"
 #include "SystemFontHelper.h"
+#include "ThemedTabControlPainter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DoubleBufferedPaint.h"
 #include "../Helper/DpiCompatibility.h"
@@ -307,8 +307,8 @@ void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		backgroundColor = DarkModeColorProvider::BACKGROUND_COLOR;
-		textColor = DarkModeColorProvider::TEXT_COLOR;
+		backgroundColor = m_darkModeColorProvider->GetBackgroundColor();
+		textColor = m_darkModeColorProvider->GetTextColor();
 	}
 	else
 	{
@@ -349,9 +349,9 @@ void ThemeManager::ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		backgroundColor = DarkModeColorProvider::BACKGROUND_COLOR;
-		textColor = DarkModeColorProvider::TEXT_COLOR;
-		insertMarkColor = DarkModeColorProvider::FOREGROUND_COLOR;
+		backgroundColor = m_darkModeColorProvider->GetBackgroundColor();
+		textColor = m_darkModeColorProvider->GetTextColor();
+		insertMarkColor = m_darkModeColorProvider->GetForegroundColor();
 	}
 	else
 	{
@@ -372,8 +372,8 @@ void ThemeManager::ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		backgroundColor = DarkModeColorProvider::BACKGROUND_COLOR;
-		textColor = DarkModeColorProvider::TEXT_COLOR;
+		backgroundColor = m_darkModeColorProvider->GetBackgroundColor();
+		textColor = m_darkModeColorProvider->GetTextColor();
 	}
 	else
 	{
@@ -415,7 +415,7 @@ void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 
 	if (enableDarkMode)
 	{
-		insertMarkColor = DarkModeColorProvider::FOREGROUND_COLOR;
+		insertMarkColor = m_darkModeColorProvider->GetForegroundColor();
 	}
 	else
 	{
@@ -727,11 +727,11 @@ LRESULT ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 			if (itemState == MBI_DISABLED || itemState == MBI_DISABLEDHOT
 				|| itemState == MBI_DISABLEDPUSHED)
 			{
-				textColor = DarkModeColorProvider::TEXT_COLOR_DISABLED;
+				textColor = m_darkModeColorProvider->GetDisabledTextColor();
 			}
 			else
 			{
-				textColor = DarkModeColorProvider::TEXT_COLOR;
+				textColor = m_darkModeColorProvider->GetTextColor();
 			}
 
 			options.crText = textColor;
@@ -851,8 +851,8 @@ LRESULT ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 	case WM_CTLCOLORBTN:
 	{
 		auto hdc = reinterpret_cast<HDC>(wParam);
-		SetBkColor(hdc, DarkModeColorProvider::BACKGROUND_COLOR);
-		SetTextColor(hdc, DarkModeColorProvider::TEXT_COLOR);
+		SetBkColor(hdc, m_darkModeColorProvider->GetBackgroundColor());
+		SetTextColor(hdc, m_darkModeColorProvider->GetTextColor());
 		return reinterpret_cast<LRESULT>(m_darkModeColorProvider->GetBackgroundBrush());
 	}
 	break;
@@ -963,11 +963,11 @@ LRESULT ThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
 
 		if (IsWindowEnabled(customDraw->hdr.hwndFrom))
 		{
-			textColor = DarkModeColorProvider::TEXT_COLOR;
+			textColor = m_darkModeColorProvider->GetTextColor();
 		}
 		else
 		{
-			textColor = DarkModeColorProvider::TEXT_COLOR_DISABLED;
+			textColor = m_darkModeColorProvider->GetDisabledTextColor();
 		}
 
 		SetTextColor(customDraw->hdc, textColor);
@@ -1022,14 +1022,14 @@ LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 			// color. That matches the behavior of the control in the default theme.
 			WI_SetFlag(customDraw->nmcd.uItemState, CDIS_HOT);
 			customDraw->clrHighlightHotTrack =
-				DarkModeColorProvider::TOOLBAR_CHECKED_BACKGROUND_COLOR;
+				m_darkModeColorProvider->GetToolbarCheckedBackgroundColor();
 		}
 		else
 		{
-			customDraw->clrHighlightHotTrack = DarkModeColorProvider::HOT_ITEM_BACKGROUND_COLOR;
+			customDraw->clrHighlightHotTrack = m_darkModeColorProvider->GetHotItemBackgroundColor();
 		}
 
-		customDraw->clrText = DarkModeColorProvider::TEXT_COLOR;
+		customDraw->clrText = m_darkModeColorProvider->GetTextColor();
 		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
 	}
 
@@ -1044,7 +1044,7 @@ LRESULT ThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	{
 		auto hdc = reinterpret_cast<HDC>(wParam);
 		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, DarkModeColorProvider::TEXT_COLOR);
+		SetTextColor(hdc, m_darkModeColorProvider->GetTextColor());
 		return reinterpret_cast<LRESULT>(m_darkModeColorProvider->GetComboBoxExBackgroundBrush());
 	}
 	break;
@@ -1066,7 +1066,7 @@ LRESULT ThemeManager::TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		HDC memDC = doubleBufferedPaint.GetMemoryDC();
 		RECT paintRect = doubleBufferedPaint.GetPaintRect();
 
-		DarkModeTabControlPainter painter(hwnd, m_darkModeColorProvider);
+		ThemedTabControlPainter painter(hwnd, m_darkModeColorProvider);
 
 		if (auto itr = m_hotTabMap.find(hwnd); itr != m_hotTabMap.end())
 		{
@@ -1138,7 +1138,7 @@ LRESULT ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 			case CDDS_ITEMPREPAINT:
 				// This sets the text color in the listview header.
-				SetTextColor(customDraw->hdc, DarkModeColorProvider::TEXT_COLOR);
+				SetTextColor(customDraw->hdc, m_darkModeColorProvider->GetTextColor());
 				return CDRF_NEWFONT;
 			}
 		}
@@ -1186,7 +1186,7 @@ LRESULT ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		DCHECK(!text.empty());
 
 		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, DarkModeColorProvider::TEXT_COLOR);
+		SetTextColor(hdc, m_darkModeColorProvider->GetTextColor());
 
 		auto font = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0, 0));
 		wil::unique_select_object selectFont;

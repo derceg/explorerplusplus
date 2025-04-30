@@ -6,13 +6,13 @@
 
 #include <optional>
 
-class DarkModeColorProvider;
+class ColorProvider;
 
-// Draws an entire tab control (the tabs, plus background) in dark mode.
-class DarkModeTabControlPainter
+// Draws an entire tab control (the tabs, plus background) in the provided theme colors.
+class ThemedTabControlPainter
 {
 public:
-	DarkModeTabControlPainter(HWND hwnd, const DarkModeColorProvider *darkModeColorProvider);
+	ThemedTabControlPainter(HWND hwnd, const ColorProvider *colorProvider);
 
 	void SetHotItem(int hotItem);
 	void ClearHotItem();
@@ -23,6 +23,6 @@ private:
 	RECT GetTabRect(int index);
 
 	const HWND m_hwnd;
-	const DarkModeColorProvider *const m_darkModeColorProvider;
+	const ColorProvider *const m_colorProvider;
 	std::optional<int> m_hotItem;
 };

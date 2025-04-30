@@ -3,19 +3,18 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DarkModeTabControlPainter.h"
-#include "DarkModeColorProvider.h"
+#include "ThemedTabControlPainter.h"
+#include "ColorProvider.h"
 #include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
 
-DarkModeTabControlPainter::DarkModeTabControlPainter(HWND hwnd,
-	const DarkModeColorProvider *darkModeColorProvider) :
+ThemedTabControlPainter::ThemedTabControlPainter(HWND hwnd, const ColorProvider *colorProvider) :
 	m_hwnd(hwnd),
-	m_darkModeColorProvider(darkModeColorProvider)
+	m_colorProvider(colorProvider)
 {
 }
 
-void DarkModeTabControlPainter::SetHotItem(int hotItem)
+void ThemedTabControlPainter::SetHotItem(int hotItem)
 {
 	if (hotItem < 0 || hotItem >= TabCtrl_GetItemCount(m_hwnd))
 	{
@@ -26,12 +25,12 @@ void DarkModeTabControlPainter::SetHotItem(int hotItem)
 	m_hotItem = hotItem;
 }
 
-void DarkModeTabControlPainter::ClearHotItem()
+void ThemedTabControlPainter::ClearHotItem()
 {
 	m_hotItem.reset();
 }
 
-void DarkModeTabControlPainter::Paint(HDC hdc, const RECT &paintRect)
+void ThemedTabControlPainter::Paint(HDC hdc, const RECT &paintRect)
 {
 	auto style = GetWindowLongPtr(m_hwnd, GWL_STYLE);
 
@@ -52,7 +51,7 @@ void DarkModeTabControlPainter::Paint(HDC hdc, const RECT &paintRect)
 
 	RECT bottomEdgeRect = { clientRect.left, clientRect.bottom - 2, clientRect.right,
 		clientRect.bottom - 1 };
-	int frameRes = FrameRect(hdc, &bottomEdgeRect, m_darkModeColorProvider->GetBorderBrush());
+	int frameRes = FrameRect(hdc, &bottomEdgeRect, m_colorProvider->GetBorderBrush());
 	DCHECK_NE(frameRes, 0);
 
 	int modeRes = SetBkMode(hdc, TRANSPARENT);
@@ -82,7 +81,7 @@ void DarkModeTabControlPainter::Paint(HDC hdc, const RECT &paintRect)
 	}
 }
 
-void DarkModeTabControlPainter::DrawTab(int index, HDC hdc)
+void ThemedTabControlPainter::DrawTab(int index, HDC hdc)
 {
 	bool isHot = (index == m_hotItem);
 	int selectedIndex = TabCtrl_GetCurSel(m_hwnd);
@@ -98,15 +97,15 @@ void DarkModeTabControlPainter::DrawTab(int index, HDC hdc)
 		backgroundRect.bottom += 1;
 	}
 
-	auto backgroundBrush = isSelected ? m_darkModeColorProvider->GetSelectedItemBackgroundBrush()
-		: isHot                       ? m_darkModeColorProvider->GetHotItemBackgroundBrush()
-									  : m_darkModeColorProvider->GetTabBackgroundBrush();
+	auto backgroundBrush = isSelected ? m_colorProvider->GetSelectedItemBackgroundBrush()
+		: isHot                       ? m_colorProvider->GetHotItemBackgroundBrush()
+									  : m_colorProvider->GetTabBackgroundBrush();
 	int res = FillRect(hdc, &backgroundRect, backgroundBrush);
 	DCHECK_NE(res, 0);
 
 	Gdiplus::Graphics graphics(hdc);
 	Gdiplus::Color borderColor;
-	borderColor.SetFromCOLORREF(DarkModeColorProvider::BORDER_COLOR);
+	borderColor.SetFromCOLORREF(m_colorProvider->GetBorderColor());
 	Gdiplus::Pen borderPen(borderColor);
 	Gdiplus::Status status;
 
@@ -173,15 +172,14 @@ void DarkModeTabControlPainter::DrawTab(int index, HDC hdc)
 	}
 
 	auto colorRes = SetTextColor(hdc,
-		isSelected ? DarkModeColorProvider::TEXT_COLOR
-				   : DarkModeColorProvider::TEXT_COLOR_BACKGROUND);
+		isSelected ? m_colorProvider->GetTextColor() : m_colorProvider->GetBackgroundTextColor());
 	DCHECK_NE(colorRes, CLR_INVALID);
 	res = DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &drawRect,
 		DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	DCHECK_NE(res, 0);
 }
 
-RECT DarkModeTabControlPainter::GetTabRect(int index)
+RECT ThemedTabControlPainter::GetTabRect(int index)
 {
 	RECT itemRect;
 	auto res = TabCtrl_GetItemRect(m_hwnd, index, &itemRect);

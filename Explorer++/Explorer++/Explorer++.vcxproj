@@ -994,7 +994,7 @@
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
-    <ClCompile Include="DarkModeTabControlPainter.cpp" />
+    <ClCompile Include="ThemedTabControlPainter.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
     <ClCompile Include="AppearanceOptionsPage.cpp" />
@@ -1298,11 +1298,12 @@
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
+    <ClInclude Include="ColorProvider.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
-    <ClInclude Include="DarkModeTabControlPainter.h" />
+    <ClInclude Include="ThemedTabControlPainter.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />
     <ClInclude Include="AppearanceOptionsPage.h" />

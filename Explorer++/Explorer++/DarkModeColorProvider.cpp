@@ -15,6 +15,61 @@ DarkModeColorProvider::DarkModeColorProvider() :
 {
 }
 
+COLORREF DarkModeColorProvider::GetBackgroundColor() const
+{
+	return BACKGROUND_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetTextColor() const
+{
+	return TEXT_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetBackgroundTextColor() const
+{
+	return BACKGROUND_TEXT_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetDisabledTextColor() const
+{
+	return DISABLED_TEXT_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetForegroundColor() const
+{
+	return FOREGROUND_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetSelectedItemBackgroundColor() const
+{
+	return SELECTED_ITEM_BACKGROUND_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetHotItemBackgroundColor() const
+{
+	return HOT_ITEM_BACKGROUND_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetToolbarCheckedBackgroundColor() const
+{
+	return TOOLBAR_CHECKED_BACKGROUND_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetBorderColor() const
+{
+	return BORDER_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetComboBoxExBackgroundColor() const
+{
+	return COMBO_BOX_EX_BACKGROUND_COLOR;
+}
+
+COLORREF DarkModeColorProvider::GetTabBackgroundColor() const
+{
+	return TAB_BACKGROUND_COLOR;
+}
+
 HBRUSH DarkModeColorProvider::GetBackgroundBrush() const
 {
 	return m_backgroundBrush.get();
