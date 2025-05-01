@@ -19,15 +19,6 @@ class EventWindow;
 class DarkModeManager
 {
 public:
-	enum PreferredAppMode
-	{
-		Default,
-		AllowDark,
-		ForceDark,
-		ForceLight,
-		Max
-	};
-
 	DarkModeManager(EventWindow *eventWindow, const Config *config);
 
 	bool IsDarkModeSupported() const;
@@ -43,6 +34,15 @@ private:
 	static constexpr DWORD BUILD_NUMBER_1809 = 17763;
 	static constexpr DWORD BUILD_NUMBER_1903 = 18362;
 	static constexpr DWORD BUILD_NUMBER_1909 = 18363;
+
+	enum PreferredAppMode
+	{
+		Default,
+		AllowDark,
+		ForceDark,
+		ForceLight,
+		Max
+	};
 
 	using RtlGetVersionType = NTSTATUS(WINAPI *)(LPOSVERSIONINFOEXW);
 
