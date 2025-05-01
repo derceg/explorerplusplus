@@ -200,6 +200,7 @@
     <ClCompile Include="BookmarkTreeViewContextMenuTest.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="BrowserCommandControllerTest.cpp" />
+    <ClCompile Include="BrowserCommandTargetFake.cpp" />
     <ClCompile Include="BrowserListTest.cpp" />
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
@@ -216,6 +217,7 @@
     <ClCompile Include="ColumnXmlStorageTest.cpp" />
     <ClCompile Include="CommandLineSplitterTest.cpp" />
     <ClCompile Include="CommandLineTest.cpp" />
+    <ClCompile Include="BrowserCommandTargetManagerTest.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutorTest.cpp" />
     <ClCompile Include="ConfigRegistryStorageTest.cpp" />
     <ClCompile Include="ConfigStorageTestHelper.cpp" />
@@ -256,6 +258,7 @@
     <ClCompile Include="HistoryTrackerTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />
     <ClCompile Include="ResourceLoaderFake.cpp" />
+    <ClCompile Include="ScopedBrowserCommandTargetTest.cpp" />
     <ClCompile Include="ScopedTestDir.cpp" />
     <ClCompile Include="SearchTabsModelTest.cpp" />
     <ClCompile Include="ShellBrowserEventsTest.cpp" />
@@ -377,6 +380,7 @@
     <ClInclude Include="BrowserWindowMock.h" />
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />
+    <ClInclude Include="BrowserCommandTargetFake.h" />
     <ClInclude Include="ConfigStorageTestHelper.h" />
     <ClInclude Include="DragDropTestHelper.h" />
     <ClInclude Include="DriveEnumeratorFake.h" />

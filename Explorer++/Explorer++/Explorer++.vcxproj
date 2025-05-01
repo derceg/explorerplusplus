@@ -989,11 +989,13 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BookmarkTreeViewContextMenu.cpp" />
+    <ClCompile Include="BrowserCommandTargetManager.cpp" />
     <ClCompile Include="BrowserWindow.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
+    <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ThemedTabControlPainter.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
@@ -1299,6 +1301,8 @@
     <ClInclude Include="BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
     <ClInclude Include="ColorProvider.h" />
+    <ClInclude Include="BrowserCommandTarget.h" />
+    <ClInclude Include="BrowserCommandTargetManager.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
@@ -1360,6 +1364,7 @@
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="HistoryTracker.h" />
     <ClInclude Include="IconSet.h" />
+    <ClInclude Include="ScopedBrowserCommandTarget.h" />
     <ClInclude Include="SearchTabsModel.h" />
     <ClInclude Include="ShellBrowser\ColumnHelper.h" />
     <ClInclude Include="ShellBrowser\NavigationEvents.h" />

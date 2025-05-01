@@ -532,9 +532,6 @@
     <ClCompile Include="OneShotTimer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserCommandController.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="HistoryModel.cpp">
       <Filter>History</Filter>
     </ClCompile>
@@ -781,9 +778,6 @@
     <ClCompile Include="AddressBarView.cpp">
       <Filter>Address Bar\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserWindow.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="StatusBarView.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
@@ -828,6 +822,18 @@
     </ClCompile>
     <ClCompile Include="ThemedTabControlPainter.cpp">
       <Filter>Theming</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserWindow.cpp">
+      <Filter>Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserCommandController.cpp">
+      <Filter>Browser\Command Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserCommandTargetManager.cpp">
+      <Filter>Browser\Command Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedBrowserCommandTarget.cpp">
+      <Filter>Browser\Command Handling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1359,9 +1365,6 @@
     <ClInclude Include="TabHistoryMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BrowserWindow.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowser.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
@@ -1369,9 +1372,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="OneShotTimer.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="BrowserCommandController.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="HistoryModel.h">
@@ -1719,6 +1719,21 @@
     <ClInclude Include="ThemedTabControlPainter.h">
       <Filter>Theming</Filter>
     </ClInclude>
+    <ClInclude Include="BrowserCommandTarget.h">
+      <Filter>Browser\Command Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserCommandTargetManager.h">
+      <Filter>Browser\Command Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedBrowserCommandTarget.h">
+      <Filter>Browser\Command Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserWindow.h">
+      <Filter>Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserCommandController.h">
+      <Filter>Browser\Command Handling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1931,6 +1946,12 @@
     </Filter>
     <Filter Include="Theming">
       <UniqueIdentifier>{661ce1d5-e14b-42b5-a6a8-3aad268bd5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Browser">
+      <UniqueIdentifier>{475e7a41-8c74-457f-8c26-d235876ec838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Browser\Command Handling">
+      <UniqueIdentifier>{f7182c76-082d-40ff-8608-e9acc927cdc3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

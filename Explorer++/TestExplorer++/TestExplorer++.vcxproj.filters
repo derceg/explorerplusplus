@@ -111,9 +111,6 @@
     <ClCompile Include="OneShotTimerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserCommandControllerTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowserFake.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -379,9 +376,6 @@
     <ClCompile Include="AddressBarTest.cpp">
       <Filter>Address Bar\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserWindowFake.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="BrowserTestBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -436,6 +430,21 @@
     </ClCompile>
     <ClCompile Include="ThemedTabControlPainterTest.cpp">
       <Filter>Theming</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedBrowserCommandTargetTest.cpp">
+      <Filter>Browser\Command Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserCommandTargetManagerTest.cpp">
+      <Filter>Browser\Command Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserWindowFake.cpp">
+      <Filter>Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserCommandControllerTest.cpp">
+      <Filter>Browser\Command Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserCommandTargetFake.cpp">
+      <Filter>Browser\Command Handling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -586,6 +595,12 @@
     <Filter Include="Theming">
       <UniqueIdentifier>{350e0f47-a121-4eb0-8b5d-55c3357b04af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Browser">
+      <UniqueIdentifier>{ee9d159a-6a61-4653-a5d5-8de9051c6c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Browser\Command Handling">
+      <UniqueIdentifier>{1172cdbf-214a-4687-be9a-0e560e29b874}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -634,9 +649,6 @@
     <ClInclude Include="DragDropTestHelper.h" />
     <ClInclude Include="TestResources.h">
       <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BrowserWindowMock.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellTestHelper.h" />
     <ClInclude Include="ImageTestHelper.h" />
@@ -695,9 +707,6 @@
     <ClInclude Include="NavigationRequestDelegateMock.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="BrowserWindowFake.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="BrowserTestBase.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -716,6 +725,15 @@
     </ClInclude>
     <ClInclude Include="ResourceLoaderFake.h">
       <Filter>Resource Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserCommandTargetFake.h">
+      <Filter>Browser\Command Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserWindowFake.h">
+      <Filter>Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserWindowMock.h">
+      <Filter>Browser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
