@@ -46,5 +46,6 @@ private:
 	void UndoRenameOperation(const RenamedItems_t &renamedItemList);
 	void UndoDeleteOperation(const DeletedItems_t &deletedItemList);
 
+private:
 	std::stack<UndoItem_t> m_stackFileActions;
 };

@@ -59,13 +59,14 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 HRESULT FileActionHandler::DeleteFiles(HWND hwnd, const DeletedItems_t &deletedItems,
 	bool permanent, bool silent)
 {
-	HRESULT hr = FileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
+	DeletedItems_t temp(deletedItems);
+	const HRESULT hr = FileOperations::DeleteFiles(hwnd, temp, permanent, silent);
 
 	if (SUCCEEDED(hr))
 	{
 		UndoItem_t undoItem;
 		undoItem.type = UndoType::Deleted;
-		undoItem.deletedItems = deletedItems;
+		undoItem.deletedItems = temp;
 		m_stackFileActions.push(undoItem);
 	}
 
@@ -126,6 +127,11 @@ void FileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemLis
 	 - Find the item in the recycle bin (probably need to read INFO2 file).
 	 - Restore it (context menu command).
 	 - Push delete action onto stack. */
+
+	for (const auto& item : deletedItemList)
+	{
+		FileOperations::Undelete(item);
+	}
 }
 
 BOOL FileActionHandler::CanUndo() const
