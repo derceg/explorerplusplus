@@ -15,6 +15,37 @@ int BrowserWindow::GetId() const
 	return m_id;
 }
 
+BrowserWindow::LifecycleState BrowserWindow::GetLifecycleState() const
+{
+	return m_lifecycleState;
+}
+
+void BrowserWindow::SetLifecycleState(LifecycleState state)
+{
+	if (state == LifecycleState::Main)
+	{
+		CHECK(m_lifecycleState == LifecycleState::Starting);
+	}
+	else if (state == LifecycleState::Closing)
+	{
+		CHECK(m_lifecycleState == LifecycleState::Main);
+	}
+	else
+	{
+		CHECK(false);
+	}
+
+	m_lifecycleState = state;
+
+	m_lifecycleStateChangedSignal(state);
+}
+
+boost::signals2::connection BrowserWindow::AddLifecycleStateChangedObserver(
+	const LifecycleStateChangedSignal::slot_type &observer)
+{
+	return m_lifecycleStateChangedSignal.connect(observer);
+}
+
 bool BrowserWindow::IsShellBrowserActive(const ShellBrowser *shellBrowser) const
 {
 	return shellBrowser == GetActiveShellBrowser();

@@ -6,7 +6,6 @@
 #include "MainToolbar.h"
 #include "App.h"
 #include "BrowserCommandController.h"
-#include "BrowserWindow.h"
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
@@ -137,8 +136,8 @@ void MainToolbar::Initialize(HWND parent,
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&MainToolbar::ParentWndProc, this)));
 
-	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(
-		std::bind_front(&MainToolbar::OnBrowserInitialized, this)));
+	m_connections.push_back(m_browserWindow->AddLifecycleStateChangedObserver(
+		std::bind_front(&MainToolbar::OnBrowserLifecycleStateChanged, this)));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&MainToolbar::OnTabSelected, this),
@@ -446,10 +445,12 @@ int MainToolbar::LookupToolbarButtonTextID(MainToolbarButton button) const
 	return 0;
 }
 
-void MainToolbar::OnBrowserInitialized()
+void MainToolbar::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
 {
-	m_browserInitialized = true;
-	UpdateToolbarButtonStates();
+	if (updatedState == BrowserWindow::LifecycleState::Main)
+	{
+		UpdateToolbarButtonStates();
+	}
 }
 
 void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
@@ -734,7 +735,7 @@ void MainToolbar::UpdateConfigDependentButtonStates()
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	if (!m_browserInitialized)
+	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		return;
 	}
@@ -774,7 +775,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 void MainToolbar::OnClipboardUpdate()
 {
-	if (!m_browserInitialized)
+	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		return;
 	}

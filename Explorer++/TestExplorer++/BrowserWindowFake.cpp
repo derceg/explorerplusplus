@@ -18,10 +18,13 @@ BrowserWindowFake::BrowserWindowFake(TabEvents *tabEvents, NavigationEvents *nav
 	m_navigationEvents(navigationEvents),
 	m_window(CreateBrowserWindow())
 {
+	SetLifecycleState(LifecycleState::Main);
 }
 
 BrowserWindowFake::~BrowserWindowFake()
 {
+	SetLifecycleState(LifecycleState::Closing);
+
 	while (!m_tabs.empty())
 	{
 		auto tab = std::move(m_tabs.back());
@@ -65,14 +68,6 @@ void BrowserWindowFake::RegisterBrowserWindowClass()
 HWND BrowserWindowFake::GetHWND() const
 {
 	return m_window.get();
-}
-
-boost::signals2::connection BrowserWindowFake::AddBrowserInitializedObserver(
-	const BrowserInitializedSignal::slot_type &observer)
-{
-	UNREFERENCED_PARAMETER(observer);
-
-	return {};
 }
 
 BrowserCommandController *BrowserWindowFake::GetCommandController()

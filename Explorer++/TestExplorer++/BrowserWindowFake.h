@@ -22,8 +22,6 @@ public:
 
 	// BrowserWindow
 	HWND GetHWND() const override;
-	boost::signals2::connection AddBrowserInitializedObserver(
-		const BrowserInitializedSignal::slot_type &observer) override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
 	void FocusActiveTab() override;

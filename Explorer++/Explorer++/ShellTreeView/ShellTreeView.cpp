@@ -88,10 +88,13 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 
 	StartDirectoryMonitoringForDrives();
 
-	m_connections.push_back(m_browserWindow->AddBrowserInitializedObserver(
-		[this]()
+	m_connections.push_back(m_browserWindow->AddLifecycleStateChangedObserver(
+		[this](BrowserWindow::LifecycleState updatedState)
 		{
-			m_browserInitialized = true;
+			if (updatedState != BrowserWindow::LifecycleState::Main)
+			{
+				return;
+			}
 
 			// Updating the treeview selection is relatively expensive, so it's not done at all
 			// during startup. Therefore, the selection will be set a single time, once the
@@ -640,7 +643,7 @@ void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
 {
 	using namespace std::chrono_literals;
 
-	if (!m_browserInitialized)
+	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		// This class will select an item initially (to ensure that there's always a selected item).
 		// That will take place before the application has finished initializing. That initial
@@ -1551,8 +1554,8 @@ void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 void ShellTreeView::UpdateSelection()
 {
-	if (!m_browserInitialized || !m_config->synchronizeTreeview.get()
-		|| !m_config->showFolders.get())
+	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main
+		|| !m_config->synchronizeTreeview.get() || !m_config->showFolders.get())
 	{
 		return;
 	}

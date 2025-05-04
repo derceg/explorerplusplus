@@ -15,8 +15,6 @@ class BrowserWindowMock : public BrowserWindow
 public:
 	// BrowserWindow
 	MOCK_METHOD(HWND, GetHWND, (), (const, override));
-	MOCK_METHOD(boost::signals2::connection, AddBrowserInitializedObserver,
-		(const BrowserInitializedSignal::slot_type &observer), (override));
 	MOCK_METHOD(BrowserCommandController *, GetCommandController, (), (override));
 	MOCK_METHOD(BrowserPane *, GetActivePane, (), (const, override));
 	MOCK_METHOD(void, FocusActiveTab, (), (override));

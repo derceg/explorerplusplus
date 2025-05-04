@@ -18,16 +18,31 @@ struct WindowStorageData;
 class BrowserWindow : public Navigator, public MenuHelpTextRequest
 {
 public:
-	using BrowserInitializedSignal = boost::signals2::signal<void()>;
+	enum class LifecycleState
+	{
+		// Indicates that the browser is in the process of initializing.
+		Starting,
+
+		// Indicates that the browser is in the main part of its lifecycle. That is, it has fully
+		// initialized and hasn't started closing.
+		Main,
+
+		// Indicates that the browser has started closing.
+		Closing
+	};
+
+	using LifecycleStateChangedSignal = boost::signals2::signal<void(LifecycleState updatedState)>;
 
 	BrowserWindow();
 	virtual ~BrowserWindow() = default;
 
 	int GetId() const;
 
+	LifecycleState GetLifecycleState() const;
+	boost::signals2::connection AddLifecycleStateChangedObserver(
+		const LifecycleStateChangedSignal::slot_type &observer);
+
 	virtual HWND GetHWND() const = 0;
-	virtual boost::signals2::connection AddBrowserInitializedObserver(
-		const BrowserInitializedSignal::slot_type &observer) = 0;
 	virtual BrowserCommandController *GetCommandController() = 0;
 
 	virtual BrowserPane *GetActivePane() const = 0;
@@ -52,7 +67,13 @@ public:
 	virtual void TryClose() = 0;
 	virtual void Close() = 0;
 
+protected:
+	void SetLifecycleState(LifecycleState state);
+
 private:
 	static inline int idCounter = 1;
 	const int m_id;
+
+	LifecycleState m_lifecycleState = LifecycleState::Starting;
+	LifecycleStateChangedSignal m_lifecycleStateChangedSignal;
 };

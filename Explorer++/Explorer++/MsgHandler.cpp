@@ -278,7 +278,7 @@ concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout(WeakPtr<Explore
 
 void Explorerplusplus::UpdateLayout()
 {
-	if (!m_browserInitialized || m_browserClosing)
+	if (GetLifecycleState() != LifecycleState::Main)
 	{
 		return;
 	}
@@ -512,8 +512,7 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 
 int Explorerplusplus::OnDestroy()
 {
-	DCHECK(!m_browserClosing);
-	m_browserClosing = true;
+	SetLifecycleState(LifecycleState::Closing);
 
 	// Broadcasting focus changed events when the browser is being closed is both unnecessary and
 	// unsafe. It's unsafe, because guarantees that are normally upheld during the lifetime of the
@@ -950,7 +949,7 @@ void Explorerplusplus::FocusChanged()
 boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 	const FocusChangedSignal::slot_type &observer)
 {
-	CHECK(!m_browserClosing)
+	CHECK(GetLifecycleState() != LifecycleState::Closing)
 		<< "Adding a focus changed observer to a browser window while it's being closed is unsafe";
 
 	return m_focusChangedSignal.connect(observer);

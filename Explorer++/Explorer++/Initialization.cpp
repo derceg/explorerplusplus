@@ -75,8 +75,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	m_themeWindowTracker =
 		std::make_unique<ThemeWindowTracker>(m_hContainer, m_app->GetThemeManager());
 
-	m_browserInitialized = true;
-	m_browserInitializedSignal();
+	SetLifecycleState(LifecycleState::Main);
 }
 
 void Explorerplusplus::InitializeDisplayWindow()

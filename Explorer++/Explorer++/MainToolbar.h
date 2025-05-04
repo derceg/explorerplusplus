@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
 #include "MainFontSetter.h"
@@ -19,7 +20,6 @@
 #include <unordered_map>
 
 class App;
-class BrowserWindow;
 class NavigationRequest;
 class ResourceLoader;
 class ShellBrowser;
@@ -86,7 +86,7 @@ private:
 
 	void UpdateToolbarButtonImageIndexes();
 
-	void OnBrowserInitialized();
+	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	void OnShowFoldersUpdated(bool showFolders);
 
@@ -101,7 +101,6 @@ private:
 	CoreInterface *const m_coreInterface;
 	const ResourceLoader *const m_resourceLoader;
 	ShellIconLoader *const m_shellIconLoader;
-	bool m_browserInitialized = false;
 
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;

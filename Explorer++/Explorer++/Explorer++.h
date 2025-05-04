@@ -108,8 +108,6 @@ public:
 
 	// BrowserWindow
 	HWND GetHWND() const override;
-	boost::signals2::connection AddBrowserInitializedObserver(
-		const BrowserInitializedSignal::slot_type &observer) override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
 	void FocusActiveTab() override;
@@ -500,10 +498,6 @@ private:
 	bool m_performingLayout = false;
 #endif
 
-	/* Initialization. */
-	bool m_browserInitialized = false;
-	BrowserInitializedSignal m_browserInitializedSignal;
-
 	MainWindow *m_mainWindow = nullptr;
 	AddressBar *m_addressBar = nullptr;
 	StatusBar *m_statusBar = nullptr;
@@ -523,8 +517,6 @@ private:
 	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
 
 	FocusChangedSignal m_focusChangedSignal;
-	bool m_browserClosing = false;
-
 	// Treeview
 	HolderWindow *m_treeViewHolder = nullptr;
 	ShellTreeView *m_shellTreeView = nullptr;

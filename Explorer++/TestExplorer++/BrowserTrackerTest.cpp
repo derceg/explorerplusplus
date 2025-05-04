@@ -30,14 +30,6 @@ public:
 		return nullptr;
 	}
 
-	boost::signals2::connection AddBrowserInitializedObserver(
-		const BrowserInitializedSignal::slot_type &observer) override
-	{
-		UNREFERENCED_PARAMETER(observer);
-
-		return {};
-	}
-
 	BrowserCommandController *GetCommandController() override
 	{
 		return nullptr;

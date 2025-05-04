@@ -138,12 +138,6 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 	return RegisterClassEx(&windowClass);
 }
 
-boost::signals2::connection Explorerplusplus::AddBrowserInitializedObserver(
-	const BrowserInitializedSignal::slot_type &observer)
-{
-	return m_browserInitializedSignal.connect(observer);
-}
-
 void Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
 	GetActivePane()->GetTabContainerImpl()->CreateNewTab(*tab);

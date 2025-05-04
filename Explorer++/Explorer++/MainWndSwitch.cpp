@@ -1409,7 +1409,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		return OnListViewKeyDown(lParam);
 
 	case TBN_ENDADJUST:
-		if (m_browserInitialized)
+		if (GetLifecycleState() == LifecycleState::Main)
 		{
 			OnRebarToolbarSizeUpdated(reinterpret_cast<NMHDR *>(lParam)->hwndFrom);
 		}
