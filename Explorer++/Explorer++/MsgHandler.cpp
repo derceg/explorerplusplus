@@ -514,15 +514,6 @@ int Explorerplusplus::OnDestroy()
 {
 	SetLifecycleState(LifecycleState::Closing);
 
-	// Broadcasting focus changed events when the browser is being closed is both unnecessary and
-	// unsafe. It's unsafe, because guarantees that are normally upheld during the lifetime of the
-	// browser window won't necessarily be upheld while the browser window is closing. For example,
-	// normally there should always be at least one tab. When the browser window is closing, the tab
-	// container will be destroyed, so the assumption that there is at least a single tab won't
-	// necessarily hold.
-	// Therefore, all slots are disconnected here.
-	m_focusChangedSignal.disconnect_all_slots();
-
 	if (m_SHChangeNotifyID != 0)
 	{
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);
@@ -939,20 +930,6 @@ void Explorerplusplus::OnShowHiddenFiles()
 	Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	tab.GetShellBrowserImpl()->SetShowHidden(!tab.GetShellBrowserImpl()->GetShowHidden());
 	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
-}
-
-void Explorerplusplus::FocusChanged()
-{
-	m_focusChangedSignal();
-}
-
-boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
-	const FocusChangedSignal::slot_type &observer)
-{
-	CHECK(GetLifecycleState() != LifecycleState::Closing)
-		<< "Adding a focus changed observer to a browser window while it's being closed is unsafe";
-
-	return m_focusChangedSignal.connect(observer);
 }
 
 void Explorerplusplus::FocusActiveTab()

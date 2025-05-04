@@ -51,10 +51,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		SendMessage(m_hContainer, WM_MENUSELECT, wParam, lParam);
 		break;
 
-	case WM_SETFOCUS:
-		FocusChanged();
-		break;
-
 	case WM_CONTEXTMENU:
 		if (reinterpret_cast<HWND>(wParam)
 			== GetActivePane()

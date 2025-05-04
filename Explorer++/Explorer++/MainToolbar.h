@@ -82,7 +82,7 @@ private:
 
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const NavigationRequest *request);
-	void OnFocusChanged();
+	void OnBrowserCommandTargetChanged();
 
 	void UpdateToolbarButtonImageIndexes();
 

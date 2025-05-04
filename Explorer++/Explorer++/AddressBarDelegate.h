@@ -12,4 +12,5 @@ public:
 
 	virtual bool OnKeyPressed(UINT key) = 0;
 	virtual void OnBeginDrag() = 0;
+	virtual void OnFocused() = 0;
 };

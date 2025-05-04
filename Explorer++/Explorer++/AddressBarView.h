@@ -12,7 +12,6 @@
 #include <vector>
 
 class AddressBarDelegate;
-class BrowserWindow;
 struct Config;
 class WindowSubclass;
 
@@ -23,7 +22,7 @@ public:
 	SignalWrapper<AddressBarView, void()> sizeUpdatedSignal;
 	SignalWrapper<AddressBarView, void()> windowDestroyedSignal;
 
-	static AddressBarView *Create(HWND parent, BrowserWindow *browser, const Config *config);
+	static AddressBarView *Create(HWND parent, const Config *config);
 
 	void SetDelegate(AddressBarDelegate *delegate);
 	HWND GetHWND() const;
@@ -37,7 +36,7 @@ public:
 	void SetTextForTesting(const std::wstring &text);
 
 private:
-	AddressBarView(HWND parent, BrowserWindow *browser, const Config *config);
+	AddressBarView(HWND parent, const Config *config);
 
 	static HWND CreateAddressBar(HWND parent);
 
@@ -50,7 +49,6 @@ private:
 	void OnNcDestroy();
 
 	const HWND m_hwnd;
-	BrowserWindow *const m_browser;
 	AddressBarDelegate *m_delegate = nullptr;
 	MainFontSetter m_fontSetter;
 	std::wstring m_currentText;

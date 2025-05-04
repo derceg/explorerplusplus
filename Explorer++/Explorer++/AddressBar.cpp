@@ -37,6 +37,7 @@ AddressBar::AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *
 	m_browser(browser),
 	m_runtime(runtime),
 	m_iconFetcher(iconFetcher),
+	m_commandTarget(browser->GetCommandTargetManager(), this),
 	m_weakPtrFactory(this)
 {
 	Initialize(tabEvents, shellBrowserEvents, navigationEvents);
@@ -188,6 +189,11 @@ void AddressBar::OnBeginDrag()
 	SHDoDragDrop(nullptr, dataObject.get(), nullptr, allowedEffects, &effect);
 }
 
+void AddressBar::OnFocused()
+{
+	m_commandTarget.TargetFocused();
+}
+
 void AddressBar::OnTabSelected(const Tab &tab)
 {
 	UpdateTextAndIcon(tab.GetShellBrowser());
@@ -256,6 +262,18 @@ concurrencpp::null_result AddressBar::RetrieveUpdatedIcon(WeakPtr<AddressBar> we
 	}
 
 	weakSelf->m_view->UpdateTextAndIcon(std::nullopt, iconInfo->iconIndex);
+}
+
+bool AddressBar::IsCommandEnabled(int command) const
+{
+	UNREFERENCED_PARAMETER(command);
+
+	return false;
+}
+
+void AddressBar::ExecuteCommand(int command)
+{
+	UNREFERENCED_PARAMETER(command);
 }
 
 void AddressBar::OnWindowDestroyed()

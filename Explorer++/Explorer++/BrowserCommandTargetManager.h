@@ -7,12 +7,16 @@
 #include "BrowserCommandTarget.h"
 #include "../Helper/SignalWrapper.h"
 
+class BrowserWindow;
+
 // Manages the active target view for an individual browser window.
 class BrowserCommandTargetManager
 {
 public:
 	// Signals
 	SignalWrapper<BrowserCommandTargetManager, void()> targetChangedSignal;
+
+	BrowserCommandTargetManager(const BrowserWindow *browser);
 
 	BrowserCommandTarget *GetCurrentTarget() const;
 
@@ -30,6 +34,9 @@ private:
 		void ExecuteCommand(int command) override;
 	};
 
+	void UpdateCurrentTarget(BrowserCommandTarget *currentTarget);
+
+	const BrowserWindow *const m_browser;
 	BrowserCommandTarget *m_currentTarget = nullptr;
 	static inline DefaultTarget m_defaultTarget;
 };

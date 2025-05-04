@@ -30,7 +30,7 @@ protected:
 		m_cachedIcons(std::make_shared<CachedIcons>(10)),
 		m_iconFetcher(std::make_shared<AsyncIconFetcher>(&m_runtime, m_cachedIcons)),
 		m_browser(AddBrowser()),
-		m_addressBarView(AddressBarView::Create(m_browser->GetHWND(), m_browser, &m_config)),
+		m_addressBarView(AddressBarView::Create(m_browser->GetHWND(), &m_config)),
 		m_addressBar(AddressBar::Create(m_addressBarView, m_browser, &m_tabEvents,
 			&m_shellBrowserEvents, &m_navigationEvents, &m_runtime, m_iconFetcher))
 	{
@@ -132,4 +132,15 @@ TEST_F(AddressBarTest, RevertTextOnEscape)
 	auto *delegate = m_addressBarView->GetDelegateForTesting();
 	delegate->OnKeyPressed(VK_ESCAPE);
 	EXPECT_THAT(m_addressBarView->GetText(), StrCaseEq(path));
+}
+
+TEST_F(AddressBarTest, ActiveTargetOnFocus)
+{
+	auto *commandTargetManager = m_browser->GetCommandTargetManager();
+	EXPECT_NE(commandTargetManager->GetCurrentTarget(), m_addressBar);
+
+	// When the address bar receives focus, it should mark itself as the active target.
+	auto *delegate = m_addressBarView->GetDelegateForTesting();
+	delegate->OnFocused();
+	EXPECT_EQ(commandTargetManager->GetCurrentTarget(), m_addressBar);
 }

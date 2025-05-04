@@ -5,6 +5,8 @@
 #pragma once
 
 #include "AddressBarDelegate.h"
+#include "BrowserCommandTarget.h"
+#include "ScopedBrowserCommandTarget.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/WeakPtr.h"
@@ -25,7 +27,7 @@ class ShellBrowserEvents;
 class Tab;
 class TabEvents;
 
-class AddressBar : private AddressBarDelegate
+class AddressBar : private AddressBarDelegate, public BrowserCommandTarget
 {
 public:
 	static AddressBar *Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
@@ -33,6 +35,10 @@ public:
 		const Runtime *runtime, std::shared_ptr<AsyncIconFetcher> iconFetcher);
 
 	AddressBarView *GetView() const;
+
+	// BrowserCommandTarget
+	bool IsCommandEnabled(int command) const override;
+	void ExecuteCommand(int command) override;
 
 private:
 	enum class IconUpdateType
@@ -55,6 +61,7 @@ private:
 	// AddressBarDelegate
 	bool OnKeyPressed(UINT key) override;
 	void OnBeginDrag() override;
+	void OnFocused() override;
 
 	void OnEnterPressed();
 	void OnEscapePressed();
@@ -71,9 +78,8 @@ private:
 	BrowserWindow *const m_browser;
 	const Runtime *const m_runtime;
 	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;
-
+	ScopedBrowserCommandTarget m_commandTarget;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 
 	WeakPtrFactory<AddressBar> m_weakPtrFactory;

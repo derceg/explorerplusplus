@@ -6,6 +6,7 @@
 #include "MainToolbar.h"
 #include "App.h"
 #include "BrowserCommandController.h"
+#include "BrowserCommandTargetManager.h"
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
@@ -147,8 +148,9 @@ void MainToolbar::Initialize(HWND parent,
 		std::bind_front(&MainToolbar::OnNavigationCommitted, this),
 		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
 
-	m_connections.push_back(m_coreInterface->AddFocusChangeObserver(
-		std::bind_front(&MainToolbar::OnFocusChanged, this)));
+	m_connections.push_back(
+		m_browserWindow->GetCommandTargetManager()->targetChangedSignal.AddObserver(
+			std::bind_front(&MainToolbar::OnBrowserCommandTargetChanged, this)));
 	m_connections.push_back(m_app->GetConfig()->useLargeToolbarIcons.addObserver(
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
 	m_connections.push_back(m_app->GetConfig()->showFolders.addObserver(
@@ -864,7 +866,7 @@ void MainToolbar::OnNavigationCommitted(const NavigationRequest *request)
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnFocusChanged()
+void MainToolbar::OnBrowserCommandTargetChanged()
 {
 	UpdateToolbarButtonStates();
 }

@@ -6,7 +6,7 @@
 #include "BrowserWindow.h"
 #include "ShellBrowser/ShellBrowser.h"
 
-BrowserWindow::BrowserWindow() : m_id(idCounter++)
+BrowserWindow::BrowserWindow() : m_id(idCounter++), m_commandTargetManager(this)
 {
 }
 
@@ -44,6 +44,11 @@ boost::signals2::connection BrowserWindow::AddLifecycleStateChangedObserver(
 	const LifecycleStateChangedSignal::slot_type &observer)
 {
 	return m_lifecycleStateChangedSignal.connect(observer);
+}
+
+BrowserCommandTargetManager *BrowserWindow::GetCommandTargetManager()
+{
+	return &m_commandTargetManager;
 }
 
 bool BrowserWindow::IsShellBrowserActive(const ShellBrowser *shellBrowser) const

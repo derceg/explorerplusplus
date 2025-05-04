@@ -15,14 +15,12 @@ using MainMenuItemRightClickedSignal =
 using MainMenuItemMiddleClickedSignal =
 	boost::signals2::signal<bool(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown),
 		FirstSuccessfulRequestCombiner<bool>>;
-using FocusChangedSignal = boost::signals2::signal<void()>;
 
 class ShellBrowserImpl;
 class TabContainerImpl;
 
-/* Basic interface between Explorerplusplus
-and some of the other components (such as the
-dialogs and toolbars). */
+// Deprecated interface between Explorerplusplus and some of the other components (such as the
+// dialogs and toolbars).
 class CoreInterface
 {
 public:
@@ -55,6 +53,4 @@ public:
 		const MainMenuItemMiddleClickedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) = 0;
-	virtual boost::signals2::connection AddFocusChangeObserver(
-		const FocusChangedSignal::slot_type &observer) = 0;
 };

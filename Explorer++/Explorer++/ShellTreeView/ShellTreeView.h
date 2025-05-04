@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "BrowserCommandTarget.h"
 #include "FileSystemChangeWatcher.h"
 #include "MainFontSetter.h"
+#include "ScopedBrowserCommandTarget.h"
 #include "ShellChangeWatcher.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellContextMenu.h"
@@ -27,7 +29,10 @@ class FileActionHandler;
 class ShellBrowserImpl;
 class ShellTreeNode;
 
-class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public ShellContextMenuHandler
+class ShellTreeView :
+	public ShellDropTargetWindow<HTREEITEM>,
+	public ShellContextMenuHandler,
+	public BrowserCommandTarget
 {
 public:
 	static ShellTreeView *Create(HWND hParent, App *app, BrowserWindow *browserWindow,
@@ -58,6 +63,10 @@ public:
 		const std::wstring &verb) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
 		UINT menuItemId) override;
+
+	// BrowserCommandTarget
+	bool IsCommandEnabled(int command) const override;
+	void ExecuteCommand(int command) override;
 
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
@@ -229,6 +238,7 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *m_config;
 	FileActionHandler *m_fileActionHandler;
+	ScopedBrowserCommandTarget m_commandTarget;
 
 	// Note that the treeview control sets the font on the tooltip control it creates each time the
 	// tooltip is shown (which can be seen by logging WM_SETFONT calls made on the tooltip control).

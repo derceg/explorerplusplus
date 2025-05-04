@@ -126,7 +126,6 @@ public:
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;
-	void FocusChanged() override;
 	void TryClose() override;
 	void Close() override;
 
@@ -439,8 +438,6 @@ private:
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainerImpl *GetTabContainerImpl() const override;
 	HWND GetTreeView() const override;
-	boost::signals2::connection AddFocusChangeObserver(
-		const FocusChangedSignal::slot_type &observer) override;
 
 	/* Menus. */
 	void InitializeMainMenu();
@@ -516,7 +513,6 @@ private:
 
 	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
 
-	FocusChangedSignal m_focusChangedSignal;
 	// Treeview
 	HolderWindow *m_treeViewHolder = nullptr;
 	ShellTreeView *m_shellTreeView = nullptr;

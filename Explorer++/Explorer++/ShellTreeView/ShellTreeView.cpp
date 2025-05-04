@@ -57,6 +57,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 	m_browserWindow(browserWindow),
 	m_config(app->GetConfig()),
 	m_fileActionHandler(fileActionHandler),
+	m_commandTarget(browserWindow->GetCommandTargetManager(), this),
 	m_fontSetter(GetHWND(), app->GetConfig()),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
@@ -164,7 +165,7 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	switch (msg)
 	{
 	case WM_SETFOCUS:
-		m_browserWindow->FocusChanged();
+		m_commandTarget.TargetFocused();
 		break;
 
 	case WM_RBUTTONDOWN:
@@ -1550,6 +1551,18 @@ void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	}
 	break;
 	}
+}
+
+bool ShellTreeView::IsCommandEnabled(int command) const
+{
+	UNREFERENCED_PARAMETER(command);
+
+	return false;
+}
+
+void ShellTreeView::ExecuteCommand(int command)
+{
+	UNREFERENCED_PARAMETER(command);
 }
 
 void ShellTreeView::UpdateSelection()

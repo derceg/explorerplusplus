@@ -251,7 +251,7 @@ bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 
 void Explorerplusplus::CreateAddressBar()
 {
-	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), this, m_config);
+	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), m_config);
 	addressBarView->sizeUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnAddressBarSizeUpdated, this));
 

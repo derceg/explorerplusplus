@@ -85,10 +85,6 @@ public:
 	{
 	}
 
-	void FocusChanged() override
-	{
-	}
-
 	void TryClose() override
 	{
 	}

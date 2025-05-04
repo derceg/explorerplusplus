@@ -18,13 +18,10 @@ BrowserWindowFake::BrowserWindowFake(TabEvents *tabEvents, NavigationEvents *nav
 	m_navigationEvents(navigationEvents),
 	m_window(CreateBrowserWindow())
 {
-	SetLifecycleState(LifecycleState::Main);
 }
 
 BrowserWindowFake::~BrowserWindowFake()
 {
-	SetLifecycleState(LifecycleState::Closing);
-
 	while (!m_tabs.empty())
 	{
 		auto tab = std::move(m_tabs.back());
@@ -124,10 +121,6 @@ bool BrowserWindowFake::IsActive() const
 }
 
 void BrowserWindowFake::Activate()
-{
-}
-
-void BrowserWindowFake::FocusChanged()
 {
 }
 

@@ -5,21 +5,19 @@
 #include "stdafx.h"
 #include "AddressBarView.h"
 #include "AddressBarDelegate.h"
-#include "BrowserWindow.h"
 #include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <Shlwapi.h>
 
-AddressBarView *AddressBarView::Create(HWND parent, BrowserWindow *browser, const Config *config)
+AddressBarView *AddressBarView::Create(HWND parent, const Config *config)
 {
-	return new AddressBarView(parent, browser, config);
+	return new AddressBarView(parent, config);
 }
 
-AddressBarView::AddressBarView(HWND parent, BrowserWindow *browser, const Config *config) :
+AddressBarView::AddressBarView(HWND parent, const Config *config) :
 	m_hwnd(CreateAddressBar(parent)),
-	m_browser(browser),
 	m_fontSetter(m_hwnd, config)
 {
 	HIMAGELIST smallIcons;
@@ -86,7 +84,7 @@ LRESULT AddressBarView::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 		break;
 
 	case WM_SETFOCUS:
-		m_browser->FocusChanged();
+		m_delegate->OnFocused();
 		break;
 	}
 

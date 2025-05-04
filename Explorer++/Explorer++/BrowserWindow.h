@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BrowserCommandTargetManager.h"
 #include "Navigator.h"
 #include "../Helper/MenuHelpTextRequest.h"
 #include <boost/signals2.hpp>
@@ -42,6 +43,10 @@ public:
 	boost::signals2::connection AddLifecycleStateChangedObserver(
 		const LifecycleStateChangedSignal::slot_type &observer);
 
+	BrowserCommandTargetManager *GetCommandTargetManager();
+
+	bool IsShellBrowserActive(const ShellBrowser *shellBrowser) const;
+
 	virtual HWND GetHWND() const = 0;
 	virtual BrowserCommandController *GetCommandController() = 0;
 
@@ -51,7 +56,6 @@ public:
 
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;
-	bool IsShellBrowserActive(const ShellBrowser *shellBrowser) const;
 
 	virtual void StartMainToolbarCustomization() = 0;
 
@@ -61,8 +65,6 @@ public:
 
 	virtual bool IsActive() const = 0;
 	virtual void Activate() = 0;
-
-	virtual void FocusChanged() = 0;
 
 	virtual void TryClose() = 0;
 	virtual void Close() = 0;
@@ -76,4 +78,6 @@ private:
 
 	LifecycleState m_lifecycleState = LifecycleState::Starting;
 	LifecycleStateChangedSignal m_lifecycleStateChangedSignal;
+
+	BrowserCommandTargetManager m_commandTargetManager;
 };

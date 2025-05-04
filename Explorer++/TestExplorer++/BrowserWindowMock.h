@@ -27,7 +27,6 @@ public:
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
 	MOCK_METHOD(bool, IsActive, (), (const, override));
 	MOCK_METHOD(void, Activate, (), (override));
-	MOCK_METHOD(void, FocusChanged, (), (override));
 	MOCK_METHOD(void, TryClose, (), (override));
 	MOCK_METHOD(void, Close, (), (override));
 

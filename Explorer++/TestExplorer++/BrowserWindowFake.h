@@ -33,9 +33,10 @@ public:
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;
-	void FocusChanged() override;
 	void TryClose() override;
 	void Close() override;
+
+	using BrowserWindow::SetLifecycleState;
 
 	// Navigator
 	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;

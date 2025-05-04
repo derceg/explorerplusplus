@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BrowserCommandTarget.h"
 #include "ClipboardOperations.h"
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
@@ -11,6 +12,7 @@
 #include "FolderSettings.h"
 #include "MainFontSetter.h"
 #include "NavigationManager.h"
+#include "ScopedBrowserCommandTarget.h"
 #include "ServiceProvider.h"
 #include "ShellBrowser.h"
 #include "ShellChangeWatcher.h"
@@ -43,6 +45,7 @@
 class AcceleratorManager;
 class App;
 struct BasicItemInfo_t;
+class BrowserCommandTargetManager;
 class CachedIcons;
 struct Config;
 class FileActionHandler;
@@ -65,16 +68,18 @@ typedef struct
 class ShellBrowserImpl :
 	public ShellBrowser,
 	public ShellDropTargetWindow<int>,
+	public BrowserCommandTarget,
 	private boost::noncopyable
 {
 public:
 	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler,
+		BrowserCommandTargetManager *commandTargetManager, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
+		BrowserCommandTargetManager *commandTargetManager, FileActionHandler *fileActionHandler,
+		const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
@@ -161,6 +166,10 @@ public:
 	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 	void AutoSizeColumns();
+
+	// BrowserCommandTarget
+	bool IsCommandEnabled(int command) const override;
+	void ExecuteCommand(int command) override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;
@@ -355,8 +364,8 @@ private:
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
 	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
+		BrowserCommandTargetManager *commandTargetManager, FileActionHandler *fileActionHandler,
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
@@ -613,6 +622,8 @@ private:
 	const HCURSOR m_progressCursor;
 
 	TabNavigationInterface *m_tabNavigation;
+	BrowserCommandTargetManager *const m_commandTargetManager;
+	ScopedBrowserCommandTarget m_commandTarget;
 	FileActionHandler *m_fileActionHandler;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
