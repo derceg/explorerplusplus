@@ -16,6 +16,7 @@ class BrowserCommandController : private boost::noncopyable
 public:
 	BrowserCommandController(BrowserWindow *browser, Config *config);
 
+	bool IsCommandEnabled(int command) const;
 	void ExecuteCommand(int command,
 		OpenFolderDisposition disposition = OpenFolderDisposition::CurrentTab);
 

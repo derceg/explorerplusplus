@@ -6,7 +6,6 @@
 #include "MainToolbar.h"
 #include "App.h"
 #include "BrowserCommandController.h"
-#include "BrowserCommandTargetManager.h"
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
@@ -749,7 +748,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Up,
 		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoUp());
 
-	auto *target = m_browser->GetCommandTargetManager()->GetCurrentTarget();
+	auto *browserController = m_browser->GetCommandController();
 	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
@@ -763,9 +762,9 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,
 		m_coreInterface->CanShowFileProperties());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete,
-		target->IsCommandEnabled(IDM_FILE_DELETE));
+		browserController->IsCommandEnabled(IDM_FILE_DELETE));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,
-		target->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
+		browserController->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
 		tab.GetShellBrowserImpl()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,

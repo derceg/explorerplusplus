@@ -17,6 +17,21 @@ BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Confi
 {
 }
 
+bool BrowserCommandController::IsCommandEnabled(int command) const
+{
+	switch (command)
+	{
+	// These commands are context-sensitive (i.e. they depend on the active target).
+	case IDM_FILE_DELETE:
+	case IDM_FILE_DELETEPERMANENTLY:
+		return m_browser->GetCommandTargetManager()->GetCurrentTarget()->IsCommandEnabled(command);
+
+	default:
+		DCHECK(false);
+		return false;
+	}
+}
+
 void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition disposition)
 {
 	switch (command)
