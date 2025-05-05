@@ -57,11 +57,6 @@ BOOL Explorerplusplus::CanRename() const
 	return TestItemAttributes(SFGAO_CANRENAME);
 }
 
-BOOL Explorerplusplus::CanShowFileProperties() const
-{
-	return TestItemAttributes(SFGAO_HASPROPSHEET);
-}
-
 /* Returns TRUE if all the specified attributes are set on the selected items. */
 BOOL Explorerplusplus::TestItemAttributes(SFGAOF attributes) const
 {

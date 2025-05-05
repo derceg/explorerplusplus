@@ -19,13 +19,13 @@ BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Confi
 
 bool BrowserCommandController::IsCommandEnabled(int command) const
 {
+	if (IsCommandContextSensitive(command))
+	{
+		return m_browser->GetCommandTargetManager()->GetCurrentTarget()->IsCommandEnabled(command);
+	}
+
 	switch (command)
 	{
-	// These commands are context-sensitive (i.e. they depend on the active target).
-	case IDM_FILE_DELETE:
-	case IDM_FILE_DELETEPERMANENTLY:
-		return m_browser->GetCommandTargetManager()->GetCurrentTarget()->IsCommandEnabled(command);
-
 	case IDM_GO_BACK:
 		return GetActiveShellBrowser()->GetNavigationController()->CanGoBack();
 
@@ -43,13 +43,14 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition disposition)
 {
+	if (IsCommandContextSensitive(command))
+	{
+		m_browser->GetCommandTargetManager()->GetCurrentTarget()->ExecuteCommand(command);
+		return;
+	}
+
 	switch (command)
 	{
-	case IDM_FILE_DELETE:
-	case IDM_FILE_DELETEPERMANENTLY:
-		m_browser->GetCommandTargetManager()->GetCurrentTarget()->ExecuteCommand(command);
-		break;
-
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
 		m_config->showAddressBar = !m_config->showAddressBar.get();
 		break;
@@ -145,6 +146,21 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 	default:
 		DCHECK(false);
 		break;
+	}
+}
+
+bool BrowserCommandController::IsCommandContextSensitive(int command) const
+{
+	switch (command)
+	{
+	// These commands are context-sensitive (i.e. they depend on the active target).
+	case IDM_FILE_DELETE:
+	case IDM_FILE_DELETEPERMANENTLY:
+	case IDM_FILE_PROPERTIES:
+		return true;
+
+	default:
+		return false;
 	}
 }
 

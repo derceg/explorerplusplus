@@ -122,7 +122,7 @@ public:
 	std::wstring GetItemDisplayName(int index) const;
 	std::wstring GetItemFullName(int index) const;
 
-	void ShowPropertiesForSelectedFiles() const;
+	void ShowPropertiesForSelectedItems() const;
 
 	/* Column support. */
 	std::vector<Column_t> GetCurrentColumns();

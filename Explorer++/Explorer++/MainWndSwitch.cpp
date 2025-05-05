@@ -351,7 +351,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::Properties:
 	case IDM_FILE_PROPERTIES:
-		OnShowFileProperties();
+		m_commandController.ExecuteCommand(IDM_FILE_PROPERTIES);
 		break;
 
 	case IDM_FILE_EXIT:

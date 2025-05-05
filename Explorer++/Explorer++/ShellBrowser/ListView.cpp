@@ -812,7 +812,7 @@ void ShellBrowserImpl::MarkItemAsCut(int item, bool cut)
 	}
 }
 
-void ShellBrowserImpl::ShowPropertiesForSelectedFiles() const
+void ShellBrowserImpl::ShowPropertiesForSelectedItems() const
 {
 	std::vector<unique_pidl_child> pidls;
 	std::vector<PCITEMID_CHILD> rawPidls;

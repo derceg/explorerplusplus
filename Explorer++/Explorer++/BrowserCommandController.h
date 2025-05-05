@@ -21,6 +21,8 @@ public:
 		OpenFolderDisposition disposition = OpenFolderDisposition::CurrentTab);
 
 private:
+	bool IsCommandContextSensitive(int command) const;
+
 	void GoBack(OpenFolderDisposition disposition);
 	void GoForward(OpenFolderDisposition disposition);
 	void GoUp(OpenFolderDisposition disposition);

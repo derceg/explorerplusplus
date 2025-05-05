@@ -48,7 +48,6 @@ public:
 
 	void StartRenamingSelectedItem();
 	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
-	void ShowPropertiesOfSelectedItem() const;
 	void CopySelectedItemToClipboard(bool copy);
 	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy);
 	void Paste();
@@ -160,6 +159,7 @@ private:
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	void OnShowContextMenu(const POINT &ptScreen);
 	void UpdateSelection();
+	void ShowPropertiesForSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);

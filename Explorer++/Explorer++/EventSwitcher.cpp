@@ -91,23 +91,6 @@ void Explorerplusplus::OnSetFileAttributes() const
 	}
 }
 
-void Explorerplusplus::OnShowFileProperties() const
-{
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-		selectedTab.GetShellBrowserImpl()->ShowPropertiesForSelectedFiles();
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		m_shellTreeView->ShowPropertiesOfSelectedItem();
-	}
-}
-
 void Explorerplusplus::OnPaste()
 {
 	HWND focus = GetFocus();

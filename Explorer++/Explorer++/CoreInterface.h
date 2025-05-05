@@ -43,7 +43,6 @@ public:
 	virtual BOOL CanCut() const = 0;
 	virtual BOOL CanCopy() const = 0;
 	virtual BOOL CanRename() const = 0;
-	virtual BOOL CanShowFileProperties() const = 0;
 	virtual BOOL CanPaste(PasteType pasteType) const = 0;
 
 	virtual boost::signals2::connection AddMainMenuPreShowObserver(

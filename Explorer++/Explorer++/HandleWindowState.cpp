@@ -49,7 +49,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		m_commandController.IsCommandEnabled(IDM_FILE_DELETE));
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETEPERMANENTLY,
 		m_commandController.IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_PROPERTIES, CanShowFileProperties());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_PROPERTIES,
+		m_commandController.IsCommandEnabled(IDM_FILE_PROPERTIES));
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_UNDO, m_FileActionHandler.CanUndo());
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTE, CanPaste(PasteType::Normal));

@@ -1332,7 +1332,7 @@ void ShellTreeView::StartRenamingItem(PCIDLIST_ABSOLUTE pidl)
 	TreeView_EditLabel(m_hTreeView, item);
 }
 
-void ShellTreeView::ShowPropertiesOfSelectedItem() const
+void ShellTreeView::ShowPropertiesForSelectedItem() const
 {
 	auto pidlDirectory = GetSelectedNodePidl();
 	ShowMultipleFileProperties(pidlDirectory.get(), {}, m_hTreeView);
@@ -1566,6 +1566,9 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_CANDELETE);
+
+	case IDM_FILE_PROPERTIES:
+		return TestItemAttributes(GetSelectedNode(), SFGAO_HASPROPSHEET);
 	}
 
 	return false;
@@ -1581,6 +1584,10 @@ void ShellTreeView::ExecuteCommand(int command)
 
 	case IDM_FILE_DELETEPERMANENTLY:
 		DeleteSelectedItem(true);
+		break;
+
+	case IDM_FILE_PROPERTIES:
+		ShowPropertiesForSelectedItem();
 		break;
 	}
 }

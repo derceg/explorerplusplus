@@ -1180,6 +1180,9 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 		return DoAllSelectedItemsHaveAttributes(SFGAO_CANDELETE);
+
+	case IDM_FILE_PROPERTIES:
+		return DoAllSelectedItemsHaveAttributes(SFGAO_HASPROPSHEET);
 	}
 
 	return false;
@@ -1195,6 +1198,10 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 
 	case IDM_FILE_DELETEPERMANENTLY:
 		DeleteSelectedItems(true);
+		break;
+
+	case IDM_FILE_PROPERTIES:
+		ShowPropertiesForSelectedItems();
 		break;
 	}
 }

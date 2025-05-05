@@ -760,7 +760,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
 		m_coreInterface->CanPaste(PasteType::Normal));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,
-		m_coreInterface->CanShowFileProperties());
+		browserController->IsCommandEnabled(IDM_FILE_PROPERTIES));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete,
 		browserController->IsCommandEnabled(IDM_FILE_DELETE));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,

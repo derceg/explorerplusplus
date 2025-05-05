@@ -242,7 +242,6 @@ private:
 	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;
 	void OnFileRename();
-	void OnShowFileProperties() const;
 	void OnCopy(BOOL bCopy);
 	void OnPaste();
 	void OnPasteShortcut();
@@ -411,7 +410,6 @@ private:
 	BOOL CanCut() const override;
 	BOOL CanCopy() const override;
 	BOOL CanRename() const override;
-	BOOL CanShowFileProperties() const override;
 	BOOL CanPaste(PasteType pasteType) const override;
 	bool CanPasteLink() const;
 	BOOL TestItemAttributes(SFGAOF attributes) const;

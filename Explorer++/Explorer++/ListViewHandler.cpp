@@ -143,7 +143,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	case VK_RETURN:
 		if (IsKeyDown(VK_MENU))
 		{
-			m_pActiveShellBrowser->ShowPropertiesForSelectedFiles();
+			m_pActiveShellBrowser->ShowPropertiesForSelectedItems();
 		}
 		else
 		{
