@@ -337,12 +337,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::Delete:
 	case IDM_FILE_DELETE:
-		OnFileDelete(false);
+		m_commandController.ExecuteCommand(IDM_FILE_DELETE);
 		break;
 
 	case MainToolbarButton::DeletePermanently:
 	case IDM_FILE_DELETEPERMANENTLY:
-		OnFileDelete(true);
+		m_commandController.ExecuteCommand(IDM_FILE_DELETEPERMANENTLY);
 		break;
 
 	case IDM_FILE_RENAME:

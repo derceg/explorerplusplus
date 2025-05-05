@@ -75,23 +75,6 @@ void Explorerplusplus::OnFileRename()
 	}
 }
 
-void Explorerplusplus::OnFileDelete(bool permanent)
-{
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-		tab.GetShellBrowserImpl()->DeleteSelectedItems(permanent);
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		m_shellTreeView->DeleteSelectedItem(permanent);
-	}
-}
-
 void Explorerplusplus::OnSetFileAttributes() const
 {
 	HWND hFocus;

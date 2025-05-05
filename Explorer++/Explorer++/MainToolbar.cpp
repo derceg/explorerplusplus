@@ -68,22 +68,22 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 };
 // clang-format on
 
-MainToolbar *MainToolbar::Create(HWND parent, App *app, BrowserWindow *browserWindow,
+MainToolbar *MainToolbar::Create(HWND parent, App *app, BrowserWindow *browser,
 	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	return new MainToolbar(parent, app, browserWindow, coreInterface, resourceLoader,
-		shellIconLoader, initialButtons);
+	return new MainToolbar(parent, app, browser, coreInterface, resourceLoader, shellIconLoader,
+		initialButtons);
 }
 
-MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow,
+MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browser,
 	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_app(app),
-	m_browserWindow(browserWindow),
+	m_browser(browser),
 	m_coreInterface(coreInterface),
 	m_resourceLoader(resourceLoader),
 	m_shellIconLoader(shellIconLoader),
@@ -137,20 +137,18 @@ void MainToolbar::Initialize(HWND parent,
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&MainToolbar::ParentWndProc, this)));
 
-	m_connections.push_back(m_browserWindow->AddLifecycleStateChangedObserver(
+	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
 		std::bind_front(&MainToolbar::OnBrowserLifecycleStateChanged, this)));
 
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
-		std::bind_front(&MainToolbar::OnTabSelected, this),
-		TabEventScope::ForBrowser(*m_browserWindow)));
+		std::bind_front(&MainToolbar::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&MainToolbar::OnNavigationCommitted, this),
-		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
-	m_connections.push_back(
-		m_browserWindow->GetCommandTargetManager()->targetChangedSignal.AddObserver(
-			std::bind_front(&MainToolbar::OnBrowserCommandTargetChanged, this)));
+	m_connections.push_back(m_browser->GetCommandTargetManager()->targetChangedSignal.AddObserver(
+		std::bind_front(&MainToolbar::OnBrowserCommandTargetChanged, this)));
 	m_connections.push_back(m_app->GetConfig()->useLargeToolbarIcons.addObserver(
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
 	m_connections.push_back(m_app->GetConfig()->showFolders.addObserver(
@@ -573,7 +571,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, L"");
 
-	const auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
 
 	if (ptbgit->iItem == MainToolbarButton::Back)
 	{
@@ -616,7 +614,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 // contains the name of the folder.
 std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 {
-	const auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
 
 	unique_pidl_absolute parentPidl;
@@ -670,7 +668,7 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 {
-	const auto *shellBrowser = m_browserWindow->GetActiveShellBrowser();
+	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	const auto *navigationController = shellBrowser->GetNavigationController();
 
 	if ((historyType == TabHistoryMenu::MenuType::Back && !navigationController->CanGoBack())
@@ -692,15 +690,15 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 	}
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_browserWindow,
-		m_shellIconLoader, historyType);
+	TabHistoryMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_browser, m_shellIconLoader,
+		historyType);
 	popupMenu.Show(m_hwnd, GetMenuPositionForButton(button));
 }
 
 void MainToolbar::ShowUpNavigationMenu()
 {
 	PopupMenuView popupMenu;
-	TabParentItemsMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_browserWindow,
+	TabParentItemsMenu menu(&popupMenu, m_app->GetAcceleratorManager(), m_browser,
 		m_shellIconLoader);
 	popupMenu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
 }
@@ -737,7 +735,7 @@ void MainToolbar::UpdateConfigDependentButtonStates()
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		return;
 	}
@@ -751,6 +749,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Up,
 		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoUp());
 
+	auto *target = m_browser->GetCommandTargetManager()->GetCurrentTarget();
 	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
@@ -763,9 +762,10 @@ void MainToolbar::UpdateToolbarButtonStates()
 		m_coreInterface->CanPaste(PasteType::Normal));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,
 		m_coreInterface->CanShowFileProperties());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete, m_coreInterface->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete,
+		target->IsCommandEnabled(IDM_FILE_DELETE));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,
-		m_coreInterface->CanDelete());
+		target->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
 		tab.GetShellBrowserImpl()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
@@ -777,7 +777,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 void MainToolbar::OnClipboardUpdate()
 {
-	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		return;
 	}
@@ -834,7 +834,7 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 
 	auto disposition = DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
 		WI_IsFlagSet(keysDown, MK_SHIFT));
-	auto *commandController = m_browserWindow->GetCommandController();
+	auto *commandController = m_browser->GetCommandController();
 
 	switch (tbButton.idCommand)
 	{

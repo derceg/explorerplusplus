@@ -1016,19 +1016,44 @@ bool ShellBrowserImpl::TestListViewItemAttributes(int item, SFGAOF attributes) c
 	return false;
 }
 
-HRESULT ShellBrowserImpl::GetListViewSelectionAttributes(SFGAOF *attributes) const
+bool ShellBrowserImpl::DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const
 {
-	HRESULT hr = E_FAIL;
+	SFGAOF commonAttributes = attributes;
+	HRESULT hr = GetListViewSelectionAttributes(&commonAttributes);
 
-	/* TODO: This should probably check all selected files. */
-	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED);
-
-	if (selectedItem != -1)
+	if (SUCCEEDED(hr))
 	{
-		hr = GetListViewItemAttributes(selectedItem, attributes);
+		return (commonAttributes & attributes) == attributes;
 	}
 
-	return hr;
+	return false;
+}
+
+HRESULT ShellBrowserImpl::GetListViewSelectionAttributes(SFGAOF *attributes) const
+{
+	std::vector<unique_pidl_child> childPidls;
+	std::vector<PCITEMID_CHILD> rawChildPidls;
+
+	int item = -1;
+
+	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	{
+		auto pidl = GetItemChildIdl(item);
+
+		rawChildPidls.push_back(pidl.get());
+		childPidls.push_back(std::move(pidl));
+	}
+
+	if (rawChildPidls.empty())
+	{
+		return E_FAIL;
+	}
+
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	RETURN_IF_FAILED(SHBindToObject(nullptr, m_directoryState.pidlDirectory.Raw(), nullptr,
+		IID_PPV_ARGS(&shellFolder)));
+	return shellFolder->GetAttributesOf(static_cast<UINT>(rawChildPidls.size()),
+		rawChildPidls.data(), attributes);
 }
 
 HRESULT ShellBrowserImpl::GetListViewItemAttributes(int item, SFGAOF *attributes) const

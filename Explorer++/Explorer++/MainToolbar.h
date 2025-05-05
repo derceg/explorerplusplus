@@ -28,7 +28,7 @@ class ShellIconLoader;
 class MainToolbar : public BaseWindow
 {
 public:
-	static MainToolbar *Create(HWND parent, App *app, BrowserWindow *browserWindow,
+	static MainToolbar *Create(HWND parent, App *app, BrowserWindow *browser,
 		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 		ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
@@ -44,7 +44,7 @@ public:
 	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 
 private:
-	MainToolbar(HWND parent, App *app, BrowserWindow *browserWindow, CoreInterface *coreInterface,
+	MainToolbar(HWND parent, App *app, BrowserWindow *browser, CoreInterface *coreInterface,
 		const ResourceLoader *resourceLoader, ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
@@ -97,7 +97,7 @@ private:
 	void OnFontOrDpiUpdated();
 
 	App *const m_app;
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
 	CoreInterface *const m_coreInterface;
 	const ResourceLoader *const m_resourceLoader;
 	ShellIconLoader *const m_shellIconLoader;

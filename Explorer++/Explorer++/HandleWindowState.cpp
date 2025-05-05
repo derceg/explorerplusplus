@@ -44,9 +44,13 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYCOLUMNTEXT,
 		anySelected && (viewMode == +ViewMode::Details));
 
+	auto *target = GetCommandTargetManager()->GetCurrentTarget();
+
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_RENAME, CanRename());
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETE, CanDelete());
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETEPERMANENTLY, CanDelete());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETE,
+		target->IsCommandEnabled(IDM_FILE_DELETE));
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETEPERMANENTLY,
+		target->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_PROPERTIES, CanShowFileProperties());
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_UNDO, m_FileActionHandler.CanUndo());

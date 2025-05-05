@@ -154,7 +154,6 @@ public:
 	void PasteSymLinks();
 	void OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems);
 	void StartRenamingSelectedItems();
-	void DeleteSelectedItems(bool permanent);
 
 	bool GetShowInGroups() const;
 	void SetShowInGroups(bool showInGroups);
@@ -447,8 +446,10 @@ private:
 	void OnOneClickActivateUpdated(BOOL newValue);
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
 
+	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
+	void DeleteSelectedItems(bool permanent);
 	void StartRenamingSingleFile();
 	void StartRenamingMultipleFiles();
 

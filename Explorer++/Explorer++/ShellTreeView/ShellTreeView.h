@@ -49,7 +49,6 @@ public:
 	void StartRenamingSelectedItem();
 	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
 	void ShowPropertiesOfSelectedItem() const;
-	void DeleteSelectedItem(bool permanent);
 	void CopySelectedItemToClipboard(bool copy);
 	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy);
 	void Paste();
@@ -161,6 +160,7 @@ private:
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	void OnShowContextMenu(const POINT &ptScreen);
 	void UpdateSelection();
+	void DeleteSelectedItem(bool permanent);
 
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
 	void OnClipboardUpdate();
@@ -197,6 +197,7 @@ private:
 		int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
 	void ProcessSubfoldersResult(int subfoldersResultId);
 
+	ShellTreeNode *GetSelectedNode() const;
 	ShellTreeNode *GetNodeFromTreeViewItem(HTREEITEM item) const;
 	ShellTreeNode *GetNodeById(int id) const;
 	ShellTreeNode *GetNodeByIdRecursive(ShellTreeNode *node, int id) const;
@@ -224,7 +225,7 @@ private:
 
 	void OnCutItemChanged(HTREEITEM previousCutItem, HTREEITEM newCutItem);
 	bool ShouldGhostItem(HTREEITEM item);
-	bool TestItemAttributes(ShellTreeNode *node, SFGAOF attributes);
+	bool TestItemAttributes(ShellTreeNode *node, SFGAOF attributes) const;
 	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
 	ShellBrowserImpl *GetSelectedShellBrowser() const;

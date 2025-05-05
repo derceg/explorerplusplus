@@ -1175,12 +1175,26 @@ const NavigationManager *ShellBrowserImpl::GetNavigationManager() const
 
 bool ShellBrowserImpl::IsCommandEnabled(int command) const
 {
-	UNREFERENCED_PARAMETER(command);
+	switch (command)
+	{
+	case IDM_FILE_DELETE:
+	case IDM_FILE_DELETEPERMANENTLY:
+		return DoAllSelectedItemsHaveAttributes(SFGAO_CANDELETE);
+	}
 
 	return false;
 }
 
 void ShellBrowserImpl::ExecuteCommand(int command)
 {
-	UNREFERENCED_PARAMETER(command);
+	switch (command)
+	{
+	case IDM_FILE_DELETE:
+		DeleteSelectedItems(false);
+		break;
+
+	case IDM_FILE_DELETEPERMANENTLY:
+		DeleteSelectedItems(true);
+		break;
+	}
 }

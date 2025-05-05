@@ -1033,6 +1033,12 @@ void ShellTreeView::SortChildren(HTREEITEM parent)
 	TreeView_SortChildrenCB(m_hTreeView, &tvSort, 0);
 }
 
+ShellTreeNode *ShellTreeView::GetSelectedNode() const
+{
+	auto selectedItem = TreeView_GetSelection(m_hTreeView);
+	return GetNodeFromTreeViewItem(selectedItem);
+}
+
 unique_pidl_absolute ShellTreeView::GetSelectedNodePidl() const
 {
 	auto selectedItem = TreeView_GetSelection(m_hTreeView);
@@ -1555,14 +1561,28 @@ void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 bool ShellTreeView::IsCommandEnabled(int command) const
 {
-	UNREFERENCED_PARAMETER(command);
+	switch (command)
+	{
+	case IDM_FILE_DELETE:
+	case IDM_FILE_DELETEPERMANENTLY:
+		return TestItemAttributes(GetSelectedNode(), SFGAO_CANDELETE);
+	}
 
 	return false;
 }
 
 void ShellTreeView::ExecuteCommand(int command)
 {
-	UNREFERENCED_PARAMETER(command);
+	switch (command)
+	{
+	case IDM_FILE_DELETE:
+		DeleteSelectedItem(false);
+		break;
+
+	case IDM_FILE_DELETEPERMANENTLY:
+		DeleteSelectedItem(true);
+		break;
+	}
 }
 
 void ShellTreeView::UpdateSelection()
@@ -1730,7 +1750,7 @@ bool ShellTreeView::ShouldGhostItem(HTREEITEM item)
 	return false;
 }
 
-bool ShellTreeView::TestItemAttributes(ShellTreeNode *node, SFGAOF attributes)
+bool ShellTreeView::TestItemAttributes(ShellTreeNode *node, SFGAOF attributes) const
 {
 	SFGAOF commonAttributes = attributes;
 	HRESULT hr = node->GetShellItem()->GetAttributes(commonAttributes, &commonAttributes);

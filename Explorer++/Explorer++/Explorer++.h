@@ -241,7 +241,6 @@ private:
 	void OnCopyItemPath() const;
 	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;
-	void OnFileDelete(bool permanent);
 	void OnFileRename();
 	void OnShowFileProperties() const;
 	void OnCopy(BOOL bCopy);
@@ -412,7 +411,6 @@ private:
 	BOOL CanCut() const override;
 	BOOL CanCopy() const override;
 	BOOL CanRename() const override;
-	BOOL CanDelete() const override;
 	BOOL CanShowFileProperties() const override;
 	BOOL CanPaste(PasteType pasteType) const override;
 	bool CanPasteLink() const;

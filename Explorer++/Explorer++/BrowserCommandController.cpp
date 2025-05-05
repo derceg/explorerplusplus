@@ -21,6 +21,11 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 {
 	switch (command)
 	{
+	case IDM_FILE_DELETE:
+	case IDM_FILE_DELETEPERMANENTLY:
+		m_browser->GetCommandTargetManager()->GetCurrentTarget()->ExecuteCommand(command);
+		break;
+
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
 		m_config->showAddressBar = !m_config->showAddressBar.get();
 		break;
