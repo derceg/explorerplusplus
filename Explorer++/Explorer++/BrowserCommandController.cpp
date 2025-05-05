@@ -26,6 +26,15 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_FILE_DELETEPERMANENTLY:
 		return m_browser->GetCommandTargetManager()->GetCurrentTarget()->IsCommandEnabled(command);
 
+	case IDM_GO_BACK:
+		return GetActiveShellBrowser()->GetNavigationController()->CanGoBack();
+
+	case IDM_GO_FORWARD:
+		return GetActiveShellBrowser()->GetNavigationController()->CanGoForward();
+
+	case IDM_GO_UP:
+		return GetActiveShellBrowser()->GetNavigationController()->CanGoUp();
+
 	default:
 		DCHECK(false);
 		return false;

@@ -739,16 +739,16 @@ void MainToolbar::UpdateToolbarButtonStates()
 		return;
 	}
 
+	auto *browserController = m_browser->GetCommandController();
 	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
-		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoBack());
+		browserController->IsCommandEnabled(IDM_GO_BACK));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Forward,
-		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoForward());
+		browserController->IsCommandEnabled(IDM_GO_FORWARD));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Up,
-		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoUp());
+		browserController->IsCommandEnabled(IDM_GO_UP));
 
-	auto *browserController = m_browser->GetCommandController();
 	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,

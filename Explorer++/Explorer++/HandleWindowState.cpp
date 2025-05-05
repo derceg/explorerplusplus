@@ -114,11 +114,11 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		MF_BYCOMMAND);
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_GO_BACK,
-		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoBack());
+		m_commandController.IsCommandEnabled(IDM_GO_BACK));
 	MenuHelper::EnableItem(hProgramMenu, IDM_GO_FORWARD,
-		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoForward());
+		m_commandController.IsCommandEnabled(IDM_GO_FORWARD));
 	MenuHelper::EnableItem(hProgramMenu, IDM_GO_UP,
-		tab.GetShellBrowserImpl()->GetNavigationController()->CanGoUp());
+		m_commandController.IsCommandEnabled(IDM_GO_UP));
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOSIZECOLUMNS, viewMode == +ViewMode::Details);
 
