@@ -27,34 +27,6 @@ void Explorerplusplus::ApplyDisplayWindowPosition()
 		m_config->displayWindowVertical, NULL);
 }
 
-void Explorerplusplus::CopyToFolder(bool move)
-{
-	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
-	{
-		return;
-	}
-
-	std::vector<unique_pidl_absolute> pidlPtrs;
-	std::vector<PCIDLIST_ABSOLUTE> pidls;
-	int iItem = -1;
-
-	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-	{
-		auto pidlPtr = m_pActiveShellBrowser->GetItemCompleteIdl(iItem);
-
-		if (!pidlPtr)
-		{
-			continue;
-		}
-
-		pidls.push_back(pidlPtr.get());
-		pidlPtrs.push_back(std::move(pidlPtr));
-	}
-
-	auto title = m_app->GetResourceLoader()->LoadString(IDS_GENERAL_COPY_TO_FOLDER_TITLE);
-	FileOperations::CopyFilesToFolder(m_hContainer, title, pidls, move);
-}
-
 void Explorerplusplus::FolderSizeCallbackStub(int nFolders, int nFiles,
 	PULARGE_INTEGER lTotalFolderSize, LPVOID pData)
 {

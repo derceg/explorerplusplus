@@ -61,12 +61,14 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	/* The following menu items are only enabled when one
 	or more files are selected (they represent file
 	actions, cut/copy, etc). */
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPY, CanCopy());
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_CUT, CanCut());
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPYTOFOLDER,
-		CanCopy() && GetFocus() != m_shellTreeView->GetHWND());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_CUT,
+		m_commandController.IsCommandEnabled(IDM_EDIT_CUT));
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPY,
+		m_commandController.IsCommandEnabled(IDM_EDIT_COPY));
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_MOVETOFOLDER,
-		CanCut() && GetFocus() != m_shellTreeView->GetHWND());
+		m_commandController.IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPYTOFOLDER,
+		m_commandController.IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_WILDCARDDESELECT, anySelected);
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_SELECTNONE, anySelected);
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_RESOLVELINK, anySelected);

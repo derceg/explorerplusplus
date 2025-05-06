@@ -35,16 +35,6 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 	return FALSE;
 }
 
-BOOL Explorerplusplus::CanCut() const
-{
-	return TestItemAttributes(SFGAO_CANMOVE);
-}
-
-BOOL Explorerplusplus::CanCopy() const
-{
-	return TestItemAttributes(SFGAO_CANCOPY);
-}
-
 BOOL Explorerplusplus::CanRename() const
 {
 	return TestItemAttributes(SFGAO_CANRENAME);

@@ -835,6 +835,9 @@
     <ClCompile Include="ScopedBrowserCommandTarget.cpp">
       <Filter>Browser\Command Handling</Filter>
     </ClCompile>
+    <ClCompile Include="FileOperations.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1734,6 +1737,9 @@
     <ClInclude Include="BrowserCommandController.h">
       <Filter>Browser\Command Handling</Filter>
     </ClInclude>
+    <ClInclude Include="FileOperations.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1952,6 +1958,9 @@
     </Filter>
     <Filter Include="Browser\Command Handling">
       <UniqueIdentifier>{f7182c76-082d-40ff-8608-e9acc927cdc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shell">
+      <UniqueIdentifier>{21f63c44-0578-42d5-9b67-5f49a3f011ce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

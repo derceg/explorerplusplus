@@ -39,8 +39,6 @@ public:
 
 	virtual wil::unique_hmenu BuildViewsMenu() = 0;
 
-	virtual BOOL CanCut() const = 0;
-	virtual BOOL CanCopy() const = 0;
 	virtual BOOL CanRename() const = 0;
 	virtual BOOL CanPaste(PasteType pasteType) const = 0;
 

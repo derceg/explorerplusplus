@@ -751,12 +751,14 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
-		m_coreInterface->CanCopy() && GetFocus() != m_coreInterface->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut,
+		browserController->IsCommandEnabled(IDM_EDIT_CUT));
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy,
+		browserController->IsCommandEnabled(IDM_EDIT_COPY));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MoveTo,
-		m_coreInterface->CanCut() && GetFocus() != m_coreInterface->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy, m_coreInterface->CanCopy());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut, m_coreInterface->CanCut());
+		browserController->IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
+		browserController->IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
 		m_coreInterface->CanPaste(PasteType::Normal));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,

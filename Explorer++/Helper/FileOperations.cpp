@@ -119,7 +119,7 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLU
 }
 
 HRESULT FileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
-	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, TransferAction action)
 {
 	unique_pidl_absolute pidl;
 	BOOL bRes = CreateBrowseDialog(hOwner, strTitle, wil::out_param(pidl));
@@ -137,13 +137,13 @@ HRESULT FileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTi
 		return E_FAIL;
 	}
 
-	hr = CopyFiles(hOwner, destinationFolder.get(), pidls, move);
+	hr = CopyFiles(hOwner, destinationFolder.get(), pidls, action);
 
 	return hr;
 }
 
 HRESULT FileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
-	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, TransferAction action)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -184,7 +184,7 @@ HRESULT FileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 		return hr;
 	}
 
-	if (move)
+	if (action == TransferAction::Move)
 	{
 		hr = fo->MoveItems(unknown.get(), destinationFolder);
 	}
@@ -390,26 +390,22 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 
 HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut)
 {
-	return CopyFilesToClipboard(items, false, dataObjectOut);
+	return CopyFilesToClipboard(items, ClipboardAction::Copy, dataObjectOut);
 }
 
 HRESULT CutFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut)
 {
-	return CopyFilesToClipboard(items, true, dataObjectOut);
+	return CopyFilesToClipboard(items, ClipboardAction::Cut, dataObjectOut);
 }
 
-HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, bool move,
+HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action,
 	IDataObject **dataObjectOut)
 {
 	wil::com_ptr_nothrow<IDataObject> dataObject;
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
-	DWORD effect = move ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
-
-	if (!move)
-	{
-		WI_SetFlag(effect, DROPEFFECT_LINK);
-	}
+	DWORD effect =
+		action == ClipboardAction::Cut ? DROPEFFECT_MOVE : (DROPEFFECT_COPY | DROPEFFECT_LINK);
 
 	RETURN_IF_FAILED(SetPreferredDropEffect(dataObject.get(), effect));
 

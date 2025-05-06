@@ -10,6 +10,7 @@
 #include "ScopedBrowserCommandTarget.h"
 #include "ShellChangeWatcher.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
@@ -48,8 +49,6 @@ public:
 
 	void StartRenamingSelectedItem();
 	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
-	void CopySelectedItemToClipboard(bool copy);
-	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy);
 	void Paste();
 	void PasteShortcut();
 
@@ -162,8 +161,12 @@ private:
 	void ShowPropertiesForSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 
-	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
+	void CopySelectedItemToClipboard(ClipboardAction action);
+	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action);
+	void CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action);
 	void OnClipboardUpdate();
+
+	void CopySelectedItemToFolder(TransferAction action);
 
 	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;
 

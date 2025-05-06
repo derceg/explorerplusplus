@@ -18,6 +18,7 @@
 #include "ShellChangeWatcher.h"
 #include "SortModes.h"
 #include "ViewModes.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
@@ -150,7 +151,7 @@ public:
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
 	BOOL CanCreate() const;
-	HRESULT CopySelectedItemsToClipboard(bool copy);
+	HRESULT CopySelectedItemsToClipboard(ClipboardAction action);
 	void PasteShortcut();
 	void PasteHardLinks();
 	void PasteSymLinks();
@@ -454,6 +455,7 @@ private:
 	void DeleteSelectedItems(bool permanent);
 	void StartRenamingSingleFile();
 	void StartRenamingMultipleFiles();
+	void CopySelectedItemsToFolder(TransferAction action);
 
 	// Listview header context menu
 	void OnListViewHeaderRightClick(const POINTS &cursorPos);

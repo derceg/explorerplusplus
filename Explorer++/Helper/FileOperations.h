@@ -8,6 +8,18 @@
 #include <list>
 #include <vector>
 
+enum class ClipboardAction
+{
+	Cut,
+	Copy
+};
+
+enum class TransferAction
+{
+	Move,
+	Copy
+};
+
 namespace FileOperations
 {
 
@@ -22,9 +34,9 @@ HRESULT DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLUTE> &pidls, bool
 	bool silent);
 void DeleteFileSecurely(const std::wstring &strFilename, OverwriteMethod overwriteMethod);
 HRESULT CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
-	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move);
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, TransferAction action);
 HRESULT CopyFiles(HWND hwnd, IShellItem *destinationFolder, std::vector<PCIDLIST_ABSOLUTE> &pidls,
-	bool move);
+	TransferAction action);
 
 HRESULT CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFolderName,
 	IFileOperationProgressSink *progressSink);
@@ -44,5 +56,5 @@ BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOL
 
 HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);
 HRESULT CutFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);
-HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, bool move,
+HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action,
 	IDataObject **dataObjectOut);

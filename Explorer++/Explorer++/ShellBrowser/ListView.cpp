@@ -710,7 +710,7 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'C':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemsToClipboard(true);
+			CopySelectedItemsToClipboard(ClipboardAction::Copy);
 		}
 		break;
 
@@ -725,7 +725,7 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'X':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemsToClipboard(false);
+			CopySelectedItemsToClipboard(ClipboardAction::Cut);
 		}
 		break;
 

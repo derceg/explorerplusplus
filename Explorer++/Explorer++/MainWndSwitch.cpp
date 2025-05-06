@@ -362,14 +362,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		m_FileActionHandler.Undo();
 		break;
 
-	case MainToolbarButton::Copy:
-	case IDM_EDIT_COPY:
-		OnCopy(TRUE);
-		break;
-
 	case MainToolbarButton::Cut:
 	case IDM_EDIT_CUT:
-		OnCopy(FALSE);
+		m_commandController.ExecuteCommand(IDM_EDIT_CUT);
+		break;
+
+	case MainToolbarButton::Copy:
+	case IDM_EDIT_COPY:
+		m_commandController.ExecuteCommand(IDM_EDIT_COPY);
 		break;
 
 	case MainToolbarButton::Paste:
@@ -391,14 +391,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		GetActiveShellBrowserImpl()->PasteSymLinks();
 		break;
 
-	case IDM_EDIT_COPYTOFOLDER:
-	case MainToolbarButton::CopyTo:
-		CopyToFolder(false);
-		break;
-
 	case MainToolbarButton::MoveTo:
 	case IDM_EDIT_MOVETOFOLDER:
-		CopyToFolder(true);
+		m_commandController.ExecuteCommand(IDM_EDIT_MOVETOFOLDER);
+		break;
+
+	case IDM_EDIT_COPYTOFOLDER:
+	case MainToolbarButton::CopyTo:
+		m_commandController.ExecuteCommand(IDM_EDIT_COPYTOFOLDER);
 		break;
 
 	case IDM_EDIT_SELECTALL:

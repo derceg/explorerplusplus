@@ -995,6 +995,7 @@
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
+    <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ThemedTabControlPainter.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
@@ -1307,6 +1308,7 @@
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
+    <ClInclude Include="FileOperations.h" />
     <ClInclude Include="ThemedTabControlPainter.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />

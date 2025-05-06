@@ -20,6 +20,7 @@
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "Config.h"
+#include "FileOperations.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
@@ -34,7 +35,6 @@
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ScopedRedrawDisabler.h"
@@ -754,14 +754,14 @@ LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 	case 'C':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemToClipboard(true);
+			CopySelectedItemToClipboard(ClipboardAction::Copy);
 		}
 		break;
 
 	case 'X':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemToClipboard(false);
+			CopySelectedItemToClipboard(ClipboardAction::Cut);
 		}
 		break;
 
@@ -775,7 +775,7 @@ LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 	case VK_INSERT:
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemToClipboard(true);
+			CopySelectedItemToClipboard(ClipboardAction::Copy);
 		}
 		if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
@@ -1528,14 +1528,14 @@ bool ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	else if (verb == L"copy")
 	{
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		CopyItemToClipboard(pidlComplete.get(), true);
+		CopyItemToClipboard(pidlComplete.get(), ClipboardAction::Copy);
 
 		return true;
 	}
 	else if (verb == L"cut")
 	{
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		CopyItemToClipboard(pidlComplete.get(), false);
+		CopyItemToClipboard(pidlComplete.get(), ClipboardAction::Cut);
 
 		return true;
 	}
@@ -1569,6 +1569,14 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 
 	case IDM_FILE_PROPERTIES:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_HASPROPSHEET);
+
+	case IDM_EDIT_MOVETOFOLDER:
+	case IDM_EDIT_CUT:
+		return TestItemAttributes(GetSelectedNode(), SFGAO_CANMOVE);
+
+	case IDM_EDIT_COPYTOFOLDER:
+	case IDM_EDIT_COPY:
+		return TestItemAttributes(GetSelectedNode(), SFGAO_CANCOPY);
 	}
 
 	return false;
@@ -1589,7 +1597,31 @@ void ShellTreeView::ExecuteCommand(int command)
 	case IDM_FILE_PROPERTIES:
 		ShowPropertiesForSelectedItem();
 		break;
+
+	case IDM_EDIT_CUT:
+		CopySelectedItemToClipboard(ClipboardAction::Cut);
+		break;
+
+	case IDM_EDIT_COPY:
+		CopySelectedItemToClipboard(ClipboardAction::Copy);
+		break;
+
+	case IDM_EDIT_MOVETOFOLDER:
+		CopySelectedItemToFolder(TransferAction::Move);
+		break;
+
+	case IDM_EDIT_COPYTOFOLDER:
+		CopySelectedItemToFolder(TransferAction::Copy);
+		break;
 	}
+}
+
+void ShellTreeView::CopySelectedItemToFolder(TransferAction action)
+{
+	auto pidl = GetSelectedNodePidl();
+	std::vector<PCIDLIST_ABSOLUTE> rawPidls = { pidl.get() };
+	Epp::FileOperations::CopyFilesToFolder(m_hTreeView, rawPidls, action,
+		m_app->GetResourceLoader());
 }
 
 void ShellTreeView::UpdateSelection()
@@ -1627,13 +1659,13 @@ void ShellTreeView::UpdateSelection()
 	TreeView_SelectItem(m_hTreeView, item);
 }
 
-void ShellTreeView::CopySelectedItemToClipboard(bool copy)
+void ShellTreeView::CopySelectedItemToClipboard(ClipboardAction action)
 {
 	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
-	CopyItemToClipboard(item, copy);
+	CopyItemToClipboard(item, action);
 }
 
-void ShellTreeView::CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy)
+void ShellTreeView::CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action)
 {
 	auto item = LocateExistingItem(pidl);
 
@@ -1642,10 +1674,10 @@ void ShellTreeView::CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy)
 		return;
 	}
 
-	CopyItemToClipboard(item, copy);
+	CopyItemToClipboard(item, action);
 }
 
-void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, bool copy)
+void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action)
 {
 	auto *node = GetNodeFromTreeViewItem(treeItem);
 	auto pidl = node->GetFullPidl();
@@ -1654,7 +1686,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, bool copy)
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
-	if (copy)
+	if (action == ClipboardAction::Copy)
 	{
 		hr = CopyFiles(items, &clipboardDataObject);
 

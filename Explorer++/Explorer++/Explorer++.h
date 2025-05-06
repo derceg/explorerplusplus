@@ -242,7 +242,6 @@ private:
 	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;
 	void OnFileRename();
-	void OnCopy(BOOL bCopy);
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnWildcardSelect(BOOL bSelect);
@@ -365,7 +364,6 @@ private:
 	void ToggleDualPane();
 
 	/* File operations. */
-	void CopyToFolder(bool move);
 	void OpenAllSelectedItems(
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenListViewItem(int index,
@@ -405,8 +403,6 @@ private:
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;
-	BOOL CanCut() const override;
-	BOOL CanCopy() const override;
 	BOOL CanRename() const override;
 	BOOL CanPaste(PasteType pasteType) const override;
 	bool CanPasteLink() const;

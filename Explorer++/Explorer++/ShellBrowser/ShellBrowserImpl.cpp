@@ -10,6 +10,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DirectoryOperationsHelper.h"
+#include "FileOperations.h"
 #include "FileProgressSink.h"
 #include "FolderView.h"
 #include "IconFetcherImpl.h"
@@ -28,7 +29,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
@@ -1043,7 +1043,7 @@ void ShellBrowserImpl::StartRenamingMultipleFiles()
 	massRenameDialog.ShowModalDialog();
 }
 
-HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(bool copy)
+HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(ClipboardAction action)
 {
 	auto pidls = GetSelectedItemPidls();
 
@@ -1055,7 +1055,7 @@ HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(bool copy)
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
-	if (copy)
+	if (action == ClipboardAction::Copy)
 	{
 		hr = CopyFiles(pidls, &clipboardDataObject);
 
@@ -1186,6 +1186,14 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 
 	case IDM_FILE_PROPERTIES:
 		return DoAllSelectedItemsHaveAttributes(SFGAO_HASPROPSHEET);
+
+	case IDM_EDIT_MOVETOFOLDER:
+	case IDM_EDIT_CUT:
+		return DoAllSelectedItemsHaveAttributes(SFGAO_CANMOVE);
+
+	case IDM_EDIT_COPYTOFOLDER:
+	case IDM_EDIT_COPY:
+		return DoAllSelectedItemsHaveAttributes(SFGAO_CANCOPY);
 	}
 
 	return false;
@@ -1205,6 +1213,22 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 
 	case IDM_FILE_PROPERTIES:
 		ShowPropertiesForSelectedItems();
+		break;
+
+	case IDM_EDIT_CUT:
+		CopySelectedItemsToClipboard(ClipboardAction::Cut);
+		break;
+
+	case IDM_EDIT_COPY:
+		CopySelectedItemsToClipboard(ClipboardAction::Copy);
+		break;
+
+	case IDM_EDIT_MOVETOFOLDER:
+		CopySelectedItemsToFolder(TransferAction::Move);
+		break;
+
+	case IDM_EDIT_COPYTOFOLDER:
+		CopySelectedItemsToFolder(TransferAction::Copy);
 		break;
 	}
 }
@@ -1237,4 +1261,20 @@ void ShellBrowserImpl::CreateNewFolder()
 
 	auto newFolderName = m_app->GetResourceLoader()->LoadString(IDS_NEW_FOLDER_NAME);
 	FileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
+}
+
+void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)
+{
+	auto pidls = GetSelectedItemPidls();
+
+	if (pidls.empty())
+	{
+		return;
+	}
+
+	std::vector<PCIDLIST_ABSOLUTE> rawPidls;
+	std::ranges::transform(pidls, std::back_inserter(rawPidls),
+		[](const auto &pidl) { return pidl.Raw(); });
+
+	Epp::FileOperations::CopyFilesToFolder(m_hOwner, rawPidls, action, m_app->GetResourceLoader());
 }

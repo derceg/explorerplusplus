@@ -626,12 +626,12 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		OnCloseTab();
 		break;
 
-	case APPCOMMAND_COPY:
-		OnCopy(TRUE);
+	case APPCOMMAND_CUT:
+		m_commandController.ExecuteCommand(IDM_EDIT_CUT);
 		break;
 
-	case APPCOMMAND_CUT:
-		OnCopy(FALSE);
+	case APPCOMMAND_COPY:
+		m_commandController.ExecuteCommand(IDM_EDIT_COPY);
 		break;
 
 	case APPCOMMAND_HELP:

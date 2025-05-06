@@ -45,21 +45,6 @@ void Explorerplusplus::OnCopyUniversalPaths() const
 	}
 }
 
-void Explorerplusplus::OnCopy(BOOL bCopy)
-{
-	HWND hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-		selectedTab.GetShellBrowserImpl()->CopySelectedItemsToClipboard(bCopy);
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		m_shellTreeView->CopySelectedItemToClipboard(bCopy);
-	}
-}
-
 void Explorerplusplus::OnFileRename()
 {
 	HWND hFocus = GetFocus();
