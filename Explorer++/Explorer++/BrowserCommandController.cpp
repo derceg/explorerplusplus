@@ -26,6 +26,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 	switch (command)
 	{
+	case IDM_ACTIONS_NEWFOLDER:
+		return GetActiveShellBrowser()->CanCreateNewFolder();
+
 	case IDM_GO_BACK:
 		return GetActiveShellBrowser()->GetNavigationController()->CanGoBack();
 
@@ -77,6 +80,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_VIEW_TOOLBARS_CUSTOMIZE:
 		m_browser->StartMainToolbarCustomization();
+		break;
+
+	case IDM_ACTIONS_NEWFOLDER:
+		GetActiveShellBrowser()->CreateNewFolder();
 		break;
 
 	case IDM_GO_BACK:

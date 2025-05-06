@@ -103,7 +103,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::CheckItem(hProgramMenu, IDM_FILTER_APPLYFILTER,
 		tab.GetShellBrowserImpl()->IsFilterApplied());
 
-	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_NEWFOLDER, CanCreate());
+	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_NEWFOLDER,
+		m_commandController.IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_SPLITFILE,
 		(tab.GetShellBrowserImpl()->GetNumSelectedFiles() == 1) && !virtualFolder);
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_MERGEFILES,

@@ -771,7 +771,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 		tab.GetShellBrowserImpl()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt, !virtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder,
-		m_coreInterface->CanCreate());
+		browserController->IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
 }
 
 void MainToolbar::OnClipboardUpdate()

@@ -21,6 +21,8 @@ public:
 
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
+	virtual bool CanCreateNewFolder() const = 0;
+	virtual void CreateNewFolder() = 0;
 
 	int GetId() const;
 

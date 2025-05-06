@@ -75,3 +75,12 @@ ShellNavigationController *ShellBrowserFake::GetNavigationController() const
 {
 	return m_navigationController.get();
 }
+
+bool ShellBrowserFake::CanCreateNewFolder() const
+{
+	return false;
+}
+
+void ShellBrowserFake::CreateNewFolder()
+{
+}

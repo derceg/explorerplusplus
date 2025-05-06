@@ -179,38 +179,6 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 	}
 }
 
-void Explorerplusplus::OnCreateNewFolder()
-{
-	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-
-	wil::com_ptr_nothrow<IShellItem> directoryShellItem;
-	HRESULT hr = SHCreateItemFromIDList(pidlDirectory.get(), IID_PPV_ARGS(&directoryShellItem));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	auto sink = winrt::make_self<FileProgressSink>();
-	sink->SetPostNewItemObserver(
-		[this](PIDLIST_ABSOLUTE pidl)
-		{
-			ListViewHelper::SelectAllItems(m_hActiveListView, false);
-			SetFocus(m_hActiveListView);
-
-			m_pActiveShellBrowser->QueueRename(pidl);
-		});
-
-	auto newFolderName = m_app->GetResourceLoader()->LoadString(IDS_NEW_FOLDER_NAME);
-	hr = FileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
-
-	if (FAILED(hr))
-	{
-		auto errorMessage = m_app->GetResourceLoader()->LoadString(IDS_NEWFOLDERERROR);
-		MessageBox(m_hContainer, errorMessage.c_str(), App::APP_NAME, MB_ICONERROR | MB_OK);
-	}
-}
-
 void Explorerplusplus::OnResolveLink()
 {
 	TCHAR szFullFileName[MAX_PATH];

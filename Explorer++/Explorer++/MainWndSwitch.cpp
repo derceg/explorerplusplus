@@ -1157,7 +1157,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::NewFolder:
 	case IDM_ACTIONS_NEWFOLDER:
-		OnCreateNewFolder();
+		m_commandController.ExecuteCommand(IDM_ACTIONS_NEWFOLDER);
 		break;
 
 	case MainToolbarButton::MergeFiles:

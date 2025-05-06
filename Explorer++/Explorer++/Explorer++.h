@@ -257,7 +257,6 @@ private:
 	void OnShowHiddenFiles();
 	void OnRefresh();
 	void OnSelectColumns();
-	void OnCreateNewFolder();
 	void OnMergeFiles();
 	void OnSplitFile();
 	void OnDestroyFiles();
@@ -406,7 +405,6 @@ private:
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;
-	bool CanCreate() const override;
 	BOOL CanCut() const override;
 	BOOL CanCopy() const override;
 	BOOL CanRename() const override;

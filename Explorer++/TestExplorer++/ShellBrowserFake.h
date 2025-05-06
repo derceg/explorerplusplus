@@ -36,6 +36,8 @@ public:
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
+	bool CanCreateNewFolder() const override;
+	void CreateNewFolder() override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;

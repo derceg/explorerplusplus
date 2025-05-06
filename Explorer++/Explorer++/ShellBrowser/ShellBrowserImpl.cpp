@@ -9,12 +9,15 @@
 #include "ColorRuleModel.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DirectoryOperationsHelper.h"
+#include "FileProgressSink.h"
 #include "FolderView.h"
 #include "IconFetcherImpl.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "MassRenameDialog.h"
 #include "PreservedFolderState.h"
+#include "ResourceLoader.h"
 #include "ServiceProvider.h"
 #include "ShellEnumeratorImpl.h"
 #include "ShellNavigationController.h"
@@ -1204,4 +1207,34 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 		ShowPropertiesForSelectedItems();
 		break;
 	}
+}
+
+bool ShellBrowserImpl::CanCreateNewFolder() const
+{
+	return CanCreateInDirectory(m_directoryState.pidlDirectory.Raw());
+}
+
+void ShellBrowserImpl::CreateNewFolder()
+{
+	wil::com_ptr_nothrow<IShellItem> directoryShellItem;
+	HRESULT hr = SHCreateItemFromIDList(m_directoryState.pidlDirectory.Raw(),
+		IID_PPV_ARGS(&directoryShellItem));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto sink = winrt::make_self<FileProgressSink>();
+	sink->SetPostNewItemObserver(
+		[this](PIDLIST_ABSOLUTE pidl)
+		{
+			ListViewHelper::SelectAllItems(m_hListView, false);
+			SetFocus(m_hListView);
+
+			QueueRename(pidl);
+		});
+
+	auto newFolderName = m_app->GetResourceLoader()->LoadString(IDS_NEW_FOLDER_NAME);
+	FileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
 }

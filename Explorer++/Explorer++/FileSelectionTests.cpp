@@ -35,13 +35,6 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 	return FALSE;
 }
 
-bool Explorerplusplus::CanCreate() const
-{
-	const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
-	return CanCreateInDirectory(pidlDirectory.get());
-}
-
 BOOL Explorerplusplus::CanCut() const
 {
 	return TestItemAttributes(SFGAO_CANMOVE);
