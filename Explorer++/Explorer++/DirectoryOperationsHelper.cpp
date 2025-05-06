@@ -55,15 +55,42 @@ bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
 
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl)
 {
-	if (IsFilesystemFolder(pidl))
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
+
+	if (FAILED(hr))
 	{
-		return true;
+		return false;
 	}
 
-	// Library folders aren't filesystem folders, but they act like them (e.g. they allow items to
-	// be created, copied and moved) and ultimately they're backed by filesystem folders. If this is
-	// a library folder, file creation will be allowed.
-	return IsChildOfLibrariesFolder(pidl);
+	wil::com_ptr_nothrow<ITransferDestination> transferDestination;
+	hr = shellItem->BindToHandler(nullptr, BHID_Transfer, IID_PPV_ARGS(&transferDestination));
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	// Note that SFGAO_READONLY isn't related to FILE_ATTRIBUTE_READONLY (which has no meaning for
+	// directories). When the SFGAO_READONLY attribute is set on a directory, it indicates that new
+	// items can't be created in that directory.
+	//
+	// A read-only directory can be created, for example, by mounting a virtual hard disk as
+	// read-only.
+	SFGAOF attributes = 0;
+	hr = shellItem->GetAttributes(SFGAO_READONLY | SFGAO_STORAGE, &attributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	if (attributes != SFGAO_STORAGE)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 bool CanCustomizeDirectory(PCIDLIST_ABSOLUTE pidl)

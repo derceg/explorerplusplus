@@ -1210,20 +1210,6 @@ BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
 	return FALSE;
 }
 
-bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl)
-{
-	unique_pidl_absolute pidlLibraries;
-	HRESULT hr =
-		SHGetKnownFolderIDList(FOLDERID_Libraries, 0, nullptr, wil::out_param(pidlLibraries));
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	return ILIsParent(pidlLibraries.get(), pidl, FALSE);
-}
-
 class FileSystemBindData :
 	public winrt::implements<FileSystemBindData, IFileSystemBindData, winrt::non_agile>
 {

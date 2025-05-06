@@ -128,7 +128,6 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	const std::vector<PCITEMID_CHILD> &items, HWND hwnd, const std::wstring &action, DWORD mask,
 	IUnknown *site);
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
-bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl,
 	IShellFolder *parent = nullptr, ShellItemType shellItemType = ShellItemType::File);
 HRESULT UpdatePidl(PCIDLIST_ABSOLUTE inputPidl, PidlAbsolute &outputPidl);
