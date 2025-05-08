@@ -119,6 +119,8 @@ void StatusBar::OnMenuSelect(HMENU menu, UINT itemId, UINT flags)
 
 void StatusBar::OnMenuClose()
 {
+	m_showingMenuHelpText = false;
+
 	const auto *tab = m_browser->GetActiveShellBrowser()->GetTab();
 	SetStandardParts();
 	UpdateText(*tab);
@@ -126,6 +128,8 @@ void StatusBar::OnMenuClose()
 
 void StatusBar::OnMenuItemSelected(HMENU menu, UINT itemId, UINT flags)
 {
+	m_showingMenuHelpText = true;
+
 	m_view->SetParts({ 100 });
 
 	std::optional<std::wstring> helpText;
@@ -147,6 +151,13 @@ void StatusBar::OnMenuItemSelected(HMENU menu, UINT itemId, UINT flags)
 
 void StatusBar::UpdateText(const Tab &tab)
 {
+	if (m_showingMenuHelpText)
+	{
+		// If menu help text is being shown, there's no need to update the status bar text for the
+		// current tab.
+		return;
+	}
+
 	if (auto *navigation = tab.GetShellBrowser()->MaybeGetLatestActiveNavigation())
 	{
 		// In this case, there is at least one active navigation in progress, so the status bar

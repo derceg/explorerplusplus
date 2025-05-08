@@ -55,5 +55,6 @@ private:
 	const BrowserWindow *const m_browser;
 	const Config *const m_config;
 	const ResourceLoader *const m_resourceLoader;
+	bool m_showingMenuHelpText = false;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };
