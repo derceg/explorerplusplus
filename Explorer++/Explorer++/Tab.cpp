@@ -37,14 +37,11 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	m_tabEvents(tabEvents),
 	m_useCustomName(initialData.useCustomName),
 	m_customName(initialData.customName),
-	m_lockState(initialData.lockState)
-{
-	Initialize();
-}
-
-void Tab::Initialize()
+	m_lockState(LockState::NotLocked)
 {
 	m_shellBrowser->SetTab(this);
+
+	ApplyLockState(initialData.lockState, NotificationMode::DontNotify);
 }
 
 int Tab::GetId() const
@@ -118,6 +115,11 @@ Tab::LockState Tab::GetLockState() const
 
 void Tab::SetLockState(LockState lockState)
 {
+	ApplyLockState(lockState, NotificationMode::Notify);
+}
+
+void Tab::ApplyLockState(LockState lockState, NotificationMode notificationMode)
+{
 	if (lockState == m_lockState)
 	{
 		return;
@@ -130,7 +132,10 @@ void Tab::SetLockState(LockState lockState)
 		: NavigationTargetMode::Normal;
 	m_shellBrowser->GetNavigationController()->SetNavigationTargetMode(navigationTargetMode);
 
-	m_tabEvents->NotifyUpdated(*this, PropertyType::LockState);
+	if (notificationMode == NotificationMode::Notify)
+	{
+		m_tabEvents->NotifyUpdated(*this, PropertyType::LockState);
+	}
 }
 
 bool Tab::IsLocked() const

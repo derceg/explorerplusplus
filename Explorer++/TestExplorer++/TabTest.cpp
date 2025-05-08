@@ -81,6 +81,21 @@ TEST_F(TabTest, EmptyName)
 	EXPECT_EQ(tab.GetName(), folderName);
 }
 
+TEST_F(TabTest, InitialLockState)
+{
+	auto tab1 = BuildTab({ .lockState = Tab::LockState::NotLocked });
+	EXPECT_EQ(tab1.GetShellBrowser()->GetNavigationController()->GetNavigationTargetMode(),
+		NavigationTargetMode::Normal);
+
+	auto tab2 = BuildTab({ .lockState = Tab::LockState::Locked });
+	EXPECT_EQ(tab2.GetShellBrowser()->GetNavigationController()->GetNavigationTargetMode(),
+		NavigationTargetMode::Normal);
+
+	auto tab3 = BuildTab({ .lockState = Tab::LockState::AddressLocked });
+	EXPECT_EQ(tab3.GetShellBrowser()->GetNavigationController()->GetNavigationTargetMode(),
+		NavigationTargetMode::ForceNewTab);
+}
+
 TEST_F(TabTest, LockState)
 {
 	auto tab = BuildTab();
@@ -121,6 +136,20 @@ TEST_F(TabTest, Update)
 	tab.SetLockState(Tab::LockState::Locked);
 	tab.SetLockState(Tab::LockState::AddressLocked);
 	tab.SetLockState(Tab::LockState::NotLocked);
+}
+
+TEST_F(TabTest, NoUpdateOnCreation)
+{
+	MockFunction<void(const Tab &tab, Tab::PropertyType propertyType)> tabUpdatedCallback;
+	m_tabEvents.AddUpdatedObserver(tabUpdatedCallback.AsStdFunction(), TabEventScope::Global());
+
+	// Specifying a lock state during construction shouldn't result in an update notification being
+	// triggered.
+	EXPECT_CALL(tabUpdatedCallback, Call(_, _)).Times(0);
+
+	auto tab1 = BuildTab({ .lockState = Tab::LockState::NotLocked });
+	auto tab2 = BuildTab({ .lockState = Tab::LockState::Locked });
+	auto tab3 = BuildTab({ .lockState = Tab::LockState::AddressLocked });
 }
 
 TEST_F(TabTest, GetBrowser)

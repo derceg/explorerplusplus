@@ -75,7 +75,13 @@ public:
 	// BOOL	bUsingDefaultColumns;
 
 private:
-	void Initialize();
+	enum class NotificationMode
+	{
+		DontNotify,
+		Notify
+	};
+
+	void ApplyLockState(LockState lockState, NotificationMode notificationMode);
 
 	static inline int idCounter = 1;
 	const int m_id;
