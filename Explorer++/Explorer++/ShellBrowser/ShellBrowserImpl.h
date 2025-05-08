@@ -150,7 +150,6 @@ public:
 	uint64_t GetSelectionSize();
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
-	BOOL CanCreate() const;
 	HRESULT CopySelectedItemsToClipboard(ClipboardAction action);
 	void PasteShortcut();
 	void PasteHardLinks();

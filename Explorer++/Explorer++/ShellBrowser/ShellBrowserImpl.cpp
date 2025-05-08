@@ -715,24 +715,6 @@ bool ShellBrowserImpl::InVirtualFolder() const
 	return m_directoryState.virtualFolder;
 }
 
-/* We can create files in this folder if it is
-part of the filesystem, or if it is the root of
-the namespace (i.e. the desktop). */
-BOOL ShellBrowserImpl::CanCreate() const
-{
-	BOOL bCanCreate = FALSE;
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(nullptr, CSIDL_DESKTOP, nullptr, 0, wil::out_param(pidl));
-
-	if (SUCCEEDED(hr))
-	{
-		bCanCreate = !InVirtualFolder()
-			|| ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), pidl.get());
-	}
-
-	return bCanCreate;
-}
-
 BOOL ShellBrowserImpl::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	std::wstring parsingPath;
