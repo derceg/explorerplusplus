@@ -117,8 +117,6 @@ HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttribute
 HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes);
 BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters,
 	LaunchProcessFlags flags = LaunchProcessFlags::None);
-BOOL StartCommandPrompt(const std::wstring &directory,
-	LaunchProcessFlags flags = LaunchProcessFlags::None);
 BOOL LaunchProcess(HWND hwnd, const std::wstring &path, const std::wstring &parameters,
 	const std::wstring &startDirectory, LaunchProcessFlags flags);
 BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,

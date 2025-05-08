@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "Navigator.h"
+#include "NavigationHelper.h"
+#include "../Helper/ShellHelper.h"
 #include <boost/core/noncopyable.hpp>
 
 class BrowserWindow;
@@ -23,6 +24,9 @@ public:
 private:
 	bool IsCommandContextSensitive(int command) const;
 
+	bool CanStartCommandPrompt() const;
+
+	void StartCommandPrompt(LaunchProcessFlags flags = LaunchProcessFlags::None);
 	void GoBack(OpenFolderDisposition disposition);
 	void GoForward(OpenFolderDisposition disposition);
 	void GoUp(OpenFolderDisposition disposition);

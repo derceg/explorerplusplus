@@ -748,9 +748,6 @@ void MainToolbar::UpdateToolbarButtonStates()
 		browserController->IsCommandEnabled(IDM_GO_FORWARD));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Up,
 		browserController->IsCommandEnabled(IDM_GO_UP));
-
-	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
-
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut,
 		browserController->IsCommandEnabled(IDM_EDIT_CUT));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy,
@@ -771,7 +768,8 @@ void MainToolbar::UpdateToolbarButtonStates()
 		tab.GetShellBrowserImpl()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
 		tab.GetShellBrowserImpl()->GetNumSelectedFiles() > 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt, !virtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt,
+		browserController->IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder,
 		browserController->IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
 }

@@ -176,29 +176,6 @@ BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters, LaunchProce
 	return LaunchProcess(hwnd, currentProcessPath, parameters, L"", flags);
 }
 
-BOOL StartCommandPrompt(const std::wstring &directory, LaunchProcessFlags flags)
-{
-	wil::unique_cotaskmem_string systemPath;
-	HRESULT hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
-
-	if (FAILED(hr))
-	{
-		return FALSE;
-	}
-
-	std::filesystem::path fullPath(systemPath.get());
-	fullPath /= L"cmd.exe";
-
-	std::wstring parameters;
-
-	if (WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
-	{
-		parameters = L"/K cd /d " + directory;
-	}
-
-	return LaunchProcess(nullptr, fullPath.c_str(), parameters, directory, flags);
-}
-
 BOOL LaunchProcess(HWND hwnd, const std::wstring &path, const std::wstring &parameters,
 	const std::wstring &startDirectory, LaunchProcessFlags flags)
 {

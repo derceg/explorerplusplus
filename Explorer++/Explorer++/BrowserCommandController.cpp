@@ -9,7 +9,8 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "../Helper/ShellHelper.h"
+
+using namespace std::string_literals;
 
 BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Config *config) :
 	m_browser(browser),
@@ -26,6 +27,10 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 	switch (command)
 	{
+	case IDM_FILE_OPENCOMMANDPROMPT:
+	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
+		return CanStartCommandPrompt();
+
 	case IDM_ACTIONS_NEWFOLDER:
 		return GetActiveShellBrowser()->CanCreateNewFolder();
 
@@ -44,6 +49,32 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	}
 }
 
+bool BrowserCommandController::CanStartCommandPrompt() const
+{
+	const auto *shellBrowser = GetActiveShellBrowser();
+
+	SFGAOF attributes = SFGAO_FILESYSTEM | SFGAO_STREAM;
+	HRESULT hr = GetItemAttributes(shellBrowser->GetDirectory().Raw(), &attributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	// SFGAO_STREAM will be set if the item is a container file (e.g. a .zip file). It's not
+	// possible to show a command prompt in that case.
+	//
+	// Note that if the item is a nested folder within a container file, the SFGAO_FILESYSTEM
+	// attribute won't be set, so checking SFGAO_STREAM is only necessary for the top-level folder
+	// within a container file.
+	if (WI_IsFlagClear(attributes, SFGAO_FILESYSTEM) || WI_IsFlagSet(attributes, SFGAO_STREAM))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition disposition)
 {
 	if (IsCommandContextSensitive(command))
@@ -54,6 +85,14 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	switch (command)
 	{
+	case IDM_FILE_OPENCOMMANDPROMPT:
+		StartCommandPrompt();
+		break;
+
+	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
+		StartCommandPrompt(LaunchProcessFlags::Elevated);
+		break;
+
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
 		m_config->showAddressBar = !m_config->showAddressBar.get();
 		break;
@@ -173,6 +212,39 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 	default:
 		return false;
 	}
+}
+
+void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
+{
+	wil::unique_cotaskmem_string systemPath;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	std::filesystem::path fullPath(systemPath.get());
+	fullPath /= L"cmd.exe";
+
+	const auto *shellBrowser = GetActiveShellBrowser();
+
+	wil::unique_cotaskmem_string directoryPath;
+	hr = SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(), SIGDN_FILESYSPATH, &directoryPath);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	std::wstring parameters;
+
+	if (WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
+	{
+		parameters = L"/K cd /d "s + directoryPath.get();
+	}
+
+	LaunchProcess(nullptr, fullPath.c_str(), parameters, directoryPath.get(), flags);
 }
 
 void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
