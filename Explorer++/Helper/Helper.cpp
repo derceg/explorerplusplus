@@ -133,41 +133,6 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *sz
 	return FALSE;
 }
 
-HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated)
-{
-	HINSTANCE hNewInstance = nullptr;
-
-	TCHAR systemPath[MAX_PATH];
-	BOOL bRes = SHGetSpecialFolderPath(nullptr, systemPath, CSIDL_SYSTEM, 0);
-
-	if (bRes)
-	{
-		TCHAR commandPath[MAX_PATH];
-		TCHAR *szRet = PathCombine(commandPath, systemPath, _T("cmd.exe"));
-
-		if (szRet != nullptr)
-		{
-			TCHAR operation[32];
-			std::wstring parameters;
-
-			if (elevated)
-			{
-				StringCchCopy(operation, std::size(operation), _T("runas"));
-				parameters = _T("/K cd /d ") + directory;
-			}
-			else
-			{
-				StringCchCopy(operation, std::size(operation), _T("open"));
-			}
-
-			hNewInstance = ShellExecute(nullptr, operation, commandPath, parameters.c_str(),
-				directory.c_str(), SW_SHOWNORMAL);
-		}
-	}
-
-	return hNewInstance;
-}
-
 BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 {
 	BOOL bSuccess = FALSE;

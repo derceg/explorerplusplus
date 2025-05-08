@@ -305,11 +305,11 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::OpenCommandPrompt:
 	case IDM_FILE_OPENCOMMANDPROMPT:
-		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), false);
+		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory());
 		break;
 
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
-		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), true);
+		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), LaunchProcessFlags::Elevated);
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:

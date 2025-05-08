@@ -53,13 +53,13 @@ enum class ShellItemType
 	Folder
 };
 
-enum class LaunchCurrentProcessFlags
+enum class LaunchProcessFlags
 {
 	None = 0,
 	Elevated = 1 << 0
 };
 
-DEFINE_ENUM_FLAG_OPERATORS(LaunchCurrentProcessFlags);
+DEFINE_ENUM_FLAG_OPERATORS(LaunchProcessFlags);
 
 struct JumpListTaskInformation
 {
@@ -116,7 +116,11 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList);
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes);
 BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters,
-	LaunchCurrentProcessFlags flags = LaunchCurrentProcessFlags::None);
+	LaunchProcessFlags flags = LaunchProcessFlags::None);
+BOOL StartCommandPrompt(const std::wstring &directory,
+	LaunchProcessFlags flags = LaunchProcessFlags::None);
+BOOL LaunchProcess(HWND hwnd, const std::wstring &path, const std::wstring &parameters,
+	const std::wstring &startDirectory, LaunchProcessFlags flags);
 BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,
 	const std::wstring &parameters, const std::wstring &startDirectory);
 BOOL ExecuteFileAction(HWND hwnd, PCIDLIST_ABSOLUTE pidl, const std::wstring &verb,

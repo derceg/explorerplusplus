@@ -55,7 +55,6 @@ BOOL GetFileNameFromUser(HWND hwnd, TCHAR *fullFileName, UINT cchMax,
 	const TCHAR *initialDirectory);
 
 /* General helper functions. */
-HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated);
 HRESULT GetCPUBrandString(std::wstring &cpuBrand);
 void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect,
 	LONG lindex, DWORD tymed);

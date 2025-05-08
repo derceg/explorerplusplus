@@ -17,6 +17,7 @@
 #include <wil/com.h>
 #include <propkey.h>
 #include <wininet.h>
+#include <filesystem>
 
 namespace
 {
@@ -168,20 +169,47 @@ HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes)
 	return hr;
 }
 
-BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters,
-	LaunchCurrentProcessFlags flags)
+BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters, LaunchProcessFlags flags)
 {
 	TCHAR currentProcessPath[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
+	return LaunchProcess(hwnd, currentProcessPath, parameters, L"", flags);
+}
 
+BOOL StartCommandPrompt(const std::wstring &directory, LaunchProcessFlags flags)
+{
+	wil::unique_cotaskmem_string systemPath;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
+
+	if (FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	std::filesystem::path fullPath(systemPath.get());
+	fullPath /= L"cmd.exe";
+
+	std::wstring parameters;
+
+	if (WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
+	{
+		parameters = L"/K cd /d " + directory;
+	}
+
+	return LaunchProcess(nullptr, fullPath.c_str(), parameters, directory, flags);
+}
+
+BOOL LaunchProcess(HWND hwnd, const std::wstring &path, const std::wstring &parameters,
+	const std::wstring &startDirectory, LaunchProcessFlags flags)
+{
 	std::wstring verb;
 
-	if (WI_IsFlagSet(flags, LaunchCurrentProcessFlags::Elevated))
+	if (WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
 	{
 		verb = L"runas";
 	}
 
-	return ExecuteFileAction(hwnd, currentProcessPath, verb, parameters, L"");
+	return ExecuteFileAction(hwnd, path, verb, parameters, startDirectory);
 }
 
 BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,

@@ -89,7 +89,7 @@ ClipboardOperations::PastedItems PasteSymLinksViaElevatedProcess(const std::wstr
 	{
 		std::wstring parameters =
 			std::format(L"{} \"{}\"", CommandLine::PASTE_SYMLINKS_ARGUMENT, destination);
-		return LaunchCurrentProcess(nullptr, parameters, LaunchCurrentProcessFlags::Elevated);
+		return LaunchCurrentProcess(nullptr, parameters, LaunchProcessFlags::Elevated);
 	};
 
 	PasteSymLinksServer server;
@@ -116,7 +116,8 @@ PastedItems PasteSymLinks(const std::wstring &destination)
 	auto pastedItems = PasteLinksOfType(destination, LinkType::SymLink);
 
 	auto itr = std::find_if(pastedItems.begin(), pastedItems.end(),
-		[](const auto &pastedItem) {
+		[](const auto &pastedItem)
+		{
 			return pastedItem.error
 				== std::error_code(ERROR_PRIVILEGE_NOT_HELD, std::system_category());
 		});
