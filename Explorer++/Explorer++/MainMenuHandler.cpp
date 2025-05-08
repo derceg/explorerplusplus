@@ -48,7 +48,7 @@ void Explorerplusplus::OnFilterResults()
 
 void Explorerplusplus::OnMergeFiles()
 {
-	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
+	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectoryPath();
 
 	std::list<std::wstring> fullFilenameList;
 	int iItem = -1;
@@ -106,7 +106,7 @@ void Explorerplusplus::OnSearch()
 		[this]
 		{
 			Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectory();
+			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryPath();
 
 			return new SearchDialog(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
 				this, this, GetActivePane()->GetTabContainerImpl());
@@ -168,7 +168,7 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 		std::size(fileName));
 	StringCchCat(fileName, std::size(fileName), _T(".txt"));
 
-	std::wstring directory = m_pActiveShellBrowser->GetDirectory();
+	std::wstring directory = m_pActiveShellBrowser->GetDirectoryPath();
 
 	BOOL bSaveNameRetrieved =
 		GetFileNameFromUser(m_hContainer, fileName, std::size(fileName), directory.c_str());
@@ -204,7 +204,7 @@ void Explorerplusplus::OnResolveLink()
 			Tab &newTab = GetActivePane()->GetTabContainerImpl()->CreateNewTab(szPath,
 				TabSettings(_selected = true));
 
-			if (newTab.GetShellBrowserImpl()->GetDirectory() == szPath)
+			if (newTab.GetShellBrowserImpl()->GetDirectoryPath() == szPath)
 			{
 				wil::com_ptr_nothrow<IShellFolder> parent;
 				hr = SHBindToObject(nullptr, newTab.GetShellBrowserImpl()->GetDirectoryIdl().get(),

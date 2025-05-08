@@ -427,7 +427,7 @@ void Explorerplusplus::OnListViewPaste()
 		 will cause the destination directory to change in the
 		 middle of the copy operation. */
 		StringCchCopy(szDestination, std::size(szDestination),
-			selectedTab.GetShellBrowserImpl()->GetDirectory().c_str());
+			selectedTab.GetShellBrowserImpl()->GetDirectoryPath().c_str());
 
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';

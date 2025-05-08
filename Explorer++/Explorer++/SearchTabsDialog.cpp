@@ -268,7 +268,7 @@ std::wstring SearchTabsDialog::GetTabColumnText(const Tab *tab, ColumnType colum
 		return tab->GetName();
 
 	case SearchTabsDialog::ColumnType::Path:
-		return tab->GetShellBrowserImpl()->GetDirectory();
+		return tab->GetShellBrowserImpl()->GetDirectoryPath();
 
 	default:
 		LOG(FATAL) << "Search tabs column type not found";

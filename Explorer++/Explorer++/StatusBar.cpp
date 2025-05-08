@@ -233,7 +233,7 @@ void StatusBar::UpdateText(const Tab &tab)
 	m_view->SetPartText(1, sizeText);
 
 	std::wstring driveFreeSpaceText =
-		CreateDriveFreeSpaceString(tab.GetShellBrowserImpl()->GetDirectory().c_str());
+		CreateDriveFreeSpaceString(tab.GetShellBrowserImpl()->GetDirectoryPath().c_str());
 	m_view->SetPartText(2, driveFreeSpaceText);
 }
 

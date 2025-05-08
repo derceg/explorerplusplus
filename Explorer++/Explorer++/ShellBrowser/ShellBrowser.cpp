@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "NavigationManager.h"
+#include "ShellNavigationController.h"
 
 ShellBrowser::ShellBrowser() : m_id(idCounter++)
 {
@@ -25,6 +26,12 @@ void ShellBrowser::SetTab(const Tab *tab)
 {
 	CHECK(!m_tab);
 	m_tab = tab;
+}
+
+const PidlAbsolute &ShellBrowser::GetDirectory() const
+{
+	const auto *currentEntry = GetNavigationController()->GetCurrentEntry();
+	return currentEntry->GetPidl();
 }
 
 const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const

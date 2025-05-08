@@ -238,14 +238,14 @@ void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wst
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
 	ExecuteFileAction(m_hContainer, itemPath, L"", parameters,
-		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters)
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
 	ExecuteFileAction(m_hContainer, pidl, L"", parameters,
-		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
 }
 
 void Explorerplusplus::OnSize(UINT state)
@@ -814,7 +814,7 @@ void Explorerplusplus::CreateNewWindow(const std::vector<TabStorageData> &tabs)
 
 void Explorerplusplus::OnCloneWindow()
 {
-	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
+	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectoryPath();
 
 	TCHAR szQuotedCurrentDirectory[MAX_PATH];
 	StringCchPrintf(szQuotedCurrentDirectory, std::size(szQuotedCurrentDirectory), _T("\"%s\""),

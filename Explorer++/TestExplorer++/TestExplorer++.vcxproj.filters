@@ -446,6 +446,9 @@
     <ClCompile Include="BrowserCommandTargetFake.cpp">
       <Filter>Browser\Command Handling</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowserTest.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

@@ -305,17 +305,17 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::OpenCommandPrompt:
 	case IDM_FILE_OPENCOMMANDPROMPT:
-		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory());
+		StartCommandPrompt(m_pActiveShellBrowser->GetDirectoryPath());
 		break;
 
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
-		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), LaunchProcessFlags::Elevated);
+		StartCommandPrompt(m_pActiveShellBrowser->GetDirectoryPath(), LaunchProcessFlags::Elevated);
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:
 	{
 		BulkClipboardWriter clipboardWriter;
-		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectory());
+		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectoryPath());
 	}
 	break;
 
@@ -1375,7 +1375,7 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, UINT notification
 	{
 	case CBN_DROPDOWN:
 		AddPathsToComboBoxEx(m_addressBar->GetView()->GetHWND(),
-			m_pActiveShellBrowser->GetDirectory().c_str());
+			m_pActiveShellBrowser->GetDirectoryPath().c_str());
 		break;
 	}
 

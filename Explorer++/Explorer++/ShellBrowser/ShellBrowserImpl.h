@@ -95,7 +95,7 @@ public:
 
 	/* Get/Set current state. */
 	unique_pidl_absolute GetDirectoryIdl() const;
-	std::wstring GetDirectory() const;
+	std::wstring GetDirectoryPath() const;
 	int GetUniqueFolderId() const;
 	bool GetAutoArrange() const;
 	void SetAutoArrange(bool autoArrange);

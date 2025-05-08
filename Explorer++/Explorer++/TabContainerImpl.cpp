@@ -705,7 +705,7 @@ void TabContainerImpl::SetTabIcon(const Tab &tab)
 	else
 	{
 		auto cachedIconIndex =
-			m_cachedIcons->MaybeGetIconIndex(tab.GetShellBrowserImpl()->GetDirectory());
+			m_cachedIcons->MaybeGetIconIndex(tab.GetShellBrowserImpl()->GetDirectoryPath());
 
 		if (cachedIconIndex)
 		{

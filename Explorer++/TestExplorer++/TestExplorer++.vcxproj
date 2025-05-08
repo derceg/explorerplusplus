@@ -224,6 +224,7 @@
     <ClCompile Include="ConfigXmlStorageTest.cpp" />
     <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="CustomFontStorageTest.cpp" />
+    <ClCompile Include="ShellBrowserTest.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />

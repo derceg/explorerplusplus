@@ -40,7 +40,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 	DisplayWindow_ClearTextBuffer(m_displayWindow->GetHWND());
 	DisplayWindow_SetThumbnailFile(m_displayWindow->GetHWND(), L"", FALSE);
 
-	std::wstring currentDirectory = tab.GetShellBrowserImpl()->GetDirectory();
+	std::wstring currentDirectory = tab.GetShellBrowserImpl()->GetDirectoryPath();
 	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlComputer;

@@ -1644,7 +1644,7 @@ void ShellTreeView::UpdateSelection()
 	// Note that mapped drives don't have that specific issue, as they're contained within the This
 	// PC folder. However, there is still the general problem that each parent folder has to be
 	// enumerated and all the work is done on the main thread.
-	if (PathIsUNC(selectedShellBrowser->GetDirectory().c_str()))
+	if (PathIsUNC(selectedShellBrowser->GetDirectoryPath().c_str()))
 	{
 		return;
 	}

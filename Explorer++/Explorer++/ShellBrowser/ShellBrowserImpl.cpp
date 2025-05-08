@@ -578,7 +578,7 @@ std::wstring ShellBrowserImpl::GetItemFullName(int index) const
 	return GetItemByIndex(index).parsingName;
 }
 
-std::wstring ShellBrowserImpl::GetDirectory() const
+std::wstring ShellBrowserImpl::GetDirectoryPath() const
 {
 	return m_directoryState.directory;
 }
@@ -1115,13 +1115,13 @@ void ShellBrowserImpl::PasteShortcut()
 
 void ShellBrowserImpl::PasteHardLinks()
 {
-	auto pastedItems = ClipboardOperations::PasteHardLinks(GetDirectory());
+	auto pastedItems = ClipboardOperations::PasteHardLinks(GetDirectoryPath());
 	OnInternalPaste(pastedItems);
 }
 
 void ShellBrowserImpl::PasteSymLinks()
 {
-	auto pastedItems = ClipboardOperations::PasteSymLinks(GetDirectory());
+	auto pastedItems = ClipboardOperations::PasteSymLinks(GetDirectoryPath());
 	OnInternalPaste(pastedItems);
 }
 
