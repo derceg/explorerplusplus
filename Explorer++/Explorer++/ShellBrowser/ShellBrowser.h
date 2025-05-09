@@ -32,6 +32,8 @@ public:
 	virtual ShellNavigationController *GetNavigationController() const = 0;
 	virtual bool CanCreateNewFolder() const = 0;
 	virtual void CreateNewFolder() = 0;
+	virtual bool CanSplitFile() const = 0;
+	virtual void SplitFile() = 0;
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;

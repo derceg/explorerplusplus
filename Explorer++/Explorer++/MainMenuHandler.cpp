@@ -24,7 +24,6 @@
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "SplitFileDialog.h"
 #include "TabContainerImpl.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
@@ -62,19 +61,6 @@ void Explorerplusplus::OnMergeFiles()
 	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::OnSplitFile()
-{
-	int iSelected = ListView_GetNextItem(m_hActiveListView, -1, LVNI_SELECTED);
-
-	if (iSelected != -1)
-	{
-		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iSelected);
-
-		SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_hContainer, fullFilename);
-		splitFileDialog.ShowModalDialog();
-	}
 }
 
 void Explorerplusplus::OnDestroyFiles()

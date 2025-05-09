@@ -90,6 +90,8 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
+	bool CanSplitFile() const override;
+	void SplitFile() override;
 
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
@@ -455,6 +457,7 @@ private:
 	void StartRenamingSingleFile();
 	void StartRenamingMultipleFiles();
 	void CopySelectedItemsToFolder(TransferAction action);
+	std::optional<std::wstring> GetSplitFileItemPath() const;
 
 	// Listview header context menu
 	void OnListViewHeaderRightClick(const POINTS &cursorPos);

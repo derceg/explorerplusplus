@@ -23,6 +23,7 @@
 #include "ShellEnumeratorImpl.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
+#include "SplitFileDialog.h"
 #include "ThemeManager.h"
 #include "ViewModeHelper.h"
 #include "ViewModes.h"
@@ -1243,6 +1244,55 @@ void ShellBrowserImpl::CreateNewFolder()
 
 	auto newFolderName = m_app->GetResourceLoader()->LoadString(IDS_NEW_FOLDER_NAME);
 	FileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
+}
+
+bool ShellBrowserImpl::CanSplitFile() const
+{
+	return !!GetSplitFileItemPath();
+}
+
+void ShellBrowserImpl::SplitFile()
+{
+	auto itemPath = GetSplitFileItemPath();
+
+	if (!itemPath)
+	{
+		return;
+	}
+
+	SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_hOwner, *itemPath);
+	splitFileDialog.ShowModalDialog();
+}
+
+std::optional<std::wstring> ShellBrowserImpl::GetSplitFileItemPath() const
+{
+	if (m_directoryState.virtualFolder)
+	{
+		return std::nullopt;
+	}
+
+	if (DoesItemHaveAttributes(m_directoryState.pidlDirectory.Raw(), SFGAO_STREAM))
+	{
+		// The current directory is the top-level folder in a container file. It's not possible to
+		// split a file in this case.
+		return std::nullopt;
+	}
+
+	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED);
+
+	if (selectedItem == -1)
+	{
+		return std::nullopt;
+	}
+
+	const auto &itemInfo = GetItemByIndex(selectedItem);
+
+	if (WI_IsFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		return std::nullopt;
+	}
+
+	return itemInfo.parsingName;
 }
 
 void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)

@@ -1167,7 +1167,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::SplitFile:
 	case IDM_ACTIONS_SPLITFILE:
-		OnSplitFile();
+		m_commandController.ExecuteCommand(IDM_ACTIONS_SPLITFILE);
 		break;
 
 	case IDM_ACTIONS_DESTROYFILES:

@@ -84,3 +84,12 @@ bool ShellBrowserFake::CanCreateNewFolder() const
 void ShellBrowserFake::CreateNewFolder()
 {
 }
+
+bool ShellBrowserFake::CanSplitFile() const
+{
+	return false;
+}
+
+void ShellBrowserFake::SplitFile()
+{
+}

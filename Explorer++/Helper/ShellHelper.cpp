@@ -130,6 +130,19 @@ HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output)
 	return hr;
 }
 
+bool DoesItemHaveAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF attributes)
+{
+	SFGAOF outputAttributes = attributes;
+	HRESULT hr = GetItemAttributes(pidl, &outputAttributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	return WI_AreAllFlagsSet(outputAttributes, attributes);
+}
+
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes)
 {
 	if (szItemParsingPath == nullptr || pItemAttributes == nullptr)

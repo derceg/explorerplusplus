@@ -34,6 +34,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_ACTIONS_NEWFOLDER:
 		return GetActiveShellBrowser()->CanCreateNewFolder();
 
+	case IDM_ACTIONS_SPLITFILE:
+		return GetActiveShellBrowser()->CanSplitFile();
+
 	case IDM_GO_BACK:
 		return GetActiveShellBrowser()->GetNavigationController()->CanGoBack();
 
@@ -123,6 +126,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_ACTIONS_NEWFOLDER:
 		GetActiveShellBrowser()->CreateNewFolder();
+		break;
+
+	case IDM_ACTIONS_SPLITFILE:
+		GetActiveShellBrowser()->SplitFile();
 		break;
 
 	case IDM_GO_BACK:

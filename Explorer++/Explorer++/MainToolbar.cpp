@@ -765,7 +765,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,
 		browserController->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
-		tab.GetShellBrowserImpl()->GetNumSelectedFiles() == 1);
+		browserController->IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
 		tab.GetShellBrowserImpl()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt,

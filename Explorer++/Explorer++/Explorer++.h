@@ -257,7 +257,6 @@ private:
 	void OnRefresh();
 	void OnSelectColumns();
 	void OnMergeFiles();
-	void OnSplitFile();
 	void OnDestroyFiles();
 	void OnSearch();
 	void OnCustomizeColors();

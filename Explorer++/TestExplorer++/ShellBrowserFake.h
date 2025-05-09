@@ -38,6 +38,8 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
+	bool CanSplitFile() const override;
+	void SplitFile() override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;
