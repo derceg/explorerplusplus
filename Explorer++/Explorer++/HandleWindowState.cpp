@@ -112,7 +112,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_SPLITFILE,
 		m_commandController.IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_MERGEFILES,
-		tab.GetShellBrowserImpl()->GetNumSelectedFiles() > 1);
+		m_commandController.IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_DESTROYFILES, anySelected);
 
 	UINT itemToCheck = GetViewModeMenuId(viewMode);

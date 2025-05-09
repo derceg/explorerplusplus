@@ -256,7 +256,6 @@ private:
 	void OnShowHiddenFiles();
 	void OnRefresh();
 	void OnSelectColumns();
-	void OnMergeFiles();
 	void OnDestroyFiles();
 	void OnSearch();
 	void OnCustomizeColors();

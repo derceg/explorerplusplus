@@ -40,6 +40,8 @@ public:
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
 	void SplitFile() override;
+	bool CanMergeFiles() const override;
+	void MergeFiles() override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;

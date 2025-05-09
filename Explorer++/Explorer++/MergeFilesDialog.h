@@ -8,6 +8,8 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialogHelper.h"
+#include <string>
+#include <vector>
 
 class MergeFilesDialog;
 
@@ -31,7 +33,7 @@ class MergeFiles : public ReferenceCount
 {
 public:
 	MergeFiles(HWND hDlg, const std::wstring &strOutputFilename,
-		const std::list<std::wstring> &FullFilenameList);
+		const std::vector<std::wstring> &filePaths);
 	~MergeFiles();
 
 	void StartMerging();
@@ -41,7 +43,7 @@ private:
 	HWND m_hDlg;
 
 	std::wstring m_strOutputFilename;
-	std::list<std::wstring> m_FullFilenameList;
+	std::vector<std::wstring> m_filePaths;
 
 	CRITICAL_SECTION m_csStop;
 	bool m_bstopMerging;
@@ -51,7 +53,7 @@ class MergeFilesDialog : public BaseDialog
 {
 public:
 	MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
-		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
+		const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
 		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
 
@@ -75,7 +77,7 @@ private:
 	void OnFinished();
 
 	std::wstring m_strOutputDirectory;
-	std::list<std::wstring> m_FullFilenameList;
+	std::vector<std::wstring> m_filePaths;
 	BOOL m_bShowFriendlyDates;
 
 	MergeFiles *m_pMergeFiles;

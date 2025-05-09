@@ -93,3 +93,12 @@ bool ShellBrowserFake::CanSplitFile() const
 void ShellBrowserFake::SplitFile()
 {
 }
+
+bool ShellBrowserFake::CanMergeFiles() const
+{
+	return false;
+}
+
+void ShellBrowserFake::MergeFiles()
+{
+}

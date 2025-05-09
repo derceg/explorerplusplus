@@ -1160,14 +1160,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		m_commandController.ExecuteCommand(IDM_ACTIONS_NEWFOLDER);
 		break;
 
-	case MainToolbarButton::MergeFiles:
-	case IDM_ACTIONS_MERGEFILES:
-		OnMergeFiles();
-		break;
-
 	case MainToolbarButton::SplitFile:
 	case IDM_ACTIONS_SPLITFILE:
 		m_commandController.ExecuteCommand(IDM_ACTIONS_SPLITFILE);
+		break;
+
+	case MainToolbarButton::MergeFiles:
+	case IDM_ACTIONS_MERGEFILES:
+		m_commandController.ExecuteCommand(IDM_ACTIONS_MERGEFILES);
 		break;
 
 	case IDM_ACTIONS_DESTROYFILES:

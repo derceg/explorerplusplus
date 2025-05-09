@@ -17,6 +17,7 @@
 #include "ItemData.h"
 #include "MainResource.h"
 #include "MassRenameDialog.h"
+#include "MergeFilesDialog.h"
 #include "PreservedFolderState.h"
 #include "ResourceLoader.h"
 #include "ServiceProvider.h"
@@ -1248,12 +1249,12 @@ void ShellBrowserImpl::CreateNewFolder()
 
 bool ShellBrowserImpl::CanSplitFile() const
 {
-	return !!GetSplitFileItemPath();
+	return !!GetFilePathForSplit();
 }
 
 void ShellBrowserImpl::SplitFile()
 {
-	auto itemPath = GetSplitFileItemPath();
+	auto itemPath = GetFilePathForSplit();
 
 	if (!itemPath)
 	{
@@ -1264,7 +1265,7 @@ void ShellBrowserImpl::SplitFile()
 	splitFileDialog.ShowModalDialog();
 }
 
-std::optional<std::wstring> ShellBrowserImpl::GetSplitFileItemPath() const
+std::optional<std::wstring> ShellBrowserImpl::GetFilePathForSplit() const
 {
 	if (m_directoryState.virtualFolder)
 	{
@@ -1293,6 +1294,61 @@ std::optional<std::wstring> ShellBrowserImpl::GetSplitFileItemPath() const
 	}
 
 	return itemInfo.parsingName;
+}
+
+bool ShellBrowserImpl::CanMergeFiles() const
+{
+	return !!GetFilePathsForMerge();
+}
+
+void ShellBrowserImpl::MergeFiles()
+{
+	auto items = GetFilePathsForMerge();
+
+	if (!items)
+	{
+		return;
+	}
+
+	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_hOwner,
+		m_directoryState.directory, *items, m_config->globalFolderSettings.showFriendlyDates);
+	mergeFilesDialog.ShowModalDialog();
+}
+
+std::optional<std::vector<std::wstring>> ShellBrowserImpl::GetFilePathsForMerge() const
+{
+	if (m_directoryState.virtualFolder)
+	{
+		return std::nullopt;
+	}
+
+	if (DoesItemHaveAttributes(m_directoryState.pidlDirectory.Raw(), SFGAO_STREAM))
+	{
+		return std::nullopt;
+	}
+
+	std::vector<std::wstring> items;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	{
+		const auto &itemInfo = GetItemByIndex(index);
+
+		if (WI_IsFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+		{
+			return std::nullopt;
+		}
+
+		items.push_back(itemInfo.parsingName);
+	}
+
+	if (items.size() < 2)
+	{
+		// There have to be at least 2 items to perform a merge.
+		return std::nullopt;
+	}
+
+	return items;
 }
 
 void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)

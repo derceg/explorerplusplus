@@ -92,6 +92,8 @@ public:
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
 	void SplitFile() override;
+	bool CanMergeFiles() const override;
+	void MergeFiles() override;
 
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
@@ -457,7 +459,8 @@ private:
 	void StartRenamingSingleFile();
 	void StartRenamingMultipleFiles();
 	void CopySelectedItemsToFolder(TransferAction action);
-	std::optional<std::wstring> GetSplitFileItemPath() const;
+	std::optional<std::wstring> GetFilePathForSplit() const;
+	std::optional<std::vector<std::wstring>> GetFilePathsForMerge() const;
 
 	// Listview header context menu
 	void OnListViewHeaderRightClick(const POINTS &cursorPos);

@@ -740,7 +740,6 @@ void MainToolbar::UpdateToolbarButtonStates()
 	}
 
 	auto *browserController = m_browser->GetCommandController();
-	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
 		browserController->IsCommandEnabled(IDM_GO_BACK));
@@ -767,7 +766,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
 		browserController->IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
-		tab.GetShellBrowserImpl()->GetNumSelectedFiles() > 1);
+		browserController->IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt,
 		browserController->IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder,

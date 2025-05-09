@@ -14,6 +14,7 @@
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <wil/resource.h>
+#include <algorithm>
 #include <regex>
 
 namespace NMergeFilesDialog
@@ -31,11 +32,11 @@ const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles"
 bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
 
 MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
+	const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
 	BOOL bShowFriendlyDates) :
 	BaseDialog(resourceLoader, IDD_MERGEFILES, hParent, DialogSizingType::Both),
 	m_strOutputDirectory(strOutputDirectory),
-	m_FullFilenameList(FullFilenameList),
+	m_filePaths(filePaths),
 	m_bShowFriendlyDates(bShowFriendlyDates),
 	m_pMergeFiles(nullptr),
 	m_bMergingFiles(false),
@@ -67,7 +68,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 	/* If the files all match the pattern .*[\\.]?part[0-9]+
 	(e.g. document.txt.part1), order them alphabetically. */
-	for (const auto &strFullFilename : m_FullFilenameList)
+	for (const auto &strFullFilename : m_filePaths)
 	{
 		if (!std::regex_match(strFullFilename, rxPattern))
 		{
@@ -80,14 +81,14 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 	if (bAllMatchPattern)
 	{
-		m_FullFilenameList.sort(CompareFilenames);
+		std::ranges::sort(m_filePaths, CompareFilenames);
 
 		/* Since the filenames all match the
 		pattern, construct the output filename
 		from the first files name. */
 		rxPattern.assign(_T("[\\.]?part[0-9]+"), std::regex_constants::icase);
 		strOutputFilename =
-			std::regex_replace(m_FullFilenameList.front(), rxPattern, std::wstring(_T("")));
+			std::regex_replace(m_filePaths.front(), rxPattern, std::wstring(_T("")));
 	}
 	else
 	{
@@ -133,7 +134,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 	int iItem = 0;
 
-	for (const auto &strFullFilename : m_FullFilenameList)
+	for (const auto &strFullFilename : m_filePaths)
 	{
 		TCHAR szFullFilename[MAX_PATH];
 
@@ -307,7 +308,7 @@ void MergeFilesDialog::OnOk()
 
 		std::wstring outputFileName = GetWindowString(hOutputFileName);
 
-		m_pMergeFiles = new MergeFiles(m_hDlg, outputFileName, m_FullFilenameList);
+		m_pMergeFiles = new MergeFiles(m_hDlg, outputFileName, m_filePaths);
 
 		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, 0, 0);
 
@@ -389,7 +390,7 @@ void MergeFilesDialog::OnMove(bool bUp)
 		}
 		else
 		{
-			if (iSelected == static_cast<int>((m_FullFilenameList.size() - 1)))
+			if (iSelected == static_cast<int>((m_filePaths.size() - 1)))
 			{
 				return;
 			}
@@ -397,10 +398,10 @@ void MergeFilesDialog::OnMove(bool bUp)
 			iSwap = iSelected + 1;
 		}
 
-		auto itrSelected = m_FullFilenameList.begin();
+		auto itrSelected = m_filePaths.begin();
 		std::advance(itrSelected, iSelected);
 
-		auto itrSwap = m_FullFilenameList.begin();
+		auto itrSwap = m_filePaths.begin();
 		std::advance(itrSelected, iSwap);
 
 		std::iter_swap(itrSelected, itrSwap);
@@ -438,11 +439,11 @@ DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
 }
 
 MergeFiles::MergeFiles(HWND hDlg, const std::wstring &strOutputFilename,
-	const std::list<std::wstring> &FullFilenameList)
+	const std::vector<std::wstring> &filePaths)
 {
 	m_hDlg = hDlg;
 	m_strOutputFilename = strOutputFilename;
-	m_FullFilenameList = FullFilenameList;
+	m_filePaths = filePaths;
 
 	m_bstopMerging = false;
 
@@ -470,9 +471,9 @@ void MergeFiles::StartMerging()
 	}
 
 	PostMessage(m_hDlg, NMergeFilesDialog::WM_APP_SETTOTALMERGECOUNT,
-		static_cast<WPARAM>(m_FullFilenameList.size()), 0);
+		static_cast<WPARAM>(m_filePaths.size()), 0);
 
-	for (const auto &strFullFilename : m_FullFilenameList)
+	for (const auto &strFullFilename : m_filePaths)
 	{
 		if (bStop)
 		{

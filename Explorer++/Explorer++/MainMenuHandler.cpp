@@ -14,7 +14,6 @@
 #include "FileProgressSink.h"
 #include "FilterDialog.h"
 #include "MainResource.h"
-#include "MergeFilesDialog.h"
 #include "ModelessDialogHelper.h"
 #include "OptionsDialog.h"
 #include "ResourceLoader.h"
@@ -43,24 +42,6 @@ void Explorerplusplus::OnFilterResults()
 {
 	FilterDialog filterDialog(m_app->GetResourceLoader(), m_hContainer, this);
 	filterDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::OnMergeFiles()
-{
-	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectoryPath();
-
-	std::list<std::wstring> fullFilenameList;
-	int iItem = -1;
-
-	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-	{
-		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
-		fullFilenameList.push_back(fullFilename);
-	}
-
-	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
-		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
-	mergeFilesDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnDestroyFiles()

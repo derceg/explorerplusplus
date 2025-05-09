@@ -34,6 +34,8 @@ public:
 	virtual void CreateNewFolder() = 0;
 	virtual bool CanSplitFile() const = 0;
 	virtual void SplitFile() = 0;
+	virtual bool CanMergeFiles() const = 0;
+	virtual void MergeFiles() = 0;
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;
