@@ -78,7 +78,6 @@ class TabRestorerMenu;
 struct TabSettings;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
-class UiTheming;
 class WindowSubclass;
 
 namespace Applications
@@ -320,7 +319,6 @@ private:
 	TabEvents *GetTabEvents() override;
 	TabContainerImpl *GetTabContainerImpl() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;
-	UiTheming *GetUiTheming() override;
 	AcceleratorUpdater *GetAccleratorUpdater() override;
 	Plugins::PluginCommandManager *GetPluginCommandManager() override;
 
@@ -425,7 +423,6 @@ private:
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainerImpl *GetTabContainerImpl() const override;
-	HWND GetTreeView() const override;
 
 	/* Menus. */
 	void InitializeMainMenu();
@@ -514,7 +511,6 @@ private:
 
 	/* Theming. */
 	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
-	std::unique_ptr<UiTheming> m_uiTheming;
 
 	/* Plugins. */
 	std::unique_ptr<Plugins::PluginManager> m_pluginManager;

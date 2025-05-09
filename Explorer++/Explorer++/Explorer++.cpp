@@ -27,7 +27,6 @@
 #include "TabStorage.h"
 #include "TaskbarThumbnails.h"
 #include "ThemeWindowTracker.h"
-#include "UiTheming.h"
 #include "WindowStorage.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"

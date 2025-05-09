@@ -12,17 +12,14 @@
 #include "Plugins/TabsApi/Events/TabRemoved.h"
 #include "Plugins/TabsApi/Events/TabUpdated.h"
 #include "Plugins/TabsApi/TabsApi.h"
-#include "Plugins/UiApi.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainerImpl.h"
-#include "UiTheming.h"
 #include <sol/sol.hpp>
 
 void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainerImpl *tabContainerImpl,
 	const Config *config);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
-void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state,
 	Plugins::PluginCommandManager *pluginCommandManager);
 template <typename T>
@@ -39,7 +36,6 @@ void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface
 	BindTabsAPI(state, pluginInterface->GetTabEvents(), pluginInterface->GetTabContainerImpl(),
 		config);
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
-	BindUiApi(state, pluginInterface->GetUiTheming());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
@@ -104,17 +100,6 @@ void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManage
 
 	metaTable.set_function("create", &Plugins::MenuApi::create, menuApi);
 	metaTable.set_function("remove", &Plugins::MenuApi::remove, menuApi);
-}
-
-void BindUiApi(sol::state &state, UiTheming *uiTheming)
-{
-	std::shared_ptr<Plugins::UiApi> uiApi = std::make_shared<Plugins::UiApi>(uiTheming);
-
-	sol::table uiTable = state.create_named_table("ui");
-	sol::table metaTable = MarkTableReadOnly(state, uiTable);
-
-	metaTable.set_function("setListViewColors", &Plugins::UiApi::setListViewColors, uiApi);
-	metaTable.set_function("setTreeViewColors", &Plugins::UiApi::setTreeViewColors, uiApi);
 }
 
 void BindCommandApi(int pluginId, sol::state &state,

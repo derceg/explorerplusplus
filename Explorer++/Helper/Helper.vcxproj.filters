@@ -94,9 +94,6 @@
     <ClCompile Include="ImageHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="Rgb.cpp">
-      <Filter>Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="DpiCompatibility.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
@@ -277,9 +274,6 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="ImageHelper.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="Rgb.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="DpiCompatibility.h">

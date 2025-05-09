@@ -169,12 +169,6 @@
     <ClCompile Include="PluginInitialization.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Plugins\UiApi.cpp">
-      <Filter>Plugins</Filter>
-    </ClCompile>
-    <ClCompile Include="UiTheming.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Plugins\AcceleratorParser.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -956,12 +950,6 @@
     </ClInclude>
     <ClInclude Include="Plugins\PluginManager.h">
       <Filter>Plugins</Filter>
-    </ClInclude>
-    <ClInclude Include="Plugins\UiApi.h">
-      <Filter>Plugins</Filter>
-    </ClInclude>
-    <ClInclude Include="UiTheming.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Plugins\AcceleratorParser.h">
       <Filter>Plugins</Filter>

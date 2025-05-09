@@ -920,11 +920,6 @@ TabContainerImpl *Explorerplusplus::GetTabContainerImpl() const
 	return GetActivePane()->GetTabContainerImpl();
 }
 
-HWND Explorerplusplus::GetTreeView() const
-{
-	return m_shellTreeView->GetHWND();
-}
-
 void Explorerplusplus::OnShowHiddenFiles()
 {
 	Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();

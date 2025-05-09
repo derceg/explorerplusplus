@@ -21,7 +21,6 @@
 #include "TabContainerImpl.h"
 #include "TaskbarThumbnails.h"
 #include "ThemeWindowTracker.h"
-#include "UiTheming.h"
 #include "ViewModeHelper.h"
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
@@ -67,8 +66,6 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 		WM_APP_ASSOC_CHANGED, 1, &shcne);
 
 	SetFocus(m_hActiveListView);
-
-	m_uiTheming = std::make_unique<UiTheming>(m_app, this, GetActivePane()->GetTabContainerImpl());
 
 	InitializePlugins();
 

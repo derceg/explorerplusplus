@@ -32,8 +32,6 @@ public:
 
 	virtual TabContainerImpl *GetTabContainerImpl() const = 0;
 
-	virtual HWND GetTreeView() const = 0;
-
 	virtual void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) = 0;
 	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters) = 0;
 
