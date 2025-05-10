@@ -76,6 +76,16 @@ ShellNavigationController *ShellBrowserFake::GetNavigationController() const
 	return m_navigationController.get();
 }
 
+ViewMode ShellBrowserFake::GetViewMode() const
+{
+	return m_viewMode;
+}
+
+void ShellBrowserFake::SetViewMode(ViewMode viewMode)
+{
+	m_viewMode = viewMode;
+}
+
 bool ShellBrowserFake::CanCreateNewFolder() const
 {
 	return false;

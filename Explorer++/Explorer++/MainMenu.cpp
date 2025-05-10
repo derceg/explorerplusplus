@@ -16,6 +16,7 @@
 #include "MenuRanges.h"
 #include "ResourceHelper.h"
 #include "TabRestorerMenu.h"
+#include "ViewsMenuBuilder.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -105,7 +106,8 @@ void Explorerplusplus::InitializeMainMenu()
 				MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 		});
 
-	AddViewModesToMenu(mainMenu, IDM_VIEW_PLACEHOLDER, FALSE);
+	ViewsMenuBuilder viewsMenuBuilder(m_app->GetResourceLoader());
+	viewsMenuBuilder.AddViewModesToMenu(mainMenu, IDM_VIEW_PLACEHOLDER, false);
 	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
 	SetMainMenuImages();

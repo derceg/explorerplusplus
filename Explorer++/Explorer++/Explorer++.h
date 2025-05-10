@@ -436,8 +436,6 @@ private:
 		std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator);
 	boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) override;
-	wil::unique_hmenu BuildViewsMenu() override;
-	void AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition);
 	void OnInitMenu(HMENU menu);
 	void OnExitMenuLoop(bool shortcutMenu);
 	bool MaybeHandleMainMenuItemSelection(UINT id);

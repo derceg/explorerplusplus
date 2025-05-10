@@ -832,6 +832,9 @@
     <ClCompile Include="FileOperations.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="ViewsMenuBuilder.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1727,6 +1730,9 @@
     </ClInclude>
     <ClInclude Include="FileOperations.h">
       <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewsMenuBuilder.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

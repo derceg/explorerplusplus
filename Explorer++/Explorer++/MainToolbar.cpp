@@ -17,6 +17,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
 #include "TabParentItemsMenu.h"
+#include "ViewsMenuBuilder.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
@@ -704,7 +705,9 @@ void MainToolbar::ShowUpNavigationMenu()
 
 void MainToolbar::ShowToolbarViewsMenu()
 {
-	auto viewsMenu = m_coreInterface->BuildViewsMenu();
+	ViewsMenuBuilder viewsMenuBuilder(m_resourceLoader);
+	auto viewsMenu = viewsMenuBuilder.BuildMenu(m_browser);
+
 	auto pt = GetMenuPositionForButton(MainToolbarButton::Views);
 	TrackPopupMenu(viewsMenu.get(), TPM_LEFTALIGN, pt.x, pt.y, 0, m_hwnd, nullptr);
 }

@@ -37,6 +37,7 @@
 #include "TabContainerImpl.h"
 #include "TabRestorer.h"
 #include "TabRestorerMenu.h"
+#include "ViewsMenuBuilder.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
@@ -1535,7 +1536,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 							case MainToolbarButton::Views:
 							{
-								auto viewsMenu = BuildViewsMenu();
+								ViewsMenuBuilder viewsMenuBuilder(m_app->GetResourceLoader());
+								auto viewsMenu = viewsMenuBuilder.BuildMenu(this);
 
 								// The submenu will be destroyed when the parent menu is
 								// destroyed.

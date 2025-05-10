@@ -36,6 +36,8 @@ public:
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
+	ViewMode GetViewMode() const override;
+	void SetViewMode(ViewMode viewMode) override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
@@ -52,4 +54,5 @@ private:
 	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
+	ViewMode m_viewMode = ViewMode::Icons;
 };

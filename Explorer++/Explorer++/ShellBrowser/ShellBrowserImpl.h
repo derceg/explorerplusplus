@@ -88,6 +88,8 @@ public:
 	// ShellBrowser
 	FolderSettings GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
+	ViewMode GetViewMode() const override;
+	void SetViewMode(ViewMode viewMode) override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
@@ -103,8 +105,6 @@ public:
 	int GetUniqueFolderId() const;
 	bool GetAutoArrange() const;
 	void SetAutoArrange(bool autoArrange);
-	ViewMode GetViewMode() const;
-	void SetViewMode(ViewMode viewMode);
 	void CycleViewMode(bool cycleForward);
 	SortMode GetSortMode() const;
 	void SetSortMode(SortMode sortMode);

@@ -35,8 +35,6 @@ public:
 	virtual void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) = 0;
 	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters) = 0;
 
-	virtual wil::unique_hmenu BuildViewsMenu() = 0;
-
 	virtual BOOL CanRename() const = 0;
 	virtual BOOL CanPaste(PasteType pasteType) const = 0;
 

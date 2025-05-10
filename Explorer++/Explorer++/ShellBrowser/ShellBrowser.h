@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ViewModes.h"
 #include "../Helper/PidlHelper.h"
 #include <memory>
 #include <vector>
@@ -30,6 +31,9 @@ public:
 
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
+	virtual ViewMode GetViewMode() const = 0;
+	virtual void SetViewMode(ViewMode viewMode) = 0;
+
 	virtual bool CanCreateNewFolder() const = 0;
 	virtual void CreateNewFolder() = 0;
 	virtual bool CanSplitFile() const = 0;

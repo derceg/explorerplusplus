@@ -16,6 +16,7 @@
 #include "Tab.h"
 #include "TabContainerImpl.h"
 #include "ViewModeHelper.h"
+#include "ViewsMenuBuilder.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 
@@ -39,7 +40,8 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 
 	UINT position = 0;
 
-	auto viewsMenu = BuildViewsMenu();
+	ViewsMenuBuilder viewsMenuBuilder(m_app->GetResourceLoader());
+	auto viewsMenu = viewsMenuBuilder.BuildMenu(this);
 	std::wstring text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_VIEW);
 	MenuHelper::AddSubMenuItem(menu, 0, text, std::move(viewsMenu), position++, true);
 
