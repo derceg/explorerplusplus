@@ -7,6 +7,7 @@
 #include "ShellBrowser/SortModes.h"
 #include <wil/resource.h>
 
+class ResourceLoader;
 class Tab;
 
 class SortMenuBuilder
@@ -18,7 +19,7 @@ public:
 		wil::unique_hmenu groupByMenu;
 	};
 
-	SortMenuBuilder(HINSTANCE resourceInstance);
+	SortMenuBuilder(const ResourceLoader *resourceLoader);
 
 	SortMenus BuildMenus(const Tab &tab);
 
@@ -30,5 +31,5 @@ private:
 	int DetermineSortModeMenuId(SortMode sortMode);
 	int DetermineGroupModeMenuId(SortMode sortMode);
 
-	HINSTANCE m_resourceInstance;
+	const ResourceLoader *const m_resourceLoader;
 };

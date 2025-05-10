@@ -43,7 +43,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 	std::wstring text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_VIEW);
 	MenuHelper::AddSubMenuItem(menu, 0, text, std::move(viewsMenu), position++, true);
 
-	SortMenuBuilder sortMenuBuilder(m_app->GetResourceInstance());
+	SortMenuBuilder sortMenuBuilder(m_app->GetResourceLoader());
 	auto sortMenus =
 		sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainerImpl()->GetSelectedTab());
 	text = m_app->GetResourceLoader()->LoadString(IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);

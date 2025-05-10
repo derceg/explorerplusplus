@@ -5,14 +5,15 @@
 #include "stdafx.h"
 #include "SortMenuBuilder.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "Tab.h"
 #include "../Helper/MenuHelper.h"
 
 const int SORT_MENU_RESOURCE_BLOCK_SIZE = 1000;
 
-SortMenuBuilder::SortMenuBuilder(HINSTANCE resourceInstance) : m_resourceInstance(resourceInstance)
+SortMenuBuilder::SortMenuBuilder(const ResourceLoader *resourceLoader) :
+	m_resourceLoader(resourceLoader)
 {
 }
 
@@ -30,7 +31,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 		int groupById = DetermineGroupModeMenuId(sortMode);
 
 		UINT stringIndex = GetSortMenuItemStringIndex(sortById);
-		std::wstring menuText = ResourceHelper::LoadString(m_resourceInstance, stringIndex);
+		std::wstring menuText = m_resourceLoader->LoadString(stringIndex);
 
 		MenuHelper::AddStringItem(sortByMenu.get(), sortById, menuText, position, TRUE);
 		MenuHelper::AddStringItem(groupByMenu.get(), groupById, menuText, position, TRUE);
@@ -40,8 +41,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 
 	if (tab.GetShellBrowserImpl()->GetShowInGroups())
 	{
-		std::wstring groupByNoneText =
-			ResourceHelper::LoadString(m_resourceInstance, IDS_GROUP_BY_NONE);
+		std::wstring groupByNoneText = m_resourceLoader->LoadString(IDS_GROUP_BY_NONE);
 		MenuHelper::AddStringItem(groupByMenu.get(), IDM_GROUP_BY_NONE, groupByNoneText, position++,
 			true);
 	}
@@ -58,17 +58,15 @@ wil::unique_hmenu SortMenuBuilder::CreateDefaultMenu(UINT ascendingMenuItemId,
 
 	MenuHelper::AddSeparator(menu.get());
 
-	std::wstring sortAscending =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_MENU_SORT_ASCENDING);
+	std::wstring sortAscending = m_resourceLoader->LoadString(IDS_MENU_SORT_ASCENDING);
 	MenuHelper::AddStringItem(menu.get(), ascendingMenuItemId, sortAscending);
 
-	std::wstring sortDescending =
-		ResourceHelper::LoadString(m_resourceInstance, IDS_MENU_SORT_DESCENDING);
+	std::wstring sortDescending = m_resourceLoader->LoadString(IDS_MENU_SORT_DESCENDING);
 	MenuHelper::AddStringItem(menu.get(), descendingMenuItemId, sortDescending);
 
 	MenuHelper::AddSeparator(menu.get());
 
-	std::wstring sortByMore = ResourceHelper::LoadString(m_resourceInstance, IDS_MENU_SORT_MORE);
+	std::wstring sortByMore = m_resourceLoader->LoadString(IDS_MENU_SORT_MORE);
 	MenuHelper::AddStringItem(menu.get(), IDM_SORTBY_MORE, sortByMore);
 
 	return menu;
