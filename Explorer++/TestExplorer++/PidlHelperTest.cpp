@@ -131,8 +131,7 @@ TEST(PidlAbsolute, TakeOwnership)
 	unique_pidl_absolute ownedPidl(SHSimpleIDListFromPath(L"C:\\"));
 	PCIDLIST_ABSOLUTE rawPidl = ownedPidl.get();
 
-	PidlAbsolute pidl;
-	pidl.TakeOwnership(ownedPidl.release());
+	PidlAbsolute pidl(ownedPidl.release(), Pidl::takeOwnership);
 	EXPECT_EQ(pidl.Raw(), rawPidl);
 }
 

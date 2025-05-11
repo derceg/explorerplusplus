@@ -9,6 +9,20 @@
 #include <string>
 #include <type_traits>
 
+namespace Pidl
+{
+
+struct TakeOwnership
+{
+	explicit TakeOwnership() = default;
+};
+
+// When this token is provided when constructing one of the pidl classes below, it indicates that
+// the class will take ownership of the provided pidl.
+inline constexpr TakeOwnership takeOwnership{};
+
+}
+
 // The accessor class here simply stops PidlBase from being accessed directly (since PidlBase is
 // only designed for a few types of template parameters, passing an arbitrary template parameter is
 // wrong).
@@ -41,6 +55,10 @@ private:
 		{
 		}
 
+		PidlBase(IDListType *pidl, Pidl::TakeOwnership) : m_pidl(pidl)
+		{
+		}
+
 		PidlBase(const PidlBase &other) :
 			m_pidl(other.m_pidl ? CloneFunction(other.m_pidl.get()) : nullptr)
 		{
@@ -60,11 +78,6 @@ private:
 		{
 			std::swap(m_pidl, other.m_pidl);
 			return *this;
-		}
-
-		void TakeOwnership(IDListType *pidl)
-		{
-			m_pidl.reset(pidl);
 		}
 
 		bool HasValue() const
@@ -127,7 +140,7 @@ public:
 
 	~PidlOutParamType()
 	{
-		wrapper.TakeOwnership(raw);
+		wrapper = T(raw, Pidl::takeOwnership);
 	}
 
 private:

@@ -293,7 +293,7 @@ std::optional<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformation
 {
 	ItemInfo_t itemInfo;
 
-	itemInfo.pidlComplete.TakeOwnership(ILCombine(pidlDirectory, pidlChild));
+	itemInfo.pidlComplete = PidlAbsolute(ILCombine(pidlDirectory, pidlChild), Pidl::takeOwnership);
 	itemInfo.pridl = pidlChild;
 
 	std::wstring parsingName;

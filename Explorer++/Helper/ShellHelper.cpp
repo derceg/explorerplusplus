@@ -1295,7 +1295,7 @@ HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl, ISh
 	unique_pidl_absolute pidlParent;
 	RETURN_IF_FAILED(SHGetIDListFromObject(parent, wil::out_param(pidlParent)));
 
-	outputPidl.TakeOwnership(ILCombine(pidlParent.get(), pidlRelative.get()));
+	outputPidl = PidlAbsolute(ILCombine(pidlParent.get(), pidlRelative.get()), Pidl::takeOwnership);
 
 	return S_OK;
 }
