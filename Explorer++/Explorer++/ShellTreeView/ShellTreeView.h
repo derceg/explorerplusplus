@@ -11,7 +11,6 @@
 #include "ShellChangeWatcher.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SignalWrapper.h"
@@ -30,13 +29,10 @@ class FileActionHandler;
 class ShellBrowserImpl;
 class ShellTreeNode;
 
-class ShellTreeView :
-	public ShellDropTargetWindow<HTREEITEM>,
-	public ShellContextMenuHandler,
-	public BrowserCommandTarget
+class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public BrowserCommandTarget
 {
 public:
-	static ShellTreeView *Create(HWND hParent, App *app, BrowserWindow *browserWindow,
+	static ShellTreeView *Create(HWND hParent, App *app, BrowserWindow *browser,
 		FileActionHandler *fileActionHandler);
 
 	/* User functions. */
@@ -49,17 +45,9 @@ public:
 
 	void StartRenamingSelectedItem();
 	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
+	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action);
 	void Paste();
 	void PasteShortcut();
-
-	// FileContextMenuHandler
-	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
-	std::wstring GetHelpTextForItem(UINT menuItemId) override;
-	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		const std::wstring &verb) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		UINT menuItemId) override;
 
 	// BrowserCommandTarget
 	bool IsCommandEnabled(int command) const override;
@@ -73,8 +61,6 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
 	static const SIGDN DISPLAY_NAME_TYPE = SIGDN_NORMALDISPLAY;
-
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	struct BasicItemInfo
 	{
@@ -125,7 +111,7 @@ private:
 		wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 	};
 
-	ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindow,
+	ShellTreeView(HWND hParent, App *app, BrowserWindow *browser,
 		FileActionHandler *fileActionHandler);
 	~ShellTreeView();
 
@@ -162,7 +148,6 @@ private:
 	void DeleteSelectedItem(bool permanent);
 
 	void CopySelectedItemToClipboard(ClipboardAction action);
-	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action);
 	void CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action);
 	void OnClipboardUpdate();
 
@@ -235,7 +220,7 @@ private:
 
 	HWND m_hTreeView;
 	App *const m_app;
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
 	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

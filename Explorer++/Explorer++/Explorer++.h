@@ -31,7 +31,6 @@
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
-#include "../Helper/ShellContextMenu.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
@@ -94,7 +93,6 @@ class Explorerplusplus :
 	public BrowserWindow,
 	public CoreInterface,
 	public PluginInterface,
-	private ShellContextMenuHandler,
 	public TabNavigationInterface
 {
 	friend LoadSaveRegistry;
@@ -134,8 +132,6 @@ public:
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
 	static constexpr UINT WM_APP_ASSOC_CHANGED = WM_APP + 2;
-
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	static const int DISPLAY_WINDOW_MINIMUM_WIDTH = 70_px;
 	static const int DISPLAY_WINDOW_MINIMUM_HEIGHT = 70_px;
@@ -381,21 +377,6 @@ private:
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters) override;
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
-
-	// FileContextMenuHandler
-	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
-	std::wstring GetHelpTextForItem(UINT menuItemId) override;
-	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		const std::wstring &verb) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		UINT menuItemId) override;
-
-	void UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE folderPidl,
-		IContextMenu *contextMenu);
-	void RemoveNonFunctionalItemsFromBackgroundContextMenu(HMENU menu, IContextMenu *contextMenu);
-	void UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems);
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;

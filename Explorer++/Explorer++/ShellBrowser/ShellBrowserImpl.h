@@ -144,7 +144,6 @@ public:
 	bool GetFilterCaseSensitive() const;
 	void SetFilterCaseSensitive(bool filterCaseSensitive);
 
-	bool TestListViewItemAttributes(int item, SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
 
 	void SetFileAttributesForSelection();
@@ -154,12 +153,13 @@ public:
 	uint64_t GetSelectionSize();
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
-	HRESULT CopySelectedItemsToClipboard(ClipboardAction action);
+	HRESULT CopyItemsToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action);
 	void PasteShortcut();
 	void PasteHardLinks();
 	void PasteSymLinks();
 	void OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems);
 	void StartRenamingSelectedItems();
+	void StartRenamingItems(const std::vector<PidlAbsolute> &items);
 
 	bool GetShowInGroups() const;
 	void SetShowInGroups(bool showInGroups);
@@ -453,11 +453,11 @@ private:
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
 
 	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
-	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
 	void DeleteSelectedItems(bool permanent);
-	void StartRenamingSingleFile();
-	void StartRenamingMultipleFiles();
+	void StartRenamingSingleItem(const PidlAbsolute &item);
+	void StartRenamingMultipleItems(const std::vector<PidlAbsolute> &items);
+	HRESULT CopySelectedItemsToClipboard(ClipboardAction action);
 	void CopySelectedItemsToFolder(TransferAction action);
 	std::optional<std::wstring> GetFilePathForSplit() const;
 	std::optional<std::vector<std::wstring>> GetFilePathsForMerge() const;
@@ -470,6 +470,7 @@ private:
 	void OnColumnMenuItemSelected(int menuItemId,
 		const std::unordered_map<int, ColumnType> &menuItemMappings);
 
+	std::optional<int> MaybeGetItemIndex(PCIDLIST_ABSOLUTE pidlItem);
 	const ItemInfo_t &GetItemByIndex(int index) const;
 	ItemInfo_t &GetItemByIndex(int index);
 	int GetItemInternalIndex(int item) const;

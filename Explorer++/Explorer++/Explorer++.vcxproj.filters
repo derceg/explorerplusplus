@@ -91,9 +91,6 @@
     <ClCompile Include="TreeViewHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShellContextMenuHandler.cpp">
-      <Filter>Context Menu Support</Filter>
-    </ClCompile>
     <ClCompile Include="TaskbarThumbnails.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -834,6 +831,21 @@
     </ClCompile>
     <ClCompile Include="ViewsMenuBuilder.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenItemsContextMenuDelegate.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="BackgroundContextMenuDelegate.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp">
+      <Filter>ShellBrowser\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp">
+      <Filter>ShellTreeView\Shell Integration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1734,6 +1746,21 @@
     <ClInclude Include="ViewsMenuBuilder.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="OpenItemsContextMenuDelegate.h">
+      <Filter>Context Menu Support</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundContextMenuDelegate.h">
+      <Filter>Context Menu Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h">
+      <Filter>ShellBrowser\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenItemLocationContextMenuDelegate.h">
+      <Filter>Context Menu Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h">
+      <Filter>ShellTreeView\Shell Integration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1955,6 +1982,9 @@
     </Filter>
     <Filter Include="Shell">
       <UniqueIdentifier>{21f63c44-0578-42d5-9b67-5f49a3f011ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShellTreeView\Shell Integration">
+      <UniqueIdentifier>{3b5e176e-dea2-43eb-8811-ac61069f2420}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

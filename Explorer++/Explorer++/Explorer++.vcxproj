@@ -987,6 +987,7 @@
     <ClCompile Include="AcceleratorManager.cpp" />
     <ClCompile Include="AddressBarView.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="BackgroundContextMenuDelegate.cpp" />
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BookmarkTreeViewContextMenu.cpp" />
     <ClCompile Include="BrowserCommandTargetManager.cpp" />
@@ -996,7 +997,11 @@
     <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
+    <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
+    <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
+    <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="ThemedTabControlPainter.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
@@ -1227,7 +1232,6 @@
     <ClCompile Include="ShellBrowser\SortManager.cpp" />
     <ClCompile Include="ShellBrowser\TileView.cpp" />
     <ClCompile Include="ShellBrowser\ViewModes.cpp" />
-    <ClCompile Include="ShellContextMenuHandler.cpp" />
     <ClCompile Include="SplitFileDialog.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -1297,6 +1301,7 @@
     <ClInclude Include="AddressBarView.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="AppStorage.h" />
+    <ClInclude Include="BackgroundContextMenuDelegate.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
@@ -1308,6 +1313,10 @@
     <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
+    <ClInclude Include="OpenItemsContextMenuDelegate.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />
+    <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="ThemedTabControlPainter.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />

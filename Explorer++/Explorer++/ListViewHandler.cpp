@@ -4,16 +4,20 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
+#include "BackgroundContextMenuDelegate.h"
 #include "Config.h"
 #include "FolderView.h"
 #include "IDropFilesCallback.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "NewMenuClient.h"
+#include "OpenItemsContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "ServiceProvider.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
+#include "ShellBrowser/ShellBrowserContextMenuDelegate.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
@@ -225,7 +229,10 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
-	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this, this);
+	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this);
+
+	BackgroundContextMenuDelegate backgroundDelegate(this, m_app->GetResourceLoader());
+	shellContextMenu.AddDelegate(&backgroundDelegate);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -278,7 +285,14 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 			WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 		}
 
-		ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this, this);
+		ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this);
+
+		OpenItemsContextMenuDelegate openItemsDelegate(this, m_app->GetResourceLoader());
+		shellContextMenu.AddDelegate(&openItemsDelegate);
+
+		ShellBrowserContextMenuDelegate shellBrowserDelegate(m_pActiveShellBrowser->GetWeakPtr());
+		shellContextMenu.AddDelegate(&shellBrowserDelegate);
+
 		shellContextMenu.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
 	}
 }

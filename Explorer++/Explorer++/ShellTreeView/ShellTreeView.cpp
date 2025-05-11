@@ -23,11 +23,13 @@
 #include "FileOperations.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
+#include "OpenItemsContextMenuDelegate.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTreeNode.h"
+#include "ShellTreeViewContextMenuDelegate.h"
 #include "TabContainerImpl.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardHelper.h"
@@ -43,21 +45,21 @@
 #include <wil/common.h>
 #include <propkey.h>
 
-ShellTreeView *ShellTreeView::Create(HWND hParent, App *app, BrowserWindow *browserWindow,
+ShellTreeView *ShellTreeView::Create(HWND hParent, App *app, BrowserWindow *browser,
 	FileActionHandler *fileActionHandler)
 {
-	return new ShellTreeView(hParent, app, browserWindow, fileActionHandler);
+	return new ShellTreeView(hParent, app, browser, fileActionHandler);
 }
 
-ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindow,
+ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browser,
 	FileActionHandler *fileActionHandler) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
 	m_app(app),
-	m_browserWindow(browserWindow),
+	m_browser(browser),
 	m_config(app->GetConfig()),
 	m_fileActionHandler(fileActionHandler),
-	m_commandTarget(browserWindow->GetCommandTargetManager(), this),
+	m_commandTarget(browser->GetCommandTargetManager(), this),
 	m_fontSetter(GetHWND(), app->GetConfig()),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
@@ -89,7 +91,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 
 	StartDirectoryMonitoringForDrives();
 
-	m_connections.push_back(m_browserWindow->AddLifecycleStateChangedObserver(
+	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
 		[this](BrowserWindow::LifecycleState updatedState)
 		{
 			if (updatedState != BrowserWindow::LifecycleState::Main)
@@ -111,22 +113,21 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind(&ShellTreeView::UpdateSelection, this),
-		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
 	// When manually selecting an item in the treeview, a navigation will be initiated. It's
 	// possible that navigation may fail, in which case, the selection will be reset by this
 	// observer.
 	m_connections.push_back(m_app->GetNavigationEvents()->AddFailedObserver(
 		std::bind(&ShellTreeView::UpdateSelection, this),
-		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCancelledObserver(
 		std::bind(&ShellTreeView::UpdateSelection, this),
-		NavigationEventScope::ForActiveShellBrowser(*m_browserWindow)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
-	m_connections.push_back(
-		m_app->GetTabEvents()->AddSelectedObserver(std::bind(&ShellTreeView::UpdateSelection, this),
-			TabEventScope::ForBrowser(*m_browserWindow)));
+	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
+		std::bind(&ShellTreeView::UpdateSelection, this), TabEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetClipboardWatcher()->updateSignal.AddObserver(
 		std::bind_front(&ShellTreeView::OnClipboardUpdate, this)));
@@ -644,7 +645,7 @@ void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
 {
 	using namespace std::chrono_literals;
 
-	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		// This class will select an item initially (to ensure that there's always a selected item).
 		// That will take place before the application has finished initializing. That initial
@@ -1207,7 +1208,7 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 	}
 
 	auto pidl = GetNodePidl(hitTestInfo.hItem);
-	m_browserWindow->OpenItem(pidl.get(),
+	m_browser->OpenItem(pidl.get(),
 		DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
 			WI_IsFlagSet(keysDown, MK_SHIFT)));
 }
@@ -1479,83 +1480,19 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this, m_browserWindow);
+	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, m_browser);
+
+	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_app->GetResourceLoader());
+	shellContextMenu.AddDelegate(&openItemsDelegate);
+
+	ShellTreeViewContextMenuDelegate treeViewDelegate(this);
+	shellContextMenu.AddDelegate(&treeViewDelegate);
+
 	shellContextMenu.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
 
 	if (highlightTargetItem)
 	{
 		TreeView_SetItemState(m_hTreeView, targetItem, 0, TVIS_DROPHILITED);
-	}
-}
-
-void ShellTreeView::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
-{
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
-	UNREFERENCED_PARAMETER(contextMenu);
-
-	std::wstring openInNewTabText =
-		m_app->GetResourceLoader()->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB);
-	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, true);
-}
-
-std::wstring ShellTreeView::GetHelpTextForItem(UINT menuItemId)
-{
-	switch (menuItemId)
-	{
-	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
-		return m_app->GetResourceLoader()->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
-
-	default:
-		DCHECK(false);
-		return L"";
-	}
-}
-
-bool ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
-{
-	assert(pidlItems.size() == 1);
-
-	if (verb == L"rename")
-	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		StartRenamingItem(pidlComplete.get());
-
-		return true;
-	}
-	else if (verb == L"copy")
-	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		CopyItemToClipboard(pidlComplete.get(), ClipboardAction::Copy);
-
-		return true;
-	}
-	else if (verb == L"cut")
-	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		CopyItemToClipboard(pidlComplete.get(), ClipboardAction::Cut);
-
-		return true;
-	}
-
-	return false;
-}
-
-void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
-{
-	assert(pidlItems.size() == 1);
-
-	switch (menuItemId)
-	{
-	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
-	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		m_browserWindow->OpenItem(pidlComplete.get(), OpenFolderDisposition::NewTabDefault);
-	}
-	break;
 	}
 }
 
@@ -1626,7 +1563,7 @@ void ShellTreeView::CopySelectedItemToFolder(TransferAction action)
 
 void ShellTreeView::UpdateSelection()
 {
-	if (m_browserWindow->GetLifecycleState() != BrowserWindow::LifecycleState::Main
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main
 		|| !m_config->synchronizeTreeview.get() || !m_config->showFolders.get())
 	{
 		return;
@@ -1815,7 +1752,7 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 
 ShellBrowserImpl *ShellTreeView::GetSelectedShellBrowser() const
 {
-	return m_browserWindow->GetActivePane()
+	return m_browser->GetActivePane()
 		->GetTabContainerImpl()
 		->GetSelectedTab()
 		.GetShellBrowserImpl();

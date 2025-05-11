@@ -4,14 +4,15 @@
 
 #include "stdafx.h"
 #include "SearchDialog.h"
+#include "BrowserList.h"
 #include "BrowserWindow.h"
-#include "CoreInterface.h"
 #include "DialogConstants.h"
 #include "MainResource.h"
+#include "OpenItemLocationContextMenuDelegate.h"
+#include "OpenItemsContextMenuDelegate.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainerImpl.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -58,13 +59,10 @@ const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Direc
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
 SearchDialog::SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	std::wstring_view searchDirectory, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	TabContainerImpl *tabContainerImpl) :
+	std::wstring_view searchDirectory, BrowserList *browserList) :
 	BaseDialog(resourceLoader, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
-	m_browserWindow(browserWindow),
-	m_coreInterface(coreInterface),
-	m_tabContainerImpl(tabContainerImpl),
+	m_browserList(browserList),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
 	m_pSearch(nullptr),
@@ -549,81 +547,6 @@ int CALLBACK SearchDialog::SortResultsByPath(LPARAM lParam1, LPARAM lParam2)
 	return StrCmpLogicalW(szPath1, szPath2);
 }
 
-void SearchDialog::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
-{
-	UNREFERENCED_PARAMETER(contextMenu);
-
-	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-	SFGAOF itemAttributes = SFGAO_FOLDER;
-	GetItemAttributes(pidlComplete.get(), &itemAttributes);
-
-	std::wstring openLocationText;
-
-	if ((itemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
-	{
-		openLocationText = m_resourceLoader->LoadString(IDS_SEARCH_OPEN_FOLDER_LOCATION);
-	}
-	else
-	{
-		openLocationText = m_resourceLoader->LoadString(IDS_SEARCH_OPEN_FILE_LOCATION);
-	}
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(MENUITEMINFO);
-	mii.fMask = MIIM_STRING | MIIM_ID;
-	mii.wID = OPEN_FILE_LOCATION_MENU_ITEM_ID;
-	mii.dwTypeData = openLocationText.data();
-	InsertMenuItem(menu, 1, TRUE, &mii);
-}
-
-std::wstring SearchDialog::GetHelpTextForItem(UINT menuItemId)
-{
-	switch (menuItemId)
-	{
-	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
-		return m_resourceLoader->LoadString(IDS_SEARCH_OPEN_ITEM_LOCATION_HELP_TEXT);
-
-	default:
-		DCHECK(false);
-		return L"";
-	}
-}
-
-bool SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
-{
-	if (verb == L"open")
-	{
-		for (const auto &pidlItem : pidlItems)
-		{
-			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem.Raw()));
-			m_browserWindow->OpenItem(pidlComplete.get());
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
-{
-	switch (menuItemId)
-	{
-	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
-	{
-		auto navigateParams = NavigateParams::Normal(pidlParent);
-		m_tabContainerImpl->CreateNewTab(navigateParams, TabSettings(_selected = true));
-
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		m_coreInterface->GetActiveShellBrowserImpl()->SelectItems({ pidlComplete.get() });
-	}
-	break;
-	}
-}
-
 INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch (pnmhdr->code)
@@ -649,7 +572,10 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 					auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
 					CHECK(itr != m_SearchItemsMapInternal.end());
 
-					m_browserWindow->OpenItem(itr->second.c_str());
+					auto *browser = m_browserList->GetLastActive();
+					CHECK(browser);
+
+					browser->OpenItem(itr->second.c_str());
 				}
 			}
 		}
@@ -706,8 +632,15 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
 						ILRemoveLastID(pidlDirectory.get());
 
-						ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this,
-							m_browserWindow);
+						ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, nullptr);
+
+						OpenItemsContextMenuDelegate openItemsDelegate(m_browserList,
+							m_resourceLoader);
+						shellContextMenu.AddDelegate(&openItemsDelegate);
+
+						OpenItemLocationContextMenuDelegate openLocationDelegate(m_browserList,
+							m_resourceLoader);
+						shellContextMenu.AddDelegate(&openLocationDelegate);
 
 						DWORD dwCursorPos = GetMessagePos();
 

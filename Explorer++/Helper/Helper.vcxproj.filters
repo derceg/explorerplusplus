@@ -178,6 +178,15 @@
     <ClCompile Include="DoubleBufferedPaint.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="ShellContextMenuBuilder.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenuIdGenerator.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenuIdRemapper.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -401,6 +410,18 @@
     </ClInclude>
     <ClInclude Include="DoubleBufferedPaint.h">
       <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenuDelegate.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenuIdRemapper.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenuIdGenerator.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenuBuilder.h">
+      <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

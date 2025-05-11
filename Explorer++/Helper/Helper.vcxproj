@@ -661,6 +661,9 @@
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
     <ClCompile Include="ScopedStopSource.cpp" />
+    <ClCompile Include="ShellContextMenuBuilder.cpp" />
+    <ClCompile Include="ShellContextMenuIdGenerator.cpp" />
+    <ClCompile Include="ShellContextMenuIdRemapper.cpp" />
     <ClCompile Include="SystemClockImpl.cpp" />
     <ClCompile Include="UniqueResources.cpp" />
     <ClCompile Include="ShellContextMenu.cpp" />
@@ -752,6 +755,10 @@
     <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />
     <ClInclude Include="ScopedStopSource.h" />
+    <ClInclude Include="ShellContextMenuBuilder.h" />
+    <ClInclude Include="ShellContextMenuDelegate.h" />
+    <ClInclude Include="ShellContextMenuIdGenerator.h" />
+    <ClInclude Include="ShellContextMenuIdRemapper.h" />
     <ClInclude Include="SignalHelper.h" />
     <ClInclude Include="SignalWrapper.h" />
     <ClInclude Include="SystemClock.h" />

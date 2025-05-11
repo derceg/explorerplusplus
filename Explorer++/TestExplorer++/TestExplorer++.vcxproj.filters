@@ -449,6 +449,18 @@
     <ClCompile Include="ShellBrowserTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp">
+      <Filter>Helper\Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenuIdRemapperTest.cpp">
+      <Filter>Helper\Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenuBuilderTest.cpp">
+      <Filter>Helper\Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenuDelegateFake.cpp">
+      <Filter>Helper\Shell\Shell Integration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -604,6 +616,9 @@
     <Filter Include="Browser\Command Handling">
       <UniqueIdentifier>{1172cdbf-214a-4687-be9a-0e560e29b874}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helper\Shell\Shell Integration">
+      <UniqueIdentifier>{f7f6433c-ee36-4e28-9fad-de2f33ce22c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -737,6 +752,9 @@
     </ClInclude>
     <ClInclude Include="BrowserWindowMock.h">
       <Filter>Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenuDelegateFake.h">
+      <Filter>Helper\Shell\Shell Integration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

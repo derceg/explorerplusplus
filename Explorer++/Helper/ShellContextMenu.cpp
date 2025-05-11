@@ -6,18 +6,31 @@
 #include "ShellContextMenu.h"
 #include "MenuHelpTextRequest.h"
 #include "MenuHelper.h"
+#include "ShellContextMenuBuilder.h"
+#include "ShellContextMenuDelegate.h"
+#include "ShellContextMenuIdRemapper.h"
 #include "ShellHelper.h"
 #include "StringHelper.h"
 #include "WindowSubclass.h"
 
 ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PCITEMID_CHILD> &pidlItems, ShellContextMenuHandler *handler,
-	MenuHelpTextRequest *menuHelpTextRequest) :
+	const std::vector<PCITEMID_CHILD> &pidlItems, MenuHelpTextRequest *menuHelpTextRequest) :
 	m_pidlParent(pidlParent),
 	m_pidlItems(pidlItems.begin(), pidlItems.end()),
-	m_handler(handler),
-	m_menuHelpTextRequest(menuHelpTextRequest)
+	m_menuHelpTextRequest(menuHelpTextRequest),
+	m_idGenerator(MAX_SHELL_MENU_ID + 1)
 {
+}
+
+ShellContextMenu::~ShellContextMenu() = default;
+
+void ShellContextMenu::AddDelegate(ShellContextMenuDelegate *delegate)
+{
+	m_delegates.push_back(delegate);
+
+	auto [itr, didInsert] = m_delegateToIdRemapperMap.insert(
+		{ delegate, std::make_unique<ShellContextMenuIdRemapper>(delegate, &m_idGenerator) });
+	DCHECK(didInsert);
 }
 
 void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags)
@@ -58,7 +71,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 			contextMenuflags);
 	}
 
-	m_handler->UpdateMenuEntries(menu.get(), m_pidlParent.Raw(), m_pidlItems, m_contextMenu.get());
+	UpdateMenuEntries(menu.get());
 
 	MenuHelper::RemoveTrailingSeparators(menu.get());
 	MenuHelper::RemoveDuplicateSeperators(menu.get());
@@ -75,8 +88,13 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ShellContextMenu::ParentWindowSubclass, this));
 
-	auto helpTextConnection = m_menuHelpTextRequest->AddMenuHelpTextRequestObserver(
-		std::bind_front(&ShellContextMenu::MaybeGetMenuHelpText, this, menu.get()));
+	boost::signals2::connection helpTextConnection;
+
+	if (m_menuHelpTextRequest)
+	{
+		helpTextConnection = m_menuHelpTextRequest->AddMenuHelpTextRequestObserver(
+			std::bind_front(&ShellContextMenu::MaybeGetMenuHelpText, this, menu.get()));
+	}
 
 	UINT cmd =
 		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, hwnd, nullptr);
@@ -105,10 +123,10 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 
 		bool handled = false;
 
-		// Pass the menu back to the caller to give it the chance to handle it.
+		// Pass the item to the delegates to give one of them the chance to handle it.
 		if (SUCCEEDED(hr))
 		{
-			handled = m_handler->HandleShellMenuItem(m_pidlParent.Raw(), m_pidlItems, verb);
+			handled = MaybeHandleShellMenuItem(verb);
 		}
 
 		if (!handled)
@@ -127,9 +145,11 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 			m_contextMenu->InvokeCommand(&commandInfo);
 		}
 	}
-	else
+	else if (auto *delegate = m_idGenerator.MaybeGetDelegateForId(cmd))
 	{
-		m_handler->HandleCustomMenuItem(m_pidlParent.Raw(), m_pidlItems, cmd);
+		const auto *idRemapper = GetIdRemapperForDelegate(delegate);
+		delegate->HandleCustomMenuItem(m_pidlParent.Raw(), m_pidlItems,
+			idRemapper->GetOriginalId(cmd));
 	}
 }
 
@@ -168,6 +188,29 @@ wil::com_ptr_nothrow<IContextMenu> ShellContextMenu::MaybeGetShellContextMenu(HW
 	}
 
 	return contextMenu;
+}
+
+void ShellContextMenu::UpdateMenuEntries(HMENU menu)
+{
+	for (auto *delegate : m_delegates)
+	{
+		ShellContextMenuBuilder builder(menu, m_contextMenu.get(),
+			GetIdRemapperForDelegate(delegate));
+		delegate->UpdateMenuEntries(m_pidlParent.Raw(), m_pidlItems, &builder);
+	}
+}
+
+bool ShellContextMenu::MaybeHandleShellMenuItem(const std::wstring &verb)
+{
+	for (auto *delegate : m_delegates)
+	{
+		if (delegate->MaybeHandleShellMenuItem(m_pidlParent.Raw(), m_pidlItems, verb))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 // Returns the parsing path for the current directory, but only if it's a filesystem path.
@@ -284,5 +327,19 @@ std::optional<std::wstring> ShellContextMenu::MaybeGetMenuHelpText(HMENU shellCo
 		return helpText;
 	}
 
-	return m_handler->GetHelpTextForItem(id);
+	if (auto *delegate = m_idGenerator.MaybeGetDelegateForId(id))
+	{
+		const auto *idRemapper = GetIdRemapperForDelegate(delegate);
+		return delegate->GetHelpTextForCustomItem(idRemapper->GetOriginalId(id));
+	}
+
+	return std::nullopt;
+}
+
+ShellContextMenuIdRemapper *ShellContextMenu::GetIdRemapperForDelegate(
+	ShellContextMenuDelegate *delegate)
+{
+	auto itr = m_delegateToIdRemapperMap.find(delegate);
+	CHECK(itr != m_delegateToIdRemapperMap.end());
+	return itr->second.get();
 }

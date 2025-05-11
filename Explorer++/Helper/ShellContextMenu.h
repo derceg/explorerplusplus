@@ -5,35 +5,18 @@
 #pragma once
 
 #include "PidlHelper.h"
+#include "ShellContextMenuIdGenerator.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/com.h>
+#include <memory>
 #include <optional>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 class MenuHelpTextRequest;
-
-class ShellContextMenuHandler
-{
-public:
-	virtual ~ShellContextMenuHandler() = default;
-
-	// Allows the caller to add/update items on the context menu before it's shown.
-	virtual void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) = 0;
-
-	// Retrieves the help text for a custom menu item.
-	virtual std::wstring GetHelpTextForItem(UINT menuItemId) = 0;
-
-	// Allows the caller to handle the processing of a shell menu item. For example, the 'Open' item
-	// may be processed internally.
-	// Returns true if the item was processed; false otherwise.
-	virtual bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, const std::wstring &verb) = 0;
-
-	// Handles the processing for one of the menu items that was added by the caller.
-	virtual void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, UINT menuItemId) = 0;
-};
+class ShellContextMenuDelegate;
+class ShellContextMenuIdRemapper;
 
 class ShellContextMenu : private boost::noncopyable
 {
@@ -45,26 +28,35 @@ public:
 		ExtendedVerbs = 1 << 1
 	};
 
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
+	static constexpr int MIN_SHELL_MENU_ID = 1;
+	static constexpr int MAX_SHELL_MENU_ID = 1000;
 
 	ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems,
-		ShellContextMenuHandler *handler, MenuHelpTextRequest *menuHelpTextRequest);
+		MenuHelpTextRequest *menuHelpTextRequest);
+	~ShellContextMenu();
 
+	void AddDelegate(ShellContextMenuDelegate *delegate);
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);
 
 private:
 	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const;
+	void UpdateMenuEntries(HMENU menu);
+	bool MaybeHandleShellMenuItem(const std::wstring &verb);
 	std::optional<std::string> MaybeGetFilesystemDirectory() const;
 
 	LRESULT ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	std::optional<std::wstring> MaybeGetMenuHelpText(HMENU shellContextMenu, HMENU menu, int id);
 
+	ShellContextMenuIdRemapper *GetIdRemapperForDelegate(ShellContextMenuDelegate *delegate);
+
 	const PidlAbsolute m_pidlParent;
 	const std::vector<PidlChild> m_pidlItems;
-	ShellContextMenuHandler *const m_handler;
 	MenuHelpTextRequest *const m_menuHelpTextRequest;
+	ShellContextMenuIdGenerator m_idGenerator;
+	std::vector<ShellContextMenuDelegate *> m_delegates;
+	std::unordered_map<ShellContextMenuDelegate *, std::unique_ptr<ShellContextMenuIdRemapper>>
+		m_delegateToIdRemapperMap;
 	wil::com_ptr_nothrow<IContextMenu> m_contextMenu;
 };
 

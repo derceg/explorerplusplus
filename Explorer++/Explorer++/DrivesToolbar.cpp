@@ -10,11 +10,12 @@
 #include "DrivesToolbarView.h"
 #include "MainResource.h"
 #include "NavigationHelper.h"
+#include "OpenItemsContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "TabContainerImpl.h"
-#include "../Helper/MenuHelper.h"
+#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include <ShlObj.h>
 #include <Shlwapi.h>
@@ -65,16 +66,16 @@ private:
 };
 
 DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view, DriveModel *driveModel,
-	BrowserWindow *browserWindow, const ResourceLoader *resourceLoader)
+	BrowserWindow *browser, const ResourceLoader *resourceLoader)
 {
-	return new DrivesToolbar(view, driveModel, browserWindow, resourceLoader);
+	return new DrivesToolbar(view, driveModel, browser, resourceLoader);
 }
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
-	BrowserWindow *browserWindow, const ResourceLoader *resourceLoader) :
+	BrowserWindow *browser, const ResourceLoader *resourceLoader) :
 	m_view(view),
 	m_driveModel(driveModel),
-	m_browserWindow(browserWindow),
+	m_browser(browser),
 	m_resourceLoader(resourceLoader)
 {
 	Initialize();
@@ -155,14 +156,12 @@ void DrivesToolbar::OnButtonClicked(const std::wstring &drivePath, const MouseEv
 {
 	UNREFERENCED_PARAMETER(event);
 
-	m_browserWindow->OpenItem(drivePath,
-		DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
+	m_browser->OpenItem(drivePath, DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
-	m_browserWindow->OpenItem(drivePath,
-		DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
+	m_browser->OpenItem(drivePath, DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)
@@ -196,65 +195,12 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this, m_browserWindow);
-	shellContextMenu.ShowMenu(m_view->GetHWND(), &ptScreen, nullptr, flags);
-}
+	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, m_browser);
 
-void DrivesToolbar::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
-{
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
-	UNREFERENCED_PARAMETER(contextMenu);
+	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_resourceLoader);
+	shellContextMenu.AddDelegate(&openItemsDelegate);
 
-	std::wstring openInNewTabText = m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB);
-	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, TRUE);
-}
-
-std::wstring DrivesToolbar::GetHelpTextForItem(UINT menuItemId)
-{
-	switch (menuItemId)
-	{
-	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
-		return m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
-
-	default:
-		DCHECK(false);
-		return L"";
-	}
-}
-
-bool DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
-{
-	if (verb == L"open")
-	{
-		assert(pidlItems.size() == 1);
-
-		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0].Raw()));
-		m_browserWindow->OpenItem(pidl.get());
-		return true;
-	}
-
-	return false;
-}
-
-void DrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
-{
-	UNREFERENCED_PARAMETER(pidlItems);
-
-	switch (menuItemId)
-	{
-	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
-	{
-		assert(pidlItems.size() == 1);
-
-		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0].Raw()));
-		m_browserWindow->OpenItem(pidl.get(), OpenFolderDisposition::NewTabDefault);
-	}
-	break;
-	}
+	shellContextMenu.ShowMenu(m_browser->GetHWND(), &ptScreen, nullptr, flags);
 }
 
 void DrivesToolbar::OnWindowDestroyed()

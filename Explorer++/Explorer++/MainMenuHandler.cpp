@@ -76,7 +76,7 @@ void Explorerplusplus::OnSearch()
 			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryPath();
 
 			return new SearchDialog(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
-				this, this, GetActivePane()->GetTabContainerImpl());
+				m_app->GetBrowserList());
 		});
 }
 

@@ -768,6 +768,23 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	}
 }
 
+std::optional<int> ShellBrowserImpl::MaybeGetItemIndex(PCIDLIST_ABSOLUTE pidlItem)
+{
+	int numItems = ListView_GetItemCount(m_hListView);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		const auto &item = GetItemByIndex(i);
+
+		if (ArePidlsEquivalent(pidlItem, item.pidlComplete.Raw()))
+		{
+			return i;
+		}
+	}
+
+	return std::nullopt;
+}
+
 const ShellBrowserImpl::ItemInfo_t &ShellBrowserImpl::GetItemByIndex(int index) const
 {
 	int internalIndex = GetItemInternalIndex(index);
@@ -1003,19 +1020,6 @@ void ShellBrowserImpl::SetFileAttributesForSelection()
 	setFileAttributesDialog.ShowModalDialog();
 }
 
-bool ShellBrowserImpl::TestListViewItemAttributes(int item, SFGAOF attributes) const
-{
-	SFGAOF commonAttributes = attributes;
-	HRESULT hr = GetListViewItemAttributes(item, &commonAttributes);
-
-	if (SUCCEEDED(hr))
-	{
-		return (commonAttributes & attributes) == attributes;
-	}
-
-	return false;
-}
-
 bool ShellBrowserImpl::DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const
 {
 	SFGAOF commonAttributes = attributes;
@@ -1054,12 +1058,6 @@ HRESULT ShellBrowserImpl::GetListViewSelectionAttributes(SFGAOF *attributes) con
 		IID_PPV_ARGS(&shellFolder)));
 	return shellFolder->GetAttributesOf(static_cast<UINT>(rawChildPidls.size()),
 		rawChildPidls.data(), attributes);
-}
-
-HRESULT ShellBrowserImpl::GetListViewItemAttributes(int item, SFGAOF *attributes) const
-{
-	const auto &itemInfo = GetItemByIndex(item);
-	return GetItemAttributes(itemInfo.pidlComplete.Raw(), attributes);
 }
 
 std::vector<PidlAbsolute> ShellBrowserImpl::GetSelectedItemPidls() const

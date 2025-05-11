@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "../Helper/ShellContextMenu.h"
 #include <boost/signals2.hpp>
 #include <string>
 #include <vector>
@@ -15,11 +14,11 @@ class DrivesToolbarView;
 struct MouseEvent;
 class ResourceLoader;
 
-class DrivesToolbar : private ShellContextMenuHandler
+class DrivesToolbar
 {
 public:
 	static DrivesToolbar *Create(DrivesToolbarView *view, DriveModel *driveModel,
-		BrowserWindow *browserWindow, const ResourceLoader *resourceLoader);
+		BrowserWindow *browser, const ResourceLoader *resourceLoader);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
 	DrivesToolbar(DrivesToolbar &&) = delete;
@@ -29,9 +28,7 @@ public:
 	DrivesToolbarView *GetView() const;
 
 private:
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
-
-	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browserWindow,
+	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browser,
 		const ResourceLoader *resourceLoader);
 	~DrivesToolbar();
 
@@ -50,20 +47,11 @@ private:
 
 	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient, bool showExtended);
 
-	// FileContextMenuHandler
-	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
-	std::wstring GetHelpTextForItem(UINT menuItemId) override;
-	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		const std::wstring &verb) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		UINT menuItemId) override;
-
 	void OnWindowDestroyed();
 
 	DrivesToolbarView *const m_view;
 	DriveModel *const m_driveModel;
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

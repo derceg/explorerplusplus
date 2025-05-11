@@ -899,20 +899,15 @@ may or may not have been inserted into
 the listview yet. */
 void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 {
-	int numItems = ListView_GetItemCount(m_hListView);
+	auto index = MaybeGetItemIndex(pidlItem);
 
-	for (int i = 0; i < numItems; i++)
+	if (!index)
 	{
-		const auto &item = GetItemByIndex(i);
-
-		if (ArePidlsEquivalent(pidlItem, item.pidlComplete.Raw()))
-		{
-			ListView_EditLabel(m_hListView, i);
-			return;
-		}
+		m_directoryState.queuedRenameItem = pidlItem;
+		return;
 	}
 
-	m_directoryState.queuedRenameItem = pidlItem;
+	ListView_EditLabel(m_hListView, *index);
 }
 
 int ShellBrowserImpl::GetUniqueFolderId() const
@@ -967,54 +962,57 @@ void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 
 void ShellBrowserImpl::StartRenamingSelectedItems()
 {
-	int numSelected = ListView_GetSelectedCount(m_hListView);
-
-	// If there is only item selected, start editing it in-place. If multiple items are selected,
-	// show the mass rename dialog.
-	if (numSelected == 1)
-	{
-		StartRenamingSingleFile();
-	}
-	else if (numSelected > 1)
-	{
-		StartRenamingMultipleFiles();
-	}
+	StartRenamingItems(GetSelectedItemPidls());
 }
 
-void ShellBrowserImpl::StartRenamingSingleFile()
+void ShellBrowserImpl::StartRenamingItems(const std::vector<PidlAbsolute> &items)
 {
-	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED | LVNI_FOCUSED);
+	std::vector<PidlAbsolute> renameableItems;
+	std::ranges::copy_if(items, std::back_inserter(renameableItems),
+		[](const auto &item) { return DoesItemHaveAttributes(item.Raw(), SFGAO_CANRENAME); });
 
-	if (selectedItem == -1)
+	if (renameableItems.empty())
 	{
 		return;
 	}
 
-	bool canRename = TestListViewItemAttributes(selectedItem, SFGAO_CANRENAME);
-
-	if (!canRename)
+	if (renameableItems.size() == 1)
 	{
-		return;
+		StartRenamingSingleItem(renameableItems[0]);
 	}
-
-	ListView_EditLabel(m_hListView, selectedItem);
+	else
+	{
+		StartRenamingMultipleItems(items);
+	}
 }
 
-void ShellBrowserImpl::StartRenamingMultipleFiles()
+void ShellBrowserImpl::StartRenamingSingleItem(const PidlAbsolute &item)
+{
+	auto index = MaybeGetItemIndex(item.Raw());
+
+	if (!index)
+	{
+		return;
+	}
+
+	ListView_EditLabel(m_hListView, *index);
+}
+
+void ShellBrowserImpl::StartRenamingMultipleItems(const std::vector<PidlAbsolute> &items)
 {
 	std::list<std::wstring> fullFilenameList;
-	int item = -1;
 
-	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	for (const auto &item : items)
 	{
-		bool canRename = TestListViewItemAttributes(item, SFGAO_CANRENAME);
+		std::wstring fullFilename;
+		HRESULT hr = GetDisplayName(item.Raw(), SHGDN_FORPARSING, fullFilename);
 
-		if (!canRename)
+		if (FAILED(hr))
 		{
 			continue;
 		}
 
-		fullFilenameList.push_back(GetItemFullName(item));
+		fullFilenameList.push_back(fullFilename);
 	}
 
 	if (fullFilenameList.empty())
@@ -1029,9 +1027,13 @@ void ShellBrowserImpl::StartRenamingMultipleFiles()
 
 HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(ClipboardAction action)
 {
-	auto pidls = GetSelectedItemPidls();
+	return CopyItemsToClipboard(GetSelectedItemPidls(), action);
+}
 
-	if (pidls.empty())
+HRESULT ShellBrowserImpl::CopyItemsToClipboard(const std::vector<PidlAbsolute> &items,
+	ClipboardAction action)
+{
+	if (items.empty())
 	{
 		return E_UNEXPECTED;
 	}
@@ -1041,7 +1043,7 @@ HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(ClipboardAction action)
 
 	if (action == ClipboardAction::Copy)
 	{
-		hr = CopyFiles(pidls, &clipboardDataObject);
+		hr = CopyFiles(items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1050,7 +1052,7 @@ HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(ClipboardAction action)
 	}
 	else
 	{
-		hr = CutFiles(pidls, &clipboardDataObject);
+		hr = CutFiles(items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
