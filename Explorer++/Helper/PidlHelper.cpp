@@ -61,6 +61,23 @@ std::size_t hash_value(const PidlAbsolute &pidl)
 	return hasher(parsingPath);
 }
 
+PidlAbsolute CombinePidls(PCIDLIST_ABSOLUTE parent, PCUIDLIST_RELATIVE child)
+{
+	// ILCombine() has the unusual behavior of returning a clone of one of the parameters, if the
+	// other is null. That's unusual, since the function is documented as returning an absolute
+	// pidl. So, of the parent pidl were null, the returned pidl would be a copy of the child pidl.
+	// Which likely isn't going to be absolute.
+	//
+	// Within the application, there shouldn't be instances where ILCombine() is being called with a
+	// null parameter. That is, the intent within the application is to consistently join two pidls,
+	// forming an absolute pidl, never to simply receive a copy of one of the pidls.
+	//
+	// So, if at least one the parameters is null, this CHECK will be triggered.
+	CHECK(parent && child);
+
+	return PidlAbsolute(ILCombine(parent, child), Pidl::takeOwnership);
+}
+
 std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl)
 {
 	return cppcodec::base64_rfc4648::encode(reinterpret_cast<const char *>(pidl), ILGetSize(pidl));

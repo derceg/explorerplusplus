@@ -162,5 +162,7 @@ PidlOutParamType<T> PidlOutParam(T &p)
 	return PidlOutParamType<T>(p);
 }
 
+PidlAbsolute CombinePidls(PCIDLIST_ABSOLUTE parent, PCUIDLIST_RELATIVE child);
+
 std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl);
 PidlAbsolute DecodePidlFromBase64(const std::string &encodedPidl);
