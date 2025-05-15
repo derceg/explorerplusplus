@@ -5,26 +5,36 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "App.h"
+#include "BackgroundContextMenuDelegate.h"
+#include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColumnHelper.h"
 #include "Config.h"
+#include "FolderView.h"
 #include "IconFetcher.h"
 #include "ItemData.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
 #include "NavigateParams.h"
+#include "NewMenuClient.h"
+#include "OpenItemsContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "SelectColumnsDialog.h"
+#include "ServiceProvider.h"
 #include "SetFileAttributesDialog.h"
+#include "ShellBrowserContextMenuDelegate.h"
 #include "ShellNavigationController.h"
+#include "ShellView.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ShellBackgroundContextMenu.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ShellItemContextMenu.h"
 #include <glog/logging.h>
 #include <wil/common.h>
 #include <format>
@@ -116,6 +126,10 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 			return 0;
 		}
 		break;
+
+	case WM_CONTEXTMENU:
+		OnShowListViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+		return 0;
 
 	case WM_SETCURSOR:
 		if (OnSetCursor(reinterpret_cast<HWND>(wParam)))
@@ -348,6 +362,114 @@ bool ShellBrowserImpl::OnMouseWheel(int xPos, int yPos, int delta, UINT keys)
 	}
 
 	return false;
+}
+
+void ShellBrowserImpl::OnShowListViewContextMenu(const POINT &ptScreen)
+{
+	POINT finalPoint = ptScreen;
+
+	bool keyboardGenerated = false;
+
+	if (ptScreen.x == -1 && ptScreen.y == -1)
+	{
+		keyboardGenerated = true;
+	}
+
+	if (ListView_GetSelectedCount(m_hListView) == 0)
+	{
+		if (keyboardGenerated)
+		{
+			finalPoint = { 0, 0 };
+			ClientToScreen(m_hListView, &finalPoint);
+		}
+
+		ShowBackgroundContextMenu(finalPoint);
+	}
+	else
+	{
+		if (keyboardGenerated)
+		{
+			int targetItem = ListView_GetNextItem(m_hListView, -1, LVNI_FOCUSED | LVNI_SELECTED);
+
+			if (targetItem == -1)
+			{
+				auto lastSelectedItem = ListViewHelper::GetLastSelectedItemIndex(m_hListView);
+				targetItem = lastSelectedItem.value();
+			}
+
+			RECT itemRect;
+			ListView_GetItemRect(m_hListView, targetItem, &itemRect, LVIR_ICON);
+
+			finalPoint = { itemRect.left + (itemRect.right - itemRect.left) / 2,
+				itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
+			ClientToScreen(m_hListView, &finalPoint);
+		}
+
+		ShowItemContextMenu(finalPoint);
+	}
+}
+
+void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
+{
+	ShellBackgroundContextMenu contextMenu(m_directoryState.pidlDirectory.Raw(), m_browser);
+
+	BackgroundContextMenuDelegate backgroundDelegate(m_browser, m_app->GetResourceLoader());
+	contextMenu.AddDelegate(&backgroundDelegate);
+
+	auto serviceProvider = winrt::make_self<ServiceProvider>();
+
+	auto newMenuClient = winrt::make<NewMenuClient>(this);
+	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
+
+	winrt::com_ptr<IFolderView2> folderView =
+		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr());
+	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
+
+	auto shellView = winrt::make<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, false);
+	serviceProvider->RegisterService(SID_DefView, shellView.get());
+
+	ShellBackgroundContextMenu::Flags flags = ShellBackgroundContextMenu::Flags::None;
+
+	if (IsKeyDown(VK_SHIFT))
+	{
+		WI_SetFlag(flags, ShellBackgroundContextMenu::Flags::ExtendedVerbs);
+	}
+
+	contextMenu.ShowMenu(m_hListView, &pt, serviceProvider.get(), flags);
+}
+
+void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
+{
+	auto selectedItems = GetSelectedItemPidls();
+
+	if (selectedItems.empty())
+	{
+		return;
+	}
+
+	std::vector<PCITEMID_CHILD> childPidls;
+
+	for (const auto &item : selectedItems)
+	{
+		childPidls.push_back(ILFindLastID(item.Raw()));
+	}
+
+	ShellItemContextMenu contextMenu(m_directoryState.pidlDirectory.Raw(), childPidls, m_browser);
+
+	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_app->GetResourceLoader());
+	contextMenu.AddDelegate(&openItemsDelegate);
+
+	ShellBrowserContextMenuDelegate shellBrowserDelegate(m_weakPtrFactory.GetWeakPtr());
+	contextMenu.AddDelegate(&shellBrowserDelegate);
+
+	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::Rename;
+
+	if (IsKeyDown(VK_SHIFT))
+	{
+		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
+	}
+
+	contextMenu.ShowMenu(m_hListView, &pt, nullptr, flags);
 }
 
 bool ShellBrowserImpl::OnSetCursor(HWND target)

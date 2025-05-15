@@ -274,9 +274,6 @@ private:
 	void OnListViewClick(const NMITEMACTIVATE *eventInfo);
 	void OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo);
 	LRESULT OnListViewKeyDown(LPARAM lParam);
-	void OnShowListViewContextMenu(const POINT &ptScreen);
-	void OnListViewBackgroundRClick(POINT *pCursorPos);
-	void OnListViewItemRClick(POINT *pCursorPos);
 	void OnListViewCopyItemPath() const;
 	void OnListViewCopyUniversalPaths() const;
 	void OnListViewSetFileAttributes() const;

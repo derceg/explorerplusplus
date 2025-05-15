@@ -5,23 +5,18 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "App.h"
-#include "BackgroundContextMenuDelegate.h"
 #include "Config.h"
 #include "FolderView.h"
 #include "IDropFilesCallback.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "NewMenuClient.h"
-#include "OpenItemsContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "ServiceProvider.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
-#include "ShellBrowser/ShellBrowserContextMenuDelegate.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
-#include "ShellView.h"
 #include "SortMenuBuilder.h"
 #include "TabContainerImpl.h"
 #include "ViewModeHelper.h"
@@ -31,9 +26,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/ShellBackgroundContextMenu.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ShellItemContextMenu.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
 
@@ -54,19 +47,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 	{
 	case WM_MENUSELECT:
 		SendMessage(m_hContainer, WM_MENUSELECT, wParam, lParam);
-		break;
-
-	case WM_CONTEXTMENU:
-		if (reinterpret_cast<HWND>(wParam)
-			== GetActivePane()
-				->GetTabContainerImpl()
-				->GetSelectedTab()
-				.GetShellBrowserImpl()
-				->GetListView())
-		{
-			OnShowListViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
-			return 0;
-		}
 		break;
 
 	case WM_NOTIFY:
@@ -173,129 +153,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	}
 
 	return 0;
-}
-
-void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
-{
-	POINT finalPoint = ptScreen;
-
-	bool keyboardGenerated = false;
-
-	if (ptScreen.x == -1 && ptScreen.y == -1)
-	{
-		keyboardGenerated = true;
-	}
-
-	Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-
-	if (ListView_GetSelectedCount(tab.GetShellBrowserImpl()->GetListView()) == 0)
-	{
-		if (keyboardGenerated)
-		{
-			finalPoint = { 0, 0 };
-			ClientToScreen(tab.GetShellBrowserImpl()->GetListView(), &finalPoint);
-		}
-
-		OnListViewBackgroundRClick(&finalPoint);
-	}
-	else
-	{
-		if (keyboardGenerated)
-		{
-			int targetItem = ListView_GetNextItem(tab.GetShellBrowserImpl()->GetListView(), -1,
-				LVNI_FOCUSED | LVNI_SELECTED);
-
-			if (targetItem == -1)
-			{
-				auto lastSelectedItem = ListViewHelper::GetLastSelectedItemIndex(
-					tab.GetShellBrowserImpl()->GetListView());
-				targetItem = lastSelectedItem.value();
-			}
-
-			RECT itemRect;
-			ListView_GetItemRect(tab.GetShellBrowserImpl()->GetListView(), targetItem, &itemRect,
-				LVIR_ICON);
-
-			finalPoint = { itemRect.left + (itemRect.right - itemRect.left) / 2,
-				itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
-			ClientToScreen(tab.GetShellBrowserImpl()->GetListView(), &finalPoint);
-		}
-
-		OnListViewItemRClick(&finalPoint);
-	}
-}
-
-void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
-{
-	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
-
-	ShellBackgroundContextMenu contextMenu(pidlDirectory.get(), this);
-
-	BackgroundContextMenuDelegate backgroundDelegate(this, m_app->GetResourceLoader());
-	contextMenu.AddDelegate(&backgroundDelegate);
-
-	auto serviceProvider = winrt::make_self<ServiceProvider>();
-
-	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowserImpl());
-	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
-
-	winrt::com_ptr<IFolderView2> folderView =
-		winrt::make<FolderView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr());
-	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
-
-	auto shellView =
-		winrt::make<ShellView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr(), this, false);
-	serviceProvider->RegisterService(SID_DefView, shellView.get());
-
-	ShellBackgroundContextMenu::Flags flags = ShellBackgroundContextMenu::Flags::None;
-
-	if (IsKeyDown(VK_SHIFT))
-	{
-		WI_SetFlag(flags, ShellBackgroundContextMenu::Flags::ExtendedVerbs);
-	}
-
-	contextMenu.ShowMenu(selectedTab.GetShellBrowserImpl()->GetListView(), pCursorPos,
-		serviceProvider.get(), flags);
-}
-
-void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
-{
-	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
-
-	if (nSelected > 0)
-	{
-		std::vector<unique_pidl_child> pidlPtrs;
-		std::vector<PCITEMID_CHILD> pidlItems;
-		int iItem = -1;
-
-		while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-		{
-			auto pidlPtr = m_pActiveShellBrowser->GetItemChildIdl(iItem);
-
-			pidlItems.push_back(pidlPtr.get());
-			pidlPtrs.push_back(std::move(pidlPtr));
-		}
-
-		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-
-		ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::Rename;
-
-		if (IsKeyDown(VK_SHIFT))
-		{
-			WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
-		}
-
-		ShellItemContextMenu contextMenu(pidlDirectory.get(), pidlItems, this);
-
-		OpenItemsContextMenuDelegate openItemsDelegate(this, m_app->GetResourceLoader());
-		contextMenu.AddDelegate(&openItemsDelegate);
-
-		ShellBrowserContextMenuDelegate shellBrowserDelegate(m_pActiveShellBrowser->GetWeakPtr());
-		contextMenu.AddDelegate(&shellBrowserDelegate);
-
-		contextMenu.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
-	}
 }
 
 void Explorerplusplus::OnListViewClick(const NMITEMACTIVATE *eventInfo)

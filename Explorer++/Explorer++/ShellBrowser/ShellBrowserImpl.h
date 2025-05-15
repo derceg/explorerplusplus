@@ -46,7 +46,7 @@
 class AcceleratorManager;
 class App;
 struct BasicItemInfo_t;
-class BrowserCommandTargetManager;
+class BrowserWindow;
 class CachedIcons;
 struct Config;
 class FileActionHandler;
@@ -73,12 +73,12 @@ class ShellBrowserImpl :
 	private boost::noncopyable
 {
 public:
-	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
-		BrowserCommandTargetManager *commandTargetManager, FileActionHandler *fileActionHandler,
+	ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
-		BrowserCommandTargetManager *commandTargetManager, FileActionHandler *fileActionHandler,
+	ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
 		const FolderColumns *initialColumns);
 	~ShellBrowserImpl();
@@ -365,8 +365,8 @@ private:
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
-	ShellBrowserImpl(HWND hOwner, App *app, TabNavigationInterface *tabNavigation,
-		BrowserCommandTargetManager *commandTargetManager, FileActionHandler *fileActionHandler,
+	ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
@@ -422,6 +422,9 @@ private:
 	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);
 	bool OnMouseWheel(int xPos, int yPos, int delta, UINT keys);
+	void OnShowListViewContextMenu(const POINT &ptScreen);
+	void ShowBackgroundContextMenu(const POINT &pt);
+	void ShowItemContextMenu(const POINT &pt);
 	bool OnSetCursor(HWND target);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
@@ -624,6 +627,7 @@ private:
 	HWND m_hOwner;
 
 	App *const m_app;
+	BrowserWindow *const m_browser;
 
 	std::shared_ptr<ShellEnumeratorImpl> m_shellEnumerator;
 	NavigationManager m_navigationManager;
@@ -632,7 +636,6 @@ private:
 	const HCURSOR m_progressCursor;
 
 	TabNavigationInterface *m_tabNavigation;
-	BrowserCommandTargetManager *const m_commandTargetManager;
 	ScopedBrowserCommandTarget m_commandTarget;
 	FileActionHandler *m_fileActionHandler;
 
