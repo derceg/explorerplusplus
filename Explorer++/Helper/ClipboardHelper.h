@@ -4,7 +4,11 @@
 
 #pragma once
 
+#include "PidlHelper.h"
 #include <objidl.h>
+#include <vector>
+
+class Clipboard;
 
 enum class PasteType
 {
@@ -14,3 +18,4 @@ enum class PasteType
 
 bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
 	PasteType pasteType);
+void CopyItemPathsToClipboard(Clipboard *clipboard, const std::vector<PidlAbsolute> &items);

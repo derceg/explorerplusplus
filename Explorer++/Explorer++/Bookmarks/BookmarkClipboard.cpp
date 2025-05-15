@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "../Helper/BulkClipboardWriter.h"
+#include "../Helper/SystemClipboard.h"
 #include <boost/algorithm/string/join.hpp>
 
 UINT BookmarkClipboard::GetClipboardFormat()
@@ -15,7 +16,7 @@ UINT BookmarkClipboard::GetClipboardFormat()
 
 BookmarkItems BookmarkClipboard::ReadBookmarks()
 {
-	Clipboard clipboard;
+	SystemClipboard clipboard;
 	auto data = clipboard.ReadCustomData(GetClipboardFormat());
 
 	if (!data)
@@ -28,7 +29,8 @@ BookmarkItems BookmarkClipboard::ReadBookmarks()
 
 bool BookmarkClipboard::WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems)
 {
-	BulkClipboardWriter clipboardWriter;
+	SystemClipboard clipboard;
+	BulkClipboardWriter clipboardWriter(&clipboard);
 	std::vector<std::wstring> lines;
 
 	for (const auto &bookmarkItem : bookmarkItems)

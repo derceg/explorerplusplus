@@ -27,6 +27,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SystemClipboard.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
 
@@ -201,29 +202,6 @@ void Explorerplusplus::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
 	}
 }
 
-void Explorerplusplus::OnListViewCopyItemPath() const
-{
-	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
-	{
-		return;
-	}
-
-	std::wstring strItemPaths;
-	int iItem = -1;
-
-	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-	{
-		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
-
-		strItemPaths += fullFilename + std::wstring(_T("\r\n"));
-	}
-
-	strItemPaths = strItemPaths.substr(0, strItemPaths.size() - 2);
-
-	BulkClipboardWriter clipboardWriter;
-	clipboardWriter.WriteText(strItemPaths);
-}
-
 void Explorerplusplus::OnListViewCopyUniversalPaths() const
 {
 	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
@@ -257,7 +235,8 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 	strUniversalPaths = strUniversalPaths.substr(0, strUniversalPaths.size() - 2);
 
-	BulkClipboardWriter clipboardWriter;
+	SystemClipboard clipboard;
+	BulkClipboardWriter clipboardWriter(&clipboard);
 	clipboardWriter.WriteText(strUniversalPaths);
 }
 

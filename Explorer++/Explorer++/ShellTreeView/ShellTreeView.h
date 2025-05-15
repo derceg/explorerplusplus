@@ -151,6 +151,7 @@ private:
 	void CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action);
 	void OnClipboardUpdate();
 
+	void CopySelectedItemPath() const;
 	void CopySelectedItemToFolder(TransferAction action);
 
 	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;

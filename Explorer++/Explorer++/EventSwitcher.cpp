@@ -13,22 +13,6 @@
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainerImpl.h"
 
-void Explorerplusplus::OnCopyItemPath() const
-{
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		OnListViewCopyItemPath();
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		OnTreeViewCopyItemPath();
-	}
-}
-
 void Explorerplusplus::OnCopyUniversalPaths() const
 {
 	HWND hFocus;

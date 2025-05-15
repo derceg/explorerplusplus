@@ -34,6 +34,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SystemClipboard.h"
 #include <wil/com.h>
 #include <list>
 
@@ -1166,6 +1167,9 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 {
 	switch (command)
 	{
+	case IDM_FILE_COPYITEMPATH:
+		return ListView_GetSelectedCount(m_hListView) > 0;
+
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 		return DoAllSelectedItemsHaveAttributes(SFGAO_CANDELETE);
@@ -1192,6 +1196,10 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 {
 	switch (command)
 	{
+	case IDM_FILE_COPYITEMPATH:
+		CopySelectedItemPaths();
+		break;
+
 	case IDM_FILE_DELETE:
 		DeleteSelectedItems(false);
 		break;
@@ -1224,6 +1232,13 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 		CopySelectedItemsToFolder(TransferAction::Copy);
 		break;
 	}
+}
+
+void ShellBrowserImpl::CopySelectedItemPaths() const
+{
+	SystemClipboard clipboard;
+	auto selectedItems = GetSelectedItemPidls();
+	CopyItemPathsToClipboard(&clipboard, selectedItems);
 }
 
 bool ShellBrowserImpl::CanCreateNewFolder() const

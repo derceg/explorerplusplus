@@ -42,6 +42,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SystemClipboard.h"
 #include "../Helper/WindowHelper.h"
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;
@@ -315,13 +316,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case IDM_FILE_COPYFOLDERPATH:
 	{
-		BulkClipboardWriter clipboardWriter;
+		SystemClipboard clipboard;
+		BulkClipboardWriter clipboardWriter(&clipboard);
 		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectoryPath());
 	}
 	break;
 
 	case IDM_FILE_COPYITEMPATH:
-		OnCopyItemPath();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_FILE_COPYUNIVERSALFILEPATHS:

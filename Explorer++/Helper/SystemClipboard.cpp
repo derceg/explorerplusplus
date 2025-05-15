@@ -3,10 +3,10 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Clipboard.h"
+#include "SystemClipboard.h"
 #include "DataExchangeHelper.h"
 
-Clipboard::Clipboard() : m_clipboardOpened(false)
+SystemClipboard::SystemClipboard() : m_clipboardOpened(false)
 {
 	if (OpenClipboard(nullptr))
 	{
@@ -14,7 +14,7 @@ Clipboard::Clipboard() : m_clipboardOpened(false)
 	}
 }
 
-Clipboard::~Clipboard()
+SystemClipboard::~SystemClipboard()
 {
 	if (m_clipboardOpened)
 	{
@@ -22,7 +22,7 @@ Clipboard::~Clipboard()
 	}
 }
 
-std::optional<std::wstring> Clipboard::ReadText()
+std::optional<std::wstring> SystemClipboard::ReadText()
 {
 	HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
 
@@ -34,7 +34,7 @@ std::optional<std::wstring> Clipboard::ReadText()
 	return ReadStringFromGlobal(clipboardData);
 }
 
-std::optional<std::vector<std::wstring>> Clipboard::ReadHDropData()
+std::optional<std::vector<std::wstring>> SystemClipboard::ReadHDropData()
 {
 	HANDLE clipboardData = GetClipboardData(CF_HDROP);
 
@@ -46,7 +46,7 @@ std::optional<std::vector<std::wstring>> Clipboard::ReadHDropData()
 	return ReadHDropDataFromGlobal(clipboardData);
 }
 
-std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
+std::unique_ptr<Gdiplus::Bitmap> SystemClipboard::ReadPng()
 {
 	HANDLE clipboardData = GetClipboardData(GetPngClipboardFormat());
 
@@ -58,7 +58,7 @@ std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
 	return ReadPngDataFromGlobal(clipboardData);
 }
 
-std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadDIB()
+std::unique_ptr<Gdiplus::Bitmap> SystemClipboard::ReadDIB()
 {
 	HANDLE clipboardData = GetClipboardData(CF_DIB);
 
@@ -70,7 +70,7 @@ std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadDIB()
 	return ReadDIBDataFromGlobal(clipboardData);
 }
 
-std::optional<std::string> Clipboard::ReadCustomData(UINT format)
+std::optional<std::string> SystemClipboard::ReadCustomData(UINT format)
 {
 	HANDLE clipboardData = GetClipboardData(format);
 
@@ -82,9 +82,9 @@ std::optional<std::string> Clipboard::ReadCustomData(UINT format)
 	return ReadBinaryDataFromGlobal(clipboardData);
 }
 
-bool Clipboard::WriteText(const std::wstring &str)
+bool SystemClipboard::WriteText(const std::wstring &text)
 {
-	auto global = WriteStringToGlobal(str);
+	auto global = WriteStringToGlobal(text);
 
 	if (!global)
 	{
@@ -94,7 +94,7 @@ bool Clipboard::WriteText(const std::wstring &str)
 	return WriteDataToClipboard(CF_UNICODETEXT, std::move(global));
 }
 
-bool Clipboard::WriteHDropData(const std::vector<std::wstring> &paths)
+bool SystemClipboard::WriteHDropData(const std::vector<std::wstring> &paths)
 {
 	auto global = WriteHDropDataToGlobal(paths);
 
@@ -106,7 +106,7 @@ bool Clipboard::WriteHDropData(const std::vector<std::wstring> &paths)
 	return WriteDataToClipboard(CF_HDROP, std::move(global));
 }
 
-bool Clipboard::WritePng(Gdiplus::Bitmap *bitmap)
+bool SystemClipboard::WritePng(Gdiplus::Bitmap *bitmap)
 {
 	auto global = WritePngDataToGlobal(bitmap);
 
@@ -118,7 +118,7 @@ bool Clipboard::WritePng(Gdiplus::Bitmap *bitmap)
 	return WriteDataToClipboard(GetPngClipboardFormat(), std::move(global));
 }
 
-bool Clipboard::WriteDIB(Gdiplus::Bitmap *bitmap)
+bool SystemClipboard::WriteDIB(Gdiplus::Bitmap *bitmap)
 {
 	auto global = WriteDIBDataToGlobal(bitmap);
 
@@ -130,7 +130,7 @@ bool Clipboard::WriteDIB(Gdiplus::Bitmap *bitmap)
 	return WriteDataToClipboard(CF_DIB, std::move(global));
 }
 
-bool Clipboard::WriteCustomData(UINT format, const std::string &data)
+bool SystemClipboard::WriteCustomData(UINT format, const std::string &data)
 {
 	auto global = WriteBinaryDataToGlobal(data);
 
@@ -142,7 +142,7 @@ bool Clipboard::WriteCustomData(UINT format, const std::string &data)
 	return WriteDataToClipboard(format, std::move(global));
 }
 
-bool Clipboard::WriteDataToClipboard(UINT format, wil::unique_hglobal global)
+bool SystemClipboard::WriteDataToClipboard(UINT format, wil::unique_hglobal global)
 {
 	HANDLE clipboardData = SetClipboardData(format, global.get());
 
@@ -159,7 +159,7 @@ bool Clipboard::WriteDataToClipboard(UINT format, wil::unique_hglobal global)
 	return true;
 }
 
-bool Clipboard::Clear()
+bool SystemClipboard::Clear()
 {
 	return EmptyClipboard();
 }

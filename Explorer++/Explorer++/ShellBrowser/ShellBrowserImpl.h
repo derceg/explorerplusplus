@@ -455,6 +455,7 @@ private:
 	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
 
+	void CopySelectedItemPaths() const;
 	void DeleteSelectedItems(bool permanent);
 	void StartRenamingSelectedItems();
 	void StartRenamingSingleItem(const PidlAbsolute &item);

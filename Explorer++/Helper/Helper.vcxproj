@@ -640,7 +640,7 @@
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="BulkClipboardWriter.cpp" />
     <ClCompile Include="CachedIcons.cpp" />
-    <ClCompile Include="Clipboard.cpp" />
+    <ClCompile Include="SystemClipboard.cpp" />
     <ClCompile Include="ClipboardHelper.cpp" />
     <ClCompile Include="ClipboardWatcher.cpp" />
     <ClCompile Include="ComboBox.cpp" />
@@ -736,6 +736,7 @@
     <ClInclude Include="BulkClipboardWriter.h" />
     <ClInclude Include="CachedIcons.h" />
     <ClInclude Include="Clipboard.h" />
+    <ClInclude Include="SystemClipboard.h" />
     <ClInclude Include="ClipboardHelper.h" />
     <ClInclude Include="ClipboardWatcher.h" />
     <ClInclude Include="ComboBox.h" />

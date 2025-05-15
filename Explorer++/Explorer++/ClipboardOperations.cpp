@@ -7,8 +7,8 @@
 #include "CommandLine.h"
 #include "DirectoryOperationsHelper.h"
 #include "PasteSymLinksServer.h"
-#include "../Helper/Clipboard.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SystemClipboard.h"
 
 using namespace std::chrono_literals;
 
@@ -44,7 +44,7 @@ void CreateSymLink(const std::filesystem::path &sourceFilePath,
 ClipboardOperations::PastedItems PasteLinksOfType(const std::wstring &destination,
 	LinkType linkType)
 {
-	Clipboard clipboard;
+	SystemClipboard clipboard;
 	auto paths = clipboard.ReadHDropData();
 
 	if (!paths)

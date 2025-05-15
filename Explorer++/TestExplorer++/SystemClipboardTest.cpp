@@ -3,13 +3,13 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "../Helper/Clipboard.h"
+#include "../Helper/SystemClipboard.h"
 #include "ImageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-class ClipboardTest : public Test
+class SystemClipboardTest : public Test
 {
 protected:
 	void SetUp() override
@@ -18,10 +18,10 @@ protected:
 		ASSERT_TRUE(res);
 	}
 
-	Clipboard m_clipboard;
+	SystemClipboard m_clipboard;
 };
 
-TEST_F(ClipboardTest, ReadWriteText)
+TEST_F(SystemClipboardTest, ReadWriteText)
 {
 	std::wstring text = L"Clipboard text";
 	auto res = m_clipboard.WriteText(text);
@@ -32,7 +32,7 @@ TEST_F(ClipboardTest, ReadWriteText)
 	EXPECT_EQ(*clipboardText, text);
 }
 
-TEST_F(ClipboardTest, ReadWriteHDropData)
+TEST_F(SystemClipboardTest, ReadWriteHDropData)
 {
 	std::vector<std::wstring> files = { L"C:\\file1", L"C:\\file2", L"C:\\file3" };
 	auto res = m_clipboard.WriteHDropData(files);
@@ -42,7 +42,7 @@ TEST_F(ClipboardTest, ReadWriteHDropData)
 	EXPECT_EQ(retrievedFiles, files);
 }
 
-TEST_F(ClipboardTest, ReadWritePngData)
+TEST_F(SystemClipboardTest, ReadWritePngData)
 {
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
 	BuildTestGdiplusBitmap(100, 100, bitmap);
@@ -56,7 +56,7 @@ TEST_F(ClipboardTest, ReadWritePngData)
 	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
-TEST_F(ClipboardTest, ReadWriteDIBData)
+TEST_F(SystemClipboardTest, ReadWriteDIBData)
 {
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
 	BuildTestGdiplusBitmap(100, 100, bitmap);
@@ -70,7 +70,7 @@ TEST_F(ClipboardTest, ReadWriteDIBData)
 	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
-TEST_F(ClipboardTest, ReadWriteCustomData)
+TEST_F(SystemClipboardTest, ReadWriteCustomData)
 {
 	using namespace std::string_literals;
 
@@ -86,7 +86,7 @@ TEST_F(ClipboardTest, ReadWriteCustomData)
 	EXPECT_EQ(*clipboardText, text);
 }
 
-TEST_F(ClipboardTest, Clear)
+TEST_F(SystemClipboardTest, Clear)
 {
 	std::wstring text = L"Clipboard text";
 	auto res = m_clipboard.WriteText(text);

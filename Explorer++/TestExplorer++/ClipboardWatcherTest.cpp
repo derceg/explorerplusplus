@@ -7,7 +7,7 @@
 #include "ExecutorWrapper.h"
 #include "MessageLoop.h"
 #include "UIThreadExecutor.h"
-#include "../Helper/Clipboard.h"
+#include "../Helper/SystemClipboard.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -45,7 +45,7 @@ TEST_F(ClipboardWatcherTest, UpdateOnWrite)
 	EXPECT_CALL(m_callback, Call());
 
 	{
-		Clipboard clipboard;
+		SystemClipboard clipboard;
 		clipboard.WriteText(L"Text");
 	}
 
@@ -57,7 +57,7 @@ TEST_F(ClipboardWatcherTest, UpdateOnClear)
 	EXPECT_CALL(m_callback, Call());
 
 	{
-		Clipboard clipboard;
+		SystemClipboard clipboard;
 		clipboard.Clear();
 	}
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Clipboard.h"
+class Clipboard;
 
 // The Clipboard class won't clear the clipboard, unless explicitly told to.
 // That makes sense, as it's possible to set multiple pieces of data on the
@@ -17,11 +17,11 @@
 class BulkClipboardWriter
 {
 public:
-	BulkClipboardWriter();
+	BulkClipboardWriter(Clipboard *clipboard);
 
 	bool WriteText(const std::wstring &str);
 	bool WriteCustomData(UINT format, const std::string &data);
 
 private:
-	Clipboard m_clipboard;
+	Clipboard *const m_clipboard;
 };

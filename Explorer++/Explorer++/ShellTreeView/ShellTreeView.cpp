@@ -42,6 +42,7 @@
 #include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ShellItemContextMenu.h"
+#include "../Helper/SystemClipboard.h"
 #include <wil/common.h>
 #include <propkey.h>
 
@@ -1500,6 +1501,11 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 {
 	switch (command)
 	{
+	case IDM_FILE_COPYITEMPATH:
+		// There should always be a selected item, meaning it should always be possible to copy the
+		// item's path.
+		return true;
+
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_CANDELETE);
@@ -1526,6 +1532,10 @@ void ShellTreeView::ExecuteCommand(int command)
 {
 	switch (command)
 	{
+	case IDM_FILE_COPYITEMPATH:
+		CopySelectedItemPath();
+		break;
+
 	case IDM_FILE_DELETE:
 		DeleteSelectedItem(false);
 		break;
@@ -1558,6 +1568,13 @@ void ShellTreeView::ExecuteCommand(int command)
 		CopySelectedItemToFolder(TransferAction::Copy);
 		break;
 	}
+}
+
+void ShellTreeView::CopySelectedItemPath() const
+{
+	SystemClipboard clipboard;
+	auto pidl = GetSelectedNodePidl();
+	CopyItemPathsToClipboard(&clipboard, { pidl.get() });
 }
 
 void ShellTreeView::CopySelectedItemToFolder(TransferAction action)

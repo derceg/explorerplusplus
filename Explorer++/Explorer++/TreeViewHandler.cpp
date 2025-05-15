@@ -12,6 +12,7 @@
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "../Helper/BulkClipboardWriter.h"
+#include "../Helper/SystemClipboard.h"
 
 void Explorerplusplus::CreateFolderControls()
 {
@@ -36,17 +37,6 @@ void Explorerplusplus::CreateFolderControls()
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
 }
 
-void Explorerplusplus::OnTreeViewCopyItemPath() const
-{
-	auto pidl = m_shellTreeView->GetSelectedNodePidl();
-
-	std::wstring fullFileName;
-	GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
-
-	BulkClipboardWriter clipboardWriter;
-	clipboardWriter.WriteText(fullFileName);
-}
-
 void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 {
 	auto pidl = m_shellTreeView->GetSelectedNodePidl();
@@ -59,7 +49,8 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 	DWORD dwRet = WNetGetUniversalName(fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
 		(void **) &uni, &dwBufferSize);
 
-	BulkClipboardWriter clipboardWriter;
+	SystemClipboard clipboard;
+	BulkClipboardWriter clipboardWriter(&clipboard);
 
 	if (dwRet == NO_ERROR)
 	{

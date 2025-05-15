@@ -35,7 +35,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	int numSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 	bool anySelected = (numSelected > 0);
 
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYITEMPATH, AnyItemsSelected());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYITEMPATH,
+		m_commandController.IsCommandEnabled(IDM_FILE_COPYITEMPATH));
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYUNIVERSALFILEPATHS, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SETFILEATTRIBUTES, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPT,

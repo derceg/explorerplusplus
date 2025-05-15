@@ -15,7 +15,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
-#include "../Helper/Clipboard.h"
+#include "../Helper/SystemClipboard.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -104,7 +104,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 {
-	Clipboard clipboard;
+	SystemClipboard clipboard;
 	clipboard.Clear();
 
 	CopiedBookmark copiedBookmark(m_bookmark);
@@ -124,7 +124,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 {
-	Clipboard clipboard;
+	SystemClipboard clipboard;
 	clipboard.Clear();
 
 	CopiedBookmark copiedBookmark(m_bookmark);
@@ -140,7 +140,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 {
-	Clipboard clipboard;
+	SystemClipboard clipboard;
 	clipboard.Clear();
 
 	auto *bookmark = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),

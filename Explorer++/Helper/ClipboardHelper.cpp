@@ -4,7 +4,9 @@
 
 #include "stdafx.h"
 #include "ClipboardHelper.h"
+#include "BulkClipboardWriter.h"
 #include "DragDropHelper.h"
+#include <boost/algorithm/string/join.hpp>
 #include <wil/com.h>
 
 bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
@@ -66,4 +68,30 @@ bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObj
 	}
 
 	return true;
+}
+
+void CopyItemPathsToClipboard(Clipboard *clipboard, const std::vector<PidlAbsolute> &items)
+{
+	std::vector<std::wstring> paths;
+
+	for (const auto &item : items)
+	{
+		wil::unique_cotaskmem_string path;
+		HRESULT hr = SHGetNameFromIDList(item.Raw(), SIGDN_DESKTOPABSOLUTEPARSING, &path);
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		paths.push_back(path.get());
+	}
+
+	if (paths.empty())
+	{
+		return;
+	}
+
+	BulkClipboardWriter clipboardWriter(clipboard);
+	clipboardWriter.WriteText(boost::algorithm::join(paths, L"\r\n"));
 }

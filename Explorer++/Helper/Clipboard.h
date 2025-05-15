@@ -4,33 +4,19 @@
 
 #pragma once
 
-#include <wil/resource.h>
-#include <gdiplus.h>
 #include <optional>
 #include <string>
 
 class Clipboard
 {
 public:
-	Clipboard();
-	~Clipboard();
+	virtual ~Clipboard() = default;
 
-	std::optional<std::wstring> ReadText();
-	std::optional<std::vector<std::wstring>> ReadHDropData();
-	std::unique_ptr<Gdiplus::Bitmap> ReadPng();
-	std::unique_ptr<Gdiplus::Bitmap> ReadDIB();
-	std::optional<std::string> ReadCustomData(UINT format);
+	virtual std::optional<std::wstring> ReadText() = 0;
+	virtual std::optional<std::string> ReadCustomData(UINT format) = 0;
 
-	bool WriteText(const std::wstring &str);
-	bool WriteHDropData(const std::vector<std::wstring> &paths);
-	bool WritePng(Gdiplus::Bitmap *bitmap);
-	bool WriteDIB(Gdiplus::Bitmap *bitmap);
-	bool WriteCustomData(UINT format, const std::string &data);
+	virtual bool WriteText(const std::wstring &text) = 0;
+	virtual bool WriteCustomData(UINT format, const std::string &data) = 0;
 
-	bool Clear();
-
-private:
-	bool WriteDataToClipboard(UINT format, wil::unique_hglobal global);
-
-	bool m_clipboardOpened;
+	virtual bool Clear() = 0;
 };

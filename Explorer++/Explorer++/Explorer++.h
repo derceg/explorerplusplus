@@ -233,7 +233,6 @@ private:
 	bool OnCloseTab();
 	void OnSaveDirectoryListing() const;
 	void OnCloneWindow();
-	void OnCopyItemPath() const;
 	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;
 	void OnPaste();
@@ -274,13 +273,11 @@ private:
 	void OnListViewClick(const NMITEMACTIVATE *eventInfo);
 	void OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo);
 	LRESULT OnListViewKeyDown(LPARAM lParam);
-	void OnListViewCopyItemPath() const;
 	void OnListViewCopyUniversalPaths() const;
 	void OnListViewSetFileAttributes() const;
 	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
-	void OnTreeViewCopyItemPath() const;
 	void OnTreeViewSetFileAttributes() const;
 	void OnTreeViewCopyUniversalPaths() const;
 
