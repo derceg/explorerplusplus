@@ -12,16 +12,16 @@ ShellBrowserContextMenuDelegate::ShellBrowserContextMenuDelegate(
 {
 }
 
-void ShellBrowserContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, ShellContextMenuBuilder *builder)
+void ShellBrowserContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, ShellContextMenuBuilder *builder)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(builder);
 }
 
-bool ShellBrowserContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
+bool ShellBrowserContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, const std::wstring &verb)
 {
 	if (!m_shellBrowserWeak)
 	{
@@ -30,20 +30,20 @@ bool ShellBrowserContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE
 
 	if (verb == L"rename")
 	{
-		m_shellBrowserWeak->StartRenamingItems(BuildItemList(pidlParent, pidlItems));
+		m_shellBrowserWeak->StartRenamingItems(BuildItemList(directory, items));
 
 		return true;
 	}
 	else if (verb == L"copy")
 	{
-		m_shellBrowserWeak->CopyItemsToClipboard(BuildItemList(pidlParent, pidlItems),
+		m_shellBrowserWeak->CopyItemsToClipboard(BuildItemList(directory, items),
 			ClipboardAction::Copy);
 
 		return true;
 	}
 	else if (verb == L"cut")
 	{
-		m_shellBrowserWeak->CopyItemsToClipboard(BuildItemList(pidlParent, pidlItems),
+		m_shellBrowserWeak->CopyItemsToClipboard(BuildItemList(directory, items),
 			ClipboardAction::Cut);
 
 		return true;
@@ -65,11 +65,11 @@ std::vector<PidlAbsolute> ShellBrowserContextMenuDelegate::BuildItemList(
 	return fullPidls;
 }
 
-void ShellBrowserContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
+void ShellBrowserContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, UINT menuItemId)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(menuItemId);
 }
 

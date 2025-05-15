@@ -187,6 +187,15 @@
     <ClCompile Include="ShellContextMenuIdRemapper.cpp">
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBackgroundContextMenuDelegate.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBackgroundContextMenu.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellItemContextMenu.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -421,6 +430,18 @@
       <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="ShellContextMenuBuilder.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBackgroundContextMenu.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellItemContextMenu.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBackgroundContextMenuDelegate.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellItemContextMenuDelegate.h">
       <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
   </ItemGroup>

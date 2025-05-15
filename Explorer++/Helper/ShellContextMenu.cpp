@@ -13,10 +13,10 @@
 #include "StringHelper.h"
 #include "WindowSubclass.h"
 
-ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PCITEMID_CHILD> &pidlItems, MenuHelpTextRequest *menuHelpTextRequest) :
-	m_pidlParent(pidlParent),
-	m_pidlItems(pidlItems.begin(), pidlItems.end()),
+ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PCITEMID_CHILD> &items, MenuHelpTextRequest *menuHelpTextRequest) :
+	m_directory(directory),
+	m_items(items.begin(), items.end()),
 	m_menuHelpTextRequest(menuHelpTextRequest),
 	m_idGenerator(MAX_SHELL_MENU_ID + 1)
 {
@@ -33,30 +33,9 @@ void ShellContextMenu::AddDelegate(ShellContextMenuDelegate *delegate)
 	DCHECK(didInsert);
 }
 
-void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags)
+void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT flags)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
-
-	UINT contextMenuflags = CMF_NORMAL;
-
-	if (WI_IsFlagSet(flags, Flags::ExtendedVerbs))
-	{
-		contextMenuflags |= CMF_EXTENDEDVERBS;
-	}
-
-	if (WI_IsFlagSet(flags, Flags::Rename))
-	{
-		// The rename item shouldn't be added to the background context menu.
-		assert(!m_pidlItems.empty());
-
-		contextMenuflags |= CMF_CANRENAME;
-	}
-
-	if (m_pidlItems.empty())
-	{
-		// The background context menu shouldn't have any default item set.
-		contextMenuflags |= CMF_NODEFAULT;
-	}
 
 	m_contextMenu = MaybeGetShellContextMenu(hwnd);
 
@@ -67,8 +46,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 			objectWithSite->SetSite(site);
 		}
 
-		m_contextMenu->QueryContextMenu(menu.get(), 0, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,
-			contextMenuflags);
+		m_contextMenu->QueryContextMenu(menu.get(), 0, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, flags);
 	}
 
 	UpdateMenuEntries(menu.get());
@@ -148,46 +126,8 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flag
 	else if (auto *delegate = m_idGenerator.MaybeGetDelegateForId(cmd))
 	{
 		const auto *idRemapper = GetIdRemapperForDelegate(delegate);
-		delegate->HandleCustomMenuItem(m_pidlParent.Raw(), m_pidlItems,
-			idRemapper->GetOriginalId(cmd));
+		delegate->HandleCustomMenuItem(m_directory.Raw(), m_items, idRemapper->GetOriginalId(cmd));
 	}
-}
-
-// It's possible for a folder to not provide any IContextMenu instance (for example, the Home folder
-// in Windows 11 doesn't provide any IContextMenu instance for the background menu). So, this method
-// may return null.
-wil::com_ptr_nothrow<IContextMenu> ShellContextMenu::MaybeGetShellContextMenu(HWND hwnd) const
-{
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	HRESULT hr = SHBindToObject(nullptr, m_pidlParent.Raw(), nullptr, IID_PPV_ARGS(&shellFolder));
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	wil::com_ptr_nothrow<IContextMenu> contextMenu;
-
-	if (m_pidlItems.empty())
-	{
-		hr = shellFolder->CreateViewObject(hwnd, IID_PPV_ARGS(&contextMenu));
-	}
-	else
-	{
-		std::vector<PCITEMID_CHILD> pidlItemsRaw;
-		std::transform(m_pidlItems.begin(), m_pidlItems.end(), std::back_inserter(pidlItemsRaw),
-			[](const PidlChild &pidl) { return pidl.Raw(); });
-
-		hr = GetUIObjectOf(shellFolder.get(), hwnd, static_cast<UINT>(pidlItemsRaw.size()),
-			pidlItemsRaw.data(), IID_PPV_ARGS(&contextMenu));
-	}
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	return contextMenu;
 }
 
 void ShellContextMenu::UpdateMenuEntries(HMENU menu)
@@ -196,7 +136,7 @@ void ShellContextMenu::UpdateMenuEntries(HMENU menu)
 	{
 		ShellContextMenuBuilder builder(menu, m_contextMenu.get(),
 			GetIdRemapperForDelegate(delegate));
-		delegate->UpdateMenuEntries(m_pidlParent.Raw(), m_pidlItems, &builder);
+		delegate->UpdateMenuEntries(m_directory.Raw(), m_items, &builder);
 	}
 }
 
@@ -204,7 +144,7 @@ bool ShellContextMenu::MaybeHandleShellMenuItem(const std::wstring &verb)
 {
 	for (auto *delegate : m_delegates)
 	{
-		if (delegate->MaybeHandleShellMenuItem(m_pidlParent.Raw(), m_pidlItems, verb))
+		if (delegate->MaybeHandleShellMenuItem(m_directory.Raw(), m_items, verb))
 		{
 			return true;
 		}
@@ -217,7 +157,7 @@ bool ShellContextMenu::MaybeHandleShellMenuItem(const std::wstring &verb)
 std::optional<std::string> ShellContextMenu::MaybeGetFilesystemDirectory() const
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
-	HRESULT hr = SHCreateItemFromIDList(m_pidlParent.Raw(), IID_PPV_ARGS(&shellItem));
+	HRESULT hr = SHCreateItemFromIDList(m_directory.Raw(), IID_PPV_ARGS(&shellItem));
 
 	if (FAILED(hr))
 	{
@@ -235,6 +175,7 @@ std::optional<std::string> ShellContextMenu::MaybeGetFilesystemDirectory() const
 	// In Windows Explorer, it appears that when a menu item is invoked from the background context
 	// menu in a library folder, the directory that's used is the default directory for that
 	// library. The functionality here tries to mimic that behavior.
+	//
 	// Without this, menu items like "Git Bash Here" wouldn't work when invoked from a library
 	// directory (since a library doesn't have a filesystem path, even though it may be filesystem
 	// backed).

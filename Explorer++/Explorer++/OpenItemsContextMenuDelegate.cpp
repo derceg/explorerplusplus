@@ -26,15 +26,15 @@ OpenItemsContextMenuDelegate::OpenItemsContextMenuDelegate(BrowserWindow *browse
 {
 }
 
-void OpenItemsContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, ShellContextMenuBuilder *builder)
+void OpenItemsContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, ShellContextMenuBuilder *builder)
 {
-	if (pidlItems.size() != 1)
+	if (items.size() != 1)
 	{
 		return;
 	}
 
-	PidlAbsolute pidlComplete = CombinePidls(pidlParent, pidlItems[0].Raw());
+	PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
 
 	if (!DoesItemHaveAttributes(pidlComplete.Raw(), SFGAO_FOLDER))
 	{
@@ -45,16 +45,16 @@ void OpenItemsContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParen
 		m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB), 1, true);
 }
 
-bool OpenItemsContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
+bool OpenItemsContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, const std::wstring &verb)
 {
 	if (verb == L"open")
 	{
 		auto *browser = GetTargetBrowser();
 
-		for (const auto &pidl : pidlItems)
+		for (const auto &pidl : items)
 		{
-			PidlAbsolute pidlComplete = CombinePidls(pidlParent, pidl.Raw());
+			PidlAbsolute pidlComplete = CombinePidls(directory, pidl.Raw());
 
 			browser->OpenItem(pidlComplete.Raw());
 		}
@@ -65,17 +65,17 @@ bool OpenItemsContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pi
 	return false;
 }
 
-void OpenItemsContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
+void OpenItemsContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, UINT menuItemId)
 {
 	switch (menuItemId)
 	{
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{
 		// This menu item should only be added when a single folder is selected.
-		CHECK_EQ(pidlItems.size(), 1u);
+		CHECK_EQ(items.size(), 1u);
 
-		PidlAbsolute pidlComplete = CombinePidls(pidlParent, pidlItems[0].Raw());
+		PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
 
 		auto *browser = GetTargetBrowser();
 		browser->OpenItem(pidlComplete.Raw(), OpenFolderDisposition::NewTabDefault);

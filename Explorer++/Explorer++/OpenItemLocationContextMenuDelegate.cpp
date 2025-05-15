@@ -18,15 +18,15 @@ OpenItemLocationContextMenuDelegate::OpenItemLocationContextMenuDelegate(Browser
 {
 }
 
-void OpenItemLocationContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, ShellContextMenuBuilder *builder)
+void OpenItemLocationContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, ShellContextMenuBuilder *builder)
 {
-	if (pidlItems.size() != 1)
+	if (items.size() != 1)
 	{
 		return;
 	}
 
-	PidlAbsolute pidlComplete = CombinePidls(pidlParent, pidlItems[0].Raw());
+	PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
 
 	std::wstring openLocationText;
 
@@ -42,20 +42,20 @@ void OpenItemLocationContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pi
 	builder->AddStringItem(OPEN_ITEM_LOCATION_MENU_ITEM_ID, openLocationText, 1, true);
 }
 
-bool OpenItemLocationContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
+bool OpenItemLocationContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, const std::wstring &verb)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(verb);
 
 	return false;
 }
 
-void OpenItemLocationContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
+void OpenItemLocationContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, UINT menuItemId)
 {
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(items);
 
 	switch (menuItemId)
 	{
@@ -64,7 +64,7 @@ void OpenItemLocationContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE
 		// TODO: The target item should be selected.
 		auto *browser = m_browserList->GetLastActive();
 		CHECK(browser);
-		browser->OpenItem(pidlParent);
+		browser->OpenItem(directory);
 	}
 	break;
 

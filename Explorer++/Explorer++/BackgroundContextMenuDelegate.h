@@ -4,24 +4,21 @@
 
 #pragma once
 
-#include "../Helper/ShellContextMenuDelegate.h"
+#include "../Helper/ShellBackgroundContextMenuDelegate.h"
 
 class BrowserWindow;
 class ResourceLoader;
 
 // Adds a number of custom items to the background context menu.
-class BackgroundContextMenuDelegate : public ShellContextMenuDelegate
+class BackgroundContextMenuDelegate : public ShellBackgroundContextMenuDelegate
 {
 public:
 	BackgroundContextMenuDelegate(const BrowserWindow *browser,
 		const ResourceLoader *resourceLoader);
 
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		ShellContextMenuBuilder *builder) override;
-	bool MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, const std::wstring &verb) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		UINT menuItemId) override;
+	void UpdateMenuEntries(PCIDLIST_ABSOLUTE directory, ShellContextMenuBuilder *builder) override;
+	bool MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory, const std::wstring &verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory, UINT menuItemId) override;
 	std::wstring GetHelpTextForCustomItem(UINT menuItemId) override;
 
 private:

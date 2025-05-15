@@ -20,12 +20,9 @@ BackgroundContextMenuDelegate::BackgroundContextMenuDelegate(const BrowserWindow
 {
 }
 
-void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, ShellContextMenuBuilder *builder)
+void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory,
+	ShellContextMenuBuilder *builder)
 {
-	// This delegate should only be used with the background context menu.
-	CHECK(pidlItems.empty());
-
 	RemoveNonFunctionalItems(builder);
 
 	UINT position = 0;
@@ -48,7 +45,7 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlPare
 
 	builder->AddSeparator(position++, true);
 
-	if (CanCustomizeDirectory(pidlParent))
+	if (CanCustomizeDirectory(directory))
 	{
 		text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_CUSTOMIZE);
 		builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_CUSTOMIZE, text, position++, true);
@@ -58,7 +55,7 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlPare
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE);
 	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE, text, position++, true);
 
-	if (!CanPasteInDirectory(pidlParent, PasteType::Normal))
+	if (!CanPasteInDirectory(directory, PasteType::Normal))
 	{
 		builder->EnableItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE, false);
 	}
@@ -66,7 +63,7 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlPare
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT);
 	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, text, position++, true);
 
-	if (!CanPasteInDirectory(pidlParent, PasteType::Shortcut))
+	if (!CanPasteInDirectory(directory, PasteType::Shortcut))
 	{
 		builder->EnableItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, false);
 	}
@@ -85,21 +82,19 @@ void BackgroundContextMenuDelegate::RemoveNonFunctionalItems(ShellContextMenuBui
 	builder->RemoveShellItem(L"savesearch");
 }
 
-bool BackgroundContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
+bool BackgroundContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::wstring &verb)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
 	UNREFERENCED_PARAMETER(verb);
 
 	return false;
 }
 
-void BackgroundContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
+void BackgroundContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory,
+	UINT menuItemId)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
 
 	// Custom items in the context menu will be handled by the WM_COMMAND handler.
 	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(menuItemId, 0), 0);

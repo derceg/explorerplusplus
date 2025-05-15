@@ -4,22 +4,22 @@
 
 #pragma once
 
-#include "../Helper/ShellContextMenuDelegate.h"
+#include "../Helper/ShellItemContextMenuDelegate.h"
 
 class ShellTreeView;
 
 // When the shell context menu is being shown for an item in a ShellTreeView instance, this class
 // handles the view-specific items.
-class ShellTreeViewContextMenuDelegate : public ShellContextMenuDelegate
+class ShellTreeViewContextMenuDelegate : public ShellItemContextMenuDelegate
 {
 public:
 	ShellTreeViewContextMenuDelegate(ShellTreeView *shellTreeView);
 
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+	void UpdateMenuEntries(PCIDLIST_ABSOLUTE directory, const std::vector<PidlChild> &items,
 		ShellContextMenuBuilder *builder) override;
-	bool MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PidlChild> &pidlItems, const std::wstring &verb) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+	bool MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory, const std::vector<PidlChild> &items,
+		const std::wstring &verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory, const std::vector<PidlChild> &items,
 		UINT menuItemId) override;
 	std::wstring GetHelpTextForCustomItem(UINT menuItemId) override;
 

@@ -18,28 +18,33 @@ class MenuHelpTextRequest;
 class ShellContextMenuDelegate;
 class ShellContextMenuIdRemapper;
 
+// Can be used to display a shell context menu (either an item context menu or background context
+// menu). This class is simply a base class, so exactly which menu is shown is up to the derived
+// class.
 class ShellContextMenu : private boost::noncopyable
 {
 public:
-	enum class Flags
-	{
-		Standard = 0,
-		Rename = 1 << 0,
-		ExtendedVerbs = 1 << 1
-	};
-
 	static constexpr int MIN_SHELL_MENU_ID = 1;
 	static constexpr int MAX_SHELL_MENU_ID = 1000;
 
-	ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems,
+	virtual ~ShellContextMenu();
+
+protected:
+	ShellContextMenu(PCIDLIST_ABSOLUTE directory, const std::vector<PCITEMID_CHILD> &items,
 		MenuHelpTextRequest *menuHelpTextRequest);
-	~ShellContextMenu();
 
 	void AddDelegate(ShellContextMenuDelegate *delegate);
-	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);
+	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT flags);
+
+	// It's possible for a folder to not provide any IContextMenu instance (for example, the Home
+	// folder in Windows 11 doesn't provide any IContextMenu instance for the background menu). So,
+	// this method may return null.
+	virtual wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const = 0;
+
+	const PidlAbsolute m_directory;
+	const std::vector<PidlChild> m_items;
 
 private:
-	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const;
 	void UpdateMenuEntries(HMENU menu);
 	bool MaybeHandleShellMenuItem(const std::wstring &verb);
 	std::optional<std::string> MaybeGetFilesystemDirectory() const;
@@ -50,8 +55,6 @@ private:
 
 	ShellContextMenuIdRemapper *GetIdRemapperForDelegate(ShellContextMenuDelegate *delegate);
 
-	const PidlAbsolute m_pidlParent;
-	const std::vector<PidlChild> m_pidlItems;
 	MenuHelpTextRequest *const m_menuHelpTextRequest;
 	ShellContextMenuIdGenerator m_idGenerator;
 	std::vector<ShellContextMenuDelegate *> m_delegates;
@@ -59,5 +62,3 @@ private:
 		m_delegateToIdRemapperMap;
 	wil::com_ptr_nothrow<IContextMenu> m_contextMenu;
 };
-
-DEFINE_ENUM_FLAG_OPERATORS(ShellContextMenu::Flags);

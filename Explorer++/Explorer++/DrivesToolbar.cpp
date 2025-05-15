@@ -15,8 +15,8 @@
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "TabContainerImpl.h"
-#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ShellItemContextMenu.h"
 #include <ShlObj.h>
 #include <Shlwapi.h>
 
@@ -188,19 +188,19 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 	[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
 	assert(res);
 
-	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
+	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::None;
 
 	if (showExtended)
 	{
-		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
+		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, m_browser);
+	ShellItemContextMenu contextMenu(pidl.get(), { child.get() }, m_browser);
 
 	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_resourceLoader);
-	shellContextMenu.AddDelegate(&openItemsDelegate);
+	contextMenu.AddDelegate(&openItemsDelegate);
 
-	shellContextMenu.ShowMenu(m_browser->GetHWND(), &ptScreen, nullptr, flags);
+	contextMenu.ShowMenu(m_browser->GetHWND(), &ptScreen, nullptr, flags);
 }
 
 void DrivesToolbar::OnWindowDestroyed()

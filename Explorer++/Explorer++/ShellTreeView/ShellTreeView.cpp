@@ -40,8 +40,8 @@
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ScopedRedrawDisabler.h"
-#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ShellItemContextMenu.h"
 #include <wil/common.h>
 #include <propkey.h>
 
@@ -1473,22 +1473,22 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 
 	ILRemoveLastID(pidl.get());
 
-	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Rename;
+	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::Rename;
 
 	if (IsKeyDown(VK_SHIFT))
 	{
-		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
+		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, m_browser);
+	ShellItemContextMenu contextMenu(pidl.get(), { child.get() }, m_browser);
 
 	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_app->GetResourceLoader());
-	shellContextMenu.AddDelegate(&openItemsDelegate);
+	contextMenu.AddDelegate(&openItemsDelegate);
 
 	ShellTreeViewContextMenuDelegate treeViewDelegate(this);
-	shellContextMenu.AddDelegate(&treeViewDelegate);
+	contextMenu.AddDelegate(&treeViewDelegate);
 
-	shellContextMenu.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
+	contextMenu.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
 
 	if (highlightTargetItem)
 	{

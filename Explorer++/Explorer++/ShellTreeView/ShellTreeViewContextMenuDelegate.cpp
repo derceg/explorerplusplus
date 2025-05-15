@@ -14,21 +14,21 @@ ShellTreeViewContextMenuDelegate::ShellTreeViewContextMenuDelegate(ShellTreeView
 {
 }
 
-void ShellTreeViewContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, ShellContextMenuBuilder *builder)
+void ShellTreeViewContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, ShellContextMenuBuilder *builder)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(builder);
 }
 
-bool ShellTreeViewContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
+bool ShellTreeViewContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, const std::wstring &verb)
 {
 	// The context menu should only ever be shown for a single item in the treeview.
-	CHECK_EQ(pidlItems.size(), 1u);
+	CHECK_EQ(items.size(), 1u);
 
-	PidlAbsolute pidlComplete = CombinePidls(pidlParent, pidlItems[0].Raw());
+	PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
 
 	if (verb == L"rename")
 	{
@@ -52,11 +52,11 @@ bool ShellTreeViewContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUT
 	return false;
 }
 
-void ShellTreeViewContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
+void ShellTreeViewContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, UINT menuItemId)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(menuItemId);
 }
 

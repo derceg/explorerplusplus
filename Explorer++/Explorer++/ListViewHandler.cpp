@@ -31,8 +31,9 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/ShellContextMenu.h"
+#include "../Helper/ShellBackgroundContextMenu.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ShellItemContextMenu.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
 
@@ -229,10 +230,10 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
-	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this);
+	ShellBackgroundContextMenu contextMenu(pidlDirectory.get(), this);
 
 	BackgroundContextMenuDelegate backgroundDelegate(this, m_app->GetResourceLoader());
-	shellContextMenu.AddDelegate(&backgroundDelegate);
+	contextMenu.AddDelegate(&backgroundDelegate);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -247,14 +248,14 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 		winrt::make<ShellView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
-	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
+	ShellBackgroundContextMenu::Flags flags = ShellBackgroundContextMenu::Flags::None;
 
 	if (IsKeyDown(VK_SHIFT))
 	{
-		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
+		WI_SetFlag(flags, ShellBackgroundContextMenu::Flags::ExtendedVerbs);
 	}
 
-	shellContextMenu.ShowMenu(selectedTab.GetShellBrowserImpl()->GetListView(), pCursorPos,
+	contextMenu.ShowMenu(selectedTab.GetShellBrowserImpl()->GetListView(), pCursorPos,
 		serviceProvider.get(), flags);
 }
 
@@ -278,22 +279,22 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-		ShellContextMenu::Flags flags = ShellContextMenu::Flags::Rename;
+		ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::Rename;
 
 		if (IsKeyDown(VK_SHIFT))
 		{
-			WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
+			WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 		}
 
-		ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this);
+		ShellItemContextMenu contextMenu(pidlDirectory.get(), pidlItems, this);
 
 		OpenItemsContextMenuDelegate openItemsDelegate(this, m_app->GetResourceLoader());
-		shellContextMenu.AddDelegate(&openItemsDelegate);
+		contextMenu.AddDelegate(&openItemsDelegate);
 
 		ShellBrowserContextMenuDelegate shellBrowserDelegate(m_pActiveShellBrowser->GetWeakPtr());
-		shellContextMenu.AddDelegate(&shellBrowserDelegate);
+		contextMenu.AddDelegate(&shellBrowserDelegate);
 
-		shellContextMenu.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
+		contextMenu.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
 	}
 }
 

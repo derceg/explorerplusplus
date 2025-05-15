@@ -5,29 +5,29 @@
 #include "pch.h"
 #include "ShellContextMenuDelegateFake.h"
 
-void ShellContextMenuDelegateFake::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, ShellContextMenuBuilder *builder)
+void ShellContextMenuDelegateFake::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, ShellContextMenuBuilder *builder)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(builder);
 }
 
-bool ShellContextMenuDelegateFake::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
+bool ShellContextMenuDelegateFake::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, const std::wstring &verb)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(verb);
 
 	return false;
 }
 
-void ShellContextMenuDelegateFake::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
+void ShellContextMenuDelegateFake::HandleCustomMenuItem(PCIDLIST_ABSOLUTE directory,
+	const std::vector<PidlChild> &items, UINT menuItemId)
 {
-	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(directory);
+	UNREFERENCED_PARAMETER(items);
 	UNREFERENCED_PARAMETER(menuItemId);
 }
 

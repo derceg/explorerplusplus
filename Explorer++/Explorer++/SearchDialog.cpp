@@ -18,8 +18,8 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
-#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ShellItemContextMenu.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <algorithm>
@@ -632,15 +632,15 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
 						ILRemoveLastID(pidlDirectory.get());
 
-						ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, nullptr);
+						ShellItemContextMenu contextMenu(pidlDirectory.get(), pidlItems, nullptr);
 
 						OpenItemsContextMenuDelegate openItemsDelegate(m_browserList,
 							m_resourceLoader);
-						shellContextMenu.AddDelegate(&openItemsDelegate);
+						contextMenu.AddDelegate(&openItemsDelegate);
 
 						OpenItemLocationContextMenuDelegate openLocationDelegate(m_browserList,
 							m_resourceLoader);
-						shellContextMenu.AddDelegate(&openLocationDelegate);
+						contextMenu.AddDelegate(&openLocationDelegate);
 
 						DWORD dwCursorPos = GetMessagePos();
 
@@ -648,14 +648,14 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						ptCursor.x = GET_X_LPARAM(dwCursorPos);
 						ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
-						ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
+						ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::None;
 
 						if (IsKeyDown(VK_SHIFT))
 						{
-							WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
+							WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 						}
 
-						shellContextMenu.ShowMenu(m_hDlg, &ptCursor, nullptr, flags);
+						contextMenu.ShowMenu(m_hDlg, &ptCursor, nullptr, flags);
 					}
 				}
 			}
