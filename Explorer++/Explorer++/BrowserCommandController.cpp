@@ -216,6 +216,7 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 	// These commands are context-sensitive (i.e. they depend on the active target).
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
+	case IDM_FILE_RENAME:
 	case IDM_FILE_PROPERTIES:
 	case IDM_EDIT_CUT:
 	case IDM_EDIT_COPY:

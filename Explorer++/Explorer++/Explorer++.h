@@ -236,7 +236,6 @@ private:
 	void OnCopyItemPath() const;
 	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;
-	void OnFileRename();
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnWildcardSelect(BOOL bSelect);
@@ -380,14 +379,9 @@ private:
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;
-	BOOL CanRename() const override;
 	BOOL CanPaste(PasteType pasteType) const override;
 	bool CanPasteLink() const;
-	BOOL TestItemAttributes(SFGAOF attributes) const;
-	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;
 	PidlAbsolute MaybeGetFocusedDirectory() const;
-
-	HRESULT GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 
 	/* Display window. */
 	void OnDisplayWindowResized(WPARAM wParam);

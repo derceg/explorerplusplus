@@ -1504,6 +1504,9 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 	case IDM_FILE_DELETEPERMANENTLY:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_CANDELETE);
 
+	case IDM_FILE_RENAME:
+		return TestItemAttributes(GetSelectedNode(), SFGAO_CANRENAME);
+
 	case IDM_FILE_PROPERTIES:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_HASPROPSHEET);
 
@@ -1529,6 +1532,10 @@ void ShellTreeView::ExecuteCommand(int command)
 
 	case IDM_FILE_DELETEPERMANENTLY:
 		DeleteSelectedItem(true);
+		break;
+
+	case IDM_FILE_RENAME:
+		StartRenamingSelectedItem();
 		break;
 
 	case IDM_FILE_PROPERTIES:

@@ -43,7 +43,6 @@ public:
 	/* Sorting. */
 	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
 
-	void StartRenamingSelectedItem();
 	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
 	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action);
 	void Paste();
@@ -144,6 +143,7 @@ private:
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	void OnShowContextMenu(const POINT &ptScreen);
 	void UpdateSelection();
+	void StartRenamingSelectedItem();
 	void ShowPropertiesForSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 

@@ -45,21 +45,6 @@ void Explorerplusplus::OnCopyUniversalPaths() const
 	}
 }
 
-void Explorerplusplus::OnFileRename()
-{
-	HWND hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-		selectedTab.GetShellBrowserImpl()->StartRenamingSelectedItems();
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		m_shellTreeView->StartRenamingSelectedItem();
-	}
-}
-
 void Explorerplusplus::OnSetFileAttributes() const
 {
 	HWND hFocus;

@@ -144,8 +144,6 @@ public:
 	bool GetFilterCaseSensitive() const;
 	void SetFilterCaseSensitive(bool filterCaseSensitive);
 
-	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
-
 	void SetFileAttributesForSelection();
 
 	void SelectItems(const std::vector<PidlAbsolute> &pidls);
@@ -158,7 +156,6 @@ public:
 	void PasteHardLinks();
 	void PasteSymLinks();
 	void OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems);
-	void StartRenamingSelectedItems();
 	void StartRenamingItems(const std::vector<PidlAbsolute> &items);
 
 	bool GetShowInGroups() const;
@@ -453,8 +450,10 @@ private:
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
 
 	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
+	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
 
 	void DeleteSelectedItems(bool permanent);
+	void StartRenamingSelectedItems();
 	void StartRenamingSingleItem(const PidlAbsolute &item);
 	void StartRenamingMultipleItems(const std::vector<PidlAbsolute> &items);
 	HRESULT CopySelectedItemsToClipboard(ClipboardAction action);

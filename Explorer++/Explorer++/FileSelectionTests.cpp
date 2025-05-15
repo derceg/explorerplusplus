@@ -35,51 +35,6 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 	return FALSE;
 }
 
-BOOL Explorerplusplus::CanRename() const
-{
-	return TestItemAttributes(SFGAO_CANRENAME);
-}
-
-/* Returns TRUE if all the specified attributes are set on the selected items. */
-BOOL Explorerplusplus::TestItemAttributes(SFGAOF attributes) const
-{
-	SFGAOF commonAttributes = attributes;
-	HRESULT hr = GetSelectionAttributes(&commonAttributes);
-
-	if (SUCCEEDED(hr))
-	{
-		return (commonAttributes & attributes) == attributes;
-	}
-
-	return FALSE;
-}
-
-HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
-{
-	HWND hFocus;
-	HRESULT hr = E_FAIL;
-
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-		hr = selectedTab.GetShellBrowserImpl()->GetListViewSelectionAttributes(pItemAttributes);
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		hr = GetTreeViewSelectionAttributes(pItemAttributes);
-	}
-
-	return hr;
-}
-
-HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
-{
-	auto pidl = m_shellTreeView->GetSelectedNodePidl();
-	return GetItemAttributes(pidl.get(), pItemAttributes);
-}
-
 BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 {
 	auto directory = MaybeGetFocusedDirectory();
