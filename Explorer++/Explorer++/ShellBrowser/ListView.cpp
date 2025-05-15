@@ -35,6 +35,7 @@
 #include "../Helper/ShellBackgroundContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ShellItemContextMenu.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include <glog/logging.h>
 #include <wil/common.h>
 #include <format>
@@ -417,16 +418,11 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 	contextMenu.AddDelegate(&backgroundDelegate);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
-
-	auto newMenuClient = winrt::make<NewMenuClient>(this);
-	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
-
-	winrt::com_ptr<IFolderView2> folderView =
-		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr());
-	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
-
-	auto shellView = winrt::make<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, false);
-	serviceProvider->RegisterService(SID_DefView, shellView.get());
+	serviceProvider->RegisterService(IID_INewMenuClient, winrt::make<NewMenuClient>(this));
+	serviceProvider->RegisterService(IID_IFolderView,
+		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr()));
+	serviceProvider->RegisterService(SID_DefView,
+		winrt::make<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, false));
 
 	ShellBackgroundContextMenu::Flags flags = ShellBackgroundContextMenu::Flags::None;
 

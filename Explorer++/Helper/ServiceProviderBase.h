@@ -5,19 +5,19 @@
 #pragma once
 
 #include "ShellHelper.h"
+#include "WinRTBaseWrapper.h"
 #include <boost/container_hash/hash.hpp>
-#include <wil/com.h>
 #include <unordered_map>
 
 class ServiceProviderBase
 {
 public:
-	void RegisterService(REFGUID guidService, IUnknown *service);
+	void RegisterService(REFGUID guidService, winrt::com_ptr<IUnknown> service);
 	HRESULT QueryService(REFGUID guidService, REFIID riid, void **ppv);
 
 protected:
 	ServiceProviderBase() = default;
 
 private:
-	std::unordered_map<IID, wil::com_ptr_nothrow<IUnknown>, boost::hash<IID>> m_services;
+	std::unordered_map<IID, winrt::com_ptr<IUnknown>, boost::hash<IID>> m_services;
 };

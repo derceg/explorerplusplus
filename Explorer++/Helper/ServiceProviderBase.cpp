@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ServiceProviderBase.h"
 
-void ServiceProviderBase::RegisterService(REFGUID guidService, IUnknown *service)
+void ServiceProviderBase::RegisterService(REFGUID guidService, winrt::com_ptr<IUnknown> service)
 {
 	m_services[guidService] = service;
 }

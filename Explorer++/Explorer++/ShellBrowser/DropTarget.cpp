@@ -77,9 +77,8 @@ IUnknown *ShellBrowserImpl::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPid
 	if (!m_dropServiceProvider)
 	{
 		m_dropServiceProvider = winrt::make_self<ServiceProvider>();
-
-		auto folderView = winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr());
-		m_dropServiceProvider->RegisterService(IID_IFolderView, folderView.get());
+		m_dropServiceProvider->RegisterService(IID_IFolderView,
+			winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr()));
 	}
 
 	return m_dropServiceProvider.get();

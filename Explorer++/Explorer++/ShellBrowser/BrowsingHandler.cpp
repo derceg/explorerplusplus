@@ -214,9 +214,8 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 		SWC_BROWSER, &m_shellWindowCookie));
 
 	auto document = winrt::make_self<DocumentServiceProvider>();
-	auto shellView =
-		winrt::make_self<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, true);
-	document->RegisterService(IID_IFolderView, shellView.get());
+	document->RegisterService(IID_IFolderView,
+		winrt::make_self<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, true));
 
 	auto browserApp = winrt::make_self<WebBrowserApp>(m_hOwner, document.get());
 

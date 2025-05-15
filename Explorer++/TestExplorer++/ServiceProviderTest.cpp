@@ -6,6 +6,7 @@
 #include "ServiceProvider.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <gtest/gtest.h>
+#include <wil/com.h>
 
 namespace
 {
@@ -30,7 +31,7 @@ TEST(ServiceProvider, RegisterService)
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
 	auto fakeService = winrt::make<FakeService>();
-	serviceProvider->RegisterService(IID_IUnknown, fakeService.get());
+	serviceProvider->RegisterService(IID_IUnknown, fakeService);
 
 	wil::com_ptr_nothrow<IUnknown> result;
 	EXPECT_HRESULT_SUCCEEDED(serviceProvider->QueryService(IID_IUnknown, IID_PPV_ARGS(&result)));

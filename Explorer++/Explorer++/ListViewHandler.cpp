@@ -283,9 +283,8 @@ void Explorerplusplus::OnListViewPaste()
 	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(), PasteType::Normal))
 	{
 		auto serviceProvider = winrt::make_self<ServiceProvider>();
-
-		auto folderView = winrt::make<FolderView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr());
-		serviceProvider->RegisterService(IID_IFolderView, folderView.get());
+		serviceProvider->RegisterService(IID_IFolderView,
+			winrt::make<FolderView>(selectedTab.GetShellBrowserImpl()->GetWeakPtr()));
 
 		ExecuteActionFromContextMenu(directory.get(), {},
 			selectedTab.GetShellBrowserImpl()->GetListView(), L"paste", 0, serviceProvider.get());

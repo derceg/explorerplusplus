@@ -1110,9 +1110,8 @@ void ShellBrowserImpl::RestoreStateOfCutItems()
 void ShellBrowserImpl::PasteShortcut()
 {
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
-
-	auto folderView = winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr());
-	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
+	serviceProvider->RegisterService(IID_IFolderView,
+		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr()));
 
 	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.Raw(), {}, m_hListView,
 		L"pastelink", 0, serviceProvider.get());
