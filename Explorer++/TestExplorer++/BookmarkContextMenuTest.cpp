@@ -15,7 +15,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
-#include "../Helper/SystemClipboard.h"
+#include "SimulatedClipboardStore.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -65,13 +65,12 @@ protected:
 
 	AcceleratorManager m_acceleratorManager;
 	ResourceLoaderFake m_resourceLoader;
+	SimulatedClipboardStore m_clipboardStore;
 
 	BookmarkTree m_bookmarkTree;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
-
-	PopupMenuView m_popupMenu;
 };
 
 class BookmarkContextMenuSingleBookmarkTest : public BookmarkContextMenuTestBase
@@ -80,19 +79,26 @@ protected:
 	BookmarkContextMenuSingleBookmarkTest() :
 		m_bookmark(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\bookmarked\\folder"),
-			0)),
-		m_contextMenu(&m_popupMenu, &m_acceleratorManager, &m_bookmarkTree, { m_bookmark },
-			&m_resourceLoader, m_browser, m_browser->GetHWND())
+			0))
 	{
 	}
 
+	std::unique_ptr<BookmarkContextMenu> BuildContextMenu(MenuView *menuView)
+	{
+		return std::make_unique<BookmarkContextMenu>(menuView, &m_acceleratorManager,
+			&m_bookmarkTree, RawBookmarkItems{ m_bookmark }, &m_resourceLoader, m_browser,
+			m_browser->GetHWND(), &m_clipboardStore);
+	}
+
 	BookmarkItem *const m_bookmark;
-	BookmarkContextMenu m_contextMenu;
 };
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 {
-	m_popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN, false, false);
+	PopupMenuView popupMenu;
+	auto contextMenu = BuildContextMenu(&popupMenu);
+
+	popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN, false, false);
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
 
@@ -104,18 +110,18 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 {
-	SystemClipboard clipboard;
-	clipboard.Clear();
+	PopupMenuView popupMenu;
+	auto contextMenu = BuildContextMenu(&popupMenu);
 
 	CopiedBookmark copiedBookmark(m_bookmark);
 	const auto *parentFolder = m_bookmark->GetParent();
 
-	m_popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, false, false);
+	popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, false, false);
 
 	// Cutting the bookmark should have removed it from the tree.
 	ASSERT_TRUE(parentFolder->GetChildren().empty());
 
-	BookmarkClipboard bookmarkClipboard;
+	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	ASSERT_EQ(clipboardItems.size(), 1u);
 
@@ -124,14 +130,14 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 {
-	SystemClipboard clipboard;
-	clipboard.Clear();
+	PopupMenuView popupMenu;
+	auto contextMenu = BuildContextMenu(&popupMenu);
 
 	CopiedBookmark copiedBookmark(m_bookmark);
 
-	m_popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
+	popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
 
-	BookmarkClipboard bookmarkClipboard;
+	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	ASSERT_EQ(clipboardItems.size(), 1u);
 
@@ -140,15 +146,20 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 {
-	SystemClipboard clipboard;
-	clipboard.Clear();
-
+	// This bookmark is explicitly copied before the menu is constructed. That's because the paste
+	// menu item will be disabled if there are no bookmarks on the clipboard, which will then cause
+	// the test to fail. Copying the bookmark first ensures that the paste item will be enabled when
+	// the menu is built.
 	auto *bookmark = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"f:\\"), 0);
 	CopiedBookmark copiedBookmark(bookmark);
-	ASSERT_TRUE(BookmarkHelper::CopyBookmarkItems(&m_bookmarkTree, { bookmark }, false));
+	ASSERT_TRUE(
+		BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { bookmark }, false));
 
-	m_popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE, false, false);
+	PopupMenuView popupMenu;
+	auto contextMenu = BuildContextMenu(&popupMenu);
+
+	popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE, false, false);
 
 	const auto *parentFolder = m_bookmark->GetParent();
 	ASSERT_EQ(parentFolder->GetChildren().size(), 2u);
@@ -159,9 +170,12 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Delete)
 {
+	PopupMenuView popupMenu;
+	auto contextMenu = BuildContextMenu(&popupMenu);
+
 	MockFunction<void(const std::wstring &guid)> removedCallback;
 	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
 
 	EXPECT_CALL(removedCallback, Call(m_bookmark->GetGUID()));
-	m_popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, false, false);
+	popupMenu.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, false, false);
 }

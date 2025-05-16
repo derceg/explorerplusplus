@@ -11,6 +11,7 @@
 class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
+class ClipboardStore;
 class CoreInterface;
 class ResourceLoader;
 class TabContainerImpl;
@@ -49,8 +50,10 @@ void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser);
 
-bool CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut);
-void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index);
+bool CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
+	const RawBookmarkItems &bookmarkItems, bool cut);
+void PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentFolder, size_t index);
 
 BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);
 

@@ -14,6 +14,7 @@
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
+#include "../Helper/ClipboardStore.h"
 
 ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, App *app,
 	BrowserWindow *browser) :
@@ -81,7 +82,7 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK_HELP_TEXT));
 
-		if (!IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()))
+		if (!m_app->GetClipboardStore()->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()))
 		{
 			m_menuView->EnableItem(IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK, false);
 		}
@@ -164,8 +165,8 @@ void ToolbarContextMenu::OnPasteBookmark()
 {
 	auto *bookmarkTree = m_app->GetBookmarkTree();
 	auto *bookmarksToolbarFolder = bookmarkTree->GetBookmarksToolbarFolder();
-	BookmarkHelper::PasteBookmarkItems(bookmarkTree, bookmarksToolbarFolder,
-		bookmarksToolbarFolder->GetChildren().size());
+	BookmarkHelper::PasteBookmarkItems(m_app->GetClipboardStore(), bookmarkTree,
+		bookmarksToolbarFolder, bookmarksToolbarFolder->GetChildren().size());
 }
 
 void ToolbarContextMenu::OnNewApplication()

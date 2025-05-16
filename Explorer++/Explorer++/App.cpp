@@ -362,6 +362,11 @@ Runtime *App::GetRuntime()
 	return &m_runtime;
 }
 
+ClipboardStore *App::GetClipboardStore()
+{
+	return &m_clipboardStore;
+}
+
 ClipboardWatcher *App::GetClipboardWatcher()
 {
 	return &m_clipboardWatcher;

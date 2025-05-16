@@ -3,25 +3,31 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "../Helper/SystemClipboard.h"
+#include "../Helper/Clipboard.h"
 #include "ImageTestHelper.h"
+#include "../Helper/SystemClipboardStore.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-class SystemClipboardTest : public Test
+class ClipboardTest : public Test
 {
 protected:
+	ClipboardTest() : m_clipboard(&m_store)
+	{
+	}
+
 	void SetUp() override
 	{
 		auto res = m_clipboard.Clear();
 		ASSERT_TRUE(res);
 	}
 
-	SystemClipboard m_clipboard;
+	SystemClipboardStore m_store;
+	Clipboard m_clipboard;
 };
 
-TEST_F(SystemClipboardTest, ReadWriteText)
+TEST_F(ClipboardTest, ReadWriteText)
 {
 	std::wstring text = L"Clipboard text";
 	auto res = m_clipboard.WriteText(text);
@@ -32,7 +38,7 @@ TEST_F(SystemClipboardTest, ReadWriteText)
 	EXPECT_EQ(*clipboardText, text);
 }
 
-TEST_F(SystemClipboardTest, ReadWriteHDropData)
+TEST_F(ClipboardTest, ReadWriteHDropData)
 {
 	std::vector<std::wstring> files = { L"C:\\file1", L"C:\\file2", L"C:\\file3" };
 	auto res = m_clipboard.WriteHDropData(files);
@@ -42,7 +48,7 @@ TEST_F(SystemClipboardTest, ReadWriteHDropData)
 	EXPECT_EQ(retrievedFiles, files);
 }
 
-TEST_F(SystemClipboardTest, ReadWritePngData)
+TEST_F(ClipboardTest, ReadWritePngData)
 {
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
 	BuildTestGdiplusBitmap(100, 100, bitmap);
@@ -56,7 +62,7 @@ TEST_F(SystemClipboardTest, ReadWritePngData)
 	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
-TEST_F(SystemClipboardTest, ReadWriteDIBData)
+TEST_F(ClipboardTest, ReadWriteDIBData)
 {
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
 	BuildTestGdiplusBitmap(100, 100, bitmap);
@@ -70,7 +76,7 @@ TEST_F(SystemClipboardTest, ReadWriteDIBData)
 	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
-TEST_F(SystemClipboardTest, ReadWriteCustomData)
+TEST_F(ClipboardTest, ReadWriteCustomData)
 {
 	using namespace std::string_literals;
 
@@ -86,7 +92,7 @@ TEST_F(SystemClipboardTest, ReadWriteCustomData)
 	EXPECT_EQ(*clipboardText, text);
 }
 
-TEST_F(SystemClipboardTest, Clear)
+TEST_F(ClipboardTest, Clear)
 {
 	std::wstring text = L"Clipboard text";
 	auto res = m_clipboard.WriteText(text);

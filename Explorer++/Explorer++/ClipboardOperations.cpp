@@ -7,8 +7,9 @@
 #include "CommandLine.h"
 #include "DirectoryOperationsHelper.h"
 #include "PasteSymLinksServer.h"
+#include "../Helper/Clipboard.h"
+#include "../Helper/ClipboardStore.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/SystemClipboard.h"
 
 using namespace std::chrono_literals;
 
@@ -41,10 +42,10 @@ void CreateSymLink(const std::filesystem::path &sourceFilePath,
 	}
 }
 
-ClipboardOperations::PastedItems PasteLinksOfType(const std::wstring &destination,
-	LinkType linkType)
+ClipboardOperations::PastedItems PasteLinksOfType(ClipboardStore *clipboardStore,
+	const std::wstring &destination, LinkType linkType)
 {
-	SystemClipboard clipboard;
+	Clipboard clipboard(clipboardStore);
 	auto paths = clipboard.ReadHDropData();
 
 	if (!paths)
@@ -101,19 +102,19 @@ ClipboardOperations::PastedItems PasteSymLinksViaElevatedProcess(const std::wstr
 namespace ClipboardOperations
 {
 
-bool CanPasteLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
+bool CanPasteLinkInDirectory(const ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl)
 {
-	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
+	return clipboardStore->IsDataAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
 }
 
-PastedItems PasteHardLinks(const std::wstring &destination)
+PastedItems PasteHardLinks(ClipboardStore *clipboardStore, const std::wstring &destination)
 {
-	return PasteLinksOfType(destination, LinkType::HardLink);
+	return PasteLinksOfType(clipboardStore, destination, LinkType::HardLink);
 }
 
-PastedItems PasteSymLinks(const std::wstring &destination)
+PastedItems PasteSymLinks(ClipboardStore *clipboardStore, const std::wstring &destination)
 {
-	auto pastedItems = PasteLinksOfType(destination, LinkType::SymLink);
+	auto pastedItems = PasteLinksOfType(clipboardStore, destination, LinkType::SymLink);
 
 	auto itr = std::find_if(pastedItems.begin(), pastedItems.end(),
 		[](const auto &pastedItem)

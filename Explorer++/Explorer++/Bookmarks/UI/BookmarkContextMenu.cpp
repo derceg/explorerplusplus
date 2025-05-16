@@ -9,19 +9,21 @@
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
+#include "../Helper/ClipboardStore.h"
 #include <algorithm>
 #include <ranges>
 
 BookmarkContextMenu::BookmarkContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
 	const RawBookmarkItems &bookmarkItems, const ResourceLoader *resourceLoader,
-	BrowserWindow *browser, HWND parentWindow) :
+	BrowserWindow *browser, HWND parentWindow, ClipboardStore *clipboardStore) :
 	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItems(bookmarkItems),
 	m_resourceLoader(resourceLoader),
 	m_browser(browser),
-	m_parentWindow(parentWindow)
+	m_parentWindow(parentWindow),
+	m_clipboardStore(clipboardStore)
 {
 	BuildMenu();
 
@@ -92,7 +94,7 @@ void BookmarkContextMenu::BuildMenu()
 
 	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, !permanentNodeSelected);
 	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE,
-		IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
+		m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()));
 	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, !permanentNodeSelected);
 
 	if (m_bookmarkItems.size() == 1)
@@ -247,12 +249,13 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type,
 
 void BookmarkContextMenu::OnCopy(bool cut)
 {
-	BookmarkHelper::CopyBookmarkItems(m_bookmarkTree, m_bookmarkItems, cut);
+	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, m_bookmarkItems, cut);
 }
 
 void BookmarkContextMenu::OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex)
 {
-	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, targetParentFolder, targetIndex);
+	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, targetParentFolder,
+		targetIndex);
 }
 
 void BookmarkContextMenu::OnDelete()

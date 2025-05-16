@@ -109,7 +109,7 @@
     <ClCompile Include="BulkClipboardWriter.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
-    <ClCompile Include="SystemClipboard.cpp">
+    <ClCompile Include="Clipboard.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
     <ClCompile Include="DataExchangeHelper.cpp">
@@ -195,6 +195,9 @@
     </ClCompile>
     <ClCompile Include="ShellItemContextMenu.cpp">
       <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemClipboardStore.cpp">
+      <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -312,7 +315,7 @@
     <ClInclude Include="BulkClipboardWriter.h">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
-    <ClInclude Include="SystemClipboard.h">
+    <ClInclude Include="Clipboard.h">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
     <ClInclude Include="DataExchangeHelper.h">
@@ -444,7 +447,10 @@
     <ClInclude Include="ShellItemContextMenuDelegate.h">
       <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
-    <ClInclude Include="Clipboard.h">
+    <ClInclude Include="ClipboardStore.h">
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemClipboardStore.h">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
   </ItemGroup>

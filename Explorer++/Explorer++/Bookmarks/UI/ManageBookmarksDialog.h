@@ -17,6 +17,7 @@ class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreeView;
 class BrowserWindow;
+class ClipboardStore;
 struct Config;
 class IconFetcher;
 class ManageBookmarksDialog;
@@ -53,7 +54,7 @@ public:
 	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 		HWND hParent, BrowserWindow *browserWindow, const Config *config,
 		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree);
+		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
 	~ManageBookmarksDialog();
 
 protected:
@@ -124,8 +125,8 @@ private:
 	const Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	IconFetcher *const m_iconFetcher;
-
 	BookmarkTree *const m_bookmarkTree;
+	ClipboardStore *const m_clipboardStore;
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 

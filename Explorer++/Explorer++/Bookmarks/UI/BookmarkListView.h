@@ -18,6 +18,7 @@ class AcceleratorManager;
 class BookmarkIconManager;
 class BookmarkTree;
 class BrowserWindow;
+class ClipboardStore;
 struct Config;
 class IconFetcher;
 class ResourceLoader;
@@ -35,7 +36,7 @@ public:
 	BookmarkListView(HWND hListView, HINSTANCE resourceInstance, BookmarkTree *bookmarkTree,
 		BrowserWindow *browser, const Config *config, const AcceleratorManager *acceleratorManager,
 		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
-		const std::vector<Column> &initialColumns);
+		const std::vector<Column> &initialColumns, ClipboardStore *clipboardStore);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
 		const BookmarkHistoryEntry *entry = nullptr) override;
@@ -138,6 +139,7 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	std::vector<Column> m_columns;
+	ClipboardStore *const m_clipboardStore;
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 	BookmarkHelper::ColumnType m_sortColumn;

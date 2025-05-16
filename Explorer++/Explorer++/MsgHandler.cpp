@@ -41,7 +41,6 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/SystemClipboard.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
@@ -703,8 +702,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	/* Remove the trailing newline. */
 	strColumnInfo = strColumnInfo.substr(0, strColumnInfo.size() - 2);
 
-	SystemClipboard clipboard;
-	BulkClipboardWriter clipboardWriter(&clipboard);
+	BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
 	clipboardWriter.WriteText(strColumnInfo);
 }
 

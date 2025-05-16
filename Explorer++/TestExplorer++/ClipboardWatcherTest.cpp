@@ -7,7 +7,8 @@
 #include "ExecutorWrapper.h"
 #include "MessageLoop.h"
 #include "UIThreadExecutor.h"
-#include "../Helper/SystemClipboard.h"
+#include "../Helper/Clipboard.h"
+#include "../Helper/SystemClipboardStore.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -34,6 +35,7 @@ protected:
 		m_messageLoop.RunWithTimeout(5s, m_uiThreadExecutor.Get());
 	}
 
+	SystemClipboardStore m_clipboardStore;
 	MessageLoop m_messageLoop;
 	ExecutorWrapper<UIThreadExecutor> m_uiThreadExecutor;
 	MockFunction<void()> m_callback;
@@ -45,7 +47,7 @@ TEST_F(ClipboardWatcherTest, UpdateOnWrite)
 	EXPECT_CALL(m_callback, Call());
 
 	{
-		SystemClipboard clipboard;
+		Clipboard clipboard(&m_clipboardStore);
 		clipboard.WriteText(L"Text");
 	}
 
@@ -57,7 +59,7 @@ TEST_F(ClipboardWatcherTest, UpdateOnClear)
 	EXPECT_CALL(m_callback, Call());
 
 	{
-		SystemClipboard clipboard;
+		Clipboard clipboard(&m_clipboardStore);
 		clipboard.Clear();
 	}
 

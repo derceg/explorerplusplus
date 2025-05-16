@@ -7,6 +7,8 @@
 #include "ExitCode.h"
 #include <optional>
 
+class ClipboardStore;
+
 namespace CommandLine
 {
 
@@ -19,6 +21,7 @@ namespace StartupCommandLineProcessor
 
 // Processes command line options that are relevant during startup. For example, this will enable
 // logging if the appropriate option has been set.
-std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings);
+std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings,
+	ClipboardStore *clipboardStore);
 
 }

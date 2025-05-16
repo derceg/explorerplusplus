@@ -30,6 +30,7 @@
 #include "TabRestorer.h"
 #include "ThemeManager.h"
 #include "../Helper/ClipboardWatcher.h"
+#include "../Helper/SystemClipboardStore.h"
 #include "../Helper/SystemClockImpl.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -59,6 +60,7 @@ public:
 	bool GetSavePreferencesToXmlFile() const;
 	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
 	Runtime *GetRuntime();
+	ClipboardStore *GetClipboardStore();
 	ClipboardWatcher *GetClipboardWatcher();
 	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
@@ -114,6 +116,7 @@ private:
 	bool m_savePreferencesToXmlFile = false;
 	Runtime m_runtime;
 	EventWindow m_eventWindow;
+	SystemClipboardStore m_clipboardStore;
 	ClipboardWatcher m_clipboardWatcher;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;

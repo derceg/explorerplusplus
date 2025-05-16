@@ -640,7 +640,7 @@
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="BulkClipboardWriter.cpp" />
     <ClCompile Include="CachedIcons.cpp" />
-    <ClCompile Include="SystemClipboard.cpp" />
+    <ClCompile Include="Clipboard.cpp" />
     <ClCompile Include="ClipboardHelper.cpp" />
     <ClCompile Include="ClipboardWatcher.cpp" />
     <ClCompile Include="ComboBox.cpp" />
@@ -667,6 +667,7 @@
     <ClCompile Include="ShellContextMenuIdGenerator.cpp" />
     <ClCompile Include="ShellContextMenuIdRemapper.cpp" />
     <ClCompile Include="ShellItemContextMenu.cpp" />
+    <ClCompile Include="SystemClipboardStore.cpp" />
     <ClCompile Include="SystemClockImpl.cpp" />
     <ClCompile Include="UniqueResources.cpp" />
     <ClCompile Include="ShellContextMenu.cpp" />
@@ -735,8 +736,8 @@
     <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="BulkClipboardWriter.h" />
     <ClInclude Include="CachedIcons.h" />
+    <ClInclude Include="ClipboardStore.h" />
     <ClInclude Include="Clipboard.h" />
-    <ClInclude Include="SystemClipboard.h" />
     <ClInclude Include="ClipboardHelper.h" />
     <ClInclude Include="ClipboardWatcher.h" />
     <ClInclude Include="ComboBox.h" />
@@ -769,6 +770,7 @@
     <ClInclude Include="ShellItemContextMenuDelegate.h" />
     <ClInclude Include="SignalHelper.h" />
     <ClInclude Include="SignalWrapper.h" />
+    <ClInclude Include="SystemClipboardStore.h" />
     <ClInclude Include="SystemClock.h" />
     <ClInclude Include="SystemClockImpl.h" />
     <ClInclude Include="UniqueResources.h" />

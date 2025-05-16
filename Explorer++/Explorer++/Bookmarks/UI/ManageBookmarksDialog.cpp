@@ -25,14 +25,15 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree) :
+	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore) :
 	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_config(config),
 	m_acceleratorManager(acceleratorManager),
 	m_iconFetcher(iconFetcher),
-	m_bookmarkTree(bookmarkTree)
+	m_bookmarkTree(bookmarkTree),
+	m_clipboardStore(clipboardStore)
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 
@@ -192,7 +193,7 @@ void ManageBookmarksDialog::SetupListView()
 
 	m_bookmarkListView = new BookmarkListView(hListView, m_resourceInstance, m_bookmarkTree,
 		m_browserWindow, m_config, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
-		m_persistentSettings->m_listViewColumns);
+		m_persistentSettings->m_listViewColumns, m_clipboardStore);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
@@ -663,7 +664,7 @@ void ManageBookmarksDialog::OnCopy(bool cut)
 		return;
 	}
 
-	BookmarkHelper::CopyBookmarkItems(m_bookmarkTree, selectedItems, cut);
+	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, selectedItems, cut);
 }
 
 void ManageBookmarksDialog::OnPaste()
@@ -689,7 +690,8 @@ void ManageBookmarksDialog::OnPaste()
 		targetIndex = m_currentBookmarkFolder->GetChildren().size();
 	}
 
-	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_currentBookmarkFolder, targetIndex);
+	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, m_currentBookmarkFolder,
+		targetIndex);
 }
 
 void ManageBookmarksDialog::OnDelete()

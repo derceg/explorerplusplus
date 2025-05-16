@@ -12,7 +12,6 @@
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "../Helper/BulkClipboardWriter.h"
-#include "../Helper/SystemClipboard.h"
 
 void Explorerplusplus::CreateFolderControls()
 {
@@ -49,8 +48,7 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 	DWORD dwRet = WNetGetUniversalName(fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
 		(void **) &uni, &dwBufferSize);
 
-	SystemClipboard clipboard;
-	BulkClipboardWriter clipboardWriter(&clipboard);
+	BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
 
 	if (dwRet == NO_ERROR)
 	{

@@ -29,7 +29,8 @@
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	BookmarkTree *bookmarkTree, BrowserWindow *browser, const Config *config,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
+	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns,
+	ClipboardStore *clipboardStore) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceInstance(resourceInstance),
@@ -39,6 +40,7 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_columns(initialColumns),
+	m_clipboardStore(clipboardStore),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true)
 {
@@ -532,7 +534,7 @@ void BookmarkListView::OnShowContextMenu(const POINT &ptScreen)
 
 		PopupMenuView popupMenu;
 		BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-			rawBookmarkItems, m_resourceLoader, m_browser, m_hListView);
+			rawBookmarkItems, m_resourceLoader, m_browser, m_hListView, m_clipboardStore);
 		popupMenu.Show(m_hListView, finalPoint);
 	}
 }

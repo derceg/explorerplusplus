@@ -42,7 +42,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/SystemClipboard.h"
 #include "../Helper/WindowHelper.h"
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;
@@ -316,8 +315,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case IDM_FILE_COPYFOLDERPATH:
 	{
-		SystemClipboard clipboard;
-		BulkClipboardWriter clipboardWriter(&clipboard);
+		BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
 		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectoryPath());
 	}
 	break;
@@ -1227,7 +1225,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 			{
 				return new ManageBookmarksDialog(m_app->GetResourceLoader(),
 					m_app->GetResourceInstance(), hwnd, this, m_config,
-					m_app->GetAcceleratorManager(), &m_iconFetcher, m_app->GetBookmarkTree());
+					m_app->GetAcceleratorManager(), &m_iconFetcher, m_app->GetBookmarkTree(),
+					m_app->GetClipboardStore());
 			});
 		break;
 

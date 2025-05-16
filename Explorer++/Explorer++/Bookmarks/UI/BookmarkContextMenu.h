@@ -12,6 +12,7 @@
 
 class BookmarkTree;
 class BrowserWindow;
+class ClipboardStore;
 class ResourceLoader;
 
 // Displays a context menu for one or more bookmarks. If multiple bookmarks are provided, they
@@ -21,7 +22,8 @@ class BookmarkContextMenu : public MenuBase
 public:
 	BookmarkContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems,
-		const ResourceLoader *resourceLoader, BrowserWindow *browserWindow, HWND parentWindow);
+		const ResourceLoader *resourceLoader, BrowserWindow *browser, HWND parentWindow,
+		ClipboardStore *clipboardStore);
 
 private:
 	void BuildMenu();
@@ -44,5 +46,6 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	BrowserWindow *const m_browser;
 	const HWND m_parentWindow;
+	ClipboardStore *const m_clipboardStore;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

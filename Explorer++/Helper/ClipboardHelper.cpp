@@ -70,7 +70,8 @@ bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObj
 	return true;
 }
 
-void CopyItemPathsToClipboard(Clipboard *clipboard, const std::vector<PidlAbsolute> &items)
+void CopyItemPathsToClipboard(ClipboardStore *clipboardStore,
+	const std::vector<PidlAbsolute> &items)
 {
 	std::vector<std::wstring> paths;
 
@@ -92,6 +93,6 @@ void CopyItemPathsToClipboard(Clipboard *clipboard, const std::vector<PidlAbsolu
 		return;
 	}
 
-	BulkClipboardWriter clipboardWriter(clipboard);
+	BulkClipboardWriter clipboardWriter(clipboardStore);
 	clipboardWriter.WriteText(boost::algorithm::join(paths, L"\r\n"));
 }

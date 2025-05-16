@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkItem.h"
+#include "SimulatedClipboardStore.h"
 #include <gtest/gtest.h>
 
 TEST(BookmarkClipboardTest, BookmarkReadWrite)
@@ -28,7 +29,8 @@ TEST(BookmarkClipboardTest, BookmarkReadWrite)
 		ownedBookmarkItems.push_back(bookmarkItem);
 	}
 
-	BookmarkClipboard bookmarkClipboard;
+	SimulatedClipboardStore clipboardStore;
+	BookmarkClipboard bookmarkClipboard(&clipboardStore);
 	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
 
 	ASSERT_TRUE(res);

@@ -15,6 +15,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
+#include "SimulatedClipboardStore.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
 
@@ -66,8 +67,9 @@ protected:
 		m_bookmarkTree(CreateBookmarkTree()),
 		m_browser(AddBrowser()),
 		m_bookmarksToolbarView(BookmarksToolbarView::Create(m_browser->GetHWND(), &m_config)),
-		m_bookmarksToolbar(BookmarksToolbar::Create(m_bookmarksToolbarView, m_browser,
-			&m_acceleratorManager, &m_resourceLoader, &m_iconFetcher, m_bookmarkTree.get()))
+		m_bookmarksToolbar(
+			BookmarksToolbar::Create(m_bookmarksToolbarView, m_browser, &m_acceleratorManager,
+				&m_resourceLoader, &m_iconFetcher, m_bookmarkTree.get(), &m_clipboardStore))
 	{
 	}
 
@@ -110,6 +112,7 @@ protected:
 	AcceleratorManager m_acceleratorManager;
 	ResourceLoaderFake m_resourceLoader;
 	IconFetcherFake m_iconFetcher;
+	SimulatedClipboardStore m_clipboardStore;
 
 	std::unique_ptr<BookmarkTree> m_bookmarkTree;
 

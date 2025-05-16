@@ -34,7 +34,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/SystemClipboard.h"
 #include <wil/com.h>
 #include <list>
 
@@ -1120,13 +1119,15 @@ void ShellBrowserImpl::PasteShortcut()
 
 void ShellBrowserImpl::PasteHardLinks()
 {
-	auto pastedItems = ClipboardOperations::PasteHardLinks(GetDirectoryPath());
+	auto pastedItems =
+		ClipboardOperations::PasteHardLinks(m_app->GetClipboardStore(), GetDirectoryPath());
 	OnInternalPaste(pastedItems);
 }
 
 void ShellBrowserImpl::PasteSymLinks()
 {
-	auto pastedItems = ClipboardOperations::PasteSymLinks(GetDirectoryPath());
+	auto pastedItems =
+		ClipboardOperations::PasteSymLinks(m_app->GetClipboardStore(), GetDirectoryPath());
 	OnInternalPaste(pastedItems);
 }
 
@@ -1236,9 +1237,8 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 
 void ShellBrowserImpl::CopySelectedItemPaths() const
 {
-	SystemClipboard clipboard;
 	auto selectedItems = GetSelectedItemPidls();
-	CopyItemPathsToClipboard(&clipboard, selectedItems);
+	CopyItemPathsToClipboard(m_app->GetClipboardStore(), selectedItems);
 }
 
 bool ShellBrowserImpl::CanCreateNewFolder() const

@@ -27,7 +27,6 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/SystemClipboard.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
 
@@ -235,8 +234,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 	strUniversalPaths = strUniversalPaths.substr(0, strUniversalPaths.size() - 2);
 
-	SystemClipboard clipboard;
-	BulkClipboardWriter clipboardWriter(&clipboard);
+	BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
 	clipboardWriter.WriteText(strUniversalPaths);
 }
 

@@ -7,9 +7,13 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkItem.h"
 
+class ClipboardStore;
+
 class BookmarkClipboard
 {
 public:
+	BookmarkClipboard(ClipboardStore *clipboardStore);
+
 	BookmarkItems ReadBookmarks();
 	bool WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems);
 
@@ -17,4 +21,6 @@ public:
 
 private:
 	static inline const wchar_t CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmarks";
+
+	ClipboardStore *const m_clipboardStore;
 };

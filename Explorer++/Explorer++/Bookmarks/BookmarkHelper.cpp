@@ -310,7 +310,7 @@ void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
 
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part
 // of the specified bookmark tree.
-bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree,
+bool BookmarkHelper::CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
 	const RawBookmarkItems &bookmarkItems, bool cut)
 {
 	OwnedRefBookmarkItems ownedBookmarkItems;
@@ -321,7 +321,7 @@ bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree,
 		ownedBookmarkItems.push_back(ownedPtr);
 	}
 
-	BookmarkClipboard bookmarkClipboard;
+	BookmarkClipboard bookmarkClipboard(clipboardStore);
 	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
 
 	if (cut && res)
@@ -339,12 +339,12 @@ bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree,
 }
 
 // Note that the parent folder must be a part of the specified bookmark tree.
-void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder,
-	size_t index)
+void BookmarkHelper::PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentFolder, size_t index)
 {
 	DCHECK(parentFolder->IsFolder());
 
-	BookmarkClipboard bookmarkClipboard;
+	BookmarkClipboard bookmarkClipboard(clipboardStore);
 	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
 	int i = 0;
 

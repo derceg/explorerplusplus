@@ -4,19 +4,19 @@
 
 #include "stdafx.h"
 #include "BulkClipboardWriter.h"
-#include "Clipboard.h"
 
-BulkClipboardWriter::BulkClipboardWriter(Clipboard *clipboard) : m_clipboard(clipboard)
+BulkClipboardWriter::BulkClipboardWriter(ClipboardStore *clipboardStore) :
+	m_clipboard(clipboardStore)
 {
-	m_clipboard->Clear();
+	m_clipboard.Clear();
 }
 
-bool BulkClipboardWriter::WriteText(const std::wstring &str)
+bool BulkClipboardWriter::WriteText(const std::wstring &text)
 {
-	return m_clipboard->WriteText(str);
+	return m_clipboard.WriteText(text);
 }
 
 bool BulkClipboardWriter::WriteCustomData(UINT format, const std::string &data)
 {
-	return m_clipboard->WriteCustomData(format, data);
+	return m_clipboard.WriteCustomData(format, data);
 }

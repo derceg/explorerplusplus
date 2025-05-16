@@ -4,19 +4,35 @@
 
 #pragma once
 
+#include <gdiplus.h>
+#include <memory>
 #include <optional>
 #include <string>
+#include <vector>
+
+class ClipboardStore;
 
 class Clipboard
 {
 public:
-	virtual ~Clipboard() = default;
+	Clipboard(ClipboardStore *store);
+	~Clipboard();
 
-	virtual std::optional<std::wstring> ReadText() = 0;
-	virtual std::optional<std::string> ReadCustomData(UINT format) = 0;
+	std::optional<std::wstring> ReadText();
+	std::optional<std::vector<std::wstring>> ReadHDropData();
+	std::unique_ptr<Gdiplus::Bitmap> ReadPng();
+	std::unique_ptr<Gdiplus::Bitmap> ReadDIB();
+	std::optional<std::string> ReadCustomData(UINT format);
 
-	virtual bool WriteText(const std::wstring &text) = 0;
-	virtual bool WriteCustomData(UINT format, const std::string &data) = 0;
+	bool WriteText(const std::wstring &text);
+	bool WriteHDropData(const std::vector<std::wstring> &paths);
+	bool WritePng(Gdiplus::Bitmap *bitmap);
+	bool WriteDIB(Gdiplus::Bitmap *bitmap);
+	bool WriteCustomData(UINT format, const std::string &data);
 
-	virtual bool Clear() = 0;
+	bool Clear();
+
+private:
+	ClipboardStore *const m_store;
+	bool m_clipboardOpened = false;
 };

@@ -205,8 +205,9 @@
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
     <ClCompile Include="ClipboardHelperTest.cpp" />
-    <ClCompile Include="SimulatedClipboard.cpp" />
-    <ClCompile Include="SystemClipboardTest.cpp" />
+    <ClCompile Include="SimulatedClipboardStore.cpp" />
+    <ClCompile Include="SimulatedClipboardStoreTest.cpp" />
+    <ClCompile Include="ClipboardTest.cpp" />
     <ClCompile Include="ClipboardWatcherTest.cpp" />
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
     <ClCompile Include="ColorRulesStorageTestHelper.cpp" />
@@ -231,7 +232,6 @@
     <ClCompile Include="ShellContextMenuDelegateFake.cpp" />
     <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp" />
     <ClCompile Include="ShellContextMenuIdRemapperTest.cpp" />
-    <ClCompile Include="SimulatedClipboardTest.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
@@ -416,7 +416,7 @@
     <ClInclude Include="ShellEnumeratorFake.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />
-    <ClInclude Include="SimulatedClipboard.h" />
+    <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />
     <ClInclude Include="TestResources.h" />

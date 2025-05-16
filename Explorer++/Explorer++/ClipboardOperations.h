@@ -9,6 +9,8 @@
 #include <system_error>
 #include <vector>
 
+class ClipboardStore;
+
 namespace ClipboardOperations
 {
 
@@ -46,7 +48,7 @@ struct PastedItem
 
 using PastedItems = std::vector<PastedItem>;
 
-bool CanPasteLinkInDirectory(PCIDLIST_ABSOLUTE pidl);
+bool CanPasteLinkInDirectory(const ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl);
 
 // There are two types of paste operations used within the application:
 //
@@ -55,7 +57,7 @@ bool CanPasteLinkInDirectory(PCIDLIST_ABSOLUTE pidl);
 // 2. A paste that is really just a file operation that's performed internally.
 //
 // These functions allow for the second type of paste operation to be performed.
-PastedItems PasteHardLinks(const std::wstring &destination);
-PastedItems PasteSymLinks(const std::wstring &destination);
+PastedItems PasteHardLinks(ClipboardStore *clipboardStore, const std::wstring &destination);
+PastedItems PasteSymLinks(ClipboardStore *clipboardStore, const std::wstring &destination);
 
 }

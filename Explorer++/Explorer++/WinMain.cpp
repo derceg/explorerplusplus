@@ -7,6 +7,7 @@
 #include "CommandLine.h"
 #include "CrashHandlerHelper.h"
 #include "StartupCommandLineProcessor.h"
+#include "../Helper/SystemClipboardStore.h"
 #include <boost/locale.hpp>
 #include <wil/result.h>
 #include <cstdlib>
@@ -50,7 +51,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	const auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
 
-	auto exitCode = StartupCommandLineProcessor::Process(&commandLineSettings);
+	auto clipboardStore = std::make_unique<SystemClipboardStore>();
+	auto exitCode =
+		StartupCommandLineProcessor::Process(&commandLineSettings, clipboardStore.get());
+	clipboardStore.reset();
 
 	if (exitCode)
 	{

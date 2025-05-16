@@ -71,7 +71,7 @@
     <ClCompile Include="RegistrySettingsTest.cpp">
       <Filter>Helper\Settings</Filter>
     </ClCompile>
-    <ClCompile Include="SystemClipboardTest.cpp">
+    <ClCompile Include="ClipboardTest.cpp">
       <Filter>Helper\Data Exchange\Clipboard</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
@@ -461,11 +461,11 @@
     <ClCompile Include="ShellContextMenuDelegateFake.cpp">
       <Filter>Helper\Shell\Shell Integration</Filter>
     </ClCompile>
-    <ClCompile Include="SimulatedClipboardTest.cpp" />
-    <ClCompile Include="SimulatedClipboard.cpp" />
     <ClCompile Include="ClipboardHelperTest.cpp">
       <Filter>Helper\Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="SimulatedClipboardStoreTest.cpp" />
+    <ClCompile Include="SimulatedClipboardStore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -761,7 +761,7 @@
     <ClInclude Include="ShellContextMenuDelegateFake.h">
       <Filter>Helper\Shell\Shell Integration</Filter>
     </ClInclude>
-    <ClInclude Include="SimulatedClipboard.h" />
+    <ClInclude Include="SimulatedClipboardStore.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

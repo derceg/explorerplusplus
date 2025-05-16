@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "ClipboardOperations.h"
 #include "DirectoryOperationsHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -51,7 +52,7 @@ BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 bool Explorerplusplus::CanPasteLink() const
 {
 	const auto *activeShellBrowser = GetActiveShellBrowserImpl();
-	return ClipboardOperations::CanPasteLinkInDirectory(
+	return ClipboardOperations::CanPasteLinkInDirectory(m_app->GetClipboardStore(),
 		activeShellBrowser->GetDirectoryIdl().get());
 }
 

@@ -34,7 +34,8 @@ ReplaceExplorerResults UpdateReplaceExplorerSetting(
 namespace StartupCommandLineProcessor
 {
 
-std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings)
+std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings,
+	ClipboardStore *clipboardStore)
 {
 	if (commandLineSettings->crashedData)
 	{
@@ -44,8 +45,8 @@ std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings
 
 	if (commandLineSettings->pasteSymLinksDestination)
 	{
-		auto pastedItems =
-			ClipboardOperations::PasteSymLinks(*commandLineSettings->pasteSymLinksDestination);
+		auto pastedItems = ClipboardOperations::PasteSymLinks(clipboardStore,
+			*commandLineSettings->pasteSymLinksDestination);
 
 		PasteSymLinksClient client;
 		client.NotifyServerOfResult(pastedItems);

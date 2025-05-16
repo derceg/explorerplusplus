@@ -42,7 +42,6 @@
 #include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ShellItemContextMenu.h"
-#include "../Helper/SystemClipboard.h"
 #include <wil/common.h>
 #include <propkey.h>
 
@@ -1572,9 +1571,8 @@ void ShellTreeView::ExecuteCommand(int command)
 
 void ShellTreeView::CopySelectedItemPath() const
 {
-	SystemClipboard clipboard;
 	auto pidl = GetSelectedNodePidl();
-	CopyItemPathsToClipboard(&clipboard, { pidl.get() });
+	CopyItemPathsToClipboard(m_app->GetClipboardStore(), { pidl.get() });
 }
 
 void ShellTreeView::CopySelectedItemToFolder(TransferAction action)
