@@ -909,6 +909,10 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		}
 		break;
 
+	case VK_RETURN:
+		OpenSelectedItems();
+		break;
+
 	case VK_BACK:
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
@@ -1019,6 +1023,18 @@ void ShellBrowserImpl::ShowPropertiesForSelectedItems() const
 
 	auto pidlDirectory = GetDirectoryIdl();
 	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls, m_hOwner);
+}
+
+void ShellBrowserImpl::OpenSelectedItems()
+{
+	auto selectedItems = GetSelectedItemPidls();
+	auto disposition = selectedItems.size() == 1 ? OpenFolderDisposition::CurrentTab
+												 : OpenFolderDisposition::NewTabDefault;
+
+	for (const auto &selectedItem : selectedItems)
+	{
+		m_browser->OpenItem(selectedItem.Raw(), disposition);
+	}
 }
 
 void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)

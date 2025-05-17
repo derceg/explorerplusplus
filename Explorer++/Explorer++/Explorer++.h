@@ -346,12 +346,6 @@ private:
 	void OnTreeViewHolderResized(int newWidth);
 	void ToggleDualPane();
 
-	/* File operations. */
-	void OpenAllSelectedItems(
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-	void OpenListViewItem(int index,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-
 	// Navigator
 	using Navigator::OpenDefaultItem;
 	using Navigator::OpenItem;

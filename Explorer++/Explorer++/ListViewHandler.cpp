@@ -125,18 +125,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 	switch (keyDown->wVKey)
 	{
-	case VK_RETURN:
-		if (IsKeyDown(VK_MENU))
-		{
-			m_pActiveShellBrowser->ShowPropertiesForSelectedItems();
-		}
-		else
-		{
-			OpenAllSelectedItems(
-				DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
-		}
-		break;
-
 	case 'V':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
@@ -277,38 +265,4 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 	}
 
 	return nSimilar;
-}
-
-void Explorerplusplus::OpenAllSelectedItems(OpenFolderDisposition openFolderDisposition)
-{
-	BOOL bSeenDirectory = FALSE;
-	DWORD dwAttributes;
-	int iItem = -1;
-	int iFolderItem = -1;
-
-	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVIS_SELECTED)) != -1)
-	{
-		dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(iItem).dwFileAttributes;
-
-		if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-		{
-			bSeenDirectory = TRUE;
-			iFolderItem = iItem;
-		}
-		else
-		{
-			OpenListViewItem(iItem);
-		}
-	}
-
-	if (bSeenDirectory)
-	{
-		OpenListViewItem(iFolderItem, openFolderDisposition);
-	}
-}
-
-void Explorerplusplus::OpenListViewItem(int index, OpenFolderDisposition openFolderDisposition)
-{
-	auto pidlComplete = m_pActiveShellBrowser->GetItemCompleteIdl(index);
-	OpenItem(pidlComplete.get(), openFolderDisposition);
 }

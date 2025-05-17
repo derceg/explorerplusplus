@@ -132,8 +132,6 @@ public:
 	std::wstring GetItemDisplayName(int index) const;
 	std::wstring GetItemFullName(int index) const;
 
-	void ShowPropertiesForSelectedItems() const;
-
 	/* Column support. */
 	std::vector<Column_t> GetCurrentColumns();
 	void SetCurrentColumns(const std::vector<Column_t> &columns);
@@ -461,6 +459,8 @@ private:
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
 
 	void CopySelectedItemPaths() const;
+	void ShowPropertiesForSelectedItems() const;
+	void OpenSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 	void StartRenamingSelectedItems();
 	void StartRenamingSingleItem(const PidlAbsolute &item);
