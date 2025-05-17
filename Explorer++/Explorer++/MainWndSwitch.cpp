@@ -1061,7 +1061,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case MainToolbarButton::Refresh:
 	case IDM_VIEW_REFRESH:
 	case IDM_BACKGROUND_CONTEXT_MENU_REFRESH:
-		OnRefresh();
+		m_commandController.ExecuteCommand(IDM_VIEW_REFRESH);
 		break;
 
 	case IDM_SORTBY_MORE:

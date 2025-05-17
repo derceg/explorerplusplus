@@ -146,6 +146,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		m_browser->StartMainToolbarCustomization();
 		break;
 
+	case IDM_VIEW_REFRESH:
+		GetActiveShellBrowser()->GetNavigationController()->Refresh();
+		break;
+
 	case IDM_ACTIONS_NEWFOLDER:
 		GetActiveShellBrowser()->CreateNewFolder();
 		break;

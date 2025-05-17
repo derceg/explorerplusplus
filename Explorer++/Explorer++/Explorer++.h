@@ -247,7 +247,6 @@ private:
 	void OnSortDirectionSelected(SortDirection direction);
 	void OnGroupSortDirectionSelected(SortDirection direction);
 	void OnShowHiddenFiles();
-	void OnRefresh();
 	void OnSelectColumns();
 	void OnDestroyFiles();
 	void OnSearch();

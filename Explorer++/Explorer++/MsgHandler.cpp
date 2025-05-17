@@ -614,7 +614,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 	case APPCOMMAND_BROWSER_REFRESH:
 		SendMessage(m_hContainer, WM_CANCELMODE, 0, 0);
-		OnRefresh();
+		m_commandController.ExecuteCommand(IDM_VIEW_REFRESH);
 		break;
 
 	case APPCOMMAND_BROWSER_SEARCH:
@@ -652,12 +652,6 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 	case APPCOMMAND_REDO:
 		break;
 	}
-}
-
-void Explorerplusplus::OnRefresh()
-{
-	Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard()

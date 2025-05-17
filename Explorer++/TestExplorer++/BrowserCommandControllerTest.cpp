@@ -28,11 +28,13 @@ protected:
 		m_browser->ActivateTabAtIndex(0);
 	}
 
-	void NavigateTab(Tab *tab, const std::wstring &path)
+	void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr)
 	{
 		auto pidl = CreateSimplePidlForTest(path);
 		auto navigateParams = NavigateParams::Normal(pidl.Raw());
 		tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+
+		wil::assign_to_opt_param(outputPidl, pidl);
 	}
 
 	Config m_config;
@@ -54,6 +56,25 @@ TEST_F(BrowserCommandControllerTest, CopyFolderPath)
 	auto clipboardText = clipboard.ReadText();
 	ASSERT_TRUE(clipboardText.has_value());
 	EXPECT_THAT(*clipboardText, StrCaseEq(path));
+}
+
+TEST_F(BrowserCommandControllerTest, Refresh)
+{
+	PidlAbsolute pidl;
+	NavigateTab(m_tab, L"C:\\Fake", &pidl);
+
+	auto *navigationController = m_tab->GetShellBrowser()->GetNavigationController();
+
+	int originalEntryId = navigationController->GetCurrentEntry()->GetId();
+
+	m_commandController.ExecuteCommand(IDM_VIEW_REFRESH);
+
+	// Refreshing should result in the current entry being replaced, but shouldn't add any entries.
+	ASSERT_EQ(navigationController->GetNumHistoryEntries(), 1);
+
+	auto *updatedEntry = navigationController->GetCurrentEntry();
+	EXPECT_NE(updatedEntry->GetId(), originalEntryId);
+	EXPECT_EQ(updatedEntry->GetPidl(), pidl);
 }
 
 TEST_F(BrowserCommandControllerTest, Back)
