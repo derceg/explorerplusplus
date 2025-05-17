@@ -155,52 +155,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnListViewClick(const NMITEMACTIVATE *eventInfo)
-{
-	if (!m_config->globalFolderSettings.oneClickActivate.get())
-	{
-		return;
-	}
-
-	LVHITTESTINFO htInfo = {};
-	htInfo.pt = eventInfo->ptAction;
-	ListView_HitTest(m_hActiveListView, &htInfo);
-
-	if (WI_IsFlagSet(htInfo.flags, LVHT_ONITEMSTATEICON) && m_config->checkBoxSelection.get())
-	{
-		// In this case, the click was on the checkbox, so it should be ignored.
-		return;
-	}
-
-	OnListViewDoubleClick(eventInfo);
-}
-
-void Explorerplusplus::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
-{
-	// Note that while it's stated in the documentation for both NM_CLICK and NM_DBLCLK that "The
-	// iItem member of lParam is only valid if the icon or first-column label has been clicked.", it
-	// appears that's not actually the case. From testing, iItem will be correctly populated even
-	// when the click/double-click takes place elsewhere in a row. Therefore, it should be ok to use
-	// that value in this function.
-	if (eventInfo->iItem == -1)
-	{
-		return;
-	}
-
-	if (WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_ALT))
-	{
-		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-		auto pidl = m_pActiveShellBrowser->GetItemChildIdl(eventInfo->iItem);
-		ShowMultipleFileProperties(pidlDirectory.get(), { pidl.get() }, m_hContainer);
-	}
-	else
-	{
-		OpenListViewItem(eventInfo->iItem,
-			DetermineOpenDisposition(false, WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_CONTROL),
-				WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_SHIFT)));
-	}
-}
-
 void Explorerplusplus::OnListViewCopyUniversalPaths() const
 {
 	if (ListView_GetSelectedCount(m_hActiveListView) == 0)

@@ -168,6 +168,14 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
+			case NM_CLICK:
+				OnListViewClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
+				break;
+
+			case NM_DBLCLK:
+				OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
+				break;
+
 			case LVN_BEGINDRAG:
 				OnListViewBeginDrag(reinterpret_cast<NMLISTVIEW *>(lParam));
 				break;
@@ -233,6 +241,53 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void ShellBrowserImpl::OnListViewClick(const NMITEMACTIVATE *eventInfo)
+{
+	if (!m_config->globalFolderSettings.oneClickActivate.get())
+	{
+		return;
+	}
+
+	LVHITTESTINFO htInfo = {};
+	htInfo.pt = eventInfo->ptAction;
+	ListView_HitTest(m_hListView, &htInfo);
+
+	if (WI_IsFlagSet(htInfo.flags, LVHT_ONITEMSTATEICON) && m_config->checkBoxSelection.get())
+	{
+		// In this case, the click was on the checkbox, so it should be ignored.
+		return;
+	}
+
+	OnListViewDoubleClick(eventInfo);
+}
+
+void ShellBrowserImpl::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
+{
+	// Note that while it's stated in the documentation for both NM_CLICK and NM_DBLCLK that "The
+	// iItem member of lParam is only valid if the icon or first-column label has been clicked.", it
+	// appears that's not actually the case. From testing, iItem will be correctly populated even
+	// when the click/double-click takes place elsewhere in a row. Therefore, it should be ok to use
+	// that value in this function.
+	if (eventInfo->iItem == -1)
+	{
+		return;
+	}
+
+	const auto &item = GetItemByIndex(eventInfo->iItem);
+
+	if (WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_ALT))
+	{
+		ShowMultipleFileProperties(m_directoryState.pidlDirectory.Raw(), { item.pridl.Raw() },
+			m_hOwner);
+	}
+	else
+	{
+		m_browser->OpenItem(item.pidlComplete.Raw(),
+			DetermineOpenDisposition(false, WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_CONTROL),
+				WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_SHIFT)));
+	}
 }
 
 bool ShellBrowserImpl::OnListViewLeftButtonDoubleClick(const POINT *pt)

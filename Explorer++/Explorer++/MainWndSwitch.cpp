@@ -1377,20 +1377,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 	switch (nmhdr->code)
 	{
-	case NM_CLICK:
-		if (nmhdr->hwndFrom == m_hActiveListView)
-		{
-			OnListViewClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
-		}
-		break;
-
-	case NM_DBLCLK:
-		if (nmhdr->hwndFrom == m_hActiveListView)
-		{
-			OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
-		}
-		break;
-
 	case LVN_KEYDOWN:
 		return OnListViewKeyDown(lParam);
 
