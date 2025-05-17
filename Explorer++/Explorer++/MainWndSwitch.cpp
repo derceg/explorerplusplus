@@ -38,7 +38,6 @@
 #include "TabRestorer.h"
 #include "TabRestorerMenu.h"
 #include "ViewsMenuBuilder.h"
-#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
@@ -314,12 +313,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:
-	{
-		BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
-		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectoryPath());
-	}
-	break;
-
 	case IDM_FILE_COPYITEMPATH:
 		m_commandController.ExecuteCommand(id);
 		break;

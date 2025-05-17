@@ -11,6 +11,8 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
+#include "SimulatedClipboardStore.h"
+#include "../Helper/Clipboard.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -21,7 +23,7 @@ protected:
 	BrowserCommandControllerTest() :
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab()),
-		m_commandController(m_browser, &m_config)
+		m_commandController(m_browser, &m_config, &m_clipboardStore)
 	{
 		m_browser->ActivateTabAtIndex(0);
 	}
@@ -34,11 +36,25 @@ protected:
 	}
 
 	Config m_config;
+	SimulatedClipboardStore m_clipboardStore;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
 	BrowserCommandController m_commandController;
 };
+
+TEST_F(BrowserCommandControllerTest, CopyFolderPath)
+{
+	std::wstring path = L"C:\\Fake";
+	NavigateTab(m_tab, path);
+
+	m_commandController.ExecuteCommand(IDM_FILE_COPYFOLDERPATH);
+
+	Clipboard clipboard(&m_clipboardStore);
+	auto clipboardText = clipboard.ReadText();
+	ASSERT_TRUE(clipboardText.has_value());
+	EXPECT_THAT(*clipboardText, StrCaseEq(path));
+}
 
 TEST_F(BrowserCommandControllerTest, Back)
 {

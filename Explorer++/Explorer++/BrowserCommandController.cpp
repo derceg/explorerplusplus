@@ -9,12 +9,15 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "../Helper/BulkClipboardWriter.h"
 
 using namespace std::string_literals;
 
-BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Config *config) :
+BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Config *config,
+	ClipboardStore *clipboardStore) :
 	m_browser(browser),
-	m_config(config)
+	m_config(config),
+	m_clipboardStore(clipboardStore)
 {
 }
 
@@ -97,6 +100,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
 		StartCommandPrompt(LaunchProcessFlags::Elevated);
+		break;
+
+	case IDM_FILE_COPYFOLDERPATH:
+		CopyFolderPath();
 		break;
 
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
@@ -263,6 +270,23 @@ void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 	LaunchProcess(nullptr, fullPath.c_str(), parameters, directoryPath.get(), flags);
 }
 
+void BrowserCommandController::CopyFolderPath() const
+{
+	const auto *shellBrowser = GetActiveShellBrowser();
+
+	wil::unique_cotaskmem_string path;
+	HRESULT hr = SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(),
+		SIGDN_DESKTOPABSOLUTEPARSING, &path);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	BulkClipboardWriter clipboardWriter(m_clipboardStore);
+	clipboardWriter.WriteText(path.get());
+}
+
 void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
 {
 	auto *shellBrowser = GetActiveShellBrowser();
@@ -350,7 +374,12 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	m_browser->OpenItem(pidl.get(), disposition);
 }
 
-ShellBrowser *BrowserCommandController::GetActiveShellBrowser() const
+ShellBrowser *BrowserCommandController::GetActiveShellBrowser()
+{
+	return m_browser->GetActiveShellBrowser();
+}
+
+const ShellBrowser *BrowserCommandController::GetActiveShellBrowser() const
 {
 	return m_browser->GetActiveShellBrowser();
 }
