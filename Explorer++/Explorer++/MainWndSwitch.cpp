@@ -465,53 +465,16 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_EXTRALARGEICONS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::ExtraLargeIcons);
-		break;
-
 	case IDM_VIEW_LARGEICONS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::LargeIcons);
-		break;
-
 	case IDM_VIEW_ICONS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::Icons);
-		break;
-
 	case IDM_VIEW_SMALLICONS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::SmallIcons);
-		break;
-
 	case IDM_VIEW_LIST:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::List);
-		break;
-
 	case IDM_VIEW_DETAILS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::Details);
-		break;
-
 	case IDM_VIEW_EXTRALARGETHUMBNAILS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::ExtraLargeThumbnails);
-		break;
-
 	case IDM_VIEW_LARGETHUMBNAILS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::LargeThumbnails);
-		break;
-
 	case IDM_VIEW_THUMBNAILS:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::Thumbnails);
-		break;
-
 	case IDM_VIEW_TILES:
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl()->SetViewMode(
-			ViewMode::Tiles);
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_VIEW_CHANGEDISPLAYCOLOURS:

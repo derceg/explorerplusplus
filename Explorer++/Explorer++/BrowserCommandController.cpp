@@ -146,6 +146,46 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		m_browser->StartMainToolbarCustomization();
 		break;
 
+	case IDM_VIEW_EXTRALARGEICONS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::ExtraLargeIcons);
+		break;
+
+	case IDM_VIEW_LARGEICONS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::LargeIcons);
+		break;
+
+	case IDM_VIEW_ICONS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::Icons);
+		break;
+
+	case IDM_VIEW_SMALLICONS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::SmallIcons);
+		break;
+
+	case IDM_VIEW_LIST:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::List);
+		break;
+
+	case IDM_VIEW_DETAILS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::Details);
+		break;
+
+	case IDM_VIEW_EXTRALARGETHUMBNAILS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::ExtraLargeThumbnails);
+		break;
+
+	case IDM_VIEW_LARGETHUMBNAILS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::LargeThumbnails);
+		break;
+
+	case IDM_VIEW_THUMBNAILS:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::Thumbnails);
+		break;
+
+	case IDM_VIEW_TILES:
+		GetActiveShellBrowser()->SetViewMode(ViewMode::Tiles);
+		break;
+
 	case IDM_VIEW_REFRESH:
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
 		break;
