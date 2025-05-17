@@ -112,3 +112,15 @@ bool ShellBrowserFake::CanMergeFiles() const
 void ShellBrowserFake::MergeFiles()
 {
 }
+
+void ShellBrowserFake::SelectAllItems()
+{
+}
+
+void ShellBrowserFake::InvertSelection()
+{
+}
+
+void ShellBrowserFake::ClearSelection()
+{
+}

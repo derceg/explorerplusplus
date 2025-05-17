@@ -106,6 +106,18 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		CopyFolderPath();
 		break;
 
+	case IDM_EDIT_SELECTALL:
+		GetActiveShellBrowser()->SelectAllItems();
+		break;
+
+	case IDM_EDIT_INVERTSELECTION:
+		GetActiveShellBrowser()->InvertSelection();
+		break;
+
+	case IDM_EDIT_SELECTNONE:
+		GetActiveShellBrowser()->ClearSelection();
+		break;
+
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
 		m_config->showAddressBar = !m_config->showAddressBar.get();
 		break;

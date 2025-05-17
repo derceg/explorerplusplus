@@ -1390,3 +1390,21 @@ void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)
 
 	Epp::FileOperations::CopyFilesToFolder(m_hOwner, rawPidls, action, m_app->GetResourceLoader());
 }
+
+void ShellBrowserImpl::SelectAllItems()
+{
+	ListViewHelper::SelectAllItems(m_hListView, true);
+	SetFocus(m_hListView);
+}
+
+void ShellBrowserImpl::InvertSelection()
+{
+	ListViewHelper::InvertSelection(m_hListView);
+	SetFocus(m_hListView);
+}
+
+void ShellBrowserImpl::ClearSelection()
+{
+	ListViewHelper::SelectAllItems(m_hListView, false);
+	SetFocus(m_hListView);
+}

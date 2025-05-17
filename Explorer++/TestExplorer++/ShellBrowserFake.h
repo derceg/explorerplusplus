@@ -44,6 +44,9 @@ public:
 	void SplitFile() override;
 	bool CanMergeFiles() const override;
 	void MergeFiles() override;
+	void SelectAllItems() override;
+	void InvertSelection() override;
+	void ClearSelection() override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;

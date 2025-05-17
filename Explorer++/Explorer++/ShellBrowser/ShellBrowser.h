@@ -41,6 +41,10 @@ public:
 	virtual bool CanMergeFiles() const = 0;
 	virtual void MergeFiles() = 0;
 
+	virtual void SelectAllItems() = 0;
+	virtual void InvertSelection() = 0;
+	virtual void ClearSelection() = 0;
+
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;
 	virtual const NavigationManager *GetNavigationManager() const = 0;
