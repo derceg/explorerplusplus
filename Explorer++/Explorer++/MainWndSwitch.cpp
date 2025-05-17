@@ -1292,25 +1292,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_DW_HIDEDISPLAYWINDOW:
 		m_config->showDisplayWindow = false;
 		break;
-
-	case IDM_BACKGROUND_CONTEXT_MENU_CUSTOMIZE:
-		// Note that the call below won't always result in the customize tab being selected. That's
-		// because the properties dialog will select the tab based on its display name, which can
-		// change as the display language is changed in Windows.
-		// In Explorer, the title of the dialog is dynamically retrieved. Although it might be
-		// possible to do that here as well, that strategy would break if the customize dialog
-		// resource ID ever changed.
-		// Another alternative might be to load the "customize" string from the string table. But
-		// the language used by the application has nothing to do with the language used by Windows
-		// itself. Also, the text would have to be exactly the same as that used by Windows for a
-		// given language, which probably wouldn't be clear to translators. Minor variations within
-		// a language (e.g. customize vs customise) could cause the tab to not be selected.
-		// Therefore, this will only work when the actual title of the properties dialog is
-		// "customize" (ignoring case). That's not ideal, but not too much of an issue, since the
-		// properties dialog will always be opened, just not always on the customize tab.
-		ExecuteFileAction(m_hContainer, GetActiveShellBrowserImpl()->GetDirectoryIdl().get(),
-			L"properties", L"customize", L"");
-		break;
 	}
 
 	return 1;
