@@ -67,9 +67,6 @@
     <ClCompile Include="HandleWindowState.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Initialization.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ListViewHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>

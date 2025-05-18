@@ -1187,7 +1187,6 @@
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
-    <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="AcceleratorHelper.cpp" />
