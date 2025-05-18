@@ -206,6 +206,8 @@ private:
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ListViewSubclassProc(HWND ListView, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	void SetUpControlVisibilityConfigListeners();
+
 	/* Main window message handlers. */
 	LRESULT CALLBACK CommandHandler(HWND hwnd, HWND control, int id, UINT notificationCode);
 	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id, UINT notificationCode);
@@ -341,9 +343,7 @@ private:
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
-	void ToggleFolders();
 	void OnTreeViewHolderResized(int newWidth);
-	void ToggleDualPane();
 
 	// Navigator
 	using Navigator::OpenDefaultItem;

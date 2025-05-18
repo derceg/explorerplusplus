@@ -319,7 +319,7 @@ void Explorerplusplus::UpdateLayout()
 
 	int indentRebar = rebarHeight;
 
-	if (m_config->showStatusBar)
+	if (m_config->showStatusBar.get())
 	{
 		RECT statusBarRect;
 		GetWindowRect(m_statusBar->GetView()->GetHWND(), &statusBarRect);
@@ -431,7 +431,7 @@ void Explorerplusplus::UpdateLayout()
 	}
 
 	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, holderTop, m_treeViewWidth, holderHeight,
-		SWP_NOZORDER);
+		(m_config->showFolders.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER);
 
 	/* <---- Display window ----> */
 
@@ -480,7 +480,7 @@ void Explorerplusplus::UpdateLayout()
 	GetWindowRect(m_statusBar->GetView()->GetHWND(), &statusBarRect);
 
 	UINT statusBarShowFlags =
-		(m_config->showStatusBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
+		(m_config->showStatusBar.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
 	SetWindowPos(m_statusBar->GetView()->GetHWND(), nullptr, 0,
 		mainWindowHeight - GetRectHeight(&statusBarRect), mainWindowWidth,
 		GetRectHeight(&statusBarRect), statusBarShowFlags);

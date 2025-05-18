@@ -82,9 +82,6 @@
     <ClCompile Include="MsgHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="WindowHandler.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="IDropFilesCallback.cpp">
       <Filter>Core</Filter>
     </ClCompile>

@@ -69,6 +69,8 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 		m_displayWindowHeight = storageData->displayWindowHeight;
 	}
 
+	SetUpControlVisibilityConfigListeners();
+
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hContainer,
 		std::bind_front(&Explorerplusplus::WindowProcedure, this)));
 
@@ -135,6 +137,16 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 	windowClass.lpszMenuName = nullptr;
 	windowClass.lpszClassName = WINDOW_CLASS_NAME;
 	return RegisterClassEx(&windowClass);
+}
+
+void Explorerplusplus::SetUpControlVisibilityConfigListeners()
+{
+	m_connections.push_back(
+		m_config->showStatusBar.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
+	m_connections.push_back(
+		m_config->showFolders.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
+	m_connections.push_back(
+		m_config->showDisplayWindow.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
 }
 
 void Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)

@@ -82,7 +82,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_DUAL_PANE, m_config->dualPane);
 	}
 
-	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_STATUSBAR, m_config->showStatusBar);
+	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_STATUSBAR, m_config->showStatusBar.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_FOLDERS, m_config->showFolders.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_DISPLAYWINDOW, m_config->showDisplayWindow.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_TOOLBARS_ADDRESS_BAR,

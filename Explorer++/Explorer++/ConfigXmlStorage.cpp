@@ -428,7 +428,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"ShowPrivilegeLevelInTitleBar",
 		XMLSettings::EncodeBoolValue(config.showPrivilegeLevelInTitleBar.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"ShowStatusBar", XMLSettings::EncodeBoolValue(config.showStatusBar));
+		L"ShowStatusBar", XMLSettings::EncodeBoolValue(config.showStatusBar.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"ShowTabBarAtBottom", XMLSettings::EncodeBoolValue(config.showTabBarAtBottom.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,

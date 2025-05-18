@@ -1282,7 +1282,6 @@
     <ClCompile Include="ViewsMenuBuilder.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="Win32ResourceLoader.cpp" />
-    <ClCompile Include="WindowHandler.cpp" />
     <ClCompile Include="WindowOptionsPage.cpp" />
     <ClCompile Include="WindowRegistryStorage.cpp" />
     <ClCompile Include="WindowStorage.cpp" />

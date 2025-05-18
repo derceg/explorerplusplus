@@ -237,7 +237,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 {
 	RegistrySettings::SaveDword(settingsKey, L"ShowExtensions",
 		config.globalFolderSettings.showExtensions);
-	RegistrySettings::SaveDword(settingsKey, L"ShowStatusBar", config.showStatusBar);
+	RegistrySettings::SaveDword(settingsKey, L"ShowStatusBar", config.showStatusBar.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowFolders", config.showFolders.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowAddressBar", config.showAddressBar.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowToolbar", config.showMainToolbar.get());

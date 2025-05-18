@@ -78,7 +78,4 @@ void Explorerplusplus::InitializeDisplayWindow()
 	m_displayWindow = DisplayWindow::Create(m_hContainer, m_config);
 
 	ApplyDisplayWindowPosition();
-
-	m_connections.push_back(
-		m_config->showDisplayWindow.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
 }

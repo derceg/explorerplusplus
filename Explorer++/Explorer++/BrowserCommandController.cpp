@@ -118,6 +118,18 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->ClearSelection();
 		break;
 
+	case IDM_VIEW_STATUSBAR:
+		m_config->showStatusBar = !m_config->showStatusBar.get();
+		break;
+
+	case IDM_VIEW_FOLDERS:
+		m_config->showFolders = !m_config->showFolders.get();
+		break;
+
+	case IDM_VIEW_DISPLAYWINDOW:
+		m_config->showDisplayWindow = !m_config->showDisplayWindow.get();
+		break;
+
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
 		m_config->showAddressBar = !m_config->showAddressBar.get();
 		break;

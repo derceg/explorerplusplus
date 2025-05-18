@@ -419,21 +419,20 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_DUAL_PANE:
-		ToggleDualPane();
+		m_config->dualPane = !m_config->dualPane;
 		break;
 
 	case IDM_VIEW_STATUSBAR:
-		m_config->showStatusBar = !m_config->showStatusBar;
-		UpdateLayout();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case MainToolbarButton::Folders:
 	case IDM_VIEW_FOLDERS:
-		ToggleFolders();
+		m_commandController.ExecuteCommand(IDM_VIEW_FOLDERS);
 		break;
 
 	case IDM_VIEW_DISPLAYWINDOW:
-		m_config->showDisplayWindow = !m_config->showDisplayWindow.get();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_DISPLAYWINDOW_VERTICAL:

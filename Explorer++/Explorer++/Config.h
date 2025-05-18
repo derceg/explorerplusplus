@@ -48,7 +48,7 @@ struct Config
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	ChangeNotifyMode changeNotifyMode = ChangeNotifyMode::Shell;
 	bool dualPane = false;
-	bool showStatusBar = true;
+	ValueWrapper<bool> showStatusBar = true;
 	ValueWrapper<bool> showDisplayWindow = true;
 	bool alwaysOpenNewTab = false;
 	bool openNewTabNextToCurrent = false;

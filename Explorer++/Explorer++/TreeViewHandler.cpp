@@ -27,7 +27,7 @@ void Explorerplusplus::CreateFolderControls()
 		m_app->GetResourceLoader()->LoadString(IDS_HIDE_FOLDERS_PANE), m_app->GetConfig(),
 		m_app->GetResourceLoader(), m_app->GetDarkModeManager(), m_app->GetDarkModeColorProvider());
 	m_treeViewHolder->SetCloseButtonClickedCallback(
-		std::bind(&Explorerplusplus::ToggleFolders, this));
+		[this]() { m_config->showFolders = !m_config->showFolders.get(); });
 	m_treeViewHolder->SetResizedCallback(
 		std::bind_front(&Explorerplusplus::OnTreeViewHolderResized, this));
 
