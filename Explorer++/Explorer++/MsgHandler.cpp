@@ -606,7 +606,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_BROWSER_HOME:
-		OnGoHome();
+		m_commandController.ExecuteCommand(IDA_HOME);
 		break;
 
 	case APPCOMMAND_BROWSER_FAVORITES:

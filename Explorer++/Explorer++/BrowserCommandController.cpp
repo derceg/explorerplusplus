@@ -278,6 +278,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GoToPath(WSL_DISTRIBUTIONS_PATH, disposition);
 		break;
 
+	case IDA_HOME:
+		GetActiveShellBrowser()->GetNavigationController()->Navigate(m_config->defaultTabDirectory);
+		break;
+
 	default:
 		DCHECK(false);
 		break;

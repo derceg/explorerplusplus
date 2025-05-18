@@ -202,10 +202,3 @@ void Explorerplusplus::OnGoToOffset(int offset)
 	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
 }
-
-void Explorerplusplus::OnGoHome()
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->GetNavigationController()->Navigate(
-		m_config->defaultTabDirectory);
-}

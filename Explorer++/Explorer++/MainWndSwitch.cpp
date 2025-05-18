@@ -1240,7 +1240,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDA_HOME:
-		OnGoHome();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDA_TAB1:

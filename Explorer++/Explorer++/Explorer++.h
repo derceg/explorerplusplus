@@ -261,7 +261,6 @@ private:
 	void OnAbout();
 
 	void OnGoToOffset(int offset);
-	void OnGoHome();
 
 	int HighlightSimilarFiles(HWND ListView) const;
 
