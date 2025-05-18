@@ -9,7 +9,6 @@
 #include "BrowserCommandController.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
-#include "CommandLine.h"
 #include "CoreInterface.h"
 #include "IconFetcherImpl.h"
 #include "LayoutDefaults.h"
@@ -19,17 +18,13 @@
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
 #include "RebarView.h"
-#include "ShellBrowser/Columns.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
 #include "TabStorage.h"
-#include "Theme.h"
-#include "ValueWrapper.h"
 #include "WindowStorage.h"
 #include "../Helper/ClipboardHelper.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
@@ -41,21 +36,16 @@
 /* Sent when a folder size calculation has finished. */
 #define WM_APP_FOLDERSIZECOMPLETED WM_APP + 3
 
-// Forward declarations.
-class AcceleratorManager;
 class AddressBar;
 class App;
 class BookmarksMainMenu;
 class BookmarksToolbar;
 class BrowserTracker;
-class CachedIcons;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
-class FrequentLocationsMenu;
 class HistoryMenu;
 class HolderWindow;
-class ILoadSave;
 class LoadSaveRegistry;
 class LoadSaveXML;
 class MainFontSetter;
@@ -73,8 +63,6 @@ class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
 class TabContainerImpl;
-class TabRestorerMenu;
-struct TabSettings;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
 class WindowSubclass;
