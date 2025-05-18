@@ -6,7 +6,6 @@
 
 #include "BrowserCommandTarget.h"
 #include "ClipboardOperations.h"
-#include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FileSystemChangeWatcher.h"
 #include "FolderSettings.h"
@@ -19,7 +18,6 @@
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WeakPtr.h"
@@ -36,10 +34,8 @@
 #include <wil/resource.h>
 #include <thumbcache.h>
 #include <future>
-#include <list>
 #include <memory>
 #include <optional>
-#include <stop_token>
 #include <unordered_map>
 #include <unordered_set>
 

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "App.h"
+#include "ColumnDataRetrieval.h"
 #include "Config.h"
 #include "ItemData.h"
 #include "NavigateParams.h"

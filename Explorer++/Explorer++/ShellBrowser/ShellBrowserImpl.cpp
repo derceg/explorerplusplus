@@ -8,6 +8,7 @@
 #include "BrowserWindow.h"
 #include "ClipboardOperations.h"
 #include "ColorRuleModel.h"
+#include "ColumnDataRetrieval.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DirectoryOperationsHelper.h"
