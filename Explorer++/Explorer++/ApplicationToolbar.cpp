@@ -10,7 +10,6 @@
 #include "ApplicationHelper.h"
 #include "ApplicationModel.h"
 #include "ApplicationToolbarView.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
@@ -69,20 +68,20 @@ private:
 };
 
 ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
-	ApplicationModel *model, ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+	ApplicationModel *model, ApplicationExecutor *applicationExecutor, const BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
 {
-	return new ApplicationToolbar(view, model, applicationExecutor, coreInterface,
-		acceleratorManager, resourceLoader);
+	return new ApplicationToolbar(view, model, applicationExecutor, browser, acceleratorManager,
+		resourceLoader);
 }
 
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+	ApplicationExecutor *applicationExecutor, const BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	m_view(view),
 	m_model(model),
 	m_applicationExecutor(applicationExecutor),
-	m_coreInterface(coreInterface),
+	m_browser(browser),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader)
 {
@@ -167,7 +166,7 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 
 	PopupMenuView popupMenu;
 	ApplicationContextMenu menu(&popupMenu, m_acceleratorManager, m_model, application,
-		m_applicationExecutor, m_resourceLoader, m_coreInterface);
+		m_applicationExecutor, m_browser, m_resourceLoader);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 

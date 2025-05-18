@@ -12,7 +12,7 @@
 #include <vector>
 
 class AcceleratorManager;
-class CoreInterface;
+class BrowserWindow;
 struct MouseEvent;
 class ResourceLoader;
 
@@ -28,7 +28,7 @@ class ApplicationToolbar : private DropTargetInternal
 {
 public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
-		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+		ApplicationExecutor *applicationExecutor, const BrowserWindow *browser,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	ApplicationToolbar(const ApplicationToolbar &) = delete;
@@ -66,7 +66,7 @@ private:
 	};
 
 	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface,
+		ApplicationExecutor *applicationExecutor, const BrowserWindow *browser,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	void Initialize();
@@ -97,7 +97,7 @@ private:
 	ApplicationToolbarView *m_view;
 	ApplicationModel *m_model;
 	ApplicationExecutor *const m_applicationExecutor;
-	CoreInterface *const m_coreInterface;
+	const BrowserWindow *const m_browser;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 

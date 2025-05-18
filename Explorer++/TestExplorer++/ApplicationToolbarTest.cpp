@@ -26,7 +26,7 @@ protected:
 		m_browser(AddBrowser()),
 		m_applicationToolbarView(ApplicationToolbarView::Create(m_browser->GetHWND(), &m_config)),
 		m_applicationToolbar(ApplicationToolbar::Create(m_applicationToolbarView,
-			m_applicationModel.get(), &m_applicationExecutor, nullptr, nullptr, nullptr))
+			m_applicationModel.get(), &m_applicationExecutor, m_browser, nullptr, nullptr))
 	{
 	}
 

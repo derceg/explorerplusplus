@@ -13,10 +13,10 @@ namespace Applications
 
 ApplicationContextMenu::ApplicationContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, ApplicationModel *model, Application *application,
-	ApplicationExecutor *applicationExecutor, const ResourceLoader *resourceLoader,
-	CoreInterface *coreInterface) :
+	ApplicationExecutor *applicationExecutor, const BrowserWindow *browser,
+	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
-	m_controller(model, application, applicationExecutor, resourceLoader, coreInterface)
+	m_controller(model, application, applicationExecutor, browser, resourceLoader)
 {
 	BuildMenu(resourceLoader);
 

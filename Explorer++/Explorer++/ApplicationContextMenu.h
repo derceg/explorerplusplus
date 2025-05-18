@@ -9,7 +9,7 @@
 #include <boost/signals2.hpp>
 #include <vector>
 
-class CoreInterface;
+class BrowserWindow;
 class MenuView;
 class ResourceLoader;
 
@@ -25,7 +25,7 @@ class ApplicationContextMenu : public MenuBase
 public:
 	ApplicationContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		ApplicationModel *model, Application *application, ApplicationExecutor *applicationExecutor,
-		const ResourceLoader *resourceLoader, CoreInterface *coreInterface);
+		const BrowserWindow *browser, const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);

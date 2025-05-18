@@ -9,7 +9,7 @@
 #include "ApplicationEditorDialog.h"
 #include "ApplicationExecutor.h"
 #include "ApplicationModel.h"
-#include "CoreInterface.h"
+#include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 
@@ -18,12 +18,12 @@ namespace Applications
 
 ApplicationContextMenuController::ApplicationContextMenuController(ApplicationModel *model,
 	Application *application, ApplicationExecutor *applicationExecutor,
-	const ResourceLoader *resourceLoader, CoreInterface *coreInterface) :
+	const BrowserWindow *browser, const ResourceLoader *resourceLoader) :
 	m_model(model),
 	m_application(application),
 	m_applicationExecutor(applicationExecutor),
-	m_resourceLoader(resourceLoader),
-	m_coreInterface(coreInterface)
+	m_browser(browser),
+	m_resourceLoader(resourceLoader)
 {
 }
 
@@ -62,8 +62,7 @@ void ApplicationContextMenuController::OnNew()
 {
 	auto index = m_model->GetItemIndex(m_application);
 
-	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(), m_resourceLoader,
-		m_model,
+	ApplicationEditorDialog editorDialog(m_browser->GetHWND(), m_resourceLoader, m_model,
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Application>(L"", L""), index));
 	editorDialog.ShowModalDialog();
@@ -72,8 +71,8 @@ void ApplicationContextMenuController::OnNew()
 void ApplicationContextMenuController::OnDelete()
 {
 	std::wstring message = m_resourceLoader->LoadString(IDS_APPLICATIONBUTTON_DELETE);
-	int messageBoxReturn = MessageBox(m_coreInterface->GetMainWindow(), message.c_str(),
-		App::APP_NAME, MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
+	int messageBoxReturn = MessageBox(m_browser->GetHWND(), message.c_str(), App::APP_NAME,
+		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
 	if (messageBoxReturn != IDYES)
 	{
@@ -85,8 +84,8 @@ void ApplicationContextMenuController::OnDelete()
 
 void ApplicationContextMenuController::OnShowProperties()
 {
-	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(), m_resourceLoader,
-		m_model, ApplicationEditorDialog::EditDetails::EditApplication(m_application));
+	ApplicationEditorDialog editorDialog(m_browser->GetHWND(), m_resourceLoader, m_model,
+		ApplicationEditorDialog::EditDetails::EditApplication(m_application));
 	editorDialog.ShowModalDialog();
 }
 
