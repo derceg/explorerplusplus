@@ -91,6 +91,38 @@ HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &i
 	return S_OK;
 }
 
+HRESULT GetTextFromDataObject(IDataObject *dataObject, std::wstring &outputText)
+{
+	FORMATETC ftc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	wil::unique_stg_medium stg;
+	RETURN_IF_FAILED(dataObject->GetData(&ftc, &stg));
+
+	auto text = ReadStringFromGlobal(stg.hGlobal);
+
+	if (!text)
+	{
+		return E_FAIL;
+	}
+
+	outputText = *text;
+
+	return S_OK;
+}
+
+HRESULT SetTextOnDataObject(IDataObject *dataObject, const std::wstring &text)
+{
+	auto global = WriteStringToGlobal(text);
+
+	if (!global)
+	{
+		return E_FAIL;
+	}
+
+	FORMATETC ftc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	auto stg = GetStgMediumForGlobal(std::move(global));
+	return MoveStorageToObject(dataObject, &ftc, std::move(stg));
+}
+
 HRESULT SetBlobData(IDataObject *dataObject, CLIPFORMAT format, const void *data, size_t size)
 {
 	FORMATETC ftc = { format, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };

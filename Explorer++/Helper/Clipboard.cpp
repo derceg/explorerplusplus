@@ -25,62 +25,62 @@ Clipboard::~Clipboard()
 
 std::optional<std::wstring> Clipboard::ReadText()
 {
-	HANDLE clipboardData = m_store->GetData(CF_UNICODETEXT);
+	auto clipboardData = m_store->GetData(CF_UNICODETEXT);
 
 	if (!clipboardData)
 	{
 		return std::nullopt;
 	}
 
-	return ReadStringFromGlobal(clipboardData);
+	return ReadStringFromGlobal(clipboardData.get());
 }
 
 std::optional<std::vector<std::wstring>> Clipboard::ReadHDropData()
 {
-	HANDLE clipboardData = m_store->GetData(CF_HDROP);
+	auto clipboardData = m_store->GetData(CF_HDROP);
 
 	if (!clipboardData)
 	{
 		return std::nullopt;
 	}
 
-	return ReadHDropDataFromGlobal(clipboardData);
+	return ReadHDropDataFromGlobal(clipboardData.get());
 }
 
 std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
 {
-	HANDLE clipboardData = m_store->GetData(GetPngClipboardFormat());
+	auto clipboardData = m_store->GetData(GetPngClipboardFormat());
 
 	if (!clipboardData)
 	{
 		return nullptr;
 	}
 
-	return ReadPngDataFromGlobal(clipboardData);
+	return ReadPngDataFromGlobal(clipboardData.get());
 }
 
 std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadDIB()
 {
-	HANDLE clipboardData = m_store->GetData(CF_DIB);
+	auto clipboardData = m_store->GetData(CF_DIB);
 
 	if (!clipboardData)
 	{
 		return nullptr;
 	}
 
-	return ReadDIBDataFromGlobal(clipboardData);
+	return ReadDIBDataFromGlobal(clipboardData.get());
 }
 
 std::optional<std::string> Clipboard::ReadCustomData(UINT format)
 {
-	HANDLE clipboardData = m_store->GetData(format);
+	auto clipboardData = m_store->GetData(format);
 
 	if (!clipboardData)
 	{
 		return std::nullopt;
 	}
 
-	return ReadBinaryDataFromGlobal(clipboardData);
+	return ReadBinaryDataFromGlobal(clipboardData.get());
 }
 
 bool Clipboard::WriteText(const std::wstring &text)

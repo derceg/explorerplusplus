@@ -14,8 +14,13 @@ public:
 	bool Close() override;
 
 	bool IsDataAvailable(UINT format) const override;
-	HGLOBAL GetData(UINT format) const override;
+	wil::unique_hglobal GetData(UINT format) const override;
 	bool SetData(UINT format, wil::unique_hglobal global) override;
+
+	wil::com_ptr_nothrow<IDataObject> GetDataObject() const override;
+	bool SetDataObject(IDataObject *dataObject) override;
+	bool IsDataObjectCurrent(IDataObject *dataObject) const override;
+	bool FlushDataObject() override;
 
 	bool Clear() override;
 };

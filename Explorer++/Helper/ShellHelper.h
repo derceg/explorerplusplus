@@ -89,6 +89,11 @@ using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMI
 using unique_shell_window_cookie = wil::unique_com_token<IShellWindows, long,
 	decltype(&IShellWindows::Revoke), &IShellWindows::Revoke>;
 
+void ReleaseFormatEtc(FORMATETC *formatEtc);
+
+using unique_formatetc =
+	wil::unique_struct<FORMATETC, decltype(&::ReleaseFormatEtc), ::ReleaseFormatEtc>;
+
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output);
 std::wstring GetDisplayNameWithFallback(PCIDLIST_ABSOLUTE pidl, DWORD flags);
 HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output);

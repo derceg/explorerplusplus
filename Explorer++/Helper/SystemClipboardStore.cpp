@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SystemClipboardStore.h"
+#include "DataExchangeHelper.h"
 
 bool SystemClipboardStore::Open()
 {
@@ -20,9 +21,16 @@ bool SystemClipboardStore::IsDataAvailable(UINT format) const
 	return IsClipboardFormatAvailable(format);
 }
 
-HGLOBAL SystemClipboardStore::GetData(UINT format) const
+wil::unique_hglobal SystemClipboardStore::GetData(UINT format) const
 {
-	return GetClipboardData(format);
+	auto data = GetClipboardData(format);
+
+	if (!data)
+	{
+		return nullptr;
+	}
+
+	return CloneGlobal(data);
 }
 
 bool SystemClipboardStore::SetData(UINT format, wil::unique_hglobal global)
@@ -39,6 +47,34 @@ bool SystemClipboardStore::SetData(UINT format, wil::unique_hglobal global)
 	global.release();
 
 	return true;
+}
+
+wil::com_ptr_nothrow<IDataObject> SystemClipboardStore::GetDataObject() const
+{
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	HRESULT hr = OleGetClipboard(&dataObject);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return dataObject;
+}
+
+bool SystemClipboardStore::SetDataObject(IDataObject *dataObject)
+{
+	return (OleSetClipboard(dataObject) == S_OK);
+}
+
+bool SystemClipboardStore::IsDataObjectCurrent(IDataObject *dataObject) const
+{
+	return (OleIsCurrentClipboard(dataObject) == S_OK);
+}
+
+bool SystemClipboardStore::FlushDataObject()
+{
+	return (OleFlushClipboard() == S_OK);
 }
 
 bool SystemClipboardStore::Clear()

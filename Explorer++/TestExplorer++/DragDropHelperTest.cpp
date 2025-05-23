@@ -5,6 +5,8 @@
 #include "pch.h"
 #include "../Helper/DragDropHelper.h"
 #include "DragDropTestHelper.h"
+#include "../Helper/DataObjectImpl.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -29,3 +31,15 @@ TEST_P(PreferredDropEffectTestSuite, PreferredDropEffect)
 
 INSTANTIATE_TEST_SUITE_P(CopyAndMoveEffects, PreferredDropEffectTestSuite,
 	Values(DROPEFFECT_COPY, DROPEFFECT_MOVE));
+
+TEST(DragDropHelperTest, GetSetTextOnDataObject)
+{
+	auto dataObject = winrt::make<DataObjectImpl>();
+
+	std::wstring text = L"Test text";
+	ASSERT_HRESULT_SUCCEEDED(SetTextOnDataObject(dataObject.get(), text));
+
+	std::wstring retrievedText;
+	ASSERT_HRESULT_SUCCEEDED(GetTextFromDataObject(dataObject.get(), retrievedText));
+	EXPECT_EQ(retrievedText, text);
+}

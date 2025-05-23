@@ -21,6 +21,8 @@ HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
 	IDataObject **dataObjectOut);
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &items,
 	IDataObject **dataObjectOut);
+HRESULT GetTextFromDataObject(IDataObject *dataObject, std::wstring &outputText);
+HRESULT SetTextOnDataObject(IDataObject *dataObject, const std::wstring &text);
 HRESULT SetBlobData(IDataObject *dataObject, CLIPFORMAT format, const void *data, size_t size);
 HRESULT SetBlobData(IDataObject *dataObject, FORMATETC *ftc, const void *data, size_t size);
 HRESULT GetBlobData(IDataObject *dataObject, CLIPFORMAT format, std::string &outputData);

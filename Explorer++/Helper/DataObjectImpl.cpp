@@ -187,7 +187,7 @@ IFACEMETHODIMP DataObjectImpl::DAdvise(FORMATETC *format, DWORD flags, IAdviseSi
 	UNREFERENCED_PARAMETER(sink);
 	UNREFERENCED_PARAMETER(connection);
 
-	return E_NOTIMPL;
+	return OLE_E_ADVISENOTSUPPORTED;
 }
 
 IFACEMETHODIMP DataObjectImpl::DUnadvise(DWORD connection)

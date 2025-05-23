@@ -204,6 +204,7 @@
     <ClCompile Include="BrowserListTest.cpp" />
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
+    <ClCompile Include="SimulatedClipboardDataObject.cpp" />
     <ClCompile Include="ClipboardHelperTest.cpp" />
     <ClCompile Include="SimulatedClipboardStore.cpp" />
     <ClCompile Include="SimulatedClipboardStoreTest.cpp" />
@@ -386,6 +387,7 @@
     <ClInclude Include="BrowserTestBase.h" />
     <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowMock.h" />
+    <ClInclude Include="SimulatedClipboardDataObject.h" />
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />
     <ClInclude Include="BrowserCommandTargetFake.h" />

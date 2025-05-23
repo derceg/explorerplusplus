@@ -1472,3 +1472,11 @@ bool DoesItemExist(PCIDLIST_ABSOLUTE pidl)
 	// succeeded, the item exists.
 	return true;
 }
+
+void ReleaseFormatEtc(FORMATETC *formatEtc)
+{
+	if (formatEtc->ptd)
+	{
+		CoTaskMemFree(formatEtc->ptd);
+	}
+}

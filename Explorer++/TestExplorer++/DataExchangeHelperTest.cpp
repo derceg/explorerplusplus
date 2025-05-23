@@ -103,3 +103,16 @@ TEST(DataExchangeHelperTest, ReadWriteVirtualFiles)
 
 	EXPECT_EQ(retrievedVirtualFiles, virtualFiles);
 }
+
+TEST(DataExchangeHelperTest, CloneGlobal)
+{
+	std::wstring text = L"Test text";
+	auto global = WriteStringToGlobal(text);
+	ASSERT_NE(global, nullptr);
+
+	auto clone = CloneGlobal(global.get());
+	ASSERT_NE(clone, nullptr);
+
+	auto retrievedText = ReadStringFromGlobal(clone.get());
+	EXPECT_EQ(retrievedText, text);
+}

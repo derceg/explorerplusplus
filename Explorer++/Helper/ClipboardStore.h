@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wil/com.h>
 #include <wil/resource.h>
 
 // Represents an underlying clipboard backing store. A derived class might simply forward these
@@ -18,8 +19,13 @@ public:
 	virtual bool Close() = 0;
 
 	virtual bool IsDataAvailable(UINT format) const = 0;
-	virtual HGLOBAL GetData(UINT format) const = 0;
+	virtual wil::unique_hglobal GetData(UINT format) const = 0;
 	virtual bool SetData(UINT format, wil::unique_hglobal global) = 0;
+
+	virtual wil::com_ptr_nothrow<IDataObject> GetDataObject() const = 0;
+	virtual bool SetDataObject(IDataObject *dataObject) = 0;
+	virtual bool IsDataObjectCurrent(IDataObject *dataObject) const = 0;
+	virtual bool FlushDataObject() = 0;
 
 	virtual bool Clear() = 0;
 };

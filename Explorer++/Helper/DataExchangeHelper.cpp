@@ -22,17 +22,17 @@ std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
 
 	auto size = GlobalSize(mem.get());
 
-	if (size == 0)
+	if (size == 0 || (size % sizeof(wchar_t)) != 0)
 	{
 		return std::nullopt;
 	}
 
-	return std::wstring(static_cast<const WCHAR *>(mem.get()), (size / sizeof(WCHAR)) - 1);
+	return std::wstring(static_cast<const wchar_t *>(mem.get()), (size / sizeof(wchar_t)) - 1);
 }
 
 wil::unique_hglobal WriteStringToGlobal(const std::wstring &str)
 {
-	return WriteDataToGlobal(str.c_str(), (str.size() + 1) * sizeof(WCHAR));
+	return WriteDataToGlobal(str.c_str(), (str.size() + 1) * sizeof(wchar_t));
 }
 
 std::optional<std::string> ReadBinaryDataFromGlobal(HGLOBAL global)
@@ -148,7 +148,7 @@ wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &path
 	concatenatedPaths.append(1, '\0');
 
 	size_t headerSize = sizeof(DROPFILES);
-	size_t concatenatedPathsSize = concatenatedPaths.size() * sizeof(WCHAR);
+	size_t concatenatedPathsSize = concatenatedPaths.size() * sizeof(wchar_t);
 
 	wil::unique_hglobal global(GlobalAlloc(GHND, headerSize + concatenatedPathsSize));
 
@@ -437,4 +437,39 @@ HRESULT MoveStorageToObject(IDataObject *dataObject, FORMATETC *format, wil::uni
 	stg.release();
 
 	return S_OK;
+}
+
+wil::unique_hglobal CloneGlobal(HGLOBAL global)
+{
+	wil::unique_hglobal_locked sourceMemory(global);
+
+	if (!sourceMemory)
+	{
+		return nullptr;
+	}
+
+	auto size = GlobalSize(sourceMemory.get());
+
+	if (size == 0)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hglobal clone(GlobalAlloc(GMEM_MOVEABLE, size));
+
+	if (!clone)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hglobal_locked destinationMemory(clone.get());
+
+	if (!destinationMemory)
+	{
+		return nullptr;
+	}
+
+	memcpy(destinationMemory.get(), sourceMemory.get(), size);
+
+	return clone;
 }
