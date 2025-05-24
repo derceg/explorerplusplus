@@ -199,6 +199,9 @@
     <ClCompile Include="SystemClipboardStore.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="WilExtraTypes.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -452,6 +455,9 @@
     </ClInclude>
     <ClInclude Include="SystemClipboardStore.h">
       <Filter>Data Exchange\Clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="WilExtraTypes.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

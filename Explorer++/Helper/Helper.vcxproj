@@ -725,6 +725,7 @@
     <ClCompile Include="TabHelper.cpp" />
     <ClCompile Include="TimeHelper.cpp" />
     <ClCompile Include="UniqueThreadId.cpp" />
+    <ClCompile Include="WilExtraTypes.cpp" />
     <ClCompile Include="WindowHelper.cpp" />
     <ClCompile Include="WindowSubclass.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
@@ -809,6 +810,7 @@
     <ClInclude Include="WeakPtr.h" />
     <ClInclude Include="WeakPtrFactory.h" />
     <ClInclude Include="WeakState.h" />
+    <ClInclude Include="WilExtraTypes.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="WindowSubclass.h" />
     <ClInclude Include="WinRTBaseWrapper.h" />

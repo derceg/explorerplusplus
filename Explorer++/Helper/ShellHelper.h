@@ -5,10 +5,9 @@
 #pragma once
 
 #include "PidlHelper.h"
-#include <wil/resource.h>
+#include "WilExtraTypes.h"
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
-#include <exdisp.h>
 #include <shellapi.h>
 #include <list>
 #include <optional>
@@ -81,18 +80,6 @@ struct ShellIconInfo
 	int iconIndex;
 	int overlayIndex;
 };
-
-using unique_pidl_absolute = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>>;
-using unique_pidl_relative = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_RELATIVE>>;
-using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMID_CHILD>>;
-
-using unique_shell_window_cookie = wil::unique_com_token<IShellWindows, long,
-	decltype(&IShellWindows::Revoke), &IShellWindows::Revoke>;
-
-void ReleaseFormatEtc(FORMATETC *formatEtc);
-
-using unique_formatetc =
-	wil::unique_struct<FORMATETC, decltype(&::ReleaseFormatEtc), ::ReleaseFormatEtc>;
 
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output);
 std::wstring GetDisplayNameWithFallback(PCIDLIST_ABSOLUTE pidl, DWORD flags);
