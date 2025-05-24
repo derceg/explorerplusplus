@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FileOperations.h"
+#include "ClipboardStore.h"
 #include "DragDropHelper.h"
 #include "DriveInfo.h"
 #include "Helper.h"
@@ -388,18 +389,20 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	return FALSE;
 }
 
-HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut)
-{
-	return CopyFilesToClipboard(items, ClipboardAction::Copy, dataObjectOut);
-}
-
-HRESULT CutFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut)
-{
-	return CopyFilesToClipboard(items, ClipboardAction::Cut, dataObjectOut);
-}
-
-HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action,
+HRESULT CopyFiles(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,
 	IDataObject **dataObjectOut)
+{
+	return CopyFilesToClipboard(clipboardStore, items, ClipboardAction::Copy, dataObjectOut);
+}
+
+HRESULT CutFiles(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,
+	IDataObject **dataObjectOut)
+{
+	return CopyFilesToClipboard(clipboardStore, items, ClipboardAction::Cut, dataObjectOut);
+}
+
+HRESULT CopyFilesToClipboard(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,
+	ClipboardAction action, IDataObject **dataObjectOut)
 {
 	wil::com_ptr_nothrow<IDataObject> dataObject;
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
@@ -409,7 +412,10 @@ HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAc
 
 	RETURN_IF_FAILED(SetPreferredDropEffect(dataObject.get(), effect));
 
-	RETURN_IF_FAILED(OleSetClipboard(dataObject.get()));
+	if (!clipboardStore->SetDataObject(dataObject.get()))
+	{
+		return E_FAIL;
+	}
 
 	*dataObjectOut = dataObject.detach();
 

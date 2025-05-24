@@ -188,10 +188,9 @@ void Explorerplusplus::OnListViewSetFileAttributes() const
 
 void Explorerplusplus::OnListViewPaste()
 {
-	wil::com_ptr_nothrow<IDataObject> clipboardObject;
-	HRESULT hr = OleGetClipboard(&clipboardObject);
+	auto clipboardObject = m_app->GetClipboardStore()->GetDataObject();
 
-	if (FAILED(hr))
+	if (!clipboardObject)
 	{
 		return;
 	}

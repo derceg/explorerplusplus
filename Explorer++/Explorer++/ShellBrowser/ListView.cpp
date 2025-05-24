@@ -469,7 +469,8 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 {
 	ShellBackgroundContextMenu contextMenu(m_directoryState.pidlDirectory.Raw(), m_browser);
 
-	BackgroundContextMenuDelegate backgroundDelegate(m_browser, m_app->GetResourceLoader());
+	BackgroundContextMenuDelegate backgroundDelegate(m_browser, m_app->GetClipboardStore(),
+		m_app->GetResourceLoader());
 	contextMenu.AddDelegate(&backgroundDelegate);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();

@@ -149,14 +149,15 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser
 
 ShellBrowserImpl::~ShellBrowserImpl()
 {
-	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
+	if (m_clipboardDataObject
+		&& m_app->GetClipboardStore()->IsDataObjectCurrent(m_clipboardDataObject.get()))
 	{
 		// Ensure that any data that was copied to the clipboard remains there. Technically, this
 		// only needs to be done when the application is closed. However, determining whether the
 		// application set the current data on the clipboard when the tab that set the data has
 		// already been closed is difficult, so the easiest thing to do is just flush the clipboard
 		// here.
-		OleFlushClipboard();
+		m_app->GetClipboardStore()->FlushDataObject();
 	}
 
 	DestroyWindow(m_hListView);
@@ -1045,7 +1046,7 @@ HRESULT ShellBrowserImpl::CopyItemsToClipboard(const std::vector<PidlAbsolute> &
 
 	if (action == ClipboardAction::Copy)
 	{
-		hr = CopyFiles(items, &clipboardDataObject);
+		hr = CopyFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1054,7 +1055,7 @@ HRESULT ShellBrowserImpl::CopyItemsToClipboard(const std::vector<PidlAbsolute> &
 	}
 	else
 	{
-		hr = CutFiles(items, &clipboardDataObject);
+		hr = CutFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1085,7 +1086,8 @@ void ShellBrowserImpl::UpdateCurrentClipboardObject(
 
 void ShellBrowserImpl::OnClipboardUpdate()
 {
-	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_FALSE)
+	if (m_clipboardDataObject
+		&& !m_app->GetClipboardStore()->IsDataObjectCurrent(m_clipboardDataObject.get()))
 	{
 		RestoreStateOfCutItems();
 

@@ -15,8 +15,9 @@
 #include "../Helper/ShellHelper.h"
 
 BackgroundContextMenuDelegate::BackgroundContextMenuDelegate(const BrowserWindow *browser,
-	const ResourceLoader *resourceLoader) :
+	ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader) :
 	m_browser(browser),
+	m_clipboardStore(clipboardStore),
 	m_resourceLoader(resourceLoader)
 {
 }
@@ -56,7 +57,7 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE director
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE);
 	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE, text, position++, true);
 
-	if (!CanPasteInDirectory(directory, PasteType::Normal))
+	if (!CanPasteInDirectory(m_clipboardStore, directory, PasteType::Normal))
 	{
 		builder->EnableItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE, false);
 	}
@@ -64,7 +65,7 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE director
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT);
 	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, text, position++, true);
 
-	if (!CanPasteInDirectory(directory, PasteType::Shortcut))
+	if (!CanPasteInDirectory(m_clipboardStore, directory, PasteType::Shortcut))
 	{
 		builder->EnableItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, false);
 	}

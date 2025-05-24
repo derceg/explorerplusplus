@@ -8,6 +8,8 @@
 #include <list>
 #include <vector>
 
+class ClipboardStore;
+
 enum class ClipboardAction
 {
 	Cut,
@@ -54,7 +56,9 @@ BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOL
 
 };
 
-HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);
-HRESULT CutFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);
-HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action,
+HRESULT CopyFiles(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,
 	IDataObject **dataObjectOut);
+HRESULT CutFiles(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,
+	IDataObject **dataObjectOut);
+HRESULT CopyFilesToClipboard(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,
+	ClipboardAction action, IDataObject **dataObjectOut);

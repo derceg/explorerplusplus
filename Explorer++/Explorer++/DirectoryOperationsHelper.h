@@ -6,7 +6,10 @@
 
 #include "../Helper/ClipboardHelper.h"
 
-bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType);
+class ClipboardStore;
+
+bool CanPasteInDirectory(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl,
+	PasteType pasteType);
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl);
 bool CanCustomizeDirectory(PCIDLIST_ABSOLUTE pidl);
 bool IsFilesystemFolder(PCIDLIST_ABSOLUTE pidl);

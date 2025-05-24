@@ -4,18 +4,19 @@
 
 #include "stdafx.h"
 #include "DirectoryOperationsHelper.h"
+#include "../Helper/ClipboardStore.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 
 namespace
 {
 
-bool CanShellPasteClipboardDataInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
+bool CanShellPasteClipboardDataInDirectory(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl,
+	PasteType pasteType)
 {
-	wil::com_ptr_nothrow<IDataObject> clipboardObject;
-	HRESULT hr = OleGetClipboard(&clipboardObject);
+	auto clipboardObject = clipboardStore->GetDataObject();
 
-	if (FAILED(hr))
+	if (!clipboardObject)
 	{
 		return false;
 	}
@@ -23,14 +24,14 @@ bool CanShellPasteClipboardDataInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pas
 	return CanShellPasteDataObject(pidl, clipboardObject.get(), pasteType);
 }
 
-bool CanPasteCustomDataInDirectory(PCIDLIST_ABSOLUTE pidl)
+bool CanPasteCustomDataInDirectory(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl)
 {
 	auto customFormats = DropHandler::GetDropFormats();
 	bool dataAvailable = false;
 
 	for (const auto &customFormat : customFormats)
 	{
-		if (IsClipboardFormatAvailable(customFormat))
+		if (clipboardStore->IsDataAvailable(customFormat))
 		{
 			dataAvailable = true;
 			break;
@@ -47,10 +48,11 @@ bool CanPasteCustomDataInDirectory(PCIDLIST_ABSOLUTE pidl)
 
 }
 
-bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
+bool CanPasteInDirectory(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl,
+	PasteType pasteType)
 {
-	return CanShellPasteClipboardDataInDirectory(pidl, pasteType)
-		|| (pasteType == PasteType::Normal && CanPasteCustomDataInDirectory(pidl));
+	return CanShellPasteClipboardDataInDirectory(clipboardStore, pidl, pasteType)
+		|| (pasteType == PasteType::Normal && CanPasteCustomDataInDirectory(clipboardStore, pidl));
 }
 
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl)

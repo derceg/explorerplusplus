@@ -147,10 +147,11 @@ HWND ShellTreeView::CreateTreeView(HWND parent)
 
 ShellTreeView::~ShellTreeView()
 {
-	if (m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()
-		&& OleIsCurrentClipboard(m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()) == S_OK)
+	auto *clipboardDataObject = m_cutCopiedItemManager.GetCutCopiedClipboardDataObject();
+
+	if (clipboardDataObject && m_app->GetClipboardStore()->IsDataObjectCurrent(clipboardDataObject))
 	{
-		OleFlushClipboard();
+		m_app->GetClipboardStore()->FlushDataObject();
 	}
 
 	m_iconThreadPool.clear_queue();
@@ -1647,7 +1648,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction acti
 
 	if (action == ClipboardAction::Copy)
 	{
-		hr = CopyFiles(items, &clipboardDataObject);
+		hr = CopyFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1656,7 +1657,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction acti
 	}
 	else
 	{
-		hr = CutFiles(items, &clipboardDataObject);
+		hr = CutFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1667,10 +1668,9 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction acti
 
 void ShellTreeView::Paste()
 {
-	wil::com_ptr_nothrow<IDataObject> clipboardObject;
-	HRESULT hr = OleGetClipboard(&clipboardObject);
+	auto clipboardObject = m_app->GetClipboardStore()->GetDataObject();
 
-	if (FAILED(hr))
+	if (!clipboardObject)
 	{
 		return;
 	}
@@ -1685,7 +1685,7 @@ void ShellTreeView::Paste()
 	else
 	{
 		std::wstring destinationPath;
-		hr = GetDisplayName(selectedItemPidl.get(), SHGDN_FORPARSING, destinationPath);
+		HRESULT hr = GetDisplayName(selectedItemPidl.get(), SHGDN_FORPARSING, destinationPath);
 
 		if (FAILED(hr))
 		{
@@ -1708,9 +1708,10 @@ void ShellTreeView::PasteShortcut()
 
 void ShellTreeView::OnClipboardUpdate()
 {
-	if (m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()
-		&& OleIsCurrentClipboard(m_cutCopiedItemManager.GetCutCopiedClipboardDataObject())
-			== S_FALSE)
+	auto *clipboardDataObject = m_cutCopiedItemManager.GetCutCopiedClipboardDataObject();
+
+	if (clipboardDataObject
+		&& !m_app->GetClipboardStore()->IsDataObjectCurrent(clipboardDataObject))
 	{
 		m_cutCopiedItemManager.ClearCutCopiedItem();
 	}

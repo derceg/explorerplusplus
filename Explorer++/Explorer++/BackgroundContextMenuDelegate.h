@@ -7,13 +7,14 @@
 #include "../Helper/ShellBackgroundContextMenuDelegate.h"
 
 class BrowserWindow;
+class ClipboardStore;
 class ResourceLoader;
 
 // Adds a number of custom items to the background context menu.
 class BackgroundContextMenuDelegate : public ShellBackgroundContextMenuDelegate
 {
 public:
-	BackgroundContextMenuDelegate(const BrowserWindow *browser,
+	BackgroundContextMenuDelegate(const BrowserWindow *browser, ClipboardStore *clipboardStore,
 		const ResourceLoader *resourceLoader);
 
 	void UpdateMenuEntries(PCIDLIST_ABSOLUTE directory, ShellContextMenuBuilder *builder) override;
@@ -25,5 +26,6 @@ private:
 	void RemoveNonFunctionalItems(ShellContextMenuBuilder *builder);
 
 	const BrowserWindow *const m_browser;
+	ClipboardStore *const m_clipboardStore;
 	const ResourceLoader *const m_resourceLoader;
 };

@@ -45,7 +45,7 @@ BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 		return false;
 	}
 
-	return CanPasteInDirectory(directory.Raw(), pasteType);
+	return CanPasteInDirectory(m_app->GetClipboardStore(), directory.Raw(), pasteType);
 }
 
 // Tests whether a hard link or symlink can be pasted.
