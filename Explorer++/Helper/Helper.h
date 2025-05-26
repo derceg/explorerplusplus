@@ -50,10 +50,6 @@ BOOL GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInf
 BOOL CheckGroupMembership(GroupType groupType);
 BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
-/* User interaction. */
-BOOL GetFileNameFromUser(HWND hwnd, TCHAR *fullFileName, UINT cchMax,
-	const TCHAR *initialDirectory);
-
 /* General helper functions. */
 HRESULT GetCPUBrandString(std::wstring &cpuBrand);
 void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect,

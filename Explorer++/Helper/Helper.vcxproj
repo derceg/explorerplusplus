@@ -657,6 +657,7 @@
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
+    <ClCompile Include="FileDialogs.cpp" />
     <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
@@ -756,6 +757,7 @@
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
+    <ClInclude Include="FileDialogs.h" />
     <ClInclude Include="MenuHelpTextRequest.h" />
     <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ScopedBitmapLock.h" />

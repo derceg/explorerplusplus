@@ -202,6 +202,9 @@
     <ClCompile Include="WilExtraTypes.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="FileDialogs.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -458,6 +461,9 @@
     </ClInclude>
     <ClInclude Include="WilExtraTypes.h">
       <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="FileDialogs.h">
+      <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

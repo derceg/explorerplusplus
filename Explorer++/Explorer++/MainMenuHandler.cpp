@@ -26,6 +26,7 @@
 #include "TabContainerImpl.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
+#include "../Helper/FileDialogs.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -130,20 +131,25 @@ void Explorerplusplus::OnAbout()
 
 void Explorerplusplus::OnSaveDirectoryListing() const
 {
-	TCHAR fileName[MAX_PATH];
-	LoadString(m_app->GetResourceInstance(), IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName,
-		std::size(fileName));
-	StringCchCat(fileName, std::size(fileName), _T(".txt"));
-
 	std::wstring directory = m_pActiveShellBrowser->GetDirectoryPath();
 
-	BOOL bSaveNameRetrieved =
-		GetFileNameFromUser(m_hContainer, fileName, std::size(fileName), directory.c_str());
+	const auto *resourceLoader = m_app->GetResourceLoader();
+	auto defaultFileName = resourceLoader->LoadString(IDS_GENERAL_DIRECTORY_LISTING_FILENAME);
 
-	if (bSaveNameRetrieved)
+	std::vector<FileDialogs::FileType> fileTypes = {
+		{ resourceLoader->LoadString(IDS_GENERAL_DIRECTORY_LISTING_TEXT_DOCUMENT), L"*.txt" }
+	};
+
+	std::wstring filePath;
+	HRESULT hr = FileDialogs::ShowSaveAsDialog(m_hContainer, directory, defaultFileName, fileTypes,
+		0, filePath);
+
+	if (FAILED(hr))
 	{
-		FileOperations::SaveDirectoryListing(directory, fileName);
+		return;
 	}
+
+	FileOperations::SaveDirectoryListing(directory, filePath);
 }
 
 void Explorerplusplus::OnResolveLink()

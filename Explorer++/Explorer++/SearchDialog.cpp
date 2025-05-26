@@ -16,6 +16,7 @@
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/FileDialogs.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
@@ -221,40 +222,20 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-HRESULT SearchDialog::OnBrowserForFolder()
+void SearchDialog::OnBrowserForFolder()
 {
-	auto fileOpenDialog = wil::CoCreateInstanceNoThrow<IFileOpenDialog>(CLSID_FileOpenDialog);
+	wchar_t defaultDirectory[MAX_PATH];
+	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, defaultDirectory, std::size(defaultDirectory));
 
-	if (!fileOpenDialog)
+	std::wstring folderPath;
+	HRESULT hr = FileDialogs::ShowSelectFolderDialog(m_hDlg, defaultDirectory, folderPath);
+
+	if (FAILED(hr))
 	{
-		return E_FAIL;
+		return;
 	}
 
-	FILEOPENDIALOGOPTIONS options;
-	RETURN_IF_FAILED(fileOpenDialog->GetOptions(&options));
-	RETURN_IF_FAILED(fileOpenDialog->SetOptions(
-		options | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST));
-
-	wchar_t directory[MAX_PATH];
-	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, directory, std::size(directory));
-
-	if (wil::com_ptr_nothrow<IShellItem> defaultItem;
-		SUCCEEDED(SHCreateItemFromParsingName(directory, nullptr, IID_PPV_ARGS(&defaultItem))))
-	{
-		fileOpenDialog->SetDefaultFolder(defaultItem.get());
-	}
-
-	RETURN_IF_FAILED(fileOpenDialog->Show(m_hDlg));
-
-	wil::com_ptr_nothrow<IShellItem> shellItem;
-	RETURN_IF_FAILED(fileOpenDialog->GetResult(&shellItem));
-
-	wil::unique_cotaskmem_string parsingPath;
-	RETURN_IF_FAILED(shellItem->GetDisplayName(SIGDN_FILESYSPATH, &parsingPath));
-
-	SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, parsingPath.get());
-
-	return S_OK;
+	SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, folderPath.c_str());
 }
 
 void SearchDialog::OnSearch()

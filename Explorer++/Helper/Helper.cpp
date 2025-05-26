@@ -377,43 +377,6 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	return bSuccess;
 }
 
-BOOL GetFileNameFromUser(HWND hwnd, TCHAR *fullFileName, UINT cchMax, const TCHAR *initialDirectory)
-{
-	/* As per the documentation for
-	the OPENFILENAME structure, the
-	length of the filename buffer
-	should be at least 256. */
-	assert(cchMax >= 256);
-
-	const TCHAR *filter = _T("Text Document (*.txt)\0*.txt\0All Files\0*.*\0\0");
-	OPENFILENAME ofn;
-	BOOL bRet;
-
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = hwnd;
-	ofn.lpstrFilter = filter;
-	ofn.lpstrCustomFilter = nullptr;
-	ofn.nMaxCustFilter = 0;
-	ofn.nFilterIndex = 0;
-	ofn.lpstrFile = fullFileName;
-	ofn.nMaxFile = cchMax;
-	ofn.lpstrFileTitle = nullptr;
-	ofn.nMaxFileTitle = 0;
-	ofn.lpstrInitialDir = initialDirectory;
-	ofn.lpstrTitle = nullptr;
-	ofn.Flags = OFN_ENABLESIZING | OFN_OVERWRITEPROMPT | OFN_EXPLORER;
-	ofn.lpstrDefExt = _T("txt");
-	ofn.lCustData = NULL;
-	ofn.lpfnHook = nullptr;
-	ofn.pvReserved = nullptr;
-	ofn.dwReserved = NULL;
-	ofn.FlagsEx = NULL;
-
-	bRet = GetSaveFileName(&ofn);
-
-	return bRet;
-}
-
 BOOL IsImage(const TCHAR *szFileName)
 {
 	static const TCHAR *IMAGE_EXTS[] = { _T("bmp"), _T("ico"), _T("gif"), _T("jpg"), _T("exf"),
