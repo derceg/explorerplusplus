@@ -470,13 +470,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_VIEW_LARGETHUMBNAILS:
 	case IDM_VIEW_THUMBNAILS:
 	case IDM_VIEW_TILES:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_VIEW_CHANGEDISPLAYCOLOURS:
-		OnChangeDisplayColors();
-		break;
-
 	case IDM_FILTER_FILTERRESULTS:
 	case IDM_FILTER_ENABLE_FILTER:
 		m_commandController.ExecuteCommand(id);

@@ -34,6 +34,7 @@ private:
 
 	void StartCommandPrompt(LaunchProcessFlags flags = LaunchProcessFlags::None);
 	void CopyFolderPath() const;
+	void OnChangeDisplayColors();
 	void GoBack(OpenFolderDisposition disposition);
 	void GoForward(OpenFolderDisposition disposition);
 	void GoUp(OpenFolderDisposition disposition);

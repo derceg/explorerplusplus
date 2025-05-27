@@ -8,7 +8,6 @@
 #include "Config.h"
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
-#include "DisplayColoursDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "FileProgressSink.h"
 #include "MainResource.h"
@@ -27,12 +26,6 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
-
-void Explorerplusplus::OnChangeDisplayColors()
-{
-	DisplayColoursDialog displayColoursDialog(m_app->GetResourceLoader(), m_hContainer, m_config);
-	displayColoursDialog.ShowModalDialog();
-}
 
 void Explorerplusplus::OnDestroyFiles()
 {

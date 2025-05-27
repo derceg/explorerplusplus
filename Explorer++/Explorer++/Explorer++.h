@@ -227,7 +227,6 @@ private:
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnResolveLink();
-	void OnChangeDisplayColors();
 	void OnSortBy(SortMode sortMode);
 	void OnGroupBy(SortMode groupMode);
 	void OnGroupByNone();

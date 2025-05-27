@@ -7,6 +7,7 @@
 #include "AboutDialog.h"
 #include "BrowserWindow.h"
 #include "Config.h"
+#include "DisplayColoursDialog.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -223,6 +224,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
 		break;
 
+	case IDM_VIEW_CHANGEDISPLAYCOLOURS:
+		OnChangeDisplayColors();
+		break;
+
 	case IDM_FILTER_FILTERRESULTS:
 		GetActiveShellBrowser()->EditFilterSettings();
 		break;
@@ -398,6 +403,12 @@ void BrowserCommandController::CopyFolderPath() const
 
 	BulkClipboardWriter clipboardWriter(m_clipboardStore);
 	clipboardWriter.WriteText(path.get());
+}
+
+void BrowserCommandController::OnChangeDisplayColors()
+{
+	DisplayColoursDialog displayColoursDialog(m_resourceLoader, m_browser->GetHWND(), m_config);
+	displayColoursDialog.ShowModalDialog();
 }
 
 void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
