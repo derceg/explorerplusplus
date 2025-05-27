@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "SelectionType.h"
 #include "ViewModes.h"
 #include "../Helper/PidlHelper.h"
 #include <boost/signals2.hpp>
@@ -44,6 +45,8 @@ public:
 
 	virtual void SelectAllItems() = 0;
 	virtual void InvertSelection() = 0;
+	virtual void SelectItemsMatchingPattern(const std::wstring &pattern,
+		SelectionType selectionType) = 0;
 	virtual void ClearSelection() = 0;
 
 	virtual std::wstring GetFilterText() const = 0;

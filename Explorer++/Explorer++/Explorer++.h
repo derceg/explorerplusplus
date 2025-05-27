@@ -18,6 +18,7 @@
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
 #include "RebarView.h"
+#include "SelectionType.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
@@ -226,7 +227,7 @@ private:
 	void OnSetFileAttributes() const;
 	void OnPaste();
 	void OnPasteShortcut();
-	void OnWildcardSelect(BOOL bSelect);
+	void OnWildcardSelect(SelectionType selectionType);
 	void OnResolveLink();
 	void OnChangeDisplayColors();
 	void OnSortBy(SortMode sortMode);

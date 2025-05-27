@@ -94,6 +94,8 @@ public:
 	void MergeFiles() override;
 	void SelectAllItems() override;
 	void InvertSelection() override;
+	void SelectItemsMatchingPattern(const std::wstring &pattern,
+		SelectionType selectionType) override;
 	void ClearSelection() override;
 	std::wstring GetFilterText() const override;
 	void SetFilterText(const std::wstring &filter) override;

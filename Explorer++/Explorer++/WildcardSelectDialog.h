@@ -5,15 +5,18 @@
 #pragma once
 
 #include "BaseDialog.h"
+#include "SelectionType.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
+#include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <list>
 #include <string>
+#include <vector>
 
-class BrowserWindow;
+class ShellBrowser;
 class WildcardSelectDialog;
 
 class WildcardSelectDialogPersistentSettings : public DialogSettings
@@ -48,8 +51,8 @@ private:
 class WildcardSelectDialog : public BaseDialog
 {
 public:
-	WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND hParent, BOOL bSelect,
-		BrowserWindow *browserWindow);
+	WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND parent,
+		ShellBrowser *shellBrowser, SelectionType selectionType);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -60,14 +63,15 @@ private:
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
+	void OnShellBrowserDestroyed();
+
 	void OnOk();
 	void OnCancel();
-	void SelectItems(TCHAR *szPattern);
 
-	BOOL m_bSelect;
-	BrowserWindow *m_browserWindow = nullptr;
-
+	ShellBrowser *const m_shellBrowser;
+	const SelectionType m_selectionType;
 	wil::unique_hicon m_icon;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	WildcardSelectDialogPersistentSettings *m_pwsdps = nullptr;
 };

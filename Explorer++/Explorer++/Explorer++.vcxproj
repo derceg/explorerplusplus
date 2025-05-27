@@ -1313,6 +1313,7 @@
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
+    <ClInclude Include="SelectionType.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="ThemedTabControlPainter.h" />

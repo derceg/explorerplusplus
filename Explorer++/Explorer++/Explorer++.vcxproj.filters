@@ -1755,6 +1755,9 @@
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h">
       <Filter>ShellTreeView\Shell Integration</Filter>
     </ClInclude>
+    <ClInclude Include="SelectionType.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

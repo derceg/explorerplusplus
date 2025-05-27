@@ -4,13 +4,9 @@
 
 #include "stdafx.h"
 #include "WildcardSelectDialog.h"
-#include "BrowserPane.h"
-#include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainerImpl.h"
-#include "../Helper/ListViewHelper.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -20,13 +16,16 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("Wildcar
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
-WildcardSelectDialog::WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	BOOL bSelect, BrowserWindow *browserWindow) :
-	BaseDialog(resourceLoader, IDD_WILDCARDSELECT, hParent, DialogSizingType::Horizontal),
-	m_bSelect(bSelect),
-	m_browserWindow(browserWindow)
+WildcardSelectDialog::WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND parent,
+	ShellBrowser *shellBrowser, SelectionType selectionType) :
+	BaseDialog(resourceLoader, IDD_WILDCARDSELECT, parent, DialogSizingType::Horizontal),
+	m_shellBrowser(shellBrowser),
+	m_selectionType(selectionType)
 {
 	m_pwsdps = &WildcardSelectDialogPersistentSettings::GetInstance();
+
+	m_connections.push_back(m_shellBrowser->AddDestroyedObserver(
+		std::bind_front(&WildcardSelectDialog::OnShellBrowserDestroyed, this)));
 }
 
 INT_PTR WildcardSelectDialog::OnInitDialog()
@@ -43,7 +42,7 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 
 	ComboBox_SetText(hComboBox, m_pwsdps->m_pattern.c_str());
 
-	if (!m_bSelect)
+	if (m_selectionType == SelectionType::Deselect)
 	{
 		std::wstring deselectTitle = m_resourceLoader->LoadString(IDS_WILDCARDDESELECTION);
 		SetWindowText(m_hDlg, deselectTitle.c_str());
@@ -84,6 +83,11 @@ INT_PTR WildcardSelectDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void WildcardSelectDialog::OnShellBrowserDestroyed()
+{
+	EndDialog(m_hDlg, 0);
+}
+
 void WildcardSelectDialog::OnOk()
 {
 	TCHAR szPattern[512];
@@ -91,7 +95,7 @@ void WildcardSelectDialog::OnOk()
 
 	if (lstrlen(szPattern) != 0)
 	{
-		SelectItems(szPattern);
+		m_shellBrowser->SelectItemsMatchingPattern(szPattern, m_selectionType);
 
 		bool bStorePattern = true;
 
@@ -115,24 +119,6 @@ void WildcardSelectDialog::OnOk()
 	}
 
 	EndDialog(m_hDlg, 1);
-}
-
-void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
-{
-	const auto &tab = m_browserWindow->GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	HWND hListView = tab.GetShellBrowserImpl()->GetListView();
-
-	int nItems = ListView_GetItemCount(hListView);
-
-	for (int i = 0; i < nItems; i++)
-	{
-		std::wstring filename = tab.GetShellBrowserImpl()->GetItemName(i);
-
-		if (CheckWildcardMatch(szPattern, filename.c_str(), FALSE) == 1)
-		{
-			ListViewHelper::SelectItem(hListView, i, m_bSelect);
-		}
-	}
 }
 
 void WildcardSelectDialog::OnCancel()

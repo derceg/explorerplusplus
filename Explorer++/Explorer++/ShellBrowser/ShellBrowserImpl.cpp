@@ -1409,6 +1409,22 @@ void ShellBrowserImpl::InvertSelection()
 	SetFocus(m_listView);
 }
 
+void ShellBrowserImpl::SelectItemsMatchingPattern(const std::wstring &pattern,
+	SelectionType selectionType)
+{
+	int numItems = ListView_GetItemCount(m_listView);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		std::wstring filename = GetItemName(i);
+
+		if (CheckWildcardMatch(pattern.c_str(), filename.c_str(), false))
+		{
+			ListViewHelper::SelectItem(m_listView, i, selectionType == SelectionType::Select);
+		}
+	}
+}
+
 void ShellBrowserImpl::ClearSelection()
 {
 	ListViewHelper::SelectAllItems(m_listView, false);

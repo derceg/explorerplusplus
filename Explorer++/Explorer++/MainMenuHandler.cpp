@@ -51,10 +51,10 @@ void Explorerplusplus::OnDestroyFiles()
 	destroyFilesDialog.ShowModalDialog();
 }
 
-void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
+void Explorerplusplus::OnWildcardSelect(SelectionType selectionType)
 {
-	WildcardSelectDialog wilcardSelectDialog(m_app->GetResourceLoader(), m_hContainer, bSelect,
-		this);
+	WildcardSelectDialog wilcardSelectDialog(m_app->GetResourceLoader(), m_hContainer,
+		m_pActiveShellBrowser, selectionType);
 	wilcardSelectDialog.ShowModalDialog();
 }
 

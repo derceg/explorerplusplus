@@ -123,6 +123,13 @@ void ShellBrowserFake::InvertSelection()
 {
 }
 
+void ShellBrowserFake::SelectItemsMatchingPattern(const std::wstring &pattern,
+	SelectionType selectionType)
+{
+	UNREFERENCED_PARAMETER(pattern);
+	UNREFERENCED_PARAMETER(selectionType);
+}
+
 void ShellBrowserFake::ClearSelection()
 {
 }
