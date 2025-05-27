@@ -25,7 +25,7 @@ void ShellBrowserImpl::QueueColumnTask(int itemInternalIndex, ColumnType columnT
 	GlobalFolderSettings globalFolderSettings = m_config->globalFolderSettings;
 
 	auto result = m_columnThreadPool.push(
-		[listView = m_hListView, columnResultID, columnType, itemInternalIndex, basicItemInfo,
+		[listView = m_listView, columnResultID, columnType, itemInternalIndex, basicItemInfo,
 			globalFolderSettings](int id)
 		{
 			UNREFERENCED_PARAMETER(id);
@@ -95,14 +95,14 @@ void ShellBrowserImpl::ProcessColumnResult(int columnResultId)
 
 	auto columnText = std::make_unique<TCHAR[]>(result.columnText.size() + 1);
 	StringCchCopy(columnText.get(), result.columnText.size() + 1, result.columnText.c_str());
-	ListView_SetItemText(m_hListView, *index, *columnIndex, columnText.get());
+	ListView_SetItemText(m_listView, *index, *columnIndex, columnText.get());
 
 	m_columnResults.erase(itr);
 }
 
 std::optional<int> ShellBrowserImpl::GetColumnIndexByType(ColumnType columnType) const
 {
-	HWND header = ListView_GetHeader(m_hListView);
+	HWND header = ListView_GetHeader(m_listView);
 
 	int numItems = Header_GetItemCount(header);
 
@@ -128,7 +128,7 @@ std::optional<int> ShellBrowserImpl::GetColumnIndexByType(ColumnType columnType)
 
 std::optional<ColumnType> ShellBrowserImpl::GetColumnTypeByIndex(int index) const
 {
-	HWND hHeader = ListView_GetHeader(m_hListView);
+	HWND hHeader = ListView_GetHeader(m_listView);
 
 	HDITEM hdItem;
 	hdItem.mask = HDI_LPARAM;
@@ -179,7 +179,7 @@ void ShellBrowserImpl::SetUpListViewColumns()
 
 	for (int i = m_nCurrentColumns + m_nActiveColumns; i >= m_nActiveColumns; i--)
 	{
-		ListView_DeleteColumn(m_hListView, i);
+		ListView_DeleteColumn(m_listView, i);
 	}
 
 	m_nCurrentColumns = m_nActiveColumns;
@@ -201,9 +201,9 @@ void ShellBrowserImpl::InsertColumn(ColumnType columnType, int columnIndex, int 
 		lvColumn.fmt = LVCFMT_RIGHT;
 	}
 
-	int actualColumnIndex = ListView_InsertColumn(m_hListView, columnIndex, &lvColumn);
+	int actualColumnIndex = ListView_InsertColumn(m_listView, columnIndex, &lvColumn);
 
-	HWND header = ListView_GetHeader(m_hListView);
+	HWND header = ListView_GetHeader(m_listView);
 
 	// Store the column's ID with the column itself.
 	HDITEM hdItem;
@@ -214,7 +214,7 @@ void ShellBrowserImpl::InsertColumn(ColumnType columnType, int columnIndex, int 
 
 void ShellBrowserImpl::DeleteAllColumns()
 {
-	HWND header = ListView_GetHeader(m_hListView);
+	HWND header = ListView_GetHeader(m_listView);
 	int numColumns = Header_GetItemCount(header);
 
 	if (numColumns == -1)
@@ -224,7 +224,7 @@ void ShellBrowserImpl::DeleteAllColumns()
 
 	for (int i = numColumns - 1; i >= 0; i--)
 	{
-		ListView_DeleteColumn(m_hListView, i);
+		ListView_DeleteColumn(m_listView, i);
 	}
 
 	m_PreviousSortColumnExists = false;
@@ -516,7 +516,7 @@ void ShellBrowserImpl::ApplyHeaderSortArrow()
 	int iColumn = 0;
 	int iPreviousSortedColumn = 0;
 
-	hHeader = ListView_GetHeader(m_hListView);
+	hHeader = ListView_GetHeader(m_listView);
 
 	if (m_PreviousSortColumnExists)
 	{
@@ -645,7 +645,7 @@ void ShellBrowserImpl::SaveColumnWidths()
 		{
 			if (itr->checked)
 			{
-				itr->width = ListView_GetColumnWidth(m_hListView, iColumn);
+				itr->width = ListView_GetColumnWidth(m_listView, iColumn);
 
 				iColumn++;
 			}
@@ -697,7 +697,7 @@ void ShellBrowserImpl::SetCurrentColumns(const std::vector<Column_t> &columns)
 		}
 		else if (!column.checked && existingColumn->checked)
 		{
-			ListView_DeleteColumn(m_hListView, columnIndex);
+			ListView_DeleteColumn(m_listView, columnIndex);
 		}
 
 		if (column.checked)

@@ -48,8 +48,8 @@ void ShellBrowserImpl::SetShowInGroups(bool showInGroups)
 
 	if (!showInGroups)
 	{
-		ListView_EnableGroupView(m_hListView, false);
-		ListView_RemoveAllGroups(m_hListView);
+		ListView_EnableGroupView(m_listView, false);
+		ListView_RemoveAllGroups(m_listView);
 		m_directoryState.groups.clear();
 	}
 	else
@@ -822,21 +822,21 @@ void ShellBrowserImpl::MoveItemsIntoGroups()
 	int iGroupId;
 	int i = 0;
 
-	ScopedRedrawDisabler redrawDisabler(m_hListView);
+	ScopedRedrawDisabler redrawDisabler(m_listView);
 
-	ListView_RemoveAllGroups(m_hListView);
+	ListView_RemoveAllGroups(m_listView);
 	m_directoryState.groups.clear();
 
-	ListView_EnableGroupView(m_hListView, true);
+	ListView_EnableGroupView(m_listView, true);
 
-	nItems = ListView_GetItemCount(m_hListView);
+	nItems = ListView_GetItemCount(m_listView);
 
 	for (i = 0; i < nItems; i++)
 	{
 		item.mask = LVIF_PARAM;
 		item.iItem = i;
 		item.iSubItem = 0;
-		ListView_GetItem(m_hListView, &item);
+		ListView_GetItem(m_listView, &item);
 
 		iGroupId = DetermineItemGroup((int) item.lParam);
 
@@ -860,7 +860,7 @@ void ShellBrowserImpl::InsertItemIntoGroup(int index, int groupId)
 	item.iItem = index;
 	item.iSubItem = 0;
 	item.iGroupId = groupId;
-	BOOL res = ListView_SetItem(m_hListView, &item);
+	BOOL res = ListView_SetItem(m_listView, &item);
 
 	if (res)
 	{
@@ -896,12 +896,12 @@ void ShellBrowserImpl::InsertGroupIntoListView(const ListViewGroup &listViewGrou
 	lvigs.lvGroup.stateMask = 0;
 	lvigs.pfnGroupCompare = GroupComparisonStub;
 	lvigs.pvData = this;
-	ListView_InsertGroupSorted(m_hListView, &lvigs);
+	ListView_InsertGroupSorted(m_listView, &lvigs);
 }
 
 void ShellBrowserImpl::RemoveGroupFromListView(const ListViewGroup &listViewGroup)
 {
-	ListView_RemoveGroup(m_hListView, listViewGroup.id);
+	ListView_RemoveGroup(m_listView, listViewGroup.id);
 }
 
 void ShellBrowserImpl::UpdateGroupHeader(const ListViewGroup &listViewGroup)
@@ -912,7 +912,7 @@ void ShellBrowserImpl::UpdateGroupHeader(const ListViewGroup &listViewGroup)
 	lvGroup.cbSize = sizeof(LVGROUP);
 	lvGroup.mask = LVGF_HEADER;
 	lvGroup.pszHeader = header.data();
-	ListView_SetGroupInfo(m_hListView, listViewGroup.id, &lvGroup);
+	ListView_SetGroupInfo(m_listView, listViewGroup.id, &lvGroup);
 }
 
 std::wstring ShellBrowserImpl::GenerateGroupHeader(const ListViewGroup &listViewGroup)
@@ -959,7 +959,7 @@ std::optional<int> ShellBrowserImpl::GetItemGroupId(int index)
 	item.mask = LVIF_GROUPID;
 	item.iItem = index;
 	item.iSubItem = 0;
-	BOOL res = ListView_GetItem(m_hListView, &item);
+	BOOL res = ListView_GetItem(m_listView, &item);
 
 	if (!res || item.iGroupId == I_GROUPIDNONE)
 	{

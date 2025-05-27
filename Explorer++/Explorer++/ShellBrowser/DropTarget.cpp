@@ -20,7 +20,7 @@
 int ShellBrowserImpl::GetDropTargetItem(const POINT &pt)
 {
 	POINT ptClient = pt;
-	BOOL res = ScreenToClient(m_hListView, &ptClient);
+	BOOL res = ScreenToClient(m_listView, &ptClient);
 
 	if (!res)
 	{
@@ -29,7 +29,7 @@ int ShellBrowserImpl::GetDropTargetItem(const POINT &pt)
 
 	LVHITTESTINFO hitTestInfo;
 	hitTestInfo.pt = ptClient;
-	int index = ListView_HitTest(m_hListView, &hitTestInfo);
+	int index = ListView_HitTest(m_listView, &hitTestInfo);
 
 	if (index == -1)
 	{
@@ -96,11 +96,11 @@ bool ShellBrowserImpl::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObj
 
 void ShellBrowserImpl::UpdateUiForDrop(int targetItem, const POINT &pt)
 {
-	ListView_SetItemState(m_hListView, -1, 0, LVIS_DROPHILITED);
+	ListView_SetItemState(m_listView, -1, 0, LVIS_DROPHILITED);
 
 	if (targetItem != -1)
 	{
-		ListView_SetItemState(m_hListView, targetItem, LVIS_DROPHILITED, LVIS_DROPHILITED);
+		ListView_SetItemState(m_listView, targetItem, LVIS_DROPHILITED, LVIS_DROPHILITED);
 	}
 
 	ScrollListViewForDrop(pt);
@@ -125,14 +125,14 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 	POINT ptOrigin;
 
 	pt = *ppt;
-	ScreenToClient(m_hListView, &pt);
+	ScreenToClient(m_listView, &pt);
 
 	/* The auto arrange style must be off for the items
 	to be moved. Therefore, if the style is on, turn it
 	off, move the items, and the turn it back on. */
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, false);
+		ListViewHelper::SetAutoArrange(m_listView, false);
 	}
 
 	for (const auto &pidl : m_draggedItems)
@@ -155,12 +155,12 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 			int nItems;
 			int i = 0;
 
-			nItems = ListView_GetItemCount(m_hListView);
+			nItems = ListView_GetItemCount(m_listView);
 
 			/* Find the closest item to the dropped item. */
 			for (i = 0; i < nItems; i++)
 			{
-				ListView_GetItemPosition(m_hListView, i, &ptItem);
+				ListView_GetItemPosition(m_listView, i, &ptItem);
 
 				if (bBelowPreviousItem && (pt.y - ptItem.y) < 0)
 				{
@@ -183,7 +183,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 				lvItem.mask = LVIF_PARAM;
 				lvItem.iItem = i;
 				lvItem.iSubItem = 0;
-				bRes = ListView_GetItem(m_hListView, &lvItem);
+				bRes = ListView_GetItem(m_listView, &lvItem);
 
 				if (bRes)
 				{
@@ -205,7 +205,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 				iSort++;
 			}
 
-			ListView_SortItems(m_hListView, SortTemporaryStub, (LPARAM) this);
+			ListView_SortItems(m_listView, SortTemporaryStub, (LPARAM) this);
 		}
 		else
 		{
@@ -226,12 +226,12 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 				int nItems;
 
 				lvhti.pt = pt;
-				iHitItem = ListView_HitTest(m_hListView, &lvhti);
+				iHitItem = ListView_HitTest(m_listView, &lvhti);
 
 				/* Based on ListView_PositionInsertMark() code. */
 				if (iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
 				{
-					ListView_GetItemRect(m_hListView, lvhti.iItem, &rcItem, LVIR_BOUNDS);
+					ListView_GetItemRect(m_listView, lvhti.iItem, &rcItem, LVIR_BOUNDS);
 
 					if ((pt.x - rcItem.left) > ((rcItem.right - rcItem.left) / 2))
 					{
@@ -241,14 +241,14 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 					{
 						/* Can just insert the item _after_ the item to the
 						left, unless this is the start of a row. */
-						iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
+						iNext = ListView_GetNextItem(m_listView, iHitItem, LVNI_TOLEFT);
 
 						if (iNext == -1)
 						{
 							iNext = iHitItem;
 						}
 
-						bRowStart = (ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
+						bRowStart = (ListView_GetNextItem(m_listView, iNext, LVNI_TOLEFT) == -1);
 					}
 				}
 				else
@@ -256,17 +256,17 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 					lvfi.flags = LVFI_NEARESTXY;
 					lvfi.pt = pt;
 					lvfi.vkDirection = VK_UP;
-					iNext = ListView_FindItem(m_hListView, -1, &lvfi);
+					iNext = ListView_FindItem(m_listView, -1, &lvfi);
 
 					if (iNext == -1)
 					{
 						lvfi.flags = LVFI_NEARESTXY;
 						lvfi.pt = pt;
 						lvfi.vkDirection = VK_LEFT;
-						iNext = ListView_FindItem(m_hListView, -1, &lvfi);
+						iNext = ListView_FindItem(m_listView, -1, &lvfi);
 					}
 
-					ListView_GetItemRect(m_hListView, iNext, &rcItem, LVIR_BOUNDS);
+					ListView_GetItemRect(m_listView, iNext, &rcItem, LVIR_BOUNDS);
 
 					if (pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
 					{
@@ -274,7 +274,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 						{
 							int iBelow;
 
-							iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
+							iBelow = ListView_GetNextItem(m_listView, iNext, LVNI_BELOW);
 
 							if (iBelow != -1)
 							{
@@ -285,9 +285,9 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 						bRowEnd = TRUE;
 					}
 
-					nItems = ListView_GetItemCount(m_hListView);
+					nItems = ListView_GetItemCount(m_listView);
 
-					ListView_GetItemRect(m_hListView, nItems - 1, &rcItem, LVIR_BOUNDS);
+					ListView_GetItemRect(m_listView, nItems - 1, &rcItem, LVIR_BOUNDS);
 
 					if ((pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
 						&& pt.x < rcItem.right + ((rcItem.right - rcItem.left) / 2) + 2
@@ -302,7 +302,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 					{
 						int iLeft;
 
-						iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
+						iLeft = ListView_GetNextItem(m_listView, iNext, LVNI_TOLEFT);
 
 						if (iLeft != -1)
 						{
@@ -315,7 +315,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 					}
 				}
 
-				ListView_GetItemPosition(m_hListView, iNext, &ptNext);
+				ListView_GetItemPosition(m_listView, iNext, &ptNext);
 
 				/* Offset by 1 pixel in the x-direction. This ensures that
 				the dropped item will always be placed AFTER iNext. */
@@ -324,19 +324,19 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 					/* If at the start of a row, simply place at x = 0
 					so that dropped item will be placed before first
 					item... */
-					ListView_SetItemPosition32(m_hListView, *index, 0, ptNext.y);
+					ListView_SetItemPosition32(m_listView, *index, 0, ptNext.y);
 				}
 				else
 				{
-					ListView_SetItemPosition32(m_hListView, *index, ptNext.x + 1, ptNext.y);
+					ListView_SetItemPosition32(m_listView, *index, ptNext.x + 1, ptNext.y);
 				}
 			}
 			else
 			{
-				ListView_GetOrigin(m_hListView, &ptOrigin);
+				ListView_GetOrigin(m_listView, &ptOrigin);
 
 				/* ListView may be scrolled horizontally or vertically. */
-				ListView_SetItemPosition32(m_hListView, *index,
+				ListView_SetItemPosition32(m_listView, *index,
 					ptOrigin.x + pt.x - m_ptDraggedOffset.x,
 					ptOrigin.y + pt.y - m_ptDraggedOffset.y);
 			}
@@ -345,7 +345,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, true);
+		ListViewHelper::SetAutoArrange(m_listView, true);
 	}
 
 	m_performingDrag = false;
@@ -354,7 +354,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 {
 	POINT ptClient = pt;
-	BOOL res = ScreenToClient(m_hListView, &ptClient);
+	BOOL res = ScreenToClient(m_listView, &ptClient);
 
 	if (!res)
 	{
@@ -362,7 +362,7 @@ void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 	}
 
 	RECT rc;
-	res = GetClientRect(m_hListView, &rc);
+	res = GetClientRect(m_listView, &rc);
 
 	if (!res)
 	{
@@ -371,7 +371,7 @@ void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 
 	LONG_PTR fStyle;
 
-	fStyle = GetWindowLongPtr(m_hListView, GWL_STYLE);
+	fStyle = GetWindowLongPtr(m_listView, GWL_STYLE);
 
 	/* The listview can be scrolled only if there
 	is a scrollbar present. */
@@ -379,11 +379,11 @@ void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 	{
 		if (ptClient.x < MIN_X_POS)
 		{
-			ListView_Scroll(m_hListView, -X_SCROLL_AMOUNT, 0);
+			ListView_Scroll(m_listView, -X_SCROLL_AMOUNT, 0);
 		}
 		else if (ptClient.x > (rc.right - MIN_X_POS))
 		{
-			ListView_Scroll(m_hListView, X_SCROLL_AMOUNT, 0);
+			ListView_Scroll(m_listView, X_SCROLL_AMOUNT, 0);
 		}
 	}
 
@@ -391,18 +391,18 @@ void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 	{
 		if (ptClient.y < MIN_Y_POS)
 		{
-			ListView_Scroll(m_hListView, 0, -Y_SCROLL_AMOUNT);
+			ListView_Scroll(m_listView, 0, -Y_SCROLL_AMOUNT);
 		}
 		else if (ptClient.y > (rc.bottom - MIN_Y_POS))
 		{
-			ListView_Scroll(m_hListView, 0, Y_SCROLL_AMOUNT);
+			ListView_Scroll(m_listView, 0, Y_SCROLL_AMOUNT);
 		}
 	}
 }
 
 void ShellBrowserImpl::ResetDropUiState()
 {
-	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
+	ListViewHelper::PositionInsertMark(m_listView, nullptr);
 
-	ListView_SetItemState(m_hListView, -1, 0, LVIS_DROPHILITED);
+	ListView_SetItemState(m_listView, -1, 0, LVIS_DROPHILITED);
 }

@@ -87,7 +87,7 @@ void ShellBrowserImpl::RemoveFilteredItems()
 		return;
 	}
 
-	int nItems = ListView_GetItemCount(m_hListView);
+	int nItems = ListView_GetItemCount(m_listView);
 
 	for (int i = nItems - 1; i >= 0; i--)
 	{
@@ -112,7 +112,7 @@ void ShellBrowserImpl::RemoveFilteredItem(int iItem, int iItemInternal)
 
 	const auto &item = m_itemInfoMap.at(iItemInternal);
 
-	if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
+	if (ListView_GetItemState(m_listView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
 	{
 		ulFileSize.LowPart = item.wfd.nFileSizeLow;
 		ulFileSize.HighPart = item.wfd.nFileSizeHigh;
@@ -128,7 +128,7 @@ void ShellBrowserImpl::RemoveFilteredItem(int iItem, int iItemInternal)
 	m_directoryState.totalDirSize -= ulFileSize.QuadPart;
 
 	/* Remove the item from the m_hListView. */
-	ListView_DeleteItem(m_hListView, iItem);
+	ListView_DeleteItem(m_listView, iItem);
 
 	m_directoryState.numItems--;
 

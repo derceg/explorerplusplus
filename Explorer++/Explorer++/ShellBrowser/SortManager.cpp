@@ -14,7 +14,7 @@
 
 void ShellBrowserImpl::SortFolder()
 {
-	SendMessage(m_hListView, LVM_SORTITEMS, reinterpret_cast<WPARAM>(this),
+	SendMessage(m_listView, LVM_SORTITEMS, reinterpret_cast<WPARAM>(this),
 		reinterpret_cast<LPARAM>(SortStub));
 
 	if (m_folderSettings.viewMode == +ViewMode::Details)

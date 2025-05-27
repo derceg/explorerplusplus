@@ -71,7 +71,7 @@ void ShellBrowserImpl::StartDirectoryMonitoringViaFileSystemChangeWatcher()
 void ShellBrowserImpl::ProcessShellChangeNotifications(
 	const std::vector<ShellChangeNotification> &shellChangeNotifications)
 {
-	ScopedRedrawDisabler redrawDisabler(m_hListView);
+	ScopedRedrawDisabler redrawDisabler(m_listView);
 
 	for (const auto &change : shellChangeNotifications)
 	{
@@ -366,7 +366,7 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 		return;
 	}
 
-	UINT state = ListView_GetItemState(m_hListView, *itemIndex, LVIS_SELECTED);
+	UINT state = ListView_GetItemState(m_listView, *itemIndex, LVIS_SELECTED);
 
 	if (WI_IsFlagSet(state, LVIS_SELECTED))
 	{
@@ -391,16 +391,16 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 		// recycle bin is renamed, the parsing name remains the same.
 		BasicItemInfo_t basicItemInfo = getBasicItemInfo(*internalIndex);
 		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
-		ListView_SetItemText(m_hListView, *itemIndex, 0, filename.data());
+		ListView_SetItemText(m_listView, *itemIndex, 0, filename.data());
 	}
 
 	if (WI_IsFlagSet(updatedItemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
 	{
-		ListView_SetItemState(m_hListView, *itemIndex, LVIS_CUT, LVIS_CUT);
+		ListView_SetItemState(m_listView, *itemIndex, LVIS_CUT, LVIS_CUT);
 	}
 	else
 	{
-		ListView_SetItemState(m_hListView, *itemIndex, 0, LVIS_CUT);
+		ListView_SetItemState(m_listView, *itemIndex, 0, LVIS_CUT);
 	}
 
 	if (m_folderSettings.showInGroups)
@@ -410,7 +410,7 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 	}
 
 	// It's not safe to use itemIndex past this point.
-	ListView_SortItems(m_hListView, SortStub, this);
+	ListView_SortItems(m_listView, SortStub, this);
 	itemIndex.reset();
 }
 
@@ -459,7 +459,7 @@ void ShellBrowserImpl::InvalidateAllColumnsForItem(int itemIndex)
 
 	for (int i = 0; i < numColumns; i++)
 	{
-		ListView_SetItemText(m_hListView, itemIndex, i, LPSTR_TEXTCALLBACK);
+		ListView_SetItemText(m_listView, itemIndex, i, LPSTR_TEXTCALLBACK);
 	}
 }
 
@@ -470,7 +470,7 @@ void ShellBrowserImpl::InvalidateIconForItem(int itemIndex)
 	lvItem.iItem = itemIndex;
 	lvItem.iSubItem = 0;
 	lvItem.iImage = I_IMAGECALLBACK;
-	ListView_SetItem(m_hListView, &lvItem);
+	ListView_SetItem(m_listView, &lvItem);
 }
 
 concurrencpp::null_result ShellBrowserImpl::OnCurrentDirectoryRenamed(

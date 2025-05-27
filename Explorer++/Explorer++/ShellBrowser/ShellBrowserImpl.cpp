@@ -69,7 +69,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
-	m_hListView(GetHWND()),
+	m_listView(GetHWND()),
 	m_hOwner(hOwner),
 	m_app(app),
 	m_browser(browser),
@@ -113,7 +113,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser
 	m_weakPtrFactory(this)
 {
 	InitializeListView();
-	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
+	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_listView, m_cachedIcons);
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddStartedObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this),
@@ -163,7 +163,7 @@ ShellBrowserImpl::~ShellBrowserImpl()
 		m_app->GetClipboardStore()->FlushDataObject();
 	}
 
-	DestroyWindow(m_hListView);
+	DestroyWindow(m_listView);
 
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
@@ -184,7 +184,7 @@ HWND ShellBrowserImpl::CreateListView(HWND parent)
 
 void ShellBrowserImpl::InitializeListView()
 {
-	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hListView);
+	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(m_listView);
 
 	if (m_config->useFullRowSelect.get())
 	{
@@ -202,16 +202,16 @@ void ShellBrowserImpl::InitializeListView()
 	m_connections.push_back(m_config->checkBoxSelection.addObserver(
 		std::bind_front(&ShellBrowserImpl::OnCheckBoxSelectionUpdated, this)));
 
-	ListView_SetExtendedListViewStyle(m_hListView, dwExtendedStyle);
+	ListView_SetExtendedListViewStyle(m_listView, dwExtendedStyle);
 
-	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_GRIDLINES,
+	ListViewHelper::SetAutoArrange(m_listView, m_folderSettings.autoArrange);
+	ListViewHelper::AddRemoveExtendedStyles(m_listView, LVS_EX_GRIDLINES,
 		m_config->globalFolderSettings.showGridlines.get());
 
 	m_connections.push_back(m_config->globalFolderSettings.showGridlines.addObserver(
 		std::bind_front(&ShellBrowserImpl::OnShowGridlinesUpdated, this)));
 
-	ListViewHelper::ActivateOneClickSelect(m_hListView,
+	ListViewHelper::ActivateOneClickSelect(m_listView,
 		m_config->globalFolderSettings.oneClickActivate.get(),
 		m_config->globalFolderSettings.oneClickActivateHoverTime.get());
 
@@ -220,11 +220,11 @@ void ShellBrowserImpl::InitializeListView()
 	m_connections.push_back(m_config->globalFolderSettings.oneClickActivateHoverTime.addObserver(
 		std::bind_front(&ShellBrowserImpl::OnOneClickActivateHoverTimeUpdated, this)));
 
-	m_app->GetThemeManager()->ApplyThemeToWindowAndChildren(m_hListView);
+	m_app->GetThemeManager()->ApplyThemeToWindowAndChildren(m_listView);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hListView,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_listView,
 		std::bind_front(&ShellBrowserImpl::ListViewProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hListView),
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_listView),
 		std::bind_front(&ShellBrowserImpl::ListViewParentProc, this)));
 
 	m_connections.push_back(m_app->GetColorRuleModel()->AddItemAddedObserver(
@@ -240,7 +240,7 @@ void ShellBrowserImpl::InitializeListView()
 
 	if (m_folderSettings.showInGroups)
 	{
-		ListView_EnableGroupView(m_hListView, true);
+		ListView_EnableGroupView(m_listView, true);
 	}
 }
 
@@ -262,7 +262,7 @@ void ShellBrowserImpl::SetAutoArrange(bool autoArrange)
 {
 	m_folderSettings.autoArrange = autoArrange;
 
-	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
+	ListViewHelper::SetAutoArrange(m_listView, m_folderSettings.autoArrange);
 }
 
 ViewMode ShellBrowserImpl::GetViewMode() const
@@ -308,8 +308,8 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 {
 	DWORD dwStyle;
 
-	ListView_SetImageList(m_hListView, nullptr, LVSIL_SMALL);
-	ListView_SetImageList(m_hListView, nullptr, LVSIL_NORMAL);
+	ListView_SetImageList(m_listView, nullptr, LVSIL_SMALL);
+	ListView_SetImageList(m_listView, nullptr, LVSIL_NORMAL);
 
 	switch (viewMode)
 	{
@@ -317,7 +317,7 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+		ListView_SetImageList(m_listView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
 			LVSIL_NORMAL);
 	}
 	break;
@@ -326,7 +326,7 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+		ListView_SetImageList(m_listView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
 			LVSIL_NORMAL);
 	}
 	break;
@@ -342,7 +342,7 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+		ListView_SetImageList(m_listView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
 			LVSIL_NORMAL);
 	}
 	break;
@@ -353,7 +353,7 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+		ListView_SetImageList(m_listView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
 			LVSIL_SMALL);
 	}
 	break;
@@ -431,7 +431,7 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	ViewMode previousViewMode = m_folderSettings.viewMode;
 	m_folderSettings.viewMode = viewMode;
 
-	SendMessage(m_hListView, LVM_SETVIEW, dwStyle, 0);
+	SendMessage(m_listView, LVM_SETVIEW, dwStyle, 0);
 
 	if (previousViewMode != +ViewMode::Details && viewMode == +ViewMode::Details)
 	{
@@ -456,17 +456,17 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 
 void ShellBrowserImpl::SetFirstColumnTextToCallback()
 {
-	int numItems = ListView_GetItemCount(m_hListView);
+	int numItems = ListView_GetItemCount(m_listView);
 
 	for (int i = 0; i < numItems; i++)
 	{
-		ListView_SetItemText(m_hListView, i, 0, LPSTR_TEXTCALLBACK);
+		ListView_SetItemText(m_listView, i, 0, LPSTR_TEXTCALLBACK);
 	}
 }
 
 void ShellBrowserImpl::SetFirstColumnTextToFilename()
 {
-	int numItems = ListView_GetItemCount(m_hListView);
+	int numItems = ListView_GetItemCount(m_listView);
 
 	for (int i = 0; i < numItems; i++)
 	{
@@ -475,7 +475,7 @@ void ShellBrowserImpl::SetFirstColumnTextToFilename()
 		BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 
-		ListView_SetItemText(m_hListView, i, 0, filename.data());
+		ListView_SetItemText(m_listView, i, 0, filename.data());
 	}
 }
 
@@ -558,7 +558,7 @@ void ShellBrowserImpl::SetGroupSortDirection(SortDirection direction)
 
 	m_folderSettings.groupSortDirection = direction;
 
-	ListView_SortGroups(m_hListView, GroupComparisonStub, this);
+	ListView_SortGroups(m_listView, GroupComparisonStub, this);
 }
 
 std::wstring ShellBrowserImpl::GetItemName(int index) const
@@ -599,7 +599,7 @@ unique_pidl_absolute ShellBrowserImpl::GetDirectoryIdl() const
 
 void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 {
-	ListViewHelper::SelectAllItems(m_hListView, false);
+	ListViewHelper::SelectAllItems(m_listView, false);
 
 	int smallestIndex = INT_MAX;
 
@@ -613,7 +613,7 @@ void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 			continue;
 		}
 
-		ListViewHelper::SelectItem(m_hListView, *index, true);
+		ListViewHelper::SelectItem(m_listView, *index, true);
 
 		if (*index < smallestIndex)
 		{
@@ -623,8 +623,8 @@ void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 
 	if (smallestIndex != INT_MAX)
 	{
-		ListViewHelper::FocusItem(m_hListView, smallestIndex, true);
-		ListView_EnsureVisible(m_hListView, smallestIndex, FALSE);
+		ListViewHelper::FocusItem(m_listView, smallestIndex, true);
+		ListView_EnsureVisible(m_listView, smallestIndex, FALSE);
 	}
 }
 
@@ -640,7 +640,7 @@ int ShellBrowserImpl::LocateFileItemIndex(const TCHAR *szFileName) const
 	{
 		lvFind.flags = LVFI_PARAM;
 		lvFind.lParam = iInternalIndex;
-		iItem = ListView_FindItem(m_hListView, -1, &lvFind);
+		iItem = ListView_FindItem(m_listView, -1, &lvFind);
 
 		return iItem;
 	}
@@ -693,7 +693,7 @@ std::optional<int> ShellBrowserImpl::LocateItemByInternalIndex(int internalIndex
 	LVFINDINFO lvfi;
 	lvfi.flags = LVFI_PARAM;
 	lvfi.lParam = internalIndex;
-	int item = ListView_FindItem(m_hListView, -1, &lvfi);
+	int item = ListView_FindItem(m_listView, -1, &lvfi);
 
 	if (item == -1)
 	{
@@ -749,14 +749,14 @@ int ShellBrowserImpl::DetermineItemSortedPosition(LPARAM lParam) const
 	int nItems = 0;
 	int i = 0;
 
-	nItems = ListView_GetItemCount(m_hListView);
+	nItems = ListView_GetItemCount(m_listView);
 
 	while (res > 0 && i < nItems)
 	{
 		lvItem.mask = LVIF_PARAM;
 		lvItem.iItem = i;
 		lvItem.iSubItem = 0;
-		bItem = ListView_GetItem(m_hListView, &lvItem);
+		bItem = ListView_GetItem(m_listView, &lvItem);
 
 		if (bItem)
 		{
@@ -913,7 +913,7 @@ void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 		return;
 	}
 
-	ListView_EditLabel(m_hListView, *index);
+	ListView_EditLabel(m_listView, *index);
 }
 
 int ShellBrowserImpl::GetUniqueFolderId() const
@@ -939,7 +939,7 @@ BasicItemInfo_t ShellBrowserImpl::getBasicItemInfo(int internalIndex) const
 
 HWND ShellBrowserImpl::GetListView() const
 {
-	return m_hListView;
+	return m_listView;
 }
 
 FolderSettings ShellBrowserImpl::GetFolderSettings() const
@@ -952,7 +952,7 @@ void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int item = -1;
 
-	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	while ((item = ListView_GetNextItem(m_listView, item, LVNI_SELECTED)) != -1)
 	{
 		auto &itemInfo = GetItemByIndex(item);
 		pidls.push_back(itemInfo.pidlComplete.Raw());
@@ -963,7 +963,7 @@ void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 		return;
 	}
 
-	m_fileActionHandler->DeleteFiles(m_hListView, pidls, permanent, false);
+	m_fileActionHandler->DeleteFiles(m_listView, pidls, permanent, false);
 }
 
 void ShellBrowserImpl::StartRenamingSelectedItems()
@@ -1001,7 +1001,7 @@ void ShellBrowserImpl::StartRenamingSingleItem(const PidlAbsolute &item)
 		return;
 	}
 
-	ListView_EditLabel(m_hListView, *index);
+	ListView_EditLabel(m_listView, *index);
 }
 
 void ShellBrowserImpl::StartRenamingMultipleItems(const std::vector<PidlAbsolute> &items)
@@ -1026,7 +1026,7 @@ void ShellBrowserImpl::StartRenamingMultipleItems(const std::vector<PidlAbsolute
 		return;
 	}
 
-	MassRenameDialog massRenameDialog(m_app->GetResourceLoader(), m_resourceInstance, m_hListView,
+	MassRenameDialog massRenameDialog(m_app->GetResourceLoader(), m_resourceInstance, m_listView,
 		fullFilenameList, m_fileActionHandler);
 	massRenameDialog.ShowModalDialog();
 }
@@ -1066,7 +1066,7 @@ HRESULT ShellBrowserImpl::CopyItemsToClipboard(const std::vector<PidlAbsolute> &
 
 			int item = -1;
 
-			while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+			while ((item = ListView_GetNextItem(m_listView, item, LVNI_SELECTED)) != -1)
 			{
 				std::wstring filename = GetItemName(item);
 				m_cutFileNames.emplace_back(filename);
@@ -1119,8 +1119,8 @@ void ShellBrowserImpl::PasteShortcut()
 	serviceProvider->RegisterService(IID_IFolderView,
 		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr()));
 
-	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.Raw(), {}, m_hListView,
-		L"pastelink", 0, serviceProvider.get());
+	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.Raw(), {}, m_listView, L"pastelink",
+		0, serviceProvider.get());
 }
 
 void ShellBrowserImpl::PasteHardLinks()
@@ -1175,7 +1175,7 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 	switch (command)
 	{
 	case IDM_FILE_COPYITEMPATH:
-		return ListView_GetSelectedCount(m_hListView) > 0;
+		return ListView_GetSelectedCount(m_listView) > 0;
 
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
@@ -1267,8 +1267,8 @@ void ShellBrowserImpl::CreateNewFolder()
 	sink->SetPostNewItemObserver(
 		[this](PIDLIST_ABSOLUTE pidl)
 		{
-			ListViewHelper::SelectAllItems(m_hListView, false);
-			SetFocus(m_hListView);
+			ListViewHelper::SelectAllItems(m_listView, false);
+			SetFocus(m_listView);
 
 			QueueRename(pidl);
 		});
@@ -1309,7 +1309,7 @@ std::optional<std::wstring> ShellBrowserImpl::GetFilePathForSplit() const
 		return std::nullopt;
 	}
 
-	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED);
+	int selectedItem = ListView_GetNextItem(m_listView, -1, LVNI_SELECTED);
 
 	if (selectedItem == -1)
 	{
@@ -1360,7 +1360,7 @@ std::optional<std::vector<std::wstring>> ShellBrowserImpl::GetFilePathsForMerge(
 	std::vector<std::wstring> items;
 	int index = -1;
 
-	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	while ((index = ListView_GetNextItem(m_listView, index, LVNI_SELECTED)) != -1)
 	{
 		const auto &itemInfo = GetItemByIndex(index);
 
@@ -1399,20 +1399,20 @@ void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)
 
 void ShellBrowserImpl::SelectAllItems()
 {
-	ListViewHelper::SelectAllItems(m_hListView, true);
-	SetFocus(m_hListView);
+	ListViewHelper::SelectAllItems(m_listView, true);
+	SetFocus(m_listView);
 }
 
 void ShellBrowserImpl::InvertSelection()
 {
-	ListViewHelper::InvertSelection(m_hListView);
-	SetFocus(m_hListView);
+	ListViewHelper::InvertSelection(m_listView);
+	SetFocus(m_listView);
 }
 
 void ShellBrowserImpl::ClearSelection()
 {
-	ListViewHelper::SelectAllItems(m_hListView, false);
-	SetFocus(m_hListView);
+	ListViewHelper::SelectAllItems(m_listView, false);
+	SetFocus(m_listView);
 }
 
 bool ShellBrowserImpl::CanSaveDirectoryListing() const
@@ -1435,7 +1435,7 @@ void ShellBrowserImpl::SaveDirectoryListing()
 	};
 
 	std::wstring filePath;
-	HRESULT hr = FileDialogs::ShowSaveAsDialog(m_hListView, m_directoryState.directory,
+	HRESULT hr = FileDialogs::ShowSaveAsDialog(m_listView, m_directoryState.directory,
 		defaultFileName, fileTypes, 0, filePath);
 
 	if (FAILED(hr))

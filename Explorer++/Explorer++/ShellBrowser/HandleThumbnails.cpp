@@ -21,10 +21,10 @@ void ShellBrowserImpl::SetupThumbnailsView(int shellImageListType)
 	FAIL_FAST_IF_FAILED(SHGetImageList(shellImageListType, IID_PPV_ARGS(&imageList)));
 	m_directoryState.thumbnailsShellImageList = reinterpret_cast<HIMAGELIST>(imageList);
 
-	int numItems = ListView_GetItemCount(m_hListView);
+	int numItems = ListView_GetItemCount(m_listView);
 	m_directoryState.thumbnailsImageList.reset(
 		ImageList_Create(m_thumbnailItemWidth, m_thumbnailItemHeight, ILC_COLOR32, numItems, 10));
-	ListView_SetImageList(m_hListView, m_directoryState.thumbnailsImageList.get(), LVSIL_NORMAL);
+	ListView_SetImageList(m_listView, m_directoryState.thumbnailsImageList.get(), LVSIL_NORMAL);
 
 	InvalidateAllItemImages();
 }
@@ -36,7 +36,7 @@ void ShellBrowserImpl::RemoveThumbnailsView()
 
 	InvalidateAllItemImages();
 
-	ListView_SetImageList(m_hListView, nullptr, LVSIL_NORMAL);
+	ListView_SetImageList(m_listView, nullptr, LVSIL_NORMAL);
 
 	m_directoryState.thumbnailsShellImageList = nullptr;
 	m_directoryState.thumbnailsImageList.reset();
@@ -44,7 +44,7 @@ void ShellBrowserImpl::RemoveThumbnailsView()
 
 void ShellBrowserImpl::InvalidateAllItemImages()
 {
-	int numItems = ListView_GetItemCount(m_hListView);
+	int numItems = ListView_GetItemCount(m_listView);
 
 	for (int i = 0; i < numItems; i++)
 	{
@@ -53,7 +53,7 @@ void ShellBrowserImpl::InvalidateAllItemImages()
 		lvItem.iItem = i;
 		lvItem.iSubItem = 0;
 		lvItem.iImage = I_IMAGECALLBACK;
-		ListView_SetItem(m_hListView, &lvItem);
+		ListView_SetItem(m_listView, &lvItem);
 	}
 }
 
@@ -64,7 +64,7 @@ void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 
 	auto result = m_thumbnailThreadPool.push(
-		[listView = m_hListView, thumbnailResultID, internalIndex, basicItemInfo,
+		[listView = m_listView, thumbnailResultID, internalIndex, basicItemInfo,
 			thumbnailSize = m_thumbnailItemWidth](int id) -> std::optional<ThumbnailResult_t>
 		{
 			UNREFERENCED_PARAMETER(id);
@@ -181,7 +181,7 @@ void ShellBrowserImpl::ProcessThumbnailResult(int thumbnailResultId)
 	lvItem.iItem = *index;
 	lvItem.iSubItem = 0;
 	lvItem.iImage = imageIndex;
-	ListView_SetItem(m_hListView, &lvItem);
+	ListView_SetItem(m_listView, &lvItem);
 }
 
 /* Draws a thumbnail based on an items icon. */
@@ -207,7 +207,7 @@ int ShellBrowserImpl::GetThumbnailInternal(int iType, int iInternalIndex,
 	HBRUSH hbr;
 	int iImage;
 
-	hdc = GetDC(m_hListView);
+	hdc = GetDC(m_listView);
 	hdcBacking = CreateCompatibleDC(hdc);
 
 	/* Backing bitmap. */
@@ -216,7 +216,7 @@ int ShellBrowserImpl::GetThumbnailInternal(int iType, int iInternalIndex,
 
 	/* Set the background of the new bitmap to be the same color as the
 	background in the listview. */
-	hbr = CreateSolidBrush(ListView_GetBkColor(m_hListView));
+	hbr = CreateSolidBrush(ListView_GetBkColor(m_listView));
 	RECT rect = { 0, 0, m_thumbnailItemWidth, m_thumbnailItemHeight };
 	FillRect(hdcBacking, &rect, hbr);
 
@@ -235,10 +235,10 @@ int ShellBrowserImpl::GetThumbnailInternal(int iType, int iInternalIndex,
 	bitmap needs to be selected out of its DC). */
 	SelectObject(hdcBacking, hBackingBitmapOld);
 	DeleteDC(hdcBacking);
-	ReleaseDC(m_hListView, hdc);
+	ReleaseDC(m_listView, hdc);
 
 	/* Add the new bitmap to the imagelist. */
-	himl = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
+	himl = ListView_GetImageList(m_listView, LVSIL_NORMAL);
 	iImage = ImageList_Add(himl, hBackingBitmap, nullptr);
 
 	/* Now delete the backing bitmap. */

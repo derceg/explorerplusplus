@@ -12,20 +12,20 @@ void ShellBrowserImpl::InsertTileViewColumns()
 	lvColumn.mask = 0;
 
 	/* Name. */
-	ListView_InsertColumn(m_hListView, 1, &lvColumn);
+	ListView_InsertColumn(m_listView, 1, &lvColumn);
 
 	/* Type. */
-	ListView_InsertColumn(m_hListView, 2, &lvColumn);
+	ListView_InsertColumn(m_listView, 2, &lvColumn);
 
 	/* File size. */
-	ListView_InsertColumn(m_hListView, 3, &lvColumn);
+	ListView_InsertColumn(m_listView, 3, &lvColumn);
 
 	LVTILEVIEWINFO lvtvi;
 	lvtvi.cbSize = sizeof(lvtvi);
 	lvtvi.dwMask = LVTVIM_COLUMNS;
 	lvtvi.dwFlags = LVTVIF_AUTOSIZE;
 	lvtvi.cLines = 2;
-	ListView_SetTileViewInfo(m_hListView, &lvtvi);
+	ListView_SetTileViewInfo(m_listView, &lvtvi);
 }
 
 void ShellBrowserImpl::SetTileViewInfo()
@@ -35,14 +35,14 @@ void ShellBrowserImpl::SetTileViewInfo()
 	int nItems;
 	int i = 0;
 
-	nItems = ListView_GetItemCount(m_hListView);
+	nItems = ListView_GetItemCount(m_listView);
 
 	for (i = 0; i < nItems; i++)
 	{
 		lvItem.mask = LVIF_PARAM;
 		lvItem.iItem = i;
 		lvItem.iSubItem = 0;
-		bRes = ListView_GetItem(m_hListView, &lvItem);
+		bRes = ListView_GetItem(m_listView, &lvItem);
 
 		if (bRes)
 		{
@@ -64,13 +64,13 @@ void ShellBrowserImpl::SetTileViewItemInfo(int iItem, int iItemInternal)
 	lvti.cColumns = 2;
 	lvti.puColumns = uColumns;
 	lvti.piColFmt = columnFormats;
-	ListView_SetTileInfo(m_hListView, &lvti);
+	ListView_SetTileInfo(m_listView, &lvti);
 
 	std::wstring fullFileName = GetItemFullName(iItem);
 
 	SHGetFileInfo(fullFileName.c_str(), 0, &shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
 
-	ListView_SetItemText(m_hListView, iItem, 1, shfi.szTypeName);
+	ListView_SetItemText(m_listView, iItem, 1, shfi.szTypeName);
 
 	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		!= FILE_ATTRIBUTE_DIRECTORY)
@@ -82,6 +82,6 @@ void ShellBrowserImpl::SetTileViewItemInfo(int iItem, int iItemInternal)
 			? m_config->globalFolderSettings.sizeDisplayFormat
 			: +SizeDisplayFormat::None;
 		std::wstring fileSizeText = FormatSizeString(fileSize.QuadPart, displayFormat);
-		ListView_SetItemText(m_hListView, iItem, 2, fileSizeText.data());
+		ListView_SetItemText(m_listView, iItem, 2, fileSizeText.data());
 	}
 }

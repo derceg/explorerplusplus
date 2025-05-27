@@ -628,7 +628,7 @@ private:
 	std::optional<int> LocateItemByInternalIndex(int internalIndex) const;
 	void ApplyHeaderSortArrow();
 
-	HWND m_hListView;
+	HWND m_listView;
 	HWND m_hOwner;
 
 	App *const m_app;

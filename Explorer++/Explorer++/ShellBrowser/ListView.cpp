@@ -164,7 +164,7 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	switch (uMsg)
 	{
 	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hListView)
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_listView)
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -225,7 +225,7 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 				return OnListViewCustomDraw(reinterpret_cast<NMLVCUSTOMDRAW *>(lParam));
 			}
 		}
-		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
+		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_listView))
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -252,7 +252,7 @@ void ShellBrowserImpl::OnListViewClick(const NMITEMACTIVATE *eventInfo)
 
 	LVHITTESTINFO htInfo = {};
 	htInfo.pt = eventInfo->ptAction;
-	ListView_HitTest(m_hListView, &htInfo);
+	ListView_HitTest(m_listView, &htInfo);
 
 	if (WI_IsFlagSet(htInfo.flags, LVHT_ONITEMSTATEICON) && m_config->checkBoxSelection.get())
 	{
@@ -299,7 +299,7 @@ bool ShellBrowserImpl::OnListViewLeftButtonDoubleClick(const POINT *pt)
 
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
-	ListView_HitTest(m_hListView, &ht);
+	ListView_HitTest(m_listView, &ht);
 
 	if (ht.flags != LVHT_NOWHERE)
 	{
@@ -315,13 +315,13 @@ void ShellBrowserImpl::OnListViewMButtonDown(const POINT *pt)
 {
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
-	ListView_HitTest(m_hListView, &ht);
+	ListView_HitTest(m_listView, &ht);
 
 	if (ht.flags != LVHT_NOWHERE && ht.iItem != -1)
 	{
 		m_middleButtonItem = ht.iItem;
 
-		ListView_SetItemState(m_hListView, ht.iItem, LVIS_FOCUSED, LVIS_FOCUSED);
+		ListView_SetItemState(m_listView, ht.iItem, LVIS_FOCUSED, LVIS_FOCUSED);
 	}
 	else
 	{
@@ -333,7 +333,7 @@ void ShellBrowserImpl::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 {
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
-	ListView_HitTest(m_hListView, &ht);
+	ListView_HitTest(m_listView, &ht);
 
 	if (ht.flags == LVHT_NOWHERE)
 	{
@@ -377,14 +377,14 @@ void ShellBrowserImpl::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, 
 	{
 		LVHITTESTINFO hitTestInfo = {};
 		hitTestInfo.pt = { x, y };
-		int itemAtPoint = ListView_HitTest(m_hListView, &hitTestInfo);
+		int itemAtPoint = ListView_HitTest(m_listView, &hitTestInfo);
 
 		if (itemAtPoint != -1
-			&& ListView_GetItemState(m_hListView, itemAtPoint, LVIS_SELECTED) != LVIS_SELECTED)
+			&& ListView_GetItemState(m_listView, itemAtPoint, LVIS_SELECTED) != LVIS_SELECTED)
 		{
-			ListViewHelper::SelectAllItems(m_hListView, false);
-			ListViewHelper::FocusItem(m_hListView, itemAtPoint, true);
-			ListViewHelper::SelectItem(m_hListView, itemAtPoint, true);
+			ListViewHelper::SelectAllItems(m_listView, false);
+			ListViewHelper::FocusItem(m_listView, itemAtPoint, true);
+			ListViewHelper::SelectItem(m_listView, itemAtPoint, true);
 		}
 	}
 }
@@ -431,12 +431,12 @@ void ShellBrowserImpl::OnShowListViewContextMenu(const POINT &ptScreen)
 		keyboardGenerated = true;
 	}
 
-	if (ListView_GetSelectedCount(m_hListView) == 0)
+	if (ListView_GetSelectedCount(m_listView) == 0)
 	{
 		if (keyboardGenerated)
 		{
 			finalPoint = { 0, 0 };
-			ClientToScreen(m_hListView, &finalPoint);
+			ClientToScreen(m_listView, &finalPoint);
 		}
 
 		ShowBackgroundContextMenu(finalPoint);
@@ -445,20 +445,20 @@ void ShellBrowserImpl::OnShowListViewContextMenu(const POINT &ptScreen)
 	{
 		if (keyboardGenerated)
 		{
-			int targetItem = ListView_GetNextItem(m_hListView, -1, LVNI_FOCUSED | LVNI_SELECTED);
+			int targetItem = ListView_GetNextItem(m_listView, -1, LVNI_FOCUSED | LVNI_SELECTED);
 
 			if (targetItem == -1)
 			{
-				auto lastSelectedItem = ListViewHelper::GetLastSelectedItemIndex(m_hListView);
+				auto lastSelectedItem = ListViewHelper::GetLastSelectedItemIndex(m_listView);
 				targetItem = lastSelectedItem.value();
 			}
 
 			RECT itemRect;
-			ListView_GetItemRect(m_hListView, targetItem, &itemRect, LVIR_ICON);
+			ListView_GetItemRect(m_listView, targetItem, &itemRect, LVIR_ICON);
 
 			finalPoint = { itemRect.left + (itemRect.right - itemRect.left) / 2,
 				itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
-			ClientToScreen(m_hListView, &finalPoint);
+			ClientToScreen(m_listView, &finalPoint);
 		}
 
 		ShowItemContextMenu(finalPoint);
@@ -487,7 +487,7 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 		WI_SetFlag(flags, ShellBackgroundContextMenu::Flags::ExtendedVerbs);
 	}
 
-	contextMenu.ShowMenu(m_hListView, &pt, serviceProvider.get(), flags);
+	contextMenu.ShowMenu(m_listView, &pt, serviceProvider.get(), flags);
 }
 
 void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
@@ -521,12 +521,12 @@ void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	contextMenu.ShowMenu(m_hListView, &pt, nullptr, flags);
+	contextMenu.ShowMenu(m_listView, &pt, nullptr, flags);
 }
 
 bool ShellBrowserImpl::OnSetCursor(HWND target)
 {
-	if (target != m_hListView)
+	if (target != m_listView)
 	{
 		return false;
 	}
@@ -638,7 +638,7 @@ void ShellBrowserImpl::ProcessIconResult(int internalIndex, int iconIndex, int o
 	lvItem.iImage = iconIndex;
 	lvItem.stateMask = LVIS_OVERLAYMASK;
 	lvItem.state = INDEXTOOVERLAYMASK(overlayIndex);
-	ListView_SetItem(m_hListView, &lvItem);
+	ListView_SetItem(m_listView, &lvItem);
 }
 
 LRESULT ShellBrowserImpl::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
@@ -678,8 +678,8 @@ void ShellBrowserImpl::QueueInfoTipTask(int internalIndex, const std::wstring &e
 		{
 			UNREFERENCED_PARAMETER(id);
 
-			auto result = GetInfoTipAsync(m_hListView, infoTipResultId, internalIndex,
-				basicItemInfo, configCopy, m_resourceInstance, virtualFolder);
+			auto result = GetInfoTipAsync(m_listView, infoTipResultId, internalIndex, basicItemInfo,
+				configCopy, m_resourceInstance, virtualFolder);
 
 			// If the item name is truncated in the listview,
 			// existingInfoTip will contain that value. Therefore, it's
@@ -775,7 +775,7 @@ void ShellBrowserImpl::ProcessInfoTipResult(int infoTipResultId)
 	infoTip.iItem = *index;
 	infoTip.iSubItem = 0;
 	infoTip.pszText = infoTipText;
-	ListView_SetInfoTip(m_hListView, &infoTip);
+	ListView_SetInfoTip(m_listView, &infoTip);
 }
 
 void ShellBrowserImpl::OnListViewItemInserted(const NMLISTVIEW *itemData)
@@ -801,7 +801,7 @@ void ShellBrowserImpl::OnListViewItemChanged(const NMLISTVIEW *changeData)
 	if (m_config->checkBoxSelection.get() && (LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
 	{
 		bool checked = ((changeData->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
-		ListViewHelper::SelectItem(m_hListView, changeData->iItem, checked);
+		ListViewHelper::SelectItem(m_listView, changeData->iItem, checked);
 	}
 
 	bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
@@ -816,11 +816,11 @@ void ShellBrowserImpl::OnListViewItemChanged(const NMLISTVIEW *changeData)
 	{
 		if (!previouslySelected && currentlySelected)
 		{
-			ListView_SetCheckState(m_hListView, changeData->iItem, TRUE);
+			ListView_SetCheckState(m_listView, changeData->iItem, TRUE);
 		}
 		else if (previouslySelected && !currentlySelected)
 		{
-			ListView_SetCheckState(m_hListView, changeData->iItem, FALSE);
+			ListView_SetCheckState(m_listView, changeData->iItem, FALSE);
 		}
 	}
 
@@ -875,8 +875,8 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'A':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			ListViewHelper::SelectAllItems(m_hListView, true);
-			SetFocus(m_hListView);
+			ListViewHelper::SelectAllItems(m_listView, true);
+			SetFocus(m_listView);
 		}
 		break;
 
@@ -891,8 +891,8 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'I':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			ListViewHelper::InvertSelection(m_hListView);
-			SetFocus(m_hListView);
+			ListViewHelper::InvertSelection(m_listView);
+			SetFocus(m_listView);
 		}
 		break;
 
@@ -948,7 +948,7 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 
 std::optional<int> ShellBrowserImpl::MaybeGetItemIndex(PCIDLIST_ABSOLUTE pidlItem)
 {
-	int numItems = ListView_GetItemCount(m_hListView);
+	int numItems = ListView_GetItemCount(m_listView);
 
 	for (int i = 0; i < numItems; i++)
 	{
@@ -981,7 +981,7 @@ int ShellBrowserImpl::GetItemInternalIndex(int item) const
 	lvItem.mask = LVIF_PARAM;
 	lvItem.iItem = item;
 	lvItem.iSubItem = 0;
-	BOOL res = ListView_GetItem(m_hListView, &lvItem);
+	BOOL res = ListView_GetItem(m_listView, &lvItem);
 	CHECK(res);
 
 	return static_cast<int>(lvItem.lParam);
@@ -999,11 +999,11 @@ void ShellBrowserImpl::MarkItemAsCut(int item, bool cut)
 
 	if (cut)
 	{
-		ListView_SetItemState(m_hListView, item, LVIS_CUT, LVIS_CUT);
+		ListView_SetItemState(m_listView, item, LVIS_CUT, LVIS_CUT);
 	}
 	else
 	{
-		ListView_SetItemState(m_hListView, item, 0, LVIS_CUT);
+		ListView_SetItemState(m_listView, item, 0, LVIS_CUT);
 	}
 }
 
@@ -1014,7 +1014,7 @@ void ShellBrowserImpl::ShowPropertiesForSelectedItems() const
 
 	int item = -1;
 
-	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	while ((item = ListView_GetNextItem(m_listView, item, LVNI_SELECTED)) != -1)
 	{
 		auto pidl = GetItemChildIdl(item);
 
@@ -1102,7 +1102,7 @@ void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)
 
 	int cmd =
 		TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-			cursorPos.x, cursorPos.y, 0, m_hListView, nullptr);
+			cursorPos.x, cursorPos.y, 0, m_listView, nullptr);
 
 	if (cmd == 0)
 	{
@@ -1159,7 +1159,7 @@ void ShellBrowserImpl::OnListViewHeaderMenuItemSelected(int menuItemId,
 
 void ShellBrowserImpl::OnShowMoreColumnsSelected()
 {
-	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_hListView, this);
+	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_listView, this);
 	selectColumnsDialog.ShowModalDialog();
 }
 
@@ -1193,7 +1193,7 @@ void ShellBrowserImpl::SetFileAttributesForSelection()
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
 	int index = -1;
 
-	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	while ((index = ListView_GetNextItem(m_listView, index, LVNI_SELECTED)) != -1)
 	{
 		NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
@@ -1205,7 +1205,7 @@ void ShellBrowserImpl::SetFileAttributesForSelection()
 		sfaiList.push_back(sfai);
 	}
 
-	SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(), m_hListView,
+	SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(), m_listView,
 		sfaiList);
 	setFileAttributesDialog.ShowModalDialog();
 }
@@ -1230,7 +1230,7 @@ HRESULT ShellBrowserImpl::GetListViewSelectionAttributes(SFGAOF *attributes) con
 
 	int item = -1;
 
-	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	while ((item = ListView_GetNextItem(m_listView, item, LVNI_SELECTED)) != -1)
 	{
 		auto pidl = GetItemChildIdl(item);
 
@@ -1255,7 +1255,7 @@ std::vector<PidlAbsolute> ShellBrowserImpl::GetSelectedItemPidls() const
 	std::vector<PidlAbsolute> selectedItemPidls;
 	int index = -1;
 
-	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	while ((index = ListView_GetNextItem(m_listView, index, LVNI_SELECTED)) != -1)
 	{
 		const auto &item = GetItemByIndex(index);
 		selectedItemPidls.push_back(item.pidlComplete);
@@ -1291,16 +1291,16 @@ HRESULT ShellBrowserImpl::StartDrag(int draggedItem, const POINT &startPoint)
 	m_draggedItems = pidls;
 
 	POINT ptItem;
-	ListView_GetItemPosition(m_hListView, draggedItem, &ptItem);
+	ListView_GetItemPosition(m_listView, draggedItem, &ptItem);
 
 	POINT ptOrigin;
-	ListView_GetOrigin(m_hListView, &ptOrigin);
+	ListView_GetOrigin(m_listView, &ptOrigin);
 
 	m_ptDraggedOffset.x = ptOrigin.x + startPoint.x - ptItem.x;
 	m_ptDraggedOffset.y = ptOrigin.y + startPoint.y - ptItem.y;
 
 	DWORD finalEffect;
-	HRESULT hr = SHDoDragDrop(m_hListView, dataObject.get(), nullptr,
+	HRESULT hr = SHDoDragDrop(m_listView, dataObject.get(), nullptr,
 		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &finalEffect);
 
 	m_draggedItems.clear();
@@ -1317,7 +1317,7 @@ void ShellBrowserImpl::AutoSizeColumns()
 		return;
 	}
 
-	HWND header = ListView_GetHeader(m_hListView);
+	HWND header = ListView_GetHeader(m_listView);
 	int numColumns = Header_GetItemCount(header);
 
 	if (numColumns == -1)
@@ -1327,7 +1327,7 @@ void ShellBrowserImpl::AutoSizeColumns()
 
 	for (int i = 0; i < numColumns; i++)
 	{
-		ListView_SetColumnWidth(m_hListView, i, LVSCW_AUTOSIZE);
+		ListView_SetColumnWidth(m_listView, i, LVSCW_AUTOSIZE);
 	}
 }
 
@@ -1382,7 +1382,7 @@ BOOL ShellBrowserImpl::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		}
 	}
 
-	HWND editControl = ListView_GetEditControl(m_hListView);
+	HWND editControl = ListView_GetEditControl(m_listView);
 
 	if (editControl == nullptr)
 	{
@@ -1475,8 +1475,7 @@ BOOL ShellBrowserImpl::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	}
 
 	unique_pidl_child newChild;
-	hr =
-		parent->SetNameOf(m_hListView, child, newFilename.c_str(), flags, wil::out_param(newChild));
+	hr = parent->SetNameOf(m_listView, child, newFilename.c_str(), flags, wil::out_param(newChild));
 
 	// S_FALSE can be returned in certain situations when no rename actually took place. For
 	// example, when changing a drive label, elevation will be requested. If the user declines the
@@ -1573,32 +1572,32 @@ LRESULT ShellBrowserImpl::OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDra
 void ShellBrowserImpl::OnColorRulesUpdated()
 {
 	// Any changes to the color rules will require the listview to be redrawn.
-	InvalidateRect(m_hListView, nullptr, false);
+	InvalidateRect(m_listView, nullptr, false);
 }
 
 void ShellBrowserImpl::OnFullRowSelectUpdated(BOOL newValue)
 {
-	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_FULLROWSELECT, newValue);
+	ListViewHelper::AddRemoveExtendedStyles(m_listView, LVS_EX_FULLROWSELECT, newValue);
 }
 
 void ShellBrowserImpl::OnCheckBoxSelectionUpdated(BOOL newValue)
 {
-	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_CHECKBOXES, newValue);
+	ListViewHelper::AddRemoveExtendedStyles(m_listView, LVS_EX_CHECKBOXES, newValue);
 }
 
 void ShellBrowserImpl::OnShowGridlinesUpdated(BOOL newValue)
 {
-	ListViewHelper::AddRemoveExtendedStyles(m_hListView, LVS_EX_GRIDLINES, newValue);
+	ListViewHelper::AddRemoveExtendedStyles(m_listView, LVS_EX_GRIDLINES, newValue);
 }
 
 void ShellBrowserImpl::OnOneClickActivateUpdated(BOOL newValue)
 {
-	ListViewHelper::ActivateOneClickSelect(m_hListView, newValue,
+	ListViewHelper::ActivateOneClickSelect(m_listView, newValue,
 		m_config->globalFolderSettings.oneClickActivateHoverTime.get());
 }
 
 void ShellBrowserImpl::OnOneClickActivateHoverTimeUpdated(UINT newValue)
 {
-	ListViewHelper::ActivateOneClickSelect(m_hListView,
+	ListViewHelper::ActivateOneClickSelect(m_listView,
 		m_config->globalFolderSettings.oneClickActivate.get(), newValue);
 }

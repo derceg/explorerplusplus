@@ -34,7 +34,7 @@ void ShellBrowserImpl::OnNavigationStarted(const NavigationRequest *request)
 {
 	CHECK(request->GetShellBrowser() == this);
 
-	RecalcWindowCursor(m_hListView);
+	RecalcWindowCursor(m_listView);
 }
 
 void ShellBrowserImpl::ChangeFolders(const PidlAbsolute &directory)
@@ -74,7 +74,7 @@ void ShellBrowserImpl::PrepareToChangeFolders()
 
 	m_shellChangeWatcher.StopWatchingAll();
 
-	ListView_DeleteAllItems(m_hListView);
+	ListView_DeleteAllItems(m_listView);
 
 	if (m_folderVisited)
 	{
@@ -108,10 +108,10 @@ void ShellBrowserImpl::StoreCurrentlySelectedItems()
 
 void ShellBrowserImpl::ResetFolderState()
 {
-	ListView_SetImageList(m_hListView, nullptr, LVSIL_SMALL);
-	ListView_SetImageList(m_hListView, nullptr, LVSIL_NORMAL);
+	ListView_SetImageList(m_listView, nullptr, LVSIL_SMALL);
+	ListView_SetImageList(m_listView, nullptr, LVSIL_NORMAL);
 
-	ListView_RemoveAllGroups(m_hListView);
+	ListView_RemoveAllGroups(m_listView);
 
 	m_directoryState = DirectoryState();
 
@@ -458,7 +458,7 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request)
 
 	NotifyShellOfNavigation(request->GetNavigateParams().pidl.Raw());
 
-	RecalcWindowCursor(m_hListView);
+	RecalcWindowCursor(m_listView);
 
 	StartDirectoryMonitoring();
 
@@ -477,15 +477,15 @@ void ShellBrowserImpl::AddNavigationItems(const NavigationRequest *request,
 		AddItemInternal(-1, item, FALSE);
 	}
 
-	ScopedRedrawDisabler redrawDisabler(m_hListView);
+	ScopedRedrawDisabler redrawDisabler(m_listView);
 
 	InsertAwaitingItems();
 	SortFolder();
 
-	ListView_EnsureVisible(m_hListView, 0, FALSE);
+	ListView_EnsureVisible(m_listView, 0, FALSE);
 
 	/* Set the focus back to the first item. */
-	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+	ListView_SetItemState(m_listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
 	// A history entry should be created when the navigation is committed, so the current entry
 	// should always be for the current navigation.
@@ -530,7 +530,7 @@ std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFr
 
 void ShellBrowserImpl::InsertAwaitingItems()
 {
-	int nPrevItems = ListView_GetItemCount(m_hListView);
+	int nPrevItems = ListView_GetItemCount(m_listView);
 
 	if (nPrevItems == 0 && m_directoryState.awaitingAddList.empty())
 	{
@@ -542,11 +542,11 @@ void ShellBrowserImpl::InsertAwaitingItems()
 	/* Make the listview allocate space (for internal data structures)
 	for all the items at once, rather than individually.
 	Acts as a speed optimization. */
-	ListView_SetItemCount(m_hListView, m_directoryState.awaitingAddList.size() + nPrevItems);
+	ListView_SetItemCount(m_listView, m_directoryState.awaitingAddList.size() + nPrevItems);
 
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, false);
+		ListViewHelper::SetAutoArrange(m_listView, false);
 	}
 
 	int nAdded = 0;
@@ -597,7 +597,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 		lv.lParam = awaitingItem.iItemInternal;
 
 		/* Insert the item into the list view control. */
-		int iItemIndex = ListView_InsertItem(m_hListView, &lv);
+		int iItemIndex = ListView_InsertItem(m_listView, &lv);
 
 		if (awaitingItem.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
 		{
@@ -605,7 +605,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 			if (awaitingItem.iAfter != -1)
 			{
-				ListView_GetItemPosition(m_hListView, awaitingItem.iAfter, &ptItem);
+				ListView_GetItemPosition(m_listView, awaitingItem.iAfter, &ptItem);
 			}
 			else
 			{
@@ -614,7 +614,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 			}
 
 			/* The item will end up in the position AFTER iAfter. */
-			ListView_SetItemPosition32(m_hListView, iItemIndex, ptItem.x, ptItem.y);
+			ListView_SetItemPosition32(m_listView, iItemIndex, ptItem.x, ptItem.y);
 		}
 
 		if (m_folderSettings.viewMode == +ViewMode::Tiles)
@@ -635,14 +635,14 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 		if (selectItr != m_directoryState.filesToSelect.end())
 		{
-			ListViewHelper::SelectItem(m_hListView, iItemIndex, true);
+			ListViewHelper::SelectItem(m_listView, iItemIndex, true);
 
-			int selectedCount = ListView_GetSelectedCount(m_hListView);
+			int selectedCount = ListView_GetSelectedCount(m_listView);
 
 			if (selectedCount == 1)
 			{
-				ListViewHelper::FocusItem(m_hListView, iItemIndex, true);
-				ListView_EnsureVisible(m_hListView, iItemIndex, FALSE);
+				ListViewHelper::FocusItem(m_listView, iItemIndex, true);
+				ListView_EnsureVisible(m_listView, iItemIndex, FALSE);
 			}
 
 			m_directoryState.filesToSelect.erase(selectItr);
@@ -651,7 +651,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 		/* If the file is marked as hidden, ghost it out. */
 		if (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 		{
-			ListView_SetItemState(m_hListView, iItemIndex, LVIS_CUT, LVIS_CUT);
+			ListView_SetItemState(m_listView, iItemIndex, LVIS_CUT, LVIS_CUT);
 		}
 
 		/* Add the current file's size to the running size of the current directory. */
@@ -668,7 +668,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 	if (m_folderSettings.autoArrange)
 	{
-		ListViewHelper::SetAutoArrange(m_hListView, true);
+		ListViewHelper::SetAutoArrange(m_listView, true);
 	}
 
 	m_directoryState.numItems = nPrevItems + nAdded;
@@ -678,7 +678,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 	if (itemToRename)
 	{
 		m_directoryState.queuedRenameItem.Reset();
-		ListView_EditLabel(m_hListView, *itemToRename);
+		ListView_EditLabel(m_listView, *itemToRename);
 	}
 }
 
@@ -727,7 +727,7 @@ void ShellBrowserImpl::RemoveItem(int iItemInternal)
 	items are inserted. */
 	lvfi.flags = LVFI_PARAM;
 	lvfi.lParam = iItemInternal;
-	iItem = ListView_FindItem(m_hListView, -1, &lvfi);
+	iItem = ListView_FindItem(m_listView, -1, &lvfi);
 
 	if (iItem != -1)
 	{
@@ -742,13 +742,13 @@ void ShellBrowserImpl::RemoveItem(int iItemInternal)
 		}
 
 		/* Remove the item from the listview. */
-		ListView_DeleteItem(m_hListView, iItem);
+		ListView_DeleteItem(m_listView, iItem);
 	}
 
 	m_directoryState.filteredItemsList.erase(iItemInternal);
 	m_itemInfoMap.erase(iItemInternal);
 
-	nItems = ListView_GetItemCount(m_hListView);
+	nItems = ListView_GetItemCount(m_listView);
 
 	m_directoryState.numItems--;
 }
