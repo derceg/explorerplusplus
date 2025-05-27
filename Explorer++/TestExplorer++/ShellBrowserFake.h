@@ -40,6 +40,8 @@ public:
 	void SetViewMode(ViewMode viewMode) override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
+	bool CanAutoSizeColumns() const override;
+	void AutoSizeColumns() override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;

@@ -129,7 +129,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_GO_UP,
 		m_commandController.IsCommandEnabled(IDM_GO_UP));
 
-	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOSIZECOLUMNS, viewMode == +ViewMode::Details);
+	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOSIZECOLUMNS,
+		m_commandController.IsCommandEnabled(IDM_VIEW_AUTOSIZECOLUMNS));
 
 	if (viewMode == +ViewMode::Details)
 	{

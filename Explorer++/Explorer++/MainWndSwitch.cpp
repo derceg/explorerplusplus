@@ -1012,7 +1012,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_AUTOSIZECOLUMNS:
-		m_pActiveShellBrowser->AutoSizeColumns();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT:

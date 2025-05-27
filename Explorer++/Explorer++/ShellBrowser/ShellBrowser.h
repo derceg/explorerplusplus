@@ -38,6 +38,8 @@ public:
 	virtual void SetViewMode(ViewMode viewMode) = 0;
 	virtual bool IsAutoArrangeEnabled() const = 0;
 	virtual void SetAutoArrangeEnabled(bool enabled) = 0;
+	virtual bool CanAutoSizeColumns() const = 0;
+	virtual void AutoSizeColumns() = 0;
 
 	virtual bool CanCreateNewFolder() const = 0;
 	virtual void CreateNewFolder() = 0;

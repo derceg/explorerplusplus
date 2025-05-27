@@ -1310,6 +1310,11 @@ HRESULT ShellBrowserImpl::StartDrag(int draggedItem, const POINT &startPoint)
 	return hr;
 }
 
+bool ShellBrowserImpl::CanAutoSizeColumns() const
+{
+	return m_folderSettings.viewMode == +ViewMode::Details;
+}
+
 void ShellBrowserImpl::AutoSizeColumns()
 {
 	if (m_folderSettings.viewMode != +ViewMode::Details)

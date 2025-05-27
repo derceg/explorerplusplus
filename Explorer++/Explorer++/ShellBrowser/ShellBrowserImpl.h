@@ -88,6 +88,8 @@ public:
 	void SetViewMode(ViewMode viewMode) override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
+	bool CanAutoSizeColumns() const override;
+	void AutoSizeColumns() override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
@@ -171,7 +173,6 @@ public:
 	void ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
-	void AutoSizeColumns();
 
 	// BrowserCommandTarget
 	bool IsCommandEnabled(int command) const override;

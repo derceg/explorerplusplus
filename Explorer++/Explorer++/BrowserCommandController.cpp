@@ -44,6 +44,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_EDIT_WILDCARDDESELECT:
 		return GetActiveShellBrowser()->CanStartWildcardSelection(SelectionType::Deselect);
 
+	case IDM_VIEW_AUTOSIZECOLUMNS:
+		return GetActiveShellBrowser()->CanAutoSizeColumns();
+
 	case IDM_ACTIONS_NEWFOLDER:
 		return GetActiveShellBrowser()->CanCreateNewFolder();
 
@@ -227,6 +230,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_VIEW_REFRESH:
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
+		break;
+
+	case IDM_VIEW_AUTOSIZECOLUMNS:
+		GetActiveShellBrowser()->AutoSizeColumns();
 		break;
 
 	case IDM_VIEW_CHANGEDISPLAYCOLOURS:

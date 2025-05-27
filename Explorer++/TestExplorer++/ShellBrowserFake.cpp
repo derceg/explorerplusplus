@@ -98,6 +98,15 @@ void ShellBrowserFake::SetAutoArrangeEnabled(bool enabled)
 	m_autoArrangeEnabled = enabled;
 }
 
+bool ShellBrowserFake::CanAutoSizeColumns() const
+{
+	return false;
+}
+
+void ShellBrowserFake::AutoSizeColumns()
+{
+}
+
 bool ShellBrowserFake::CanCreateNewFolder() const
 {
 	return false;
