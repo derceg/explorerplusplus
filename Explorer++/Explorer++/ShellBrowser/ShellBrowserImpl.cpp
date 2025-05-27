@@ -30,6 +30,7 @@
 #include "ThemeManager.h"
 #include "ViewModeHelper.h"
 #include "ViewModes.h"
+#include "WildcardSelectDialog.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
@@ -1407,6 +1408,24 @@ void ShellBrowserImpl::InvertSelection()
 {
 	ListViewHelper::InvertSelection(m_listView);
 	SetFocus(m_listView);
+}
+
+bool ShellBrowserImpl::CanStartWildcardSelection(SelectionType selectionType) const
+{
+	if (selectionType == SelectionType::Select)
+	{
+		return true;
+	}
+
+	int numSelected = ListView_GetSelectedCount(m_listView);
+	return numSelected > 0;
+}
+
+void ShellBrowserImpl::StartWildcardSelection(SelectionType selectionType)
+{
+	WildcardSelectDialog wilcardSelectDialog(m_app->GetResourceLoader(), m_owner, this,
+		selectionType);
+	wilcardSelectDialog.ShowModalDialog();
 }
 
 void ShellBrowserImpl::SelectItemsMatchingPattern(const std::wstring &pattern,

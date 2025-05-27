@@ -73,7 +73,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		m_commandController.IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPYTOFOLDER,
 		m_commandController.IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_WILDCARDDESELECT, anySelected);
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_WILDCARDDESELECT,
+		m_commandController.IsCommandEnabled(IDM_EDIT_WILDCARDDESELECT));
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_SELECTNONE, anySelected);
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_RESOLVELINK, anySelected);
 

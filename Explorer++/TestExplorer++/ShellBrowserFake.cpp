@@ -123,6 +123,18 @@ void ShellBrowserFake::InvertSelection()
 {
 }
 
+bool ShellBrowserFake::CanStartWildcardSelection(SelectionType selectionType) const
+{
+	UNREFERENCED_PARAMETER(selectionType);
+
+	return false;
+}
+
+void ShellBrowserFake::StartWildcardSelection(SelectionType selectionType)
+{
+	UNREFERENCED_PARAMETER(selectionType);
+}
+
 void ShellBrowserFake::SelectItemsMatchingPattern(const std::wstring &pattern,
 	SelectionType selectionType)
 {

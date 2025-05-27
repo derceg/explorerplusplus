@@ -40,6 +40,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
 		return CanStartCommandPrompt();
 
+	case IDM_EDIT_WILDCARDDESELECT:
+		return GetActiveShellBrowser()->CanStartWildcardSelection(SelectionType::Deselect);
+
 	case IDM_ACTIONS_NEWFOLDER:
 		return GetActiveShellBrowser()->CanCreateNewFolder();
 
@@ -126,6 +129,14 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_EDIT_SELECTNONE:
 		GetActiveShellBrowser()->ClearSelection();
+		break;
+
+	case IDM_EDIT_WILDCARDSELECTION:
+		GetActiveShellBrowser()->StartWildcardSelection(SelectionType::Select);
+		break;
+
+	case IDM_EDIT_WILDCARDDESELECT:
+		GetActiveShellBrowser()->StartWildcardSelection(SelectionType::Deselect);
 		break;
 
 	case IDM_VIEW_STATUSBAR:

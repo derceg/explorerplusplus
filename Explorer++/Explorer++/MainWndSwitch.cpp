@@ -407,11 +407,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_EDIT_WILDCARDSELECTION:
-		OnWildcardSelect(SelectionType::Select);
-		break;
-
 	case IDM_EDIT_WILDCARDDESELECT:
-		OnWildcardSelect(SelectionType::Deselect);
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_EDIT_RESOLVELINK:

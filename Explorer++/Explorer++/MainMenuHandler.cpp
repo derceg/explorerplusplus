@@ -22,7 +22,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
-#include "WildcardSelectDialog.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -49,13 +48,6 @@ void Explorerplusplus::OnDestroyFiles()
 	DestroyFilesDialog destroyFilesDialog(m_app->GetResourceLoader(), m_hContainer,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::OnWildcardSelect(SelectionType selectionType)
-{
-	WildcardSelectDialog wilcardSelectDialog(m_app->GetResourceLoader(), m_hContainer,
-		m_pActiveShellBrowser, selectionType);
-	wilcardSelectDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnSearch()
