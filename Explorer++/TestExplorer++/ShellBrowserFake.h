@@ -53,6 +53,7 @@ public:
 	void SetFilterCaseSensitive(bool caseSensitive) override;
 	bool IsFilterEnabled() const override;
 	void SetFilterEnabled(bool enable) override;
+	void EditFilterSettings() override;
 	bool CanSaveDirectoryListing() const override;
 	void SaveDirectoryListing() override;
 	boost::signals2::connection AddDestroyedObserver(

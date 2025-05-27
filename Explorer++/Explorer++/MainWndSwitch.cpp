@@ -481,7 +481,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILTER_FILTERRESULTS:
-		OnFilterResults();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_FILTER_ENABLE_FILTER:

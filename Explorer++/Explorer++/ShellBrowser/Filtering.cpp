@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "App.h"
+#include "FilterDialog.h"
 #include "MainResource.h"
 #include "../Helper/ListViewHelper.h"
 
@@ -178,4 +179,10 @@ void ShellBrowserImpl::RestoreFilteredItem(int internalIndex)
 	m_directoryState.awaitingAddList.push_back(awaitingAdd);
 
 	InsertAwaitingItems();
+}
+
+void ShellBrowserImpl::EditFilterSettings()
+{
+	FilterDialog filterDialog(m_app->GetResourceLoader(), m_hOwner, this);
+	filterDialog.ShowModalDialog();
 }

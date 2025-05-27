@@ -11,7 +11,6 @@
 #include "DisplayColoursDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "FileProgressSink.h"
-#include "FilterDialog.h"
 #include "MainResource.h"
 #include "ModelessDialogHelper.h"
 #include "OptionsDialog.h"
@@ -34,12 +33,6 @@ void Explorerplusplus::OnChangeDisplayColors()
 {
 	DisplayColoursDialog displayColoursDialog(m_app->GetResourceLoader(), m_hContainer, m_config);
 	displayColoursDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::OnFilterResults()
-{
-	FilterDialog filterDialog(m_app->GetResourceLoader(), m_hContainer, m_pActiveShellBrowser);
-	filterDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnDestroyFiles()

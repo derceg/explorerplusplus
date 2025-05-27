@@ -52,6 +52,7 @@ public:
 	virtual void SetFilterCaseSensitive(bool caseSensitive) = 0;
 	virtual bool IsFilterEnabled() const = 0;
 	virtual void SetFilterEnabled(bool enable) = 0;
+	virtual void EditFilterSettings() = 0;
 
 	virtual bool CanSaveDirectoryListing() const = 0;
 	virtual void SaveDirectoryListing() = 0;

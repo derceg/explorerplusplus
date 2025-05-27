@@ -229,7 +229,6 @@ private:
 	void OnWildcardSelect(BOOL bSelect);
 	void OnResolveLink();
 	void OnChangeDisplayColors();
-	void OnFilterResults();
 	void OnSortBy(SortMode sortMode);
 	void OnGroupBy(SortMode groupMode);
 	void OnGroupByNone();

@@ -212,6 +212,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
 		break;
 
+	case IDM_FILTER_FILTERRESULTS:
+		GetActiveShellBrowser()->EditFilterSettings();
+		break;
+
 	case IDM_ACTIONS_NEWFOLDER:
 		GetActiveShellBrowser()->CreateNewFolder();
 		break;

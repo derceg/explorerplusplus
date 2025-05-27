@@ -157,6 +157,10 @@ void ShellBrowserFake::SetFilterEnabled(bool enable)
 	m_filterEnabled = enable;
 }
 
+void ShellBrowserFake::EditFilterSettings()
+{
+}
+
 bool ShellBrowserFake::CanSaveDirectoryListing() const
 {
 	return false;
