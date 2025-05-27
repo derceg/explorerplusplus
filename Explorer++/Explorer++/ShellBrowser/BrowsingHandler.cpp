@@ -544,7 +544,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 	Acts as a speed optimization. */
 	ListView_SetItemCount(m_listView, m_directoryState.awaitingAddList.size() + nPrevItems);
 
-	if (m_folderSettings.autoArrange)
+	if (m_folderSettings.autoArrangeEnabled)
 	{
 		ListViewHelper::SetAutoArrange(m_listView, false);
 	}
@@ -666,7 +666,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 		nAdded++;
 	}
 
-	if (m_folderSettings.autoArrange)
+	if (m_folderSettings.autoArrangeEnabled)
 	{
 		ListViewHelper::SetAutoArrange(m_listView, true);
 	}
@@ -687,7 +687,7 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	BOOL bHideSystemFile = FALSE;
 	BOOL bFilenameFiltered = FALSE;
 
-	if (m_folderSettings.enableFilter
+	if (m_folderSettings.filterEnabled
 		&& ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(itemInfo.displayName.c_str());

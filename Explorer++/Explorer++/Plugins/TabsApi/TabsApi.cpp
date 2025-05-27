@@ -19,7 +19,7 @@ Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowserImpl &shellBr
 	sortMode = shellBrowser.GetSortMode();
 	groupMode = shellBrowser.GetGroupMode();
 	viewMode = shellBrowser.GetViewMode();
-	autoArrange = shellBrowser.GetAutoArrange();
+	autoArrange = shellBrowser.IsAutoArrangeEnabled();
 	sortDirection = shellBrowser.GetSortDirection();
 	groupSortDirection = shellBrowser.GetGroupSortDirection();
 	showInGroups = shellBrowser.GetShowInGroups();
@@ -203,7 +203,7 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 
 	if (autoArrange)
 	{
-		folderSettings.autoArrange = *autoArrange;
+		folderSettings.autoArrangeEnabled = *autoArrange;
 	}
 
 	sol::optional<int> sortDirection = folderSettingsTable[FolderSettingsConstants::SORT_DIRECTION];

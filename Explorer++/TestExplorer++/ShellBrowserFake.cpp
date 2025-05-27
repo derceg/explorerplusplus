@@ -88,6 +88,16 @@ void ShellBrowserFake::SetViewMode(ViewMode viewMode)
 	m_viewMode = viewMode;
 }
 
+bool ShellBrowserFake::IsAutoArrangeEnabled() const
+{
+	return m_autoArrangeEnabled;
+}
+
+void ShellBrowserFake::SetAutoArrangeEnabled(bool enabled)
+{
+	m_autoArrangeEnabled = enabled;
+}
+
 bool ShellBrowserFake::CanCreateNewFolder() const
 {
 	return false;
@@ -171,9 +181,9 @@ bool ShellBrowserFake::IsFilterEnabled() const
 	return m_filterEnabled;
 }
 
-void ShellBrowserFake::SetFilterEnabled(bool enable)
+void ShellBrowserFake::SetFilterEnabled(bool enabled)
 {
-	m_filterEnabled = enable;
+	m_filterEnabled = enabled;
 }
 
 void ShellBrowserFake::EditFilterSettings()

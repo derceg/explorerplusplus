@@ -154,7 +154,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOARRANGE, TRUE);
 		MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_AUTOARRANGE,
-			tab.GetShellBrowserImpl()->GetAutoArrange());
+			tab.GetShellBrowser()->IsAutoArrangeEnabled());
 	}
 
 	SortMenuBuilder sortMenuBuilder(m_app->GetResourceLoader());

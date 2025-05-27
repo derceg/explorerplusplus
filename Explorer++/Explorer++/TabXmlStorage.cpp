@@ -107,12 +107,12 @@ FolderSettings LoadFolderSettings(IXMLDOMNode *tabNode)
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_APPLY_FILTER,
-		folderSettings.enableFilter);
+		folderSettings.filterEnabled);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_HIDDEN, folderSettings.showHidden);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_AUTO_ARRANGE,
-		folderSettings.autoArrange);
+		folderSettings.autoArrangeEnabled);
 	XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_FILTER, folderSettings.filter);
 
 	return folderSettings;
@@ -208,13 +208,13 @@ void SaveFolderSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_IN_GROUPS,
 		XMLSettings::EncodeBoolValue(folderSettings.showInGroups));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_APPLY_FILTER,
-		XMLSettings::EncodeBoolValue(folderSettings.enableFilter));
+		XMLSettings::EncodeBoolValue(folderSettings.filterEnabled));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER_CASE_SENSITIVE,
 		XMLSettings::EncodeBoolValue(folderSettings.filterCaseSensitive));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_HIDDEN,
 		XMLSettings::EncodeBoolValue(folderSettings.showHidden));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_AUTO_ARRANGE,
-		XMLSettings::EncodeBoolValue(folderSettings.autoArrange));
+		XMLSettings::EncodeBoolValue(folderSettings.autoArrangeEnabled));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER,
 		folderSettings.filter.c_str());
 }

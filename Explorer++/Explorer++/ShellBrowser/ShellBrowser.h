@@ -33,8 +33,11 @@ public:
 
 	virtual FolderSettings GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
+
 	virtual ViewMode GetViewMode() const = 0;
 	virtual void SetViewMode(ViewMode viewMode) = 0;
+	virtual bool IsAutoArrangeEnabled() const = 0;
+	virtual void SetAutoArrangeEnabled(bool enabled) = 0;
 
 	virtual bool CanCreateNewFolder() const = 0;
 	virtual void CreateNewFolder() = 0;
@@ -56,7 +59,7 @@ public:
 	virtual bool IsFilterCaseSensitive() const = 0;
 	virtual void SetFilterCaseSensitive(bool caseSensitive) = 0;
 	virtual bool IsFilterEnabled() const = 0;
-	virtual void SetFilterEnabled(bool enable) = 0;
+	virtual void SetFilterEnabled(bool enabled) = 0;
 	virtual void EditFilterSettings() = 0;
 
 	virtual bool CanSaveDirectoryListing() const = 0;

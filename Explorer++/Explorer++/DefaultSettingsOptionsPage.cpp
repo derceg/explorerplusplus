@@ -44,7 +44,7 @@ void DefaultSettingsOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_SHOWHIDDENGLOBAL, BST_CHECKED);
 	}
 
-	if (m_config->defaultFolderSettings.autoArrange)
+	if (m_config->defaultFolderSettings.autoArrangeEnabled)
 	{
 		CheckDlgButton(GetDialog(), IDC_AUTOARRANGEGLOBAL, BST_CHECKED);
 	}
@@ -116,7 +116,7 @@ void DefaultSettingsOptionsPage::SaveSettings()
 	m_config->defaultFolderSettings.showHidden =
 		(IsDlgButtonChecked(GetDialog(), IDC_SHOWHIDDENGLOBAL) == BST_CHECKED);
 
-	m_config->defaultFolderSettings.autoArrange =
+	m_config->defaultFolderSettings.autoArrangeEnabled =
 		(IsDlgButtonChecked(GetDialog(), IDC_AUTOARRANGEGLOBAL) == BST_CHECKED);
 
 	bool sortAscending = (IsDlgButtonChecked(GetDialog(), IDC_SORTASCENDINGGLOBAL) == BST_CHECKED);

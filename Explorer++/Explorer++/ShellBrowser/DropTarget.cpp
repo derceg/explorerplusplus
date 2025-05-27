@@ -130,7 +130,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 	/* The auto arrange style must be off for the items
 	to be moved. Therefore, if the style is on, turn it
 	off, move the items, and the turn it back on. */
-	if (m_folderSettings.autoArrange)
+	if (m_folderSettings.autoArrangeEnabled)
 	{
 		ListViewHelper::SetAutoArrange(m_listView, false);
 	}
@@ -213,7 +213,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 			have to be 'snapped' to the nearest item position.
 			Otherwise, they may simply be placed where they are
 			dropped. */
-			if (m_folderSettings.autoArrange)
+			if (m_folderSettings.autoArrangeEnabled)
 			{
 				LVFINDINFO lvfi;
 				LVHITTESTINFO lvhti;
@@ -343,7 +343,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 		}
 	}
 
-	if (m_folderSettings.autoArrange)
+	if (m_folderSettings.autoArrangeEnabled)
 	{
 		ListViewHelper::SetAutoArrange(m_listView, true);
 	}

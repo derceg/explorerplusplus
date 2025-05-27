@@ -154,7 +154,7 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ShowInGroupsGlobal",
 		config.defaultFolderSettings.showInGroups);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"AutoArrangeGlobal",
-		config.defaultFolderSettings.autoArrange);
+		config.defaultFolderSettings.autoArrangeEnabled);
 	RegistrySettings::ReadDword(settingsKey, L"SortAscendingGlobal",
 		[&config](DWORD value)
 		{
@@ -316,7 +316,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"ShowInGroupsGlobal",
 		config.defaultFolderSettings.showInGroups);
 	RegistrySettings::SaveDword(settingsKey, L"AutoArrangeGlobal",
-		config.defaultFolderSettings.autoArrange);
+		config.defaultFolderSettings.autoArrangeEnabled);
 	RegistrySettings::SaveDword(settingsKey, L"SortAscendingGlobal",
 		config.defaultFolderSettings.sortDirection == +SortDirection::Ascending);
 	RegistrySettings::SaveDword(settingsKey, L"GroupSortDirectionGlobal",

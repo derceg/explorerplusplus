@@ -38,6 +38,8 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	bool IsAutoArrangeEnabled() const override;
+	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
@@ -56,7 +58,7 @@ public:
 	bool IsFilterCaseSensitive() const override;
 	void SetFilterCaseSensitive(bool caseSensitive) override;
 	bool IsFilterEnabled() const override;
-	void SetFilterEnabled(bool enable) override;
+	void SetFilterEnabled(bool enabled) override;
 	void EditFilterSettings() override;
 	bool CanSaveDirectoryListing() const override;
 	void SaveDirectoryListing() override;
@@ -72,7 +74,9 @@ private:
 	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
+
 	ViewMode m_viewMode = ViewMode::Icons;
+	bool m_autoArrangeEnabled = true;
 
 	std::wstring m_filterText;
 	bool m_filterCaseSensitive = false;

@@ -993,15 +993,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_VIEW_AUTOARRANGE:
-		GetActivePane()
-			->GetTabContainerImpl()
-			->GetSelectedTab()
-			.GetShellBrowserImpl()
-			->SetAutoArrange(!GetActivePane()
-					->GetTabContainerImpl()
-					->GetSelectedTab()
-					.GetShellBrowserImpl()
-					->GetAutoArrange());
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_VIEW_SHOWHIDDENFILES:

@@ -205,7 +205,7 @@ void ShellBrowserImpl::InitializeListView()
 
 	ListView_SetExtendedListViewStyle(m_listView, dwExtendedStyle);
 
-	ListViewHelper::SetAutoArrange(m_listView, m_folderSettings.autoArrange);
+	ListViewHelper::SetAutoArrange(m_listView, m_folderSettings.autoArrangeEnabled);
 	ListViewHelper::AddRemoveExtendedStyles(m_listView, LVS_EX_GRIDLINES,
 		m_config->globalFolderSettings.showGridlines.get());
 
@@ -254,16 +254,16 @@ void ShellBrowserImpl::ChangeToInitialFolder()
 	ChangeFolders(currentEntry->GetPidl());
 }
 
-bool ShellBrowserImpl::GetAutoArrange() const
+bool ShellBrowserImpl::IsAutoArrangeEnabled() const
 {
-	return m_folderSettings.autoArrange;
+	return m_folderSettings.autoArrangeEnabled;
 }
 
-void ShellBrowserImpl::SetAutoArrange(bool autoArrange)
+void ShellBrowserImpl::SetAutoArrangeEnabled(bool enabled)
 {
-	m_folderSettings.autoArrange = autoArrange;
+	m_folderSettings.autoArrangeEnabled = enabled;
 
-	ListViewHelper::SetAutoArrange(m_listView, m_folderSettings.autoArrange);
+	ListViewHelper::SetAutoArrange(m_listView, m_folderSettings.autoArrangeEnabled);
 }
 
 ViewMode ShellBrowserImpl::GetViewMode() const

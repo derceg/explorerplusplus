@@ -86,6 +86,8 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	bool IsAutoArrangeEnabled() const override;
+	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanCreateNewFolder() const override;
 	void CreateNewFolder() override;
 	bool CanSplitFile() const override;
@@ -104,7 +106,7 @@ public:
 	bool IsFilterCaseSensitive() const override;
 	void SetFilterCaseSensitive(bool caseSensitive) override;
 	bool IsFilterEnabled() const override;
-	void SetFilterEnabled(bool enable) override;
+	void SetFilterEnabled(bool enabled) override;
 	void EditFilterSettings() override;
 	bool CanSaveDirectoryListing() const override;
 	void SaveDirectoryListing() override;
@@ -117,8 +119,6 @@ public:
 	unique_pidl_absolute GetDirectoryIdl() const;
 	std::wstring GetDirectoryPath() const;
 	int GetUniqueFolderId() const;
-	bool GetAutoArrange() const;
-	void SetAutoArrange(bool autoArrange);
 	void CycleViewMode(bool cycleForward);
 	SortMode GetSortMode() const;
 	void SetSortMode(SortMode sortMode);

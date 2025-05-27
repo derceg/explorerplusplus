@@ -40,12 +40,12 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
 	tab1.folderSettings.sortMode = SortMode::Size;
 	tab1.folderSettings.groupMode = SortMode::Name;
 	tab1.folderSettings.viewMode = ViewMode::Icons;
-	tab1.folderSettings.autoArrange = true;
+	tab1.folderSettings.autoArrangeEnabled = true;
 	tab1.folderSettings.sortDirection = SortDirection::Descending;
 	tab1.folderSettings.groupSortDirection = SortDirection::Ascending;
 	tab1.folderSettings.showInGroups = false;
 	tab1.folderSettings.showHidden = true;
-	tab1.folderSettings.enableFilter = false;
+	tab1.folderSettings.filterEnabled = false;
 	tab1.folderSettings.filterCaseSensitive = false;
 
 	tab1.columns.realFolderColumns = { { ColumnType::Name, TRUE, DEFAULT_COLUMN_WIDTH },
@@ -75,12 +75,12 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
 	tab2.folderSettings.sortMode = SortMode::DateModified;
 	tab2.folderSettings.groupMode = SortMode::Size;
 	tab2.folderSettings.viewMode = ViewMode::SmallIcons;
-	tab2.folderSettings.autoArrange = false;
+	tab2.folderSettings.autoArrangeEnabled = false;
 	tab2.folderSettings.sortDirection = SortDirection::Ascending;
 	tab2.folderSettings.groupSortDirection = SortDirection::Descending;
 	tab2.folderSettings.showInGroups = true;
 	tab2.folderSettings.showHidden = false;
-	tab2.folderSettings.enableFilter = true;
+	tab2.folderSettings.filterEnabled = true;
 	tab2.folderSettings.filterCaseSensitive = false;
 	tab2.folderSettings.filter = L"*.exe";
 
@@ -93,12 +93,12 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
 	tab3.folderSettings.sortMode = SortMode::Created;
 	tab3.folderSettings.groupMode = SortMode::Name;
 	tab3.folderSettings.viewMode = ViewMode::Details;
-	tab3.folderSettings.autoArrange = true;
+	tab3.folderSettings.autoArrangeEnabled = true;
 	tab3.folderSettings.sortDirection = SortDirection::Descending;
 	tab3.folderSettings.groupSortDirection = SortDirection::Ascending;
 	tab3.folderSettings.showInGroups = false;
 	tab3.folderSettings.showHidden = true;
-	tab3.folderSettings.enableFilter = true;
+	tab3.folderSettings.filterEnabled = true;
 	tab3.folderSettings.filterCaseSensitive = true;
 	tab3.folderSettings.filter = L"*.txt";
 

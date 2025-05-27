@@ -63,13 +63,13 @@ struct FolderSettings
 	SortMode sortMode = SortMode::Name;
 	SortMode groupMode = SortMode::Name;
 	ViewMode viewMode = ViewMode::Icons;
-	bool autoArrange = true;
+	bool autoArrangeEnabled = true;
 	SortDirection sortDirection = SortDirection::Ascending;
 	SortDirection groupSortDirection = SortDirection::Ascending;
 	bool showInGroups = false;
 	bool showHidden = true;
 
-	bool enableFilter = false;
+	bool filterEnabled = false;
 	bool filterCaseSensitive = false;
 	std::wstring filter;
 

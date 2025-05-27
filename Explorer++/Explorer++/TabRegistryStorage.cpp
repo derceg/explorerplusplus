@@ -80,13 +80,13 @@ FolderSettings LoadFolderSettings(HKEY key)
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_APPLY_FILTER,
-		folderSettings.enableFilter);
+		folderSettings.filterEnabled);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SHOW_HIDDEN,
 		folderSettings.showHidden);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_AUTO_ARRANGE,
-		folderSettings.autoArrange);
+		folderSettings.autoArrangeEnabled);
 	RegistrySettings::ReadString(key, SETTING_FILTER, folderSettings.filter);
 
 	return folderSettings;
@@ -168,11 +168,11 @@ void SaveFolderSettings(HKEY key, const FolderSettings &folderSettings)
 	RegistrySettings::SaveDword(key, SETTING_GROUP_SORT_DIRECTION,
 		folderSettings.groupSortDirection);
 	RegistrySettings::SaveDword(key, SETTING_SHOW_IN_GROUPS, folderSettings.showInGroups);
-	RegistrySettings::SaveDword(key, SETTING_APPLY_FILTER, folderSettings.enableFilter);
+	RegistrySettings::SaveDword(key, SETTING_APPLY_FILTER, folderSettings.filterEnabled);
 	RegistrySettings::SaveDword(key, SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
 	RegistrySettings::SaveDword(key, SETTING_SHOW_HIDDEN, folderSettings.showHidden);
-	RegistrySettings::SaveDword(key, SETTING_AUTO_ARRANGE, folderSettings.autoArrange);
+	RegistrySettings::SaveDword(key, SETTING_AUTO_ARRANGE, folderSettings.autoArrangeEnabled);
 	RegistrySettings::SaveString(key, SETTING_FILTER, folderSettings.filter);
 }
 

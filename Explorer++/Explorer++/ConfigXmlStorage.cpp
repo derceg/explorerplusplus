@@ -122,7 +122,8 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"AllowMultipleInstances", config.allowMultipleInstances);
 	GetBoolSetting(settingsNode, L"AlwaysOpenInNewTab", config.alwaysOpenNewTab);
 	GetBoolSetting(settingsNode, L"AlwaysShowTabBar", config.alwaysShowTabBar);
-	GetBoolSetting(settingsNode, L"AutoArrangeGlobal", config.defaultFolderSettings.autoArrange);
+	GetBoolSetting(settingsNode, L"AutoArrangeGlobal",
+		config.defaultFolderSettings.autoArrangeEnabled);
 	GetBoolSetting(settingsNode, L"CheckBoxSelection", config.checkBoxSelection);
 	GetBoolSetting(settingsNode, L"CloseMainWindowOnTabClose", config.closeMainWindowOnTabClose);
 	GetBoolSetting(settingsNode, L"ConfirmCloseTabs", config.confirmCloseTabs);
@@ -286,7 +287,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"AlwaysShowTabBar", XMLSettings::EncodeBoolValue(config.alwaysShowTabBar.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"AutoArrangeGlobal",
-		XMLSettings::EncodeBoolValue(config.defaultFolderSettings.autoArrange));
+		XMLSettings::EncodeBoolValue(config.defaultFolderSettings.autoArrangeEnabled));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"CheckBoxSelection", XMLSettings::EncodeBoolValue(config.checkBoxSelection.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,

@@ -23,7 +23,7 @@ void ShellBrowserImpl::SetFilterText(const std::wstring &filter)
 
 	m_folderSettings.filter = filter;
 
-	if (m_folderSettings.enableFilter)
+	if (m_folderSettings.filterEnabled)
 	{
 		UnfilterAllItems();
 		UpdateFiltering();
@@ -44,7 +44,7 @@ void ShellBrowserImpl::SetFilterCaseSensitive(bool caseSensitive)
 
 	m_folderSettings.filterCaseSensitive = caseSensitive;
 
-	if (m_folderSettings.enableFilter)
+	if (m_folderSettings.filterEnabled)
 	{
 		UnfilterAllItems();
 		UpdateFiltering();
@@ -53,24 +53,24 @@ void ShellBrowserImpl::SetFilterCaseSensitive(bool caseSensitive)
 
 bool ShellBrowserImpl::IsFilterEnabled() const
 {
-	return m_folderSettings.enableFilter;
+	return m_folderSettings.filterEnabled;
 }
 
-void ShellBrowserImpl::SetFilterEnabled(bool enable)
+void ShellBrowserImpl::SetFilterEnabled(bool enabled)
 {
-	if (enable == m_folderSettings.enableFilter)
+	if (enabled == m_folderSettings.filterEnabled)
 	{
 		return;
 	}
 
-	m_folderSettings.enableFilter = enable;
+	m_folderSettings.filterEnabled = enabled;
 
 	UpdateFiltering();
 }
 
 void ShellBrowserImpl::UpdateFiltering()
 {
-	if (m_folderSettings.enableFilter)
+	if (m_folderSettings.filterEnabled)
 	{
 		RemoveFilteredItems();
 	}
@@ -82,7 +82,7 @@ void ShellBrowserImpl::UpdateFiltering()
 
 void ShellBrowserImpl::RemoveFilteredItems()
 {
-	if (!m_folderSettings.enableFilter)
+	if (!m_folderSettings.filterEnabled)
 	{
 		return;
 	}

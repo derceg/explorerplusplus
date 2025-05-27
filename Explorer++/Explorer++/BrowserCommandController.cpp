@@ -220,6 +220,11 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->SetViewMode(ViewMode::Tiles);
 		break;
 
+	case IDM_VIEW_AUTOARRANGE:
+		GetActiveShellBrowser()->SetAutoArrangeEnabled(
+			!GetActiveShellBrowser()->IsAutoArrangeEnabled());
+		break;
+
 	case IDM_VIEW_REFRESH:
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
 		break;
