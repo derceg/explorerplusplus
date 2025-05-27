@@ -218,7 +218,7 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"change_display_window_colors", IDM_VIEW_CHANGEDISPLAYCOLOURS},
 
 	{L"set_filter", IDM_FILTER_FILTERRESULTS},
-	{L"apply_filter", IDM_FILTER_APPLYFILTER},
+	{L"enable_filter", IDM_FILTER_ENABLE_FILTER},
 
 	{L"new_folder", IDM_ACTIONS_NEWFOLDER},
 	{L"split_file", IDM_ACTIONS_SPLITFILE},

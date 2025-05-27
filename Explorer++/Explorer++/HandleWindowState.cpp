@@ -106,8 +106,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_SHOWHIDDENFILES,
 		tab.GetShellBrowserImpl()->GetShowHidden());
-	MenuHelper::CheckItem(hProgramMenu, IDM_FILTER_APPLYFILTER,
-		tab.GetShellBrowserImpl()->IsFilterApplied());
+	MenuHelper::CheckItem(hProgramMenu, IDM_FILTER_ENABLE_FILTER,
+		tab.GetShellBrowserImpl()->IsFilterEnabled());
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_NEWFOLDER,
 		m_commandController.IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));

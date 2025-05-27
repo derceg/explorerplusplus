@@ -37,6 +37,8 @@ ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
 
 ShellBrowserFake::~ShellBrowserFake()
 {
+	m_destroyedSignal();
+
 	m_inlineExecutor->shutdown();
 }
 
@@ -125,6 +127,36 @@ void ShellBrowserFake::ClearSelection()
 {
 }
 
+std::wstring ShellBrowserFake::GetFilterText() const
+{
+	return m_filterText;
+}
+
+void ShellBrowserFake::SetFilterText(const std::wstring &filter)
+{
+	m_filterText = filter;
+}
+
+bool ShellBrowserFake::IsFilterCaseSensitive() const
+{
+	return m_filterCaseSensitive;
+}
+
+void ShellBrowserFake::SetFilterCaseSensitive(bool caseSensitive)
+{
+	m_filterCaseSensitive = caseSensitive;
+}
+
+bool ShellBrowserFake::IsFilterEnabled() const
+{
+	return m_filterEnabled;
+}
+
+void ShellBrowserFake::SetFilterEnabled(bool enable)
+{
+	m_filterEnabled = enable;
+}
+
 bool ShellBrowserFake::CanSaveDirectoryListing() const
 {
 	return false;
@@ -132,4 +164,10 @@ bool ShellBrowserFake::CanSaveDirectoryListing() const
 
 void ShellBrowserFake::SaveDirectoryListing()
 {
+}
+
+boost::signals2::connection ShellBrowserFake::AddDestroyedObserver(
+	const DestroyedSignal::slot_type &observer)
+{
+	return m_destroyedSignal.connect(observer);
 }

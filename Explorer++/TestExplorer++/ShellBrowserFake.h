@@ -47,8 +47,16 @@ public:
 	void SelectAllItems() override;
 	void InvertSelection() override;
 	void ClearSelection() override;
+	std::wstring GetFilterText() const override;
+	void SetFilterText(const std::wstring &filter) override;
+	bool IsFilterCaseSensitive() const override;
+	void SetFilterCaseSensitive(bool caseSensitive) override;
+	bool IsFilterEnabled() const override;
+	void SetFilterEnabled(bool enable) override;
 	bool CanSaveDirectoryListing() const override;
 	void SaveDirectoryListing() override;
+	boost::signals2::connection AddDestroyedObserver(
+		const DestroyedSignal::slot_type &observer) override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;
@@ -60,4 +68,10 @@ private:
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 	ViewMode m_viewMode = ViewMode::Icons;
+
+	std::wstring m_filterText;
+	bool m_filterCaseSensitive = false;
+	bool m_filterEnabled = false;
+
+	DestroyedSignal m_destroyedSignal;
 };

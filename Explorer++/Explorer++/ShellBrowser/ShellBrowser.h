@@ -6,8 +6,7 @@
 
 #include "ViewModes.h"
 #include "../Helper/PidlHelper.h"
-#include <memory>
-#include <vector>
+#include <boost/signals2.hpp>
 
 struct FolderSettings;
 class NavigationManager;
@@ -18,6 +17,8 @@ class Tab;
 class ShellBrowser
 {
 public:
+	using DestroyedSignal = boost::signals2::signal<void()>;
+
 	ShellBrowser();
 	virtual ~ShellBrowser() = default;
 
@@ -45,8 +46,18 @@ public:
 	virtual void InvertSelection() = 0;
 	virtual void ClearSelection() = 0;
 
+	virtual std::wstring GetFilterText() const = 0;
+	virtual void SetFilterText(const std::wstring &filter) = 0;
+	virtual bool IsFilterCaseSensitive() const = 0;
+	virtual void SetFilterCaseSensitive(bool caseSensitive) = 0;
+	virtual bool IsFilterEnabled() const = 0;
+	virtual void SetFilterEnabled(bool enable) = 0;
+
 	virtual bool CanSaveDirectoryListing() const = 0;
 	virtual void SaveDirectoryListing() = 0;
+
+	virtual boost::signals2::connection AddDestroyedObserver(
+		const DestroyedSignal::slot_type &observer) = 0;
 
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;

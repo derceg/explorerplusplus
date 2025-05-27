@@ -38,7 +38,7 @@ void Explorerplusplus::OnChangeDisplayColors()
 
 void Explorerplusplus::OnFilterResults()
 {
-	FilterDialog filterDialog(m_app->GetResourceLoader(), m_hContainer, this);
+	FilterDialog filterDialog(m_app->GetResourceLoader(), m_hContainer, m_pActiveShellBrowser);
 	filterDialog.ShowModalDialog();
 }
 

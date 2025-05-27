@@ -163,7 +163,7 @@
 #define IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY 367
 #define IDS_ABOUT_ARM64_BUILD           368
 #define IDS_LISTVIEW_FOLDER_EMPTY       369
-#define IDS_FILTER_APPLIED              370
+#define IDS_FILTER_ENABLED              370
 #define IDM_GO_QUICK_ACCESS             371
 #define IDM_GO_DOWNLOADS                372
 #define IDM_GO_VIDEOS                   373
@@ -770,7 +770,7 @@
 #define IDM_GO_CONTROL_PANEL            40209
 #define IDM_GO_PRINTERS                 40210
 #define IDM_GO_NETWORK                  40215
-#define IDM_FILTER_APPLYFILTER          40229
+#define IDM_FILTER_ENABLE_FILTER        40229
 #define IDM_FILTER_FILTERRESULTS        40230
 #define IDM_FILE_COPYCOLUMNTEXT         40237
 #define IDM_TAB_DUPLICATETAB            40247

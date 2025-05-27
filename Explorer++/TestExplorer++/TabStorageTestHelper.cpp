@@ -45,7 +45,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
 	tab1.folderSettings.groupSortDirection = SortDirection::Ascending;
 	tab1.folderSettings.showInGroups = false;
 	tab1.folderSettings.showHidden = true;
-	tab1.folderSettings.applyFilter = false;
+	tab1.folderSettings.enableFilter = false;
 	tab1.folderSettings.filterCaseSensitive = false;
 
 	tab1.columns.realFolderColumns = { { ColumnType::Name, TRUE, DEFAULT_COLUMN_WIDTH },
@@ -80,7 +80,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
 	tab2.folderSettings.groupSortDirection = SortDirection::Descending;
 	tab2.folderSettings.showInGroups = true;
 	tab2.folderSettings.showHidden = false;
-	tab2.folderSettings.applyFilter = true;
+	tab2.folderSettings.enableFilter = true;
 	tab2.folderSettings.filterCaseSensitive = false;
 	tab2.folderSettings.filter = L"*.exe";
 
@@ -98,7 +98,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs,
 	tab3.folderSettings.groupSortDirection = SortDirection::Ascending;
 	tab3.folderSettings.showInGroups = false;
 	tab3.folderSettings.showHidden = true;
-	tab3.folderSettings.applyFilter = true;
+	tab3.folderSettings.enableFilter = true;
 	tab3.folderSettings.filterCaseSensitive = true;
 	tab3.folderSettings.filter = L"*.txt";
 

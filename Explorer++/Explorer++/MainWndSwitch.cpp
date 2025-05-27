@@ -484,8 +484,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnFilterResults();
 		break;
 
-	case IDM_FILTER_APPLYFILTER:
-		m_pActiveShellBrowser->SetFilterApplied(!m_pActiveShellBrowser->IsFilterApplied());
+	case IDM_FILTER_ENABLE_FILTER:
+		m_pActiveShellBrowser->SetFilterEnabled(!m_pActiveShellBrowser->IsFilterEnabled());
 		break;
 
 	case IDM_SORTBY_NAME:

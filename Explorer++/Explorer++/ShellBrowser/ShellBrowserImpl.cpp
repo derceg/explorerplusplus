@@ -150,6 +150,8 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser
 
 ShellBrowserImpl::~ShellBrowserImpl()
 {
+	m_destroyedSignal();
+
 	if (m_clipboardDataObject
 		&& m_app->GetClipboardStore()->IsDataObjectCurrent(m_clipboardDataObject.get()))
 	{
@@ -1442,4 +1444,10 @@ void ShellBrowserImpl::SaveDirectoryListing()
 	}
 
 	FileOperations::SaveDirectoryListing(m_directoryState.directory, filePath);
+}
+
+boost::signals2::connection ShellBrowserImpl::AddDestroyedObserver(
+	const DestroyedSignal::slot_type &observer)
+{
+	return m_destroyedSignal.connect(observer);
 }

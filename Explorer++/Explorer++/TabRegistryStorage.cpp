@@ -80,7 +80,7 @@ FolderSettings LoadFolderSettings(HKEY key)
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_APPLY_FILTER,
-		folderSettings.applyFilter);
+		folderSettings.enableFilter);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SHOW_HIDDEN,
@@ -168,7 +168,7 @@ void SaveFolderSettings(HKEY key, const FolderSettings &folderSettings)
 	RegistrySettings::SaveDword(key, SETTING_GROUP_SORT_DIRECTION,
 		folderSettings.groupSortDirection);
 	RegistrySettings::SaveDword(key, SETTING_SHOW_IN_GROUPS, folderSettings.showInGroups);
-	RegistrySettings::SaveDword(key, SETTING_APPLY_FILTER, folderSettings.applyFilter);
+	RegistrySettings::SaveDword(key, SETTING_APPLY_FILTER, folderSettings.enableFilter);
 	RegistrySettings::SaveDword(key, SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
 	RegistrySettings::SaveDword(key, SETTING_SHOW_HIDDEN, folderSettings.showHidden);

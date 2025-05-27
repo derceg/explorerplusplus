@@ -687,7 +687,7 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	BOOL bHideSystemFile = FALSE;
 	BOOL bFilenameFiltered = FALSE;
 
-	if (m_folderSettings.applyFilter
+	if (m_folderSettings.enableFilter
 		&& ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(itemInfo.displayName.c_str());

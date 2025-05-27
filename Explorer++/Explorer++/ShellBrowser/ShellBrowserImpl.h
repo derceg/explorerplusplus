@@ -95,8 +95,16 @@ public:
 	void SelectAllItems() override;
 	void InvertSelection() override;
 	void ClearSelection() override;
+	std::wstring GetFilterText() const override;
+	void SetFilterText(const std::wstring &filter) override;
+	bool IsFilterCaseSensitive() const override;
+	void SetFilterCaseSensitive(bool caseSensitive) override;
+	bool IsFilterEnabled() const override;
+	void SetFilterEnabled(bool enable) override;
 	bool CanSaveDirectoryListing() const override;
 	void SaveDirectoryListing() override;
+	boost::signals2::connection AddDestroyedObserver(
+		const DestroyedSignal::slot_type &observer) override;
 
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
@@ -134,14 +142,6 @@ public:
 	std::vector<Column_t> GetCurrentColumns();
 	void SetCurrentColumns(const std::vector<Column_t> &columns);
 	static SortMode DetermineColumnSortMode(ColumnType columnType);
-
-	/* Filtering. */
-	std::wstring GetFilterText() const;
-	void SetFilterText(std::wstring_view filter);
-	bool IsFilterApplied() const;
-	void SetFilterApplied(bool filter);
-	bool GetFilterCaseSensitive() const;
-	void SetFilterCaseSensitive(bool filterCaseSensitive);
 
 	void SetFileAttributesForSelection();
 
@@ -722,6 +722,8 @@ private:
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
 	IDataObject *m_draggedDataObject;
+
+	DestroyedSignal m_destroyedSignal;
 
 	WeakPtrFactory<ShellBrowserImpl> m_weakPtrFactory;
 };

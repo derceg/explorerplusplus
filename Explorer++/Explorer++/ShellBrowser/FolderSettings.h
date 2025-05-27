@@ -69,7 +69,7 @@ struct FolderSettings
 	bool showInGroups = false;
 	bool showHidden = true;
 
-	bool applyFilter = false;
+	bool enableFilter = false;
 	bool filterCaseSensitive = false;
 	std::wstring filter;
 

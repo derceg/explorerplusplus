@@ -7,11 +7,13 @@
 #include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
+#include <boost/signals2.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
+#include <vector>
 
-class CoreInterface;
 class FilterDialog;
+class ShellBrowser;
 
 class FilterDialogPersistentSettings : public DialogSettings
 {
@@ -42,7 +44,7 @@ private:
 class FilterDialog : public BaseDialog
 {
 public:
-	FilterDialog(const ResourceLoader *resourceLoader, HWND hParent, CoreInterface *coreInterface);
+	FilterDialog(const ResourceLoader *resourceLoader, HWND hParent, ShellBrowser *shellBrowser);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -55,10 +57,13 @@ private:
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
+	void OnShellBrowserDestroyed();
+
 	void OnOk();
 	void OnCancel();
 
-	CoreInterface *m_coreInterface;
+	ShellBrowser *const m_shellBrowser;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	FilterDialogPersistentSettings *m_persistentSettings;
 };

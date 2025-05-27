@@ -4,11 +4,10 @@
 
 #include "stdafx.h"
 #include "FilterDialog.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -19,11 +18,14 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
 FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	CoreInterface *coreInterface) :
+	ShellBrowser *shellBrowser) :
 	BaseDialog(resourceLoader, IDD_FILTER, hParent, DialogSizingType::Horizontal),
-	m_coreInterface(coreInterface)
+	m_shellBrowser(shellBrowser)
 {
 	m_persistentSettings = &FilterDialogPersistentSettings::GetInstance();
+
+	m_connections.push_back(m_shellBrowser->AddDestroyedObserver(
+		std::bind_front(&FilterDialog::OnShellBrowserDestroyed, this)));
 }
 
 INT_PTR FilterDialog::OnInitDialog()
@@ -38,13 +40,11 @@ INT_PTR FilterDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strFilter.c_str()));
 	}
 
-	std::wstring filter = m_coreInterface->GetActiveShellBrowserImpl()->GetFilterText();
-
-	ComboBox_SelectString(hComboBox, -1, filter.c_str());
+	ComboBox_SelectString(hComboBox, -1, m_shellBrowser->GetFilterText().c_str());
 
 	SendMessage(hComboBox, CB_SETEDITSEL, 0, MAKELPARAM(0, -1));
 
-	if (m_coreInterface->GetActiveShellBrowserImpl()->GetFilterCaseSensitive())
+	if (m_shellBrowser->IsFilterCaseSensitive())
 	{
 		CheckDlgButton(m_hDlg, IDC_FILTERS_CASESENSITIVE, BST_CHECKED);
 	}
@@ -89,6 +89,11 @@ INT_PTR FilterDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void FilterDialog::OnShellBrowserDestroyed()
+{
+	EndDialog(m_hDlg, 0);
+}
+
 INT_PTR FilterDialog::OnClose()
 {
 	EndDialog(m_hDlg, 0);
@@ -123,15 +128,10 @@ void FilterDialog::OnOk()
 		m_persistentSettings->m_FilterList.push_front(filter);
 	}
 
-	m_coreInterface->GetActiveShellBrowserImpl()->SetFilterCaseSensitive(
+	m_shellBrowser->SetFilterCaseSensitive(
 		IsDlgButtonChecked(m_hDlg, IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
-
-	m_coreInterface->GetActiveShellBrowserImpl()->SetFilterText(filter);
-
-	if (!m_coreInterface->GetActiveShellBrowserImpl()->IsFilterApplied())
-	{
-		m_coreInterface->GetActiveShellBrowserImpl()->SetFilterApplied(TRUE);
-	}
+	m_shellBrowser->SetFilterText(filter);
+	m_shellBrowser->SetFilterEnabled(true);
 
 	EndDialog(m_hDlg, 1);
 }

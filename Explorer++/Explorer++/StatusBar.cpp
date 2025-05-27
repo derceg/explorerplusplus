@@ -199,9 +199,9 @@ void StatusBar::UpdateText(const Tab &tab)
 		}
 	}
 
-	if (tab.GetShellBrowserImpl()->IsFilterApplied())
+	if (tab.GetShellBrowser()->IsFilterEnabled())
 	{
-		auto filterAppliedText = m_resourceLoader->LoadString(IDS_FILTER_APPLIED);
+		auto filterAppliedText = m_resourceLoader->LoadString(IDS_FILTER_ENABLED);
 		numItemsText += L" | " + filterAppliedText;
 	}
 

@@ -107,7 +107,7 @@ FolderSettings LoadFolderSettings(IXMLDOMNode *tabNode)
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_APPLY_FILTER,
-		folderSettings.applyFilter);
+		folderSettings.enableFilter);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_HIDDEN, folderSettings.showHidden);
@@ -208,7 +208,7 @@ void SaveFolderSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_IN_GROUPS,
 		XMLSettings::EncodeBoolValue(folderSettings.showInGroups));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_APPLY_FILTER,
-		XMLSettings::EncodeBoolValue(folderSettings.applyFilter));
+		XMLSettings::EncodeBoolValue(folderSettings.enableFilter));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER_CASE_SENSITIVE,
 		XMLSettings::EncodeBoolValue(folderSettings.filterCaseSensitive));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_HIDDEN,
