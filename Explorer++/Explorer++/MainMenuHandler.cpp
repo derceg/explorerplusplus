@@ -23,7 +23,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerImpl.h"
-#include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
@@ -113,12 +112,6 @@ void Explorerplusplus::OnSearchTabs()
 void Explorerplusplus::OnOpenOnlineDocumentation()
 {
 	ShellExecute(nullptr, L"open", App::DOCUMENTATION_URL, nullptr, nullptr, SW_SHOWNORMAL);
-}
-
-void Explorerplusplus::OnCheckForUpdates()
-{
-	UpdateCheckDialog updateCheckDialog(m_app->GetResourceLoader(), m_hContainer);
-	updateCheckDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnResolveLink()

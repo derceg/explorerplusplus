@@ -36,6 +36,7 @@ private:
 	void GoUp(OpenFolderDisposition disposition);
 	void GoToPath(const std::wstring &path, OpenFolderDisposition disposition);
 	void GoToKnownFolder(REFKNOWNFOLDERID knownFolderId, OpenFolderDisposition disposition);
+	void OnCheckForUpdates();
 	void OnAbout();
 
 	ShellBrowser *GetActiveShellBrowser();

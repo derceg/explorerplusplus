@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "UpdateCheckDialog.h"
 #include "../Helper/BulkClipboardWriter.h"
 
 using namespace std::string_literals;
@@ -287,6 +288,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GoToPath(WSL_DISTRIBUTIONS_PATH, disposition);
 		break;
 
+	case IDM_HELP_CHECKFORUPDATES:
+		OnCheckForUpdates();
+		break;
+
 	case IDM_HELP_ABOUT:
 		OnAbout();
 		break;
@@ -457,6 +462,12 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	}
 
 	m_browser->OpenItem(pidl.get(), disposition);
+}
+
+void BrowserCommandController::OnCheckForUpdates()
+{
+	UpdateCheckDialog updateCheckDialog(m_resourceLoader, m_browser->GetHWND());
+	updateCheckDialog.ShowModalDialog();
 }
 
 void BrowserCommandController::OnAbout()
