@@ -288,6 +288,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GoToPath(WSL_DISTRIBUTIONS_PATH, disposition);
 		break;
 
+	case IDM_HELP_ONLINE_DOCUMENTATION:
+		OnOpenOnlineDocumentation();
+		break;
+
 	case IDM_HELP_CHECKFORUPDATES:
 		OnCheckForUpdates();
 		break;
@@ -462,6 +466,11 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	}
 
 	m_browser->OpenItem(pidl.get(), disposition);
+}
+
+void BrowserCommandController::OnOpenOnlineDocumentation()
+{
+	ShellExecute(nullptr, L"open", DOCUMENTATION_URL, nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 void BrowserCommandController::OnCheckForUpdates()

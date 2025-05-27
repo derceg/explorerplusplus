@@ -635,7 +635,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_HELP:
-		OnOpenOnlineDocumentation();
+		m_commandController.ExecuteCommand(IDM_HELP_ONLINE_DOCUMENTATION);
 		break;
 
 	case APPCOMMAND_NEW:

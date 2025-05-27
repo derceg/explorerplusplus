@@ -25,6 +25,9 @@ public:
 		OpenFolderDisposition disposition = OpenFolderDisposition::CurrentTab);
 
 private:
+	static constexpr wchar_t DOCUMENTATION_URL[] =
+		L"https://explorerplusplus.readthedocs.io/en/latest/";
+
 	bool IsCommandContextSensitive(int command) const;
 
 	bool CanStartCommandPrompt() const;
@@ -36,6 +39,7 @@ private:
 	void GoUp(OpenFolderDisposition disposition);
 	void GoToPath(const std::wstring &path, OpenFolderDisposition disposition);
 	void GoToKnownFolder(REFKNOWNFOLDERID knownFolderId, OpenFolderDisposition disposition);
+	void OnOpenOnlineDocumentation();
 	void OnCheckForUpdates();
 	void OnAbout();
 

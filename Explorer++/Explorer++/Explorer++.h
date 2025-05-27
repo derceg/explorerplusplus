@@ -243,7 +243,6 @@ private:
 	void OnRunScript();
 	void OnShowOptions();
 	void OnSearchTabs();
-	void OnOpenOnlineDocumentation();
 
 	void OnGoToOffset(int offset);
 

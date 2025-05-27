@@ -1198,9 +1198,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_HELP_ONLINE_DOCUMENTATION:
-		OnOpenOnlineDocumentation();
-		break;
-
 	case IDM_HELP_CHECKFORUPDATES:
 	case IDM_HELP_ABOUT:
 		m_commandController.ExecuteCommand(id);

@@ -109,11 +109,6 @@ void Explorerplusplus::OnSearchTabs()
 		});
 }
 
-void Explorerplusplus::OnOpenOnlineDocumentation()
-{
-	ShellExecute(nullptr, L"open", App::DOCUMENTATION_URL, nullptr, nullptr, SW_SHOWNORMAL);
-}
-
 void Explorerplusplus::OnResolveLink()
 {
 	TCHAR szFullFileName[MAX_PATH];
