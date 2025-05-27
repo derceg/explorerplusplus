@@ -280,7 +280,7 @@ void ShellBrowserImpl::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
 	if (WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_ALT))
 	{
 		ShowMultipleFileProperties(m_directoryState.pidlDirectory.Raw(), { item.pridl.Raw() },
-			m_hOwner);
+			m_owner);
 	}
 	else
 	{
@@ -1023,7 +1023,7 @@ void ShellBrowserImpl::ShowPropertiesForSelectedItems() const
 	}
 
 	auto pidlDirectory = GetDirectoryIdl();
-	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls, m_hOwner);
+	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls, m_owner);
 }
 
 void ShellBrowserImpl::OpenSelectedItems()

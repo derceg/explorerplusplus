@@ -39,11 +39,11 @@
 #include <wil/com.h>
 #include <list>
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserImpl(hOwner, app, browser, tabNavigation, fileActionHandler,
+	ShellBrowserImpl(owner, app, browser, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
@@ -52,11 +52,11 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser
 	ChangeToInitialFolder();
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns) :
-	ShellBrowserImpl(hOwner, app, browser, tabNavigation, fileActionHandler, folderSettings,
+	ShellBrowserImpl(owner, app, browser, tabNavigation, fileActionHandler, folderSettings,
 		initialColumns)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
@@ -65,15 +65,15 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser
 	ChangeToInitialFolder();
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
-	ShellDropTargetWindow(CreateListView(hOwner)),
+	ShellDropTargetWindow(CreateListView(owner)),
 	m_listView(GetHWND()),
-	m_hOwner(hOwner),
+	m_owner(owner),
 	m_app(app),
 	m_browser(browser),
-	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(hOwner,
+	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(owner,
 		folderSettings.showHidden ? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
 								  : ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden)),
 	m_navigationManager(this, app->GetNavigationEvents(), m_shellEnumerator,
@@ -1291,7 +1291,7 @@ void ShellBrowserImpl::SplitFile()
 		return;
 	}
 
-	SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_hOwner, *itemPath);
+	SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_owner, *itemPath);
 	splitFileDialog.ShowModalDialog();
 }
 
@@ -1340,7 +1340,7 @@ void ShellBrowserImpl::MergeFiles()
 		return;
 	}
 
-	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_hOwner,
+	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_owner,
 		m_directoryState.directory, *items, m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
 }
@@ -1394,7 +1394,7 @@ void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)
 	std::ranges::transform(pidls, std::back_inserter(rawPidls),
 		[](const auto &pidl) { return pidl.Raw(); });
 
-	Epp::FileOperations::CopyFilesToFolder(m_hOwner, rawPidls, action, m_app->GetResourceLoader());
+	Epp::FileOperations::CopyFilesToFolder(m_owner, rawPidls, action, m_app->GetResourceLoader());
 }
 
 void ShellBrowserImpl::SelectAllItems()

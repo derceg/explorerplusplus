@@ -183,6 +183,6 @@ void ShellBrowserImpl::RestoreFilteredItem(int internalIndex)
 
 void ShellBrowserImpl::EditFilterSettings()
 {
-	FilterDialog filterDialog(m_app->GetResourceLoader(), m_hOwner, this);
+	FilterDialog filterDialog(m_app->GetResourceLoader(), m_owner, this);
 	filterDialog.ShowModalDialog();
 }

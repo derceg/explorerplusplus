@@ -69,11 +69,11 @@ class ShellBrowserImpl :
 	private boost::noncopyable
 {
 public:
-	ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
 		const FolderColumns *initialColumns);
@@ -365,7 +365,7 @@ private:
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
-	ShellBrowserImpl(HWND hOwner, App *app, BrowserWindow *browser,
+	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 
@@ -629,7 +629,7 @@ private:
 	void ApplyHeaderSortArrow();
 
 	HWND m_listView;
-	HWND m_hOwner;
+	HWND m_owner;
 
 	App *const m_app;
 	BrowserWindow *const m_browser;

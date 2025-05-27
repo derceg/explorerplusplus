@@ -218,7 +218,7 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	document->RegisterService(IID_IFolderView,
 		winrt::make_self<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, true));
 
-	auto browserApp = winrt::make_self<WebBrowserApp>(m_hOwner, document.get());
+	auto browserApp = winrt::make_self<WebBrowserApp>(m_owner, document.get());
 
 	// Registering the same window multiple times (ultimately with different pidls) is odd, but
 	// appears to work fine (since a shell window is uniquely identified through a cookie, rather
@@ -237,7 +237,7 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 #pragma warning(                                                                                   \
 	disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
 						 // 'reinterpret_cast': truncation from 'HWND' to 'long'
-	RETURN_IF_FAILED(m_shellWindows->Register(browserApp.get(), reinterpret_cast<long>(m_hOwner),
+	RETURN_IF_FAILED(m_shellWindows->Register(browserApp.get(), reinterpret_cast<long>(m_owner),
 		SWC_BROWSER, &registeredCookie));
 #pragma warning(pop)
 
