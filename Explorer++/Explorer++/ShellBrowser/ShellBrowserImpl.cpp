@@ -33,6 +33,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
+#include "../Helper/FileDialogs.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
@@ -1410,4 +1411,35 @@ void ShellBrowserImpl::ClearSelection()
 {
 	ListViewHelper::SelectAllItems(m_hListView, false);
 	SetFocus(m_hListView);
+}
+
+bool ShellBrowserImpl::CanSaveDirectoryListing() const
+{
+	return !m_directoryState.virtualFolder;
+}
+
+void ShellBrowserImpl::SaveDirectoryListing()
+{
+	if (!CanSaveDirectoryListing())
+	{
+		return;
+	}
+
+	const auto *resourceLoader = m_app->GetResourceLoader();
+	auto defaultFileName = resourceLoader->LoadString(IDS_DIRECTORY_LISTING_FILENAME);
+
+	std::vector<FileDialogs::FileType> fileTypes = {
+		{ resourceLoader->LoadString(IDS_DIRECTORY_LISTING_TEXT_DOCUMENT), L"*.txt" }
+	};
+
+	std::wstring filePath;
+	HRESULT hr = FileDialogs::ShowSaveAsDialog(m_hListView, m_directoryState.directory,
+		defaultFileName, fileTypes, 0, filePath);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	FileOperations::SaveDirectoryListing(m_directoryState.directory, filePath);
 }

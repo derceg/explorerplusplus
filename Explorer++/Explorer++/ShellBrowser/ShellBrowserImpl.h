@@ -95,6 +95,8 @@ public:
 	void SelectAllItems() override;
 	void InvertSelection() override;
 	void ClearSelection() override;
+	bool CanSaveDirectoryListing() const override;
+	void SaveDirectoryListing() override;
 
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 

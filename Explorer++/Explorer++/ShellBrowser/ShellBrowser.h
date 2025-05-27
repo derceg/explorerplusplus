@@ -45,6 +45,9 @@ public:
 	virtual void InvertSelection() = 0;
 	virtual void ClearSelection() = 0;
 
+	virtual bool CanSaveDirectoryListing() const = 0;
+	virtual void SaveDirectoryListing() = 0;
+
 protected:
 	virtual NavigationManager *GetNavigationManager() = 0;
 	virtual const NavigationManager *GetNavigationManager() const = 0;

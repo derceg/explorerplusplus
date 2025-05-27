@@ -300,7 +300,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILE_SAVEDIRECTORYLISTING:
-		OnSaveDirectoryListing();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case MainToolbarButton::OpenCommandPrompt:

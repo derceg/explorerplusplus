@@ -221,7 +221,6 @@ private:
 	/* Main menu handlers. */
 	void OnNewTab();
 	bool OnCloseTab();
-	void OnSaveDirectoryListing() const;
 	void OnCloneWindow();
 	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;

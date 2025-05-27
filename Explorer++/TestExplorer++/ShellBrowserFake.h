@@ -47,6 +47,8 @@ public:
 	void SelectAllItems() override;
 	void InvertSelection() override;
 	void ClearSelection() override;
+	bool CanSaveDirectoryListing() const override;
+	void SaveDirectoryListing() override;
 
 protected:
 	NavigationManager *GetNavigationManager() override;

@@ -30,7 +30,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	const Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
 
 	ViewMode viewMode = tab.GetShellBrowserImpl()->GetViewMode();
-	bool virtualFolder = tab.GetShellBrowserImpl()->InVirtualFolder();
 
 	int numSelected = tab.GetShellBrowserImpl()->GetNumSelected();
 	bool anySelected = (numSelected > 0);
@@ -43,7 +42,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		m_commandController.IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR,
 		m_commandController.IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR));
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SAVEDIRECTORYLISTING, !virtualFolder);
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SAVEDIRECTORYLISTING,
+		m_commandController.IsCommandEnabled(IDM_FILE_SAVEDIRECTORYLISTING));
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYCOLUMNTEXT,
 		anySelected && (viewMode == +ViewMode::Details));
 

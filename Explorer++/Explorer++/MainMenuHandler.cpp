@@ -26,7 +26,6 @@
 #include "TabContainerImpl.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
-#include "../Helper/FileDialogs.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -127,29 +126,6 @@ void Explorerplusplus::OnAbout()
 {
 	AboutDialog aboutDialog(m_app->GetResourceLoader(), m_hContainer);
 	aboutDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::OnSaveDirectoryListing() const
-{
-	std::wstring directory = m_pActiveShellBrowser->GetDirectoryPath();
-
-	const auto *resourceLoader = m_app->GetResourceLoader();
-	auto defaultFileName = resourceLoader->LoadString(IDS_GENERAL_DIRECTORY_LISTING_FILENAME);
-
-	std::vector<FileDialogs::FileType> fileTypes = {
-		{ resourceLoader->LoadString(IDS_GENERAL_DIRECTORY_LISTING_TEXT_DOCUMENT), L"*.txt" }
-	};
-
-	std::wstring filePath;
-	HRESULT hr = FileDialogs::ShowSaveAsDialog(m_hContainer, directory, defaultFileName, fileTypes,
-		0, filePath);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	FileOperations::SaveDirectoryListing(directory, filePath);
 }
 
 void Explorerplusplus::OnResolveLink()

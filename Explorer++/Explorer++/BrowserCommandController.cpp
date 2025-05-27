@@ -30,6 +30,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 	switch (command)
 	{
+	case IDM_FILE_SAVEDIRECTORYLISTING:
+		return GetActiveShellBrowser()->CanSaveDirectoryListing();
+
 	case IDM_FILE_OPENCOMMANDPROMPT:
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
 		return CanStartCommandPrompt();
@@ -94,6 +97,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	switch (command)
 	{
+	case IDM_FILE_SAVEDIRECTORYLISTING:
+		GetActiveShellBrowser()->SaveDirectoryListing();
+		break;
+
 	case IDM_FILE_OPENCOMMANDPROMPT:
 		StartCommandPrompt();
 		break;

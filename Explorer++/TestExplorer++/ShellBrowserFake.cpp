@@ -124,3 +124,12 @@ void ShellBrowserFake::InvertSelection()
 void ShellBrowserFake::ClearSelection()
 {
 }
+
+bool ShellBrowserFake::CanSaveDirectoryListing() const
+{
+	return false;
+}
+
+void ShellBrowserFake::SaveDirectoryListing()
+{
+}
