@@ -8,6 +8,7 @@
 #include "BrowserWindowFake.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "ResourceLoaderFake.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
@@ -23,7 +24,7 @@ protected:
 	BrowserCommandControllerTest() :
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab()),
-		m_commandController(m_browser, &m_config, &m_clipboardStore)
+		m_commandController(m_browser, &m_config, &m_clipboardStore, &m_resourceLoader)
 	{
 		m_browser->ActivateTabAtIndex(0);
 	}
@@ -39,6 +40,7 @@ protected:
 
 	Config m_config;
 	SimulatedClipboardStore m_clipboardStore;
+	ResourceLoaderFake m_resourceLoader;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;

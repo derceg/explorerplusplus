@@ -245,7 +245,6 @@ private:
 	void OnSearchTabs();
 	void OnOpenOnlineDocumentation();
 	void OnCheckForUpdates();
-	void OnAbout();
 
 	void OnGoToOffset(int offset);
 

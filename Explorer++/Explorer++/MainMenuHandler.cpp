@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "AboutDialog.h"
 #include "App.h"
 #include "Config.h"
 #include "CustomizeColorsDialog.h"
@@ -120,12 +119,6 @@ void Explorerplusplus::OnCheckForUpdates()
 {
 	UpdateCheckDialog updateCheckDialog(m_app->GetResourceLoader(), m_hContainer);
 	updateCheckDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::OnAbout()
-{
-	AboutDialog aboutDialog(m_app->GetResourceLoader(), m_hContainer);
-	aboutDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnResolveLink()

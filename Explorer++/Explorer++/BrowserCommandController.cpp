@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BrowserCommandController.h"
+#include "AboutDialog.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainResource.h"
@@ -14,10 +15,11 @@
 using namespace std::string_literals;
 
 BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Config *config,
-	ClipboardStore *clipboardStore) :
+	ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader) :
 	m_browser(browser),
 	m_config(config),
-	m_clipboardStore(clipboardStore)
+	m_clipboardStore(clipboardStore),
+	m_resourceLoader(resourceLoader)
 {
 }
 
@@ -285,6 +287,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GoToPath(WSL_DISTRIBUTIONS_PATH, disposition);
 		break;
 
+	case IDM_HELP_ABOUT:
+		OnAbout();
+		break;
+
 	case IDA_HOME:
 		GetActiveShellBrowser()->GetNavigationController()->Navigate(m_config->defaultTabDirectory);
 		break;
@@ -451,6 +457,12 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	}
 
 	m_browser->OpenItem(pidl.get(), disposition);
+}
+
+void BrowserCommandController::OnAbout()
+{
+	AboutDialog aboutDialog(m_resourceLoader, m_browser->GetHWND());
+	aboutDialog.ShowModalDialog();
 }
 
 ShellBrowser *BrowserCommandController::GetActiveShellBrowser()

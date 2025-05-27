@@ -11,13 +11,14 @@
 class BrowserWindow;
 class ClipboardStore;
 struct Config;
+class ResourceLoader;
 class ShellBrowser;
 
 class BrowserCommandController : private boost::noncopyable
 {
 public:
-	BrowserCommandController(BrowserWindow *browser, Config *config,
-		ClipboardStore *clipboardStore);
+	BrowserCommandController(BrowserWindow *browser, Config *config, ClipboardStore *clipboardStore,
+		const ResourceLoader *resourceLoader);
 
 	bool IsCommandEnabled(int command) const;
 	void ExecuteCommand(int command,
@@ -35,6 +36,7 @@ private:
 	void GoUp(OpenFolderDisposition disposition);
 	void GoToPath(const std::wstring &path, OpenFolderDisposition disposition);
 	void GoToKnownFolder(REFKNOWNFOLDERID knownFolderId, OpenFolderDisposition disposition);
+	void OnAbout();
 
 	ShellBrowser *GetActiveShellBrowser();
 	const ShellBrowser *GetActiveShellBrowser() const;
@@ -42,4 +44,5 @@ private:
 	BrowserWindow *const m_browser;
 	Config *const m_config;
 	ClipboardStore *const m_clipboardStore;
+	const ResourceLoader *const m_resourceLoader;
 };

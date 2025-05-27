@@ -1206,7 +1206,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_HELP_ABOUT:
-		OnAbout();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDA_NEXTTAB:
