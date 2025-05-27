@@ -481,11 +481,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILTER_FILTERRESULTS:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_FILTER_ENABLE_FILTER:
-		m_pActiveShellBrowser->SetFilterEnabled(!m_pActiveShellBrowser->IsFilterEnabled());
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_SORTBY_NAME:
