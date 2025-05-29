@@ -28,7 +28,6 @@ private:
 	void SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab);
 
 	UINT GetSortMenuItemStringIndex(UINT uItemId);
-	int DetermineSortModeMenuId(SortMode sortMode);
 	int DetermineGroupModeMenuId(SortMode sortMode);
 
 	const ResourceLoader *const m_resourceLoader;

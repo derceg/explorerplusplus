@@ -5,6 +5,7 @@
 #pragma once
 
 #include "SelectionType.h"
+#include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/PidlHelper.h"
 #include <boost/signals2.hpp>
@@ -36,6 +37,12 @@ public:
 
 	virtual ViewMode GetViewMode() const = 0;
 	virtual void SetViewMode(ViewMode viewMode) = 0;
+
+	virtual SortMode GetSortMode() const = 0;
+	virtual void SetSortMode(SortMode sortMode) = 0;
+	virtual SortDirection GetSortDirection() const = 0;
+	virtual void SetSortDirection(SortDirection direction) = 0;
+
 	virtual bool IsAutoArrangeEnabled() const = 0;
 	virtual void SetAutoArrangeEnabled(bool enabled) = 0;
 	virtual bool CanAutoSizeColumns() const = 0;

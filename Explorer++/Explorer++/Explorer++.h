@@ -227,7 +227,6 @@ private:
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnResolveLink();
-	void OnSortBy(SortMode sortMode);
 	void OnGroupBy(SortMode groupMode);
 	void OnGroupByNone();
 	void OnSortDirectionSelected(SortDirection direction);

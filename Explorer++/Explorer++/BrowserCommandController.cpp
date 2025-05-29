@@ -11,6 +11,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "SortModeMenuMappings.h"
 #include "UpdateCheckDialog.h"
 #include "../Helper/BulkClipboardWriter.h"
 
@@ -102,6 +103,11 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 	if (IsCommandContextSensitive(command))
 	{
 		m_browser->GetCommandTargetManager()->GetCurrentTarget()->ExecuteCommand(command);
+		return;
+	}
+	else if (IsSortModeMenuItemId(command))
+	{
+		OnSortBy(GetSortModeForMenuItemId(command));
 		return;
 	}
 
@@ -364,6 +370,21 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 
 	default:
 		return false;
+	}
+}
+
+void BrowserCommandController::OnSortBy(SortMode sortMode)
+{
+	auto *shellBrowser = GetActiveShellBrowser();
+	SortMode currentSortMode = shellBrowser->GetSortMode();
+
+	if (sortMode == currentSortMode)
+	{
+		shellBrowser->SetSortDirection(InvertSortDirection(shellBrowser->GetSortDirection()));
+	}
+	else
+	{
+		shellBrowser->SetSortMode(sortMode);
 	}
 }
 

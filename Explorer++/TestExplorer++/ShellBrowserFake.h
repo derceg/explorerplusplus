@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/NavigationManager.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -38,6 +39,10 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	SortMode GetSortMode() const override;
+	void SetSortMode(SortMode sortMode) override;
+	SortDirection GetSortDirection() const override;
+	void SetSortDirection(SortDirection direction) override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanAutoSizeColumns() const override;
@@ -76,13 +81,6 @@ private:
 	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
-
-	ViewMode m_viewMode = ViewMode::Icons;
-	bool m_autoArrangeEnabled = true;
-
-	std::wstring m_filterText;
-	bool m_filterCaseSensitive = false;
-	bool m_filterEnabled = false;
-
+	FolderSettings m_folderSettings;
 	DestroyedSignal m_destroyedSignal;
 };

@@ -843,22 +843,6 @@ void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 		m_hContainer, nullptr);
 }
 
-void Explorerplusplus::OnSortBy(SortMode sortMode)
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	SortMode currentSortMode = selectedTab.GetShellBrowserImpl()->GetSortMode();
-
-	if (sortMode == currentSortMode)
-	{
-		selectedTab.GetShellBrowserImpl()->SetSortDirection(
-			InvertSortDirection(selectedTab.GetShellBrowserImpl()->GetSortDirection()));
-	}
-	else
-	{
-		selectedTab.GetShellBrowserImpl()->SetSortMode(sortMode);
-	}
-}
-
 void Explorerplusplus::OnGroupBy(SortMode groupMode)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();

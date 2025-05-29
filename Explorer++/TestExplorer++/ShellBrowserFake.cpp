@@ -80,22 +80,42 @@ ShellNavigationController *ShellBrowserFake::GetNavigationController() const
 
 ViewMode ShellBrowserFake::GetViewMode() const
 {
-	return m_viewMode;
+	return m_folderSettings.viewMode;
 }
 
 void ShellBrowserFake::SetViewMode(ViewMode viewMode)
 {
-	m_viewMode = viewMode;
+	m_folderSettings.viewMode = viewMode;
+}
+
+SortMode ShellBrowserFake::GetSortMode() const
+{
+	return m_folderSettings.sortMode;
+}
+
+void ShellBrowserFake::SetSortMode(SortMode sortMode)
+{
+	m_folderSettings.sortMode = sortMode;
+}
+
+SortDirection ShellBrowserFake::GetSortDirection() const
+{
+	return m_folderSettings.sortDirection;
+}
+
+void ShellBrowserFake::SetSortDirection(SortDirection direction)
+{
+	m_folderSettings.sortDirection = direction;
 }
 
 bool ShellBrowserFake::IsAutoArrangeEnabled() const
 {
-	return m_autoArrangeEnabled;
+	return m_folderSettings.autoArrangeEnabled;
 }
 
 void ShellBrowserFake::SetAutoArrangeEnabled(bool enabled)
 {
-	m_autoArrangeEnabled = enabled;
+	m_folderSettings.autoArrangeEnabled = enabled;
 }
 
 bool ShellBrowserFake::CanAutoSizeColumns() const
@@ -167,32 +187,32 @@ void ShellBrowserFake::ClearSelection()
 
 std::wstring ShellBrowserFake::GetFilterText() const
 {
-	return m_filterText;
+	return m_folderSettings.filter;
 }
 
 void ShellBrowserFake::SetFilterText(const std::wstring &filter)
 {
-	m_filterText = filter;
+	m_folderSettings.filter = filter;
 }
 
 bool ShellBrowserFake::IsFilterCaseSensitive() const
 {
-	return m_filterCaseSensitive;
+	return m_folderSettings.filterCaseSensitive;
 }
 
 void ShellBrowserFake::SetFilterCaseSensitive(bool caseSensitive)
 {
-	m_filterCaseSensitive = caseSensitive;
+	m_folderSettings.filterCaseSensitive = caseSensitive;
 }
 
 bool ShellBrowserFake::IsFilterEnabled() const
 {
-	return m_filterEnabled;
+	return m_folderSettings.filterEnabled;
 }
 
 void ShellBrowserFake::SetFilterEnabled(bool enabled)
 {
-	m_filterEnabled = enabled;
+	m_folderSettings.filterEnabled = enabled;
 }
 
 void ShellBrowserFake::EditFilterSettings()

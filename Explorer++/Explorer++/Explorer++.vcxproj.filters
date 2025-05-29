@@ -841,6 +841,9 @@
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp">
       <Filter>ShellTreeView\Shell Integration</Filter>
     </ClCompile>
+    <ClCompile Include="SortModeMenuMappings.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1756,6 +1759,9 @@
       <Filter>ShellTreeView\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="SelectionType.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SortModeMenuMappings.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

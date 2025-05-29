@@ -86,6 +86,10 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	SortMode GetSortMode() const override;
+	void SetSortMode(SortMode sortMode) override;
+	SortDirection GetSortDirection() const override;
+	void SetSortDirection(SortDirection direction) override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanAutoSizeColumns() const override;
@@ -122,12 +126,8 @@ public:
 	std::wstring GetDirectoryPath() const;
 	int GetUniqueFolderId() const;
 	void CycleViewMode(bool cycleForward);
-	SortMode GetSortMode() const;
-	void SetSortMode(SortMode sortMode);
 	SortMode GetGroupMode() const;
 	void SetGroupMode(SortMode sortMode);
-	SortDirection GetSortDirection() const;
-	void SetSortDirection(SortDirection direction);
 	SortDirection GetGroupSortDirection() const;
 	void SetGroupSortDirection(SortDirection direction);
 	bool GetShowHidden() const;

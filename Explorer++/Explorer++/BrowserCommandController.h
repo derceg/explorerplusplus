@@ -5,6 +5,7 @@
 #pragma once
 
 #include "NavigationHelper.h"
+#include "ShellBrowser/SortModes.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/core/noncopyable.hpp>
 
@@ -32,6 +33,7 @@ private:
 
 	bool CanStartCommandPrompt() const;
 
+	void OnSortBy(SortMode sortMode);
 	void StartCommandPrompt(LaunchProcessFlags flags = LaunchProcessFlags::None);
 	void CopyFolderPath() const;
 	void OnChangeDisplayColors();

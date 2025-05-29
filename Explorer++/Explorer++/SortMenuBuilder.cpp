@@ -7,6 +7,7 @@
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "SortModeMenuMappings.h"
 #include "Tab.h"
 #include "../Helper/MenuHelper.h"
 
@@ -27,7 +28,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 
 	for (SortMode sortMode : sortModes)
 	{
-		int sortById = DetermineSortModeMenuId(sortMode);
+		int sortById = GetMenuItemIdForSortMode(sortMode);
 		int groupById = DetermineGroupModeMenuId(sortMode);
 
 		UINT stringIndex = GetSortMenuItemStringIndex(sortById);
@@ -76,7 +77,7 @@ void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, con
 {
 	SortMode sortMode = tab.GetShellBrowserImpl()->GetSortMode();
 	CheckMenuRadioItem(sortByMenu, IDM_SORTBY_NAME,
-		IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1), DetermineSortModeMenuId(sortMode),
+		IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1), GetMenuItemIdForSortMode(sortMode),
 		MF_BYCOMMAND);
 
 	CheckMenuRadioItem(sortByMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
@@ -183,8 +184,8 @@ UINT SortMenuBuilder::GetSortMenuItemStringIndex(UINT uItemId)
 	case IDM_SORTBY_SUBJECT:
 		return IDS_SORTBY_SUBJECT;
 
-	case IDM_SORTBY_AUTHOR:
-		return IDS_SORTBY_AUTHOR;
+	case IDM_SORTBY_AUTHORS:
+		return IDS_SORTBY_AUTHORS;
 
 	case IDM_SORTBY_KEYWORDS:
 		return IDS_SORTBY_KEYWORDS;
@@ -279,7 +280,7 @@ UINT SortMenuBuilder::GetSortMenuItemStringIndex(UINT uItemId)
 	case IDM_SORTBY_MEDIA_PARENTAL_RATING:
 		return IDS_COLUMN_NAME_PARENTALRATING;
 
-	case IDM_SORTBY_MEDIA_PARENTAL_RATNG_REASON:
+	case IDM_SORTBY_MEDIA_PARENTAL_RATING_REASON:
 		return IDS_COLUMN_NAME_PARENTALRATINGREASON;
 
 	case IDM_SORTBY_MEDIA_PERIOD:
@@ -303,204 +304,6 @@ UINT SortMenuBuilder::GetSortMenuItemStringIndex(UINT uItemId)
 	}
 
 	return 0;
-}
-
-int SortMenuBuilder::DetermineSortModeMenuId(SortMode sortMode)
-{
-	switch (sortMode)
-	{
-	case SortMode::Name:
-		return IDM_SORTBY_NAME;
-
-	case SortMode::DateModified:
-		return IDM_SORTBY_DATEMODIFIED;
-
-	case SortMode::Size:
-		return IDM_SORTBY_SIZE;
-
-	case SortMode::Type:
-		return IDM_SORTBY_TYPE;
-
-	case SortMode::TotalSize:
-		return IDM_SORTBY_TOTALSIZE;
-
-	case SortMode::FreeSpace:
-		return IDM_SORTBY_FREESPACE;
-
-	case SortMode::Comments:
-		return IDM_SORTBY_COMMENTS;
-
-	case SortMode::DateDeleted:
-		return IDM_SORTBY_DATEDELETED;
-
-	case SortMode::OriginalLocation:
-		return IDM_SORTBY_ORIGINALLOCATION;
-
-	case SortMode::Attributes:
-		return IDM_SORTBY_ATTRIBUTES;
-
-	case SortMode::RealSize:
-		return IDM_SORTBY_REALSIZE;
-
-	case SortMode::ShortName:
-		return IDM_SORTBY_SHORTNAME;
-
-	case SortMode::Owner:
-		return IDM_SORTBY_OWNER;
-
-	case SortMode::ProductName:
-		return IDM_SORTBY_PRODUCTNAME;
-
-	case SortMode::Company:
-		return IDM_SORTBY_COMPANY;
-
-	case SortMode::Description:
-		return IDM_SORTBY_DESCRIPTION;
-
-	case SortMode::FileVersion:
-		return IDM_SORTBY_FILEVERSION;
-
-	case SortMode::ProductVersion:
-		return IDM_SORTBY_PRODUCTVERSION;
-
-	case SortMode::ShortcutTo:
-		return IDM_SORTBY_SHORTCUTTO;
-
-	case SortMode::HardLinks:
-		return IDM_SORTBY_HARDLINKS;
-
-	case SortMode::Extension:
-		return IDM_SORTBY_EXTENSION;
-
-	case SortMode::Created:
-		return IDM_SORTBY_CREATED;
-
-	case SortMode::Accessed:
-		return IDM_SORTBY_ACCESSED;
-
-	case SortMode::Title:
-		return IDM_SORTBY_TITLE;
-
-	case SortMode::Subject:
-		return IDM_SORTBY_SUBJECT;
-
-	case SortMode::Authors:
-		return IDM_SORTBY_AUTHOR;
-
-	case SortMode::Keywords:
-		return IDM_SORTBY_KEYWORDS;
-
-	case SortMode::CameraModel:
-		return IDM_SORTBY_CAMERAMODEL;
-
-	case SortMode::DateTaken:
-		return IDM_SORTBY_DATETAKEN;
-
-	case SortMode::Width:
-		return IDM_SORTBY_WIDTH;
-
-	case SortMode::Height:
-		return IDM_SORTBY_HEIGHT;
-
-	case SortMode::VirtualComments:
-		return IDM_SORTBY_VIRTUALCOMMENTS;
-
-	case SortMode::FileSystem:
-		return IDM_SORTBY_FILESYSTEM;
-
-	case SortMode::NumPrinterDocuments:
-		return IDM_SORTBY_NUMPRINTERDOCUMENTS;
-
-	case SortMode::PrinterStatus:
-		return IDM_SORTBY_PRINTERSTATUS;
-
-	case SortMode::PrinterComments:
-		return IDM_SORTBY_PRINTERCOMMENTS;
-
-	case SortMode::PrinterLocation:
-		return IDM_SORTBY_PRINTERLOCATION;
-
-	case SortMode::NetworkAdapterStatus:
-		return IDM_SORTBY_NETWORKADAPTER_STATUS;
-
-	case SortMode::MediaBitrate:
-		return IDM_SORTBY_MEDIA_BITRATE;
-
-	case SortMode::MediaCopyright:
-		return IDM_SORTBY_MEDIA_COPYRIGHT;
-
-	case SortMode::MediaDuration:
-		return IDM_SORTBY_MEDIA_DURATION;
-
-	case SortMode::MediaProtected:
-		return IDM_SORTBY_MEDIA_PROTECTED;
-
-	case SortMode::MediaRating:
-		return IDM_SORTBY_MEDIA_RATING;
-
-	case SortMode::MediaAlbumArtist:
-		return IDM_SORTBY_MEDIA_ALBUM_ARTIST;
-
-	case SortMode::MediaAlbum:
-		return IDM_SORTBY_MEDIA_ALBUM;
-
-	case SortMode::MediaBeatsPerMinute:
-		return IDM_SORTBY_MEDIA_BEATS_PER_MINUTE;
-
-	case SortMode::MediaComposer:
-		return IDM_SORTBY_MEDIA_COMPOSER;
-
-	case SortMode::MediaConductor:
-		return IDM_SORTBY_MEDIA_CONDUCTOR;
-
-	case SortMode::MediaDirector:
-		return IDM_SORTBY_MEDIA_DIRECTOR;
-
-	case SortMode::MediaGenre:
-		return IDM_SORTBY_MEDIA_GENRE;
-
-	case SortMode::MediaLanguage:
-		return IDM_SORTBY_MEDIA_LANGUAGE;
-
-	case SortMode::MediaBroadcastDate:
-		return IDM_SORTBY_MEDIA_BROADCAST_DATE;
-
-	case SortMode::MediaChannel:
-		return IDM_SORTBY_MEDIA_CHANNEL;
-
-	case SortMode::MediaStationName:
-		return IDM_SORTBY_MEDIA_STATION_NAME;
-
-	case SortMode::MediaMood:
-		return IDM_SORTBY_MEDIA_MOOD;
-
-	case SortMode::MediaParentalRating:
-		return IDM_SORTBY_MEDIA_PARENTAL_RATING;
-
-	case SortMode::MediaParentalRatingReason:
-		return IDM_SORTBY_MEDIA_PARENTAL_RATNG_REASON;
-
-	case SortMode::MediaPeriod:
-		return IDM_SORTBY_MEDIA_PERIOD;
-
-	case SortMode::MediaProducer:
-		return IDM_SORTBY_MEDIA_PRODUCER;
-
-	case SortMode::MediaPublisher:
-		return IDM_SORTBY_MEDIA_PUBLISHER;
-
-	case SortMode::MediaWriter:
-		return IDM_SORTBY_MEDIA_WRITER;
-
-	case SortMode::MediaYear:
-		return IDM_SORTBY_MEDIA_YEAR;
-
-	default:
-		assert(false);
-		break;
-	}
-
-	return -1;
 }
 
 int SortMenuBuilder::DetermineGroupModeMenuId(SortMode sortMode)
