@@ -233,6 +233,7 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 			{
 				DWORD messagePos = GetMessagePos();
 				OnListViewHeaderRightClick(MAKEPOINTS(messagePos));
+				return 1;
 			}
 			break;
 			}
