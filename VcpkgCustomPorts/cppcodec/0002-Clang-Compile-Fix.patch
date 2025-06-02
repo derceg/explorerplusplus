@@ -1,0 +1,13 @@
+diff --git a/cppcodec/detail/stream_codec.hpp b/cppcodec/detail/stream_codec.hpp
+index 4d8d054..cc884b7 100644
+--- a/cppcodec/detail/stream_codec.hpp
++++ b/cppcodec/detail/stream_codec.hpp
+@@ -94,7 +94,7 @@ struct enc {
+         if (num_symbols == NumSymbols) {
+             data::put(encoded, state, CodecVariant::symbol(Codec::template index_last<SymbolIndex>(src)));
+             padder<CodecVariant::generates_padding()> pad;
+-#ifdef _MSC_VER
++#if defined(_MSC_VER) && !defined(__clang__)
+             pad.operator()<CodecVariant>(encoded, state, Codec::encoded_block_size() - NumSymbols);
+ #else
+             pad.template operator()<CodecVariant>(encoded, state, Codec::encoded_block_size() - NumSymbols);
