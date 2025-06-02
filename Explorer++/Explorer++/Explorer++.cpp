@@ -93,6 +93,8 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	m_browserTracker = std::make_unique<BrowserTracker>(app->GetBrowserList(), this);
 }
 
+Explorerplusplus::~Explorerplusplus() = default;
+
 HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 {
 	static bool mainWindowClassRegistered = false;

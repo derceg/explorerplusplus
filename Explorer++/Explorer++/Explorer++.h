@@ -184,6 +184,7 @@ private:
 	};
 
 	Explorerplusplus(App *app, const WindowStorageData *storageData);
+	~Explorerplusplus();
 
 	static HWND CreateMainWindow(const WindowStorageData *storageData);
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
