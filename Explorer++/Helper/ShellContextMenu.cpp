@@ -38,14 +38,11 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT
 	wil::unique_hmenu menu(CreatePopupMenu());
 
 	m_contextMenu = MaybeGetShellContextMenu(hwnd);
+	wil::unique_set_site_null_call resetSite;
 
 	if (m_contextMenu)
 	{
-		if (site; auto objectWithSite = m_contextMenu.try_query<IObjectWithSite>())
-		{
-			objectWithSite->SetSite(site);
-		}
-
+		resetSite = wil::com_set_site(m_contextMenu.get(), site);
 		m_contextMenu->QueryContextMenu(menu.get(), 0, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, flags);
 	}
 
