@@ -33,10 +33,6 @@ static inline const WCHAR HOME_FOLDER_PATH[] = L"shell:::{f874310e-b6b7-47dc-bc8
 // The path to the Linux distributions folder.
 static inline const WCHAR WSL_DISTRIBUTIONS_PATH[] = L"\\\\wsl$";
 
-/* See: http://msdn.microsoft.com/en-us/library/bb776902(v=VS.85).aspx#CFSTR_SHELLIDLIST */
-#define HIDA_GetPIDLFolder(pida) (PCIDLIST_ABSOLUTE)(((LPBYTE) pida) + (pida)->aoffset[0])
-#define HIDA_GetPIDLItem(pida, i) (PCIDLIST_RELATIVE)(((LPBYTE) pida) + (pida)->aoffset[i + 1])
-
 const SHCOLUMNID SCID_ORIGINAL_LOCATION = { PSGUID_DISPLACED, PID_DISPLACED_FROM };
 const SHCOLUMNID SCID_DATE_DELETED = { PSGUID_DISPLACED, PID_DISPLACED_DATE };
 
