@@ -37,7 +37,7 @@ TEST_F(ComStaThreadPoolExecutorTest, QueueMessagesAndRunTasks)
 	HWND hwnd = nullptr;
 
 	RunTaskOnExecutorForTest(m_executor,
-		[this, &hwnd]
+		[&hwnd]
 		{
 			// Note that this window isn't explicitly destroyed. That's because the test here is
 			// specifically verifying that the executor thread is pumping messages and running

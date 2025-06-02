@@ -134,7 +134,7 @@ void Explorerplusplus::UpdateMainRebarBandsFromLoadedInfo(
 	std::vector<RebarView::Band> &mainRebarBands,
 	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
-	auto getSortedBandIndex = [this, &mainRebarBands, &rebarStorageInfo](UINT bandId) -> size_t
+	auto getSortedBandIndex = [&mainRebarBands, &rebarStorageInfo](UINT bandId) -> size_t
 	{
 		auto itr = std::find_if(rebarStorageInfo.begin(), rebarStorageInfo.end(),
 			[bandId](const auto &loadedBandInfo) { return loadedBandInfo.id == bandId; });
