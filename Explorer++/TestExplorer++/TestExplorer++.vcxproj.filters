@@ -467,6 +467,9 @@
     <ClCompile Include="SimulatedClipboardStoreTest.cpp" />
     <ClCompile Include="SimulatedClipboardStore.cpp" />
     <ClCompile Include="SimulatedClipboardDataObject.cpp" />
+    <ClCompile Include="ClangCLLibs.cpp">
+      <Filter>Clang-CL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -624,6 +627,9 @@
     </Filter>
     <Filter Include="Helper\Shell\Shell Integration">
       <UniqueIdentifier>{f7f6433c-ee36-4e28-9fad-de2f33ce22c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Clang-CL">
+      <UniqueIdentifier>{dd72ce4c-26b4-4a92-9e8b-a5a3cb190423}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

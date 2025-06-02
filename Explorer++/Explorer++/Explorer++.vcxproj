@@ -197,6 +197,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
+  <Import Project="$(SolutionDir)Common.props" />
   <Import Project="$(SolutionDir)VersionNumber.props" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -327,7 +328,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -385,7 +386,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -443,7 +444,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -501,7 +502,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -560,7 +561,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -617,7 +618,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -673,7 +674,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -731,7 +732,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -785,7 +786,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -823,6 +824,7 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <TargetMachine>MachineARM64</TargetMachine>
     </Link>
     <PostBuildEvent>
       <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\Views\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
@@ -838,7 +840,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -892,7 +894,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -943,7 +945,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -992,6 +994,7 @@
     <ClCompile Include="BookmarkTreeViewContextMenu.cpp" />
     <ClCompile Include="BrowserCommandTargetManager.cpp" />
     <ClCompile Include="BrowserWindow.cpp" />
+    <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
@@ -1304,6 +1307,7 @@
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
+    <ClInclude Include="ClangCLLibs.h" />
     <ClInclude Include="ColorProvider.h" />
     <ClInclude Include="BrowserCommandTarget.h" />
     <ClInclude Include="BrowserCommandTargetManager.h" />

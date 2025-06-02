@@ -844,6 +844,9 @@
     <ClCompile Include="SortModeMenuMappings.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ClangCLLibs.cpp">
+      <Filter>Clang-CL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1764,6 +1767,9 @@
     <ClInclude Include="SortModeMenuMappings.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ClangCLLibs.h">
+      <Filter>Clang-CL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1988,6 +1994,9 @@
     </Filter>
     <Filter Include="ShellTreeView\Shell Integration">
       <UniqueIdentifier>{3b5e176e-dea2-43eb-8811-ac61069f2420}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Clang-CL">
+      <UniqueIdentifier>{5c36b2ac-3b92-4d8d-979e-bf2b43bfdf8b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
