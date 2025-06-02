@@ -24,12 +24,12 @@ public:
 	COLORREF GetComboBoxExBackgroundColor() const override;
 	COLORREF GetTabBackgroundColor() const override;
 
-	HBRUSH GetBackgroundBrush() const;
-	HBRUSH GetSelectedItemBackgroundBrush() const;
-	HBRUSH GetHotItemBackgroundBrush() const;
-	HBRUSH GetBorderBrush() const;
-	HBRUSH GetComboBoxExBackgroundBrush() const;
-	HBRUSH GetTabBackgroundBrush() const;
+	HBRUSH GetBackgroundBrush() const override;
+	HBRUSH GetSelectedItemBackgroundBrush() const override;
+	HBRUSH GetHotItemBackgroundBrush() const override;
+	HBRUSH GetBorderBrush() const override;
+	HBRUSH GetComboBoxExBackgroundBrush() const override;
+	HBRUSH GetTabBackgroundBrush() const override;
 
 private:
 	static constexpr COLORREF BACKGROUND_COLOR = RGB(32, 32, 32);
