@@ -10,7 +10,6 @@
 Plugins::PluginCommandManager::PluginCommandManager(AcceleratorManager *acceleratorManager,
 	int startId, int endId) :
 	m_acceleratorManager(acceleratorManager),
-	m_startId(startId),
 	m_endId(endId),
 	m_idCounter(startId)
 {

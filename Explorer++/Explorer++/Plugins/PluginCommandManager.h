@@ -37,7 +37,6 @@ private:
 	};
 
 	AcceleratorManager *const m_acceleratorManager;
-	const int m_startId;
 	const int m_endId;
 
 	int m_idCounter;
