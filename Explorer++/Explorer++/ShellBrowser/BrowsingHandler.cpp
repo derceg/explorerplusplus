@@ -707,7 +707,6 @@ void ShellBrowserImpl::RemoveItem(int iItemInternal)
 	ULARGE_INTEGER ulFileSize;
 	LVFINDINFO lvfi;
 	int iItem;
-	int nItems;
 
 	if (iItemInternal == -1)
 	{
@@ -747,8 +746,6 @@ void ShellBrowserImpl::RemoveItem(int iItemInternal)
 
 	m_directoryState.filteredItemsList.erase(iItemInternal);
 	m_itemInfoMap.erase(iItemInternal);
-
-	nItems = ListView_GetItemCount(m_listView);
 
 	m_directoryState.numItems--;
 }
