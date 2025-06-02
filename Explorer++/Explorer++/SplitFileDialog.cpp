@@ -551,7 +551,7 @@ void SplitFile::Split()
 
 void SplitFile::SplitInternal(HANDLE hInputFile, const LARGE_INTEGER &lFileSize)
 {
-	LARGE_INTEGER lRunningSplitSize = { 0 };
+	LARGE_INTEGER lRunningSplitSize = {};
 
 	char *pBuffer = new char[m_uSplitSize];
 	bool bStop = false;

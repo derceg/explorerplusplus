@@ -73,7 +73,7 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 	std::wstring arguments = std::format(L"\"{}\" {} {}", currentProcess,
 		CommandLine::APPLICATION_CRASHED_ARGUMENT, FormatCrashedDataForCommandLine(crashedData));
 
-	STARTUPINFO startupInfo = { 0 };
+	STARTUPINFO startupInfo = {};
 	startupInfo.cb = sizeof(startupInfo);
 	wil::unique_process_information processInformation;
 	res = CreateProcess(currentProcess, arguments.data(), nullptr, nullptr, false,

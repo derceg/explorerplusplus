@@ -32,7 +32,7 @@ void ApplicationCrashedDialog::Show()
 		message = L"A crash dump could not be created.";
 	}
 
-	TASKDIALOGCONFIG dialogConfig = { 0 };
+	TASKDIALOGCONFIG dialogConfig = {};
 	dialogConfig.cbSize = sizeof(dialogConfig);
 	dialogConfig.hwndParent = nullptr;
 	dialogConfig.hInstance = GetModuleHandle(nullptr);
