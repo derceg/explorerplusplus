@@ -46,11 +46,6 @@
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;
 
-/* Defines the distance between the cursor
-and the right edge of the treeview during
-a resizing operation. */
-static const int TREEVIEW_DRAG_OFFSET = 8;
-
 LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
