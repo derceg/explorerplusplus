@@ -90,13 +90,13 @@ std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAn
 	// will stay as-is. See the documentation on ColorMatrix for information on how this structure
 	// is laid out.
 	// clang-format off
-	Gdiplus::ColorMatrix colorMatrix = {
-		-1, 0, 0, 0, 0,
-		0, -1, 0, 0, 0,
-		0, 0, -1, 0, 0,
-		0, 0, 0, 1, 0,
-		1, 1, 1, 0, 1
-	};
+	Gdiplus::ColorMatrix colorMatrix = {{
+		{-1, 0, 0, 0, 0},
+		{0, -1, 0, 0, 0},
+		{0, 0, -1, 0, 0},
+		{0, 0, 0, 1, 0},
+		{1, 1, 1, 0, 1}
+	}};
 	// clang-format on
 
 	Gdiplus::ImageAttributes attributes;

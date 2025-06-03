@@ -22,11 +22,12 @@ DpiCompatibility::DpiCompatibility() :
 
 	if (m_user32)
 	{
-		m_SystemParametersInfoForDpi =
-			GetProcAddressByFunctionDeclaration(m_user32.get(), SystemParametersInfoForDpi);
-		m_GetSystemMetricsForDpi =
-			GetProcAddressByFunctionDeclaration(m_user32.get(), GetSystemMetricsForDpi);
-		m_GetDpiForWindow = GetProcAddressByFunctionDeclaration(m_user32.get(), GetDpiForWindow);
+		m_SystemParametersInfoForDpi = std::bit_cast<SystemParametersInfoForDpiType>(
+			GetProcAddress(m_user32.get(), "SystemParametersInfoForDpi"));
+		m_GetSystemMetricsForDpi = std::bit_cast<GetSystemMetricsForDpiType>(
+			GetProcAddress(m_user32.get(), "GetSystemMetricsForDpi"));
+		m_GetDpiForWindow =
+			std::bit_cast<GetDpiForWindowType>(GetProcAddress(m_user32.get(), "GetDpiForWindow"));
 	}
 }
 

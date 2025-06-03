@@ -180,7 +180,8 @@ TEST(WeakPtrFactoryDeathTest, BoolConversionOnDifferentThread)
 	auto weakFactoryOwner = std::make_unique<WeakFactoryOwner>();
 	auto weakPtr = weakFactoryOwner->GetWeakPtr();
 
-	EXPECT_CHECK_DEATH({ std::jthread thread([weakPtr]() { static_cast<bool>(weakPtr); }); });
+	EXPECT_CHECK_DEATH(
+		{ std::jthread thread([weakPtr]() { std::ignore = static_cast<bool>(weakPtr); }); });
 }
 
 TEST(WeakPtrFactoryDeathTest, InvalidateWeakPtrsOnDifferentThread)

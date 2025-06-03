@@ -95,8 +95,8 @@ int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	else
 	{
 		// Both items are files (as opposed to folders).
-		ULARGE_INTEGER fileSize1 = { itemInfo1.wfd.nFileSizeLow, itemInfo1.wfd.nFileSizeHigh };
-		ULARGE_INTEGER fileSize2 = { itemInfo2.wfd.nFileSizeLow, itemInfo2.wfd.nFileSizeHigh };
+		ULARGE_INTEGER fileSize1 = { { itemInfo1.wfd.nFileSizeLow, itemInfo1.wfd.nFileSizeHigh } };
+		ULARGE_INTEGER fileSize2 = { { itemInfo2.wfd.nFileSizeLow, itemInfo2.wfd.nFileSizeHigh } };
 
 		size1 = fileSize1.QuadPart;
 		size2 = fileSize2.QuadPart;

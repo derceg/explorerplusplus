@@ -89,7 +89,7 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		WIN32_FILE_ATTRIBUTE_DATA wfad;
 		GetFileAttributesEx(szFullFilename, GetFileExInfoStandard, &wfad);
 
-		ULARGE_INTEGER fileSize = { wfad.nFileSizeLow, wfad.nFileSizeHigh };
+		ULARGE_INTEGER fileSize = { { wfad.nFileSizeLow, wfad.nFileSizeHigh } };
 		auto fileSizeText = FormatSizeString(fileSize.QuadPart);
 		ListView_SetItemText(hListView, iItem, 2, fileSizeText.data());
 

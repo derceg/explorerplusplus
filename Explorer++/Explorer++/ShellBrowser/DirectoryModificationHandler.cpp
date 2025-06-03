@@ -344,9 +344,9 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 		return;
 	}
 
-	ULARGE_INTEGER oldFileSize = { m_itemInfoMap[*internalIndex].wfd.nFileSizeLow,
-		m_itemInfoMap[*internalIndex].wfd.nFileSizeHigh };
-	ULARGE_INTEGER newFileSize = { itemInfo->wfd.nFileSizeLow, itemInfo->wfd.nFileSizeHigh };
+	ULARGE_INTEGER oldFileSize = { { m_itemInfoMap[*internalIndex].wfd.nFileSizeLow,
+		m_itemInfoMap[*internalIndex].wfd.nFileSizeHigh } };
+	ULARGE_INTEGER newFileSize = { { itemInfo->wfd.nFileSizeLow, itemInfo->wfd.nFileSizeHigh } };
 
 	m_directoryState.totalDirSize += newFileSize.QuadPart - oldFileSize.QuadPart;
 

@@ -14,7 +14,7 @@
 
 DarkModeManager::DarkModeManager(EventWindow *eventWindow, const Config *config) : m_config(config)
 {
-	auto RtlGetVersion = reinterpret_cast<RtlGetVersionType>(
+	auto RtlGetVersion = std::bit_cast<RtlGetVersionType>(
 		GetProcAddress(GetModuleHandle(L"ntdll.dll"), "RtlGetVersion"));
 
 	if (!RtlGetVersion)
@@ -46,22 +46,22 @@ DarkModeManager::DarkModeManager(EventWindow *eventWindow, const Config *config)
 
 	if (osVersionInfo.dwBuildNumber < BUILD_NUMBER_1903)
 	{
-		m_AllowDarkModeForApp = reinterpret_cast<AllowDarkModeForAppType>(
+		m_AllowDarkModeForApp = std::bit_cast<AllowDarkModeForAppType>(
 			GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(135)));
 	}
 	else
 	{
-		m_SetPreferredAppMode = reinterpret_cast<SetPreferredAppModeType>(
+		m_SetPreferredAppMode = std::bit_cast<SetPreferredAppModeType>(
 			GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(135)));
 	}
 
-	m_FlushMenuThemes = reinterpret_cast<FlushMenuThemesType>(
+	m_FlushMenuThemes = std::bit_cast<FlushMenuThemesType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(136)));
-	m_RefreshImmersiveColorPolicyState = reinterpret_cast<RefreshImmersiveColorPolicyStateType>(
+	m_RefreshImmersiveColorPolicyState = std::bit_cast<RefreshImmersiveColorPolicyStateType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(104)));
-	m_AllowDarkModeForWindow = reinterpret_cast<AllowDarkModeForWindowType>(
+	m_AllowDarkModeForWindow = std::bit_cast<AllowDarkModeForWindowType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(133)));
-	m_OpenNcThemeData = reinterpret_cast<OpenNcThemeDataType>(
+	m_OpenNcThemeData = std::bit_cast<OpenNcThemeDataType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(49)));
 
 	m_connections.push_back(eventWindow->windowMessageSignal.AddObserver(
@@ -238,13 +238,21 @@ void DarkModeManager::RefreshImmersiveColorPolicyState()
 LONG DarkModeManager::DetourOpenNcThemeData()
 {
 	return DetourTransaction(
-		[] { return DetourAttach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData); });
+		[]
+		{
+			return DetourAttach(&(PVOID &) m_OpenNcThemeData,
+				reinterpret_cast<PVOID>(DetouredOpenNcThemeData));
+		});
 }
 
 LONG DarkModeManager::RestoreOpenNcThemeData()
 {
 	return DetourTransaction(
-		[] { return DetourDetach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData); });
+		[]
+		{
+			return DetourDetach(&(PVOID &) m_OpenNcThemeData,
+				reinterpret_cast<PVOID>(DetouredOpenNcThemeData));
+		});
 }
 
 HTHEME WINAPI DarkModeManager::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList)

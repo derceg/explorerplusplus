@@ -75,7 +75,7 @@ private:
 	void SetupEditControl();
 
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
-	INT_PTR OnNotify(NMHDR *nmhdr);
+	INT_PTR OnNotify(NMHDR *nmhdr) override;
 	void OnListViewDoubleClick(const NMITEMACTIVATE *itemActivate);
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
 	std::wstring GetTabColumnText(const Tab *tab, ColumnType columnType);

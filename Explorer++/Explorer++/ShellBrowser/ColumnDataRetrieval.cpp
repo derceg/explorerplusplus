@@ -277,7 +277,7 @@ std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo,
 		}
 	}
 
-	ULARGE_INTEGER fileSize = { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh };
+	ULARGE_INTEGER fileSize = { { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh } };
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
 														: +SizeDisplayFormat::None;
 	return FormatSizeString(fileSize.QuadPart, displayFormat);
@@ -375,7 +375,7 @@ bool GetRealSizeColumnRawData(const BasicItemInfo_t &itemInfo, ULARGE_INTEGER &R
 		return false;
 	}
 
-	ULARGE_INTEGER realFileSizeTemp = { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh };
+	ULARGE_INTEGER realFileSizeTemp = { { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh } };
 
 	if (realFileSizeTemp.QuadPart != 0 && (realFileSizeTemp.QuadPart % dwClusterSize) != 0)
 	{

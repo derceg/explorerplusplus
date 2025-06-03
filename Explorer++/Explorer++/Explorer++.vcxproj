@@ -198,6 +198,7 @@
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
   <Import Project="$(SolutionDir)Common.props" />
+  <Import Project="$(SolutionDir)Clang.props" />
   <Import Project="$(SolutionDir)VersionNumber.props" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>

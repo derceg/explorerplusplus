@@ -33,8 +33,8 @@ static inline const WCHAR HOME_FOLDER_PATH[] = L"shell:::{f874310e-b6b7-47dc-bc8
 // The path to the Linux distributions folder.
 static inline const WCHAR WSL_DISTRIBUTIONS_PATH[] = L"\\\\wsl$";
 
-const SHCOLUMNID SCID_ORIGINAL_LOCATION = { PSGUID_DISPLACED, PID_DISPLACED_FROM };
-const SHCOLUMNID SCID_DATE_DELETED = { PSGUID_DISPLACED, PID_DISPLACED_DATE };
+const SHCOLUMNID SCID_ORIGINAL_LOCATION = { FMTID_Displaced, PID_DISPLACED_FROM };
+const SHCOLUMNID SCID_DATE_DELETED = { FMTID_Displaced, PID_DISPLACED_DATE };
 
 enum class EnvVarsExpansion
 {

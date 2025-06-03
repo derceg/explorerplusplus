@@ -352,7 +352,8 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 			0);
 	}
 
-	if (m_bVertical && cursorPos.x <= (rc.left + 5) || !m_bVertical && cursorPos.y <= (rc.top + 5))
+	if ((m_bVertical && cursorPos.x <= (rc.left + 5))
+		|| (!m_bVertical && cursorPos.y <= (rc.top + 5)))
 	{
 		SetCursor(LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS));
 	}
@@ -387,7 +388,8 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 
 	GetClientRect(m_hwnd, &rc);
 
-	if (m_bVertical && cursorPos.x <= (rc.left + 5) || !m_bVertical && cursorPos.y <= (rc.top + 5))
+	if ((m_bVertical && cursorPos.x <= (rc.left + 5))
+		|| (!m_bVertical && cursorPos.y <= (rc.top + 5)))
 	{
 		SetCursor(LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS));
 		m_bSizing = TRUE;

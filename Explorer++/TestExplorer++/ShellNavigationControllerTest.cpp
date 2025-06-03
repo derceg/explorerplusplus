@@ -518,7 +518,7 @@ TEST_F(ShellNavigationControllerTest, FirstNavigation)
 class ShellNavigationControllerPreservedTest : public Test
 {
 protected:
-	void SetUp(int currentEntry)
+	ShellNavigationControllerPreservedTest()
 	{
 		auto preservedEntry =
 			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake1"));
@@ -527,28 +527,24 @@ protected:
 		preservedEntry =
 			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake2"));
 		m_preservedEntries.push_back(std::move(preservedEntry));
-
-		m_shellBrowser = std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation,
-			m_preservedEntries, currentEntry);
 	}
 
-	ShellNavigationController *GetNavigationController() const
+	std::unique_ptr<ShellBrowserFake> BuildShellBrowserWithCurrentEntry(int currentEntry)
 	{
-		return m_shellBrowser->GetNavigationController();
+		return std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation,
+			m_preservedEntries, currentEntry);
 	}
 
 	NavigationEvents m_navigationEvents;
 	TabNavigationMock m_tabNavigation;
-	std::unique_ptr<ShellBrowserFake> m_shellBrowser;
 
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> m_preservedEntries;
 };
 
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
 {
-	SetUp(0);
-
-	auto *navigationController = GetNavigationController();
+	auto shellBrowser = BuildShellBrowserWithCurrentEntry(0);
+	auto *navigationController = shellBrowser->GetNavigationController();
 
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
 	EXPECT_FALSE(navigationController->CanGoBack());
@@ -558,9 +554,8 @@ TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
 
 TEST_F(ShellNavigationControllerPreservedTest, SecondIndexIsCurrent)
 {
-	SetUp(1);
-
-	auto *navigationController = GetNavigationController();
+	auto shellBrowser = BuildShellBrowserWithCurrentEntry(1);
+	auto *navigationController = shellBrowser->GetNavigationController();
 
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
 	EXPECT_TRUE(navigationController->CanGoBack());
@@ -570,9 +565,8 @@ TEST_F(ShellNavigationControllerPreservedTest, SecondIndexIsCurrent)
 
 TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 {
-	SetUp(0);
-
-	auto *navigationController = GetNavigationController();
+	auto shellBrowser = BuildShellBrowserWithCurrentEntry(0);
+	auto *navigationController = shellBrowser->GetNavigationController();
 
 	for (size_t i = 0; i < m_preservedEntries.size(); i++)
 	{

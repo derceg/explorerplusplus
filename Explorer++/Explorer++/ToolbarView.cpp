@@ -389,7 +389,7 @@ void ToolbarView::OnLeftButtonUp()
 
 bool ToolbarView::OnClick(const NMMOUSE *mouseInfo)
 {
-	if (mouseInfo->dwItemSpec == -1)
+	if (mouseInfo->dwItemSpec == static_cast<DWORD_PTR>(-1))
 	{
 		return false;
 	}
@@ -424,7 +424,7 @@ bool ToolbarView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 
 bool ToolbarView::OnRightClick(const NMMOUSE *mouseInfo)
 {
-	if (mouseInfo->dwItemSpec == -1)
+	if (mouseInfo->dwItemSpec == static_cast<DWORD_PTR>(-1))
 	{
 		return false;
 	}

@@ -207,7 +207,7 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 
 bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 {
-	if (mouseInfo->dwItemSpec != -1)
+	if (mouseInfo->dwItemSpec != static_cast<DWORD_PTR>(-1))
 	{
 		return false;
 	}

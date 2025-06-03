@@ -362,7 +362,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemSizeGr
 		{ IDS_GROUPBY_SIZE_LARGE, GBYTE }, { IDS_GROUPBY_SIZE_HUGE, 4 * GBYTE },
 		{ IDS_GROUPBY_SIZE_GIGANTIC, boost::integer_traits<uint64_t>::const_max } };
 
-	ULARGE_INTEGER fileSize = { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh };
+	ULARGE_INTEGER fileSize = { { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh } };
 	int currentIndex = 0;
 
 	while (fileSize.QuadPart > sizeGroups[currentIndex].upperLimit

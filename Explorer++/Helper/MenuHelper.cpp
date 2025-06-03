@@ -173,7 +173,7 @@ HMENU FindParentMenu(HMENU menu, UINT id)
 	{
 		UINT currentId = GetMenuItemID(menu, i);
 
-		if (currentId != -1 && currentId == id)
+		if (currentId != static_cast<UINT>(-1) && currentId == id)
 		{
 			return menu;
 		}

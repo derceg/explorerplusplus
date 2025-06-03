@@ -138,6 +138,7 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <Import Project="$(SolutionDir)Common.props" />
+  <Import Project="$(SolutionDir)Clang.props" />
   <Import Project="$(SolutionDir)VersionNumber.props" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Label="Vcpkg">

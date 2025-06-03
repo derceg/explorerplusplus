@@ -232,8 +232,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int i
 	// Several toolbars will handle their own items.
 	if (control
 		&& ((m_drivesToolbar && control == m_drivesToolbar->GetView()->GetHWND())
-			|| m_applicationToolbar && control == m_applicationToolbar->GetView()->GetHWND()
-			|| m_bookmarksToolbar && control == m_bookmarksToolbar->GetView()->GetHWND()))
+			|| (m_applicationToolbar && control == m_applicationToolbar->GetView()->GetHWND())
+			|| (m_bookmarksToolbar && control == m_bookmarksToolbar->GetView()->GetHWND())))
 	{
 		return 1;
 	}

@@ -581,7 +581,8 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE
 
 	if (hWMVCore != nullptr)
 	{
-		pWMCreateEditor = (WMCREATEEDITOR_PROC) GetProcAddress(hWMVCore, "WMCreateEditor");
+		pWMCreateEditor =
+			std::bit_cast<WMCREATEEDITOR_PROC>(GetProcAddress(hWMVCore, "WMCreateEditor"));
 
 		if (pWMCreateEditor != nullptr)
 		{

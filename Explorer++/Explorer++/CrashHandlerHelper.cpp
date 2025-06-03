@@ -106,7 +106,7 @@ LONG DisableSetUnhandledExceptionFilter()
 		[]
 		{
 			return DetourAttach(&(PVOID &) OriginalSetUnhandledExceptionFilter,
-				DetouredSetUnhandledExceptionFilter);
+				reinterpret_cast<PVOID>(DetouredSetUnhandledExceptionFilter));
 		});
 }
 

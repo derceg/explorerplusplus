@@ -33,11 +33,16 @@ public:
 	int PixelsToPoints(HWND hwnd, int px);
 
 private:
+	using SystemParametersInfoForDpiType = BOOL(
+		WINAPI *)(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni, UINT dpi);
+	using GetSystemMetricsForDpiType = int(WINAPI *)(int nIndex, UINT dpi);
+	using GetDpiForWindowType = UINT(WINAPI *)(HWND hwnd);
+
 	DpiCompatibility();
 
 	wil::unique_hmodule m_user32;
 
-	decltype(&::SystemParametersInfoForDpi) m_SystemParametersInfoForDpi;
-	decltype(&::GetSystemMetricsForDpi) m_GetSystemMetricsForDpi;
-	decltype(&::GetDpiForWindow) m_GetDpiForWindow;
+	SystemParametersInfoForDpiType m_SystemParametersInfoForDpi;
+	GetSystemMetricsForDpiType m_GetSystemMetricsForDpi;
+	GetDpiForWindowType m_GetDpiForWindow;
 };

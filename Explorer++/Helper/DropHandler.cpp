@@ -46,37 +46,6 @@ void DropHandler::CopyClipboardData(IDataObject *pDataObject, HWND hwndDrop,
 
 void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject, POINT *pt)
 {
-	FORMATETC ftc;
-	STGMEDIUM stg;
-	DWORD *pdwEffect = nullptr;
-	DWORD dwEffect = DROPEFFECT_NONE;
-	BOOL bPrefferedEffect = FALSE;
-
-	SetFORMATETC(&ftc, (CLIPFORMAT) RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT), nullptr,
-		DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
-
-	/* Check if the data has a preferred drop effect
-	(i.e. copy or move). */
-	HRESULT hr = pDataObject->GetData(&ftc, &stg);
-
-	if (hr == S_OK)
-	{
-		pdwEffect = (DWORD *) GlobalLock(stg.hGlobal);
-
-		if (pdwEffect != nullptr)
-		{
-			if (*pdwEffect != DROPEFFECT_NONE)
-			{
-				dwEffect = *pdwEffect;
-				bPrefferedEffect = TRUE;
-			}
-
-			GlobalUnlock(stg.hGlobal);
-		}
-
-		ReleaseStgMedium(&stg);
-	}
-
 	HRESULT hrCopy = E_FAIL;
 	std::list<std::wstring> pastedFileList;
 

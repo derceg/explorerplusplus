@@ -27,7 +27,7 @@ void UpdateMenuAcceleratorStrings(HMENU menu, const AcceleratorManager *accelera
 	{
 		UINT id = GetMenuItemID(menu, i);
 
-		if (id == -1)
+		if (id == static_cast<UINT>(-1))
 		{
 			HMENU subMenu = GetSubMenu(menu, i);
 

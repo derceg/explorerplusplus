@@ -75,8 +75,8 @@ void ShellBrowserImpl::SetTileViewItemInfo(int iItem, int iItemInternal)
 	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		!= FILE_ATTRIBUTE_DIRECTORY)
 	{
-		ULARGE_INTEGER fileSize = { m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow,
-			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh };
+		ULARGE_INTEGER fileSize = { { m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow,
+			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh } };
 
 		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
