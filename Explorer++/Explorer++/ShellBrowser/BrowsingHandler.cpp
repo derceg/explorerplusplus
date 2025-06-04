@@ -233,6 +233,10 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	// Only the lower 32 bits of a handle are important (see the discussion at
 	// https://stackoverflow.com/q/1822667).
 	long registeredCookie;
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wpointer-to-int-cast"
+#endif
 #pragma warning(push)
 #pragma warning(                                                                                   \
 	disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
@@ -240,6 +244,9 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	RETURN_IF_FAILED(m_shellWindows->Register(browserApp.get(), reinterpret_cast<long>(m_owner),
 		SWC_BROWSER, &registeredCookie));
 #pragma warning(pop)
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
 
 	// The call to RegisterPending() above is passed the thread ID. The call to Register() will use
 	// that thread ID to link a pending window to the specified window handle. That means the cookie

@@ -536,20 +536,20 @@ std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo)
 
 std::wstring GetHardLinksColumnText(const BasicItemInfo_t &itemInfo)
 {
-	DWORD numHardLinks = GetHardLinksColumnRawData(itemInfo);
+	auto numHardLinks = GetHardLinksColumnRawData(itemInfo);
 
-	if (numHardLinks == -1)
+	if (!numHardLinks)
 	{
 		return L"";
 	}
 
 	TCHAR numHardLinksString[32];
-	StringCchPrintf(numHardLinksString, std::size(numHardLinksString), _T("%ld"), numHardLinks);
+	StringCchPrintf(numHardLinksString, std::size(numHardLinksString), _T("%ld"), *numHardLinks);
 
 	return numHardLinksString;
 }
 
-DWORD GetHardLinksColumnRawData(const BasicItemInfo_t &itemInfo)
+std::optional<DWORD> GetHardLinksColumnRawData(const BasicItemInfo_t &itemInfo)
 {
 	return GetNumFileHardLinks(itemInfo.getFullPath().c_str());
 }

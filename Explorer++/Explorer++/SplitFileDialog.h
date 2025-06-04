@@ -94,15 +94,6 @@ private:
 		GB,
 	};
 
-	enum class ErrorType
-	{
-		None,
-		OutputFilenameEmpty,
-		OutputFilenameConstant,
-		OutputDirectoryEmpty,
-		SplitSize
-	};
-
 	static const int KB = (1024);
 	static const int MB = (1024 * 1024);
 	static const int GB = (1024 * 1024 * 1024);
@@ -126,8 +117,6 @@ private:
 
 	TCHAR m_szOk[32];
 	UINT m_uElapsedTime;
-
-	ErrorType m_CurrentError;
 
 	SplitFileDialogPersistentSettings *m_persistentSettings;
 };

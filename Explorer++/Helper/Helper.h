@@ -36,7 +36,7 @@ BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize);
 BOOL CompareFileTypes(const TCHAR *pszFile1, const TCHAR *pszFile2);
 std::wstring BuildFileAttributesString(DWORD fileAttributes);
 BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax);
-DWORD GetNumFileHardLinks(const TCHAR *lpszFileName);
+std::optional<DWORD> GetNumFileHardLinks(const TCHAR *lpszFileName);
 BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax);
 HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput);
 BOOL IsImage(const TCHAR *fileName);

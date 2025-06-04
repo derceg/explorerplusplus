@@ -39,8 +39,7 @@ SplitFileDialog::SplitFileDialog(const ResourceLoader *resourceLoader, HWND hPar
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
 	m_bStopSplitting(false),
-	m_pSplitFile(nullptr),
-	m_CurrentError(ErrorType::None)
+	m_pSplitFile(nullptr)
 {
 	m_persistentSettings = &SplitFileDialogPersistentSettings::GetInstance();
 }
@@ -171,47 +170,7 @@ INT_PTR SplitFileDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	if (HIWORD(wParam) != 0)
-	{
-		switch (HIWORD(wParam))
-		{
-		case EN_CHANGE:
-		{
-			bool bHideError = false;
-
-			switch (m_CurrentError)
-			{
-			case ErrorType::OutputFilenameEmpty:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
-				break;
-
-			case ErrorType::OutputFilenameConstant:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
-				break;
-
-			case ErrorType::OutputDirectoryEmpty:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUT);
-				break;
-
-			case ErrorType::SplitSize:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_SIZE);
-				break;
-			}
-
-			if (bHideError)
-			{
-				/* If an error is currently been shown, and it is
-				for the control this notification is been sent for,
-				hide the error message. */
-				SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, L"");
-
-				m_CurrentError = ErrorType::None;
-			}
-		}
-		break;
-		}
-	}
-	else
+	if (lParam != 0)
 	{
 		switch (LOWORD(wParam))
 		{
@@ -309,8 +268,6 @@ void SplitFileDialog::OnOk()
 				m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_OUTPUTFILENAMEERROR);
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
-			m_CurrentError = ErrorType::OutputFilenameEmpty;
-
 			SetFocus(hOutputFilename);
 			return;
 		}
@@ -326,8 +283,6 @@ void SplitFileDialog::OnOk()
 				m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_OUTPUTFILENAMECONSTANTERROR);
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
-			m_CurrentError = ErrorType::OutputFilenameConstant;
-
 			SetFocus(hOutputFilename);
 			return;
 		}
@@ -340,8 +295,6 @@ void SplitFileDialog::OnOk()
 				m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_OUTPUTDIRECTORYERROR);
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
 
-			m_CurrentError = ErrorType::OutputDirectoryEmpty;
-
 			SetFocus(hEditOutputDirectory);
 			return;
 		}
@@ -351,12 +304,10 @@ void SplitFileDialog::OnOk()
 		BOOL bTranslated;
 		UINT uSplitSize = GetDlgItemInt(m_hDlg, IDC_SPLIT_EDIT_SIZE, &bTranslated, FALSE);
 
-		if (!bTranslated)
+		if (!bTranslated || uSplitSize == 0)
 		{
 			auto errorMessage = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_SIZEERROR);
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
-
-			m_CurrentError = ErrorType::SplitSize;
 
 			SetFocus(GetDlgItem(m_hDlg, IDC_SPLIT_EDIT_SIZE));
 			return;

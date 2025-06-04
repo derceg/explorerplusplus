@@ -189,16 +189,6 @@ IFACEMETHODIMP FolderView::GetGroupSubsetCount(UINT *numVisibleRows)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetRedraw(BOOL redrawOn)
-{
-	if (m_shellBrowserWeak)
-	{
-		SendMessage(m_shellBrowserWeak->GetListView(), WM_SETREDRAW, redrawOn, 0);
-	}
-
-	return S_OK;
-}
-
 IFACEMETHODIMP FolderView::IsMoveInSameFolder()
 {
 	return E_NOTIMPL;
@@ -315,11 +305,6 @@ IFACEMETHODIMP FolderView::GetDefaultSpacing(POINT *pt)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetAutoArrange()
-{
-	return E_NOTIMPL;
-}
-
 IFACEMETHODIMP FolderView::SelectItem(int item, DWORD flags)
 {
 	UNREFERENCED_PARAMETER(item);
@@ -361,39 +346,36 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD
 }
 
 // IShellFolderView
-IFACEMETHODIMP FolderView::Rearrange(LPARAM sort)
+IFACEMETHODIMP FolderView::Rearrange(LPARAM sort) noexcept
 {
 	UNREFERENCED_PARAMETER(sort);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetArrangeParam(LPARAM *sort)
+IFACEMETHODIMP FolderView::GetArrangeParam(LPARAM *sort) noexcept
 {
 	UNREFERENCED_PARAMETER(sort);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::ArrangeGrid()
+IFACEMETHODIMP FolderView::ArrangeGrid() noexcept
 {
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::AutoArrange()
+IFACEMETHODIMP FolderView::AutoArrange() noexcept
 {
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::AddObject(PUITEMID_CHILD pidl, UINT *item)
+IFACEMETHODIMP FolderView::GetAutoArrange() noexcept
 {
-	UNREFERENCED_PARAMETER(pidl);
-	UNREFERENCED_PARAMETER(item);
-
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetObject(PITEMID_CHILD *pidl, UINT item)
+IFACEMETHODIMP FolderView::AddObject(PUITEMID_CHILD pidl, UINT *item) noexcept
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(item);
@@ -401,7 +383,7 @@ IFACEMETHODIMP FolderView::GetObject(PITEMID_CHILD *pidl, UINT item)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::RemoveObject(PUITEMID_CHILD pidl, UINT *item)
+IFACEMETHODIMP FolderView::GetObject(PITEMID_CHILD *pidl, UINT item) noexcept
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(item);
@@ -409,14 +391,22 @@ IFACEMETHODIMP FolderView::RemoveObject(PUITEMID_CHILD pidl, UINT *item)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetObjectCount(UINT *count)
+IFACEMETHODIMP FolderView::RemoveObject(PUITEMID_CHILD pidl, UINT *item) noexcept
+{
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(item);
+
+	return E_NOTIMPL;
+}
+
+IFACEMETHODIMP FolderView::GetObjectCount(UINT *count) noexcept
 {
 	UNREFERENCED_PARAMETER(count);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetObjectCount(UINT count, UINT flags)
+IFACEMETHODIMP FolderView::SetObjectCount(UINT count, UINT flags) noexcept
 {
 	UNREFERENCED_PARAMETER(count);
 	UNREFERENCED_PARAMETER(flags);
@@ -424,7 +414,8 @@ IFACEMETHODIMP FolderView::SetObjectCount(UINT count, UINT flags)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::UpdateObject(PUITEMID_CHILD pidlOld, PUITEMID_CHILD pidlNew, UINT *item)
+IFACEMETHODIMP FolderView::UpdateObject(PUITEMID_CHILD pidlOld, PUITEMID_CHILD pidlNew,
+	UINT *item) noexcept
 {
 	UNREFERENCED_PARAMETER(pidlOld);
 	UNREFERENCED_PARAMETER(pidlNew);
@@ -433,7 +424,7 @@ IFACEMETHODIMP FolderView::UpdateObject(PUITEMID_CHILD pidlOld, PUITEMID_CHILD p
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::RefreshObject(PUITEMID_CHILD pidl, UINT *item)
+IFACEMETHODIMP FolderView::RefreshObject(PUITEMID_CHILD pidl, UINT *item) noexcept
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(item);
@@ -441,14 +432,24 @@ IFACEMETHODIMP FolderView::RefreshObject(PUITEMID_CHILD pidl, UINT *item)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetSelectedCount(UINT *numSelected)
+IFACEMETHODIMP FolderView::SetRedraw(BOOL redrawOn) noexcept
+{
+	if (m_shellBrowserWeak)
+	{
+		SendMessage(m_shellBrowserWeak->GetListView(), WM_SETREDRAW, redrawOn, 0);
+	}
+
+	return S_OK;
+}
+
+IFACEMETHODIMP FolderView::GetSelectedCount(UINT *numSelected) noexcept
 {
 	UNREFERENCED_PARAMETER(numSelected);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetSelectedObjects(PCUITEMID_CHILD **pidlArray, UINT *numItems)
+IFACEMETHODIMP FolderView::GetSelectedObjects(PCUITEMID_CHILD **pidlArray, UINT *numItems) noexcept
 {
 	UNREFERENCED_PARAMETER(pidlArray);
 	UNREFERENCED_PARAMETER(numItems);
@@ -456,35 +457,35 @@ IFACEMETHODIMP FolderView::GetSelectedObjects(PCUITEMID_CHILD **pidlArray, UINT 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::IsDropOnSource(IDropTarget *dropTarget)
+IFACEMETHODIMP FolderView::IsDropOnSource(IDropTarget *dropTarget) noexcept
 {
 	UNREFERENCED_PARAMETER(dropTarget);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetDragPoint(POINT *pt)
+IFACEMETHODIMP FolderView::GetDragPoint(POINT *pt) noexcept
 {
 	UNREFERENCED_PARAMETER(pt);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetDropPoint(POINT *pt)
+IFACEMETHODIMP FolderView::GetDropPoint(POINT *pt) noexcept
 {
 	UNREFERENCED_PARAMETER(pt);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::MoveIcons(IDataObject *dataObject)
+IFACEMETHODIMP FolderView::MoveIcons(IDataObject *dataObject) noexcept
 {
 	UNREFERENCED_PARAMETER(dataObject);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetItemPos(PCUITEMID_CHILD pidl, POINT *pt)
+IFACEMETHODIMP FolderView::SetItemPos(PCUITEMID_CHILD pidl, POINT *pt) noexcept
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(pt);
@@ -492,7 +493,7 @@ IFACEMETHODIMP FolderView::SetItemPos(PCUITEMID_CHILD pidl, POINT *pt)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::IsBkDropTarget(IDropTarget *dropTarget)
+IFACEMETHODIMP FolderView::IsBkDropTarget(IDropTarget *dropTarget) noexcept
 {
 	UNREFERENCED_PARAMETER(dropTarget);
 
@@ -501,21 +502,21 @@ IFACEMETHODIMP FolderView::IsBkDropTarget(IDropTarget *dropTarget)
 	return S_OK;
 }
 
-IFACEMETHODIMP FolderView::SetClipboard(BOOL move)
+IFACEMETHODIMP FolderView::SetClipboard(BOOL move) noexcept
 {
 	UNREFERENCED_PARAMETER(move);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetPoints(IDataObject *dataObject)
+IFACEMETHODIMP FolderView::SetPoints(IDataObject *dataObject) noexcept
 {
 	UNREFERENCED_PARAMETER(dataObject);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetItemSpacing(ITEMSPACING *spacing)
+IFACEMETHODIMP FolderView::GetItemSpacing(ITEMSPACING *spacing) noexcept
 {
 	UNREFERENCED_PARAMETER(spacing);
 
@@ -523,7 +524,7 @@ IFACEMETHODIMP FolderView::GetItemSpacing(ITEMSPACING *spacing)
 }
 
 IFACEMETHODIMP FolderView::SetCallback(IShellFolderViewCB *callback,
-	IShellFolderViewCB **oldCallback)
+	IShellFolderViewCB **oldCallback) noexcept
 {
 	UNREFERENCED_PARAMETER(callback);
 	UNREFERENCED_PARAMETER(oldCallback);
@@ -531,21 +532,21 @@ IFACEMETHODIMP FolderView::SetCallback(IShellFolderViewCB *callback,
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::Select(UINT flags)
+IFACEMETHODIMP FolderView::Select(UINT flags) noexcept
 {
 	UNREFERENCED_PARAMETER(flags);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::QuerySupport(UINT *support)
+IFACEMETHODIMP FolderView::QuerySupport(UINT *support) noexcept
 {
 	UNREFERENCED_PARAMETER(support);
 
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetAutomationObject(IDispatch *dispatch)
+IFACEMETHODIMP FolderView::SetAutomationObject(IDispatch *dispatch) noexcept
 {
 	UNREFERENCED_PARAMETER(dispatch);
 

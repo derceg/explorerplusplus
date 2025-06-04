@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Columns.h"
+#include <optional>
 #include <string>
 
 struct BasicItemInfo_t;
@@ -87,7 +88,7 @@ HRESULT GetItemDetailsRawData(const BasicItemInfo_t &itemInfo, const SHCOLUMNID 
 std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoType versioninfoType);
 std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo);
 std::wstring GetHardLinksColumnText(const BasicItemInfo_t &itemInfo);
-DWORD GetHardLinksColumnRawData(const BasicItemInfo_t &itemInfo);
+std::optional<DWORD> GetHardLinksColumnRawData(const BasicItemInfo_t &itemInfo);
 std::wstring GetExtensionColumnText(const BasicItemInfo_t &itemInfo);
 std::wstring GetImageColumnText(const BasicItemInfo_t &itemInfo, PROPID PropertyID);
 std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo);

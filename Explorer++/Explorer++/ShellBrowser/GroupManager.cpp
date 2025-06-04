@@ -363,7 +363,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemSizeGr
 		{ IDS_GROUPBY_SIZE_GIGANTIC, boost::integer_traits<uint64_t>::const_max } };
 
 	ULARGE_INTEGER fileSize = { { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh } };
-	int currentIndex = 0;
+	size_t currentIndex = 0;
 
 	while (fileSize.QuadPart > sizeGroups[currentIndex].upperLimit
 		&& currentIndex < (std::size(sizeGroups) - 1))
@@ -373,7 +373,7 @@ std::optional<ShellBrowserImpl::GroupInfo> ShellBrowserImpl::DetermineItemSizeGr
 
 	return GroupInfo(
 		m_app->GetResourceLoader()->LoadString(sizeGroups[currentIndex].nameResourceId),
-		currentIndex + 1);
+		static_cast<int>(currentIndex + 1));
 }
 
 /* TODO: These groups have changed as of Windows Vista. */

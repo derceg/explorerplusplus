@@ -292,25 +292,25 @@ BOOL CheckGroupMembership(GroupType groupType)
 	return bMember;
 }
 
-DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
+std::optional<DWORD> GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
-	DWORD nLinks = 0;
-
 	wil::unique_hfile file(CreateFile(lpszFileName, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, nullptr,
 		OPEN_EXISTING, NULL, nullptr));
 
-	if (file)
+	if (!file)
 	{
-		BY_HANDLE_FILE_INFORMATION fileInfo;
-		BOOL bRet = GetFileInformationByHandle(file.get(), &fileInfo);
-
-		if (bRet)
-		{
-			nLinks = fileInfo.nNumberOfLinks;
-		}
+		return std::nullopt;
 	}
 
-	return nLinks;
+	BY_HANDLE_FILE_INFORMATION fileInfo;
+	BOOL res = GetFileInformationByHandle(file.get(), &fileInfo);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return fileInfo.nNumberOfLinks;
 }
 
 BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax)

@@ -276,10 +276,25 @@ int SortByShortcutTo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &it
 
 int SortByHardlinks(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	DWORD numHardLinks1 = GetHardLinksColumnRawData(itemInfo1);
-	DWORD numHardLinks2 = GetHardLinksColumnRawData(itemInfo2);
+	auto numHardLinks1 = GetHardLinksColumnRawData(itemInfo1);
+	auto numHardLinks2 = GetHardLinksColumnRawData(itemInfo2);
 
-	return numHardLinks1 - numHardLinks2;
+	if (!numHardLinks1 && !numHardLinks2)
+	{
+		return 0;
+	}
+	else if (!numHardLinks1 && numHardLinks2)
+	{
+		return -1;
+	}
+	else if (numHardLinks1 && !numHardLinks2)
+	{
+		return 1;
+	}
+	else
+	{
+		return *numHardLinks1 - *numHardLinks2;
+	}
 }
 
 int SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)

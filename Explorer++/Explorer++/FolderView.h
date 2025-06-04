@@ -43,7 +43,6 @@ public:
 	IFACEMETHODIMP GetViewModeAndIconSize(FOLDERVIEWMODE *viewMode, int *imageSize);
 	IFACEMETHODIMP SetGroupSubsetCount(UINT numVisibleRows);
 	IFACEMETHODIMP GetGroupSubsetCount(UINT *numVisibleRows);
-	IFACEMETHODIMP SetRedraw(BOOL redrawOn);
 	IFACEMETHODIMP IsMoveInSameFolder();
 	IFACEMETHODIMP DoRename();
 
@@ -59,7 +58,6 @@ public:
 	IFACEMETHODIMP GetItemPosition(PCUITEMID_CHILD child, POINT *pt);
 	IFACEMETHODIMP GetSpacing(POINT *pt);
 	IFACEMETHODIMP GetDefaultSpacing(POINT *pt);
-	IFACEMETHODIMP GetAutoArrange();
 	IFACEMETHODIMP SelectItem(int item, DWORD flags);
 	IFACEMETHODIMP SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD_ARRAY items, POINT *pts,
 		DWORD flags);
@@ -68,32 +66,36 @@ public:
 	// Required for paste support (specifically, selecting items after they've been pasted).
 	// Note that this interface has two methods that have identical signatures to methods in the
 	// IFolderView/IFolderView2 interfaces: GetAutoArrange() and SetRedraw.
-	IFACEMETHODIMP Rearrange(LPARAM sort);
-	IFACEMETHODIMP GetArrangeParam(LPARAM *sort);
-	IFACEMETHODIMP ArrangeGrid();
-	IFACEMETHODIMP AutoArrange();
-	IFACEMETHODIMP AddObject(PUITEMID_CHILD pidl, UINT *item);
-	IFACEMETHODIMP GetObject(PITEMID_CHILD *pidl, UINT item);
-	IFACEMETHODIMP RemoveObject(PUITEMID_CHILD pidl, UINT *item);
-	IFACEMETHODIMP GetObjectCount(UINT *count);
-	IFACEMETHODIMP SetObjectCount(UINT count, UINT flags);
-	IFACEMETHODIMP UpdateObject(PUITEMID_CHILD pidlOld, PUITEMID_CHILD pidlNew, UINT *item);
-	IFACEMETHODIMP RefreshObject(PUITEMID_CHILD pidl, UINT *item);
-	IFACEMETHODIMP GetSelectedCount(UINT *numSelected);
-	IFACEMETHODIMP GetSelectedObjects(PCUITEMID_CHILD **pidlArray, UINT *numItems);
-	IFACEMETHODIMP IsDropOnSource(IDropTarget *dropTarget);
-	IFACEMETHODIMP GetDragPoint(POINT *pt);
-	IFACEMETHODIMP GetDropPoint(POINT *pt);
-	IFACEMETHODIMP MoveIcons(IDataObject *dataObject);
-	IFACEMETHODIMP SetItemPos(PCUITEMID_CHILD pidl, POINT *pt);
-	IFACEMETHODIMP IsBkDropTarget(IDropTarget *dropTarget);
-	IFACEMETHODIMP SetClipboard(BOOL move);
-	IFACEMETHODIMP SetPoints(IDataObject *dataObject);
-	IFACEMETHODIMP GetItemSpacing(ITEMSPACING *spacing);
-	IFACEMETHODIMP SetCallback(IShellFolderViewCB *callback, IShellFolderViewCB **oldCallback);
-	IFACEMETHODIMP Select(UINT flags);
-	IFACEMETHODIMP QuerySupport(UINT *support);
-	IFACEMETHODIMP SetAutomationObject(IDispatch *dispatch);
+	IFACEMETHODIMP Rearrange(LPARAM sort) noexcept;
+	IFACEMETHODIMP GetArrangeParam(LPARAM *sort) noexcept;
+	IFACEMETHODIMP ArrangeGrid() noexcept;
+	IFACEMETHODIMP AutoArrange() noexcept;
+	IFACEMETHODIMP GetAutoArrange() noexcept;
+	IFACEMETHODIMP AddObject(PUITEMID_CHILD pidl, UINT *item) noexcept;
+	IFACEMETHODIMP GetObject(PITEMID_CHILD *pidl, UINT item) noexcept;
+	IFACEMETHODIMP RemoveObject(PUITEMID_CHILD pidl, UINT *item) noexcept;
+	IFACEMETHODIMP GetObjectCount(UINT *count) noexcept;
+	IFACEMETHODIMP SetObjectCount(UINT count, UINT flags) noexcept;
+	IFACEMETHODIMP UpdateObject(PUITEMID_CHILD pidlOld, PUITEMID_CHILD pidlNew,
+		UINT *item) noexcept;
+	IFACEMETHODIMP RefreshObject(PUITEMID_CHILD pidl, UINT *item) noexcept;
+	IFACEMETHODIMP SetRedraw(BOOL redrawOn) noexcept;
+	IFACEMETHODIMP GetSelectedCount(UINT *numSelected) noexcept;
+	IFACEMETHODIMP GetSelectedObjects(PCUITEMID_CHILD **pidlArray, UINT *numItems) noexcept;
+	IFACEMETHODIMP IsDropOnSource(IDropTarget *dropTarget) noexcept;
+	IFACEMETHODIMP GetDragPoint(POINT *pt) noexcept;
+	IFACEMETHODIMP GetDropPoint(POINT *pt) noexcept;
+	IFACEMETHODIMP MoveIcons(IDataObject *dataObject) noexcept;
+	IFACEMETHODIMP SetItemPos(PCUITEMID_CHILD pidl, POINT *pt) noexcept;
+	IFACEMETHODIMP IsBkDropTarget(IDropTarget *dropTarget) noexcept;
+	IFACEMETHODIMP SetClipboard(BOOL move) noexcept;
+	IFACEMETHODIMP SetPoints(IDataObject *dataObject) noexcept;
+	IFACEMETHODIMP GetItemSpacing(ITEMSPACING *spacing) noexcept;
+	IFACEMETHODIMP SetCallback(IShellFolderViewCB *callback,
+		IShellFolderViewCB **oldCallback) noexcept;
+	IFACEMETHODIMP Select(UINT flags) noexcept;
+	IFACEMETHODIMP QuerySupport(UINT *support) noexcept;
+	IFACEMETHODIMP SetAutomationObject(IDispatch *dispatch) noexcept;
 
 private:
 	const WeakPtr<ShellBrowserImpl> m_shellBrowserWeak;
