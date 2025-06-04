@@ -382,7 +382,6 @@ BOOL IsImage(const TCHAR *szFileName)
 	static const TCHAR *IMAGE_EXTS[] = { _T("bmp"), _T("ico"), _T("gif"), _T("jpg"), _T("exf"),
 		_T("png"), _T("tif"), _T("wmf"), _T("emf"), _T("tiff") };
 	TCHAR *ext;
-	int i = 0;
 
 	ext = PathFindExtension(szFileName);
 
@@ -393,7 +392,7 @@ BOOL IsImage(const TCHAR *szFileName)
 
 	ext++;
 
-	for (i = 0; i < std::size(IMAGE_EXTS); i++)
+	for (size_t i = 0; i < std::size(IMAGE_EXTS); i++)
 	{
 		if (lstrcmpi(ext, IMAGE_EXTS[i]) == 0)
 		{

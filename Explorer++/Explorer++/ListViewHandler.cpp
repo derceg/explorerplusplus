@@ -222,9 +222,9 @@ void Explorerplusplus::OnListViewPaste()
 		szDestination[lstrlen(szDestination) + 1] = '\0';
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
-		auto *dropFilesCallback = new DropFilesCallback(this);
+		DropFilesCallback dropFilesCallback{ this };
 		pDropHandler->CopyClipboardData(clipboardObject.get(), m_hContainer, szDestination,
-			dropFilesCallback);
+			&dropFilesCallback);
 		pDropHandler->Release();
 	}
 }

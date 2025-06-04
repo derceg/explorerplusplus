@@ -297,6 +297,17 @@ void ShellBrowserImpl::SetViewMode(ViewMode viewMode)
 	case ViewMode::Tiles:
 		SetTileViewInfo();
 		break;
+
+	case ViewMode::Icons:
+	case ViewMode::SmallIcons:
+	case ViewMode::List:
+	case ViewMode::Details:
+	case ViewMode::Thumbnails:
+	case ViewMode::ExtraLargeIcons:
+	case ViewMode::LargeIcons:
+	case ViewMode::ExtraLargeThumbnails:
+	case ViewMode::LargeThumbnails:
+		break;
 	}
 }
 

@@ -420,6 +420,35 @@ std::wstring GetColumnDescription(const ResourceLoader *resourceLoader, ColumnTy
 	case ColumnType::MediaBitrate:
 		stringId = IDS_COLUMN_DESCRIPTION_BITRATE;
 		break;
+
+	case ColumnType::OriginalLocation:
+	case ColumnType::DateDeleted:
+	case ColumnType::PrinterStatus:
+	case ColumnType::MediaCopyright:
+	case ColumnType::MediaDuration:
+	case ColumnType::MediaProtected:
+	case ColumnType::MediaRating:
+	case ColumnType::MediaAlbumArtist:
+	case ColumnType::MediaAlbum:
+	case ColumnType::MediaBeatsPerMinute:
+	case ColumnType::MediaComposer:
+	case ColumnType::MediaConductor:
+	case ColumnType::MediaDirector:
+	case ColumnType::MediaGenre:
+	case ColumnType::MediaLanguage:
+	case ColumnType::MediaBroadcastDate:
+	case ColumnType::MediaChannel:
+	case ColumnType::MediaStationName:
+	case ColumnType::MediaMood:
+	case ColumnType::MediaParentalRating:
+	case ColumnType::MediaParentalRatingReason:
+	case ColumnType::MediaPeriod:
+	case ColumnType::MediaProducer:
+	case ColumnType::MediaPublisher:
+	case ColumnType::MediaWriter:
+	case ColumnType::MediaYear:
+	case ColumnType::PrinterModel:
+		break;
 	}
 
 	if (!stringId)

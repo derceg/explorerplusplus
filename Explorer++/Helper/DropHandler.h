@@ -7,11 +7,12 @@
 #include "ReferenceCount.h"
 #include <list>
 
-/* TODO: Switch to IReferenceCount in the future.
-IUnknown needed to support CShellBrowser. */
-__interface IDropFilesCallback : public IUnknown
+class IDropFilesCallback
 {
-	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt);
+public:
+	virtual ~IDropFilesCallback() = default;
+
+	virtual void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt) = 0;
 };
 
 class DropHandler : public ReferenceCount

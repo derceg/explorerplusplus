@@ -83,6 +83,9 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 			UpdateTabToolbar();
 		}
 		break;
+
+	case Tab::PropertyType::Name:
+		break;
 	}
 }
 

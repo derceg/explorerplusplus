@@ -15,7 +15,7 @@ std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat
 		_T("PB") };
 
 	auto sizeAsDouble = static_cast<double>(size);
-	int sizeIndex = 0;
+	size_t sizeIndex = 0;
 
 	if (sizeDisplayFormat != +SizeDisplayFormat::None)
 	{
@@ -44,9 +44,12 @@ std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat
 		case SizeDisplayFormat::PB:
 			sizeIndex = 5;
 			break;
+
+		case SizeDisplayFormat::None:
+			break;
 		}
 
-		for (int i = 0; i < sizeIndex; i++)
+		for (size_t i = 0; i < sizeIndex; i++)
 		{
 			sizeAsDouble /= 1024;
 		}

@@ -99,11 +99,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		OnDisplayWindowResized(wParam);
 		break;
 
-		// See https://github.com/derceg/explorerplusplus/issues/169.
-		/*case WM_APP_ASSOC_CHANGED:
-			OnAssocChanged();
-			break;*/
-
 	case WM_APP_FOLDERSIZECOMPLETED:
 	{
 		DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
@@ -226,8 +221,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int id,
-	UINT notificationCode)
+LRESULT Explorerplusplus::CommandHandler(HWND hwnd, HWND control, UINT id, UINT notificationCode)
 {
 	// Several toolbars will handle their own items.
 	if (control
@@ -250,7 +244,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int i
 
 // It makes sense to handle menu items/toolbar buttons/accelerators together, since an individual
 // command might be represented by all three of those.
-LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id,
+LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id,
 	UINT notificationCode)
 {
 	if (notificationCode == 0 && id >= MENU_BOOKMARK_START_ID && id < MENU_BOOKMARK_END_ID)
@@ -1069,7 +1063,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		NMREBARCHEVRON *pnmrc = nullptr;
 		HWND hToolbar = nullptr;
 		HMENU hMenu;
-		HIMAGELIST himlSmall;
 		MENUITEMINFO mii;
 		TCHAR szText[512];
 		TBBUTTON tbButton;
@@ -1097,10 +1090,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		hMenu = CreatePopupMenu();
 
-		HIMAGELIST himlMenu = nullptr;
-
-		Shell_GetImageLists(nullptr, &himlSmall);
-
 		switch (pnmrc->wID)
 		{
 		case REBAR_BAND_ID_MAIN_TOOLBAR:
@@ -1109,12 +1098,10 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case REBAR_BAND_ID_DRIVES_TOOLBAR:
 			hToolbar = m_drivesToolbar->GetView()->GetHWND();
-			himlMenu = himlSmall;
 			break;
 
 		case REBAR_BAND_ID_APPLICATIONS_TOOLBAR:
 			hToolbar = m_applicationToolbar->GetView()->GetHWND();
-			himlMenu = himlSmall;
 			break;
 		}
 

@@ -13,46 +13,8 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include <list>
 
-DropFilesCallback::DropFilesCallback(CoreInterface *coreInterface) :
-	m_coreInterface(coreInterface),
-	m_RefCount(1)
+DropFilesCallback::DropFilesCallback(CoreInterface *coreInterface) : m_coreInterface(coreInterface)
 {
-}
-
-HRESULT __stdcall DropFilesCallback::QueryInterface(REFIID iid, void **ppvObject)
-{
-	*ppvObject = nullptr;
-
-	if (iid == IID_IUnknown)
-	{
-		*ppvObject = static_cast<IUnknown *>(this);
-	}
-
-	if (*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-ULONG __stdcall DropFilesCallback::AddRef()
-{
-	return ++m_RefCount;
-}
-
-ULONG __stdcall DropFilesCallback::Release()
-{
-	m_RefCount--;
-
-	if (m_RefCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_RefCount;
 }
 
 void DropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)

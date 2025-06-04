@@ -198,8 +198,8 @@ private:
 	void SetUpControlVisibilityConfigListeners();
 
 	/* Main window message handlers. */
-	LRESULT CALLBACK CommandHandler(HWND hwnd, HWND control, int id, UINT notificationCode);
-	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id, UINT notificationCode);
+	LRESULT CommandHandler(HWND hwnd, HWND control, UINT id, UINT notificationCode);
+	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize(const WindowStorageData *storageData);
@@ -214,7 +214,6 @@ private:
 	void OnFocusNextWindow(FocusChangeDirection direction);
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryContentsChanged(const ShellBrowser *shellBrowser);
-	void OnAssocChanged();
 	void OnSelectTabByIndex(int iTab);
 	void OnChangeMainFontSize(FontSizeType sizeType);
 	void OnResetMainFontSize();

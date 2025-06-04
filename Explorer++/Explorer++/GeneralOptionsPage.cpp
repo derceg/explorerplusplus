@@ -405,6 +405,9 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 		case ReplaceExplorerMode::All:
 			res = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 			break;
+
+		case ReplaceExplorerMode::None:
+			break;
 		}
 	}
 	break;
