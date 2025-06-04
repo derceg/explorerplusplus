@@ -25,9 +25,6 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
-// Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
-#pragma warning(default : 4062)
-
 const int TOOLBAR_IMAGE_SIZE_SMALL = 16;
 const int TOOLBAR_IMAGE_SIZE_LARGE = 24;
 

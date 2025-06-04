@@ -13,9 +13,6 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
-// Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
-#pragma warning(default : 4062)
-
 AboutDialog::AboutDialog(const ResourceLoader *resourceLoader, HWND hParent) :
 	BaseDialog(resourceLoader, IDD_ABOUT, hParent, DialogSizingType::None)
 {

@@ -158,6 +158,7 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <Import Project="$(SolutionDir)Common.props" />
   <Import Project="$(SolutionDir)Clang.props" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -284,7 +285,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -316,7 +317,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -381,7 +382,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -417,7 +418,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -451,7 +452,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -485,7 +486,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -580,7 +581,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
@@ -608,7 +609,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
@@ -634,7 +635,7 @@
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
-      <AdditionalOptions>/w15038 /w44464 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
