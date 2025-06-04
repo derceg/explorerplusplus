@@ -329,14 +329,14 @@ void ColorRuleEditorDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName
 			return;
 		}
 
-		int iIndex = 0;
+		size_t iIndex = 0;
 
 		/* Extract the index. */
 		std::wstring strIndex = bstrName;
 		std::wistringstream iss(strIndex.substr(1));
 		iss >> iIndex;
 
-		if (iIndex < 0 || iIndex > (sizeof(m_customColors) - 1))
+		if (iIndex < 0 || iIndex > (std::size(m_customColors) - 1))
 		{
 			return;
 		}

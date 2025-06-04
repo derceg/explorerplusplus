@@ -387,7 +387,7 @@ void SearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring
 	ComboBox_SetCurSel(hComboBox, 0);
 	ComboBox_SetEditSel(hComboBox, -1, -1);
 
-	if (ComboBox_GetCount(hComboBox) > buffer.capacity())
+	if (static_cast<size_t>(ComboBox_GetCount(hComboBox)) > buffer.capacity())
 	{
 		SendMessage(hComboBox, CB_DELETESTRING, ComboBox_GetCount(hComboBox) - 1, 0);
 	}
