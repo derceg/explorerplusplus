@@ -54,7 +54,7 @@ concurrencpp::null_result FileSystemChangeWatcher::OnChange(
 	std::shared_ptr<concurrencpp::executor> uiThreadExecutor, wil::FolderChangeEvent event,
 	PCWSTR fileName)
 {
-	std::wstring fileNameCopy = fileName;
+	std::wstring fileNameCopy = fileName ? fileName : L"";
 
 	co_await concurrencpp::resume_on(uiThreadExecutor);
 
@@ -87,7 +87,17 @@ void FileSystemChangeWatcher::ProcessChangeNotification(wil::FolderChangeEvent e
 	// That also simplifies this method, since allowing the `CreateSimplePidl` call to fail means
 	// there would need to be additional handling for `m_renamedItemOldPidl` in the failure case.
 	PidlAbsolute simplePidl;
-	auto fullPath = m_path / fileName;
+
+	auto fullPath = m_path;
+
+	if (!fileName.empty())
+	{
+		fullPath /= fileName;
+	}
+
+	// A filename should always be provided, except in the case where changes have been lost.
+	DCHECK(!fileName.empty() || event == wil::FolderChangeEvent::ChangesLost);
+
 	HRESULT hr = CreateSimplePidl(fullPath.c_str(), simplePidl);
 	CHECK(SUCCEEDED(hr));
 
@@ -125,6 +135,10 @@ void FileSystemChangeWatcher::ProcessChangeNotification(wil::FolderChangeEvent e
 
 	case wil::FolderChangeEvent::Removed:
 		m_callback(Event::Removed, simplePidl, {});
+		break;
+
+	case wil::FolderChangeEvent::ChangesLost:
+		m_callback(Event::ChangesLost, simplePidl, {});
 		break;
 	}
 }

@@ -187,6 +187,10 @@ void ShellBrowserImpl::ProcessFileSystemChangeNotification(FileSystemChangeWatch
 	case FileSystemChangeWatcher::Event::Removed:
 		OnItemRemoved(simplePidl1.Raw());
 		break;
+
+	case FileSystemChangeWatcher::Event::ChangesLost:
+		RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime());
+		break;
 	}
 
 	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);

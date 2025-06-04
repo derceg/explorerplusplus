@@ -160,6 +160,10 @@ void ShellTreeView::ProcessFileSystemChangeNotification(FileSystemChangeWatcher:
 	case FileSystemChangeWatcher::Event::Removed:
 		OnItemRemoved(simplePidl1.Raw());
 		break;
+
+	case FileSystemChangeWatcher::Event::ChangesLost:
+		OnDirectoryUpdated(simplePidl1.Raw());
+		break;
 	}
 }
 

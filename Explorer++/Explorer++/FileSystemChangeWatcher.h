@@ -28,7 +28,11 @@ public:
 		Added,
 		Modified,
 		Renamed,
-		Removed
+		Removed,
+
+		// Indicates that not all directory changes were recorded. An enumeration of the directory
+		// is required.
+		ChangesLost
 	};
 
 	enum class Behavior
