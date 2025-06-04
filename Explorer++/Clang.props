@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions Condition="'$(Configuration)'=='Debug-LLVM'">-Wno-missing-designated-field-initializers -Wno-missing-field-initializers %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)'=='Debug-Clang'">-Wno-missing-designated-field-initializers -Wno-missing-field-initializers %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
