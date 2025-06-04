@@ -81,7 +81,7 @@ MainToolbar::MainToolbar(HWND parent, App *app, BrowserWindow *browser,
 	CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 	ShellIconLoader *shellIconLoader,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
-	BaseWindow(CreateMainToolbar(parent)),
+	m_hwnd(CreateMainToolbar(parent)),
 	m_app(app),
 	m_browser(browser),
 	m_coreInterface(coreInterface),
@@ -215,6 +215,10 @@ LRESULT MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DPICHANGED_AFTERPARENT:
 		OnFontOrDpiUpdated();
 		break;
+
+	case WM_NCDESTROY:
+		delete this;
+		return 0;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -724,6 +728,11 @@ POINT MainToolbar::GetMenuPositionForButton(MainToolbarButton button)
 	CHECK(res);
 
 	return pt;
+}
+
+HWND MainToolbar::GetHWND() const
+{
+	return m_hwnd;
 }
 
 // For some of the buttons on the toolbar, their state depends on an item from

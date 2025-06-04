@@ -11,10 +11,8 @@
 #include "MainToolbarStorage.h"
 #include "Tab.h"
 #include "TabHistoryMenu.h"
-#include "../Helper/BaseWindow.h"
 #include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
-#include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
 #include <unordered_map>
@@ -25,13 +23,15 @@ class ResourceLoader;
 class ShellBrowser;
 class ShellIconLoader;
 
-class MainToolbar : public BaseWindow
+class MainToolbar
 {
 public:
 	static MainToolbar *Create(HWND parent, App *app, BrowserWindow *browser,
 		CoreInterface *coreInterface, const ResourceLoader *resourceLoader,
 		ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
+
+	HWND GetHWND() const;
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
@@ -47,6 +47,7 @@ private:
 	MainToolbar(HWND parent, App *app, BrowserWindow *browser, CoreInterface *coreInterface,
 		const ResourceLoader *resourceLoader, ShellIconLoader *shellIconLoader,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
+	~MainToolbar() = default;
 
 	static HWND CreateMainToolbar(HWND parent);
 
@@ -96,6 +97,7 @@ private:
 
 	void OnFontOrDpiUpdated();
 
+	const HWND m_hwnd;
 	App *const m_app;
 	BrowserWindow *const m_browser;
 	CoreInterface *const m_coreInterface;
