@@ -24,7 +24,7 @@ class WeakPtrFactory : private boost::noncopyable
 public:
 	WeakPtrFactory(T *ptr) : m_state(std::make_shared<WeakState<T>>(ptr))
 	{
-		DCHECK_NOTNULL(ptr);
+		DCHECK(ptr);
 	}
 
 	~WeakPtrFactory()

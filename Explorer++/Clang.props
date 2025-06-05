@@ -2,10 +2,12 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)'=='Debug-Clang' OR '$(Configuration)'=='Release-Clang'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions Condition="'$(Configuration)'=='Debug-Clang'">-Wno-missing-designated-field-initializers -Wno-missing-field-initializers %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)'=='Debug-Clang' OR '$(Configuration)'=='Release-Clang'">-Wno-missing-designated-field-initializers -Wno-missing-field-initializers %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

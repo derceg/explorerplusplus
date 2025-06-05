@@ -189,7 +189,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 
 	if (res == BaseDialog::RETURN_OK)
 	{
-		DCHECK_NOTNULL(selectedParentFolder);
+		DCHECK(selectedParentFolder);
 
 		size_t targetIndex;
 
@@ -227,7 +227,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 
 	if (res == BaseDialog::RETURN_OK)
 	{
-		DCHECK_NOTNULL(selectedParentFolder);
+		DCHECK(selectedParentFolder);
 
 		size_t newIndex;
 
