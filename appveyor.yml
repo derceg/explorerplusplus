@@ -3,7 +3,6 @@ image: Visual Studio 2022
 
 configuration:
 - Debug-Asan
-- Release-Clang
 - Release
 
 platform:
@@ -25,10 +24,6 @@ matrix:
   fast_finish: true
   exclude:
     - configuration: Debug-Asan
-      platform: ARM64
-    - configuration: Release-Clang
-      platform: Win32
-    - configuration: Release-Clang
       platform: ARM64
 
 for:
