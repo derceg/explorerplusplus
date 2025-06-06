@@ -248,6 +248,14 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 			!GetActiveShellBrowser()->IsAutoArrangeEnabled());
 		break;
 
+	case IDM_SORT_ASCENDING:
+		GetActiveShellBrowser()->SetSortDirection(SortDirection::Ascending);
+		break;
+
+	case IDM_SORT_DESCENDING:
+		GetActiveShellBrowser()->SetSortDirection(SortDirection::Descending);
+		break;
+
 	case IDM_VIEW_REFRESH:
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
 		break;

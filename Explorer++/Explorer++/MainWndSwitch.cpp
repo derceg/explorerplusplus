@@ -712,11 +712,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDM_SORT_ASCENDING:
-		OnSortDirectionSelected(SortDirection::Ascending);
-		break;
-
 	case IDM_SORT_DESCENDING:
-		OnSortDirectionSelected(SortDirection::Descending);
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_GROUP_SORT_ASCENDING:

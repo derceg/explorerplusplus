@@ -218,7 +218,6 @@ private:
 	void OnResolveLink();
 	void OnGroupBy(SortMode groupMode);
 	void OnGroupByNone();
-	void OnSortDirectionSelected(SortDirection direction);
 	void OnGroupSortDirectionSelected(SortDirection direction);
 	void OnShowHiddenFiles();
 	void OnSelectColumns();

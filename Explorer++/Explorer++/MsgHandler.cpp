@@ -789,12 +789,6 @@ void Explorerplusplus::OnGroupByNone()
 	selectedTab.GetShellBrowserImpl()->SetShowInGroups(false);
 }
 
-void Explorerplusplus::OnSortDirectionSelected(SortDirection direction)
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->SetSortDirection(direction);
-}
-
 void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
