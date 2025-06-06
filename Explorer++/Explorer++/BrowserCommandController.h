@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Literals.h"
 #include "NavigationHelper.h"
 #include "ShellBrowser/SortModes.h"
 #include "../Helper/ShellHelper.h"
@@ -29,6 +30,15 @@ private:
 	static constexpr wchar_t DOCUMENTATION_URL[] =
 		L"https://explorerplusplus.readthedocs.io/en/latest/";
 
+	// When changing the font size, it will be decreased/increased by this amount.
+	static constexpr int FONT_SIZE_CHANGE_DELTA = 1_pt;
+
+	enum class FontSizeType
+	{
+		Decrease,
+		Increase
+	};
+
 	bool IsCommandContextSensitive(int command) const;
 
 	bool CanStartCommandPrompt() const;
@@ -36,6 +46,8 @@ private:
 	void OnSortBy(SortMode sortMode);
 	void StartCommandPrompt(LaunchProcessFlags flags = LaunchProcessFlags::None);
 	void CopyFolderPath() const;
+	void OnChangeMainFontSize(FontSizeType sizeType);
+	void OnResetMainFontSize();
 	void OnChangeDisplayColors();
 	void GoBack(OpenFolderDisposition disposition);
 	void GoForward(OpenFolderDisposition disposition);

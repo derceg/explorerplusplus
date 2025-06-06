@@ -29,6 +29,8 @@ public:
 	// Scales a value targeted at 96 DPI to the DPI of the specified window.
 	int ScaleValue(HWND hwnd, int value);
 
+	int PointsToPixelsForDefaultDpi(int pt);
+	int PixelsToPointsForDefaultDpi(int px);
 	int PointsToPixels(HWND hwnd, int pt);
 	int PixelsToPoints(HWND hwnd, int px);
 
@@ -45,4 +47,7 @@ private:
 	SystemParametersInfoForDpiType m_SystemParametersInfoForDpi;
 	GetSystemMetricsForDpiType m_GetSystemMetricsForDpi;
 	GetDpiForWindowType m_GetDpiForWindow;
+
+	int PointsToPixelsForDpi(int pt, UINT dpi);
+	int PixelsToPointsForDpi(int px, UINT dpi);
 };

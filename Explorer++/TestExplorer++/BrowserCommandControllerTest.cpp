@@ -78,6 +78,45 @@ TEST_F(BrowserCommandControllerTest, CopyFolderPath)
 	EXPECT_THAT(*clipboardText, StrCaseEq(path));
 }
 
+TEST_F(BrowserCommandControllerTest, ChangeMainFontSize)
+{
+	const std::wstring fontName = L"Font name";
+	m_config.mainFont = CustomFont(fontName, 10);
+
+	m_commandController.ExecuteCommand(IDM_VIEW_DECREASE_TEXT_SIZE);
+	EXPECT_EQ(m_config.mainFont.get(), CustomFont(fontName, 9));
+
+	m_commandController.ExecuteCommand(IDM_VIEW_INCREASE_TEXT_SIZE);
+	EXPECT_EQ(m_config.mainFont.get(), CustomFont(fontName, 10));
+
+	// If no custom font is currently set and a font size change is requested, a custom font should
+	// be assigned.
+	m_config.mainFont = std::nullopt;
+	m_commandController.ExecuteCommand(IDM_VIEW_DECREASE_TEXT_SIZE);
+	EXPECT_NE(m_config.mainFont.get(), std::nullopt);
+
+	m_config.mainFont = std::nullopt;
+	m_commandController.ExecuteCommand(IDM_VIEW_INCREASE_TEXT_SIZE);
+	EXPECT_NE(m_config.mainFont.get(), std::nullopt);
+}
+
+TEST_F(BrowserCommandControllerTest, ResetMainFontSize)
+{
+	// If there is no custom font assigned, resetting the font size should have no effect.
+	m_config.mainFont = std::nullopt;
+	m_commandController.ExecuteCommand(IDA_RESET_TEXT_SIZE);
+	EXPECT_EQ(m_config.mainFont.get(), std::nullopt);
+
+	const std::wstring fontName = L"Font name";
+	m_config.mainFont = CustomFont(fontName, 10);
+
+	// Resetting the font size shouldn't change the name of the font.
+	m_commandController.ExecuteCommand(IDA_RESET_TEXT_SIZE);
+	const auto &mainFont = m_config.mainFont.get();
+	ASSERT_NE(mainFont, std::nullopt);
+	EXPECT_EQ(mainFont->GetName(), fontName);
+}
+
 TEST_F(BrowserCommandControllerTest, Refresh)
 {
 	PidlAbsolute pidl;

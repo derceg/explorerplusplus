@@ -74,6 +74,16 @@ int DpiCompatibility::ScaleValue(HWND hwnd, int value)
 	return MulDiv(value, GetDpiForWindow(hwnd), USER_DEFAULT_SCREEN_DPI);
 }
 
+int DpiCompatibility::PointsToPixelsForDefaultDpi(int pt)
+{
+	return PointsToPixelsForDpi(pt, USER_DEFAULT_SCREEN_DPI);
+}
+
+int DpiCompatibility::PixelsToPointsForDefaultDpi(int px)
+{
+	return PixelsToPointsForDpi(px, USER_DEFAULT_SCREEN_DPI);
+}
+
 // One point (the unit for font size) is equal to 1/72 of an inch (see
 // https://learn.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels).
 // The number of pixels that correspond to an inch then depends on the DPI of the display. So, this
@@ -81,10 +91,20 @@ int DpiCompatibility::ScaleValue(HWND hwnd, int value)
 // window is on.
 int DpiCompatibility::PointsToPixels(HWND hwnd, int pt)
 {
-	return MulDiv(pt, GetDpiForWindow(hwnd), 72);
+	return PointsToPixelsForDpi(pt, GetDpiForWindow(hwnd));
 }
 
 int DpiCompatibility::PixelsToPoints(HWND hwnd, int px)
 {
-	return MulDiv(px, 72, GetDpiForWindow(hwnd));
+	return PixelsToPointsForDpi(px, GetDpiForWindow(hwnd));
+}
+
+int DpiCompatibility::PointsToPixelsForDpi(int pt, UINT dpi)
+{
+	return MulDiv(pt, dpi, 72);
+}
+
+int DpiCompatibility::PixelsToPointsForDpi(int px, UINT dpi)
+{
+	return MulDiv(px, 72, dpi);
 }

@@ -12,8 +12,10 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SortModeMenuMappings.h"
+#include "SystemFontHelper.h"
 #include "UpdateCheckDialog.h"
 #include "../Helper/BulkClipboardWriter.h"
+#include "../Helper/DpiCompatibility.h"
 
 using namespace std::string_literals;
 
@@ -187,6 +189,18 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_VIEW_TOOLBARS_CUSTOMIZE:
 		m_browser->StartMainToolbarCustomization();
+		break;
+
+	case IDM_VIEW_DECREASE_TEXT_SIZE:
+		OnChangeMainFontSize(FontSizeType::Decrease);
+		break;
+
+	case IDM_VIEW_INCREASE_TEXT_SIZE:
+		OnChangeMainFontSize(FontSizeType::Increase);
+		break;
+
+	case IDA_RESET_TEXT_SIZE:
+		OnResetMainFontSize();
 		break;
 
 	case IDM_VIEW_EXTRALARGEICONS:
@@ -436,6 +450,61 @@ void BrowserCommandController::CopyFolderPath() const
 
 	BulkClipboardWriter clipboardWriter(m_clipboardStore);
 	clipboardWriter.WriteText(path.get());
+}
+
+void BrowserCommandController::OnChangeMainFontSize(FontSizeType sizeType)
+{
+	auto &mainFont = m_config->mainFont.get();
+	std::wstring updatedFontName;
+	int updatedFontSize;
+
+	if (mainFont)
+	{
+		updatedFontName = mainFont->GetName();
+		updatedFontSize = mainFont->GetSize();
+	}
+	else
+	{
+		auto systemLogFont = GetDefaultSystemFontForDefaultDpi();
+		int systemFontSize = std::abs(
+			DpiCompatibility::GetInstance().PixelsToPointsForDefaultDpi(systemLogFont.lfHeight));
+
+		updatedFontName = systemLogFont.lfFaceName;
+		updatedFontSize = systemFontSize;
+	}
+
+	if (sizeType == FontSizeType::Decrease)
+	{
+		updatedFontSize -= FONT_SIZE_CHANGE_DELTA;
+	}
+	else
+	{
+		updatedFontSize += FONT_SIZE_CHANGE_DELTA;
+	}
+
+	m_config->mainFont = CustomFont(updatedFontName, updatedFontSize);
+}
+
+void BrowserCommandController::OnResetMainFontSize()
+{
+	auto &mainFont = m_config->mainFont.get();
+
+	if (!mainFont)
+	{
+		// The default font is being used, so the font size is currently the default size and
+		// nothing needs to change.
+		return;
+	}
+
+	auto systemLogFont = GetDefaultSystemFontForDefaultDpi();
+	int systemFontSize = std::abs(
+		DpiCompatibility::GetInstance().PixelsToPointsForDefaultDpi(systemLogFont.lfHeight));
+
+	// Different fonts can have different metrics, so there isn't really a concept of a "default"
+	// font size. The size of the default system font is taken as a reasonable proxy. This also
+	// means that if the user only changes the font size (while still using the system font),
+	// resetting the font size will work as expected.
+	m_config->mainFont = CustomFont(mainFont->GetName(), systemFontSize);
 }
 
 void BrowserCommandController::OnChangeDisplayColors()

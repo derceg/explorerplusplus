@@ -440,21 +440,9 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	case IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR:
 	case IDM_VIEW_TOOLBARS_LOCK_TOOLBARS:
 	case IDM_VIEW_TOOLBARS_CUSTOMIZE:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_VIEW_DECREASE_TEXT_SIZE:
-		OnChangeMainFontSize(FontSizeType::Decrease);
-		break;
-
 	case IDM_VIEW_INCREASE_TEXT_SIZE:
-		OnChangeMainFontSize(FontSizeType::Increase);
-		break;
-
 	case IDA_RESET_TEXT_SIZE:
-		OnResetMainFontSize();
-		break;
-
 	case IDM_VIEW_EXTRALARGEICONS:
 	case IDM_VIEW_LARGEICONS:
 	case IDM_VIEW_ICONS:
