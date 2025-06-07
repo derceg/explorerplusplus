@@ -11,6 +11,7 @@
 #include "CoreInterface.h"
 #include "Icon.h"
 #include "MainResource.h"
+#include "MainTabView.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "RenameTabDialog.h"
@@ -38,9 +39,6 @@
 
 using namespace std::chrono_literals;
 
-const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
-	| TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-
 // clang-format off
 const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_FILE_NEWTAB, Icon::NewTab },
@@ -49,27 +47,26 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 // clang-format on
 
-TabContainerImpl *TabContainerImpl::Create(HWND parent, BrowserWindow *browser,
+TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 	HINSTANCE resourceInstance, const Config *config)
 {
-	return new TabContainerImpl(parent, browser, tabNavigation, app, coreInterface,
-		fileActionHandler, cachedIcons, bookmarkTree, resourceInstance, config);
+	return new TabContainerImpl(view, browser, tabNavigation, app, coreInterface, fileActionHandler,
+		cachedIcons, bookmarkTree, resourceInstance, config);
 }
 
-TabContainerImpl::TabContainerImpl(HWND parent, BrowserWindow *browser,
+TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 	HINSTANCE resourceInstance, const Config *config) :
-	ShellDropTargetWindow(CreateTabControl(parent)),
+	ShellDropTargetWindow(view->GetHWND()),
+	m_view(view),
 	m_browser(browser),
 	m_tabNavigation(tabNavigation),
 	m_app(app),
 	m_coreInterface(coreInterface),
 	m_fileActionHandler(fileActionHandler),
-	m_fontSetter(m_hwnd, config, GetDefaultSystemFontForDefaultDpi()),
-	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config),
 	m_timerManager(m_hwnd),
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),
@@ -79,16 +76,14 @@ TabContainerImpl::TabContainerImpl(HWND parent, BrowserWindow *browser,
 	m_bTabBeenDragged(FALSE),
 	m_bookmarkTree(bookmarkTree)
 {
-	Initialize(parent);
-}
-
-HWND TabContainerImpl::CreateTabControl(HWND parent)
-{
-	return ::CreateTabControl(parent, TAB_CONTROL_STYLES);
+	Initialize(GetParent(m_view->GetHWND()));
 }
 
 void TabContainerImpl::Initialize(HWND parent)
 {
+	m_view->windowDestroyedSignal.AddObserver(
+		std::bind_front(&TabContainerImpl::OnWindowDestroyed, this));
+
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconSystemImageListIndex));
 
 	auto &dpiCompat = DpiCompatibility::GetInstance();
@@ -119,9 +114,6 @@ void TabContainerImpl::Initialize(HWND parent)
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&TabContainerImpl::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browser)));
-
-	m_fontSetter.fontUpdatedSignal.AddObserver(
-		std::bind_front(&TabContainerImpl::OnFontUpdated, this));
 }
 
 void TabContainerImpl::AddDefaultTabIcons(HIMAGELIST himlTab)
@@ -150,8 +142,6 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	switch (uMsg)
 	{
-		HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
-
 	case WM_LBUTTONDOWN:
 	{
 		POINT pt;
@@ -212,10 +202,6 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		m_bTabBeenDragged = FALSE;
 	}
 	break;
-
-	case WM_NCDESTROY:
-		delete this;
-		return 0;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -315,21 +301,6 @@ void TabContainerImpl::OnTabCtrlMouseMove(POINT *pt)
 		TabCtrl_SetCurFocus(m_hwnd, iSwap);
 
 		m_draggedTabEndIndex = iSwap;
-	}
-}
-
-void TabContainerImpl::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(xPos);
-	UNREFERENCED_PARAMETER(yPos);
-	UNREFERENCED_PARAMETER(keys);
-
-	auto scrollDirection = delta > 0 ? ScrollDirection::Left : ScrollDirection::Right;
-
-	for (int i = 0; i < abs(delta / WHEEL_DELTA); i++)
-	{
-		ScrollTabControl(scrollDirection);
 	}
 }
 
@@ -565,8 +536,6 @@ LRESULT TabContainerImpl::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 {
 	switch (uMsg)
 	{
-		HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
-
 	case WM_LBUTTONDBLCLK:
 		CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 		break;
@@ -1345,16 +1314,16 @@ void TabContainerImpl::ScrollTabControlForDrop(const POINT &pt)
 	}
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-	std::optional<ScrollDirection> scrollDirection;
+	std::optional<TabView::ScrollDirection> scrollDirection;
 
 	if (ptClient.x < MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI))
 	{
-		scrollDirection = ScrollDirection::Left;
+		scrollDirection = TabView::ScrollDirection::Left;
 	}
 	else if (ptClient.x
 		> (rc.right - MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI)))
 	{
-		scrollDirection = ScrollDirection::Right;
+		scrollDirection = TabView::ScrollDirection::Right;
 	}
 
 	if (!scrollDirection)
@@ -1392,57 +1361,9 @@ void TabContainerImpl::OnDropScrollTimer()
 {
 	CHECK(m_dropTargetContext);
 	CHECK(m_dropTargetContext->scrollDirection);
-	ScrollTabControl(*m_dropTargetContext->scrollDirection);
+	m_view->Scroll(*m_dropTargetContext->scrollDirection);
 
 	m_dropTargetContext->scrollDirection.reset();
-}
-
-void TabContainerImpl::ScrollTabControl(ScrollDirection direction)
-{
-	HWND upDownControl = FindWindowEx(m_hwnd, nullptr, UPDOWN_CLASS, nullptr);
-
-	// It's valid for the control not to exist if all the tabs fit within the window.
-	if (!upDownControl)
-	{
-		return;
-	}
-
-	int lowerLimit;
-	int upperLimit;
-	SendMessage(upDownControl, UDM_GETRANGE32, reinterpret_cast<WPARAM>(&lowerLimit),
-		reinterpret_cast<WPARAM>(&upperLimit));
-
-	BOOL positionRetrieved;
-	auto position =
-		SendMessage(upDownControl, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&positionRetrieved));
-
-	if (!positionRetrieved)
-	{
-		return;
-	}
-
-	switch (direction)
-	{
-	case ScrollDirection::Left:
-		position--;
-		break;
-
-	case ScrollDirection::Right:
-		position++;
-		break;
-	}
-
-	if (position < lowerLimit || position > upperLimit)
-	{
-		return;
-	}
-
-	SendMessage(m_hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), NULL);
-}
-
-void TabContainerImpl::OnFontUpdated()
-{
-	sizeUpdatedSignal.m_signal();
 }
 
 std::vector<TabStorageData> TabContainerImpl::GetStorageData() const
@@ -1456,4 +1377,9 @@ std::vector<TabStorageData> TabContainerImpl::GetStorageData() const
 	}
 
 	return tabListStorageData;
+}
+
+void TabContainerImpl::OnWindowDestroyed()
+{
+	delete this;
 }

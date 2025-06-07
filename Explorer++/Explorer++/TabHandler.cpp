@@ -7,6 +7,7 @@
 #include "App.h"
 #include "ColumnStorage.h"
 #include "Config.h"
+#include "MainTabView.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainerImpl.h"
@@ -17,7 +18,10 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	auto *tabContainer = TabContainerImpl::Create(m_hTabBacking, this, this, m_app, this,
+	auto *mainTabView = MainTabView::Create(m_hTabBacking, m_config);
+	m_connections.push_back(mainTabView->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); }));
+
+	auto *tabContainer = TabContainerImpl::Create(mainTabView, this, this, m_app, this,
 		&m_FileActionHandler, m_app->GetCachedIcons(), m_app->GetBookmarkTree(),
 		m_app->GetResourceInstance(), m_config);
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
@@ -48,8 +52,6 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddSelectionChangedObserver(
 		std::bind_front(&Explorerplusplus::OnTabListViewSelectionChanged, this),
 		ShellBrowserEventScope::ForBrowser(*this), boost::signals2::at_front));
-
-	tabContainer->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); });
 
 	auto updateLayoutObserverMethod = [this](BOOL newValue)
 	{

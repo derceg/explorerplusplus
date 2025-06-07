@@ -5,15 +5,14 @@
 #pragma once
 
 #include "IconFetcherImpl.h"
-#include "MainFontSetter.h"
 #include "OneShotTimer.h"
 #include "OneShotTimerManager.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "Tab.h"
 #include "TabContainer.h"
+#include "TabView.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
-#include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
@@ -30,6 +29,7 @@ class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
+class MainTabView;
 struct NavigateParams;
 class NavigationRequest;
 struct PreservedTab;
@@ -86,7 +86,7 @@ struct TabSettings : TabSettingsImpl
 class TabContainerImpl : public TabContainer, public ShellDropTargetWindow<int>
 {
 public:
-	static TabContainerImpl *Create(HWND parent, BrowserWindow *browser,
+	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser,
 		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE resourceInstance, const Config *config);
@@ -126,23 +126,14 @@ public:
 
 	std::vector<TabStorageData> GetStorageData() const;
 
-	// Signals
-	SignalWrapper<TabContainerImpl, void()> sizeUpdatedSignal;
-
 private:
-	enum class ScrollDirection
-	{
-		Left,
-		Right
-	};
-
 	// Contains data used when an item is dragged over this window.
 	struct DropTargetContext
 	{
 		int targetIndex = -1;
 		OneShotTimer switchTabTimer;
 		OneShotTimer scrollTimer;
-		std::optional<ScrollDirection> scrollDirection;
+		std::optional<TabView::ScrollDirection> scrollDirection;
 
 		DropTargetContext(OneShotTimerManager *timerManager) :
 			switchTabTimer(timerManager),
@@ -155,12 +146,10 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainerImpl(HWND parent, BrowserWindow *browser, TabNavigationInterface *tabNavigation,
-		App *app, CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		const Config *config);
-
-	static HWND CreateTabControl(HWND parent);
+	TabContainerImpl(MainTabView *view, BrowserWindow *browser,
+		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		HINSTANCE resourceInstance, const Config *config);
 
 	LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -174,7 +163,6 @@ private:
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp();
 	void OnTabCtrlMouseMove(POINT *pt);
-	void OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys);
 
 	void OnLButtonDoubleClick(const POINT &pt);
 
@@ -223,18 +211,16 @@ private:
 	void ScrollTabControlForDrop(const POINT &pt);
 	void OnDropSwitchTabTimer();
 	void OnDropScrollTimer();
-	void ScrollTabControl(ScrollDirection direction);
 
-	void OnFontUpdated();
+	void OnWindowDestroyed();
 
+	MainTabView *const m_view;
 	BrowserWindow *const m_browser;
 	TabNavigationInterface *m_tabNavigation;
 	App *const m_app;
 	CoreInterface *m_coreInterface;
 	FileActionHandler *m_fileActionHandler;
 
-	MainFontSetter m_fontSetter;
-	MainFontSetter m_tooltipFontSetter;
 	wil::unique_himagelist m_tabCtrlImageList;
 	OneShotTimerManager m_timerManager;
 

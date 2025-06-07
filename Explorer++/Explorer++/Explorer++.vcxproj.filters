@@ -847,6 +847,12 @@
     <ClCompile Include="ClangCLLibs.cpp">
       <Filter>Clang-CL</Filter>
     </ClCompile>
+    <ClCompile Include="TabView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MainTabView.cpp">
+      <Filter>Tabs\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1770,6 +1776,12 @@
     <ClInclude Include="ClangCLLibs.h">
       <Filter>Clang-CL</Filter>
     </ClInclude>
+    <ClInclude Include="TabView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MainTabView.h">
+      <Filter>Tabs\UI\Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1997,6 +2009,9 @@
     </Filter>
     <Filter Include="Clang-CL">
       <UniqueIdentifier>{5c36b2ac-3b92-4d8d-979e-bf2b43bfdf8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tabs\UI\Views">
+      <UniqueIdentifier>{9b97b02a-3c55-4054-9428-ae70195a30e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
