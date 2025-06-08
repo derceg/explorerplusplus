@@ -73,7 +73,6 @@ TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 	m_resourceInstance(resourceInstance),
 	m_config(config),
 	m_iPreviousTabSelectionId(-1),
-	m_bTabBeenDragged(FALSE),
 	m_bookmarkTree(bookmarkTree)
 {
 	Initialize(GetParent(m_view->GetHWND()));
@@ -81,6 +80,7 @@ TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 
 void TabContainerImpl::Initialize(HWND parent)
 {
+	m_view->SetDelegate(this);
 	m_view->windowDestroyedSignal.AddObserver(
 		std::bind_front(&TabContainerImpl::OnWindowDestroyed, this));
 
@@ -142,26 +142,6 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	switch (uMsg)
 	{
-	case WM_LBUTTONDOWN:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnTabCtrlLButtonDown(&pt);
-	}
-	break;
-
-	case WM_LBUTTONUP:
-		OnTabCtrlLButtonUp();
-		break;
-
-	case WM_MOUSEMOVE:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnTabCtrlMouseMove(&pt);
-	}
-	break;
-
 	case WM_LBUTTONDBLCLK:
 	{
 		POINT pt;
@@ -191,117 +171,9 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		handle menu help. */
 		SendMessage(m_coreInterface->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
 		break;
-
-	case WM_CAPTURECHANGED:
-	{
-		if ((HWND) lParam != hwnd)
-		{
-			ReleaseCapture();
-		}
-
-		m_bTabBeenDragged = FALSE;
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
-}
-
-void TabContainerImpl::OnTabCtrlLButtonDown(POINT *pt)
-{
-	TCHITTESTINFO info;
-	info.pt = *pt;
-	int itemNum = TabCtrl_HitTest(m_hwnd, &info);
-
-	if (info.flags != TCHT_NOWHERE)
-	{
-		/* Save the bounds of the dragged tab. */
-		TabCtrl_GetItemRect(m_hwnd, itemNum, &m_rcDraggedTab);
-
-		/* Capture mouse movement exclusively until
-		the mouse button is released. */
-		SetCapture(m_hwnd);
-
-		m_bTabBeenDragged = TRUE;
-		m_draggedTabStartIndex = itemNum;
-		m_draggedTabEndIndex = itemNum;
-	}
-}
-
-void TabContainerImpl::OnTabCtrlLButtonUp()
-{
-	if (!m_bTabBeenDragged)
-	{
-		return;
-	}
-
-	ReleaseCapture();
-
-	m_bTabBeenDragged = FALSE;
-
-	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
-	{
-		const Tab &tab = GetTabByIndex(m_draggedTabEndIndex);
-		m_app->GetTabEvents()->NotifyMoved(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
-	}
-}
-
-void TabContainerImpl::OnTabCtrlMouseMove(POINT *pt)
-{
-	if (!m_bTabBeenDragged)
-	{
-		return;
-	}
-
-	/* Dragged tab. */
-	int iSelected = TabCtrl_GetCurFocus(m_hwnd);
-
-	TCHITTESTINFO hitTestInfo;
-	hitTestInfo.pt = *pt;
-	int iSwap = TabCtrl_HitTest(m_hwnd, &hitTestInfo);
-
-	/* Check:
-	- If the cursor is over an item.
-	- If the cursor is not over the dragged item itself.
-	- If the cursor has passed to the left of the dragged tab, or
-	- If the cursor has passed to the right of the dragged tab. */
-	if (hitTestInfo.flags != TCHT_NOWHERE && iSwap != iSelected
-		&& (pt->x < m_rcDraggedTab.left || pt->x > m_rcDraggedTab.right))
-	{
-		RECT rcSwap;
-
-		TabCtrl_GetItemRect(m_hwnd, iSwap, &rcSwap);
-
-		/* These values need to be adjusted, since
-		tabs are adjusted whenever the dragged tab
-		passes a boundary, not when the cursor is
-		released. */
-		if (pt->x > m_rcDraggedTab.right)
-		{
-			/* Cursor has gone past the right edge of
-			the dragged tab. */
-			m_rcDraggedTab.left = m_rcDraggedTab.right;
-			m_rcDraggedTab.right = rcSwap.right;
-		}
-		else
-		{
-			/* Cursor has gone past the left edge of
-			the dragged tab. */
-			m_rcDraggedTab.right = m_rcDraggedTab.left;
-			m_rcDraggedTab.left = rcSwap.left;
-		}
-
-		/* Swap the dragged tab with the tab the cursor
-		finished up on. */
-		TabHelper::SwapItems(m_hwnd, iSelected, iSwap);
-
-		/* The index of the selected tab has now changed
-		(but the actual tab/browser selected remains the
-		same). */
-		TabCtrl_SetCurFocus(m_hwnd, iSwap);
-
-		m_draggedTabEndIndex = iSwap;
-	}
 }
 
 void TabContainerImpl::OnLButtonDoubleClick(const POINT &pt)
@@ -1226,6 +1098,12 @@ void TabContainerImpl::DuplicateTab(const Tab &tab)
 	auto navigateParams =
 		NavigateParams::Normal(tab.GetShellBrowserImpl()->GetDirectoryIdl().get());
 	CreateNewTab(navigateParams, {}, &folderSettings, &folderColumns);
+}
+
+void TabContainerImpl::OnTabMoved(int fromIndex, int toIndex)
+{
+	const Tab &tab = GetTabByIndex(toIndex);
+	m_app->GetTabEvents()->NotifyMoved(tab, fromIndex, toIndex);
 }
 
 int TabContainerImpl::GetDropTargetItem(const POINT &pt)

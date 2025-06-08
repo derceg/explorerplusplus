@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "AddressBarDelegate.h"
+#include "AddressBarViewDelegate.h"
 #include "BrowserCommandTarget.h"
 #include "ScopedBrowserCommandTarget.h"
 #include "../Helper/PidlHelper.h"
@@ -27,7 +27,7 @@ class ShellBrowserEvents;
 class Tab;
 class TabEvents;
 
-class AddressBar : private AddressBarDelegate, public BrowserCommandTarget
+class AddressBar : private AddressBarViewDelegate, public BrowserCommandTarget
 {
 public:
 	static AddressBar *Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
@@ -58,7 +58,7 @@ private:
 	void Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 		NavigationEvents *navigationEvents);
 
-	// AddressBarDelegate
+	// AddressBarViewDelegate
 	bool OnKeyPressed(UINT key) override;
 	void OnBeginDrag() override;
 	void OnFocused() override;

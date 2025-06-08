@@ -44,6 +44,24 @@ void SwapItems(HWND tabControl, int item1, int item2)
 	tcItem2.pszText = const_cast<wchar_t *>(text2.c_str());
 	res = TabCtrl_SetItem(tabControl, item1, &tcItem2);
 	DCHECK(res);
+
+	int selectedIndex = TabCtrl_GetCurSel(tabControl);
+	int updatedSelectionIndex = selectedIndex;
+
+	if (selectedIndex == item1)
+	{
+		updatedSelectionIndex = item2;
+	}
+	else if (selectedIndex == item2)
+	{
+		updatedSelectionIndex = item1;
+	}
+
+	if (updatedSelectionIndex != selectedIndex)
+	{
+		int selectionRes = TabCtrl_SetCurSel(tabControl, updatedSelectionIndex);
+		DCHECK_NE(selectionRes, -1);
+	}
 }
 
 int MoveItem(HWND tabControl, int currentIndex, int newIndex)

@@ -1677,7 +1677,7 @@
     <ClInclude Include="AddressBarView.h">
       <Filter>Address Bar\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="AddressBarDelegate.h">
+    <ClInclude Include="AddressBarViewDelegate.h">
       <Filter>Address Bar\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="StatusBarView.h">
@@ -1781,6 +1781,9 @@
     </ClInclude>
     <ClInclude Include="MainTabView.h">
       <Filter>Tabs\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="TabViewDelegate.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

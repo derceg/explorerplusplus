@@ -142,3 +142,22 @@ TEST_F(TabHelperTest, SwapItems)
 
 	CheckTabs(tabs);
 }
+
+TEST_F(TabHelperTest, SwapItemsWithSelection)
+{
+	auto tabs = GetTestTabs();
+	AppendTabs(tabs);
+
+	// The selected item isn't being swapped, so the selection shouldn't change.
+	ASSERT_NE(TabCtrl_SetCurSel(m_tabControl.get(), 1), -1);
+	TabHelper::SwapItems(m_tabControl.get(), 0, 2);
+	EXPECT_EQ(TabCtrl_GetCurSel(m_tabControl.get()), 1);
+
+	ASSERT_NE(TabCtrl_SetCurSel(m_tabControl.get(), 0), -1);
+	TabHelper::SwapItems(m_tabControl.get(), 0, 2);
+	EXPECT_EQ(TabCtrl_GetCurSel(m_tabControl.get()), 2);
+
+	ASSERT_NE(TabCtrl_SetCurSel(m_tabControl.get(), 1), -1);
+	TabHelper::SwapItems(m_tabControl.get(), 0, 1);
+	EXPECT_EQ(TabCtrl_GetCurSel(m_tabControl.get()), 0);
+}

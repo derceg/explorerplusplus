@@ -5,10 +5,10 @@
 #pragma once
 
 // Allows the AddressBarView controller to be notified of events that occur within the view.
-class AddressBarDelegate
+class AddressBarViewDelegate
 {
 public:
-	virtual ~AddressBarDelegate() = default;
+	virtual ~AddressBarViewDelegate() = default;
 
 	virtual bool OnKeyPressed(UINT key) = 0;
 	virtual void OnBeginDrag() = 0;

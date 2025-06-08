@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-class AddressBarDelegate;
+class AddressBarViewDelegate;
 struct Config;
 class WindowSubclass;
 
@@ -24,7 +24,7 @@ public:
 
 	static AddressBarView *Create(HWND parent, const Config *config);
 
-	void SetDelegate(AddressBarDelegate *delegate);
+	void SetDelegate(AddressBarViewDelegate *delegate);
 	HWND GetHWND() const;
 	std::wstring GetText() const;
 	bool IsTextModified() const;
@@ -32,7 +32,7 @@ public:
 	void UpdateTextAndIcon(const std::optional<std::wstring> &optionalText, int iconIndex);
 	void RevertText();
 
-	AddressBarDelegate *GetDelegateForTesting();
+	AddressBarViewDelegate *GetDelegateForTesting();
 	void SetTextForTesting(const std::wstring &text);
 
 private:
@@ -49,7 +49,7 @@ private:
 	void OnNcDestroy();
 
 	const HWND m_hwnd;
-	AddressBarDelegate *m_delegate = nullptr;
+	AddressBarViewDelegate *m_delegate = nullptr;
 	MainFontSetter m_fontSetter;
 	std::wstring m_currentText;
 

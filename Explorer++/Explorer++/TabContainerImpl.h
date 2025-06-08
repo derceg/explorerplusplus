@@ -11,6 +11,7 @@
 #include "Tab.h"
 #include "TabContainer.h"
 #include "TabView.h"
+#include "TabViewDelegate.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclass.h"
@@ -83,7 +84,10 @@ struct TabSettings : TabSettingsImpl
 	// clang-format on
 };
 
-class TabContainerImpl : public TabContainer, public ShellDropTargetWindow<int>
+class TabContainerImpl :
+	public TabContainer,
+	public ShellDropTargetWindow<int>,
+	private TabViewDelegate
 {
 public:
 	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser,
@@ -160,10 +164,6 @@ private:
 
 	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
-	void OnTabCtrlLButtonDown(POINT *pt);
-	void OnTabCtrlLButtonUp();
-	void OnTabCtrlMouseMove(POINT *pt);
-
 	void OnLButtonDoubleClick(const POINT &pt);
 
 	void OnTabCtrlMButtonUp(POINT *pt);
@@ -198,6 +198,9 @@ private:
 		const TabSettings &tabSettings, int index);
 
 	void RemoveTabFromControl(const Tab &tab);
+
+	// TabViewDelegate
+	void OnTabMoved(int fromIndex, int toIndex) override;
 
 	// ShellDropTargetWindow
 	int GetDropTargetItem(const POINT &pt) override;
@@ -241,12 +244,6 @@ private:
 
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;
-
-	// Tab dragging
-	BOOL m_bTabBeenDragged;
-	int m_draggedTabStartIndex;
-	int m_draggedTabEndIndex;
-	RECT m_rcDraggedTab;
 
 	// Drop handling
 	std::optional<DropTargetContext> m_dropTargetContext;

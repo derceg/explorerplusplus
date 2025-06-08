@@ -1516,7 +1516,7 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorManager.h" />
     <ClInclude Include="AcceleratorMappings.h" />
-    <ClInclude Include="AddressBarDelegate.h" />
+    <ClInclude Include="AddressBarViewDelegate.h" />
     <ClInclude Include="AddressBarView.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="AppStorage.h" />
@@ -1541,6 +1541,7 @@
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />
     <ClInclude Include="TabView.h" />
+    <ClInclude Include="TabViewDelegate.h" />
     <ClInclude Include="ThemedTabControlPainter.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />

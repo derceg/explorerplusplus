@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "AddressBarView.h"
-#include "AddressBarDelegate.h"
+#include "AddressBarViewDelegate.h"
 #include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
@@ -84,7 +84,10 @@ LRESULT AddressBarView::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 		break;
 
 	case WM_SETFOCUS:
-		m_delegate->OnFocused();
+		if (m_delegate)
+		{
+			m_delegate->OnFocused();
+		}
 		break;
 	}
 
@@ -114,7 +117,7 @@ LRESULT AddressBarView::ParentSubclass(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void AddressBarView::SetDelegate(AddressBarDelegate *delegate)
+void AddressBarView::SetDelegate(AddressBarViewDelegate *delegate)
 {
 	m_delegate = delegate;
 }
@@ -183,7 +186,7 @@ void AddressBarView::OnNcDestroy()
 	delete this;
 }
 
-AddressBarDelegate *AddressBarView::GetDelegateForTesting()
+AddressBarViewDelegate *AddressBarView::GetDelegateForTesting()
 {
 	CHECK(IsInTest());
 	return m_delegate;

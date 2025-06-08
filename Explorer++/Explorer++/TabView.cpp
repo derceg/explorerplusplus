@@ -5,7 +5,10 @@
 #include "stdafx.h"
 #include "TabView.h"
 #include "SystemFontHelper.h"
+#include "TabViewDelegate.h"
 #include "../Helper/Controls.h"
+#include "../Helper/TabHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
 TabView::TabView(HWND parent, DWORD style, const Config *config) :
@@ -34,11 +37,32 @@ HWND TabView::GetHWND() const
 	return m_hwnd;
 }
 
+void TabView::SetDelegate(TabViewDelegate *delegate)
+{
+	m_delegate = delegate;
+}
+
 LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
 		HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
+
+	case WM_LBUTTONDOWN:
+		OnLeftButtonDown({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+		break;
+
+	case WM_LBUTTONUP:
+		OnLeftButtonUp();
+		break;
+
+	case WM_MOUSEMOVE:
+		OnMouseMove({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+		break;
+
+	case WM_CAPTURECHANGED:
+		OnCaptureChanged(reinterpret_cast<HWND>(lParam));
+		break;
 
 	case WM_NCDESTROY:
 		OnNcDestroy();
@@ -114,6 +138,148 @@ void TabView::Scroll(ScrollDirection direction)
 	}
 
 	SendMessage(m_hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
+}
+
+void TabView::OnLeftButtonDown(const POINT &pt)
+{
+	auto index = MaybeGetIndexOfTabAtPoint(pt);
+
+	if (!index)
+	{
+		return;
+	}
+
+	SetCapture(m_hwnd);
+
+	DCHECK(!m_tabDragState);
+	m_tabDragState = { TabDragAnchor::None };
+}
+
+void TabView::OnLeftButtonUp()
+{
+	if (!m_tabDragState)
+	{
+		return;
+	}
+
+	ReleaseCapture();
+}
+
+void TabView::OnMouseMove(const POINT &pt)
+{
+	if (!m_tabDragState)
+	{
+		return;
+	}
+
+	// The tab being dragged will always be the selected tab.
+	int draggedTabIndex = GetSelectedIndex();
+
+	if (MaybeGetIndexOfTabAtPoint(pt) == draggedTabIndex)
+	{
+		m_tabDragState->anchor = TabDragAnchor::None;
+		return;
+	}
+
+	auto tabBounds = GetTabBoundsForDrag(draggedTabIndex, m_tabDragState->anchor);
+
+	int targetIndex = draggedTabIndex;
+
+	if (pt.x < tabBounds.left)
+	{
+		targetIndex--;
+	}
+	else if (pt.x > tabBounds.right)
+	{
+		targetIndex++;
+	}
+
+	if (!IsValidIndex(targetIndex) || targetIndex == draggedTabIndex)
+	{
+		return;
+	}
+
+	if (targetIndex < draggedTabIndex)
+	{
+		m_tabDragState->anchor = TabDragAnchor::Right;
+	}
+	else
+	{
+		m_tabDragState->anchor = TabDragAnchor::Left;
+	}
+
+	TabHelper::SwapItems(m_hwnd, draggedTabIndex, targetIndex);
+
+	if (m_delegate)
+	{
+		m_delegate->OnTabMoved(draggedTabIndex, targetIndex);
+	}
+}
+
+TabView::TabDragBounds TabView::GetTabBoundsForDrag(int tabIndex, TabDragAnchor anchor) const
+{
+	RECT tabRect = GetTabRect(tabIndex);
+	TabDragBounds tabBounds = { tabRect.left, tabRect.right };
+
+	if (anchor == TabDragAnchor::Left && IsValidIndex(tabIndex - 1))
+	{
+		RECT previousTabRect = GetTabRect(tabIndex - 1);
+		tabBounds.left = previousTabRect.left + GetRectWidth(&tabRect);
+	}
+	else if (anchor == TabDragAnchor::Right && IsValidIndex(tabIndex + 1))
+	{
+		RECT nextTabRect = GetTabRect(tabIndex + 1);
+		tabBounds.right = nextTabRect.right - GetRectWidth(&tabRect);
+	}
+
+	return tabBounds;
+}
+
+void TabView::OnCaptureChanged(HWND target)
+{
+	if (target != m_hwnd)
+	{
+		m_tabDragState.reset();
+	}
+}
+
+int TabView::GetSelectedIndex() const
+{
+	int index = TabCtrl_GetCurSel(m_hwnd);
+	CHECK_NE(index, -1) << "No selected tab";
+	return index;
+}
+
+bool TabView::IsValidIndex(int index) const
+{
+	return index >= 0 && index < GetNumTabs();
+}
+
+int TabView::GetNumTabs() const
+{
+	return TabCtrl_GetItemCount(m_hwnd);
+}
+
+RECT TabView::GetTabRect(int index) const
+{
+	RECT tabRect;
+	auto res = TabCtrl_GetItemRect(m_hwnd, index, &tabRect);
+	CHECK(res);
+	return tabRect;
+}
+
+std::optional<int> TabView::MaybeGetIndexOfTabAtPoint(const POINT &pt) const
+{
+	TCHITTESTINFO hitTestInfo = {};
+	hitTestInfo.pt = pt;
+	int index = TabCtrl_HitTest(m_hwnd, &hitTestInfo);
+
+	if (index < 0)
+	{
+		return std::nullopt;
+	}
+
+	return index;
 }
 
 void TabView::OnFontUpdated()
