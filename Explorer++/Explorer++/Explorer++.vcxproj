@@ -1210,6 +1210,7 @@
     <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="MainTabView.cpp" />
+    <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
@@ -1534,6 +1535,7 @@
     <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="MainTabView.h" />
+    <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
     <ClInclude Include="SelectionType.h" />

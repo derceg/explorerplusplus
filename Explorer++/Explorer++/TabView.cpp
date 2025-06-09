@@ -11,6 +11,19 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
+void TabViewItem::SetParent(TabView *parent)
+{
+	m_parent = parent;
+}
+
+void TabViewItem::NotifyParentOfUpdate() const
+{
+	if (m_parent)
+	{
+		m_parent->UpdateTab(this);
+	}
+}
+
 TabView::TabView(HWND parent, DWORD style, const Config *config) :
 	m_hwnd(CreateTabControl(parent, style)),
 	m_fontSetter(m_hwnd, config, GetDefaultSystemFontForDefaultDpi())
@@ -40,6 +53,123 @@ HWND TabView::GetHWND() const
 void TabView::SetDelegate(TabViewDelegate *delegate)
 {
 	m_delegate = delegate;
+}
+
+int TabView::AddTab(std::unique_ptr<TabViewItem> tabItem, int index)
+{
+	std::wstring text = tabItem->GetText();
+	auto iconIndex = tabItem->GetIconIndex();
+
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
+	tcItem.pszText = text.data();
+	tcItem.iImage = iconIndex ? *iconIndex : -1;
+	tcItem.lParam = reinterpret_cast<LPARAM>(tabItem.get());
+	int insertedIndex = TabCtrl_InsertItem(m_hwnd, index, &tcItem);
+	CHECK_NE(insertedIndex, -1);
+
+	tabItem->SetParent(this);
+	m_tabs.push_back(std::move(tabItem));
+
+	return insertedIndex;
+}
+
+void TabView::UpdateTab(const TabViewItem *tabItem)
+{
+	int index = GetIndexOfTabItem(tabItem);
+
+	auto originalIconIndex = MaybeGetTabIconIndex(index);
+
+	auto text = tabItem->GetText();
+	auto iconIndex = tabItem->GetIconIndex();
+
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_TEXT | TCIF_IMAGE;
+	tcItem.pszText = text.data();
+	tcItem.iImage = iconIndex ? *iconIndex : -1;
+	auto res = TabCtrl_SetItem(m_hwnd, index, &tcItem);
+	CHECK(res);
+
+	if (originalIconIndex && *originalIconIndex != iconIndex)
+	{
+		MaybeRemoveIcon(*originalIconIndex);
+	}
+}
+
+int TabView::GetIndexOfTabItem(const TabViewItem *tabItem) const
+{
+	int numTabs = GetNumTabs();
+
+	for (int i = 0; i < numTabs; i++)
+	{
+		if (GetTabAtIndex(i) == tabItem)
+		{
+			return i;
+		}
+	}
+
+	LOG(FATAL) << "Couldn't determine index for tab";
+}
+
+void TabView::RemoveTab(int index)
+{
+	CHECK(IsValidIndex(index));
+
+	auto itr =
+		std::ranges::find_if(m_tabs, [tabItem = GetTabAtIndex(index)](const auto &currentTabItem)
+			{ return currentTabItem.get() == tabItem; });
+	CHECK(itr != m_tabs.end());
+	m_tabs.erase(itr);
+
+	auto iconIndex = MaybeGetTabIconIndex(index);
+
+	auto res = TabCtrl_DeleteItem(m_hwnd, index);
+	CHECK(res);
+
+	if (iconIndex)
+	{
+		MaybeRemoveIcon(*iconIndex);
+	}
+}
+
+std::optional<int> TabView::MaybeGetTabIconIndex(int index) const
+{
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_IMAGE;
+	auto res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
+	CHECK(res);
+
+	if (tcItem.iImage == -1)
+	{
+		return std::nullopt;
+	}
+
+	return tcItem.iImage;
+}
+
+void TabView::MaybeRemoveIcon(int iconIndex)
+{
+	if (m_delegate && m_delegate->ShouldRemoveIcon(iconIndex))
+	{
+		TabCtrl_RemoveImage(m_hwnd, iconIndex);
+	}
+}
+
+void TabView::SetImageList(HIMAGELIST imageList)
+{
+	// It only makes sense to set the image list once (i.e. there shouldn't be any previous image
+	// list set).
+	auto previousImageList = TabCtrl_SetImageList(m_hwnd, imageList);
+	DCHECK(!previousImageList);
+}
+
+TabViewItem *TabView::GetTabAtIndex(int index) const
+{
+	TCITEM tcItem = {};
+	tcItem.mask = TCIF_PARAM;
+	BOOL res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
+	CHECK(res) << "Tab lookup failed for tab at index " << index;
+	return reinterpret_cast<TabViewItem *>(tcItem.lParam);
 }
 
 LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -257,7 +387,7 @@ bool TabView::IsValidIndex(int index) const
 
 int TabView::GetNumTabs() const
 {
-	return TabCtrl_GetItemCount(m_hwnd);
+	return static_cast<int>(m_tabs.size());
 }
 
 RECT TabView::GetTabRect(int index) const

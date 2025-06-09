@@ -104,15 +104,6 @@ int MoveItem(HWND tabControl, int currentIndex, int newIndex)
 	return insertedIndex;
 }
 
-void SetItemText(HWND tabControl, int item, const std::wstring &text)
-{
-	TCITEM tcItem = {};
-	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = const_cast<wchar_t *>(text.c_str());
-	auto res = TabCtrl_SetItem(tabControl, item, &tcItem);
-	DCHECK(res);
-}
-
 std::wstring GetItemText(HWND tabControl, int item)
 {
 	std::wstring text;

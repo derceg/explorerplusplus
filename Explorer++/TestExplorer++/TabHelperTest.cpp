@@ -110,15 +110,6 @@ TEST_F(TabHelperTest, GetItemText)
 	PerformGetItemTextTest({ std::wstring(1000, 'a') });
 }
 
-TEST_F(TabHelperTest, SetItemText)
-{
-	int index = AppendTab({ L"Initial text" });
-
-	std::wstring updatedText = L"Updated text";
-	TabHelper::SetItemText(m_tabControl.get(), index, updatedText);
-	EXPECT_EQ(TabHelper::GetItemText(m_tabControl.get(), index), updatedText);
-}
-
 TEST_F(TabHelperTest, MoveItem)
 {
 	auto tabs = GetTestTabs();

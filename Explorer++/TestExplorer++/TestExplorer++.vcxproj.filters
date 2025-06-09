@@ -470,6 +470,9 @@
     <ClCompile Include="ClangCLLibs.cpp">
       <Filter>Clang-CL</Filter>
     </ClCompile>
+    <ClCompile Include="TabViewTest.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -630,6 +633,9 @@
     </Filter>
     <Filter Include="Clang-CL">
       <UniqueIdentifier>{dd72ce4c-26b4-4a92-9e8b-a5a3cb190423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{c4ba0c42-8d59-4d3b-a572-8a4ade71def9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

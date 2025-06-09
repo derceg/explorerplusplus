@@ -4,13 +4,21 @@
 
 #pragma once
 
+#include "MainTabViewImageListManager.h"
 #include "TabView.h"
+
+class ResourceLoader;
 
 class MainTabView : public TabView
 {
 public:
-	static MainTabView *Create(HWND parent, const Config *config);
+	static MainTabView *Create(HWND parent, const Config *config,
+		const ResourceLoader *resourceLoader);
+
+	MainTabViewImageListManager *GetImageListManager();
 
 private:
-	MainTabView(HWND parent, const Config *config);
+	MainTabView(HWND parent, const Config *config, const ResourceLoader *resourceLoader);
+
+	MainTabViewImageListManager m_imageListManager;
 };

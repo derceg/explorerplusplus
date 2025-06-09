@@ -32,12 +32,16 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
+#include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
 
 using namespace std::chrono_literals;
+
+namespace
+{
 
 // clang-format off
 const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
@@ -46,6 +50,128 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_TAB_CLOSETAB, Icon::CloseTab }
 };
 // clang-format on
+
+class MainTabViewItem : public TabViewItem
+{
+public:
+	MainTabViewItem(Tab *tab, App *app, IconFetcher *iconFetcher, CachedIcons *cachedIcons,
+		MainTabViewImageListManager *imageListManager) :
+		m_tab(tab),
+		m_iconFetcher(iconFetcher),
+		m_cachedIcons(cachedIcons),
+		m_imageListManager(imageListManager)
+	{
+		m_connections.push_back(app->GetTabEvents()->AddUpdatedObserver(
+			std::bind_front(&MainTabViewItem::OnTabUpdated, this),
+			TabEventScope::ForBrowser(*tab->GetBrowser())));
+
+		m_connections.push_back(app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
+			std::bind(&MainTabViewItem::OnDisplayPropertiesUpdated, this),
+			ShellBrowserEventScope::ForShellBrowser(*tab->GetShellBrowser())));
+
+		m_connections.push_back(app->GetNavigationEvents()->AddCommittedObserver(
+			std::bind(&MainTabViewItem::OnDisplayPropertiesUpdated, this),
+			NavigationEventScope::ForShellBrowser(*tab->GetShellBrowser())));
+	}
+
+	std::wstring GetText() const override
+	{
+		std::wstring name = m_tab->GetName();
+		boost::replace_all(name, L"&", L"&&");
+		return name;
+	}
+
+	std::optional<int> GetIconIndex() const override
+	{
+		if (m_tab->GetLockState() == Tab::LockState::Locked
+			|| m_tab->GetLockState() == Tab::LockState::AddressLocked)
+		{
+			return m_imageListManager->GetLockIconIndex();
+		}
+
+		if (!m_iconIndex)
+		{
+			m_iconIndex = DetermineIconIndex();
+		}
+
+		return *m_iconIndex;
+	}
+
+	Tab *GetTab()
+	{
+		return m_tab;
+	}
+
+private:
+	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
+	{
+		UNREFERENCED_PARAMETER(propertyType);
+
+		if (&tab == m_tab)
+		{
+			OnDisplayPropertiesUpdated();
+		}
+	}
+
+	void OnDisplayPropertiesUpdated()
+	{
+		m_weakPtrFactory.InvalidateWeakPtrs();
+		m_iconIndex.reset();
+
+		NotifyParentOfUpdate();
+	}
+
+	int DetermineIconIndex() const
+	{
+		FetchUpdatedIcon();
+
+		auto cachedIconIndex =
+			m_cachedIcons->MaybeGetIconIndex(m_tab->GetShellBrowserImpl()->GetDirectoryPath());
+
+		if (cachedIconIndex)
+		{
+			return m_imageListManager->AddIconFromSystemImageList(*cachedIconIndex);
+		}
+
+		return m_imageListManager->GetDefaultFolderIconIndex();
+	}
+
+	void FetchUpdatedIcon() const
+	{
+		const auto &pidlDirectory = m_tab->GetShellBrowser()->GetDirectory();
+
+		m_iconFetcher->QueueIconTask(pidlDirectory.Raw(),
+			[weakSelf = m_weakPtrFactory.GetWeakPtr()](int iconIndex, int overlayIndex)
+			{
+				UNREFERENCED_PARAMETER(overlayIndex);
+
+				if (!weakSelf)
+				{
+					return;
+				}
+
+				weakSelf->OnIconLoaded(iconIndex);
+			});
+	}
+
+	void OnIconLoaded(int iconIndex) const
+	{
+		m_iconIndex = m_imageListManager->AddIconFromSystemImageList(iconIndex);
+
+		NotifyParentOfUpdate();
+	}
+
+	Tab *const m_tab;
+	IconFetcher *const m_iconFetcher;
+	CachedIcons *const m_cachedIcons;
+	MainTabViewImageListManager *const m_imageListManager;
+	mutable std::optional<int> m_iconIndex;
+	std::vector<boost::signals2::scoped_connection> m_connections;
+
+	WeakPtrFactory<MainTabViewItem> m_weakPtrFactory{ this };
+};
+
+}
 
 TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
@@ -70,10 +196,10 @@ TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 	m_timerManager(m_hwnd),
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),
+	m_bookmarkTree(bookmarkTree),
 	m_resourceInstance(resourceInstance),
 	m_config(config),
-	m_iPreviousTabSelectionId(-1),
-	m_bookmarkTree(bookmarkTree)
+	m_iPreviousTabSelectionId(-1)
 {
 	Initialize(GetParent(m_view->GetHWND()));
 }
@@ -84,58 +210,10 @@ void TabContainerImpl::Initialize(HWND parent)
 	m_view->windowDestroyedSignal.AddObserver(
 		std::bind_front(&TabContainerImpl::OnWindowDestroyed, this));
 
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconSystemImageListIndex));
-
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
-
-	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
-
-	int dpiScaledSize = MulDiv(ICON_SIZE_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-	m_tabCtrlImageList.reset(
-		ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 100));
-	TabCtrl_SetImageList(m_hwnd, m_tabCtrlImageList.get());
-
-	AddDefaultTabIcons(m_tabCtrlImageList.get());
-
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 		std::bind_front(&TabContainerImpl::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainerImpl::ParentWndProc, this)));
-
-	m_connections.push_back(m_app->GetTabEvents()->AddUpdatedObserver(
-		std::bind_front(&TabContainerImpl::OnTabUpdated, this),
-		TabEventScope::ForBrowser(*m_browser)));
-
-	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
-		std::bind_front(&TabContainerImpl::OnDirectoryPropertiesChanged, this),
-		ShellBrowserEventScope::ForBrowser(*m_browser)));
-
-	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
-		std::bind_front(&TabContainerImpl::OnNavigationCommitted, this),
-		NavigationEventScope::ForBrowser(*m_browser)));
-}
-
-void TabContainerImpl::AddDefaultTabIcons(HIMAGELIST himlTab)
-{
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-	wil::unique_hbitmap bitmap = m_app->GetResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock,
-		ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
-	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
-
-	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
-		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
-		m_defaultFolderIconSystemImageListIndex);
-}
-
-bool TabContainerImpl::IsDefaultIcon(int iconIndex)
-{
-	if (iconIndex == m_tabIconLockIndex || iconIndex == m_defaultFolderIconIndex)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -496,135 +574,6 @@ void TabContainerImpl::OnTabSelected(const Tab &tab)
 	m_app->GetTabEvents()->NotifySelected(tab);
 }
 
-void TabContainerImpl::OnNavigationCommitted(const NavigationRequest *request)
-{
-	const auto *tab = request->GetShellBrowser()->GetTab();
-
-	UpdateTabNameInWindow(*tab);
-	SetTabIcon(*tab);
-}
-
-void TabContainerImpl::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
-{
-	const auto *tab = shellBrowser->GetTab();
-
-	UpdateTabNameInWindow(*tab);
-	SetTabIcon(*tab);
-}
-
-void TabContainerImpl::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
-{
-	switch (propertyType)
-	{
-	case Tab::PropertyType::LockState:
-		SetTabIcon(tab);
-		break;
-
-	case Tab::PropertyType::Name:
-		UpdateTabNameInWindow(tab);
-		break;
-	}
-}
-
-void TabContainerImpl::UpdateTabNameInWindow(const Tab &tab)
-{
-	std::wstring name = tab.GetName();
-	boost::replace_all(name, L"&", L"&&");
-
-	int index = GetTabIndex(tab);
-	TabHelper::SetItemText(m_hwnd, index, name);
-}
-
-void TabContainerImpl::SetTabIcon(const Tab &tab)
-{
-	/* If the tab is locked, use a lock icon. */
-	if (tab.GetLockState() == Tab::LockState::Locked
-		|| tab.GetLockState() == Tab::LockState::AddressLocked)
-	{
-		SetTabIconFromImageList(tab, m_tabIconLockIndex);
-	}
-	else
-	{
-		auto cachedIconIndex =
-			m_cachedIcons->MaybeGetIconIndex(tab.GetShellBrowserImpl()->GetDirectoryPath());
-
-		if (cachedIconIndex)
-		{
-			SetTabIconFromSystemImageList(tab, *cachedIconIndex);
-		}
-		else
-		{
-			SetTabIconFromImageList(tab, m_defaultFolderIconIndex);
-		}
-
-		auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
-
-		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
-			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowserImpl()->GetUniqueFolderId()](
-				int iconIndex, int overlayIndex)
-			{
-				UNREFERENCED_PARAMETER(overlayIndex);
-
-				auto tab = GetTabOptional(tabId);
-
-				if (!tab)
-				{
-					return;
-				}
-
-				if (tab->GetShellBrowserImpl()->GetUniqueFolderId() != folderId)
-				{
-					return;
-				}
-
-				SetTabIconFromSystemImageList(*tab, iconIndex);
-			});
-	}
-}
-
-void TabContainerImpl::SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex)
-{
-	if (systemIconIndex == m_defaultFolderIconSystemImageListIndex)
-	{
-		SetTabIconFromImageList(tab, m_defaultFolderIconIndex);
-		return;
-	}
-
-	int index = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
-		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
-	SetTabIconFromImageList(tab, index);
-}
-
-void TabContainerImpl::SetTabIconFromImageList(const Tab &tab, int imageIndex)
-{
-	int tabIndex = GetTabIndex(tab);
-
-	TCITEM tcItem;
-	tcItem.mask = TCIF_IMAGE;
-	BOOL res = TabCtrl_GetItem(m_hwnd, tabIndex, &tcItem);
-
-	if (!res)
-	{
-		return;
-	}
-
-	int previousImageIndex = tcItem.iImage;
-
-	tcItem.mask = TCIF_IMAGE;
-	tcItem.iImage = imageIndex;
-	res = TabCtrl_SetItem(m_hwnd, tabIndex, &tcItem);
-
-	if (!res)
-	{
-		return;
-	}
-
-	if (!IsDefaultIcon(previousImageIndex))
-	{
-		TabCtrl_RemoveImage(m_hwnd, previousImageIndex);
-	}
-}
-
 void TabContainerImpl::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
 {
 	CreateNewTab(m_config->defaultTabDirectory, tabSettings);
@@ -755,7 +704,9 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	index = InsertNewTab(tab, navigateParams, tabSettings, index);
+	index = m_view->AddTab(std::make_unique<MainTabViewItem>(&tab, m_app, &m_iconFetcher,
+							   m_cachedIcons, m_view->GetImageListManager()),
+		index);
 
 	bool selected = false;
 
@@ -786,33 +737,6 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
 
 	return tab;
-}
-
-int TabContainerImpl::InsertNewTab(const Tab &tab, const NavigateParams &navigateParams,
-	const TabSettings &tabSettings, int index)
-{
-	std::wstring name;
-
-	if (tabSettings.name && !tabSettings.name->empty())
-	{
-		name = *tabSettings.name;
-	}
-	else
-	{
-		GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, name);
-	}
-
-	boost::replace_all(name, L"&", L"&&");
-
-	TCITEM tcItem = {};
-	tcItem.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_PARAM;
-	tcItem.pszText = name.data();
-	tcItem.iImage = tab.IsLocked() ? m_tabIconLockIndex : m_defaultFolderIconIndex;
-	tcItem.lParam = tab.GetId();
-	int insertedIndex = TabCtrl_InsertItem(m_hwnd, index, &tcItem);
-	CHECK_NE(insertedIndex, -1);
-
-	return insertedIndex;
 }
 
 bool TabContainerImpl::CloseTab(const Tab &tab)
@@ -901,16 +825,7 @@ void TabContainerImpl::RemoveTabFromControl(const Tab &tab)
 		m_tabSelectionHistory.pop_back();
 	}
 
-	TCITEM tcItemRemoved;
-	tcItemRemoved.mask = TCIF_IMAGE;
-	TabCtrl_GetItem(m_hwnd, index, &tcItemRemoved);
-
-	TabCtrl_DeleteItem(m_hwnd, index);
-
-	if (!IsDefaultIcon(tcItemRemoved.iImage))
-	{
-		TabCtrl_RemoveImage(m_hwnd, tcItemRemoved.iImage);
-	}
+	m_view->RemoveTab(index);
 }
 
 Tab &TabContainerImpl::GetTab(int tabId) const
@@ -1015,25 +930,19 @@ bool TabContainerImpl::IsTabSelected(const Tab &tab) const
 
 Tab &TabContainerImpl::GetTabByIndex(int index) const
 {
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
-	CHECK(res) << "Tab lookup failed for tab at index " << index;
-
-	return GetTab(static_cast<int>(tcItem.lParam));
+	auto *tabViewItem = static_cast<MainTabViewItem *>(m_view->GetTabAtIndex(index));
+	return *tabViewItem->GetTab();
 }
 
 int TabContainerImpl::GetTabIndex(const Tab &tab) const
 {
-	int numTabs = TabCtrl_GetItemCount(m_hwnd);
+	int numTabs = m_view->GetNumTabs();
 
 	for (int i = 0; i < numTabs; i++)
 	{
-		TCITEM tcItem;
-		tcItem.mask = TCIF_PARAM;
-		BOOL res = TabCtrl_GetItem(m_hwnd, i, &tcItem);
+		const auto &currentTab = GetTabByIndex(i);
 
-		if (res && (tcItem.lParam == tab.GetId()))
+		if (currentTab.GetId() == tab.GetId())
 		{
 			return i;
 		}
@@ -1104,6 +1013,11 @@ void TabContainerImpl::OnTabMoved(int fromIndex, int toIndex)
 {
 	const Tab &tab = GetTabByIndex(toIndex);
 	m_app->GetTabEvents()->NotifyMoved(tab, fromIndex, toIndex);
+}
+
+bool TabContainerImpl::ShouldRemoveIcon(int iconIndex)
+{
+	return !m_view->GetImageListManager()->IsDefaultIcon(iconIndex);
 }
 
 int TabContainerImpl::GetDropTargetItem(const POINT &pt)

@@ -12,12 +12,9 @@
 #include "TabContainer.h"
 #include "TabView.h"
 #include "TabViewDelegate.h"
-#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/parameter.hpp>
-#include <boost/signals2.hpp>
-#include <wil/com.h>
 #include <wil/resource.h>
 #include <functional>
 #include <optional>
@@ -146,8 +143,6 @@ private:
 		}
 	};
 
-	static const int ICON_SIZE_96DPI = 16;
-
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
 	TabContainerImpl(MainTabView *view, BrowserWindow *browser,
@@ -159,8 +154,6 @@ private:
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
-	void AddDefaultTabIcons(HIMAGELIST himlTab);
-	bool IsDefaultIcon(int iconIndex);
 
 	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
@@ -186,21 +179,11 @@ private:
 
 	void OnTabSelected(const Tab &tab);
 
-	void OnNavigationCommitted(const NavigationRequest *request);
-	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
-	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
-	void UpdateTabNameInWindow(const Tab &tab);
-	void SetTabIcon(const Tab &tab);
-	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
-	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
-
-	int InsertNewTab(const Tab &tab, const NavigateParams &navigateParams,
-		const TabSettings &tabSettings, int index);
-
 	void RemoveTabFromControl(const Tab &tab);
 
 	// TabViewDelegate
 	void OnTabMoved(int fromIndex, int toIndex) override;
+	bool ShouldRemoveIcon(int iconIndex) override;
 
 	// ShellDropTargetWindow
 	int GetDropTargetItem(const POINT &pt) override;
@@ -223,30 +206,18 @@ private:
 	App *const m_app;
 	CoreInterface *m_coreInterface;
 	FileActionHandler *m_fileActionHandler;
-
-	wil::unique_himagelist m_tabCtrlImageList;
 	OneShotTimerManager m_timerManager;
-
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
-
 	IconFetcherImpl m_iconFetcher;
 	CachedIcons *m_cachedIcons;
-	wil::com_ptr_nothrow<IImageList> m_systemImageList;
-	int m_defaultFolderIconSystemImageListIndex;
-	int m_defaultFolderIconIndex;
-	int m_tabIconLockIndex;
-
+	BookmarkTree *m_bookmarkTree;
 	HINSTANCE m_resourceInstance;
 	const Config *const m_config;
-
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;
 
 	// Drop handling
 	std::optional<DropTargetContext> m_dropTargetContext;
-
-	BookmarkTree *m_bookmarkTree;
 };

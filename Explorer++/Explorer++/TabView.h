@@ -7,14 +7,35 @@
 #include "MainFontSetter.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
+#include <CommCtrl.h>
 #include <memory>
 #include <optional>
 #include <vector>
 
 struct Config;
+class TabView;
 class TabViewDelegate;
 class WindowSubclass;
 
+// Represents an individual tab within the view.
+class TabViewItem
+{
+public:
+	virtual ~TabViewItem() = default;
+
+	void SetParent(TabView *parent);
+
+	virtual std::wstring GetText() const = 0;
+	virtual std::optional<int> GetIconIndex() const = 0;
+
+protected:
+	void NotifyParentOfUpdate() const;
+
+private:
+	TabView *m_parent = nullptr;
+};
+
+// Designed to act as a base class for a tab control. Doesn't actually add any tabs on its own.
 class TabView : private boost::noncopyable
 {
 public:
@@ -27,6 +48,13 @@ public:
 	HWND GetHWND() const;
 	void SetDelegate(TabViewDelegate *delegate);
 
+	int AddTab(std::unique_ptr<TabViewItem> tabItem, int index);
+	void UpdateTab(const TabViewItem *tabItem);
+	void RemoveTab(int index);
+	TabViewItem *GetTabAtIndex(int index) const;
+	int GetNumTabs() const;
+
+	void SetImageList(HIMAGELIST imageList);
 	void Scroll(ScrollDirection direction);
 
 	// Signals
@@ -101,6 +129,10 @@ private:
 		TabDragAnchor anchor;
 	};
 
+	int GetIndexOfTabItem(const TabViewItem *tabItem) const;
+	std::optional<int> MaybeGetTabIconIndex(int index) const;
+	void MaybeRemoveIcon(int iconIndex);
+
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys);
@@ -111,13 +143,13 @@ private:
 	void OnCaptureChanged(HWND target);
 	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
-	int GetNumTabs() const;
 	RECT GetTabRect(int index) const;
 	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &pt) const;
 	void OnFontUpdated();
 	void OnNcDestroy();
 
 	const HWND m_hwnd;
+	std::vector<std::unique_ptr<TabViewItem>> m_tabs;
 	TabViewDelegate *m_delegate = nullptr;
 	MainFontSetter m_fontSetter;
 	std::unique_ptr<MainFontSetter> m_tooltipFontSetter;

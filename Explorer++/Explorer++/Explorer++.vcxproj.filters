@@ -853,6 +853,9 @@
     <ClCompile Include="MainTabView.cpp">
       <Filter>Tabs\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="MainTabViewImageListManager.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1784,6 +1787,9 @@
     </ClInclude>
     <ClInclude Include="TabViewDelegate.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MainTabViewImageListManager.h">
+      <Filter>Tabs\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	auto *mainTabView = MainTabView::Create(m_hTabBacking, m_config);
+	auto *mainTabView = MainTabView::Create(m_hTabBacking, m_config, m_app->GetResourceLoader());
 	m_connections.push_back(mainTabView->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); }));
 
 	auto *tabContainer = TabContainerImpl::Create(mainTabView, this, this, m_app, this,

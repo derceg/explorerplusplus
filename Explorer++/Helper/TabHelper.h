@@ -11,7 +11,6 @@ namespace TabHelper
 
 void SwapItems(HWND tabControl, int item1, int item2);
 int MoveItem(HWND tabControl, int currentIndex, int newIndex);
-void SetItemText(HWND tabControl, int item, const std::wstring &text);
 std::wstring GetItemText(HWND tabControl, int item);
 
 }
