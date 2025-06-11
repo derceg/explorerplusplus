@@ -220,14 +220,6 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	switch (uMsg)
 	{
-	case WM_RBUTTONUP:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnTabCtrlRButtonUp(&pt);
-	}
-	break;
-
 	case WM_MENUSELECT:
 		/* Forward the message to the main window so it can
 		handle menu help. */
@@ -255,28 +247,13 @@ void TabContainerImpl::OnTabMiddleClicked(Tab *tab, const MouseEvent &event)
 	CloseTab(*tab);
 }
 
-void TabContainerImpl::OnTabCtrlRButtonUp(POINT *pt)
+void TabContainerImpl::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 {
-	TCHITTESTINFO tcHitTest;
-	tcHitTest.pt = *pt;
-	const int tabHitIndex = TabCtrl_HitTest(m_hwnd, &tcHitTest);
+	POINT ptScreen = event.ptClient;
+	BOOL res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
 
-	if (tcHitTest.flags == TCHT_NOWHERE)
-	{
-		return;
-	}
-
-	POINT ptCopy = *pt;
-	BOOL res = ClientToScreen(m_hwnd, &ptCopy);
-
-	if (!res)
-	{
-		return;
-	}
-
-	Tab &tab = GetTabByIndex(tabHitIndex);
-
-	CreateTabContextMenu(tab, ptCopy);
+	CreateTabContextMenu(*tab, ptScreen);
 }
 
 void TabContainerImpl::CreateTabContextMenu(Tab &tab, const POINT &pt)
@@ -680,6 +657,8 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		std::bind_front(&TabContainerImpl::OnTabDoubleClicked, this, &tab));
 	tabItem->SetMiddleClickedCallback(
 		std::bind_front(&TabContainerImpl::OnTabMiddleClicked, this, &tab));
+	tabItem->SetRightClickedCallback(
+		std::bind_front(&TabContainerImpl::OnTabRightClicked, this, &tab));
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing

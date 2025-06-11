@@ -31,9 +31,11 @@ public:
 
 	void SetDoubleClickedCallback(MouseEventCallback doubleClickedCallback);
 	void SetMiddleClickedCallback(MouseEventCallback middleClickedCallback);
+	void SetRightClickedCallback(MouseEventCallback rightClickedCallback);
 
 	void OnDoubleClicked(const MouseEvent &event);
 	void OnMiddleClicked(const MouseEvent &event);
+	void OnRightClicked(const MouseEvent &event);
 
 protected:
 	void NotifyParentOfUpdate() const;
@@ -43,6 +45,7 @@ private:
 
 	MouseEventCallback m_doubleClickedCallback;
 	MouseEventCallback m_middleClickedCallback;
+	MouseEventCallback m_rightClickedCallback;
 };
 
 // Designed to act as a base class for a tab control. Doesn't actually add any tabs on its own.
@@ -154,6 +157,7 @@ private:
 	void OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown);
 	void OnMiddleButtonDown(const POINT &pt, UINT keysDown);
 	void OnMiddleButtonUp(const POINT &pt, UINT keysDown);
+	void OnRightButtonUp(const POINT &pt, UINT keysDown);
 	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;

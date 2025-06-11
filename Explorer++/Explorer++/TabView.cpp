@@ -27,6 +27,11 @@ void TabViewItem::SetMiddleClickedCallback(MouseEventCallback middleClickedCallb
 	m_middleClickedCallback = middleClickedCallback;
 }
 
+void TabViewItem::SetRightClickedCallback(MouseEventCallback rightClickedCallback)
+{
+	m_rightClickedCallback = rightClickedCallback;
+}
+
 void TabViewItem::OnDoubleClicked(const MouseEvent &event)
 {
 	if (m_doubleClickedCallback)
@@ -40,6 +45,14 @@ void TabViewItem::OnMiddleClicked(const MouseEvent &event)
 	if (m_middleClickedCallback)
 	{
 		m_middleClickedCallback(event);
+	}
+}
+
+void TabViewItem::OnRightClicked(const MouseEvent &event)
+{
+	if (m_rightClickedCallback)
+	{
+		m_rightClickedCallback(event);
 	}
 }
 
@@ -233,6 +246,10 @@ LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_MBUTTONUP:
 		OnMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) }, static_cast<UINT>(wParam));
+		break;
+
+	case WM_RBUTTONUP:
+		OnRightButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) }, static_cast<UINT>(wParam));
 		break;
 
 	case WM_NCDESTROY:
@@ -463,6 +480,20 @@ void TabView::OnMiddleButtonUp(const POINT &pt, UINT keysDown)
 
 	auto *tabItem = GetTabAtIndex(*index);
 	tabItem->OnMiddleClicked(
+		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+}
+
+void TabView::OnRightButtonUp(const POINT &pt, UINT keysDown)
+{
+	auto index = MaybeGetIndexOfTabAtPoint(pt);
+
+	if (!index)
+	{
+		return;
+	}
+
+	auto *tabItem = GetTabAtIndex(*index);
+	tabItem->OnRightClicked(
 		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 }
 

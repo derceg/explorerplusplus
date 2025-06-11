@@ -160,8 +160,8 @@ private:
 
 	void OnTabDoubleClicked(Tab *tab, const MouseEvent &event);
 	void OnTabMiddleClicked(Tab *tab, const MouseEvent &event);
+	void OnTabRightClicked(Tab *tab, const MouseEvent &event);
 
-	void OnTabCtrlRButtonUp(POINT *pt);
 	void CreateTabContextMenu(Tab &tab, const POINT &pt);
 	void AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages);
 	void ProcessTabCommand(UINT uMenuID, Tab &tab);
