@@ -20,14 +20,8 @@ boost::signals2::connection TabCreated::connectObserver(sol::protected_function 
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabEvents->AddCreatedObserver(
-		[this, observer](const Tab &tab, bool selected)
-		{
-			UNREFERENCED_PARAMETER(selected);
-
-			onTabCreated(tab, observer);
-		},
-		TabEventScope::Global());
+	return m_tabEvents->AddCreatedObserver([this, observer](const Tab &tab)
+		{ onTabCreated(tab, observer); }, TabEventScope::Global());
 }
 
 void TabCreated::onTabCreated(const Tab &tab, sol::protected_function observer)

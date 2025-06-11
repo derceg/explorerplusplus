@@ -172,7 +172,7 @@ Tab *BrowserWindowFake::AddTab()
 	auto *rawTab = tab.get();
 	m_tabs.push_back(std::move(tab));
 
-	m_tabEvents->NotifyCreated(*rawTab, m_activeTabIndex == m_tabs.size());
+	m_tabEvents->NotifyCreated(*rawTab);
 
 	return rawTab;
 }

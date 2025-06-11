@@ -255,7 +255,7 @@ private:
 	/* Tabs. */
 	void InitializeTabs();
 	void MaybeUpdateTabBarVisibility();
-	void OnTabCreated(const Tab &tab, bool selected);
+	void OnTabCreated(const Tab &tab);
 	void OnTabSelected(const Tab &tab);
 	void ShowTabBar();
 	void HideTabBar();

@@ -61,10 +61,8 @@ Tab *TabList::ExtractTab(const TabData &tabData)
 	return tabData.GetMutableTab();
 }
 
-void TabList::OnTabCreated(Tab &tab, bool selected)
+void TabList::OnTabCreated(Tab &tab)
 {
-	UNREFERENCED_PARAMETER(selected);
-
 	auto [itr, didInsert] = m_tabs.insert(&tab);
 	DCHECK(didInsert);
 }

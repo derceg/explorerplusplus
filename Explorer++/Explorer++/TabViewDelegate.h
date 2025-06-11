@@ -16,4 +16,6 @@ public:
 	// for a tab changes, or a tab is removed). If the method returns true, it indicates that the
 	// specified icon should be removed from the view's image list.
 	virtual bool ShouldRemoveIcon(int iconIndex) = 0;
+
+	virtual void OnSelectionChanged() = 0;
 };

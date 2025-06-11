@@ -106,7 +106,7 @@ private:
 	>;
 	// clang-format on
 
-	void OnTabCreated(Tab &tab, bool selected);
+	void OnTabCreated(Tab &tab);
 	void OnTabSelected(const Tab &tab);
 	void OnTabRemoved(const Tab &tab);
 	static Tab *ExtractTab(const TabData &tabData);

@@ -462,15 +462,6 @@ LRESULT TabContainerImpl::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			break;
 		}
 		break;
-
-	case WM_NOTIFY:
-		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-		{
-		case TCN_SELCHANGE:
-			OnTabSelected(GetSelectedTab());
-			break;
-		}
-		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -655,16 +646,11 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	if (selected)
-	{
-		TabCtrl_SetCurSel(m_hwnd, index);
-	}
-
-	m_app->GetTabEvents()->NotifyCreated(tab, selected);
+	m_app->GetTabEvents()->NotifyCreated(tab);
 
 	if (selected)
 	{
-		OnTabSelected(tab);
+		SelectTabAtIndex(index);
 	}
 
 	tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
@@ -823,11 +809,7 @@ void TabContainerImpl::SelectAdjacentTab(BOOL bNextTab)
 
 void TabContainerImpl::SelectTabAtIndex(int index)
 {
-	CHECK(index >= 0 && index < GetNumTabs());
-
-	TabCtrl_SetCurSel(m_hwnd, index);
-
-	OnTabSelected(GetTabByIndex(index));
+	m_view->SelectTabAtIndex(index);
 }
 
 Tab &TabContainerImpl::GetSelectedTab() const
@@ -951,6 +933,11 @@ void TabContainerImpl::OnTabMoved(int fromIndex, int toIndex)
 bool TabContainerImpl::ShouldRemoveIcon(int iconIndex)
 {
 	return !m_view->GetImageListManager()->IsDefaultIcon(iconIndex);
+}
+
+void TabContainerImpl::OnSelectionChanged()
+{
+	OnTabSelected(GetSelectedTab());
 }
 
 int TabContainerImpl::GetDropTargetItem(const POINT &pt)

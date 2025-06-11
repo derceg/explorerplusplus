@@ -39,10 +39,9 @@ void Explorerplusplus::CreateTabBacking()
 		reinterpret_cast<HWND>(SendMessage(m_hTabWindowToolbar, TB_GETTOOLTIPS, 0, 0)), m_config);
 
 	m_connections.push_back(m_app->GetTabEvents()->AddCreatedObserver(
-		[this](const Tab &tab, bool selected)
+		[this](const Tab &tab)
 		{
 			UNREFERENCED_PARAMETER(tab);
-			UNREFERENCED_PARAMETER(selected);
 
 			UpdateTabToolbar();
 		},

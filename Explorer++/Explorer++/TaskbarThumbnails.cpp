@@ -105,8 +105,10 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 
 	for (const auto &tab : m_tabContainerImpl->GetAllTabsInOrder())
 	{
-		CreateTabProxy(tab.get(), m_tabContainerImpl->IsTabSelected(tab.get()));
+		CreateTabProxy(tab.get());
 	}
+
+	OnTabSelectionChanged(m_tabContainerImpl->GetSelectedTab());
 
 	SetUpObservers();
 }
@@ -183,7 +185,7 @@ References:
 http://dotnet.dzone.com/news/windows-7-taskbar-tabbed
 http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exercise-Experiment-with-the-New-Windows-7-Taskbar-Features/
 */
-void TaskbarThumbnails::CreateTabProxy(const Tab &tab, bool selected)
+void TaskbarThumbnails::CreateTabProxy(const Tab &tab)
 {
 	static int proxyCount = 0;
 	std::wstring proxyClassName = std::format(L"Explorer++TabProxy{}", proxyCount++);
@@ -210,7 +212,7 @@ void TaskbarThumbnails::CreateTabProxy(const Tab &tab, bool selected)
 	BOOL bValue = TRUE;
 	DwmSetWindowAttribute(hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue, sizeof(BOOL));
 	DwmSetWindowAttribute(hTabProxy, DWMWA_HAS_ICONIC_BITMAP, &bValue, sizeof(BOOL));
-	RegisterTab(hTabProxy, L"", selected);
+	RegisterTab(hTabProxy, L"");
 
 	TabProxyInfo tpi;
 	tpi.hProxy = hTabProxy;
@@ -264,19 +266,13 @@ void TaskbarThumbnails::InvalidateTaskbarThumbnailBitmap(const Tab &tab)
 	}
 }
 
-void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive)
+void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName)
 {
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */
 	m_taskbarList->RegisterTab(hTabProxy, m_browser->GetHWND());
 	m_taskbarList->SetTabOrder(hTabProxy, nullptr);
-
 	m_taskbarList->SetThumbnailTooltip(hTabProxy, szDisplayName);
-
-	if (bTabActive)
-	{
-		m_taskbarList->SetTabActive(hTabProxy, m_browser->GetHWND(), 0);
-	}
 }
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd, UINT Msg, WPARAM wParam,

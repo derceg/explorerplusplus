@@ -31,7 +31,7 @@ using TabEventScope = EventScope<EventScopeMinimumLevel::Browser>;
 class TabEvents : private boost::noncopyable
 {
 public:
-	using CreatedSignal = boost::signals2::signal<void(Tab &tab, bool selected)>;
+	using CreatedSignal = boost::signals2::signal<void(Tab &tab)>;
 	using SelectedSignal = boost::signals2::signal<void(const Tab &tab)>;
 	using MovedSignal = boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)>;
 	using PreRemovalSignal = boost::signals2::signal<void(const Tab &tab, int index)>;
@@ -66,7 +66,7 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back,
 		SlotGroup slotGroup = SlotGroup::Default);
 
-	void NotifyCreated(Tab &tab, bool selected);
+	void NotifyCreated(Tab &tab);
 	void NotifySelected(const Tab &tab);
 	void NotifyMoved(const Tab &tab, int fromIndex, int toIndex);
 	void NotifyPreRemoval(const Tab &tab, int index);

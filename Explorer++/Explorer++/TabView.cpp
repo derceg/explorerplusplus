@@ -212,6 +212,16 @@ TabViewItem *TabView::GetTabAtIndex(int index) const
 	return reinterpret_cast<TabViewItem *>(tcItem.lParam);
 }
 
+void TabView::SelectTabAtIndex(int index)
+{
+	CHECK(IsValidIndex(index));
+
+	int previousTab = TabCtrl_SetCurSel(m_hwnd, index);
+	CHECK_NE(previousTab, -1);
+
+	OnSelectionChanged();
+}
+
 LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -271,6 +281,10 @@ LRESULT TabView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		{
 		case TTN_GETDISPINFO:
 			OnGetDispInfo(reinterpret_cast<NMTTDISPINFO *>(lParam));
+			break;
+
+		case TCN_SELCHANGE:
+			OnSelectionChanged();
 			break;
 		}
 		break;
@@ -521,6 +535,14 @@ void TabView::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 	static wchar_t tabToolTip[512];
 	StringCchCopy(tabToolTip, std::size(tabToolTip), tooltip.c_str());
 	dispInfo->lpszText = tabToolTip;
+}
+
+void TabView::OnSelectionChanged()
+{
+	if (m_delegate)
+	{
+		m_delegate->OnSelectionChanged();
+	}
 }
 
 int TabView::GetSelectedIndex() const

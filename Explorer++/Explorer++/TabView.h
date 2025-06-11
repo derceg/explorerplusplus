@@ -66,6 +66,7 @@ public:
 	void UpdateTab(const TabViewItem *tabItem);
 	void RemoveTab(int index);
 	TabViewItem *GetTabAtIndex(int index) const;
+	void SelectTabAtIndex(int index);
 	int GetNumTabs() const;
 
 	void SetImageList(HIMAGELIST imageList);
@@ -160,6 +161,7 @@ private:
 	void OnMiddleButtonUp(const POINT &pt, UINT keysDown);
 	void OnRightButtonUp(const POINT &pt, UINT keysDown);
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
+	void OnSelectionChanged();
 	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;

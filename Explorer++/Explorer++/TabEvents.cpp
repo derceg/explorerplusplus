@@ -49,9 +49,9 @@ boost::signals2::connection TabEvents::AddUpdatedObserver(const UpdatedSignal::s
 		MakeFilteredObserver(observer, scope), position);
 }
 
-void TabEvents::NotifyCreated(Tab &tab, bool selected)
+void TabEvents::NotifyCreated(Tab &tab)
 {
-	m_createdSignal(tab, selected);
+	m_createdSignal(tab);
 }
 
 void TabEvents::NotifySelected(const Tab &tab)

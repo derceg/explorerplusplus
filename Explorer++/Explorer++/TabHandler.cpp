@@ -77,10 +77,8 @@ void Explorerplusplus::MaybeUpdateTabBarVisibility()
 	}
 }
 
-void Explorerplusplus::OnTabCreated(const Tab &tab, bool selected)
+void Explorerplusplus::OnTabCreated(const Tab &tab)
 {
-	UNREFERENCED_PARAMETER(selected);
-
 	/* TODO: This subclass needs to be removed. */
 	SetWindowSubclass(tab.GetShellBrowserImpl()->GetListView(), ListViewProcStub, 0,
 		reinterpret_cast<DWORD_PTR>(this));

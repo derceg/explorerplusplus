@@ -183,6 +183,7 @@ private:
 	// TabViewDelegate
 	void OnTabMoved(int fromIndex, int toIndex) override;
 	bool ShouldRemoveIcon(int iconIndex) override;
+	void OnSelectionChanged() override;
 
 	// ShellDropTargetWindow
 	int GetDropTargetItem(const POINT &pt) override;

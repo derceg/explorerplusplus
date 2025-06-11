@@ -26,7 +26,7 @@ protected:
 	BrowserWindowFake *const m_browser2;
 	Tab *const m_tab2;
 
-	StrictMock<MockFunction<void(const Tab &tab, bool selected)>> m_tabCreatedCallback;
+	StrictMock<MockFunction<void(const Tab &tab)>> m_tabCreatedCallback;
 	StrictMock<MockFunction<void(const Tab &tab, Tab::PropertyType propertyType)>>
 		m_tabUpdatedCallback;
 	StrictMock<MockFunction<void(const Tab &tab)>> m_tabSelectedCallback;
@@ -40,8 +40,8 @@ TEST_F(TabEventsTest, Signals)
 	InSequence seq;
 
 	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(), TabEventScope::Global());
-	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(*m_tab1), true));
-	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(*m_tab2), false));
+	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(*m_tab1)));
+	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(*m_tab2)));
 
 	m_tabEvents.AddUpdatedObserver(m_tabUpdatedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(m_tabUpdatedCallback, Call(Ref(*m_tab1), Tab::PropertyType::Name));
@@ -61,8 +61,8 @@ TEST_F(TabEventsTest, Signals)
 	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(*m_tab2)));
 	EXPECT_CALL(m_tabRemovedCallback, Call(Ref(*m_tab1)));
 
-	m_tabEvents.NotifyCreated(*m_tab1, true);
-	m_tabEvents.NotifyCreated(*m_tab2, false);
+	m_tabEvents.NotifyCreated(*m_tab1);
+	m_tabEvents.NotifyCreated(*m_tab2);
 	m_tabEvents.NotifyUpdated(*m_tab1, Tab::PropertyType::Name);
 	m_tabEvents.NotifyUpdated(*m_tab2, Tab::PropertyType::LockState);
 	m_tabEvents.NotifySelected(*m_tab1);
@@ -78,8 +78,8 @@ TEST_F(TabEventsTest, SignalsFilteredByBrowser)
 	// only when m_tab1 is created.
 	m_tabEvents.AddCreatedObserver(m_tabCreatedCallback.AsStdFunction(),
 		TabEventScope::ForBrowser(*m_browser1));
-	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(*m_tab1), false));
+	EXPECT_CALL(m_tabCreatedCallback, Call(Ref(*m_tab1)));
 
-	m_tabEvents.NotifyCreated(*m_tab1, false);
-	m_tabEvents.NotifyCreated(*m_tab2, false);
+	m_tabEvents.NotifyCreated(*m_tab1);
+	m_tabEvents.NotifyCreated(*m_tab2);
 }

@@ -43,8 +43,8 @@ private:
 	void SetUpObservers();
 	void SetupJumplistTasks();
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
-	void CreateTabProxy(const Tab &tab, bool selected);
-	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
+	void CreateTabProxy(const Tab &tab);
+	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName);
 	void RemoveTabProxy(const Tab &tab);
 	void DestroyTabProxy(TabProxyInfo &tabProxy);
 	void OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, int maxWidth, int maxHeight);
