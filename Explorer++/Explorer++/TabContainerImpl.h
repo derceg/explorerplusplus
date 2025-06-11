@@ -175,7 +175,6 @@ private:
 	void OnCloseTabsToRight(int index);
 
 	void ShowBackgroundContextMenu(const POINT &ptClient);
-	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
 	void OnTabSelected(const Tab &tab);
 

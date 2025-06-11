@@ -265,6 +265,15 @@ LRESULT TabView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 	switch (msg)
 	{
 		HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
+
+	case WM_NOTIFY:
+		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+		{
+		case TTN_GETDISPINFO:
+			OnGetDispInfo(reinterpret_cast<NMTTDISPINFO *>(lParam));
+			break;
+		}
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -495,6 +504,23 @@ void TabView::OnRightButtonUp(const POINT &pt, UINT keysDown)
 	auto *tabItem = GetTabAtIndex(*index);
 	tabItem->OnRightClicked(
 		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+}
+
+void TabView::OnGetDispInfo(NMTTDISPINFO *dispInfo)
+{
+	HWND toolTipControl = TabCtrl_GetToolTips(m_hwnd);
+
+	if (!toolTipControl || dispInfo->hdr.hwndFrom != toolTipControl)
+	{
+		return;
+	}
+
+	auto *tabItem = GetTabAtIndex(static_cast<int>(dispInfo->hdr.idFrom));
+	auto tooltip = tabItem->GetTooltipText();
+
+	static wchar_t tabToolTip[512];
+	StringCchCopy(tabToolTip, std::size(tabToolTip), tooltip.c_str());
+	dispInfo->lpszText = tabToolTip;
 }
 
 int TabView::GetSelectedIndex() const

@@ -81,6 +81,12 @@ public:
 		return name;
 	}
 
+	std::wstring GetTooltipText() const override
+	{
+		const auto &pidlDirectory = m_tab->GetShellBrowser()->GetDirectory();
+		return GetFolderPathForDisplayWithFallback(pidlDirectory.Raw());
+	}
+
 	std::optional<int> GetIconIndex() const override
 	{
 		if (m_tab->GetLockState() == Tab::LockState::Locked
@@ -460,10 +466,6 @@ LRESULT TabContainerImpl::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	case WM_NOTIFY:
 		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 		{
-		case TTN_GETDISPINFO:
-			OnGetDispInfo(reinterpret_cast<NMTTDISPINFO *>(lParam));
-			break;
-
 		case TCN_SELCHANGE:
 			OnTabSelected(GetSelectedTab());
 			break;
@@ -484,32 +486,6 @@ void TabContainerImpl::ShowBackgroundContextMenu(const POINT &ptClient)
 		m_app->GetTabRestorer(), m_bookmarkTree, m_browser, m_coreInterface,
 		m_app->GetResourceLoader());
 	popupMenu.Show(m_hwnd, ptScreen);
-}
-
-void TabContainerImpl::OnGetDispInfo(NMTTDISPINFO *dispInfo)
-{
-	HWND toolTipControl = TabCtrl_GetToolTips(m_hwnd);
-
-	if (dispInfo->hdr.hwndFrom != toolTipControl)
-	{
-		return;
-	}
-
-	static TCHAR tabToolTip[512];
-
-	const Tab &tab = GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
-
-	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
-	auto path = GetFolderPathForDisplay(pidlDirectory.get());
-
-	if (!path)
-	{
-		return;
-	}
-
-	StringCchCopy(tabToolTip, std::size(tabToolTip), path->c_str());
-
-	dispInfo->lpszText = tabToolTip;
 }
 
 void TabContainerImpl::OnTabSelected(const Tab &tab)

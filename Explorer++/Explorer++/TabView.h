@@ -27,6 +27,7 @@ public:
 	void SetParent(TabView *parent);
 
 	virtual std::wstring GetText() const = 0;
+	virtual std::wstring GetTooltipText() const = 0;
 	virtual std::optional<int> GetIconIndex() const = 0;
 
 	void SetDoubleClickedCallback(MouseEventCallback doubleClickedCallback);
@@ -158,6 +159,7 @@ private:
 	void OnMiddleButtonDown(const POINT &pt, UINT keysDown);
 	void OnMiddleButtonUp(const POINT &pt, UINT keysDown);
 	void OnRightButtonUp(const POINT &pt, UINT keysDown);
+	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;

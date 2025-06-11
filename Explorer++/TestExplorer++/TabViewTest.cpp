@@ -29,6 +29,11 @@ public:
 		return m_title;
 	}
 
+	std::wstring GetTooltipText() const override
+	{
+		return L"";
+	}
+
 	std::optional<int> GetIconIndex() const override
 	{
 		return std::nullopt;
