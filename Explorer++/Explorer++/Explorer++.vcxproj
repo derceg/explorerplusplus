@@ -1536,6 +1536,7 @@
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
+    <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
     <ClInclude Include="SelectionType.h" />

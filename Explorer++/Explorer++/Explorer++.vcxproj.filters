@@ -1791,6 +1791,9 @@
     <ClInclude Include="MainTabViewImageListManager.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
+    <ClInclude Include="MouseEvent.h">
+      <Filter>Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

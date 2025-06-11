@@ -5,9 +5,11 @@
 #pragma once
 
 #include "MainFontSetter.h"
+#include "MouseEvent.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
 #include <CommCtrl.h>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -21,6 +23,8 @@ class WindowSubclass;
 class TabViewItem
 {
 public:
+	using DoubleClickedCallback = std::function<void(const MouseEvent &event)>;
+
 	virtual ~TabViewItem() = default;
 
 	void SetParent(TabView *parent);
@@ -28,11 +32,17 @@ public:
 	virtual std::wstring GetText() const = 0;
 	virtual std::optional<int> GetIconIndex() const = 0;
 
+	void SetDoubleClickedCallback(DoubleClickedCallback doubleClickedCallback);
+
+	void OnDoubleClicked(const MouseEvent &event);
+
 protected:
 	void NotifyParentOfUpdate() const;
 
 private:
 	TabView *m_parent = nullptr;
+
+	DoubleClickedCallback m_doubleClickedCallback;
 };
 
 // Designed to act as a base class for a tab control. Doesn't actually add any tabs on its own.
@@ -141,6 +151,7 @@ private:
 	void OnMouseMove(const POINT &pt);
 	TabDragBounds GetTabBoundsForDrag(int tabIndex, TabDragAnchor anchor) const;
 	void OnCaptureChanged(HWND target);
+	void OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown);
 	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;

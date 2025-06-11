@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MainFontSetter.h"
+#include "MouseEvent.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <chrono>
@@ -12,20 +13,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-
-struct MouseEvent
-{
-	MouseEvent(POINT ptClient, bool shiftKey, bool ctrlKey) :
-		ptClient(ptClient),
-		shiftKey(shiftKey),
-		ctrlKey(ctrlKey)
-	{
-	}
-
-	POINT ptClient;
-	bool shiftKey;
-	bool ctrlKey;
-};
 
 struct Config;
 class ToolbarView;

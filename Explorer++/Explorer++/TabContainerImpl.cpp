@@ -220,14 +220,6 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	switch (uMsg)
 	{
-	case WM_LBUTTONDBLCLK:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnLButtonDoubleClick(pt);
-	}
-	break;
-
 	case WM_MBUTTONUP:
 	{
 		POINT pt;
@@ -254,16 +246,13 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void TabContainerImpl::OnLButtonDoubleClick(const POINT &pt)
+void TabContainerImpl::OnTabDoubleClicked(Tab *tab, const MouseEvent &event)
 {
-	TCHITTESTINFO info;
-	info.pt = pt;
-	const int index = TabCtrl_HitTest(m_hwnd, &info);
+	UNREFERENCED_PARAMETER(event);
 
-	if (info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
+	if (m_config->doubleClickTabClose)
 	{
-		const Tab &tab = GetTabByIndex(index);
-		CloseTab(tab);
+		CloseTab(*tab);
 	}
 }
 
@@ -701,12 +690,15 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		}
 	}
 
+	auto tabItem = std::make_unique<MainTabViewItem>(&tab, m_app, &m_iconFetcher, m_cachedIcons,
+		m_view->GetImageListManager());
+	tabItem->SetDoubleClickedCallback(
+		std::bind_front(&TabContainerImpl::OnTabDoubleClicked, this, &tab));
+
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	index = m_view->AddTab(std::make_unique<MainTabViewItem>(&tab, m_app, &m_iconFetcher,
-							   m_cachedIcons, m_view->GetImageListManager()),
-		index);
+	index = m_view->AddTab(std::move(tabItem), index);
 
 	bool selected = false;
 

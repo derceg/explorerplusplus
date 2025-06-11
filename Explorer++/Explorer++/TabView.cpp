@@ -16,6 +16,19 @@ void TabViewItem::SetParent(TabView *parent)
 	m_parent = parent;
 }
 
+void TabViewItem::SetDoubleClickedCallback(DoubleClickedCallback doubleClickedCallback)
+{
+	m_doubleClickedCallback = doubleClickedCallback;
+}
+
+void TabViewItem::OnDoubleClicked(const MouseEvent &event)
+{
+	if (m_doubleClickedCallback)
+	{
+		m_doubleClickedCallback(event);
+	}
+}
+
 void TabViewItem::NotifyParentOfUpdate() const
 {
 	if (m_parent)
@@ -192,6 +205,11 @@ LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_CAPTURECHANGED:
 		OnCaptureChanged(reinterpret_cast<HWND>(lParam));
+		break;
+
+	case WM_LBUTTONDBLCLK:
+		OnLeftButtonDoubleClick({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
+			static_cast<UINT>(wParam));
 		break;
 
 	case WM_NCDESTROY:
@@ -371,6 +389,20 @@ void TabView::OnCaptureChanged(HWND target)
 	{
 		m_tabDragState.reset();
 	}
+}
+
+void TabView::OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown)
+{
+	auto index = MaybeGetIndexOfTabAtPoint(pt);
+
+	if (!index)
+	{
+		return;
+	}
+
+	auto *tabItem = GetTabAtIndex(*index);
+	tabItem->OnDoubleClicked(
+		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 }
 
 int TabView::GetSelectedIndex() const

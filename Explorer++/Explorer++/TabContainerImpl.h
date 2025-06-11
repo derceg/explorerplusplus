@@ -5,6 +5,7 @@
 #pragma once
 
 #include "IconFetcherImpl.h"
+#include "MouseEvent.h"
 #include "OneShotTimer.h"
 #include "OneShotTimerManager.h"
 #include "ShellBrowser/FolderSettings.h"
@@ -157,8 +158,7 @@ private:
 
 	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
-	void OnLButtonDoubleClick(const POINT &pt);
-
+	void OnTabDoubleClicked(Tab *tab, const MouseEvent &event);
 	void OnTabCtrlMButtonUp(POINT *pt);
 
 	void OnTabCtrlRButtonUp(POINT *pt);
