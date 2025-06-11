@@ -23,7 +23,7 @@
 class DrivesToolbarButton : public ToolbarButton
 {
 public:
-	DrivesToolbarButton(const std::wstring &path, ClickedCallback clickedCallback) :
+	DrivesToolbarButton(const std::wstring &path, MouseEventCallback clickedCallback) :
 		ToolbarButton(clickedCallback),
 		m_path(path)
 	{

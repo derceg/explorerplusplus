@@ -10,7 +10,8 @@
 #include <glog/logging.h>
 #include <wil/common.h>
 
-ToolbarButton::ToolbarButton(ClickedCallback clickedCallback) : m_clickedCallback(clickedCallback)
+ToolbarButton::ToolbarButton(MouseEventCallback clickedCallback) :
+	m_clickedCallback(clickedCallback)
 {
 }
 
@@ -24,12 +25,12 @@ bool ToolbarButton::ShouldSuppressClick() const
 	return false;
 }
 
-void ToolbarButton::SetRightClickedCallback(RightClickedCallback rightClickedCallback)
+void ToolbarButton::SetRightClickedCallback(MouseEventCallback rightClickedCallback)
 {
 	m_rightClickedCallback = rightClickedCallback;
 }
 
-void ToolbarButton::SetMiddleClickedCallback(MiddleClickedCallback middleClickedCallback)
+void ToolbarButton::SetMiddleClickedCallback(MouseEventCallback middleClickedCallback)
 {
 	m_middleClickedCallback = middleClickedCallback;
 }
@@ -93,7 +94,7 @@ void ToolbarButton::NotifyParentOfUpdate() const
 	}
 }
 
-ToolbarMenuButton::ToolbarMenuButton(ClickedCallback clickedCallback) :
+ToolbarMenuButton::ToolbarMenuButton(MouseEventCallback clickedCallback) :
 	ToolbarButton(std::bind_front(&ToolbarMenuButton::OnMenuButtonClicked, this)),
 	m_clickedCallback(clickedCallback)
 {

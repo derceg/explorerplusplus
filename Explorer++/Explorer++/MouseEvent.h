@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 struct MouseEvent
 {
 	MouseEvent(POINT ptClient, bool shiftKey, bool ctrlKey) :
@@ -17,3 +19,5 @@ struct MouseEvent
 	const bool shiftKey;
 	const bool ctrlKey;
 };
+
+using MouseEventCallback = std::function<void(const MouseEvent &event)>;

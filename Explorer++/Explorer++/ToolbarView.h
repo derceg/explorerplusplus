@@ -20,12 +20,9 @@ class ToolbarView;
 class ToolbarButton
 {
 public:
-	using ClickedCallback = std::function<void(const MouseEvent &event)>;
-	using RightClickedCallback = std::function<void(const MouseEvent &event)>;
-	using MiddleClickedCallback = std::function<void(const MouseEvent &event)>;
 	using DragStartedCallback = std::function<void()>;
 
-	ToolbarButton(ClickedCallback clickedCallback);
+	ToolbarButton(MouseEventCallback clickedCallback);
 
 	virtual ~ToolbarButton() = default;
 
@@ -45,8 +42,8 @@ public:
 	void SetChecked(bool checked);
 	bool GetChecked() const;
 
-	void SetRightClickedCallback(RightClickedCallback rightClickedCallback);
-	void SetMiddleClickedCallback(MiddleClickedCallback middleClickedCallback);
+	void SetRightClickedCallback(MouseEventCallback rightClickedCallback);
+	void SetMiddleClickedCallback(MouseEventCallback middleClickedCallback);
 	void SetDragStartedCallback(DragStartedCallback dragStartedCallback);
 
 	void OnClicked(const MouseEvent &event);
@@ -60,9 +57,9 @@ protected:
 private:
 	ToolbarView *m_parent = nullptr;
 
-	ClickedCallback m_clickedCallback;
-	RightClickedCallback m_rightClickedCallback;
-	MiddleClickedCallback m_middleClickedCallback;
+	MouseEventCallback m_clickedCallback;
+	MouseEventCallback m_rightClickedCallback;
+	MouseEventCallback m_middleClickedCallback;
 	DragStartedCallback m_dragStartedCallback;
 
 	bool m_checked = false;
@@ -82,7 +79,7 @@ private:
 class ToolbarMenuButton : public ToolbarButton
 {
 public:
-	ToolbarMenuButton(ClickedCallback clickedCallback);
+	ToolbarMenuButton(MouseEventCallback clickedCallback);
 
 	bool ShouldSuppressClick() const override;
 
@@ -91,7 +88,7 @@ private:
 
 	void OnMenuButtonClicked(const MouseEvent &event);
 
-	ClickedCallback m_clickedCallback;
+	MouseEventCallback m_clickedCallback;
 	std::chrono::steady_clock::time_point m_menuLastClosedTime;
 };
 

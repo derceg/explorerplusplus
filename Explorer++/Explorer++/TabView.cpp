@@ -10,15 +10,21 @@
 #include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
+#include <wil/resource.h>
 
 void TabViewItem::SetParent(TabView *parent)
 {
 	m_parent = parent;
 }
 
-void TabViewItem::SetDoubleClickedCallback(DoubleClickedCallback doubleClickedCallback)
+void TabViewItem::SetDoubleClickedCallback(MouseEventCallback doubleClickedCallback)
 {
 	m_doubleClickedCallback = doubleClickedCallback;
+}
+
+void TabViewItem::SetMiddleClickedCallback(MouseEventCallback middleClickedCallback)
+{
+	m_middleClickedCallback = middleClickedCallback;
 }
 
 void TabViewItem::OnDoubleClicked(const MouseEvent &event)
@@ -26,6 +32,14 @@ void TabViewItem::OnDoubleClicked(const MouseEvent &event)
 	if (m_doubleClickedCallback)
 	{
 		m_doubleClickedCallback(event);
+	}
+}
+
+void TabViewItem::OnMiddleClicked(const MouseEvent &event)
+{
+	if (m_middleClickedCallback)
+	{
+		m_middleClickedCallback(event);
 	}
 }
 
@@ -212,6 +226,15 @@ LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			static_cast<UINT>(wParam));
 		break;
 
+	case WM_MBUTTONDOWN:
+		OnMiddleButtonDown({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
+			static_cast<UINT>(wParam));
+		break;
+
+	case WM_MBUTTONUP:
+		OnMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) }, static_cast<UINT>(wParam));
+		break;
+
 	case WM_NCDESTROY:
 		OnNcDestroy();
 		return 0;
@@ -388,6 +411,7 @@ void TabView::OnCaptureChanged(HWND target)
 	if (target != m_hwnd)
 	{
 		m_tabDragState.reset();
+		m_middleClickItemIndex.reset();
 	}
 }
 
@@ -402,6 +426,43 @@ void TabView::OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown)
 
 	auto *tabItem = GetTabAtIndex(*index);
 	tabItem->OnDoubleClicked(
+		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+}
+
+void TabView::OnMiddleButtonDown(const POINT &pt, UINT keysDown)
+{
+	UNREFERENCED_PARAMETER(keysDown);
+
+	auto index = MaybeGetIndexOfTabAtPoint(pt);
+
+	if (!index)
+	{
+		return;
+	}
+
+	SetCapture(m_hwnd);
+
+	m_middleClickItemIndex = *index;
+}
+
+void TabView::OnMiddleButtonUp(const POINT &pt, UINT keysDown)
+{
+	if (!m_middleClickItemIndex)
+	{
+		return;
+	}
+
+	auto releaseCapture = wil::scope_exit([] { ReleaseCapture(); });
+
+	auto index = MaybeGetIndexOfTabAtPoint(pt);
+
+	if (!index || *index != *m_middleClickItemIndex)
+	{
+		return;
+	}
+
+	auto *tabItem = GetTabAtIndex(*index);
+	tabItem->OnMiddleClicked(
 		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 }
 

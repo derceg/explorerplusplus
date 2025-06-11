@@ -159,7 +159,7 @@ private:
 	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
 	void OnTabDoubleClicked(Tab *tab, const MouseEvent &event);
-	void OnTabCtrlMButtonUp(POINT *pt);
+	void OnTabMiddleClicked(Tab *tab, const MouseEvent &event);
 
 	void OnTabCtrlRButtonUp(POINT *pt);
 	void CreateTabContextMenu(Tab &tab, const POINT &pt);

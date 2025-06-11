@@ -220,14 +220,6 @@ LRESULT TabContainerImpl::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	switch (uMsg)
 	{
-	case WM_MBUTTONUP:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnTabCtrlMButtonUp(&pt);
-	}
-	break;
-
 	case WM_RBUTTONUP:
 	{
 		POINT pt;
@@ -256,19 +248,11 @@ void TabContainerImpl::OnTabDoubleClicked(Tab *tab, const MouseEvent &event)
 	}
 }
 
-void TabContainerImpl::OnTabCtrlMButtonUp(POINT *pt)
+void TabContainerImpl::OnTabMiddleClicked(Tab *tab, const MouseEvent &event)
 {
-	TCHITTESTINFO htInfo;
-	htInfo.pt = *pt;
+	UNREFERENCED_PARAMETER(event);
 
-	/* Find the tab that the click occurred over. */
-	int iTabHit = TabCtrl_HitTest(m_hwnd, &htInfo);
-
-	if (iTabHit != -1)
-	{
-		const Tab &tab = GetTabByIndex(iTabHit);
-		CloseTab(tab);
-	}
+	CloseTab(*tab);
 }
 
 void TabContainerImpl::OnTabCtrlRButtonUp(POINT *pt)
@@ -694,6 +678,8 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		m_view->GetImageListManager());
 	tabItem->SetDoubleClickedCallback(
 		std::bind_front(&TabContainerImpl::OnTabDoubleClicked, this, &tab));
+	tabItem->SetMiddleClickedCallback(
+		std::bind_front(&TabContainerImpl::OnTabMiddleClicked, this, &tab));
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing

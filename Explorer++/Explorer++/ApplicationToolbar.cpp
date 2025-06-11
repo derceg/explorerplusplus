@@ -25,7 +25,7 @@ using namespace ApplicationHelper;
 class ApplicationToolbarButton : public ToolbarButton
 {
 public:
-	ApplicationToolbarButton(const Application *application, ClickedCallback clickedCallback) :
+	ApplicationToolbarButton(const Application *application, MouseEventCallback clickedCallback) :
 		ToolbarButton(clickedCallback),
 		m_application(application)
 	{

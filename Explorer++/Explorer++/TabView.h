@@ -9,7 +9,6 @@
 #include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
 #include <CommCtrl.h>
-#include <functional>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -23,8 +22,6 @@ class WindowSubclass;
 class TabViewItem
 {
 public:
-	using DoubleClickedCallback = std::function<void(const MouseEvent &event)>;
-
 	virtual ~TabViewItem() = default;
 
 	void SetParent(TabView *parent);
@@ -32,9 +29,11 @@ public:
 	virtual std::wstring GetText() const = 0;
 	virtual std::optional<int> GetIconIndex() const = 0;
 
-	void SetDoubleClickedCallback(DoubleClickedCallback doubleClickedCallback);
+	void SetDoubleClickedCallback(MouseEventCallback doubleClickedCallback);
+	void SetMiddleClickedCallback(MouseEventCallback middleClickedCallback);
 
 	void OnDoubleClicked(const MouseEvent &event);
+	void OnMiddleClicked(const MouseEvent &event);
 
 protected:
 	void NotifyParentOfUpdate() const;
@@ -42,7 +41,8 @@ protected:
 private:
 	TabView *m_parent = nullptr;
 
-	DoubleClickedCallback m_doubleClickedCallback;
+	MouseEventCallback m_doubleClickedCallback;
+	MouseEventCallback m_middleClickedCallback;
 };
 
 // Designed to act as a base class for a tab control. Doesn't actually add any tabs on its own.
@@ -152,6 +152,8 @@ private:
 	TabDragBounds GetTabBoundsForDrag(int tabIndex, TabDragAnchor anchor) const;
 	void OnCaptureChanged(HWND target);
 	void OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown);
+	void OnMiddleButtonDown(const POINT &pt, UINT keysDown);
+	void OnMiddleButtonUp(const POINT &pt, UINT keysDown);
 	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;
@@ -168,4 +170,8 @@ private:
 
 	// A value will only be assigned here whilst a tab is being dragged.
 	std::optional<TabDragState> m_tabDragState;
+
+	// This will only be set in between the point where the middle mouse button is pressed and the
+	// point where the button is released.
+	std::optional<int> m_middleClickItemIndex;
 };

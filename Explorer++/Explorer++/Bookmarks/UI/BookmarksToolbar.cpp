@@ -27,7 +27,7 @@ class BookmarksToolbarBookmarkButton : public ToolbarButton
 {
 public:
 	BookmarksToolbarBookmarkButton(const BookmarkItem *bookmarkItem,
-		BookmarkIconManager *bookmarkIconManager, ClickedCallback clickedCallback) :
+		BookmarkIconManager *bookmarkIconManager, MouseEventCallback clickedCallback) :
 		ToolbarButton(clickedCallback),
 		m_bookmarkItem(bookmarkItem),
 		m_bookmarkIconManager(bookmarkIconManager),
@@ -67,6 +67,12 @@ public:
 		return *m_iconIndex;
 	}
 
+	void InvalidateCachedIcon()
+	{
+		m_iconIndex.reset();
+	}
+
+private:
 	void OnIconLoaded(int iconIndex) const
 	{
 		m_iconIndex = iconIndex;
@@ -74,12 +80,6 @@ public:
 		NotifyParentOfUpdate();
 	}
 
-	void InvalidateCachedIcon()
-	{
-		m_iconIndex.reset();
-	}
-
-private:
 	const BookmarkItem *m_bookmarkItem;
 	BookmarkIconManager *m_bookmarkIconManager;
 
@@ -93,7 +93,7 @@ class BookmarksToolbarFolderButton : public ToolbarMenuButton
 {
 public:
 	BookmarksToolbarFolderButton(const BookmarkItem *bookmarkItem,
-		BookmarkIconManager *bookmarkIconManager, ClickedCallback clickedCallback) :
+		BookmarkIconManager *bookmarkIconManager, MouseEventCallback clickedCallback) :
 		ToolbarMenuButton(clickedCallback),
 		m_bookmarkItem(bookmarkItem),
 		m_bookmarkIconManager(bookmarkIconManager)
