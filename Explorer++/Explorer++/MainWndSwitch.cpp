@@ -34,7 +34,6 @@
 #include "ShellBrowser/ViewModes.h"
 #include "SortModeMenuMappings.h"
 #include "StatusBar.h"
-#include "TabBacking.h"
 #include "TabContainerImpl.h"
 #include "TabRestorer.h"
 #include "TabRestorerMenu.h"
@@ -281,7 +280,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case MainToolbarButton::CloseTab:
-	case TABTOOLBAR_CLOSE:
 	case IDM_FILE_CLOSETAB:
 		OnCloseTab();
 		break;

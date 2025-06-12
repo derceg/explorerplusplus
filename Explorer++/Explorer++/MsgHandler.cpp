@@ -28,6 +28,7 @@
 #include "StatusBarView.h"
 #include "Storage.h"
 #include "SystemFontHelper.h"
+#include "TabBacking.h"
 #include "TabContainerImpl.h"
 #include "TaskbarThumbnails.h"
 #include "ToolbarHelper.h"
@@ -390,21 +391,11 @@ void Explorerplusplus::UpdateLayout()
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
-	SetWindowPos(m_hTabBacking, nullptr, tabBackingLeft, tabTop, tabBackingWidth, tabWindowHeight,
-		showFlags);
+	SetWindowPos(m_tabBacking->GetHWND(), nullptr, tabBackingLeft, tabTop, tabBackingWidth,
+		tabWindowHeight, showFlags);
 
 	SetWindowPos(GetActivePane()->GetTabContainerImpl()->GetHWND(), nullptr, 0, 0,
 		tabBackingWidth - 25, tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
-
-	/* Tab close button. */
-	int scaledCloseToolbarXOffset =
-		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, ToolbarHelper::CLOSE_TOOLBAR_X_OFFSET);
-
-	RECT tabToolbarRect;
-	GetClientRect(m_hTabWindowToolbar, &tabToolbarRect);
-	SetWindowPos(m_hTabWindowToolbar, nullptr,
-		tabBackingWidth - GetRectWidth(&tabToolbarRect) - scaledCloseToolbarXOffset,
-		(tabWindowHeight - GetRectHeight(&tabToolbarRect)) / 2, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 	int holderTop;
 
@@ -497,7 +488,7 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hdc);
 
-	if (hwnd == m_hTabBacking)
+	if (hwnd == m_tabBacking->GetHWND())
 	{
 		if (!m_app->GetDarkModeManager()->IsDarkModeEnabled())
 		{

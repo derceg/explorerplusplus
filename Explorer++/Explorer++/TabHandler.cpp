@@ -10,15 +10,17 @@
 #include "MainTabView.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "TabBacking.h"
 #include "TabContainerImpl.h"
 #include "TabStorage.h"
 
 void Explorerplusplus::InitializeTabs()
 {
-	/* The tab backing will hold the tab window. */
-	CreateTabBacking();
+	m_tabBacking = TabBacking::Create(m_hContainer, this, this, m_app->GetResourceLoader(),
+		m_config, m_app->GetTabEvents());
 
-	auto *mainTabView = MainTabView::Create(m_hTabBacking, m_config, m_app->GetResourceLoader());
+	auto *mainTabView =
+		MainTabView::Create(m_tabBacking->GetHWND(), m_config, m_app->GetResourceLoader());
 	m_connections.push_back(mainTabView->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); }));
 
 	auto *tabContainer = TabContainerImpl::Create(mainTabView, this, this, m_app, this,

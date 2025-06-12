@@ -59,8 +59,6 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 {
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
-	m_hTabBacking = nullptr;
-	m_hTabWindowToolbar = nullptr;
 	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
 

@@ -62,6 +62,7 @@ class Runtime;
 class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
+class TabBacking;
 class TabContainerImpl;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
@@ -247,11 +248,6 @@ private:
 	void OnTreeViewSetFileAttributes() const;
 	void OnTreeViewCopyUniversalPaths() const;
 
-	/* Tab backing. */
-	void CreateTabBacking();
-	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
-	void UpdateTabToolbar();
-
 	/* Tabs. */
 	void InitializeTabs();
 	void MaybeUpdateTabBarVisibility();
@@ -391,11 +387,6 @@ private:
 
 	BrowserCommandController m_commandController;
 
-	HWND m_hTabBacking;
-
-	HWND m_hTabWindowToolbar;
-	wil::unique_himagelist m_tabWindowToolbarImageList;
-
 	/** Internal state. **/
 	HWND m_lastActiveWindow;
 	bool m_bShowTabBar;
@@ -407,6 +398,7 @@ private:
 
 	MainWindow *m_mainWindow = nullptr;
 	AddressBar *m_addressBar = nullptr;
+	TabBacking *m_tabBacking = nullptr;
 	StatusBar *m_statusBar = nullptr;
 
 	DisplayWindow *m_displayWindow = nullptr;
@@ -431,7 +423,6 @@ private:
 	std::unique_ptr<BrowserPane> m_browserPane;
 
 	/* Tabs. */
-	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 
 	/* Theming. */

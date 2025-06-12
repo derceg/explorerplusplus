@@ -1217,6 +1217,7 @@
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
+    <ClCompile Include="TabBacking.cpp" />
     <ClCompile Include="TabView.cpp" />
     <ClCompile Include="ThemedTabControlPainter.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
@@ -1482,7 +1483,6 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release-Clang|ARM64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="Tab.cpp" />
-    <ClCompile Include="TabBackingHandler.cpp" />
     <ClCompile Include="TabContainerImpl.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
     <ClCompile Include="TabHandler.cpp" />

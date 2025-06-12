@@ -22,7 +22,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SystemFontHelper.h"
-#include "TabBacking.h"
 #include "TabContainerBackgroundContextMenu.h"
 #include "TabStorage.h"
 #include "../Helper/CachedIcons.h"
@@ -453,15 +452,6 @@ LRESULT TabContainerImpl::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		ShowBackgroundContextMenu(ptClient);
 	}
 	break;
-
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case TABTOOLBAR_CLOSE:
-			CloseTab(GetSelectedTab());
-			break;
-		}
-		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
