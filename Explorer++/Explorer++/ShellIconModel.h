@@ -14,12 +14,14 @@ class ShellIconModel
 {
 public:
 	ShellIconModel() = default;
-	ShellIconModel(ShellIconLoader *shellIconLoader, PCIDLIST_ABSOLUTE pidl);
+	ShellIconModel(ShellIconLoader *shellIconLoader, PCIDLIST_ABSOLUTE pidl,
+		ShellIconSize size = ShellIconSize::Small);
 
-	wil::unique_hbitmap GetBitmap(ShellIconSize size, ShellIconUpdateCallback updateCallback) const;
+	wil::unique_hbitmap GetBitmap(ShellIconUpdateCallback updateCallback) const;
 	bool IsEmpty() const;
 
 private:
 	ShellIconLoader *m_shellIconLoader = nullptr;
 	const PidlAbsolute m_pidl;
+	const ShellIconSize m_size = ShellIconSize::Small;
 };

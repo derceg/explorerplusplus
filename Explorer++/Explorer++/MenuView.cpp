@@ -38,7 +38,7 @@ void MenuView::AppendItem(UINT id, const std::wstring &text, const ShellIconMode
 
 	int iconCallbackId = m_iconCallbackIdCounter++;
 
-	auto bitmap = shellIcon.GetBitmap(ShellIconSize::Small,
+	auto bitmap = shellIcon.GetBitmap(
 		[id, iconCallbackId, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedIcon)
 		{
 			if (!self)
