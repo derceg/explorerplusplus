@@ -6,13 +6,19 @@
 
 #include "MenuView.h"
 
+class BrowserWindow;
+
 class MainMenuSubMenuView : public MenuView
 {
 public:
-	MainMenuSubMenuView(HMENU mainMenu, UINT subMenuItemId);
+	MainMenuSubMenuView(BrowserWindow *browser, HMENU mainMenu, UINT subMenuItemId);
 
-private:
 	HMENU GetMenu() const override;
 
+	void OnSubMenuWillShow();
+	void OnSubMenuClosed();
+
+private:
+	const HWND m_hwnd;
 	HMENU m_menu = nullptr;
 };

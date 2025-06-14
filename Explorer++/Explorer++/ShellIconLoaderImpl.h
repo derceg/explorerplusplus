@@ -15,10 +15,10 @@ public:
 	ShellIconLoaderImpl(IconFetcher *iconFetcher);
 
 	wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, ShellIconSize size,
-		ShellIconUpdateCallback updateCallback) override;
+		IconUpdateCallback updateCallback) override;
 
 private:
-	void QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl, ShellIconUpdateCallback updateCallback);
+	void QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl, IconUpdateCallback updateCallback);
 	wil::unique_hbitmap GetDefaultIcon(PCIDLIST_ABSOLUTE pidl);
 
 	IconFetcher *const m_iconFetcher;

@@ -9,6 +9,7 @@
 #include "MenuView.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
+#include "ShellIconModel.h"
 #include "TabRestorer.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
@@ -47,7 +48,7 @@ void TabRestorerMenu::RebuildMenu()
 	}
 
 	for (size_t index = 0;
-		 const auto &closedTab : m_tabRestorer->GetClosedTabs() | std::views::take(MAX_MENU_ITEMS))
+		const auto &closedTab : m_tabRestorer->GetClosedTabs() | std::views::take(MAX_MENU_ITEMS))
 	{
 		AddMenuItemForClosedTab(closedTab.get(), index == 0);
 		index++;
@@ -77,8 +78,8 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 	}
 
 	m_menuView->AppendItem(id, menuText,
-		ShellIconModel(m_shellIconLoader, currentEntry->GetPidl().Raw()), helpText,
-		acceleratorText);
+		std::make_unique<ShellIconModel>(m_shellIconLoader, currentEntry->GetPidl().Raw()),
+		helpText, acceleratorText);
 
 	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
 	DCHECK(didInsert);

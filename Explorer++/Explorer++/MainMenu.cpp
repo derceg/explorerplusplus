@@ -138,7 +138,7 @@ void Explorerplusplus::InitializeMainMenu()
 void Explorerplusplus::AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
 	std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator)
 {
-	auto view = std::make_unique<MainMenuSubMenuView>(mainMenu, subMenuItemId);
+	auto view = std::make_unique<MainMenuSubMenuView>(this, mainMenu, subMenuItemId);
 	auto menu = menuCreator(view.get());
 	m_mainMenuSubMenus.emplace_back(std::move(view), std::move(menu));
 }
@@ -321,6 +321,32 @@ void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
 	}
 }
 
+void Explorerplusplus::OnInitMenuPopup(HMENU menu)
+{
+	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
+		[menu](const auto &currentSubMenu) { return currentSubMenu.view->GetMenu() == menu; });
+
+	if (subMenu == m_mainMenuSubMenus.end())
+	{
+		return;
+	}
+
+	subMenu->view->OnSubMenuWillShow();
+}
+
+void Explorerplusplus::OnUninitMenuPopup(HMENU menu)
+{
+	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
+		[menu](const auto &currentSubMenu) { return currentSubMenu.view->GetMenu() == menu; });
+
+	if (subMenu == m_mainMenuSubMenus.end())
+	{
+		return;
+	}
+
+	subMenu->view->OnSubMenuClosed();
+}
+
 bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)
 {
 	auto *subMenu = MaybeGetMainMenuSubMenuFromId(id);
@@ -385,7 +411,7 @@ std::optional<std::wstring> Explorerplusplus::MaybeGetMenuHelpText(HMENU menu, i
 	{
 		if (auto *subMenu = MaybeGetMainMenuSubMenuFromId(id))
 		{
-			return subMenu->view->GetHelpTextForItem(id);
+			return subMenu->view->GetItemHelpText(id);
 		}
 	}
 
@@ -394,17 +420,17 @@ std::optional<std::wstring> Explorerplusplus::MaybeGetMenuHelpText(HMENU menu, i
 
 Explorerplusplus::MainMenuSubMenu *Explorerplusplus::MaybeGetMainMenuSubMenuFromId(UINT id)
 {
-	auto submenu = std::ranges::find_if(m_mainMenuSubMenus,
-		[id](const auto &submenu)
+	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
+		[id](const auto &currentSubMenu)
 		{
-			return id >= submenu.menu->GetIdRange().startId
-				&& id < submenu.menu->GetIdRange().endId;
+			return id >= currentSubMenu.menu->GetIdRange().startId
+				&& id < currentSubMenu.menu->GetIdRange().endId;
 		});
 
-	if (submenu == m_mainMenuSubMenus.end())
+	if (subMenu == m_mainMenuSubMenus.end())
 	{
 		return nullptr;
 	}
 
-	return &*submenu;
+	return &*subMenu;
 }

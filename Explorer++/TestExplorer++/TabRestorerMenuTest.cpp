@@ -7,8 +7,8 @@
 #include "AcceleratorManager.h"
 #include "BrowserList.h"
 #include "BrowserWindowMock.h"
-#include "PopupMenuView.h"
-#include "PopupMenuViewTestHelper.h"
+#include "MenuViewFake.h"
+#include "MenuViewFakeTestHelper.h"
 #include "ResourceLoaderFake.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -41,7 +41,7 @@ protected:
 		tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	}
 
-	PopupMenuView m_popupMenu;
+	MenuViewFake m_menuView;
 	AcceleratorManager m_acceleratorManager;
 
 	TabEvents m_tabEvents;
@@ -68,10 +68,10 @@ TEST_F(TabRestorerMenuTest, CheckItems)
 	NavigateTab(tab2, path2);
 	m_tabEvents.NotifyPreRemoval(tab2, 0);
 
-	TabRestorerMenu menu(&m_popupMenu, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
+	TabRestorerMenu menu(&m_menuView, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
 		&m_resourceLoader);
 
-	PopupMenuViewTestHelper::CheckItemDetails(&m_popupMenu, { path2, path1 });
+	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView, { path2, path1 });
 }
 
 TEST_F(TabRestorerMenuTest, Selection)
@@ -91,7 +91,7 @@ TEST_F(TabRestorerMenuTest, Selection)
 	NavigateTab(tab3, path3);
 	m_tabEvents.NotifyPreRemoval(tab3, 0);
 
-	TabRestorerMenu menu(&m_popupMenu, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
+	TabRestorerMenu menu(&m_menuView, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
 		&m_resourceLoader);
 
 	// Tabs are listed by most recently closed first, so the menu should contain:
@@ -101,7 +101,7 @@ TEST_F(TabRestorerMenuTest, Selection)
 	// tab1
 	//
 	// and this call should select tab2.
-	m_popupMenu.SelectItem(m_popupMenu.GetItemIdForTesting(1), false, false);
+	m_menuView.SelectItem(m_menuView.GetItemId(1), false, false);
 
 	// tab2 was restored, so tab1 and tab3 should remain.
 	ASSERT_EQ(m_tabRestorer.GetClosedTabs().size(), 2u);
@@ -115,14 +115,14 @@ TEST_F(TabRestorerMenuTest, Selection)
 	// tab1
 	//
 	// and this call should select tab1.
-	m_popupMenu.SelectItem(m_popupMenu.GetItemIdForTesting(1), false, false);
+	m_menuView.SelectItem(m_menuView.GetItemId(1), false, false);
 
 	// tab1 was restored, so only tab3 should remain.
 	ASSERT_EQ(m_tabRestorer.GetClosedTabs().size(), 1u);
 	EXPECT_EQ(m_tabRestorer.GetClosedTabs().front()->id, tab3.GetId());
 
 	// This should restore tab3, leaving no tabs left to be restored.
-	m_popupMenu.SelectItem(m_popupMenu.GetItemIdForTesting(0), false, false);
+	m_menuView.SelectItem(m_menuView.GetItemId(0), false, false);
 
 	EXPECT_EQ(m_tabRestorer.GetClosedTabs().size(), 0u);
 }

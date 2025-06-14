@@ -243,6 +243,8 @@
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
+    <ClCompile Include="MenuViewFake.cpp" />
+    <ClCompile Include="ResourceIconModelTest.cpp" />
     <ClCompile Include="SimulatedClipboardDataObject.cpp" />
     <ClCompile Include="ClipboardHelperTest.cpp" />
     <ClCompile Include="SimulatedClipboardStore.cpp" />
@@ -324,7 +326,7 @@
     <ClCompile Include="ModelessDialogListTest.cpp" />
     <ClCompile Include="NavigationManagerTest.cpp" />
     <ClCompile Include="NavigationRequestTest.cpp" />
-    <ClCompile Include="PopupMenuViewTestHelper.cpp" />
+    <ClCompile Include="MenuViewFakeTestHelper.cpp" />
     <ClCompile Include="ProcessManagerTest.cpp" />
     <ClCompile Include="RuntimeHelperTest.cpp" />
     <ClCompile Include="RuntimeTest.cpp" />
@@ -343,7 +345,7 @@
     <ClCompile Include="UIThreadExecutorTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
     <ClCompile Include="PasteSymLinksServerClientTest.cpp" />
-    <ClCompile Include="PopupMenuViewTest.cpp" />
+    <ClCompile Include="MenuViewTest.cpp" />
     <ClCompile Include="ShellIconLoaderFake.cpp" />
     <ClCompile Include="ShellTestHelper.cpp" />
     <ClCompile Include="TabHistoryMenuTest.cpp" />
@@ -433,6 +435,7 @@
     <ClInclude Include="BrowserTestBase.h" />
     <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowMock.h" />
+    <ClInclude Include="MenuViewFake.h" />
     <ClInclude Include="SimulatedClipboardDataObject.h" />
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />
@@ -455,7 +458,7 @@
     <ClInclude Include="NavigationRequestDelegateMock.h" />
     <ClInclude Include="NavigationRequestTestHelper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="PopupMenuViewTestHelper.h" />
+    <ClInclude Include="MenuViewFakeTestHelper.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="ResourceLoaderFake.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
@@ -510,6 +513,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Asan|Win32'">
     <ClCompile>
@@ -538,6 +544,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Clang|Win32'">
     <ClCompile>
@@ -564,6 +573,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -592,6 +604,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Asan|x64'">
     <ClCompile>
@@ -620,6 +635,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
@@ -648,6 +666,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Asan|ARM64'">
     <ClCompile>
@@ -676,6 +697,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Clang|x64'">
     <ClCompile>
@@ -702,6 +726,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Clang|ARM64'">
     <ClCompile>
@@ -728,6 +755,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -757,6 +787,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|Win32'">
     <ClCompile>
@@ -786,6 +819,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -815,6 +851,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|x64'">
     <ClCompile>
@@ -844,6 +883,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
@@ -873,6 +915,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|ARM64'">
     <ClCompile>
@@ -902,6 +947,9 @@
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Explorer++\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

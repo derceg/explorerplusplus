@@ -496,17 +496,8 @@
     <ClCompile Include="ItemNameEditControl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShellItemsMenu.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="PopupMenuView.cpp">
-      <Filter>Core\UI\Views</Filter>
-    </ClCompile>
     <ClCompile Include="IconFetcherImpl.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="TabHistoryMenu.cpp">
-      <Filter>Core\UI</Filter>
     </ClCompile>
     <ClCompile Include="OneShotTimerManager.cpp">
       <Filter>Core</Filter>
@@ -543,18 +534,6 @@
     </ClCompile>
     <ClCompile Include="NavigationHelper.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuView.cpp">
-      <Filter>Core\UI\Views</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuBase.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="MainMenuSubMenuView.cpp">
-      <Filter>Core\UI\Views</Filter>
-    </ClCompile>
-    <ClCompile Include="TabParentItemsMenu.cpp">
-      <Filter>Core\UI</Filter>
     </ClCompile>
     <ClCompile Include="FrequentLocationsModel.cpp">
       <Filter>Frequent Locations</Filter>
@@ -602,9 +581,6 @@
       <Filter>Resource Loading</Filter>
     </ClCompile>
     <ClCompile Include="ShellIconLoaderImpl.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellIconModel.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="UIThreadExecutor.cpp">
@@ -778,9 +754,6 @@
     <ClCompile Include="DriveWatcher.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="ToolbarContextMenu.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
     <ClCompile Include="BaseDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
@@ -855,6 +828,36 @@
     </ClCompile>
     <ClCompile Include="TabBacking.cpp">
       <Filter>Tabs\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuSubMenuView.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuView.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupMenuView.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuBase.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellItemsMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TabHistoryMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TabParentItemsMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarContextMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellIconModel.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceIconModel.cpp">
+      <Filter>Menus\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1362,20 +1365,11 @@
     <ClInclude Include="ItemNameEditControl.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShellItemsMenu.h">
-      <Filter>Core\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="PopupMenuView.h">
-      <Filter>Core\UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="IconFetcher.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="IconFetcherImpl.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="TabHistoryMenu.h">
-      <Filter>Core\UI</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowser.h">
       <Filter>ShellBrowser</Filter>
@@ -1424,18 +1418,6 @@
     </ClInclude>
     <ClInclude Include="NavigationHelper.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuView.h">
-      <Filter>Core\UI\Views</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuBase.h">
-      <Filter>Core\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="MainMenuSubMenuView.h">
-      <Filter>Core\UI\Views</Filter>
-    </ClInclude>
-    <ClInclude Include="TabParentItemsMenu.h">
-      <Filter>Core\UI</Filter>
     </ClInclude>
     <ClInclude Include="FrequentLocationsModel.h">
       <Filter>Frequent Locations</Filter>
@@ -1493,9 +1475,6 @@
     </ClInclude>
     <ClInclude Include="ResourceLoader.h">
       <Filter>Resource Loading</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellIconModel.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellIconLoaderImpl.h">
       <Filter>Core</Filter>
@@ -1698,9 +1677,6 @@
     <ClInclude Include="EventWindow.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ToolbarContextMenu.h">
-      <Filter>Core\UI</Filter>
-    </ClInclude>
     <ClInclude Include="BaseDialog.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
@@ -1793,6 +1769,42 @@
     </ClInclude>
     <ClInclude Include="TabBacking.h">
       <Filter>Tabs\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuSubMenuView.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuView.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupMenuView.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuBase.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellItemsMenu.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabHistoryMenu.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabParentItemsMenu.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarContextMenu.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceIconModel.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="IconModel.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconModel.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="IconUpdateCallback.h">
+      <Filter>Menus\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2024,6 +2036,15 @@
     </Filter>
     <Filter Include="Tabs\UI\Views">
       <UniqueIdentifier>{9b97b02a-3c55-4054-9428-ae70195a30e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus">
+      <UniqueIdentifier>{a7bbccfa-f86d-46b8-947e-1b5b1c3018f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus\UI">
+      <UniqueIdentifier>{9cf52f50-3a31-4328-b70a-717cef07f56f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus\UI\Views">
+      <UniqueIdentifier>{68655611-30b7-4b1a-b7d3-24da8afb8b95}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

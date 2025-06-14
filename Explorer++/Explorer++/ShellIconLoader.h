@@ -4,16 +4,14 @@
 
 #pragma once
 
+#include "IconUpdateCallback.h"
 #include <wil/resource.h>
 #include <shtypes.h>
-#include <functional>
 
 enum class ShellIconSize
 {
 	Small
 };
-
-using ShellIconUpdateCallback = std::function<void(wil::unique_hbitmap updatedIcon)>;
 
 class ShellIconLoader
 {
@@ -21,5 +19,5 @@ public:
 	virtual ~ShellIconLoader() = default;
 
 	virtual wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, ShellIconSize size,
-		ShellIconUpdateCallback updateCallback) = 0;
+		IconUpdateCallback updateCallback) = 0;
 };

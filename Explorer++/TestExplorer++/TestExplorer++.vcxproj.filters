@@ -152,17 +152,11 @@
     <ClCompile Include="ServiceProviderTest.cpp">
       <Filter>Context Menu Support</Filter>
     </ClCompile>
-    <ClCompile Include="TabHistoryMenuTest.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellItemsMenuTest.cpp">
-      <Filter>Core\UI</Filter>
-    </ClCompile>
     <ClCompile Include="MenuHelperTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>
-    <ClCompile Include="PopupMenuViewTest.cpp">
-      <Filter>Core\UI\Views</Filter>
+    <ClCompile Include="MenuViewTest.cpp">
+      <Filter>Menus\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="HistoryModelTest.cpp">
       <Filter>History</Filter>
@@ -313,8 +307,8 @@
     <ClCompile Include="TabRestorerMenuTest.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
-    <ClCompile Include="PopupMenuViewTestHelper.cpp">
-      <Filter>Core\UI\Views</Filter>
+    <ClCompile Include="MenuViewFakeTestHelper.cpp">
+      <Filter>Menus\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="XMLSettingsTest.cpp">
       <Filter>Helper\Settings</Filter>
@@ -473,6 +467,18 @@
     <ClCompile Include="TabViewTest.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceIconModelTest.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellItemsMenuTest.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TabHistoryMenuTest.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuViewFake.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -540,12 +546,6 @@
     </Filter>
     <Filter Include="Context Menu Support">
       <UniqueIdentifier>{eadab4ea-5008-4359-9e40-273fa813fba8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\UI">
-      <UniqueIdentifier>{7af7278c-c56b-48b1-b069-4346b3f79c17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\UI\Views">
-      <UniqueIdentifier>{b80d11e6-4361-4b55-9b78-470549e95b2f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Frequent Locations">
       <UniqueIdentifier>{608f3f32-fe72-473c-af0b-a9acec71dfcd}</UniqueIdentifier>
@@ -637,6 +637,15 @@
     <Filter Include="Views">
       <UniqueIdentifier>{c4ba0c42-8d59-4d3b-a572-8a4ade71def9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Menus">
+      <UniqueIdentifier>{bc743192-ac2f-46e9-baf3-b8bc445918bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus\UI">
+      <UniqueIdentifier>{8dad2020-1443-4f9f-a490-93a95c4dd787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus\UI\Views">
+      <UniqueIdentifier>{b80d11e6-4361-4b55-9b78-470549e95b2f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -727,8 +736,8 @@
     <ClInclude Include="FakeSystemClock.h">
       <Filter>Helper\Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="PopupMenuViewTestHelper.h">
-      <Filter>Core\UI\Views</Filter>
+    <ClInclude Include="MenuViewFakeTestHelper.h">
+      <Filter>Menus\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="GTestHelper.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h">
@@ -776,6 +785,9 @@
     </ClInclude>
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="SimulatedClipboardDataObject.h" />
+    <ClInclude Include="MenuViewFake.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

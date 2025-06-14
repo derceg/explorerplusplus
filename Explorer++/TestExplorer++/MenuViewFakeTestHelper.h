@@ -7,13 +7,13 @@
 #include "../Helper/PidlHelper.h"
 #include <vector>
 
-class PopupMenuView;
+class MenuViewFake;
 
-namespace PopupMenuViewTestHelper
+namespace MenuViewFakeTestHelper
 {
 
-// For a PopupMenuView that contains a list of shell items, this function verifies that the details
+// For a MenuViewFake that contains a list of shell items, this function verifies that the details
 // of each item in the menu match the details of the corresponding pidl.
-void CheckItemDetails(PopupMenuView *popupMenu, const std::vector<PidlAbsolute> &expectedItems);
+void CheckItemDetails(MenuViewFake *menuView, const std::vector<PidlAbsolute> &expectedItems);
 
 }

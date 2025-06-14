@@ -4,9 +4,12 @@
 
 #include "stdafx.h"
 #include "MainMenuSubMenuView.h"
+#include "BrowserWindow.h"
 #include "../Helper/MenuHelper.h"
 
-MainMenuSubMenuView::MainMenuSubMenuView(HMENU mainMenu, UINT subMenuItemId)
+MainMenuSubMenuView::MainMenuSubMenuView(BrowserWindow *browser, HMENU mainMenu,
+	UINT subMenuItemId) :
+	m_hwnd(browser->GetHWND())
 {
 	// This menu will be added as a submenu of the main menu. The main menu will therefore assume
 	// ownership of the submenu and will be responsible for deleting it. So, only a non-owning
@@ -20,4 +23,14 @@ MainMenuSubMenuView::MainMenuSubMenuView(HMENU mainMenu, UINT subMenuItemId)
 HMENU MainMenuSubMenuView::GetMenu() const
 {
 	return m_menu;
+}
+
+void MainMenuSubMenuView::OnSubMenuWillShow()
+{
+	OnMenuWillShow(m_hwnd);
+}
+
+void MainMenuSubMenuView::OnSubMenuClosed()
+{
+	OnMenuClosed();
 }

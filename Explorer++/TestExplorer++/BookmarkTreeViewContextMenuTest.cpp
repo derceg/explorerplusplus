@@ -7,7 +7,7 @@
 #include "AcceleratorManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
-#include "PopupMenuView.h"
+#include "MenuViewFake.h"
 #include "ResourceLoaderFake.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -37,19 +37,19 @@ TEST(BookmarkTreeViewContextMenuTest, Selection)
 
 	ResourceLoaderFake resourceLoader;
 
-	PopupMenuView popupMenu;
-	BookmarkTreeViewContextMenu contextMenu(&popupMenu, &acceleratorManager, &delegate,
+	MenuViewFake menuView;
+	BookmarkTreeViewContextMenu contextMenu(&menuView, &acceleratorManager, &delegate,
 		&bookmarkTree, targetFolder, &resourceLoader);
 
 	EXPECT_CALL(delegate, StartRenamingFolder(targetFolder));
-	popupMenu.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
+	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
 
 	EXPECT_CALL(delegate, CreateNewFolder(targetFolder));
-	popupMenu.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
+	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
 
 	MockFunction<void(const std::wstring &guid)> removedCallback;
 	bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
 
 	EXPECT_CALL(removedCallback, Call(targetFolder->GetGUID()));
-	popupMenu.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE, false, false);
+	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE, false, false);
 }

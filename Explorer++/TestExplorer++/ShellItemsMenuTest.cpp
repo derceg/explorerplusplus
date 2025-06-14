@@ -6,7 +6,7 @@
 #include "ShellItemsMenu.h"
 #include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
-#include "PopupMenuView.h"
+#include "MenuViewFake.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
 #include <gmock/gmock.h>
@@ -59,25 +59,25 @@ protected:
 			&m_browserWindow, &m_shellIconLoader, menuStartId, menuEndId);
 	}
 
-	void CheckItemDetails(const MenuView &menuView, const std::vector<PidlAbsolute> &pidls)
+	void CheckItemDetails(const MenuViewFake *menuView, const std::vector<PidlAbsolute> &pidls)
 	{
-		ASSERT_EQ(static_cast<size_t>(menuView.GetItemCountForTesting()), pidls.size());
+		ASSERT_EQ(static_cast<size_t>(menuView->GetItemCount()), pidls.size());
 
 		for (size_t i = 0; i < pidls.size(); i++)
 		{
-			auto id = menuView.GetItemIdForTesting(static_cast<int>(i));
+			auto id = menuView->GetItemId(static_cast<int>(i));
 			auto name = GetNameForItem(i);
-			EXPECT_EQ(menuView.GetItemTextForTesting(id), name);
-			EXPECT_NE(menuView.GetItemBitmapForTesting(id), nullptr);
-			EXPECT_EQ(menuView.GetHelpTextForItem(id), GetPathForItem(name));
+			EXPECT_EQ(menuView->GetItemText(id), name);
+			EXPECT_NE(menuView->GetItemBitmap(id), nullptr);
+			EXPECT_EQ(menuView->GetItemHelpText(id), GetPathForItem(name));
 		}
 	}
 
 	void CheckIdRange(UINT startId, UINT endId, UINT expectedStartId, UINT expectedEndId)
 	{
-		PopupMenuView popupMenu;
+		MenuViewFake menuView;
 		auto pidls = BuildPidlCollection(1);
-		auto menu = BuildMenu(&popupMenu, pidls, startId, endId);
+		auto menu = BuildMenu(&menuView, pidls, startId, endId);
 		EXPECT_EQ(menu->GetIdRange(), MenuBase::IdRange(expectedStartId, expectedEndId));
 	}
 
@@ -88,23 +88,25 @@ protected:
 
 TEST_F(ShellItemsMenuTest, CheckItems)
 {
-	PopupMenuView popupMenu;
+	MenuViewFake menuView;
+	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
 	auto pidls = BuildPidlCollection(3);
-	auto menu = BuildMenu(&popupMenu, pidls);
+	auto menu = BuildMenu(&menuView, pidls);
 
-	CheckItemDetails(popupMenu, pidls);
+	CheckItemDetails(&menuView, pidls);
 }
 
 TEST_F(ShellItemsMenuTest, MaxItems)
 {
-	PopupMenuView popupMenu;
+	MenuViewFake menuView;
+	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
 	auto pidls = BuildPidlCollection(3);
-	auto menu = BuildMenu(&popupMenu, pidls, 1, 2);
+	auto menu = BuildMenu(&menuView, pidls, 1, 2);
 
 	// The menu only has a single ID it can assign from the provided range of [1,2). So, although 3
 	// items were passed in, only the first item should be added to the menu.
-	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 1);
-	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(0)), GetNameForItem(0));
+	EXPECT_EQ(menuView.GetItemCount(), 1);
+	EXPECT_EQ(menuView.GetItemText(menuView.GetItemId(0)), GetNameForItem(0));
 }
 
 TEST_F(ShellItemsMenuTest, GetIdRange)
@@ -125,14 +127,15 @@ TEST_F(ShellItemsMenuTest, GetIdRange)
 
 TEST_F(ShellItemsMenuTest, RebuildMenu)
 {
-	PopupMenuView popupMenu;
+	MenuViewFake menuView;
+	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
 	auto pidls = BuildPidlCollection(3);
-	auto menu = BuildMenu(&popupMenu, pidls);
+	auto menu = BuildMenu(&menuView, pidls);
 
 	auto updatedPidls = BuildPidlCollection(5);
 	menu->RebuildMenu(updatedPidls);
 
-	CheckItemDetails(popupMenu, updatedPidls);
+	CheckItemDetails(&menuView, updatedPidls);
 }
 
 class ShellItemsMenuSelectionTest : public Test
@@ -146,7 +149,7 @@ protected:
 
 	ShellItemsMenuSelectionTest() :
 		m_pidls(BuildPidlCollection(3)),
-		m_menu(&m_popupMenu, &m_acceleratorManager, m_pidls, &m_browserWindow, &m_shellIconLoader)
+		m_menu(&m_menuView, &m_acceleratorManager, m_pidls, &m_browserWindow, &m_shellIconLoader)
 	{
 	}
 
@@ -168,19 +171,19 @@ private:
 		EXPECT_CALL(m_browserWindow,
 			OpenItem(TypedEq<PCIDLIST_ABSOLUTE>(m_pidls[index]), disposition));
 
-		auto id = m_popupMenu.GetItemIdForTesting(static_cast<int>(index));
+		auto id = m_menuView.GetItemId(static_cast<int>(index));
 
 		if (selectionType == SelectionType::Click)
 		{
-			m_popupMenu.SelectItem(id, false, false);
+			m_menuView.SelectItem(id, false, false);
 		}
 		else
 		{
-			m_popupMenu.MiddleClickItem(id, false, false);
+			m_menuView.MiddleClickItem(id, false, false);
 		}
 	}
 
-	PopupMenuView m_popupMenu;
+	MenuViewFake m_menuView;
 	AcceleratorManager m_acceleratorManager;
 	std::vector<PidlAbsolute> m_pidls;
 	BrowserWindowMock m_browserWindow;

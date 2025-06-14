@@ -7,6 +7,7 @@
 #include "BrowserWindow.h"
 #include "MenuView.h"
 #include "NavigationHelper.h"
+#include "ShellIconModel.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
@@ -48,7 +49,8 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 	}
 
 	m_menuView->AppendItem(id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
-		ShellIconModel(m_shellIconLoader, pidl), GetFolderPathForDisplayWithFallback(pidl));
+		std::make_unique<ShellIconModel>(m_shellIconLoader, pidl),
+		GetFolderPathForDisplayWithFallback(pidl));
 
 	auto [itr, didInsert] = m_idPidlMap.insert({ id, pidl });
 	DCHECK(didInsert);

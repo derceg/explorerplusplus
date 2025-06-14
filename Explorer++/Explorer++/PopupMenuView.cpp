@@ -20,6 +20,8 @@ void PopupMenuView::Show(HWND hwnd, const POINT &point)
 	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&PopupMenuView::ParentWindowSubclass, this));
 
+	OnMenuWillShow(hwnd);
+
 	// Without the TPM_RECURSE flag, `TrackPopupMenu` will silently fail if another menu is
 	// currently showing. It's hard to see how that would ever be the intended behavior. That is,
 	// the caller has explicitly called `Show`, to display the menu. Having the operation silently
@@ -28,6 +30,8 @@ void PopupMenuView::Show(HWND hwnd, const POINT &point)
 	UINT cmd =
 		TrackPopupMenu(m_menu.get(), TPM_LEFTALIGN | TPM_VERTICAL | TPM_RECURSE | TPM_RETURNCMD,
 			point.x, point.y, 0, hwnd, nullptr);
+
+	OnMenuClosed();
 
 	if (cmd == 0)
 	{

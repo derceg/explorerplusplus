@@ -7,7 +7,7 @@
 #include "ImageTestHelper.h"
 
 wil::unique_hbitmap ShellIconLoaderFake::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, ShellIconSize size,
-	ShellIconUpdateCallback updateCallback)
+	IconUpdateCallback updateCallback)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(size);

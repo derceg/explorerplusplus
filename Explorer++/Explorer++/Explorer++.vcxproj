@@ -1213,6 +1213,7 @@
     <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
+    <ClCompile Include="ResourceIconModel.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
@@ -1534,11 +1535,14 @@
     <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="IconModel.h" />
+    <ClInclude Include="IconUpdateCallback.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
+    <ClInclude Include="ResourceIconModel.h" />
     <ClInclude Include="SelectionType.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />

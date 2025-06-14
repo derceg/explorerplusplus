@@ -10,6 +10,7 @@
 #include "ShellBrowser/HistoryEntry.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "ShellIconModel.h"
 
 TabHistoryMenu::TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, MenuType type) :
@@ -59,7 +60,7 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 	auto id = m_idCounter++;
 
 	m_menuView->AppendItem(id, GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
-		ShellIconModel(m_shellIconLoader, entry->GetPidl().Raw()));
+		std::make_unique<ShellIconModel>(m_shellIconLoader, entry->GetPidl().Raw()));
 }
 
 void TabHistoryMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)

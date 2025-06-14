@@ -7,8 +7,8 @@
 #include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
 #include "HistoryModel.h"
-#include "PopupMenuView.h"
-#include "PopupMenuViewTestHelper.h"
+#include "MenuViewFake.h"
+#include "MenuViewFakeTestHelper.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
 #include <gtest/gtest.h>
@@ -19,12 +19,12 @@ class HistoryMenuTest : public Test
 {
 protected:
 	HistoryMenuTest() :
-		m_menu(&m_popupMenu, &m_acceleratorManager, &m_historyModel, &m_browserWindow,
+		m_menu(&m_menuView, &m_acceleratorManager, &m_historyModel, &m_browserWindow,
 			&m_shellIconLoader)
 	{
 	}
 
-	PopupMenuView m_popupMenu;
+	MenuViewFake m_menuView;
 	AcceleratorManager m_acceleratorManager;
 	HistoryModel m_historyModel;
 	BrowserWindowMock m_browserWindow;
@@ -45,7 +45,7 @@ TEST_F(HistoryMenuTest, CheckItems)
 
 	// Items should appear in the reverse order that they were added to the history (i.e. with the
 	// most recent item first).
-	PopupMenuViewTestHelper::CheckItemDetails(&m_popupMenu, { pidl3, pidl2, pidl1 });
+	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView, { pidl3, pidl2, pidl1 });
 
 	// The menu should automatically update when the global history changes.
 	auto pidl4 = CreateSimplePidlForTest(L"c:\\windows\\system32");
@@ -54,5 +54,5 @@ TEST_F(HistoryMenuTest, CheckItems)
 	auto pidl5 = CreateSimplePidlForTest(L"e:\\");
 	m_historyModel.AddHistoryItem(pidl5);
 
-	PopupMenuViewTestHelper::CheckItemDetails(&m_popupMenu, { pidl5, pidl4, pidl3, pidl2, pidl1 });
+	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView, { pidl5, pidl4, pidl3, pidl2, pidl1 });
 }

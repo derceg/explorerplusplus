@@ -14,7 +14,7 @@ ShellIconLoaderImpl::ShellIconLoaderImpl(IconFetcher *iconFetcher) : m_iconFetch
 }
 
 wil::unique_hbitmap ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, ShellIconSize size,
-	ShellIconUpdateCallback updateCallback)
+	IconUpdateCallback updateCallback)
 {
 	if (size != ShellIconSize::Small)
 	{
@@ -26,7 +26,7 @@ wil::unique_hbitmap ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, S
 }
 
 void ShellIconLoaderImpl::QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl,
-	ShellIconUpdateCallback updateCallback)
+	IconUpdateCallback updateCallback)
 {
 	// The item may not have a cached icon, or the cached icon may be out of date. Therefore, this
 	// call will retrieve the updated icon. Even if the caller doesn't use the updated icon, doing

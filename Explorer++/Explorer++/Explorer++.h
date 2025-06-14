@@ -361,6 +361,8 @@ private:
 		const MainMenuPreShowSignal::slot_type &observer) override;
 	void OnInitMenu(HMENU menu);
 	void OnExitMenuLoop(bool shortcutMenu);
+	void OnInitMenuPopup(HMENU menu);
+	void OnUninitMenuPopup(HMENU menu);
 	bool MaybeHandleMainMenuItemSelection(UINT id);
 	boost::signals2::connection AddMainMenuItemMiddleClickedObserver(
 		const MainMenuItemMiddleClickedSignal::slot_type &observer) override;

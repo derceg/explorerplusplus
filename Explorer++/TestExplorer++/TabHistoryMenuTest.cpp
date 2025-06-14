@@ -6,7 +6,7 @@
 #include "TabHistoryMenu.h"
 #include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
-#include "PopupMenuView.h"
+#include "MenuViewFake.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
@@ -42,13 +42,13 @@ TEST_F(TabHistoryMenuTest, BackHistory)
 	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
 	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
-	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 2);
-	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(0)), L"Fake2");
-	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(1)), L"Fake1");
+	EXPECT_EQ(menuView.GetItemCount(), 2);
+	EXPECT_EQ(menuView.GetItemText(menuView.GetItemId(0)), L"Fake2");
+	EXPECT_EQ(menuView.GetItemText(menuView.GetItemId(1)), L"Fake1");
 }
 
 TEST_F(TabHistoryMenuTest, ForwardHistory)
@@ -61,13 +61,13 @@ TEST_F(TabHistoryMenuTest, ForwardHistory)
 	m_shellBrowser.GetNavigationController()->GoBack();
 	m_shellBrowser.GetNavigationController()->GoBack();
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
-	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 2);
-	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(0)), L"Fake2");
-	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(1)), L"Fake3");
+	EXPECT_EQ(menuView.GetItemCount(), 2);
+	EXPECT_EQ(menuView.GetItemText(menuView.GetItemId(0)), L"Fake2");
+	EXPECT_EQ(menuView.GetItemText(menuView.GetItemId(1)), L"Fake3");
 }
 
 TEST_F(TabHistoryMenuTest, BackSelection)
@@ -76,12 +76,12 @@ TEST_F(TabHistoryMenuTest, BackSelection)
 	m_shellBrowser.NavigateToPath(L"C:\\Fake2");
 	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	// Go back to Fake2.
-	popupMenu.SelectItem(popupMenu.GetItemIdForTesting(0), false, false);
+	menuView.SelectItem(menuView.GetItemId(0), false, false);
 
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 1);
 }
@@ -93,15 +93,15 @@ TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 	m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::AddEntry, &fake2);
 	m_shellBrowser.NavigateToPath(L"C:\\Fake3");
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	EXPECT_CALL(m_browserWindow,
 		OpenItem(TypedEq<PCIDLIST_ABSOLUTE>(fake2), OpenFolderDisposition::NewTabDefault));
 
 	// Open Fake2 in a new tab.
-	popupMenu.MiddleClickItem(popupMenu.GetItemIdForTesting(0), false, false);
+	menuView.MiddleClickItem(menuView.GetItemId(0), false, false);
 
 	// Since the item was opened in a new tab, the current index should remain unchanged.
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 2);
@@ -117,12 +117,12 @@ TEST_F(TabHistoryMenuTest, ForwardSelection)
 	m_shellBrowser.GetNavigationController()->GoBack();
 	m_shellBrowser.GetNavigationController()->GoBack();
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go forward to Fake3.
-	popupMenu.SelectItem(popupMenu.GetItemIdForTesting(1), false, false);
+	menuView.SelectItem(menuView.GetItemId(1), false, false);
 
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 2);
 }
@@ -138,15 +138,15 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 	m_shellBrowser.GetNavigationController()->GoBack();
 	m_shellBrowser.GetNavigationController()->GoBack();
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	EXPECT_CALL(m_browserWindow,
 		OpenItem(TypedEq<PCIDLIST_ABSOLUTE>(fake3), OpenFolderDisposition::NewTabDefault));
 
 	// Open Fake3 in a new tab.
-	popupMenu.MiddleClickItem(popupMenu.GetItemIdForTesting(1), false, false);
+	menuView.MiddleClickItem(menuView.GetItemId(1), false, false);
 
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 0);
 }
@@ -160,8 +160,8 @@ TEST_F(TabHistoryMenuTest, InvalidSelection)
 	// Go back to Fake2.
 	m_shellBrowser.GetNavigationController()->GoBack();
 
-	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
+	MenuViewFake menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go back to Fake1.
@@ -170,7 +170,7 @@ TEST_F(TabHistoryMenuTest, InvalidSelection)
 	// This will erase the forward history (i.e. Fake2 and Fake3).
 	m_shellBrowser.NavigateToPath(L"C:\\Fake4");
 
-	popupMenu.SelectItem(popupMenu.GetItemIdForTesting(0), false, false);
+	menuView.SelectItem(menuView.GetItemId(0), false, false);
 
 	// There was no forward history entry to navigate to, so the current index should remain
 	// unchanged.
