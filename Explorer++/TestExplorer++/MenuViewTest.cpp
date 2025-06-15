@@ -78,13 +78,26 @@ TEST_F(MenuViewDeathTest, RetrieveHelpTextAfterClearingMenu)
 class MenuViewIconTest : public Test
 {
 protected:
-	void AddItemsToMenu(MenuView *menuView, int numItems)
+	enum class ImageOption
+	{
+		Include,
+		Exclude
+	};
+
+	void AddItemsToMenu(MenuView *menuView, int numItems,
+		ImageOption imageOption = ImageOption::Include)
 	{
 		for (int i = 0; i < numItems; i++)
 		{
-			auto pidl = CreateSimplePidlForTest(std::format(L"C:\\Fake{}", i));
-			menuView->AppendItem(m_idCounter++, std::format(L"Item {}", i),
-				std::make_unique<ShellIconModel>(&m_shellIconLoader, pidl.Raw()));
+			std::unique_ptr<ShellIconModel> iconModel;
+
+			if (imageOption == ImageOption::Include)
+			{
+				auto pidl = CreateSimplePidlForTest(std::format(L"C:\\Fake{}", i));
+				iconModel = std::make_unique<ShellIconModel>(&m_shellIconLoader, pidl.Raw());
+			}
+
+			menuView->AppendItem(m_idCounter++, std::format(L"Item {}", i), std::move(iconModel));
 		}
 	}
 
@@ -120,6 +133,19 @@ TEST_F(MenuViewIconTest, OnShow)
 
 	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
 	EXPECT_EQ(bitmap, generatedBitmap);
+}
+
+TEST_F(MenuViewIconTest, OnShowWithNoImage)
+{
+	MenuViewFake menuView;
+	AddItemsToMenu(&menuView, 1, ImageOption::Exclude);
+
+	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+
+	// The item didn't have any image set, so showing the menu shouldn't result in any image being
+	// assigned.
+	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	EXPECT_EQ(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, MenuBeingShown)

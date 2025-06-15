@@ -52,15 +52,27 @@ protected:
 	void OnMenuClosed();
 
 private:
-	void MaybeSetItemImage(UINT id, std::unique_ptr<const IconModel> iconModel);
-	void SetItemImage(UINT id, const IconModel *iconModel);
+	struct Item
+	{
+		Item(std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText) :
+			iconModel(std::move(iconModel)),
+			helpText(helpText)
+		{
+		}
+
+		const std::unique_ptr<const IconModel> iconModel;
+		wil::unique_hbitmap bitmap;
+		const std::wstring helpText;
+	};
+
+	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
 	void MaybeAddImagesToMenu();
 	UINT GetCurrentDpi();
+	Item *GetItem(int id);
+	const Item *GetItem(int id) const;
 
-	std::unordered_map<UINT, std::unique_ptr<const IconModel>> m_itemIconModelMapping;
-	std::unordered_map<UINT, wil::unique_hbitmap> m_itemImageMapping;
-	std::unordered_map<UINT, std::wstring> m_itemHelpTextMapping;
+	std::unordered_map<UINT, Item> m_idToItemMap;
 
 	// This will only be set whilst the menu is being shown.
 	std::optional<UINT> m_currentDpi;

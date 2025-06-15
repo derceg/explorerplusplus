@@ -37,38 +37,29 @@ void MenuView::AppendItem(UINT id, const std::wstring &text,
 	auto res = InsertMenuItem(GetMenu(), GetMenuItemCount(GetMenu()), true, &menuItemInfo);
 	CHECK(res);
 
-	auto [itr, didInsert] = m_itemHelpTextMapping.insert({ id, helpText });
-	DCHECK(didInsert);
-
-	MaybeSetItemImage(id, std::move(iconModel));
-}
-
-void MenuView::MaybeSetItemImage(UINT id, std::unique_ptr<const IconModel> iconModel)
-{
-	if (!iconModel)
-	{
-		return;
-	}
-
-	auto [itr, didInsert] = m_itemIconModelMapping.insert({ id, std::move(iconModel) });
+	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, std::move(iconModel), helpText);
 	CHECK(didInsert);
 
-	if (!m_currentDpi)
+	// It's only possible to add images to the menu when the DPI is known (so that the appropriate
+	// DPI scaling factor can be applied). If there is no current DPI set (because the menu isn't
+	// being shown), nothing needs to be done. The image will be added to the menu once the menu is
+	// shown.
+	if (m_currentDpi)
 	{
-		// In this case, the menu isn't being shown. Since it's only possible to add images to the
-		// menu when the DPI is known (so that the appropriate DPI scaling factor can be applied),
-		// there's nothing else that needs to be done here. The image will be added to the menu once
-		// the menu is shown.
+		SetItemImage(id);
+	}
+}
+
+void MenuView::SetItemImage(UINT id)
+{
+	const auto *item = GetItem(id);
+
+	if (!item->iconModel)
+	{
 		return;
 	}
 
-	const auto *rawIconModel = itr->second.get();
-	SetItemImage(id, rawIconModel);
-}
-
-void MenuView::SetItemImage(UINT id, const IconModel *iconModel)
-{
-	auto bitmap = iconModel->GetBitmap(GetCurrentDpi(),
+	auto bitmap = item->iconModel->GetBitmap(GetCurrentDpi(),
 		[id, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedBitmap)
 		{
 			if (!self)
@@ -95,7 +86,8 @@ void MenuView::UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap)
 
 	if (bitmap)
 	{
-		m_itemImageMapping.insert_or_assign(id, std::move(bitmap));
+		auto *item = GetItem(id);
+		item->bitmap = std::move(bitmap);
 	}
 }
 
@@ -127,9 +119,7 @@ void MenuView::ClearMenu()
 		DCHECK(res);
 	}
 
-	m_itemIconModelMapping.clear();
-	m_itemImageMapping.clear();
-	m_itemHelpTextMapping.clear();
+	m_idToItemMap.clear();
 	m_lastRenderedImageDpi.reset();
 	m_weakPtrFactory.InvalidateWeakPtrs();
 }
@@ -164,9 +154,9 @@ void MenuView::MaybeAddImagesToMenu()
 		return;
 	}
 
-	for (const auto &[id, iconModel] : m_itemIconModelMapping)
+	for (UINT id : m_idToItemMap | std::views::keys)
 	{
-		SetItemImage(id, iconModel.get());
+		SetItemImage(id);
 	}
 
 	m_lastRenderedImageDpi = GetCurrentDpi();
@@ -180,9 +170,22 @@ UINT MenuView::GetCurrentDpi()
 
 std::wstring MenuView::GetItemHelpText(UINT id) const
 {
-	auto itr = m_itemHelpTextMapping.find(id);
-	CHECK(itr != m_itemHelpTextMapping.end());
-	return itr->second;
+	const auto *item = GetItem(id);
+	return item->helpText;
+}
+
+MenuView::Item *MenuView::GetItem(int id)
+{
+	auto itr = m_idToItemMap.find(id);
+	CHECK(itr != m_idToItemMap.end());
+	return &itr->second;
+}
+
+const MenuView::Item *MenuView::GetItem(int id) const
+{
+	auto itr = m_idToItemMap.find(id);
+	CHECK(itr != m_idToItemMap.end());
+	return &itr->second;
 }
 
 void MenuView::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
