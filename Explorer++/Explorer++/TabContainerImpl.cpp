@@ -242,7 +242,7 @@ void TabContainerImpl::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 	BOOL res = ClientToScreen(m_hwnd, &ptScreen);
 	CHECK(res);
 
-	PopupMenuView popupMenu;
+	PopupMenuView popupMenu(m_browser);
 	TabContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), tab, this,
 		m_app->GetTabEvents(), m_app->GetResourceLoader());
 	popupMenu.Show(m_hwnd, ptScreen);
@@ -273,7 +273,7 @@ void TabContainerImpl::ShowBackgroundContextMenu(const POINT &ptClient)
 	POINT ptScreen = ptClient;
 	ClientToScreen(m_hwnd, &ptScreen);
 
-	PopupMenuView popupMenu;
+	PopupMenuView popupMenu(m_browser);
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), this,
 		m_app->GetTabRestorer(), m_bookmarkTree, m_browser, m_coreInterface,
 		m_app->GetResourceLoader());

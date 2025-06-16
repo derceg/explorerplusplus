@@ -12,6 +12,8 @@
 #include <optional>
 #include <unordered_map>
 
+class MenuHelpTextHost;
+
 class MenuView
 {
 public:
@@ -21,6 +23,7 @@ public:
 		boost::signals2::signal<void(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)>;
 	using ViewDestroyedSignal = boost::signals2::signal<void()>;
 
+	MenuView(MenuHelpTextHost *menuHelpTextHost);
 	virtual ~MenuView();
 
 	void AppendItem(UINT id, const std::wstring &text,
@@ -67,10 +70,14 @@ private:
 
 	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
+	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, int id);
 	void MaybeAddImagesToMenu();
 	UINT GetCurrentDpi();
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
+
+	MenuHelpTextHost *const m_menuHelpTextHost;
+	boost::signals2::scoped_connection m_helpTextConnection;
 
 	std::unordered_map<UINT, Item> m_idToItemMap;
 

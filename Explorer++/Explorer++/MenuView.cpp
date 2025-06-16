@@ -5,8 +5,13 @@
 #include "stdafx.h"
 #include "MenuView.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/MenuHelpTextHost.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WeakPtr.h"
+
+MenuView::MenuView(MenuHelpTextHost *menuHelpTextHost) : m_menuHelpTextHost(menuHelpTextHost)
+{
+}
 
 MenuView::~MenuView()
 {
@@ -136,6 +141,9 @@ void MenuView::OnMenuWillShowForDpi(UINT dpi)
 	m_currentDpi = dpi;
 
 	MaybeAddImagesToMenu();
+
+	m_helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
+		std::bind_front(&MenuView::OnHelpTextRequested, this));
 }
 
 void MenuView::OnMenuClosed()
@@ -143,6 +151,17 @@ void MenuView::OnMenuClosed()
 	DCHECK(m_currentDpi);
 
 	m_currentDpi.reset();
+	m_helpTextConnection.disconnect();
+}
+
+std::optional<std::wstring> MenuView::OnHelpTextRequested(HMENU menu, int id)
+{
+	if (!MenuHelper::IsPartOfMenu(GetMenu(), menu))
+	{
+		return std::nullopt;
+	}
+
+	return GetItemHelpText(id);
 }
 
 void MenuView::MaybeAddImagesToMenu()

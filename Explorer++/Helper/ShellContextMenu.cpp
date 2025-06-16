@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellContextMenu.h"
-#include "MenuHelpTextRequest.h"
+#include "MenuHelpTextHost.h"
 #include "MenuHelper.h"
 #include "ShellContextMenuBuilder.h"
 #include "ShellContextMenuDelegate.h"
@@ -14,10 +14,10 @@
 #include "WindowSubclass.h"
 
 ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE directory,
-	const std::vector<PCITEMID_CHILD> &items, MenuHelpTextRequest *menuHelpTextRequest) :
+	const std::vector<PCITEMID_CHILD> &items, MenuHelpTextHost *menuHelpTextHost) :
 	m_directory(directory),
 	m_items(items.begin(), items.end()),
-	m_menuHelpTextRequest(menuHelpTextRequest),
+	m_menuHelpTextHost(menuHelpTextHost),
 	m_idGenerator(MAX_SHELL_MENU_ID + 1)
 {
 }
@@ -63,13 +63,8 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT
 	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ShellContextMenu::ParentWindowSubclass, this));
 
-	boost::signals2::connection helpTextConnection;
-
-	if (m_menuHelpTextRequest)
-	{
-		helpTextConnection = m_menuHelpTextRequest->AddMenuHelpTextRequestObserver(
-			std::bind_front(&ShellContextMenu::MaybeGetMenuHelpText, this, menu.get()));
-	}
+	auto helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
+		std::bind_front(&ShellContextMenu::MaybeGetMenuHelpText, this, menu.get()));
 
 	UINT cmd =
 		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, hwnd, nullptr);

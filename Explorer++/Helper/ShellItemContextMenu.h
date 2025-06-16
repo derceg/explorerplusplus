@@ -21,7 +21,7 @@ public:
 	};
 
 	ShellItemContextMenu(PCIDLIST_ABSOLUTE directory, const std::vector<PCITEMID_CHILD> &items,
-		MenuHelpTextRequest *menuHelpTextRequest);
+		MenuHelpTextHost *menuHelpTextHost);
 
 	void AddDelegate(ShellItemContextMenuDelegate *delegate);
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);

@@ -282,3 +282,61 @@ TEST_F(MenuViewIconTest, IconRetrievalAfterMenuDestroyed)
 	// can't be updated, but that should still be a safe operation.
 	m_shellIconLoader.TriggerPendingUpdateCallbacks();
 }
+
+namespace
+{
+
+class MenuHelpTextHostFake : public MenuHelpTextHost
+{
+public:
+	boost::signals2::connection AddMenuHelpTextRequestObserver(
+		const MenuHelpTextRequestSignal::slot_type &observer) override
+	{
+		return m_menuHelpTextRequestSignal.connect(observer);
+	}
+
+	std::optional<std::wstring> TriggerHelpTextRequest(HMENU menu, UINT id)
+	{
+		return m_menuHelpTextRequestSignal(menu, id);
+	}
+
+private:
+	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
+};
+
+}
+
+class MenuViewHelpTextRequestTest : public Test
+{
+protected:
+	MenuViewHelpTextRequestTest() : m_menuView(&m_menuHelpTextHost)
+	{
+	}
+
+	MenuHelpTextHostFake m_menuHelpTextHost;
+	MenuViewFake m_menuView;
+};
+
+TEST_F(MenuViewHelpTextRequestTest, HelpTextRequest)
+{
+	UINT itemId = 1;
+	std::wstring helpText = L"Help text";
+	m_menuView.AppendItem(itemId, L"Item", {}, helpText);
+
+	// The menu isn't being shown, so no help text should be returned.
+	auto retrievedHelpText =
+		m_menuHelpTextHost.TriggerHelpTextRequest(m_menuView.GetMenu(), itemId);
+	EXPECT_EQ(retrievedHelpText, std::nullopt);
+
+	m_menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+
+	// The menu is now being shown, so help text should be returned.
+	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(m_menuView.GetMenu(), itemId);
+	EXPECT_EQ(retrievedHelpText, helpText);
+
+	m_menuView.OnMenuClosed();
+
+	// The menu has been closed, so, again, no help text should be returned.
+	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(m_menuView.GetMenu(), itemId);
+	EXPECT_EQ(retrievedHelpText, std::nullopt);
+}

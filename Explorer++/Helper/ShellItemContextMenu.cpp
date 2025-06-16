@@ -11,8 +11,8 @@
 #include <iterator>
 
 ShellItemContextMenu::ShellItemContextMenu(PCIDLIST_ABSOLUTE directory,
-	const std::vector<PCITEMID_CHILD> &items, MenuHelpTextRequest *menuHelpTextRequest) :
-	ShellContextMenu(directory, items, menuHelpTextRequest)
+	const std::vector<PCITEMID_CHILD> &items, MenuHelpTextHost *menuHelpTextHost) :
+	ShellContextMenu(directory, items, menuHelpTextHost)
 {
 	CHECK(!m_items.empty());
 }

@@ -417,7 +417,7 @@
     <ClInclude Include="SignalHelper.h">
       <Filter>Signals</Filter>
     </ClInclude>
-    <ClInclude Include="MenuHelpTextRequest.h">
+    <ClInclude Include="MenuHelpTextHost.h">
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="ClipboardWatcher.h">

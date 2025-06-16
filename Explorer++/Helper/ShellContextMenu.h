@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <vector>
 
-class MenuHelpTextRequest;
+class MenuHelpTextHost;
 class ShellContextMenuDelegate;
 class ShellContextMenuIdRemapper;
 
@@ -31,7 +31,7 @@ public:
 
 protected:
 	ShellContextMenu(PCIDLIST_ABSOLUTE directory, const std::vector<PCITEMID_CHILD> &items,
-		MenuHelpTextRequest *menuHelpTextRequest);
+		MenuHelpTextHost *menuHelpTextHost);
 
 	void AddDelegate(ShellContextMenuDelegate *delegate);
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT flags);
@@ -55,7 +55,7 @@ private:
 
 	ShellContextMenuIdRemapper *GetIdRemapperForDelegate(ShellContextMenuDelegate *delegate);
 
-	MenuHelpTextRequest *const m_menuHelpTextRequest;
+	MenuHelpTextHost *const m_menuHelpTextHost;
 	ShellContextMenuIdGenerator m_idGenerator;
 	std::vector<ShellContextMenuDelegate *> m_delegates;
 	std::unordered_map<ShellContextMenuDelegate *, std::unique_ptr<ShellContextMenuIdRemapper>>

@@ -19,8 +19,7 @@ public:
 		ExtendedVerbs = 1 << 0
 	};
 
-	ShellBackgroundContextMenu(PCIDLIST_ABSOLUTE directory,
-		MenuHelpTextRequest *menuHelpTextRequest);
+	ShellBackgroundContextMenu(PCIDLIST_ABSOLUTE directory, MenuHelpTextHost *menuHelpTextHost);
 
 	void AddDelegate(ShellBackgroundContextMenuDelegate *delegate);
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);

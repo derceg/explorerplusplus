@@ -5,7 +5,9 @@
 #include "pch.h"
 #include "MenuViewFake.h"
 
-MenuViewFake::MenuViewFake() : m_menu(CreatePopupMenu())
+MenuViewFake::MenuViewFake(MenuHelpTextHost *menuHelpTextHost) :
+	MenuView(menuHelpTextHost),
+	m_menu(CreatePopupMenu())
 {
 	CHECK(m_menu);
 }

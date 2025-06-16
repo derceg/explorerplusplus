@@ -13,12 +13,14 @@ using MenuHelpTextRequestSignal =
 	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, UINT id),
 		FirstSuccessfulRequestCombiner<std::optional<std::wstring>>>;
 
-class MenuHelpTextRequest
+// Represents a UI component that can ultimately display menu help text.
+class MenuHelpTextHost
 {
 public:
-	virtual ~MenuHelpTextRequest() = default;
+	virtual ~MenuHelpTextHost() = default;
 
-	// Allows an observer to provide help text for a particular menu item.
+	// Allows an observer to respond to help text requests from the host, in order to provide help
+	// text for a particular menu item.
 	virtual boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) = 0;
 };

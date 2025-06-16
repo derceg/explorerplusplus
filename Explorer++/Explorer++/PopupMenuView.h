@@ -10,7 +10,7 @@
 class PopupMenuView : public MenuView
 {
 public:
-	PopupMenuView();
+	PopupMenuView(MenuHelpTextHost *menuHelpTextHost);
 
 	void Show(HWND hwnd, const POINT &point);
 

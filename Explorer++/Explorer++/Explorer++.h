@@ -115,6 +115,7 @@ public:
 	void TryClose() override;
 	void Close() override;
 
+	// MenuHelpTextHost
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 
@@ -370,7 +371,6 @@ private:
 	boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) override;
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
-	std::optional<std::wstring> MaybeGetMenuHelpText(HMENU menu, int id);
 	MainMenuSubMenu *MaybeGetMainMenuSubMenuFromId(UINT id);
 
 	/* Miscellaneous. */

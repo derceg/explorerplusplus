@@ -44,7 +44,7 @@ public:
 		OpenFolderDisposition openFolderDisposition) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
-	// MenuHelpTextRequest
+	// MenuHelpTextHost
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 

@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
+#include "NoOpMenuHelpTextHost.h"
 #include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
@@ -500,7 +501,7 @@ void BookmarkTreeView::OnShowContextMenu(const POINT &ptScreen)
 
 	TreeView_SelectItem(m_hTreeView, targetItem);
 
-	PopupMenuView popupMenu;
+	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	BookmarkTreeViewContextMenu contextMenu(&popupMenu, m_acceleratorManager, this, m_bookmarkTree,
 		GetBookmarkFolderFromTreeView(targetItem), m_resourceLoader);
 	popupMenu.Show(m_hTreeView, finalPoint);

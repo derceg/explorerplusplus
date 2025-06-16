@@ -1211,6 +1211,7 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
+    <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
     <ClCompile Include="ResourceIconModel.cpp" />
@@ -1541,6 +1542,7 @@
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MouseEvent.h" />
+    <ClInclude Include="NoOpMenuHelpTextHost.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
     <ClInclude Include="ResourceIconModel.h" />

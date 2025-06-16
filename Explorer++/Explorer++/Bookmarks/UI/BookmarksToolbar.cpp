@@ -301,7 +301,7 @@ void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	PopupMenuView popupMenu;
+	PopupMenuView popupMenu(m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_clipboardStore);
 	popupMenu.Show(m_browser->GetHWND(), ptScreen);

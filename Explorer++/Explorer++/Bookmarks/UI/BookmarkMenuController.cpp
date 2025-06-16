@@ -42,7 +42,7 @@ void BookmarkMenuController::OnMenuItemMiddleClicked(const BookmarkItem *bookmar
 
 void BookmarkMenuController::OnMenuItemRightClicked(BookmarkItem *bookmarkItem, const POINT &pt)
 {
-	PopupMenuView popupMenu;
+	PopupMenuView popupMenu(m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_parentWindow, m_clipboardStore);
 	popupMenu.Show(m_parentWindow, pt);

@@ -8,8 +8,8 @@
 #include <wil/common.h>
 
 ShellBackgroundContextMenu::ShellBackgroundContextMenu(PCIDLIST_ABSOLUTE directory,
-	MenuHelpTextRequest *menuHelpTextRequest) :
-	ShellContextMenu(directory, {}, menuHelpTextRequest)
+	MenuHelpTextHost *menuHelpTextHost) :
+	ShellContextMenu(directory, {}, menuHelpTextHost)
 {
 }
 

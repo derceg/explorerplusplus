@@ -37,7 +37,7 @@ public:
 	MOCK_METHOD(void, OpenItem,
 		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
 
-	// MenuHelpTextRequest
+	// MenuHelpTextHost
 	MOCK_METHOD(boost::signals2::connection, AddMenuHelpTextRequestObserver,
 		(const MenuHelpTextRequestSignal::slot_type &observer), (override));
 };

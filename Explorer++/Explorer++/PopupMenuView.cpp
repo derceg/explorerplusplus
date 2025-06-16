@@ -8,7 +8,9 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclass.h"
 
-PopupMenuView::PopupMenuView() : m_menu(CreatePopupMenu())
+PopupMenuView::PopupMenuView(MenuHelpTextHost *menuHelpTextHost) :
+	MenuView(menuHelpTextHost),
+	m_menu(CreatePopupMenu())
 {
 }
 

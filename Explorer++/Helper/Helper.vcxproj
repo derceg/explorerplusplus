@@ -908,7 +908,7 @@
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="FileDialogs.h" />
-    <ClInclude Include="MenuHelpTextRequest.h" />
+    <ClInclude Include="MenuHelpTextHost.h" />
     <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />

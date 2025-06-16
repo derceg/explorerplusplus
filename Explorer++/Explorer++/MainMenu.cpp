@@ -130,8 +130,6 @@ void Explorerplusplus::InitializeMainMenu()
 				MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID);
 		});
 
-	AddMenuHelpTextRequestObserver(std::bind_front(&Explorerplusplus::MaybeGetMenuHelpText, this));
-
 	UpdateMenuAcceleratorStrings(mainMenu, m_app->GetAcceleratorManager());
 }
 
@@ -403,19 +401,6 @@ void Explorerplusplus::OnMenuRightButtonUp(HMENU menu, int index, const POINT &p
 	}
 
 	m_mainMenuItemRightClickedSignal(menu, index, pt);
-}
-
-std::optional<std::wstring> Explorerplusplus::MaybeGetMenuHelpText(HMENU menu, int id)
-{
-	if (MenuHelper::IsPartOfMenu(GetMenu(m_hContainer), menu))
-	{
-		if (auto *subMenu = MaybeGetMainMenuSubMenuFromId(id))
-		{
-			return subMenu->view->GetItemHelpText(id);
-		}
-	}
-
-	return std::nullopt;
 }
 
 Explorerplusplus::MainMenuSubMenu *Explorerplusplus::MaybeGetMainMenuSubMenuFromId(UINT id)

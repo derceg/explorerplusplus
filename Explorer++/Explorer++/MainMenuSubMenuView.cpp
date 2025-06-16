@@ -9,6 +9,7 @@
 
 MainMenuSubMenuView::MainMenuSubMenuView(BrowserWindow *browser, HMENU mainMenu,
 	UINT subMenuItemId) :
+	MenuView(browser),
 	m_hwnd(browser->GetHWND())
 {
 	// This menu will be added as a submenu of the main menu. The main menu will therefore assume

@@ -5,16 +5,19 @@
 #pragma once
 
 #include "MenuView.h"
+#include "NoOpMenuHelpTextHost.h"
 #include <wil/resource.h>
 #include <string>
 
 class MenuViewFake : public MenuView
 {
 public:
-	MenuViewFake();
+	MenuViewFake(MenuHelpTextHost *menuHelpTextHost = NoOpMenuHelpTextHost::GetInstance());
 
 	using MenuView::OnMenuClosed;
 	using MenuView::OnMenuWillShowForDpi;
+
+	HMENU GetMenu() const override;
 
 	int GetItemCount() const;
 	UINT GetItemId(int index) const;
@@ -22,7 +25,5 @@ public:
 	HBITMAP GetItemBitmap(UINT id) const;
 
 private:
-	HMENU GetMenu() const override;
-
 	wil::unique_hmenu m_menu;
 };

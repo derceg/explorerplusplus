@@ -6,7 +6,7 @@
 
 #include "BrowserCommandTargetManager.h"
 #include "Navigator.h"
-#include "../Helper/MenuHelpTextRequest.h"
+#include "../Helper/MenuHelpTextHost.h"
 #include <boost/signals2.hpp>
 
 class BrowserCommandController;
@@ -16,7 +16,7 @@ class ShellBrowser;
 struct WindowStorageData;
 
 // Each browser window contains one or more browser panes, with each pane containing a set of tabs.
-class BrowserWindow : public Navigator, public MenuHelpTextRequest
+class BrowserWindow : public Navigator, public MenuHelpTextHost
 {
 public:
 	enum class LifecycleState

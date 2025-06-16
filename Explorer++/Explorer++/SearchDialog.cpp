@@ -8,6 +8,7 @@
 #include "BrowserWindow.h"
 #include "DialogConstants.h"
 #include "MainResource.h"
+#include "NoOpMenuHelpTextHost.h"
 #include "OpenItemLocationContextMenuDelegate.h"
 #include "OpenItemsContextMenuDelegate.h"
 #include "ResourceLoader.h"
@@ -613,7 +614,8 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
 						ILRemoveLastID(pidlDirectory.get());
 
-						ShellItemContextMenu contextMenu(pidlDirectory.get(), pidlItems, nullptr);
+						ShellItemContextMenu contextMenu(pidlDirectory.get(), pidlItems,
+							NoOpMenuHelpTextHost::GetInstance());
 
 						OpenItemsContextMenuDelegate openItemsDelegate(m_browserList,
 							m_resourceLoader);

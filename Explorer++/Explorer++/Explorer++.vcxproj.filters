@@ -862,6 +862,9 @@
     <ClCompile Include="TabContextMenu.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
+    <ClCompile Include="NoOpMenuHelpTextHost.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1811,6 +1814,9 @@
     </ClInclude>
     <ClInclude Include="TabContextMenu.h">
       <Filter>Tabs\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="NoOpMenuHelpTextHost.h">
+      <Filter>Menus\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

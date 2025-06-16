@@ -11,6 +11,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "NoOpMenuHelpTextHost.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -532,7 +533,7 @@ void BookmarkListView::OnShowContextMenu(const POINT &ptScreen)
 			ClientToScreen(m_hListView, &finalPoint);
 		}
 
-		PopupMenuView popupMenu;
+		PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 		BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 			rawBookmarkItems, m_resourceLoader, m_browser, m_hListView, m_clipboardStore);
 		popupMenu.Show(m_hListView, finalPoint);
