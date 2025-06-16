@@ -859,6 +859,9 @@
     <ClCompile Include="ResourceIconModel.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="TabContextMenu.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1805,6 +1808,9 @@
     </ClInclude>
     <ClInclude Include="IconUpdateCallback.h">
       <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContextMenu.h">
+      <Filter>Tabs\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

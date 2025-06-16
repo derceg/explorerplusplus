@@ -7,9 +7,10 @@
 #include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
-class App;
 class RenameTabDialog;
+class ResourceLoader;
 class Tab;
+class TabEvents;
 
 class RenameTabDialogPersistentSettings : public DialogSettings
 {
@@ -30,7 +31,8 @@ private:
 class RenameTabDialog : public BaseDialog
 {
 public:
-	RenameTabDialog(HWND parent, App *app, Tab *tab);
+	RenameTabDialog(HWND parent, Tab *tab, TabEvents *tabEvents,
+		const ResourceLoader *resourceLoader);
 
 protected:
 	INT_PTR OnInitDialog() override;

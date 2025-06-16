@@ -16,7 +16,6 @@
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/parameter.hpp>
-#include <wil/resource.h>
 #include <functional>
 #include <optional>
 #include <unordered_map>
@@ -91,7 +90,7 @@ public:
 	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser,
 		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE resourceInstance, const Config *config);
+		const Config *config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -149,7 +148,7 @@ private:
 	TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE resourceInstance, const Config *config);
+		const Config *config);
 
 	LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -161,18 +160,6 @@ private:
 	void OnTabDoubleClicked(Tab *tab, const MouseEvent &event);
 	void OnTabMiddleClicked(Tab *tab, const MouseEvent &event);
 	void OnTabRightClicked(Tab *tab, const MouseEvent &event);
-
-	void CreateTabContextMenu(Tab &tab, const POINT &pt);
-	void AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages);
-	void ProcessTabCommand(UINT uMenuID, Tab &tab);
-	void OnOpenParentInNewTab(const Tab &tab);
-	void OnRefreshTab(Tab &tab);
-	void OnRefreshAllTabs();
-	void OnRenameTab(Tab &tab);
-	void OnLockTab(Tab &tab);
-	void OnLockTabAndAddress(Tab &tab);
-	void OnCloseOtherTabs(int index);
-	void OnCloseTabsToRight(int index);
 
 	void ShowBackgroundContextMenu(const POINT &ptClient);
 
@@ -211,7 +198,6 @@ private:
 	IconFetcherImpl m_iconFetcher;
 	CachedIcons *m_cachedIcons;
 	BookmarkTree *m_bookmarkTree;
-	HINSTANCE m_resourceInstance;
 	const Config *const m_config;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 

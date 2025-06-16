@@ -9,26 +9,19 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "Icon.h"
-#include "MainResource.h"
 #include "MainTabView.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
-#include "RenameTabDialog.h"
-#include "ResourceHelper.h"
-#include "ResourceLoader.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "SystemFontHelper.h"
 #include "TabContainerBackgroundContextMenu.h"
+#include "TabContextMenu.h"
 #include "TabStorage.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/ImageHelper.h"
-#include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include "../Helper/WeakPtrFactory.h"
@@ -41,14 +34,6 @@ using namespace std::chrono_literals;
 
 namespace
 {
-
-// clang-format off
-const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, Icon::NewTab },
-	{ IDM_TAB_REFRESH, Icon::Refresh },
-	{ IDM_TAB_CLOSETAB, Icon::CloseTab }
-};
-// clang-format on
 
 class MainTabViewItem : public TabViewItem
 {
@@ -181,16 +166,16 @@ private:
 TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, const Config *config)
+	const Config *config)
 {
 	return new TabContainerImpl(view, browser, tabNavigation, app, coreInterface, fileActionHandler,
-		cachedIcons, bookmarkTree, resourceInstance, config);
+		cachedIcons, bookmarkTree, config);
 }
 
 TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, const Config *config) :
+	const Config *config) :
 	ShellDropTargetWindow(view->GetHWND()),
 	m_view(view),
 	m_browser(browser),
@@ -202,7 +187,6 @@ TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),
-	m_resourceInstance(resourceInstance),
 	m_config(config),
 	m_iPreviousTabSelectionId(-1)
 {
@@ -258,183 +242,10 @@ void TabContainerImpl::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 	BOOL res = ClientToScreen(m_hwnd, &ptScreen);
 	CHECK(res);
 
-	CreateTabContextMenu(*tab, ptScreen);
-}
-
-void TabContainerImpl::CreateTabContextMenu(Tab &tab, const POINT &pt)
-{
-	auto parentMenu =
-		wil::unique_hmenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
-
-	if (!parentMenu)
-	{
-		return;
-	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	std::vector<wil::unique_hbitmap> menuImages;
-	AddImagesToTabContextMenu(menu, menuImages);
-
-	MenuHelper::EnableItem(menu, IDM_TAB_OPENPARENTINNEWTAB,
-		!IsNamespaceRoot(tab.GetShellBrowserImpl()->GetDirectoryIdl().get()));
-	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
-	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTABANDADDRESS,
-		tab.GetLockState() == Tab::LockState::AddressLocked);
-	MenuHelper::EnableItem(menu, IDM_TAB_CLOSETAB, tab.GetLockState() == Tab::LockState::NotLocked);
-
-	UINT command =
-		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x,
-			pt.y, 0, m_hwnd, nullptr);
-
-	ProcessTabCommand(command, tab);
-}
-
-void TabContainerImpl::AddImagesToTabContextMenu(HMENU menu,
-	std::vector<wil::unique_hbitmap> &menuImages)
-{
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-
-	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
-	{
-		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_app->GetResourceLoader(),
-			mapping.second, dpi, menuImages);
-	}
-}
-
-void TabContainerImpl::ProcessTabCommand(UINT uMenuID, Tab &tab)
-{
-	switch (uMenuID)
-	{
-	case IDM_FILE_NEWTAB:
-		/* Send the resulting command back to the main window for processing. */
-		SendMessage(m_coreInterface->GetMainWindow(), WM_COMMAND, MAKEWPARAM(uMenuID, 0), 0);
-		break;
-
-	case IDM_TAB_DUPLICATETAB:
-		DuplicateTab(tab);
-		break;
-
-	case IDM_TAB_OPENPARENTINNEWTAB:
-		OnOpenParentInNewTab(tab);
-		break;
-
-	case IDM_TAB_REFRESH:
-		OnRefreshTab(tab);
-		break;
-
-	case IDM_TAB_REFRESHALL:
-		OnRefreshAllTabs();
-		break;
-
-	case IDM_TAB_RENAMETAB:
-		OnRenameTab(tab);
-		break;
-
-	case IDM_TAB_LOCKTAB:
-		OnLockTab(tab);
-		break;
-
-	case IDM_TAB_LOCKTABANDADDRESS:
-		OnLockTabAndAddress(tab);
-		break;
-
-	case IDM_TAB_CLOSETAB:
-		CloseTab(tab);
-		break;
-
-	case IDM_TAB_CLOSEOTHERTABS:
-		OnCloseOtherTabs(GetTabIndex(tab));
-		break;
-
-	case IDM_TAB_CLOSETABSTORIGHT:
-		OnCloseTabsToRight(GetTabIndex(tab));
-		break;
-	}
-}
-
-void TabContainerImpl::OnOpenParentInNewTab(const Tab &tab)
-{
-	auto pidlCurrent = tab.GetShellBrowserImpl()->GetDirectoryIdl();
-
-	unique_pidl_absolute pidlParent;
-	HRESULT hr = GetVirtualParentPath(pidlCurrent.get(), wil::out_param(pidlParent));
-
-	if (SUCCEEDED(hr))
-	{
-		auto navigateParams = NavigateParams::Normal(pidlParent.get());
-		CreateNewTab(navigateParams, TabSettings(_selected = true));
-	}
-}
-
-void TabContainerImpl::OnRefreshTab(Tab &tab)
-{
-	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
-}
-
-void TabContainerImpl::OnRefreshAllTabs()
-{
-	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
-	{
-		tab->GetShellBrowserImpl()->GetNavigationController()->Refresh();
-	}
-}
-
-void TabContainerImpl::OnRenameTab(Tab &tab)
-{
-	RenameTabDialog renameTabDialog(m_coreInterface->GetMainWindow(), m_app, &tab);
-	renameTabDialog.ShowModalDialog();
-}
-
-void TabContainerImpl::OnLockTab(Tab &tab)
-{
-	if (tab.GetLockState() == Tab::LockState::Locked)
-	{
-		tab.SetLockState(Tab::LockState::NotLocked);
-	}
-	else
-	{
-		tab.SetLockState(Tab::LockState::Locked);
-	}
-}
-
-void TabContainerImpl::OnLockTabAndAddress(Tab &tab)
-{
-	if (tab.GetLockState() == Tab::LockState::AddressLocked)
-	{
-		tab.SetLockState(Tab::LockState::NotLocked);
-	}
-	else
-	{
-		tab.SetLockState(Tab::LockState::AddressLocked);
-	}
-}
-
-void TabContainerImpl::OnCloseOtherTabs(int index)
-{
-	const int nTabs = GetNumTabs();
-
-	/* Close all tabs except the
-	specified one. */
-	for (int i = nTabs - 1; i >= 0; i--)
-	{
-		if (i != index)
-		{
-			const Tab &tab = GetTabByIndex(i);
-			CloseTab(tab);
-		}
-	}
-}
-
-void TabContainerImpl::OnCloseTabsToRight(int index)
-{
-	int nTabs = GetNumTabs();
-
-	for (int i = nTabs - 1; i > index; i--)
-	{
-		const Tab &currentTab = GetTabByIndex(i);
-		CloseTab(currentTab);
-	}
+	PopupMenuView popupMenu;
+	TabContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), tab, this,
+		m_app->GetTabEvents(), m_app->GetResourceLoader());
+	popupMenu.Show(m_hwnd, ptScreen);
 }
 
 LRESULT TabContainerImpl::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

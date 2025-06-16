@@ -946,7 +946,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		OnFocusNextWindow(FocusChangeDirection::Next);
 		break;
 
-	case IDA_TAB_DUPLICATETAB:
+	case IDA_DUPLICATE_TAB:
 		GetActivePane()->GetTabContainerImpl()->DuplicateTab(
 			GetActivePane()->GetTabContainerImpl()->GetSelectedTab());
 		break;

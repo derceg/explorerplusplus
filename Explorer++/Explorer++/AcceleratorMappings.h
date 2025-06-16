@@ -26,10 +26,7 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"select_tab_6", IDA_TAB6},
 	{L"select_tab_7", IDA_TAB7},
 	{L"select_tab_8", IDA_TAB8},
-	{L"duplicate_tab", IDA_TAB_DUPLICATETAB},
-
-	// The accelerators below are specifically excluded from customization.
-	// {L"right_click", IDA_RCLICK}
+	{L"duplicate_tab", IDA_DUPLICATE_TAB},
 
 	// Main menu items.
 	{L"new_tab", IDM_FILE_NEWTAB},

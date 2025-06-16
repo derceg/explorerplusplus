@@ -4,21 +4,22 @@
 
 #include "stdafx.h"
 #include "RenameTabDialog.h"
-#include "App.h"
 #include "MainResource.h"
+#include "TabEvents.h"
 #include "../Helper/WindowHelper.h"
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
-RenameTabDialog::RenameTabDialog(HWND parent, App *app, Tab *tab) :
-	BaseDialog(app->GetResourceLoader(), IDD_RENAMETAB, parent, DialogSizingType::None),
+RenameTabDialog::RenameTabDialog(HWND parent, Tab *tab, TabEvents *tabEvents,
+	const ResourceLoader *resourceLoader) :
+	BaseDialog(resourceLoader, IDD_RENAMETAB, parent, DialogSizingType::None),
 	m_tab(tab)
 {
 	m_prtdps = &RenameTabDialogPersistentSettings::GetInstance();
 
-	m_connections.push_back(app->GetTabEvents()->AddRemovedObserver(
-		std::bind_front(&RenameTabDialog::OnTabClosed, this),
-		TabEventScope::ForBrowser(*m_tab->GetBrowser())));
+	m_connections.push_back(
+		tabEvents->AddRemovedObserver(std::bind_front(&RenameTabDialog::OnTabClosed, this),
+			TabEventScope::ForBrowser(*m_tab->GetBrowser())));
 }
 
 INT_PTR RenameTabDialog::OnInitDialog()

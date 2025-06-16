@@ -453,7 +453,7 @@
 #define IDA_RESET_TEXT_SIZE             32768
 #define IDA_NEXTTAB                     40123
 #define IDA_PREVIOUSTAB                 40125
-#define IDA_TAB_DUPLICATETAB            40247
+#define IDA_DUPLICATE_TAB               40247
 #define IDA_ADDRESSBAR                  40286
 #define IDA_COMBODROPDOWN               40287
 #define IDA_NEXTWINDOW                  40289
