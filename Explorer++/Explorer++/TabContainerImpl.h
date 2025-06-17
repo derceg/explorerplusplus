@@ -20,7 +20,7 @@
 #include <optional>
 #include <unordered_map>
 
-class App;
+class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class CachedIcons;
@@ -28,9 +28,13 @@ struct Config;
 class CoreInterface;
 class MainTabView;
 struct NavigateParams;
+class NavigationEvents;
 class NavigationRequest;
 struct PreservedTab;
+class ResourceLoader;
+class ShellBrowserEvents;
 class ShellBrowserFactory;
+class TabRestorer;
 
 BOOST_PARAMETER_NAME(name)
 BOOST_PARAMETER_NAME(index)
@@ -85,9 +89,12 @@ class TabContainerImpl :
 	private TabViewDelegate
 {
 public:
-	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser, App *app,
+	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser,
 		CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config);
+		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
+		NavigationEvents *navigationEvents, TabRestorer *tabRestorer, CachedIcons *cachedIcons,
+		BookmarkTree *bookmarkTree, const AcceleratorManager *acceleratorManager,
+		const Config *config, const ResourceLoader *resourceLoader);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -142,9 +149,12 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainerImpl(MainTabView *view, BrowserWindow *browser, App *app,
-		CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config);
+	TabContainerImpl(MainTabView *view, BrowserWindow *browser, CoreInterface *coreInterface,
+		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		const AcceleratorManager *acceleratorManager, const Config *config,
+		const ResourceLoader *resourceLoader);
 
 	LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -185,15 +195,20 @@ private:
 
 	MainTabView *const m_view;
 	BrowserWindow *const m_browser;
-	App *const m_app;
 	CoreInterface *const m_coreInterface;
 	ShellBrowserFactory *const m_shellBrowserFactory;
+	TabEvents *const m_tabEvents;
+	ShellBrowserEvents *const m_shellBrowserEvents;
+	NavigationEvents *const m_navigationEvents;
+	TabRestorer *const m_tabRestorer;
 	OneShotTimerManager m_timerManager;
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
 	IconFetcherImpl m_iconFetcher;
-	CachedIcons *m_cachedIcons;
-	BookmarkTree *m_bookmarkTree;
+	CachedIcons *const m_cachedIcons;
+	BookmarkTree *const m_bookmarkTree;
+	const AcceleratorManager *const m_acceleratorManager;
 	const Config *const m_config;
+	const ResourceLoader *const m_resourceLoader;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	std::vector<int> m_tabSelectionHistory;

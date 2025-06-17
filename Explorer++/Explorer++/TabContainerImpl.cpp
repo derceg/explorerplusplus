@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "TabContainerImpl.h"
-#include "App.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "BrowserWindow.h"
 #include "Config.h"
@@ -13,12 +12,15 @@
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/NavigateParams.h"
+#include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
+#include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserFactory.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerBackgroundContextMenu.h"
 #include "TabContextMenu.h"
+#include "TabEvents.h"
 #include "TabStorage.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
@@ -39,22 +41,23 @@ namespace
 class MainTabViewItem : public TabViewItem
 {
 public:
-	MainTabViewItem(Tab *tab, App *app, IconFetcher *iconFetcher, CachedIcons *cachedIcons,
+	MainTabViewItem(Tab *tab, TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
+		NavigationEvents *navigationEvents, IconFetcher *iconFetcher, CachedIcons *cachedIcons,
 		MainTabViewImageListManager *imageListManager) :
 		m_tab(tab),
 		m_iconFetcher(iconFetcher),
 		m_cachedIcons(cachedIcons),
 		m_imageListManager(imageListManager)
 	{
-		m_connections.push_back(app->GetTabEvents()->AddUpdatedObserver(
-			std::bind_front(&MainTabViewItem::OnTabUpdated, this),
-			TabEventScope::ForBrowser(*tab->GetBrowser())));
+		m_connections.push_back(
+			tabEvents->AddUpdatedObserver(std::bind_front(&MainTabViewItem::OnTabUpdated, this),
+				TabEventScope::ForBrowser(*tab->GetBrowser())));
 
-		m_connections.push_back(app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
+		m_connections.push_back(shellBrowserEvents->AddDirectoryPropertiesChangedObserver(
 			std::bind(&MainTabViewItem::OnDisplayPropertiesUpdated, this),
 			ShellBrowserEventScope::ForShellBrowser(*tab->GetShellBrowser())));
 
-		m_connections.push_back(app->GetNavigationEvents()->AddCommittedObserver(
+		m_connections.push_back(navigationEvents->AddCommittedObserver(
 			std::bind(&MainTabViewItem::OnDisplayPropertiesUpdated, this),
 			NavigationEventScope::ForShellBrowser(*tab->GetShellBrowser())));
 	}
@@ -164,28 +167,40 @@ private:
 
 }
 
-TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser, App *app,
-	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
-	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config)
+TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser,
+	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
+	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	const AcceleratorManager *acceleratorManager, const Config *config,
+	const ResourceLoader *resourceLoader)
 {
-	return new TabContainerImpl(view, browser, app, coreInterface, shellBrowserFactory, cachedIcons,
-		bookmarkTree, config);
+	return new TabContainerImpl(view, browser, coreInterface, shellBrowserFactory, tabEvents,
+		shellBrowserEvents, navigationEvents, tabRestorer, cachedIcons, bookmarkTree,
+		acceleratorManager, config, resourceLoader);
 }
 
-TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser, App *app,
-	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
-	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config) :
+TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
+	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
+	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	const AcceleratorManager *acceleratorManager, const Config *config,
+	const ResourceLoader *resourceLoader) :
 	ShellDropTargetWindow(view->GetHWND()),
 	m_view(view),
 	m_browser(browser),
-	m_app(app),
 	m_coreInterface(coreInterface),
 	m_shellBrowserFactory(shellBrowserFactory),
+	m_tabEvents(tabEvents),
+	m_shellBrowserEvents(shellBrowserEvents),
+	m_navigationEvents(navigationEvents),
+	m_tabRestorer(tabRestorer),
 	m_timerManager(m_hwnd),
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),
+	m_acceleratorManager(acceleratorManager),
 	m_config(config),
+	m_resourceLoader(resourceLoader),
 	m_iPreviousTabSelectionId(-1)
 {
 	Initialize(GetParent(m_view->GetHWND()));
@@ -241,8 +256,7 @@ void TabContainerImpl::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 	CHECK(res);
 
 	PopupMenuView popupMenu(m_browser);
-	TabContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), tab, this,
-		m_app->GetTabEvents(), m_app->GetResourceLoader());
+	TabContextMenu menu(&popupMenu, m_acceleratorManager, tab, this, m_tabEvents, m_resourceLoader);
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 
@@ -272,9 +286,8 @@ void TabContainerImpl::ShowBackgroundContextMenu(const POINT &ptClient)
 	ClientToScreen(m_hwnd, &ptScreen);
 
 	PopupMenuView popupMenu(m_browser);
-	TabContainerBackgroundContextMenu menu(&popupMenu, m_app->GetAcceleratorManager(), this,
-		m_app->GetTabRestorer(), m_bookmarkTree, m_browser, m_coreInterface,
-		m_app->GetResourceLoader());
+	TabContainerBackgroundContextMenu menu(&popupMenu, m_acceleratorManager, this, m_tabRestorer,
+		m_bookmarkTree, m_browser, m_coreInterface, m_resourceLoader);
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 
@@ -287,7 +300,7 @@ void TabContainerImpl::OnTabSelected(const Tab &tab)
 
 	m_iPreviousTabSelectionId = tab.GetId();
 
-	m_app->GetTabEvents()->NotifySelected(tab);
+	m_tabEvents->NotifySelected(tab);
 }
 
 void TabContainerImpl::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
@@ -327,8 +340,8 @@ Tab &TabContainerImpl::CreateNewTab(const PreservedTab &preservedTab)
 	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
 		.customName = preservedTab.customName,
 		.lockState = preservedTab.lockState };
-	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, this,
-		m_app->GetTabEvents(), initialTabData);
+	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, this, m_tabEvents,
+		initialTabData);
 	auto *rawTab = tab.get();
 	m_tabs.insert({ tab->GetId(), std::move(tab) });
 
@@ -364,7 +377,7 @@ Tab &TabContainerImpl::CreateNewTab(NavigateParams &navigateParams, const TabSet
 	}
 	else
 	{
-		folderSettingsFinal = m_app->GetConfig()->defaultFolderSettings;
+		folderSettingsFinal = m_config->defaultFolderSettings;
 	}
 
 	auto shellBrowser =
@@ -383,8 +396,8 @@ Tab &TabContainerImpl::CreateNewTab(NavigateParams &navigateParams, const TabSet
 		initialTabData.customName = *tabSettings.name;
 	}
 
-	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, this,
-		m_app->GetTabEvents(), initialTabData);
+	auto tab = std::make_unique<Tab>(std::move(shellBrowser), m_browser, this, m_tabEvents,
+		initialTabData);
 	auto *rawTab = tab.get();
 	m_tabs.insert({ tab->GetId(), std::move(tab) });
 
@@ -415,8 +428,8 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		}
 	}
 
-	auto tabItem = std::make_unique<MainTabViewItem>(&tab, m_app, &m_iconFetcher, m_cachedIcons,
-		m_view->GetImageListManager());
+	auto tabItem = std::make_unique<MainTabViewItem>(&tab, m_tabEvents, m_shellBrowserEvents,
+		m_navigationEvents, &m_iconFetcher, m_cachedIcons, m_view->GetImageListManager());
 	tabItem->SetDoubleClickedCallback(
 		std::bind_front(&TabContainerImpl::OnTabDoubleClicked, this, &tab));
 	tabItem->SetMiddleClickedCallback(
@@ -443,7 +456,7 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = true;
 	}
 
-	m_app->GetTabEvents()->NotifyCreated(tab);
+	m_tabEvents->NotifyCreated(tab);
 
 	if (selected)
 	{
@@ -479,7 +492,7 @@ bool TabContainerImpl::CloseTab(const Tab &tab)
 		return false;
 	}
 
-	m_app->GetTabEvents()->NotifyPreRemoval(tab, GetTabIndex(tab));
+	m_tabEvents->NotifyPreRemoval(tab, GetTabIndex(tab));
 
 	RemoveTabFromControl(tab);
 
@@ -491,7 +504,7 @@ bool TabContainerImpl::CloseTab(const Tab &tab)
 
 	m_tabs.erase(itr);
 
-	m_app->GetTabEvents()->NotifyRemoved(tab);
+	m_tabEvents->NotifyRemoved(tab);
 
 	return true;
 }
@@ -724,7 +737,7 @@ void TabContainerImpl::DuplicateTab(const Tab &tab)
 void TabContainerImpl::OnTabMoved(int fromIndex, int toIndex)
 {
 	const Tab &tab = GetTabByIndex(toIndex);
-	m_app->GetTabEvents()->NotifyMoved(tab, fromIndex, toIndex);
+	m_tabEvents->NotifyMoved(tab, fromIndex, toIndex);
 }
 
 bool TabContainerImpl::ShouldRemoveIcon(int iconIndex)

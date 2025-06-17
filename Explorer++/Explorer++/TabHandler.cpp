@@ -23,8 +23,10 @@ void Explorerplusplus::InitializeTabs()
 		MainTabView::Create(m_tabBacking->GetHWND(), m_config, m_app->GetResourceLoader());
 	m_connections.push_back(mainTabView->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); }));
 
-	auto *tabContainer = TabContainerImpl::Create(mainTabView, this, m_app, this,
-		&m_shellBrowserFactory, m_app->GetCachedIcons(), m_app->GetBookmarkTree(), m_config);
+	auto *tabContainer = TabContainerImpl::Create(mainTabView, this, this, &m_shellBrowserFactory,
+		m_app->GetTabEvents(), m_app->GetShellBrowserEvents(), m_app->GetNavigationEvents(),
+		m_app->GetTabRestorer(), m_app->GetCachedIcons(), m_app->GetBookmarkTree(),
+		m_app->GetAcceleratorManager(), m_config, m_app->GetResourceLoader());
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
