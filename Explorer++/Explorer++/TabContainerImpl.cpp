@@ -14,6 +14,7 @@
 #include "PreservedTab.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
+#include "ShellBrowser/ShellBrowserFactory.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerBackgroundContextMenu.h"
@@ -163,26 +164,23 @@ private:
 
 }
 
-TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser,
-	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	const Config *config)
+TabContainerImpl *TabContainerImpl::Create(MainTabView *view, BrowserWindow *browser, App *app,
+	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
+	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config)
 {
-	return new TabContainerImpl(view, browser, tabNavigation, app, coreInterface, fileActionHandler,
-		cachedIcons, bookmarkTree, config);
+	return new TabContainerImpl(view, browser, app, coreInterface, shellBrowserFactory, cachedIcons,
+		bookmarkTree, config);
 }
 
-TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser,
-	TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	const Config *config) :
+TabContainerImpl::TabContainerImpl(MainTabView *view, BrowserWindow *browser, App *app,
+	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
+	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config) :
 	ShellDropTargetWindow(view->GetHWND()),
 	m_view(view),
 	m_browser(browser),
-	m_tabNavigation(tabNavigation),
 	m_app(app),
 	m_coreInterface(coreInterface),
-	m_fileActionHandler(fileActionHandler),
+	m_shellBrowserFactory(shellBrowserFactory),
 	m_timerManager(m_hwnd),
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),
@@ -324,9 +322,8 @@ Tab &TabContainerImpl::CreateNewTab(const std::wstring &directory, const TabSett
 
 Tab &TabContainerImpl::CreateNewTab(const PreservedTab &preservedTab)
 {
-	auto shellBrowser = std::make_unique<ShellBrowserImpl>(m_browser->GetHWND(), m_app, m_browser,
-		m_tabNavigation, m_fileActionHandler, preservedTab.history, preservedTab.currentEntry,
-		preservedTab.preservedFolderState);
+	auto shellBrowser = m_shellBrowserFactory->CreateFromPreserved(preservedTab.history,
+		preservedTab.currentEntry, preservedTab.preservedFolderState);
 	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
 		.customName = preservedTab.customName,
 		.lockState = preservedTab.lockState };
@@ -371,8 +368,7 @@ Tab &TabContainerImpl::CreateNewTab(NavigateParams &navigateParams, const TabSet
 	}
 
 	auto shellBrowser =
-		std::make_unique<ShellBrowserImpl>(m_browser->GetHWND(), m_app, m_browser, m_tabNavigation,
-			m_fileActionHandler, navigateParams.pidl, folderSettingsFinal, initialColumns);
+		m_shellBrowserFactory->Create(navigateParams.pidl, folderSettingsFinal, initialColumns);
 
 	Tab::InitialData initialTabData;
 

@@ -637,7 +637,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_UNDO:
-		m_FileActionHandler.Undo();
+		m_fileActionHandler.Undo();
 		break;
 
 	case APPCOMMAND_REDO:

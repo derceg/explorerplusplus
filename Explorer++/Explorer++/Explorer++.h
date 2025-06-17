@@ -18,6 +18,7 @@
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
 #include "RebarView.h"
+#include "ShellBrowser/ShellBrowserFactoryImpl.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
@@ -394,6 +395,9 @@ private:
 	bool m_bShowTabBar;
 	ULONG m_SHChangeNotifyID;
 
+	// Undo support.
+	FileActionHandler m_fileActionHandler;
+
 #if DCHECK_IS_ON()
 	bool m_performingLayout = false;
 #endif
@@ -438,6 +442,7 @@ private:
 
 	HWND m_hActiveListView;
 	ShellBrowserImpl *m_pActiveShellBrowser;
+	ShellBrowserFactoryImpl m_shellBrowserFactory;
 
 	/* User options variables. */
 	Config *const m_config;
@@ -470,9 +475,6 @@ private:
 	IconFetcherImpl m_iconFetcher;
 	ShellIconLoaderImpl m_shellIconLoader;
 
-	/* Undo support. */
-	FileActionHandler m_FileActionHandler;
-
 	// Main rebar
 	MainRebarView *m_mainRebarView = nullptr;
 	std::vector<boost::signals2::scoped_connection> m_rebarConnections;
@@ -487,5 +489,5 @@ private:
 	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
 
-	WeakPtrFactory<Explorerplusplus> m_weakPtrFactory;
+	WeakPtrFactory<Explorerplusplus> m_weakPtrFactory{ this };
 };

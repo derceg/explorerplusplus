@@ -354,7 +354,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDM_EDIT_UNDO:
-		m_FileActionHandler.Undo();
+		m_fileActionHandler.Undo();
 		break;
 
 	case MainToolbarButton::Cut:

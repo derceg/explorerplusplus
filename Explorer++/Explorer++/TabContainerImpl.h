@@ -26,13 +26,11 @@ class BrowserWindow;
 class CachedIcons;
 struct Config;
 class CoreInterface;
-class FileActionHandler;
 class MainTabView;
 struct NavigateParams;
 class NavigationRequest;
 struct PreservedTab;
-class ShellBrowser;
-class TabNavigationInterface;
+class ShellBrowserFactory;
 
 BOOST_PARAMETER_NAME(name)
 BOOST_PARAMETER_NAME(index)
@@ -87,10 +85,9 @@ class TabContainerImpl :
 	private TabViewDelegate
 {
 public:
-	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser,
-		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		const Config *config);
+	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser, App *app,
+		CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -145,10 +142,9 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainerImpl(MainTabView *view, BrowserWindow *browser,
-		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
-		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		const Config *config);
+	TabContainerImpl(MainTabView *view, BrowserWindow *browser, App *app,
+		CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, const Config *config);
 
 	LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -189,10 +185,9 @@ private:
 
 	MainTabView *const m_view;
 	BrowserWindow *const m_browser;
-	TabNavigationInterface *m_tabNavigation;
 	App *const m_app;
-	CoreInterface *m_coreInterface;
-	FileActionHandler *m_fileActionHandler;
+	CoreInterface *const m_coreInterface;
+	ShellBrowserFactory *const m_shellBrowserFactory;
 	OneShotTimerManager m_timerManager;
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
 	IconFetcherImpl m_iconFetcher;

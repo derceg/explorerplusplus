@@ -865,6 +865,9 @@
     <ClCompile Include="NoOpMenuHelpTextHost.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1817,6 +1820,12 @@
     </ClInclude>
     <ClInclude Include="NoOpMenuHelpTextHost.h">
       <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowserFactory.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

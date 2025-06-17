@@ -1,0 +1,32 @@
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+#include "stdafx.h"
+#include "ShellBrowserFactoryImpl.h"
+#include "ShellBrowserImpl.h"
+#include "BrowserWindow.h"
+
+ShellBrowserFactoryImpl::ShellBrowserFactoryImpl(App *app, BrowserWindow *browser,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler) :
+	m_app(app),
+	m_browser(browser),
+	m_tabNavigation(tabNavigation),
+	m_fileActionHandler(fileActionHandler)
+{
+}
+
+std::unique_ptr<ShellBrowser> ShellBrowserFactoryImpl::Create(const PidlAbsolute &initialPidl,
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
+{
+	return std::make_unique<ShellBrowserImpl>(m_browser->GetHWND(), m_app, m_browser,
+		m_tabNavigation, m_fileActionHandler, initialPidl, folderSettings, initialColumns);
+}
+
+std::unique_ptr<ShellBrowser> ShellBrowserFactoryImpl::CreateFromPreserved(
+	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
+	const PreservedFolderState &preservedFolderState)
+{
+	return std::make_unique<ShellBrowserImpl>(m_browser->GetHWND(), m_app, m_browser,
+		m_tabNavigation, m_fileActionHandler, history, currentEntry, preservedFolderState);
+}
