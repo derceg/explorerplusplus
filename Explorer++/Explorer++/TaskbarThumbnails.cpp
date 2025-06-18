@@ -103,9 +103,9 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 
 	SetupJumplistTasks();
 
-	for (const auto &tab : m_tabContainerImpl->GetAllTabsInOrder())
+	for (const auto *tab : m_tabContainerImpl->GetAllTabsInOrder())
 	{
-		CreateTabProxy(tab.get());
+		CreateTabProxy(*tab);
 	}
 
 	OnTabSelectionChanged(m_tabContainerImpl->GetSelectedTab());

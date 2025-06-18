@@ -136,6 +136,19 @@ void TabView::UpdateTab(const TabViewItem *tabItem)
 	}
 }
 
+int TabView::MoveTab(int fromIndex, int toIndex)
+{
+	CHECK(IsValidIndex(fromIndex));
+	int finalIndex = TabHelper::MoveItem(m_hwnd, fromIndex, toIndex);
+
+	if (finalIndex != fromIndex && m_delegate)
+	{
+		m_delegate->OnTabMoved(fromIndex, finalIndex);
+	}
+
+	return finalIndex;
+}
+
 int TabView::GetIndexOfTabItem(const TabViewItem *tabItem) const
 {
 	int numTabs = GetNumTabs();
@@ -216,10 +229,34 @@ void TabView::SelectTabAtIndex(int index)
 {
 	CHECK(IsValidIndex(index));
 
+	if (index == GetSelectedIndex())
+	{
+		return;
+	}
+
 	int previousTab = TabCtrl_SetCurSel(m_hwnd, index);
 	CHECK_NE(previousTab, -1);
 
 	OnSelectionChanged();
+}
+
+int TabView::GetSelectedIndex() const
+{
+	auto index = MaybeGetSelectedIndex();
+	CHECK(index) << "No selected tab";
+	return *index;
+}
+
+std::optional<int> TabView::MaybeGetSelectedIndex() const
+{
+	int index = TabCtrl_GetCurSel(m_hwnd);
+
+	if (index == -1)
+	{
+		return std::nullopt;
+	}
+
+	return index;
 }
 
 LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -543,13 +580,6 @@ void TabView::OnSelectionChanged()
 	{
 		m_delegate->OnSelectionChanged();
 	}
-}
-
-int TabView::GetSelectedIndex() const
-{
-	int index = TabCtrl_GetCurSel(m_hwnd);
-	CHECK_NE(index, -1) << "No selected tab";
-	return index;
 }
 
 bool TabView::IsValidIndex(int index) const

@@ -89,6 +89,14 @@ class TabContainerImpl :
 	private TabViewDelegate
 {
 public:
+	// When selecting an adjacent tab, indicates whether the previous or next tab should be
+	// selected.
+	enum class SelectionDirection
+	{
+		Previous,
+		Next
+	};
+
 	static TabContainerImpl *Create(MainTabView *view, BrowserWindow *browser,
 		CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
 		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
@@ -108,11 +116,10 @@ public:
 	Tab &GetTab(int tabId) const;
 	Tab *GetTabOptional(int tabId) const;
 	void SelectTab(const Tab &tab) override;
-	void SelectAdjacentTab(BOOL bNextTab);
+	void SelectAdjacentTab(SelectionDirection selectionDirection);
 	void SelectTabAtIndex(int index);
 	Tab &GetSelectedTab() const;
 	int GetSelectedTabIndex() const;
-	std::optional<int> GetSelectedTabIndexOptional() const;
 	bool IsTabSelected(const Tab &tab) const override;
 	Tab &GetTabByIndex(int index) const;
 	int GetTabIndex(const Tab &tab) const;
@@ -121,13 +128,10 @@ public:
 	void DuplicateTab(const Tab &tab);
 	bool CloseTab(const Tab &tab);
 
-	// Eventually, this should be removed.
-	std::unordered_map<int, std::unique_ptr<Tab>> &GetTabs();
-
 	/* TODO: Ideally, there would be a method of iterating over the tabs without
 	having access to the underlying container. */
 	const std::unordered_map<int, std::unique_ptr<Tab>> &GetAllTabs() const;
-	std::vector<std::reference_wrapper<const Tab>> GetAllTabsInOrder() const;
+	std::vector<Tab *> GetAllTabsInOrder() const;
 
 	std::vector<TabStorageData> GetStorageData() const;
 

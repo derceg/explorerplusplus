@@ -85,6 +85,8 @@ int MoveItem(HWND tabControl, int currentIndex, int newIndex)
 	WI_SetFlag(tcItem.mask, TCIF_TEXT);
 	tcItem.pszText = const_cast<wchar_t *>(text.c_str());
 
+	bool isSelected = (TabCtrl_GetCurSel(tabControl) == currentIndex);
+
 	res = TabCtrl_DeleteItem(tabControl, currentIndex);
 
 	if (!res)
@@ -99,6 +101,17 @@ int MoveItem(HWND tabControl, int currentIndex, int newIndex)
 	{
 		DCHECK(false);
 		return currentIndex;
+	}
+
+	if (isSelected)
+	{
+		// Note that this is technically redundant, given the practical behavior of the tab control.
+		// That is, if the selected tab is removed, no tab will be selected. Then, if a tab is
+		// added, that tab will be implicitly selected.
+		//
+		// However, given that appears to be an implementation detail, it's safer to explicitly set
+		// the current selection here, rather than rely on behavior that could change.
+		TabCtrl_SetCurSel(tabControl, insertedIndex);
 	}
 
 	return insertedIndex;

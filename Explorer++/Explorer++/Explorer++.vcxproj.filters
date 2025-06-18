@@ -4,9 +4,6 @@
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainerImpl.cpp">
-      <Filter>Tabs</Filter>
-    </ClCompile>
     <ClCompile Include="TabHandler.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -868,13 +865,13 @@
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="TabContainerImpl.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
       <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="TabContainerImpl.h">
-      <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="AboutDialog.h">
       <Filter>Dialogs</Filter>
@@ -1650,9 +1647,6 @@
     <ClInclude Include="ShellBrowser\ShellBrowserEvents.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="TabContainer.h">
-      <Filter>Tabs</Filter>
-    </ClInclude>
     <ClInclude Include="FrequentLocationsTracker.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
@@ -1826,6 +1820,12 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContainerImpl.h">
+      <Filter>Tabs\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContainer.h">
+      <Filter>Tabs\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

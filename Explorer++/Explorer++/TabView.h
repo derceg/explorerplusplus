@@ -64,9 +64,12 @@ public:
 
 	int AddTab(std::unique_ptr<TabViewItem> tabItem, int index);
 	void UpdateTab(const TabViewItem *tabItem);
+	int MoveTab(int fromIndex, int toIndex);
 	void RemoveTab(int index);
 	TabViewItem *GetTabAtIndex(int index) const;
 	void SelectTabAtIndex(int index);
+	int GetSelectedIndex() const;
+	std::optional<int> MaybeGetSelectedIndex() const;
 	int GetNumTabs() const;
 
 	void SetImageList(HIMAGELIST imageList);
@@ -162,7 +165,6 @@ private:
 	void OnRightButtonUp(const POINT &pt, UINT keysDown);
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 	void OnSelectionChanged();
-	int GetSelectedIndex() const;
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;
 	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &pt) const;

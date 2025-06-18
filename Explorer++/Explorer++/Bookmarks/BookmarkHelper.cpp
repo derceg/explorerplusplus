@@ -143,10 +143,10 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 
 	size_t index = 0;
 
-	for (auto tabRef : coreInterface->GetTabContainerImpl()->GetAllTabsInOrder())
+	for (const auto *tab : coreInterface->GetTabContainerImpl()->GetAllTabsInOrder())
 	{
-		auto &tab = tabRef.get();
-		auto *entry = tab.GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
+		const auto *entry =
+			tab->GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
 		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt,
 			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
 			GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_FORPARSING));

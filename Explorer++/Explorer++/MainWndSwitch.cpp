@@ -922,11 +922,13 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDA_NEXTTAB:
-		GetActivePane()->GetTabContainerImpl()->SelectAdjacentTab(TRUE);
+		GetActivePane()->GetTabContainerImpl()->SelectAdjacentTab(
+			TabContainerImpl::SelectionDirection::Next);
 		break;
 
 	case IDA_PREVIOUSTAB:
-		GetActivePane()->GetTabContainerImpl()->SelectAdjacentTab(FALSE);
+		GetActivePane()->GetTabContainerImpl()->SelectAdjacentTab(
+			TabContainerImpl::SelectionDirection::Previous);
 		break;
 
 	case IDA_ADDRESSBAR:

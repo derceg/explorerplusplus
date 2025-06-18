@@ -26,12 +26,11 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/TabHelper.h"
 #include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
-#include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
+#include <ranges>
 
 using namespace std::chrono_literals;
 
@@ -119,8 +118,7 @@ private:
 	{
 		FetchUpdatedIcon();
 
-		auto cachedIconIndex =
-			m_cachedIcons->MaybeGetIconIndex(m_tab->GetShellBrowserImpl()->GetDirectoryPath());
+		auto cachedIconIndex = MaybeGetCachedIconIndex();
 
 		if (cachedIconIndex)
 		{
@@ -128,6 +126,21 @@ private:
 		}
 
 		return m_imageListManager->GetDefaultFolderIconIndex();
+	}
+
+	std::optional<int> MaybeGetCachedIconIndex() const
+	{
+		const auto &pidl = m_tab->GetShellBrowser()->GetDirectory();
+
+		std::wstring parsingPath;
+		HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingPath);
+
+		if (FAILED(hr))
+		{
+			return std::nullopt;
+		}
+
+		return m_cachedIcons->MaybeGetIconIndex(parsingPath);
 	}
 
 	void FetchUpdatedIcon() const
@@ -418,13 +431,13 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		// When the application is first started, the number of tabs will be 0 initially, so there
 		// won't be any selected tab. In that case, the openNewTabNextToCurrent setting should
 		// effectively be ignored.
-		if (m_config->openNewTabNextToCurrent && GetSelectedTabIndexOptional())
+		if (m_config->openNewTabNextToCurrent && m_view->MaybeGetSelectedIndex())
 		{
 			index = GetSelectedTabIndex() + 1;
 		}
 		else
 		{
-			index = TabCtrl_GetItemCount(m_hwnd);
+			index = m_view->GetNumTabs();
 		}
 	}
 
@@ -442,6 +455,8 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	the folder). */
 	index = m_view->AddTab(std::move(tabItem), index);
 
+	m_tabEvents->NotifyCreated(tab);
+
 	bool selected = false;
 
 	if (tabSettings.selected)
@@ -449,21 +464,20 @@ Tab &TabContainerImpl::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		selected = *tabSettings.selected;
 	}
 
-	if (m_tabs.size() == 1)
-	{
-		// This is the first tab being inserted, so it should be selected (to ensure there's always
-		// a selected tab), regardless of what the caller passes in.
-		selected = true;
-	}
-
-	m_tabEvents->NotifyCreated(tab);
-
 	if (selected)
 	{
 		SelectTabAtIndex(index);
 	}
 
-	tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
+	if (m_tabs.size() == 1)
+	{
+		// The tab control will implicitly select the first tab that's created, so a selection event
+		// needs to be synthesized here.
+		CHECK_EQ(m_view->GetSelectedIndex(), index);
+		OnTabSelected(tab);
+	}
+
+	tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 
 	return tab;
 }
@@ -582,38 +596,14 @@ void TabContainerImpl::SelectTab(const Tab &tab)
 	SelectTabAtIndex(index);
 }
 
-void TabContainerImpl::SelectAdjacentTab(BOOL bNextTab)
+void TabContainerImpl::SelectAdjacentTab(SelectionDirection selectionDirection)
 {
-	int nTabs = GetNumTabs();
-	int newIndex = GetSelectedTabIndex();
+	int numTabs = GetNumTabs();
+	CHECK(numTabs > 0);
 
-	if (bNextTab)
-	{
-		/* If this is the last tab in the order,
-		wrap the selection back to the start. */
-		if (newIndex == (nTabs - 1))
-		{
-			newIndex = 0;
-		}
-		else
-		{
-			newIndex++;
-		}
-	}
-	else
-	{
-		/* If this is the first tab in the order,
-		wrap the selection back to the end. */
-		if (newIndex == 0)
-		{
-			newIndex = nTabs - 1;
-		}
-		else
-		{
-			newIndex--;
-		}
-	}
-
+	int selectedIndex = GetSelectedTabIndex();
+	int step = (selectionDirection == SelectionDirection::Next) ? 1 : -1;
+	int newIndex = (selectedIndex + step + numTabs) % numTabs;
 	SelectTabAtIndex(newIndex);
 }
 
@@ -630,21 +620,7 @@ Tab &TabContainerImpl::GetSelectedTab() const
 
 int TabContainerImpl::GetSelectedTabIndex() const
 {
-	int index = TabCtrl_GetCurSel(m_hwnd);
-	CHECK_NE(index, -1) << "No selected tab";
-	return index;
-}
-
-std::optional<int> TabContainerImpl::GetSelectedTabIndexOptional() const
-{
-	int index = TabCtrl_GetCurSel(m_hwnd);
-
-	if (index == -1)
-	{
-		return std::nullopt;
-	}
-
-	return index;
+	return m_view->GetSelectedIndex();
 }
 
 bool TabContainerImpl::IsTabSelected(const Tab &tab) const
@@ -685,12 +661,7 @@ int TabContainerImpl::GetNumTabs() const
 int TabContainerImpl::MoveTab(const Tab &tab, int newIndex)
 {
 	int index = GetTabIndex(tab);
-	return TabHelper::MoveItem(m_hwnd, index, newIndex);
-}
-
-std::unordered_map<int, std::unique_ptr<Tab>> &TabContainerImpl::GetTabs()
-{
-	return m_tabs;
+	return m_view->MoveTab(index, newIndex);
 }
 
 const std::unordered_map<int, std::unique_ptr<Tab>> &TabContainerImpl::GetAllTabs() const
@@ -698,29 +669,26 @@ const std::unordered_map<int, std::unique_ptr<Tab>> &TabContainerImpl::GetAllTab
 	return m_tabs;
 }
 
-std::vector<std::reference_wrapper<const Tab>> TabContainerImpl::GetAllTabsInOrder() const
+std::vector<Tab *> TabContainerImpl::GetAllTabsInOrder() const
 {
-	std::vector<std::reference_wrapper<const Tab>> sortedTabs;
+	std::vector<Tab *> sortedTabs;
 
-	for (const auto &tab : m_tabs | boost::adaptors::map_values)
+	for (const auto &tab : m_tabs | std::views::values)
 	{
-		sortedTabs.emplace_back(*tab);
+		sortedTabs.push_back(tab.get());
 	}
 
-	// The Tab class is non-copyable, so there are essentially two ways of
-	// retrieving a sorted list of tabs, as far as I can tell:
+	// The Tab class is non-copyable, so there are essentially two ways of retrieving a sorted list
+	// of tabs, as far as I can tell:
 	//
-	// 1. The first is to maintain a sorted list of tabs while the program is
-	// running. I generally don't think that's a good idea, since it would be
-	// redundant (the tab control already stores that information) and it risks
-	// possible issues (if the two sets get out of sync).
+	// 1. The first is to maintain a sorted list of tabs while the program is running. I generally
+	//    don't think that's a good idea, since it would be redundant (the tab control already
+	//    stores that information) and it risks possible issues (if the two sets get out of sync).
 	//
-	// 2. The second is to sort the tabs when needed. Because they're
-	// non-copyable, that can't be done directly. std::reference_wrapper allows
-	// it to be done relatively easily, though. Sorting a set of pointers would
-	// accomplish the same thing.
-	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto &tab1, const auto &tab2)
-		{ return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get()); });
+	// 2. The second is to sort the tabs when needed. Because they're non-copyable, that can't be
+	//    done directly, so pointers are used instead.
+	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto *tab1, const auto *tab2)
+		{ return GetTabIndex(*tab1) < GetTabIndex(*tab2); });
 
 	return sortedTabs;
 }
@@ -892,10 +860,9 @@ std::vector<TabStorageData> TabContainerImpl::GetStorageData() const
 {
 	std::vector<TabStorageData> tabListStorageData;
 
-	for (auto tabRef : GetAllTabsInOrder())
+	for (const auto *tab : GetAllTabsInOrder())
 	{
-		const auto &tab = tabRef.get();
-		tabListStorageData.push_back(tab.GetStorageData());
+		tabListStorageData.push_back(tab->GetStorageData());
 	}
 
 	return tabListStorageData;

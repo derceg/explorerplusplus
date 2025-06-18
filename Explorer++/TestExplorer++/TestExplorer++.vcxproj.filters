@@ -479,6 +479,9 @@
     <ClCompile Include="MenuViewFake.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="TabContainerImplTest.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

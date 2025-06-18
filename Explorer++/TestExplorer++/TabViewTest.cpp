@@ -125,6 +125,15 @@ TEST_F(TabViewTest, RemoveTab)
 	VerifyTabs(rawTabItems);
 }
 
+TEST_F(TabViewTest, SelectedIndex)
+{
+	EXPECT_EQ(m_view->MaybeGetSelectedIndex(), std::nullopt);
+
+	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab"), 0);
+	EXPECT_EQ(m_view->MaybeGetSelectedIndex(), 0);
+	EXPECT_EQ(m_view->GetSelectedIndex(), 0);
+}
+
 TEST_F(TabViewTest, GetNumTabs)
 {
 	EXPECT_EQ(m_view->GetNumTabs(), 0);
