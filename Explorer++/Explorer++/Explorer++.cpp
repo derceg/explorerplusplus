@@ -187,14 +187,6 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	CreateInitialTabs(storageData);
 
-	// Register for any shell changes. This should be done after the tabs have
-	// been created.
-	SHChangeNotifyEntry shcne;
-	shcne.fRecursive = TRUE;
-	shcne.pidl = nullptr;
-	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel, SHCNE_ASSOCCHANGED,
-		WM_APP_ASSOC_CHANGED, 1, &shcne);
-
 	SetFocus(m_hActiveListView);
 
 	InitializePlugins();
