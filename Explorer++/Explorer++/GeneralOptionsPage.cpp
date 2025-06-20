@@ -6,7 +6,6 @@
 #include "GeneralOptionsPage.h"
 #include "App.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "LanguageHelper.h"
 #include "MainResource.h"

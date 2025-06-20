@@ -10,7 +10,6 @@
 #include "ColorRuleModel.h"
 #include "ColumnDataRetrieval.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "DirectoryOperationsHelper.h"
 #include "FileOperations.h"
 #include "FileProgressSink.h"
