@@ -12,7 +12,6 @@ class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class ClipboardStore;
-class CoreInterface;
 class ResourceLoader;
 class TabContainer;
 
@@ -37,8 +36,7 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-	HWND parentWindow, BrowserWindow *browser, CoreInterface *coreInterface,
-	const AcceleratorManager *acceleratorManager);
+	HWND parentWindow, BrowserWindow *browser, const AcceleratorManager *acceleratorManager);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
 	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,

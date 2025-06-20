@@ -879,7 +879,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
 		BookmarkHelper::BookmarkAllTabs(m_app->GetBookmarkTree(), m_app->GetResourceLoader(), hwnd,
-			this, this, m_app->GetAcceleratorManager());
+			this, m_app->GetAcceleratorManager());
 		break;
 
 	case MainToolbarButton::Bookmarks:

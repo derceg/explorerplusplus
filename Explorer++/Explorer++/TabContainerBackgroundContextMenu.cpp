@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "TabContainerBackgroundContextMenu.h"
 #include "Bookmarks/BookmarkHelper.h"
-#include "CoreInterface.h"
+#include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
@@ -15,13 +15,12 @@
 TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
 	TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, BrowserWindow *browser,
-	CoreInterface *coreInterface, const ResourceLoader *resourceLoader) :
+	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_tabContainer(tabContainer),
 	m_tabRestorer(tabRestorer),
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
-	m_coreInterface(coreInterface),
 	m_resourceLoader(resourceLoader)
 {
 	BuildMenu();
@@ -61,8 +60,8 @@ void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
 		break;
 
 	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_resourceLoader,
-			m_coreInterface->GetMainWindow(), m_browser, m_coreInterface, m_acceleratorManager);
+		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_resourceLoader, m_browser->GetHWND(),
+			m_browser, m_acceleratorManager);
 		break;
 
 	default:

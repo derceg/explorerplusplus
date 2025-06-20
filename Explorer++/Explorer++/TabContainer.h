@@ -24,7 +24,6 @@ class BookmarkTree;
 class BrowserWindow;
 class CachedIcons;
 struct Config;
-class CoreInterface;
 class MainTabView;
 struct NavigateParams;
 class NavigationEvents;
@@ -94,11 +93,11 @@ public:
 	};
 
 	static TabContainer *Create(MainTabView *view, BrowserWindow *browser,
-		CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory,
-		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-		NavigationEvents *navigationEvents, TabRestorer *tabRestorer, CachedIcons *cachedIcons,
-		BookmarkTree *bookmarkTree, const AcceleratorManager *acceleratorManager,
-		const Config *config, const ResourceLoader *resourceLoader);
+		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		const AcceleratorManager *acceleratorManager, const Config *config,
+		const ResourceLoader *resourceLoader);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -149,7 +148,7 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainer(MainTabView *view, BrowserWindow *browser, CoreInterface *coreInterface,
+	TabContainer(MainTabView *view, BrowserWindow *browser,
 		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
@@ -195,7 +194,6 @@ private:
 
 	MainTabView *const m_view;
 	BrowserWindow *const m_browser;
-	CoreInterface *const m_coreInterface;
 	ShellBrowserFactory *const m_shellBrowserFactory;
 	TabEvents *const m_tabEvents;
 	ShellBrowserEvents *const m_shellBrowserEvents;

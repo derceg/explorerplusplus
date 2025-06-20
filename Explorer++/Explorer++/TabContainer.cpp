@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "MainTabView.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
@@ -181,18 +180,18 @@ private:
 }
 
 TabContainer *TabContainer::Create(MainTabView *view, BrowserWindow *browser,
-	CoreInterface *coreInterface, ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
+	ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 	TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const Config *config,
 	const ResourceLoader *resourceLoader)
 {
-	return new TabContainer(view, browser, coreInterface, shellBrowserFactory, tabEvents,
-		shellBrowserEvents, navigationEvents, tabRestorer, cachedIcons, bookmarkTree,
-		acceleratorManager, config, resourceLoader);
+	return new TabContainer(view, browser, shellBrowserFactory, tabEvents, shellBrowserEvents,
+		navigationEvents, tabRestorer, cachedIcons, bookmarkTree, acceleratorManager, config,
+		resourceLoader);
 }
 
-TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser, CoreInterface *coreInterface,
+TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 	ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 	TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
@@ -201,7 +200,6 @@ TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser, CoreInterf
 	ShellDropTargetWindow(view->GetHWND()),
 	m_view(view),
 	m_browser(browser),
-	m_coreInterface(coreInterface),
 	m_shellBrowserFactory(shellBrowserFactory),
 	m_tabEvents(tabEvents),
 	m_shellBrowserEvents(shellBrowserEvents),
@@ -238,7 +236,7 @@ LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	case WM_MENUSELECT:
 		/* Forward the message to the main window so it can
 		handle menu help. */
-		SendMessage(m_coreInterface->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
+		SendMessage(m_browser->GetHWND(), WM_MENUSELECT, wParam, lParam);
 		break;
 	}
 
@@ -300,7 +298,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	PopupMenuView popupMenu(m_browser);
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_acceleratorManager, this, m_tabRestorer,
-		m_bookmarkTree, m_browser, m_coreInterface, m_resourceLoader);
+		m_bookmarkTree, m_browser, m_resourceLoader);
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

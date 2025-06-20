@@ -72,7 +72,7 @@ protected:
 		m_browser(AddBrowser()),
 		m_shellBrowserFactory(&m_navigationEvents, &m_tabNavigation),
 		m_tabView(MainTabView::Create(m_browser->GetHWND(), &m_config, &m_resourceLoader)),
-		m_tabContainer(TabContainer::Create(m_tabView, m_browser, nullptr, &m_shellBrowserFactory,
+		m_tabContainer(TabContainer::Create(m_tabView, m_browser, &m_shellBrowserFactory,
 			&m_tabEvents, &m_shellBrowserEvents, &m_navigationEvents, nullptr, &m_cachedIcons,
 			&m_bookmarkTree, &m_acceleratorManager, &m_config, &m_resourceLoader))
 	{

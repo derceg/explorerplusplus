@@ -8,8 +8,8 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
+#include "BrowserPane.h"
 #include "BrowserWindow.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -128,7 +128,7 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkIte
 
 void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 	const ResourceLoader *resourceLoader, HWND parentWindow, BrowserWindow *browser,
-	CoreInterface *coreInterface, const AcceleratorManager *acceleratorManager)
+	const AcceleratorManager *acceleratorManager)
 {
 	std::wstring bookmarkAllTabsText =
 		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
@@ -143,7 +143,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 
 	size_t index = 0;
 
-	for (const auto *tab : coreInterface->GetTabContainer()->GetAllTabsInOrder())
+	for (const auto *tab : browser->GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
 	{
 		const auto *entry =
 			tab->GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();
