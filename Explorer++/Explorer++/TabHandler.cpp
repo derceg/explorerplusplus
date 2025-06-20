@@ -11,7 +11,7 @@
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabBacking.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "TabStorage.h"
 
 void Explorerplusplus::InitializeTabs()
@@ -23,7 +23,7 @@ void Explorerplusplus::InitializeTabs()
 		MainTabView::Create(m_tabBacking->GetHWND(), m_config, m_app->GetResourceLoader());
 	m_connections.push_back(mainTabView->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); }));
 
-	auto *tabContainer = TabContainerImpl::Create(mainTabView, this, this, &m_shellBrowserFactory,
+	auto *tabContainer = TabContainer::Create(mainTabView, this, this, &m_shellBrowserFactory,
 		m_app->GetTabEvents(), m_app->GetShellBrowserEvents(), m_app->GetNavigationEvents(),
 		m_app->GetTabRestorer(), m_app->GetCachedIcons(), m_app->GetBookmarkTree(),
 		m_app->GetAcceleratorManager(), m_config, m_app->GetResourceLoader());
@@ -70,7 +70,7 @@ void Explorerplusplus::InitializeTabs()
 void Explorerplusplus::MaybeUpdateTabBarVisibility()
 {
 	if (!m_config->alwaysShowTabBar.get()
-		&& (GetActivePane()->GetTabContainerImpl()->GetNumTabs() == 1))
+		&& (GetActivePane()->GetTabContainer()->GetNumTabs() == 1))
 	{
 		HideTabBar();
 	}
@@ -101,7 +101,7 @@ void Explorerplusplus::OnNavigationCommitted(const NavigationRequest *request)
  * tab, else the default directory is opened. */
 void Explorerplusplus::OnNewTab()
 {
-	const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowserImpl()->GetListView(), -1,
 		LVNI_FOCUSED | LVNI_SELECTED);
 
@@ -117,7 +117,7 @@ void Explorerplusplus::OnNewTab()
 			FolderColumns cols = selectedTab.GetShellBrowserImpl()->ExportAllColumns();
 
 			auto navigateParams = NavigateParams::Normal(pidl.get());
-			GetActivePane()->GetTabContainerImpl()->CreateNewTab(navigateParams,
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
 				TabSettings(_selected = true), nullptr, &cols);
 			return;
 		}
@@ -125,7 +125,7 @@ void Explorerplusplus::OnNewTab()
 
 	/* Either no items are selected, or the focused + selected item was not a
 	 * folder; open the default tab directory. */
-	GetActivePane()->GetTabContainerImpl()->CreateNewTabInDefaultDirectory(
+	GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory(
 		TabSettings(_selected = true));
 }
 
@@ -138,13 +138,12 @@ void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
 
 	CreateCommandLineTabs();
 
-	if (GetActivePane()->GetTabContainerImpl()->GetNumTabs() == 0)
+	if (GetActivePane()->GetTabContainer()->GetNumTabs() == 0)
 	{
-		GetActivePane()->GetTabContainerImpl()->CreateNewTabInDefaultDirectory({});
+		GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory({});
 	}
 
-	if (!m_config->alwaysShowTabBar.get()
-		&& GetActivePane()->GetTabContainerImpl()->GetNumTabs() == 1)
+	if (!m_config->alwaysShowTabBar.get() && GetActivePane()->GetTabContainer()->GetNumTabs() == 1)
 	{
 		m_bShowTabBar = false;
 	}
@@ -170,12 +169,12 @@ void Explorerplusplus::CreateTabsFromStorageData(const WindowStorageData &storag
 		if (loadedTab.pidl.HasValue())
 		{
 			auto navigateParams = NavigateParams::Normal(loadedTab.pidl.Raw());
-			GetActivePane()->GetTabContainerImpl()->CreateNewTab(navigateParams, tabSettings,
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, tabSettings,
 				&loadedTab.folderSettings, &validatedColumns);
 		}
 		else
 		{
-			GetActivePane()->GetTabContainerImpl()->CreateNewTab(loadedTab.directory, tabSettings,
+			GetActivePane()->GetTabContainer()->CreateNewTab(loadedTab.directory, tabSettings,
 				&loadedTab.folderSettings, &validatedColumns);
 		}
 
@@ -183,9 +182,9 @@ void Explorerplusplus::CreateTabsFromStorageData(const WindowStorageData &storag
 	}
 
 	if (storageData.selectedTab >= 0
-		&& storageData.selectedTab < GetActivePane()->GetTabContainerImpl()->GetNumTabs())
+		&& storageData.selectedTab < GetActivePane()->GetTabContainer()->GetNumTabs())
 	{
-		GetActivePane()->GetTabContainerImpl()->SelectTabAtIndex(storageData.selectedTab);
+		GetActivePane()->GetTabContainer()->SelectTabAtIndex(storageData.selectedTab);
 	}
 }
 
@@ -224,7 +223,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 		}
 
 		auto navigateParams = NavigateParams::Normal(parentPidl.get());
-		Tab &newTab = GetActivePane()->GetTabContainerImpl()->CreateNewTab(navigateParams,
+		Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
 			TabSettings(_selected = true));
 
 		if (ArePidlsEquivalent(newTab.GetShellBrowserImpl()->GetDirectoryIdl().get(),
@@ -255,7 +254,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 			continue;
 		}
 
-		GetActivePane()->GetTabContainerImpl()->CreateNewTab(*absolutePath,
+		GetActivePane()->GetTabContainer()->CreateNewTab(*absolutePath,
 			TabSettings(_selected = true));
 	}
 }
@@ -277,7 +276,7 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
-	int nTabs = GetActivePane()->GetTabContainerImpl()->GetNumTabs();
+	int nTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
 	int newIndex;
 
 	if (iTab == -1)
@@ -296,13 +295,13 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab)
 		}
 	}
 
-	GetActivePane()->GetTabContainerImpl()->SelectTabAtIndex(newIndex);
+	GetActivePane()->GetTabContainer()->SelectTabAtIndex(newIndex);
 }
 
 bool Explorerplusplus::OnCloseTab()
 {
-	const Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
-	return GetActivePane()->GetTabContainerImpl()->CloseTab(tab);
+	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	return GetActivePane()->GetTabContainer()->CloseTab(tab);
 }
 
 void Explorerplusplus::ShowTabBar()
@@ -333,7 +332,7 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const ShellBrowser *shellBr
 		}
 	}
 
-	if (GetActivePane()->GetTabContainerImpl()->IsTabSelected(*tab))
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 	{
 		SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT,
 			nullptr);
@@ -343,12 +342,12 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const ShellBrowser *shellBr
 // TabNavigationInterface
 void Explorerplusplus::CreateNewTab(NavigateParams &navigateParams, bool selected)
 {
-	GetActivePane()->GetTabContainerImpl()->CreateNewTab(navigateParams,
+	GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
 		TabSettings(_selected = selected));
 }
 
 void Explorerplusplus::SelectTabById(int tabId)
 {
-	const Tab &tab = GetActivePane()->GetTabContainerImpl()->GetTab(tabId);
-	GetActivePane()->GetTabContainerImpl()->SelectTab(tab);
+	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
+	GetActivePane()->GetTabContainer()->SelectTab(tab);
 }

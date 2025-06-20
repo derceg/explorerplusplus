@@ -5,11 +5,11 @@
 #include "stdafx.h"
 #include "BrowserPane.h"
 
-BrowserPane::BrowserPane(TabContainerImpl *tabContainerImpl) : m_tabContainerImpl(tabContainerImpl)
+BrowserPane::BrowserPane(TabContainer *tabContainer) : m_tabContainer(tabContainer)
 {
 }
 
-TabContainerImpl *BrowserPane::GetTabContainerImpl() const
+TabContainer *BrowserPane::GetTabContainer() const
 {
-	return m_tabContainerImpl;
+	return m_tabContainer;
 }

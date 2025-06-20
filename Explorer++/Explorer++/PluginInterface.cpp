@@ -5,9 +5,9 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 
-TabContainerImpl *Explorerplusplus::GetTabContainerImpl()
+TabContainer *Explorerplusplus::GetTabContainer()
 {
-	return GetActivePane()->GetTabContainerImpl();
+	return GetActivePane()->GetTabContainer();
 }
 
 Plugins::PluginMenuManager *Explorerplusplus::GetPluginMenuManager()

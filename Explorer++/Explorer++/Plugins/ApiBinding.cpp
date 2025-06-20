@@ -14,10 +14,10 @@
 #include "Plugins/TabsApi/TabsApi.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include <sol/sol.hpp>
 
-void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainerImpl *tabContainerImpl,
+void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainer *tabContainer,
 	const Config *config);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindCommandApi(int pluginId, sol::state &state,
@@ -33,17 +33,16 @@ int deny(lua_State *state);
 void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface,
 	const Config *config)
 {
-	BindTabsAPI(state, pluginInterface->GetTabEvents(), pluginInterface->GetTabContainerImpl(),
-		config);
+	BindTabsAPI(state, pluginInterface->GetTabEvents(), pluginInterface->GetTabContainer(), config);
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainerImpl *tabContainerImpl,
+void BindTabsAPI(sol::state &state, TabEvents *tabEvents, TabContainer *tabContainer,
 	const Config *config)
 {
 	std::shared_ptr<Plugins::TabsApi> tabsApi =
-		std::make_shared<Plugins::TabsApi>(tabContainerImpl, config);
+		std::make_shared<Plugins::TabsApi>(tabContainer, config);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);

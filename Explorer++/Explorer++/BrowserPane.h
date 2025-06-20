@@ -4,16 +4,16 @@
 
 #pragma once
 
-class TabContainerImpl;
+class TabContainer;
 
 // Each browser pane contains a set of tabs, with each tab showing a file listing.
 class BrowserPane
 {
 public:
-	BrowserPane(TabContainerImpl *tabContainerImpl);
+	BrowserPane(TabContainer *tabContainer);
 
-	TabContainerImpl *GetTabContainerImpl() const;
+	TabContainer *GetTabContainer() const;
 
 private:
-	TabContainerImpl *m_tabContainerImpl;
+	TabContainer *m_tabContainer;
 };

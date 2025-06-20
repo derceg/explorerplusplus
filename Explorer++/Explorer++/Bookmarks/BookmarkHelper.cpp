@@ -14,7 +14,7 @@
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <glog/logging.h>
@@ -143,7 +143,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 
 	size_t index = 0;
 
-	for (const auto *tab : coreInterface->GetTabContainerImpl()->GetAllTabsInOrder())
+	for (const auto *tab : coreInterface->GetTabContainer()->GetAllTabsInOrder())
 	{
 		const auto *entry =
 			tab->GetShellBrowserImpl()->GetNavigationController()->GetCurrentEntry();

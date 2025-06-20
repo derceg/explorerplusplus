@@ -11,7 +11,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/SortModes.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include <sol/sol.hpp>
 
 Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowserImpl &shellBrowser)
@@ -62,8 +62,8 @@ std::wstring Plugins::TabsApi::Tab::toString()
 	// clang-format on
 }
 
-Plugins::TabsApi::TabsApi(TabContainerImpl *tabContainerImpl, const Config *config) :
-	m_tabContainerImpl(tabContainerImpl),
+Plugins::TabsApi::TabsApi(TabContainer *tabContainer, const Config *config) :
+	m_tabContainer(tabContainer),
 	m_config(config)
 {
 }
@@ -72,7 +72,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 {
 	std::vector<Tab> tabs;
 
-	for (auto &item : m_tabContainerImpl->GetAllTabs())
+	for (auto &item : m_tabContainer->GetAllTabs())
 	{
 		Tab tab(*item.second);
 		tabs.push_back(tab);
@@ -83,7 +83,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 
 std::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
-	auto tabInternal = m_tabContainerImpl->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -125,7 +125,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
-	auto &newTab = m_tabContainerImpl->CreateNewTab(navigateParams, tabSettings, &folderSettings);
+	auto &newTab = m_tabContainer->CreateNewTab(navigateParams, tabSettings, &folderSettings);
 
 	return newTab.GetId();
 }
@@ -145,7 +145,7 @@ void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperti
 	if (index)
 	{
 		int finalIndex = *index;
-		int numTabs = m_tabContainerImpl->GetNumTabs();
+		int numTabs = m_tabContainer->GetNumTabs();
 
 		if (finalIndex < 0)
 		{
@@ -238,7 +238,7 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)
 {
-	auto tabInternal = m_tabContainerImpl->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -278,13 +278,13 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (active && *active)
 	{
-		m_tabContainerImpl->SelectTab(*tabInternal);
+		m_tabContainer->SelectTab(*tabInternal);
 	}
 }
 
 void Plugins::TabsApi::refresh(int tabId)
 {
-	auto tabInternal = m_tabContainerImpl->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -296,7 +296,7 @@ void Plugins::TabsApi::refresh(int tabId)
 
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
-	auto tabInternal = m_tabContainerImpl->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -305,20 +305,20 @@ int Plugins::TabsApi::move(int tabId, int newIndex)
 
 	if (newIndex < 0)
 	{
-		newIndex = m_tabContainerImpl->GetNumTabs();
+		newIndex = m_tabContainer->GetNumTabs();
 	}
 
-	return m_tabContainerImpl->MoveTab(*tabInternal, newIndex);
+	return m_tabContainer->MoveTab(*tabInternal, newIndex);
 }
 
 bool Plugins::TabsApi::close(int tabId)
 {
-	auto tabInternal = m_tabContainerImpl->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
 		return false;
 	}
 
-	return m_tabContainerImpl->CloseTab(*tabInternal);
+	return m_tabContainer->CloseTab(*tabInternal);
 }

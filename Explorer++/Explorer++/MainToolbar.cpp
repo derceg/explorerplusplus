@@ -15,7 +15,6 @@
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainerImpl.h"
 #include "TabParentItemsMenu.h"
 #include "ViewsMenuBuilder.h"
 #include "../Helper/Controls.h"

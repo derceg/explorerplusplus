@@ -20,7 +20,7 @@
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -48,7 +48,7 @@ void Explorerplusplus::OnSearch()
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchDialog",
 		[this]
 		{
-			Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryPath();
 
 			return new SearchDialog(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
@@ -109,7 +109,7 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, std::size(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			Tab &newTab = GetActivePane()->GetTabContainerImpl()->CreateNewTab(szPath,
+			Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(szPath,
 				TabSettings(_selected = true));
 
 			if (newTab.GetShellBrowserImpl()->GetDirectoryPath() == szPath)
@@ -140,6 +140,6 @@ void Explorerplusplus::OnResolveLink()
 
 void Explorerplusplus::OnGoToOffset(int offset)
 {
-	Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
 }

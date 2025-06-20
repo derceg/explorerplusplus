@@ -8,17 +8,13 @@
 #include "Config.h"
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
-#include "MainResource.h"
 #include "NavigationHelper.h"
 #include "OpenItemsContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/NavigateParams.h"
-#include "TabContainerImpl.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ShellItemContextMenu.h"
 #include <ShlObj.h>
-#include <Shlwapi.h>
 
 class DrivesToolbarButton : public ToolbarButton
 {

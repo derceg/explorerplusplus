@@ -14,7 +14,7 @@ class BrowserWindow;
 class ClipboardStore;
 class CoreInterface;
 class ResourceLoader;
-class TabContainerImpl;
+class TabContainer;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
 

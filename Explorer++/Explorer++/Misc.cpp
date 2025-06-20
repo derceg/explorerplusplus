@@ -13,7 +13,7 @@
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "TabStorage.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -59,6 +59,6 @@ void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolde
 void Explorerplusplus::OnSelectColumns()
 {
 	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_hContainer,
-		GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowserImpl());
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl());
 	selectColumnsDialog.ShowModalDialog();
 }

@@ -16,7 +16,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -32,11 +32,10 @@ struct TabProxy
 };
 }
 
-TaskbarThumbnails::TaskbarThumbnails(App *app, BrowserWindow *browser,
-	TabContainerImpl *tabContainerImpl) :
+TaskbarThumbnails::TaskbarThumbnails(App *app, BrowserWindow *browser, TabContainer *tabContainer) :
 	m_app(app),
 	m_browser(browser),
-	m_tabContainerImpl(tabContainerImpl),
+	m_tabContainer(tabContainer),
 	m_enabled(app->GetConfig()->showTaskbarThumbnails)
 {
 	Initialize();
@@ -103,12 +102,12 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 
 	SetupJumplistTasks();
 
-	for (const auto *tab : m_tabContainerImpl->GetAllTabsInOrder())
+	for (const auto *tab : m_tabContainer->GetAllTabsInOrder())
 	{
 		CreateTabProxy(*tab);
 	}
 
-	OnTabSelectionChanged(m_tabContainerImpl->GetSelectedTab());
+	OnTabSelectionChanged(m_tabContainer->GetSelectedTab());
 
 	SetUpObservers();
 }
@@ -304,7 +303,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd, UINT Msg, WPA
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM wParam,
 	LPARAM lParam, int iTabId)
 {
-	const Tab *tab = m_tabContainerImpl->GetTabOptional(iTabId);
+	const Tab *tab = m_tabContainer->GetTabOptional(iTabId);
 
 	switch (Msg)
 	{
@@ -316,7 +315,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 			ShowWindow(m_browser->GetHWND(), SW_RESTORE);
 		}
 
-		m_tabContainerImpl->SelectTab(*tab);
+		m_tabContainer->SelectTab(*tab);
 		return 0;
 
 	case WM_SETFOCUS:
@@ -385,7 +384,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 
 	case WM_CLOSE:
 	{
-		int nTabs = m_tabContainerImpl->GetNumTabs();
+		int nTabs = m_tabContainer->GetNumTabs();
 
 		if (nTabs == 1)
 		{
@@ -395,7 +394,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 		}
 		else
 		{
-			m_tabContainerImpl->CloseTab(*tab);
+			m_tabContainer->CloseTab(*tab);
 		}
 	}
 	break;
@@ -586,9 +585,9 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{
-			int index = m_tabContainerImpl->GetTabIndex(tab);
+			int index = m_tabContainer->GetTabIndex(tab);
 
-			int nTabs = m_tabContainerImpl->GetNumTabs();
+			int nTabs = m_tabContainer->GetNumTabs();
 
 			/* Potentially the tab may have swapped position, so
 			tell the taskbar to reposition it. */
@@ -598,7 +597,7 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 			}
 			else
 			{
-				const Tab &nextTab = m_tabContainerImpl->GetTabByIndex(index + 1);
+				const Tab &nextTab = m_tabContainer->GetTabByIndex(index + 1);
 
 				for (const TabProxyInfo &tabProxyInfoNext : m_TabProxyList)
 				{

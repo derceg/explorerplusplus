@@ -64,7 +64,7 @@ class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
 class TabBacking;
-class TabContainerImpl;
+class TabContainer;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
 class WindowSubclass;
@@ -269,7 +269,7 @@ private:
 
 	/* PluginInterface. */
 	TabEvents *GetTabEvents() override;
-	TabContainerImpl *GetTabContainerImpl() override;
+	TabContainer *GetTabContainer() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;
 	AcceleratorUpdater *GetAccleratorUpdater() override;
 	Plugins::PluginCommandManager *GetPluginCommandManager() override;
@@ -346,7 +346,7 @@ private:
 	/* CoreInterface methods. */
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
-	TabContainerImpl *GetTabContainerImpl() const override;
+	TabContainer *GetTabContainer() const override;
 
 	/* Menus. */
 	void InitializeMainMenu();

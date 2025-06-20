@@ -18,7 +18,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
 #include "SortMenuBuilder.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ClipboardHelper.h"
@@ -107,7 +107,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 			m_pActiveShellBrowser->SetCurrentColumns(currentColumns);
 
-			Tab &tab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+			Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 
 			return TRUE;
@@ -182,7 +182,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 void Explorerplusplus::OnListViewSetFileAttributes() const
 {
-	const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->SetFileAttributesForSelection();
 }
 
@@ -195,7 +195,7 @@ void Explorerplusplus::OnListViewPaste()
 		return;
 	}
 
-	const auto &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto directory = selectedTab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(), PasteType::Normal))

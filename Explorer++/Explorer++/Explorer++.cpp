@@ -183,7 +183,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 	UpdateLayout();
 
 	m_taskbarThumbnails =
-		std::make_unique<TaskbarThumbnails>(m_app, this, GetActivePane()->GetTabContainerImpl());
+		std::make_unique<TaskbarThumbnails>(m_app, this, GetActivePane()->GetTabContainer());
 
 	CreateInitialTabs(storageData);
 
@@ -206,7 +206,7 @@ void Explorerplusplus::InitializeDisplayWindow()
 
 void Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	GetActivePane()->GetTabContainerImpl()->CreateNewTab(*tab);
+	GetActivePane()->GetTabContainer()->CreateNewTab(*tab);
 }
 
 HWND Explorerplusplus::GetHWND() const
@@ -221,12 +221,12 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 	BOOL res = GetWindowPlacement(m_hContainer, &placement);
 	CHECK(res);
 
-	const auto *tabContainerImpl = GetActivePane()->GetTabContainerImpl();
+	const auto *tabContainer = GetActivePane()->GetTabContainer();
 
 	return { .bounds = placement.rcNormalPosition,
 		.showState = NativeShowStateToShowState(placement.showCmd),
-		.tabs = tabContainerImpl->GetStorageData(),
-		.selectedTab = tabContainerImpl->GetSelectedTabIndex(),
+		.tabs = tabContainer->GetStorageData(),
+		.selectedTab = tabContainer->GetSelectedTabIndex(),
 		.mainRebarInfo = m_mainRebarView->GetStorageData(),
 		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
 		.treeViewWidth = m_treeViewWidth,
@@ -261,7 +261,7 @@ bool Explorerplusplus::ConfirmClose()
 		return true;
 	}
 
-	auto numTabs = GetActivePane()->GetTabContainerImpl()->GetNumTabs();
+	auto numTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
 
 	if (numTabs == 1)
 	{
@@ -301,12 +301,12 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 {
-	return GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowser();
+	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
 }
 
 const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
-	return GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetShellBrowser();
+	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
 }
 
 void Explorerplusplus::StartMainToolbarCustomization()

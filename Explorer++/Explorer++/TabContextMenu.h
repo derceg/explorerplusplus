@@ -10,14 +10,14 @@
 
 class ResourceLoader;
 class Tab;
-class TabContainerImpl;
+class TabContainer;
 class TabEvents;
 
 class TabContextMenu : public MenuBase
 {
 public:
 	TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager, Tab *tab,
-		TabContainerImpl *tabContainer, TabEvents *tabEvents, const ResourceLoader *resourceLoader);
+		TabContainer *tabContainer, TabEvents *tabEvents, const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);
@@ -34,7 +34,7 @@ private:
 	void OnTabClosed(const Tab &tab);
 
 	Tab *m_tab = nullptr;
-	TabContainerImpl *const m_tabContainer;
+	TabContainer *const m_tabContainer;
 	TabEvents *const m_tabEvents;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;

@@ -11,7 +11,6 @@
 #include "Explorer++.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainerImpl.h"
 
 void Explorerplusplus::OnCopyUniversalPaths() const
 {

@@ -274,7 +274,7 @@
     <ClCompile Include="ShellContextMenuDelegateFake.cpp" />
     <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp" />
     <ClCompile Include="ShellContextMenuIdRemapperTest.cpp" />
-    <ClCompile Include="TabContainerImplTest.cpp" />
+    <ClCompile Include="TabContainerTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />

@@ -9,7 +9,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
@@ -156,7 +156,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 						/* Maintain a global list of folder size operations. */
 						displayWindowFolderSize.uId = m_iDWFolderSizeUniqueId;
 						displayWindowFolderSize.iTabId =
-							GetActivePane()->GetTabContainerImpl()->GetSelectedTab().GetId();
+							GetActivePane()->GetTabContainer()->GetSelectedTab().GetId();
 						displayWindowFolderSize.bValid = TRUE;
 						m_DWFolderSizes.push_back(displayWindowFolderSize);
 

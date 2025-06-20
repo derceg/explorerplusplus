@@ -10,7 +10,7 @@
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -371,8 +371,7 @@ void FilesFoldersOptionsPage::SaveSettings()
 	m_config->globalFolderSettings.sizeDisplayFormat = SizeDisplayFormat::_from_integral(
 		static_cast<SizeDisplayFormat::_integral>(SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0)));
 
-	for (auto &tab :
-		m_coreInterface->GetTabContainerImpl()->GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
 		tab->GetShellBrowserImpl()->GetNavigationController()->Refresh();
 	}

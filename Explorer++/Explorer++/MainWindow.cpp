@@ -10,7 +10,7 @@
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -115,7 +115,7 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 
 void MainWindow::UpdateWindowText()
 {
-	const Tab &tab = m_coreInterface->GetTabContainerImpl()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	std::wstring folderDisplayName;

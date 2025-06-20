@@ -9,7 +9,7 @@
 #include "DirectoryOperationsHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "../Helper/ClipboardHelper.h"
 
 BOOL Explorerplusplus::AnyItemsSelected() const
@@ -18,7 +18,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainerImpl()->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 		if (ListView_GetSelectedCount(selectedTab.GetShellBrowserImpl()->GetListView()) > 0)
 		{

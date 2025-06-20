@@ -9,15 +9,15 @@
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "TabRestorer.h"
 
 TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, TabContainerImpl *tabContainerImpl,
+	const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
 	TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, BrowserWindow *browser,
 	CoreInterface *coreInterface, const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
-	m_tabContainerImpl(tabContainerImpl),
+	m_tabContainer(tabContainer),
 	m_tabRestorer(tabRestorer),
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
@@ -53,7 +53,7 @@ void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case IDM_TAB_CONTAINER_NEW_TAB:
-		m_tabContainerImpl->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 		break;
 
 	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:

@@ -8,7 +8,7 @@
 #include "MainFontSetter.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "TabEvents.h"
 #include "ToolbarHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -63,7 +63,7 @@ void TabBacking::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 	switch (propertyType)
 	{
 	case Tab::PropertyType::LockState:
-		if (m_coreInterface->GetTabContainerImpl()->IsTabSelected(tab))
+		if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 		{
 			UpdateToolbar();
 		}
@@ -76,7 +76,7 @@ void TabBacking::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 
 void TabBacking::UpdateToolbar()
 {
-	auto *tabContainer = m_coreInterface->GetTabContainerImpl();
+	auto *tabContainer = m_coreInterface->GetTabContainer();
 	const Tab &selectedTab = tabContainer->GetSelectedTab();
 
 	if (tabContainer->GetNumTabs() > 1 && selectedTab.GetLockState() == Tab::LockState::NotLocked)
@@ -124,7 +124,7 @@ void TabBacking::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void TabBacking::OnCloseButtonClicked()
 {
-	auto *tabContainer = m_coreInterface->GetTabContainerImpl();
+	auto *tabContainer = m_coreInterface->GetTabContainer();
 	tabContainer->CloseTab(tabContainer->GetSelectedTab());
 }
 

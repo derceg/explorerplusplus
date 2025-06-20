@@ -5,7 +5,7 @@
 #pragma once
 
 class AcceleratorUpdater;
-class TabContainerImpl;
+class TabContainer;
 class TabEvents;
 
 namespace Plugins
@@ -22,7 +22,7 @@ public:
 	virtual ~PluginInterface() = default;
 
 	virtual TabEvents *GetTabEvents() = 0;
-	virtual TabContainerImpl *GetTabContainerImpl() = 0;
+	virtual TabContainer *GetTabContainer() = 0;
 	virtual Plugins::PluginMenuManager *GetPluginMenuManager() = 0;
 	virtual AcceleratorUpdater *GetAccleratorUpdater() = 0;
 	virtual Plugins::PluginCommandManager *GetPluginCommandManager() = 0;

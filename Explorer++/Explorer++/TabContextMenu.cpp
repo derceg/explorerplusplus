@@ -14,13 +14,13 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
-#include "TabContainerImpl.h"
+#include "TabContainer.h"
 #include "TabEvents.h"
 #include "../Helper/DpiCompatibility.h"
 #include <ranges>
 
 TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	Tab *tab, TabContainerImpl *tabContainer, TabEvents *tabEvents,
+	Tab *tab, TabContainer *tabContainer, TabEvents *tabEvents,
 	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_tab(tab),

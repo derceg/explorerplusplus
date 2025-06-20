@@ -13,7 +13,7 @@
 struct Config;
 struct FolderSettings;
 class ShellBrowserImpl;
-class TabContainerImpl;
+class TabContainer;
 struct TabSettings;
 
 namespace Plugins
@@ -52,7 +52,7 @@ public:
 		std::wstring toString();
 	};
 
-	TabsApi(TabContainerImpl *tabContainerImpl, const Config *config);
+	TabsApi(TabContainer *tabContainer, const Config *config);
 
 	std::vector<Tab> getAll();
 	std::optional<Tab> get(int tabId);
@@ -67,7 +67,7 @@ private:
 	void extractFolderSettingsForCreation(sol::table folderSettingsTable,
 		::FolderSettings &folderSettings);
 
-	TabContainerImpl *const m_tabContainerImpl;
+	TabContainer *const m_tabContainer;
 	const Config *const m_config;
 };
 }

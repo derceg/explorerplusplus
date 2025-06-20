@@ -865,7 +865,7 @@
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainerImpl.cpp">
+    <ClCompile Include="TabContainer.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1820,9 +1820,6 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h">
       <Filter>ShellBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="TabContainerImpl.h">
-      <Filter>Tabs\UI</Filter>
     </ClInclude>
     <ClInclude Include="TabContainer.h">
       <Filter>Tabs\UI</Filter>
