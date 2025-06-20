@@ -6,6 +6,8 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 
+BrowserTestBase::~BrowserTestBase() = default;
+
 BrowserWindowFake *BrowserTestBase::AddBrowser()
 {
 	auto browser = std::make_unique<BrowserWindowFake>(&m_tabEvents, &m_navigationEvents);

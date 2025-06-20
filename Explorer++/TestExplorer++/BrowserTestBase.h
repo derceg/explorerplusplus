@@ -15,6 +15,8 @@ class BrowserWindowFake;
 class BrowserTestBase : public testing::Test
 {
 protected:
+	~BrowserTestBase();
+
 	BrowserWindowFake *AddBrowser();
 	void RemoveBrowser(const BrowserWindowFake *browser);
 

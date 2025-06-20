@@ -4,109 +4,18 @@
 
 #include "pch.h"
 #include "TabContainer.h"
-#include "AcceleratorManager.h"
-#include "Bookmarks/BookmarkTree.h"
-#include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "Config.h"
 #include "MainTabView.h"
-#include "ShellBrowser/NavigationEvents.h"
-#include "ShellBrowser/ShellBrowserEvents.h"
-#include "ShellBrowser/ShellBrowserFactory.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
-#include "TabEvents.h"
-#include "TabNavigationMock.h"
-#include "Win32ResourceLoader.h"
-#include "../Helper/CachedIcons.h"
+#include "TabContainerTestBase.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-namespace
+class TabContainerTest : public TabContainerTestBase
 {
-
-class ShellBrowserFactoryFake : public ShellBrowserFactory
-{
-public:
-	ShellBrowserFactoryFake(NavigationEvents *navigationEvents, TabNavigationMock *tabNavigation) :
-		m_navigationEvents(navigationEvents),
-		m_tabNavigation(tabNavigation)
-	{
-	}
-
-	std::unique_ptr<ShellBrowser> Create(const PidlAbsolute &initialPidl,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns) override
-	{
-		UNREFERENCED_PARAMETER(initialPidl);
-		UNREFERENCED_PARAMETER(folderSettings);
-		UNREFERENCED_PARAMETER(initialColumns);
-
-		return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation);
-	}
-
-	std::unique_ptr<ShellBrowser> CreateFromPreserved(
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-		const PreservedFolderState &preservedFolderState) override
-	{
-		UNREFERENCED_PARAMETER(preservedFolderState);
-
-		return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation, history,
-			currentEntry);
-	}
-
-private:
-	NavigationEvents *const m_navigationEvents;
-	TabNavigationMock *const m_tabNavigation;
-};
-
-}
-
-class TabContainerTest : public BrowserTestBase
-{
-protected:
-	TabContainerTest() :
-		m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr),
-		m_cachedIcons(10),
-		m_browser(AddBrowser()),
-		m_shellBrowserFactory(&m_navigationEvents, &m_tabNavigation),
-		m_tabView(MainTabView::Create(m_browser->GetHWND(), &m_config, &m_resourceLoader)),
-		m_tabContainer(TabContainer::Create(m_tabView, m_browser, &m_shellBrowserFactory,
-			&m_tabEvents, &m_shellBrowserEvents, &m_navigationEvents, nullptr, &m_cachedIcons,
-			&m_bookmarkTree, &m_acceleratorManager, &m_config, &m_resourceLoader))
-	{
-	}
-
-	Tab &AddTab(const std::wstring &path, const TabSettings &tabSettings = {})
-	{
-		auto pidl = CreateSimplePidlForTest(path);
-		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		return m_tabContainer->CreateNewTab(navigateParams, tabSettings);
-	}
-
-	[[nodiscard]] int AddTabAndReturnId(const std::wstring &path,
-		const TabSettings &tabSettings = {})
-	{
-		const auto &tab = AddTab(path, tabSettings);
-		return tab.GetId();
-	}
-
-	BookmarkTree m_bookmarkTree;
-	AcceleratorManager m_acceleratorManager;
-	Config m_config;
-	Win32ResourceLoader m_resourceLoader;
-	CachedIcons m_cachedIcons;
-
-	TabEvents m_tabEvents;
-	ShellBrowserEvents m_shellBrowserEvents;
-	NavigationEvents m_navigationEvents;
-
-	BrowserWindowFake *const m_browser;
-	TabNavigationMock m_tabNavigation;
-	ShellBrowserFactoryFake m_shellBrowserFactory;
-	MainTabView *const m_tabView;
-	TabContainer *const m_tabContainer;
 };
 
 TEST_F(TabContainerTest, TabSettingsOnCreation)

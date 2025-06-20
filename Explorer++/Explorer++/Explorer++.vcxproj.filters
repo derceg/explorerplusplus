@@ -571,9 +571,6 @@
     <ClCompile Include="AcceleratorHelper.cpp">
       <Filter>Core\Accelerators</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainerBackgroundContextMenu.cpp">
-      <Filter>Tabs</Filter>
-    </ClCompile>
     <ClCompile Include="Win32ResourceLoader.cpp">
       <Filter>Resource Loading</Filter>
     </ClCompile>
@@ -866,6 +863,9 @@
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="TabContainer.cpp">
+      <Filter>Tabs\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TabContainerBackgroundContextMenu.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1473,9 +1473,6 @@
     <ClInclude Include="Accelerator.h">
       <Filter>Core\Accelerators</Filter>
     </ClInclude>
-    <ClInclude Include="TabContainerBackgroundContextMenu.h">
-      <Filter>Tabs</Filter>
-    </ClInclude>
     <ClInclude Include="Win32ResourceLoader.h">
       <Filter>Resource Loading</Filter>
     </ClInclude>
@@ -1822,6 +1819,9 @@
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="TabContainer.h">
+      <Filter>Tabs\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContainerBackgroundContextMenu.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
   </ItemGroup>
