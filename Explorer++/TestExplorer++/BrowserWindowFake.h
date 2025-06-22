@@ -5,25 +5,35 @@
 #pragma once
 
 #include "BrowserWindow.h"
+#include "ShellBrowserFactoryFake.h"
+#include "TabContainer.h"
 #include "TabNavigationMock.h"
 #include <wil/resource.h>
-#include <memory>
-#include <vector>
 
+class AcceleratorManager;
+class BookmarkTree;
+class CachedIcons;
+struct Config;
 class NavigationEvents;
+class ResourceLoader;
+class ShellBrowserEvents;
 class Tab;
 class TabEvents;
 
 class BrowserWindowFake : public BrowserWindow
 {
 public:
-	BrowserWindowFake(TabEvents *tabEvents, NavigationEvents *navigationEvents);
-	~BrowserWindowFake();
+	BrowserWindowFake(const Config *config, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	// BrowserWindow
 	HWND GetHWND() const override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
+	TabContainer *GetActiveTabContainer() override;
+	const TabContainer *GetActiveTabContainer() const override;
 	void FocusActiveTab() override;
 	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
 	ShellBrowser *GetActiveShellBrowser() override;
@@ -48,8 +58,9 @@ public:
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 
-	Tab *AddTab();
-	void ActivateTabAtIndex(size_t index);
+	[[nodiscard]] int AddTabAndReturnId(const std::wstring &path,
+		const TabSettings &tabSettings = {});
+	Tab *AddTab(const std::wstring &path, const TabSettings &tabSettings = {});
 
 private:
 	static constexpr wchar_t CLASS_NAME[] = L"TestExplorer++BrowserWindowClass";
@@ -57,14 +68,11 @@ private:
 	static wil::unique_hwnd CreateBrowserWindow();
 	static void RegisterBrowserWindowClass();
 
-	void MaybeNavigateActiveShellBrowser(PCIDLIST_ABSOLUTE pidl);
-
-	TabEvents *const m_tabEvents;
-	NavigationEvents *const m_navigationEvents;
+	const Config *const m_config;
 	TabNavigationMock m_tabNavigation;
 
 	wil::unique_hwnd m_window;
 
-	std::vector<std::unique_ptr<Tab>> m_tabs;
-	size_t m_activeTabIndex = 0;
+	ShellBrowserFactoryFake m_shellBrowserFactory;
+	TabContainer *const m_tabContainer;
 };

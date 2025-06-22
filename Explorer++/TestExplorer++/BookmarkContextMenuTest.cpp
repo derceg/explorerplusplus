@@ -40,18 +40,10 @@ protected:
 		std::wstring location;
 	};
 
-	BookmarkContextMenuTestBase() : m_browser(AddBrowser()), m_tab(m_browser->AddTab())
+	BookmarkContextMenuTestBase() :
+		m_browser(AddBrowser()),
+		m_tab(m_browser->AddTab(L"c:\\original\\path"))
 	{
-		m_browser->ActivateTabAtIndex(0);
-
-		NavigateTab(m_tab, L"c:\\original\\path");
-	}
-
-	void NavigateTab(Tab *tab, const std::wstring &path)
-	{
-		auto pidl = CreateSimplePidlForTest(path);
-		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	}
 
 	void ExpectClipboardBookmarkMatchesCopiedBookmark(const BookmarkItem *clipboardBookmark,

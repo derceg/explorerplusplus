@@ -179,7 +179,7 @@ class PidlBase64Encoding : public Test
 protected:
 	void PerformEncodeDecodeTest(const std::wstring &path)
 	{
-		auto pidl = CreateSimplePidlForTest(path, nullptr, ShellItemType::Folder);
+		auto pidl = CreateSimplePidlForTest(path);
 		auto encodedPidl = EncodePidlToBase64(pidl.Raw());
 		auto decodedPidl = DecodePidlFromBase64(encodedPidl);
 		ASSERT_TRUE(decodedPidl.HasValue());

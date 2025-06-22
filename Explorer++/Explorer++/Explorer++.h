@@ -97,6 +97,8 @@ public:
 	HWND GetHWND() const override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
+	TabContainer *GetActiveTabContainer() override;
+	const TabContainer *GetActiveTabContainer() const override;
 	void FocusActiveTab() override;
 	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
 

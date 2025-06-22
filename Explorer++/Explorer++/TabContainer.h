@@ -99,6 +99,8 @@ public:
 		const AcceleratorManager *acceleratorManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 
+	MainTabView *GetView();
+
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,

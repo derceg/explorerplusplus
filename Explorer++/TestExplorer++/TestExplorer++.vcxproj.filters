@@ -485,9 +485,6 @@
     <ClCompile Include="TabContextMenuTest.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainerTestBase.cpp">
-      <Filter>Tabs\UI</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowserFactoryFake.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -799,9 +796,6 @@
     <ClInclude Include="SimulatedClipboardDataObject.h" />
     <ClInclude Include="MenuViewFake.h">
       <Filter>Menus\UI\Views</Filter>
-    </ClInclude>
-    <ClInclude Include="TabContainerTestBase.h">
-      <Filter>Tabs\UI</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowserFactoryFake.h">
       <Filter>ShellBrowser</Filter>

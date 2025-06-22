@@ -299,6 +299,16 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 	return m_browserPane.get();
 }
 
+TabContainer *Explorerplusplus::GetActiveTabContainer()
+{
+	return GetActivePane()->GetTabContainer();
+}
+
+const TabContainer *Explorerplusplus::GetActiveTabContainer() const
+{
+	return GetActivePane()->GetTabContainer();
+}
+
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 {
 	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();

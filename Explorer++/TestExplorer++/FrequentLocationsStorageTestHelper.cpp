@@ -28,8 +28,7 @@ void BuildReferenceModel(FrequentLocationsModel *frequentLocationsModel)
 LocationVisitInfo BuildFrequentLocation(const std::wstring &location, int numVisits,
 	const SystemClock::TimePoint &lastVisitTime)
 {
-	return { CreateSimplePidlForTest(location, nullptr, ShellItemType::Folder), numVisits,
-		lastVisitTime };
+	return { CreateSimplePidlForTest(location), numVisits, lastVisitTime };
 }
 
 }

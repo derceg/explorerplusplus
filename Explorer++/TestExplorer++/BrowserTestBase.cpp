@@ -6,11 +6,19 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 
+BrowserTestBase::BrowserTestBase() :
+	m_cachedIcons(10),
+	m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr)
+{
+}
+
 BrowserTestBase::~BrowserTestBase() = default;
 
 BrowserWindowFake *BrowserTestBase::AddBrowser()
 {
-	auto browser = std::make_unique<BrowserWindowFake>(&m_tabEvents, &m_navigationEvents);
+	auto browser = std::make_unique<BrowserWindowFake>(&m_config, &m_tabEvents,
+		&m_shellBrowserEvents, &m_navigationEvents, &m_cachedIcons, &m_bookmarkTree,
+		&m_acceleratorManager, &m_resourceLoader);
 	auto *rawBrowser = browser.get();
 	m_browsers.push_back(std::move(browser));
 	return rawBrowser;

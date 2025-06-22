@@ -23,10 +23,9 @@ class BrowserCommandControllerTest : public BrowserTestBase
 protected:
 	BrowserCommandControllerTest() :
 		m_browser(AddBrowser()),
-		m_tab(m_browser->AddTab()),
+		m_tab(m_browser->AddTab(L"c:\\")),
 		m_commandController(m_browser, &m_config, &m_clipboardStore, &m_resourceLoader)
 	{
-		m_browser->ActivateTabAtIndex(0);
 	}
 
 	void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr)
@@ -67,7 +66,7 @@ TEST_F(BrowserCommandControllerTest, SortBy)
 
 TEST_F(BrowserCommandControllerTest, CopyFolderPath)
 {
-	std::wstring path = L"C:\\Fake";
+	std::wstring path = L"c:\\fake";
 	NavigateTab(m_tab, path);
 
 	m_commandController.ExecuteCommand(IDM_FILE_COPYFOLDERPATH);
@@ -119,12 +118,10 @@ TEST_F(BrowserCommandControllerTest, ResetMainFontSize)
 
 TEST_F(BrowserCommandControllerTest, Refresh)
 {
-	PidlAbsolute pidl;
-	NavigateTab(m_tab, L"C:\\Fake", &pidl);
-
 	auto *navigationController = m_tab->GetShellBrowser()->GetNavigationController();
 
 	int originalEntryId = navigationController->GetCurrentEntry()->GetId();
+	auto originalPidl = navigationController->GetCurrentEntry()->GetPidl();
 
 	m_commandController.ExecuteCommand(IDM_VIEW_REFRESH);
 
@@ -133,42 +130,37 @@ TEST_F(BrowserCommandControllerTest, Refresh)
 
 	auto *updatedEntry = navigationController->GetCurrentEntry();
 	EXPECT_NE(updatedEntry->GetId(), originalEntryId);
-	EXPECT_EQ(updatedEntry->GetPidl(), pidl);
+	EXPECT_EQ(updatedEntry->GetPidl(), originalPidl);
 }
 
 TEST_F(BrowserCommandControllerTest, Back)
 {
-	NavigateTab(m_tab, L"C:\\Fake1");
-	NavigateTab(m_tab, L"C:\\Fake2");
-	NavigateTab(m_tab, L"C:\\Fake3");
+	NavigateTab(m_tab, L"c:\\fake");
 
 	m_commandController.ExecuteCommand(IDM_GO_BACK);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 0);
 }
 
 TEST_F(BrowserCommandControllerTest, Forward)
 {
-	NavigateTab(m_tab, L"C:\\Fake1");
-	NavigateTab(m_tab, L"C:\\Fake2");
-	NavigateTab(m_tab, L"C:\\Fake3");
+	NavigateTab(m_tab, L"c:\\fake");
 
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
 
 	m_commandController.ExecuteCommand(IDM_GO_FORWARD);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 2);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
 }
 
 TEST_F(BrowserCommandControllerTest, Up)
 {
-	NavigateTab(m_tab, L"C:\\Fake");
+	NavigateTab(m_tab, L"c:\\windows\\system32");
 
 	m_commandController.ExecuteCommand(IDM_GO_UP);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 3);
 
 	auto *currentEntry = m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 	ASSERT_NE(currentEntry, nullptr);
 
-	PidlAbsolute pidlParent = CreateSimplePidlForTest(L"C:\\");
+	PidlAbsolute pidlParent = CreateSimplePidlForTest(L"c:\\windows");
 	EXPECT_EQ(currentEntry->GetPidl(), pidlParent);
 }

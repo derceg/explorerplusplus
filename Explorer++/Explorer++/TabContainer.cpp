@@ -314,6 +314,11 @@ void TabContainer::OnTabSelected(const Tab &tab)
 	m_tabEvents->NotifySelected(tab);
 }
 
+MainTabView *TabContainer::GetView()
+{
+	return m_view;
+}
+
 void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
 {
 	CreateNewTab(m_config->defaultTabDirectory, tabSettings);

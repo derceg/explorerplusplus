@@ -4,18 +4,25 @@
 
 #include "pch.h"
 #include "TabContainer.h"
+#include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "MainTabView.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
-#include "TabContainerTestBase.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-class TabContainerTest : public TabContainerTestBase
+class TabContainerTest : public BrowserTestBase
 {
+protected:
+	TabContainerTest() : m_browser(AddBrowser()), m_tabContainer(m_browser->GetActiveTabContainer())
+	{
+	}
+
+	BrowserWindowFake *const m_browser;
+	TabContainer *const m_tabContainer;
 };
 
 TEST_F(TabContainerTest, TabSettingsOnCreation)
@@ -25,19 +32,19 @@ TEST_F(TabContainerTest, TabSettingsOnCreation)
 	TabSettings tabSettings1;
 	tabSettings1.lockState = Tab::LockState::Locked;
 	tabSettings1.name = customName;
-	const auto &tab1 = AddTab(L"c:\\", tabSettings1);
-	EXPECT_EQ(tab1.GetLockState(), Tab::LockState::Locked);
-	EXPECT_EQ(tab1.GetName(), customName);
+	const auto *tab1 = m_browser->AddTab(L"c:\\", tabSettings1);
+	EXPECT_EQ(tab1->GetLockState(), Tab::LockState::Locked);
+	EXPECT_EQ(tab1->GetName(), customName);
 
 	TabSettings tabSettings2;
 	tabSettings2.index = 0;
-	const auto &tab2 = AddTab(L"d:\\", tabSettings2);
-	EXPECT_THAT(m_tabContainer->GetTabByIndex(0), Ref(tab2));
+	const auto *tab2 = m_browser->AddTab(L"d:\\", tabSettings2);
+	EXPECT_THAT(m_tabContainer->GetTabByIndex(0), Ref(*tab2));
 
 	TabSettings tabSettings3;
 	tabSettings3.selected = true;
-	const auto &tab3 = AddTab(L"e:\\", tabSettings3);
-	EXPECT_TRUE(m_tabContainer->IsTabSelected(tab3));
+	const auto *tab3 = m_browser->AddTab(L"e:\\", tabSettings3);
+	EXPECT_TRUE(m_tabContainer->IsTabSelected(*tab3));
 }
 
 TEST_F(TabContainerTest, OpenNewTabNextToCurrentOption)
@@ -47,59 +54,59 @@ TEST_F(TabContainerTest, OpenNewTabNextToCurrentOption)
 	// When the openNewTabNextToCurrent option is set and a new tab is created, that tab will be
 	// created to the right of the selected tab. When the first tab is created, there will be no
 	// selected tab, but that should still be a safe operation.
-	AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
 }
 
 TEST_F(TabContainerTest, TabText)
 {
-	auto &tab = AddTab(L"c:\\path\\to\\folder");
+	auto *tab = m_browser->AddTab(L"c:\\path\\to\\folder");
 
-	const auto *tabViewItem = m_tabView->GetTabAtIndex(0);
+	const auto *tabViewItem = m_tabContainer->GetView()->GetTabAtIndex(0);
 	EXPECT_EQ(tabViewItem->GetText(), L"folder");
 
 	// The tab's text should be updated when a navigation occurs.
 	auto pidl = CreateSimplePidlForTest(L"c:\\windows\\system32");
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
-	tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+	tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	EXPECT_EQ(tabViewItem->GetText(), L"system32");
 
 	// The text should also be updated if a custom name is set.
 	std::wstring customName = L"Custom name";
-	tab.SetCustomName(customName);
+	tab->SetCustomName(customName);
 	EXPECT_EQ(tabViewItem->GetText(), customName);
 }
 
 TEST_F(TabContainerTest, TabTooltip)
 {
 	std::wstring path = L"c:\\path\\to\\folder";
-	auto &tab = AddTab(path);
+	auto *tab = m_browser->AddTab(path);
 
-	const auto *tabViewItem = m_tabView->GetTabAtIndex(0);
+	const auto *tabViewItem = m_tabContainer->GetView()->GetTabAtIndex(0);
 	EXPECT_THAT(tabViewItem->GetTooltipText(), StrCaseEq(path));
 
 	std::wstring updatedPath = L"c:\\windows\\system32";
 	auto pidl = CreateSimplePidlForTest(updatedPath);
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
-	tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+	tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	EXPECT_THAT(tabViewItem->GetTooltipText(), StrCaseEq(updatedPath));
 }
 
 TEST_F(TabContainerTest, GetTab)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	EXPECT_THAT(m_tabContainer->GetTab(tab1.GetId()), Ref(tab1));
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	EXPECT_THAT(m_tabContainer->GetTab(tab1->GetId()), Ref(*tab1));
 
-	const auto &tab2 = AddTab(L"d:\\");
-	EXPECT_THAT(m_tabContainer->GetTab(tab2.GetId()), Ref(tab2));
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	EXPECT_THAT(m_tabContainer->GetTab(tab2->GetId()), Ref(*tab2));
 }
 
 TEST_F(TabContainerTest, GetTabOptional)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	EXPECT_EQ(m_tabContainer->GetTabOptional(tab1.GetId()), &tab1);
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	EXPECT_EQ(m_tabContainer->GetTabOptional(tab1->GetId()), tab1);
 
-	const auto &tab2 = AddTab(L"d:\\");
-	EXPECT_EQ(m_tabContainer->GetTabOptional(tab2.GetId()), &tab2);
+	const auto tab2 = m_browser->AddTab(L"d:\\");
+	EXPECT_EQ(m_tabContainer->GetTabOptional(tab2->GetId()), tab2);
 
 	EXPECT_EQ(m_tabContainer->GetTabOptional(-1), nullptr);
 }
@@ -107,79 +114,79 @@ TEST_F(TabContainerTest, GetTabOptional)
 TEST_F(TabContainerTest, GetSetSelectedTab)
 {
 	// The first tab should always be selected.
-	const auto &tab1 = AddTab(L"c:\\");
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 
-	const auto &tab2 = AddTab(L"d:\\");
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 
-	const auto &tab3 = AddTab(L"e:\\");
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 
-	m_tabContainer->SelectTab(tab3);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab3));
+	m_tabContainer->SelectTab(*tab3);
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab3));
 
-	m_tabContainer->SelectTab(tab1);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	m_tabContainer->SelectTab(*tab1);
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 
-	m_tabContainer->SelectTab(tab2);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab2));
+	m_tabContainer->SelectTab(*tab2);
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab2));
 }
 
 TEST_F(TabContainerTest, SelectAdjacentTab)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
 	m_tabContainer->SelectTabAtIndex(0);
 
 	m_tabContainer->SelectAdjacentTab(TabContainer::SelectionDirection::Next);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab2));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab2));
 
 	m_tabContainer->SelectAdjacentTab(TabContainer::SelectionDirection::Next);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab3));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab3));
 
 	// The last tab was selected, so selecting the next tab should result in the selection wrapping
 	// around.
 	m_tabContainer->SelectAdjacentTab(TabContainer::SelectionDirection::Next);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 
 	m_tabContainer->SelectTabAtIndex(2);
 
 	m_tabContainer->SelectAdjacentTab(TabContainer::SelectionDirection::Previous);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab2));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab2));
 
 	m_tabContainer->SelectAdjacentTab(TabContainer::SelectionDirection::Previous);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 
 	// The first tab was selected, so selecting the previous tab should result in the selection
 	// wrapping around again.
 	m_tabContainer->SelectAdjacentTab(TabContainer::SelectionDirection::Previous);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab3));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab3));
 }
 
 TEST_F(TabContainerTest, SelectTabAtIndex)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
 	m_tabContainer->SelectTabAtIndex(1);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab2));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab2));
 
 	m_tabContainer->SelectTabAtIndex(2);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab3));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab3));
 
 	m_tabContainer->SelectTabAtIndex(0);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
 }
 
 TEST_F(TabContainerTest, GetSelectedTabIndex)
 {
-	AddTab(L"c:\\");
-	AddTab(L"d:\\");
-	AddTab(L"e:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"d:\\");
+	m_browser->AddTab(L"e:\\");
 
 	m_tabContainer->SelectTabAtIndex(1);
 	EXPECT_EQ(m_tabContainer->GetSelectedTabIndex(), 1);
@@ -193,59 +200,59 @@ TEST_F(TabContainerTest, GetSelectedTabIndex)
 
 TEST_F(TabContainerTest, IsTabSelected)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	m_tabContainer->SelectTab(tab3);
-	EXPECT_FALSE(m_tabContainer->IsTabSelected(tab1));
-	EXPECT_FALSE(m_tabContainer->IsTabSelected(tab2));
-	EXPECT_TRUE(m_tabContainer->IsTabSelected(tab3));
+	m_tabContainer->SelectTab(*tab3);
+	EXPECT_FALSE(m_tabContainer->IsTabSelected(*tab1));
+	EXPECT_FALSE(m_tabContainer->IsTabSelected(*tab2));
+	EXPECT_TRUE(m_tabContainer->IsTabSelected(*tab3));
 
-	m_tabContainer->SelectTab(tab1);
-	EXPECT_TRUE(m_tabContainer->IsTabSelected(tab1));
-	EXPECT_FALSE(m_tabContainer->IsTabSelected(tab2));
-	EXPECT_FALSE(m_tabContainer->IsTabSelected(tab3));
+	m_tabContainer->SelectTab(*tab1);
+	EXPECT_TRUE(m_tabContainer->IsTabSelected(*tab1));
+	EXPECT_FALSE(m_tabContainer->IsTabSelected(*tab2));
+	EXPECT_FALSE(m_tabContainer->IsTabSelected(*tab3));
 
-	m_tabContainer->SelectTab(tab2);
-	EXPECT_FALSE(m_tabContainer->IsTabSelected(tab1));
-	EXPECT_TRUE(m_tabContainer->IsTabSelected(tab2));
-	EXPECT_FALSE(m_tabContainer->IsTabSelected(tab3));
+	m_tabContainer->SelectTab(*tab2);
+	EXPECT_FALSE(m_tabContainer->IsTabSelected(*tab1));
+	EXPECT_TRUE(m_tabContainer->IsTabSelected(*tab2));
+	EXPECT_FALSE(m_tabContainer->IsTabSelected(*tab3));
 }
 
 TEST_F(TabContainerTest, GetTabByIndex)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	EXPECT_THAT(m_tabContainer->GetTabByIndex(0), Ref(tab1));
-	EXPECT_THAT(m_tabContainer->GetTabByIndex(1), Ref(tab2));
-	EXPECT_THAT(m_tabContainer->GetTabByIndex(2), Ref(tab3));
+	EXPECT_THAT(m_tabContainer->GetTabByIndex(0), Ref(*tab1));
+	EXPECT_THAT(m_tabContainer->GetTabByIndex(1), Ref(*tab2));
+	EXPECT_THAT(m_tabContainer->GetTabByIndex(2), Ref(*tab3));
 }
 
 TEST_F(TabContainerTest, GetTabIndex)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	EXPECT_EQ(m_tabContainer->GetTabIndex(tab1), 0);
-	EXPECT_EQ(m_tabContainer->GetTabIndex(tab2), 1);
-	EXPECT_EQ(m_tabContainer->GetTabIndex(tab3), 2);
+	EXPECT_EQ(m_tabContainer->GetTabIndex(*tab1), 0);
+	EXPECT_EQ(m_tabContainer->GetTabIndex(*tab2), 1);
+	EXPECT_EQ(m_tabContainer->GetTabIndex(*tab3), 2);
 }
 
 TEST_F(TabContainerTest, GetNumTabs)
 {
 	EXPECT_EQ(m_tabContainer->GetNumTabs(), 0);
 
-	AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
 	EXPECT_EQ(m_tabContainer->GetNumTabs(), 1);
 
-	AddTab(L"d:\\");
+	m_browser->AddTab(L"d:\\");
 	EXPECT_EQ(m_tabContainer->GetNumTabs(), 2);
 
-	AddTab(L"e:\\");
+	m_browser->AddTab(L"e:\\");
 	EXPECT_EQ(m_tabContainer->GetNumTabs(), 3);
 
 	EXPECT_TRUE(m_tabContainer->CloseTab(m_tabContainer->GetTabByIndex(0)));
@@ -257,36 +264,36 @@ TEST_F(TabContainerTest, GetNumTabs)
 
 TEST_F(TabContainerTest, MoveTab)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
-	const auto &tab4 = AddTab(L"f:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
+	const auto *tab4 = m_browser->AddTab(L"f:\\");
 
 	m_tabContainer->SelectTabAtIndex(0);
 
-	m_tabContainer->MoveTab(tab2, 2);
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(&tab1, &tab3, &tab2, &tab4));
+	m_tabContainer->MoveTab(*tab2, 2);
+	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(tab1, tab3, tab2, tab4));
 
 	// The first tab is selected, so it should still be selected after being moved.
-	m_tabContainer->MoveTab(tab1, 3);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(&tab3, &tab2, &tab4, &tab1));
+	m_tabContainer->MoveTab(*tab1, 3);
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
+	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(tab3, tab2, tab4, tab1));
 
-	m_tabContainer->MoveTab(tab4, 0);
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(&tab4, &tab3, &tab2, &tab1));
+	m_tabContainer->MoveTab(*tab4, 0);
+	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(tab4, tab3, tab2, tab1));
 
 	// The selected tab should shift position, but should remain selected.
-	m_tabContainer->MoveTab(tab2, 3);
-	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(tab1));
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(&tab4, &tab3, &tab1, &tab2));
+	m_tabContainer->MoveTab(*tab2, 3);
+	EXPECT_THAT(m_tabContainer->GetSelectedTab(), Ref(*tab1));
+	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(tab4, tab3, tab1, tab2));
 }
 
 TEST_F(TabContainerTest, CloseTab)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	int tabId3 = AddTabAndReturnId(L"e:\\");
-	int tabId4 = AddTabAndReturnId(L"f:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
+	int tabId4 = m_browser->AddTabAndReturnId(L"f:\\");
 
 	m_tabContainer->SelectTabAtIndex(0);
 
@@ -308,8 +315,8 @@ TEST_F(TabContainerTest, CloseTab)
 
 TEST_F(TabContainerTest, CloseTabWhenLocked)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
 
 	// If a tab is locked, attempting to close it should have no effect.
 	m_tabContainer->GetTab(tabId2).SetLockState(Tab::LockState::Locked);
@@ -325,34 +332,34 @@ TEST_F(TabContainerTest, CloseTabWhenLocked)
 
 TEST_F(TabContainerTest, GetAllTabs)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
 	EXPECT_THAT(m_tabContainer->GetAllTabs(),
-		UnorderedElementsAre(Pair(tab1.GetId(), Pointer(&tab1)), Pair(tab2.GetId(), Pointer(&tab2)),
-			Pair(tab3.GetId(), Pointer(&tab3))));
+		UnorderedElementsAre(Pair(tab1->GetId(), Pointer(tab1)), Pair(tab2->GetId(), Pointer(tab2)),
+			Pair(tab3->GetId(), Pointer(tab3))));
 }
 
 TEST_F(TabContainerTest, GetAllTabsInOrder)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
-	const auto &tab3 = AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
+	const auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(&tab1, &tab2, &tab3));
+	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(tab1, tab2, tab3));
 }
 
 TEST_F(TabContainerTest, DoubleClickOnTab)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	int tabId3 = AddTabAndReturnId(L"e:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
 
 	m_config.doubleClickTabClose = false;
 
 	// This should have no effect, since the doubleClickTabClose is disabled.
-	auto *tabViewItem = m_tabView->GetTabAtIndex(1);
+	auto *tabViewItem = m_tabContainer->GetView()->GetTabAtIndex(1);
 	tabViewItem->OnDoubleClicked({ { 0, 0 }, false, false });
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId2),
@@ -360,7 +367,7 @@ TEST_F(TabContainerTest, DoubleClickOnTab)
 
 	m_config.doubleClickTabClose = true;
 
-	tabViewItem = m_tabView->GetTabAtIndex(0);
+	tabViewItem = m_tabContainer->GetView()->GetTabAtIndex(0);
 	tabViewItem->OnDoubleClicked({ { 0, 0 }, false, false });
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId2), Property(&Tab::GetId, tabId3)));
@@ -368,12 +375,12 @@ TEST_F(TabContainerTest, DoubleClickOnTab)
 
 TEST_F(TabContainerTest, MiddleClickOnTab)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	AddTab(L"e:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	m_browser->AddTab(L"e:\\");
 
 	// Middle-clicking a tab should result in the tab being closed.
-	auto *tabViewItem = m_tabView->GetTabAtIndex(2);
+	auto *tabViewItem = m_tabContainer->GetView()->GetTabAtIndex(2);
 	tabViewItem->OnMiddleClicked({ { 0, 0 }, false, false });
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId2)));
@@ -387,14 +394,14 @@ TEST_F(TabContainerTest, CreatedSignal)
 	const Tab *callbackTab = nullptr;
 	EXPECT_CALL(callback, Call(_))
 		.WillOnce([&callbackTab](const auto &createdTab) { callbackTab = &createdTab; });
-	const auto &tab = AddTab(L"c:\\");
-	EXPECT_EQ(&tab, callbackTab);
+	const auto *tab = m_browser->AddTab(L"c:\\");
+	EXPECT_EQ(tab, callbackTab);
 }
 
 TEST_F(TabContainerTest, SelectedSignal)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	const auto &tab2 = AddTab(L"d:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	const auto *tab2 = m_browser->AddTab(L"d:\\");
 
 	MockFunction<void(const Tab &tab)> callback;
 	m_tabEvents.AddSelectedObserver(callback.AsStdFunction(),
@@ -404,16 +411,16 @@ TEST_F(TabContainerTest, SelectedSignal)
 	{
 		InSequence seq;
 
-		EXPECT_CALL(callback, Call(Ref(tab2)));
+		EXPECT_CALL(callback, Call(Ref(*tab2)));
 		EXPECT_CALL(check, Call(1));
-		EXPECT_CALL(callback, Call(Ref(tab1)));
+		EXPECT_CALL(callback, Call(Ref(*tab1)));
 		EXPECT_CALL(check, Call(2));
-		EXPECT_CALL(callback, Call(Ref(tab2)));
+		EXPECT_CALL(callback, Call(Ref(*tab2)));
 		EXPECT_CALL(check, Call(3));
-		EXPECT_CALL(callback, Call(Ref(tab1)));
+		EXPECT_CALL(callback, Call(Ref(*tab1)));
 	}
 
-	m_tabContainer->SelectTab(tab2);
+	m_tabContainer->SelectTab(*tab2);
 	check.Call(1);
 	m_tabContainer->SelectTabAtIndex(0);
 	check.Call(2);
@@ -432,13 +439,13 @@ TEST_F(TabContainerTest, SelectedSignalOnFirstTabCreation)
 	const Tab *callbackTab = nullptr;
 	EXPECT_CALL(callback, Call(_))
 		.WillOnce([&callbackTab](const auto &selectedTab) { callbackTab = &selectedTab; });
-	const auto &tab = AddTab(L"c:\\");
-	EXPECT_EQ(&tab, callbackTab);
+	const auto *tab = m_browser->AddTab(L"c:\\");
+	EXPECT_EQ(tab, callbackTab);
 }
 
 TEST_F(TabContainerTest, SelectedSignalOnSelectedTabCreation)
 {
-	AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
 
 	MockFunction<void(const Tab &tab)> callback;
 	m_tabEvents.AddSelectedObserver(callback.AsStdFunction(),
@@ -447,14 +454,14 @@ TEST_F(TabContainerTest, SelectedSignalOnSelectedTabCreation)
 	const Tab *callbackTab = nullptr;
 	EXPECT_CALL(callback, Call(_))
 		.WillOnce([&callbackTab](const auto &selectedTab) { callbackTab = &selectedTab; });
-	const auto &tab2 = AddTab(L"c:\\", TabSettings(_selected = true));
-	EXPECT_EQ(&tab2, callbackTab);
+	const auto *tab2 = m_browser->AddTab(L"c:\\", TabSettings(_selected = true));
+	EXPECT_EQ(tab2, callbackTab);
 }
 
 TEST_F(TabContainerTest, SelectedSignalOnClose)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
 
 	m_tabContainer->SelectTab(m_tabContainer->GetTab(tabId2));
 
@@ -470,22 +477,22 @@ TEST_F(TabContainerTest, SelectedSignalOnClose)
 
 TEST_F(TabContainerTest, MovedSignal)
 {
-	const auto &tab1 = AddTab(L"c:\\");
-	AddTab(L"d:\\");
-	AddTab(L"e:\\");
+	const auto *tab1 = m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"d:\\");
+	m_browser->AddTab(L"e:\\");
 
 	MockFunction<void(const Tab &tab, int fromIndex, int toIndex)> callback;
 	m_tabEvents.AddMovedObserver(callback.AsStdFunction(), TabEventScope::ForBrowser(*m_browser));
 
-	EXPECT_CALL(callback, Call(Ref(tab1), 0, 2));
-	m_tabContainer->MoveTab(tab1, 2);
+	EXPECT_CALL(callback, Call(Ref(*tab1), 0, 2));
+	m_tabContainer->MoveTab(*tab1, 2);
 }
 
 TEST_F(TabContainerTest, PreRemovalSignal)
 {
-	AddTab(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	AddTab(L"e:\\");
+	m_browser->AddTab(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	m_browser->AddTab(L"e:\\");
 
 	MockFunction<void(const Tab &tab, int index)> callback;
 	m_tabEvents.AddPreRemovalObserver(callback.AsStdFunction(),
@@ -497,9 +504,9 @@ TEST_F(TabContainerTest, PreRemovalSignal)
 
 TEST_F(TabContainerTest, RemovedSignal)
 {
-	AddTab(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	AddTab(L"e:\\");
+	m_browser->AddTab(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	m_browser->AddTab(L"e:\\");
 
 	MockFunction<void(const Tab &tab)> callback;
 	m_tabEvents.AddRemovedObserver(callback.AsStdFunction(), TabEventScope::ForBrowser(*m_browser));

@@ -14,9 +14,9 @@ class TabEventsTest : public BrowserTestBase
 protected:
 	TabEventsTest() :
 		m_browser1(AddBrowser()),
-		m_tab1(m_browser1->AddTab()),
+		m_tab1(m_browser1->AddTab(L"c:\\")),
 		m_browser2(AddBrowser()),
-		m_tab2(m_browser2->AddTab())
+		m_tab2(m_browser2->AddTab(L"c:\\"))
 	{
 	}
 

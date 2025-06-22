@@ -20,16 +20,16 @@ protected:
 
 	NavigationEventsTest() :
 		m_browser1(AddBrowser()),
-		m_tab1(m_browser1->AddTab()),
-		m_tab2(m_browser1->AddTab()),
+		m_tab1(m_browser1->AddTab(L"c:\\")),
+		m_tab2(m_browser1->AddTab(L"c:\\")),
 		m_browser2(AddBrowser()),
-		m_tab3(m_browser2->AddTab()),
+		m_tab3(m_browser2->AddTab(L"c:\\")),
 		m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 		m_manualExecutorBackground(std::make_shared<concurrencpp::manual_executor>()),
 		m_manualExecutorCurrent(std::make_shared<concurrencpp::manual_executor>()),
-		m_request1(MakeNavigationRequest(m_tab1, L"c:\\")),
-		m_request2(MakeNavigationRequest(m_tab2, L"d:\\")),
-		m_request3(MakeNavigationRequest(m_tab3, L"e:\\"))
+		m_request1(MakeNavigationRequest(m_tab1, L"d:\\")),
+		m_request2(MakeNavigationRequest(m_tab2, L"e:\\")),
+		m_request3(MakeNavigationRequest(m_tab3, L"f:\\"))
 	{
 	}
 
@@ -183,8 +183,8 @@ TEST_F(NavigationEventsTest, SignalsFilteredByActiveShellBrowser)
 {
 	InSequence seq;
 
-	m_browser1->ActivateTabAtIndex(1);
-	m_browser2->ActivateTabAtIndex(0);
+	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
+	m_browser2->GetActiveTabContainer()->SelectTabAtIndex(0);
 
 	m_navigationEvents.AddStartedObserver(m_startedCallback.AsStdFunction(),
 		NavigationEventScope::ForActiveShellBrowser(*m_browser1));

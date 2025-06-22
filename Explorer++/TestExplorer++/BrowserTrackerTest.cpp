@@ -40,6 +40,16 @@ public:
 		return nullptr;
 	}
 
+	TabContainer *GetActiveTabContainer() override
+	{
+		return nullptr;
+	}
+
+	const TabContainer *GetActiveTabContainer() const override
+	{
+		return nullptr;
+	}
+
 	void FocusActiveTab() override
 	{
 	}

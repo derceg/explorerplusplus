@@ -4,7 +4,9 @@
 
 #include "pch.h"
 #include "BrowserWindowFake.h"
+#include "Config.h"
 #include "MainRebarStorage.h"
+#include "MainTabView.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
@@ -13,22 +15,17 @@
 #include "TabStorage.h"
 #include "WindowStorage.h"
 
-BrowserWindowFake::BrowserWindowFake(TabEvents *tabEvents, NavigationEvents *navigationEvents) :
-	m_tabEvents(tabEvents),
-	m_navigationEvents(navigationEvents),
-	m_window(CreateBrowserWindow())
+BrowserWindowFake::BrowserWindowFake(const Config *config, TabEvents *tabEvents,
+	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
+	m_config(config),
+	m_window(CreateBrowserWindow()),
+	m_shellBrowserFactory(navigationEvents, &m_tabNavigation),
+	m_tabContainer(TabContainer::Create(MainTabView::Create(m_window.get(), config, resourceLoader),
+		this, &m_shellBrowserFactory, tabEvents, shellBrowserEvents, navigationEvents, nullptr,
+		cachedIcons, bookmarkTree, acceleratorManager, config, resourceLoader))
 {
-}
-
-BrowserWindowFake::~BrowserWindowFake()
-{
-	while (!m_tabs.empty())
-	{
-		auto tab = std::move(m_tabs.back());
-		m_tabs.pop_back();
-
-		m_tabEvents->NotifyRemoved(*tab);
-	}
 }
 
 wil::unique_hwnd BrowserWindowFake::CreateBrowserWindow()
@@ -77,25 +74,33 @@ BrowserPane *BrowserWindowFake::GetActivePane() const
 	return nullptr;
 }
 
+TabContainer *BrowserWindowFake::GetActiveTabContainer()
+{
+	return m_tabContainer;
+}
+
+const TabContainer *BrowserWindowFake::GetActiveTabContainer() const
+{
+	return m_tabContainer;
+}
+
 void BrowserWindowFake::FocusActiveTab()
 {
 }
 
 void BrowserWindowFake::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	UNREFERENCED_PARAMETER(tab);
+	GetActiveTabContainer()->CreateNewTab(*tab);
 }
 
 ShellBrowser *BrowserWindowFake::GetActiveShellBrowser()
 {
-	CHECK(m_activeTabIndex < m_tabs.size());
-	return m_tabs[m_activeTabIndex]->GetShellBrowser();
+	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
 }
 
 const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
 {
-	CHECK(m_activeTabIndex < m_tabs.size());
-	return m_tabs[m_activeTabIndex]->GetShellBrowser();
+	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
 }
 
 void BrowserWindowFake::StartMainToolbarCustomization()
@@ -140,19 +145,79 @@ void BrowserWindowFake::OpenDefaultItem(OpenFolderDisposition openFolderDisposit
 void BrowserWindowFake::OpenItem(const std::wstring &itemPath,
 	OpenFolderDisposition openFolderDisposition)
 {
-	if (openFolderDisposition == OpenFolderDisposition::CurrentTab)
-	{
-		auto pidl = CreateSimplePidlForTest(itemPath);
-		MaybeNavigateActiveShellBrowser(pidl.Raw());
-	}
+	auto pidl = CreateSimplePidlForTest(itemPath);
+	OpenItem(pidl.Raw(), openFolderDisposition);
 }
 
 void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	OpenFolderDisposition openFolderDisposition)
 {
+	SFGAOF attributes = SFGAO_FOLDER | SFGAO_STREAM;
+	HRESULT hr = GetItemAttributes(pidlItem, &attributes);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	if (WI_IsFlagClear(attributes, SFGAO_FOLDER)
+		|| WI_AreAllFlagsSet(attributes, SFGAO_FOLDER | SFGAO_STREAM))
+	{
+		// The item is a file. No action is taken to open files here.
+		return;
+	}
+
 	if (openFolderDisposition == OpenFolderDisposition::CurrentTab)
 	{
-		MaybeNavigateActiveShellBrowser(pidlItem);
+		if (m_config->alwaysOpenNewTab)
+		{
+			openFolderDisposition = OpenFolderDisposition::ForegroundTab;
+		}
+	}
+	else if (openFolderDisposition == OpenFolderDisposition::NewTabDefault)
+	{
+		openFolderDisposition = m_config->openTabsInForeground
+			? OpenFolderDisposition::ForegroundTab
+			: OpenFolderDisposition::BackgroundTab;
+	}
+	else if (openFolderDisposition == OpenFolderDisposition::NewTabAlternate)
+	{
+		openFolderDisposition = m_config->openTabsInForeground
+			? OpenFolderDisposition::BackgroundTab
+			: OpenFolderDisposition::ForegroundTab;
+	}
+
+	switch (openFolderDisposition)
+	{
+	case OpenFolderDisposition::CurrentTab:
+	{
+		auto navigateParams = NavigateParams::Normal(pidlItem);
+		GetActiveShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+	}
+	break;
+
+	case OpenFolderDisposition::BackgroundTab:
+	{
+		auto navigateParams = NavigateParams::Normal(pidlItem);
+		GetActiveTabContainer()->CreateNewTab(navigateParams);
+	}
+	break;
+
+	case OpenFolderDisposition::ForegroundTab:
+	{
+		auto navigateParams = NavigateParams::Normal(pidlItem);
+		GetActiveTabContainer()->CreateNewTab(navigateParams, TabSettings(_selected = true));
+	}
+	break;
+
+	// This case isn't handled yet.
+	case OpenFolderDisposition::NewWindow:
+		break;
+
+	// These values are transformed above, so don't need to be handled here.
+	case OpenFolderDisposition::NewTabDefault:
+	case OpenFolderDisposition::NewTabAlternate:
+		break;
 	}
 }
 
@@ -164,34 +229,15 @@ boost::signals2::connection BrowserWindowFake::AddMenuHelpTextRequestObserver(
 	return {};
 }
 
-Tab *BrowserWindowFake::AddTab()
+int BrowserWindowFake::AddTabAndReturnId(const std::wstring &path, const TabSettings &tabSettings)
 {
-	auto tab = std::make_unique<Tab>(
-		std::make_unique<ShellBrowserFake>(m_navigationEvents, &m_tabNavigation), this, nullptr,
-		m_tabEvents);
-	auto *rawTab = tab.get();
-	m_tabs.push_back(std::move(tab));
-
-	m_tabEvents->NotifyCreated(*rawTab);
-
-	return rawTab;
+	const auto &tab = AddTab(path, tabSettings);
+	return tab->GetId();
 }
 
-void BrowserWindowFake::ActivateTabAtIndex(size_t index)
+Tab *BrowserWindowFake::AddTab(const std::wstring &path, const TabSettings &tabSettings)
 {
-	CHECK(index < m_tabs.size());
-	m_activeTabIndex = index;
-	m_tabEvents->NotifySelected(*m_tabs[m_activeTabIndex]);
-}
-
-void BrowserWindowFake::MaybeNavigateActiveShellBrowser(PCIDLIST_ABSOLUTE pidl)
-{
-	if (m_activeTabIndex >= m_tabs.size())
-	{
-		return;
-	}
-
-	auto navigateParams = NavigateParams::Normal(pidl);
-	m_tabs[m_activeTabIndex]->GetShellBrowser()->GetNavigationController()->Navigate(
-		navigateParams);
+	auto pidl = CreateSimplePidlForTest(path);
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+	return &GetActiveTabContainer()->CreateNewTab(navigateParams, tabSettings);
 }

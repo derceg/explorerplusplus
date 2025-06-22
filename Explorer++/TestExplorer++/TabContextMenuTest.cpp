@@ -4,17 +4,18 @@
 
 #include "pch.h"
 #include "TabContextMenu.h"
+#include "BrowserTestBase.h"
+#include "BrowserWindowFake.h"
 #include "MainResource.h"
 #include "MenuViewFake.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
-#include "TabContainerTestBase.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-class TabContextMenuTest : public TabContainerTestBase
+class TabContextMenuTest : public BrowserTestBase
 {
 protected:
 	struct HistoryEntrySnapshot
@@ -24,10 +25,16 @@ protected:
 		const int originalEntryId;
 	};
 
-	HistoryEntrySnapshot TakeHistoryEntrySnapshot(const Tab &tab)
+	TabContextMenuTest() :
+		m_browser(AddBrowser()),
+		m_tabContainer(m_browser->GetActiveTabContainer())
 	{
-		auto *currentEntry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-		return { &tab, currentEntry->GetPidl(), currentEntry->GetId() };
+	}
+
+	HistoryEntrySnapshot TakeHistoryEntrySnapshot(const Tab *tab)
+	{
+		auto *currentEntry = tab->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+		return { tab, currentEntry->GetPidl(), currentEntry->GetId() };
 	}
 
 	void VerifyTabRefreshed(const HistoryEntrySnapshot &snapshot)
@@ -37,14 +44,17 @@ protected:
 		EXPECT_NE(currentEntry->GetId(), snapshot.originalEntryId);
 		EXPECT_EQ(currentEntry->GetPidl(), snapshot.pidl);
 	}
+
+	BrowserWindowFake *const m_browser;
+	TabContainer *const m_tabContainer;
 };
 
 TEST_F(TabContextMenuTest, OpenParentInNewTab)
 {
-	auto &tab1 = AddTab(L"c:\\windows\\system32");
+	auto *tab1 = m_browser->AddTab(L"c:\\windows\\system32");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &tab1, m_tabContainer, &m_tabEvents,
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1, m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB, false, false);
@@ -56,11 +66,11 @@ TEST_F(TabContextMenuTest, OpenParentInNewTab)
 
 TEST_F(TabContextMenuTest, Refresh)
 {
-	auto &tab = AddTab(L"c:\\");
+	auto *tab = m_browser->AddTab(L"c:\\");
 	auto snapshot = TakeHistoryEntrySnapshot(tab);
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &tab, m_tabContainer, &m_tabEvents,
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab, m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_REFRESH, false, false);
@@ -69,15 +79,15 @@ TEST_F(TabContextMenuTest, Refresh)
 
 TEST_F(TabContextMenuTest, RefreshAll)
 {
-	auto &tab1 = AddTab(L"c:\\");
-	auto &tab2 = AddTab(L"d:\\");
-	auto &tab3 = AddTab(L"e:\\");
+	auto *tab1 = m_browser->AddTab(L"c:\\");
+	auto *tab2 = m_browser->AddTab(L"d:\\");
+	auto *tab3 = m_browser->AddTab(L"e:\\");
 
 	std::vector<HistoryEntrySnapshot> snapshots = { TakeHistoryEntrySnapshot(tab1),
 		TakeHistoryEntrySnapshot(tab2), TakeHistoryEntrySnapshot(tab3) };
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &tab1, m_tabContainer, &m_tabEvents,
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1, m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_REFRESH_ALL, false, false);
@@ -90,33 +100,33 @@ TEST_F(TabContextMenuTest, RefreshAll)
 
 TEST_F(TabContextMenuTest, LockTab)
 {
-	auto &tab = AddTab(L"c:\\");
+	auto *tab = m_browser->AddTab(L"c:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &tab, m_tabContainer, &m_tabEvents,
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab, m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB, false, false);
-	EXPECT_EQ(tab.GetLockState(), Tab::LockState::Locked);
+	EXPECT_EQ(tab->GetLockState(), Tab::LockState::Locked);
 }
 
 TEST_F(TabContextMenuTest, LockTabAndAddress)
 {
-	auto &tab = AddTab(L"c:\\");
+	auto *tab = m_browser->AddTab(L"c:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &tab, m_tabContainer, &m_tabEvents,
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab, m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS, false, false);
-	EXPECT_EQ(tab.GetLockState(), Tab::LockState::AddressLocked);
+	EXPECT_EQ(tab->GetLockState(), Tab::LockState::AddressLocked);
 }
 
 TEST_F(TabContextMenuTest, CloseTab)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	int tabId3 = AddTabAndReturnId(L"e:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
 
 	MenuViewFake menuView;
 	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
@@ -129,10 +139,10 @@ TEST_F(TabContextMenuTest, CloseTab)
 
 TEST_F(TabContextMenuTest, CloseOtherTabs)
 {
-	AddTab(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	AddTab(L"e:\\");
-	AddTab(L"f:\\");
+	m_browser->AddTab(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	m_browser->AddTab(L"e:\\");
+	m_browser->AddTab(L"f:\\");
 
 	MenuViewFake menuView;
 	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
@@ -144,10 +154,10 @@ TEST_F(TabContextMenuTest, CloseOtherTabs)
 
 TEST_F(TabContextMenuTest, CloseTabsToRight)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	AddTab(L"e:\\");
-	AddTab(L"f:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	m_browser->AddTab(L"e:\\");
+	m_browser->AddTab(L"f:\\");
 
 	MenuViewFake menuView;
 	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
@@ -160,10 +170,10 @@ TEST_F(TabContextMenuTest, CloseTabsToRight)
 
 TEST_F(TabContextMenuTest, SelectionAfterTabClosed)
 {
-	int tabId1 = AddTabAndReturnId(L"c:\\");
-	int tabId2 = AddTabAndReturnId(L"d:\\");
-	int tabId3 = AddTabAndReturnId(L"e:\\");
-	int tabId4 = AddTabAndReturnId(L"f:\\");
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
+	int tabId4 = m_browser->AddTabAndReturnId(L"f:\\");
 
 	MenuViewFake menuView;
 	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),

@@ -58,13 +58,11 @@ protected:
 
 TEST_F(AddressBarTest, DisplayUpdateAfterNavigation)
 {
-	auto *tab1 = m_browser->AddTab();
-	auto *tab2 = m_browser->AddTab();
-	m_browser->ActivateTabAtIndex(0);
+	auto *tab1 = m_browser->AddTab(L"c:\\");
+	auto *tab2 = m_browser->AddTab(L"c:\\");
 
 	auto *browser2 = AddBrowser();
-	auto *tab3 = browser2->AddTab();
-	browser2->ActivateTabAtIndex(0);
+	auto *tab3 = browser2->AddTab(L"c:\\");
 
 	std::wstring path = L"c:\\path\\to\\folder";
 	NavigateTab(tab1, path);
@@ -82,30 +80,22 @@ TEST_F(AddressBarTest, DisplayUpdateAfterNavigation)
 
 TEST_F(AddressBarTest, DisplayUpdateAfterTabSwitch)
 {
-	auto *tab1 = m_browser->AddTab();
-	auto *tab2 = m_browser->AddTab();
-	m_browser->ActivateTabAtIndex(0);
-
 	std::wstring path1 = L"c:\\path1";
-	NavigateTab(tab1, path1);
+	m_browser->AddTab(path1);
 
 	std::wstring path2 = L"c:\\path2";
-	NavigateTab(tab2, path2);
+	m_browser->AddTab(path2);
 
 	EXPECT_THAT(m_addressBarView->GetText(), StrCaseEq(path1));
-	m_browser->ActivateTabAtIndex(1);
+	m_browser->GetActiveTabContainer()->SelectTabAtIndex(1);
 	EXPECT_THAT(m_addressBarView->GetText(), StrCaseEq(path2));
 }
 
 TEST_F(AddressBarTest, OpenItemOnEnter)
 {
-	auto *tab1 = m_browser->AddTab();
-	m_browser->ActivateTabAtIndex(0);
-
-	NavigateTab(tab1, L"c:\\original\\path");
+	auto *tab1 = m_browser->AddTab(L"c:\\original\\path");
 
 	std::wstring updatedPath = L"c:\\updated\\path";
-	auto updatedPidl = CreateSimplePidlForTest(updatedPath);
 	m_addressBarView->SetTextForTesting(updatedPath);
 	auto *delegate = m_addressBarView->GetDelegateForTesting();
 	delegate->OnKeyPressed(VK_RETURN);
@@ -115,16 +105,13 @@ TEST_F(AddressBarTest, OpenItemOnEnter)
 
 	auto *currentEntry = tab1->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 	ASSERT_NE(currentEntry, nullptr);
-	EXPECT_EQ(currentEntry->GetPidl(), updatedPidl);
+	EXPECT_EQ(currentEntry->GetPidl(), CreateSimplePidlForTest(updatedPath));
 }
 
 TEST_F(AddressBarTest, RevertTextOnEscape)
 {
-	auto *tab1 = m_browser->AddTab();
-	m_browser->ActivateTabAtIndex(0);
-
 	std::wstring path = L"c:\\path";
-	NavigateTab(tab1, path);
+	m_browser->AddTab(path);
 
 	m_addressBarView->SetTextForTesting(L"c:\\path\\to\\second\\folder");
 

@@ -85,13 +85,6 @@ protected:
 		return bookmarkTree;
 	}
 
-	void NavigateTab(Tab *tab, const std::wstring &path)
-	{
-		auto pidl = CreateSimplePidlForTest(path);
-		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
-	}
-
 	void VerifyToolbarButtons()
 	{
 		const auto &buttons = m_bookmarksToolbarView->GetButtons();
@@ -182,10 +175,7 @@ TEST_F(BookmarksToolbarTest, RemoveBookmarks)
 
 TEST_F(BookmarksToolbarTest, OpenBookmarkOnClick)
 {
-	auto *tab = m_browser->AddTab();
-	m_browser->ActivateTabAtIndex(0);
-
-	NavigateTab(tab, L"c:\\original\\path");
+	auto *tab = m_browser->AddTab(L"c:\\original\\path");
 
 	const auto &buttons = m_bookmarksToolbarView->GetButtons();
 	const auto &bookmarks = m_bookmarkTree->GetBookmarksToolbarFolder()->GetChildren();

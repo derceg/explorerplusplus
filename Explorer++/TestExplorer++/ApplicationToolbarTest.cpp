@@ -153,7 +153,7 @@ private:
 
 		for (const auto &path : paths)
 		{
-			pidls.push_back(CreateSimplePidlForTest(path));
+			pidls.push_back(CreateSimplePidlForTest(path, nullptr, ShellItemType::File));
 		}
 
 		ASSERT_HRESULT_SUCCEEDED(CreateDataObjectForShellTransfer(pidls, &outputDataObject));

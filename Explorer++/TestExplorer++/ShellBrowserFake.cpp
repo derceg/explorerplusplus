@@ -30,8 +30,7 @@ ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
 		enumerationExecutor ? enumerationExecutor : m_inlineExecutor,
 		originalExecutor ? originalExecutor : m_inlineExecutor),
 	m_navigationController(std::make_unique<ShellNavigationController>(this, &m_navigationManager,
-		navigationEvents, tabNavigation,
-		CreateSimplePidlForTest(L"c:\\initial_path", nullptr, ShellItemType::Folder)))
+		navigationEvents, tabNavigation, CreateSimplePidlForTest(L"c:\\initial_path")))
 {
 }
 

@@ -53,15 +53,11 @@ TEST_F(SearchTabsModelTest, GetResults)
 	EXPECT_THAT(GeneratorToVector(m_model.GetResults()), IsEmpty());
 
 	auto *browser1 = AddBrowser();
-	auto *tab1 = browser1->AddTab();
-	browser1->ActivateTabAtIndex(0);
-	NavigateTab(tab1, L"c:\\windows\\system32");
+	auto *tab1 = browser1->AddTab(L"c:\\windows\\system32");
 	tab1->SetCustomName(L"Custom name");
 
 	auto *browser2 = AddBrowser();
-	auto *tab2 = browser2->AddTab();
-	browser2->ActivateTabAtIndex(0);
-	NavigateTab(tab2, L"j:\\documents");
+	auto *tab2 = browser2->AddTab(L"j:\\documents");
 
 	// There is no search term, so all tabs should be returned, ordered by last active time.
 	EXPECT_THAT(GeneratorToVector(m_model.GetResults()), ElementsAre(tab2, tab1));
@@ -80,8 +76,37 @@ TEST_F(SearchTabsModelTest, GetResults)
 	EXPECT_THAT(GeneratorToVector(m_model.GetResults()), IsEmpty());
 }
 
-TEST_F(SearchTabsModelTest, TabUpdates)
+TEST_F(SearchTabsModelTest, TabCreationTriggersUpdatedSignal)
 {
+	auto *browser = AddBrowser();
+
+	MockFunction<void()> callback;
+	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
+
+	// This can trigger multiple updates, due to the tab selection being set and a navigation
+	// occurring. The callback should be triggered at least once.
+	EXPECT_CALL(callback, Call()).Times(AtLeast(1));
+	browser->AddTab(L"c:\\");
+}
+
+TEST_F(SearchTabsModelTest, TabSelectionTriggersUpdatedSignal)
+{
+	auto *browser = AddBrowser();
+	browser->AddTab(L"c:\\");
+	browser->AddTab(L"c:\\");
+
+	MockFunction<void()> callback;
+	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
+
+	EXPECT_CALL(callback, Call());
+	browser->GetActiveTabContainer()->SelectTabAtIndex(1);
+}
+
+TEST_F(SearchTabsModelTest, TabUpdateTriggersUpdatedSignal)
+{
+	auto *browser = AddBrowser();
+	auto *tab = browser->AddTab(L"c:\\");
+
 	MockFunction<void()> callback;
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
 
@@ -92,46 +117,43 @@ TEST_F(SearchTabsModelTest, TabUpdates)
 		EXPECT_CALL(callback, Call());
 		EXPECT_CALL(check, Call(1));
 		EXPECT_CALL(callback, Call());
-		EXPECT_CALL(check, Call(2));
-		EXPECT_CALL(callback, Call());
-		EXPECT_CALL(check, Call(3));
-		EXPECT_CALL(callback, Call());
-		EXPECT_CALL(check, Call(4));
-		EXPECT_CALL(callback, Call());
-		EXPECT_CALL(check, Call(5));
-
-		// The callback should be invoked twice here - once for the removal of each tab.
-		EXPECT_CALL(callback, Call());
-		EXPECT_CALL(callback, Call());
-
-		EXPECT_CALL(check, Call(6));
 	}
 
-	auto *browser = AddBrowser();
-
-	auto *tab1 = browser->AddTab();
+	tab->SetCustomName(L"Updated name");
 	check.Call(1);
-
-	browser->AddTab();
-	check.Call(2);
-
-	browser->ActivateTabAtIndex(1);
-	check.Call(3);
-
-	tab1->SetCustomName(L"Updated name");
-	check.Call(4);
-
-	tab1->ClearCustomName();
-	check.Call(5);
-
-	RemoveBrowser(browser);
-	check.Call(6);
+	tab->ClearCustomName();
 }
 
-TEST_F(SearchTabsModelTest, ShellBrowserUpdates)
+TEST_F(SearchTabsModelTest, TabMoveTriggersUpdatedSignal)
 {
 	auto *browser = AddBrowser();
-	auto *tab = browser->AddTab();
+	auto *tab1 = browser->AddTab(L"c:\\");
+	browser->AddTab(L"c:\\");
+
+	MockFunction<void()> callback;
+	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
+
+	EXPECT_CALL(callback, Call());
+	browser->GetActiveTabContainer()->MoveTab(*tab1, 1);
+}
+
+TEST_F(SearchTabsModelTest, TabRemovalTriggersUpdatedSignal)
+{
+	auto *browser = AddBrowser();
+	browser->AddTab(L"c:\\");
+	int tabId2 = browser->AddTabAndReturnId(L"c:\\");
+
+	MockFunction<void()> callback;
+	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
+
+	EXPECT_CALL(callback, Call());
+	browser->GetActiveTabContainer()->CloseTab(browser->GetActiveTabContainer()->GetTab(tabId2));
+}
+
+TEST_F(SearchTabsModelTest, DirectoryPropertiesChangedTriggersUpdatedSignal)
+{
+	auto *browser = AddBrowser();
+	auto *tab = browser->AddTab(L"c:\\");
 
 	MockFunction<void()> callback;
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
@@ -140,10 +162,10 @@ TEST_F(SearchTabsModelTest, ShellBrowserUpdates)
 	m_shellBrowserEvents.NotifyDirectoryPropertiesChanged(tab->GetShellBrowser());
 }
 
-TEST_F(SearchTabsModelTest, NavigationUpdates)
+TEST_F(SearchTabsModelTest, NavigationTriggersUpdatedSignal)
 {
 	auto *browser = AddBrowser();
-	auto *tab = browser->AddTab();
+	auto *tab = browser->AddTab(L"c:\\");
 
 	MockFunction<void()> callback;
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
@@ -152,15 +174,13 @@ TEST_F(SearchTabsModelTest, NavigationUpdates)
 	NavigateTab(tab, L"c:\\users");
 }
 
-TEST_F(SearchTabsModelTest, SearchTermUpdates)
+TEST_F(SearchTabsModelTest, SearchTermUpdateTriggersUpdatedSignal)
 {
 	auto *browser1 = AddBrowser();
-	auto *tab1 = browser1->AddTab();
-	NavigateTab(tab1, L"c:\\windows");
+	browser1->AddTab(L"c:\\windows");
 
 	auto *browser2 = AddBrowser();
-	auto *tab2 = browser2->AddTab();
-	NavigateTab(tab2, L"f:\\path\\to\\project");
+	browser2->AddTab(L"f:\\path\\to\\project");
 
 	MockFunction<void()> callback;
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());

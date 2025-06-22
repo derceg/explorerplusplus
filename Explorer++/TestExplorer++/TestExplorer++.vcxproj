@@ -276,7 +276,6 @@
     <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp" />
     <ClCompile Include="ShellContextMenuIdRemapperTest.cpp" />
     <ClCompile Include="TabContainerTest.cpp" />
-    <ClCompile Include="TabContainerTestBase.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
@@ -475,7 +474,6 @@
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />
-    <ClInclude Include="TabContainerTestBase.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />

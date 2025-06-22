@@ -13,7 +13,7 @@
 class ShellBrowserTest : public BrowserTestBase
 {
 protected:
-	ShellBrowserTest() : m_browser(AddBrowser()), m_tab(m_browser->AddTab())
+	ShellBrowserTest() : m_browser(AddBrowser()), m_tab(m_browser->AddTab(L"c:\\"))
 	{
 	}
 

@@ -223,7 +223,7 @@ TEST_P(CreateSimplePidlTest, Absolute)
 
 TEST_P(CreateSimplePidlTest, Relative)
 {
-	PidlAbsolute pidlParent = CreateSimplePidlForTest(m_parentPath, nullptr, ShellItemType::Folder);
+	PidlAbsolute pidlParent = CreateSimplePidlForTest(m_parentPath);
 
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	HRESULT hr = SHBindToObject(nullptr, pidlParent.Raw(), nullptr, IID_PPV_ARGS(&parent));

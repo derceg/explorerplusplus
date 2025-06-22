@@ -13,13 +13,11 @@ class EventScopeTest : public BrowserTestBase
 protected:
 	EventScopeTest() :
 		m_browser1(AddBrowser()),
-		m_tab1(m_browser1->AddTab()),
-		m_tab2(m_browser1->AddTab()),
+		m_tab1(m_browser1->AddTab(L"c:\\")),
+		m_tab2(m_browser1->AddTab(L"c:\\")),
 		m_browser2(AddBrowser()),
-		m_tab3(m_browser2->AddTab())
+		m_tab3(m_browser2->AddTab(L"c:\\"))
 	{
-		m_browser1->ActivateTabAtIndex(0);
-		m_browser2->ActivateTabAtIndex(0);
 	}
 
 	BrowserWindowFake *const m_browser1;
@@ -90,7 +88,7 @@ TEST_F(EventScopeShellBrowserTest, ActiveShellBrowserScope)
 	EXPECT_FALSE(scope.DoesEventSourceMatch(*m_tab3->GetShellBrowser()));
 
 	// m_tab2 is now the active tab in m_browser1, so only it should match.
-	m_browser1->ActivateTabAtIndex(1);
+	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
 	EXPECT_FALSE(scope.DoesEventSourceMatch(*m_tab1->GetShellBrowser()));
 	EXPECT_TRUE(scope.DoesEventSourceMatch(*m_tab2->GetShellBrowser()));
 	EXPECT_FALSE(scope.DoesEventSourceMatch(*m_tab3->GetShellBrowser()));

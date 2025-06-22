@@ -19,10 +19,10 @@ protected:
 
 	ShellBrowserEventsTest() :
 		m_browser1(AddBrowser()),
-		m_tab1(m_browser1->AddTab()),
-		m_tab2(m_browser1->AddTab()),
+		m_tab1(m_browser1->AddTab(L"c:\\")),
+		m_tab2(m_browser1->AddTab(L"c:\\")),
 		m_browser2(AddBrowser()),
-		m_tab3(m_browser2->AddTab())
+		m_tab3(m_browser2->AddTab(L"c:\\"))
 	{
 	}
 
@@ -108,8 +108,8 @@ TEST_F(ShellBrowserEventsTest, SignalsFilteredByShellBrowser)
 
 TEST_F(ShellBrowserEventsTest, SignalsFilteredByActiveShellBrowser)
 {
-	m_browser1->ActivateTabAtIndex(1);
-	m_browser2->ActivateTabAtIndex(0);
+	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
+	m_browser2->GetActiveTabContainer()->SelectTabAtIndex(0);
 
 	m_shellBrowserEvents.AddItemsChangedObserver(m_itemsChangedCallback.AsStdFunction(),
 		ShellBrowserEventScope::ForActiveShellBrowser(*m_browser1));

@@ -7,4 +7,4 @@
 #include "../Helper/ShellHelper.h"
 
 PidlAbsolute CreateSimplePidlForTest(const std::wstring &path, IShellFolder *parent = nullptr,
-	ShellItemType shellItemType = ShellItemType::File);
+	ShellItemType shellItemType = ShellItemType::Folder);

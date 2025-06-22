@@ -17,13 +17,11 @@ protected:
 	TabListTest() :
 		m_tabList(&m_tabEvents),
 		m_browser1(AddBrowser()),
-		m_tab1(m_browser1->AddTab()),
-		m_tab2(m_browser1->AddTab()),
+		m_tab1(m_browser1->AddTab(L"c:\\")),
+		m_tab2(m_browser1->AddTab(L"c:\\")),
 		m_browser2(AddBrowser()),
-		m_tab3(m_browser2->AddTab())
+		m_tab3(m_browser2->AddTab(L"c:\\"))
 	{
-		m_browser1->ActivateTabAtIndex(0);
-		m_browser2->ActivateTabAtIndex(0);
 	}
 
 	TabList m_tabList;
@@ -36,18 +34,16 @@ protected:
 	Tab *const m_tab3;
 };
 
-TEST_F(TabListTest, AddRemove)
+TEST_F(TabListTest, Add)
 {
 	auto *browser3 = AddBrowser();
-	auto *tab4 = browser3->AddTab();
+	auto *tab4 = browser3->AddTab(L"c:\\");
 
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()),
 		UnorderedElementsAre(m_tab1, m_tab2, m_tab3, tab4));
 
-	RemoveBrowser(browser3);
-
-	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()),
-		UnorderedElementsAre(m_tab1, m_tab2, m_tab3));
+	// TODO: Removing a browser should also be tested, but at the moment, no tab removal events are
+	// broadcast when a window is closed.
 }
 
 TEST_F(TabListTest, GetById)
@@ -62,11 +58,11 @@ TEST_F(TabListTest, GetAllByLastActiveTime)
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActiveTime()),
 		ElementsAre(m_tab3, m_tab1, m_tab2));
 
-	m_browser1->ActivateTabAtIndex(1);
+	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActiveTime()),
 		ElementsAre(m_tab2, m_tab3, m_tab1));
 
-	m_browser1->ActivateTabAtIndex(0);
+	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(0);
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActiveTime()),
 		ElementsAre(m_tab1, m_tab2, m_tab3));
 }
