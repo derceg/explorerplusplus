@@ -12,7 +12,6 @@
 #include "DriveWatcherFake.h"
 #include "DrivesToolbarView.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
@@ -90,9 +89,27 @@ TEST_F(DrivesToolbarTest, OpenOnClick)
 	for (const auto &[button, drive] : boost::combine(buttons, drives))
 	{
 		button->OnClicked(MouseEvent{ { 0, 0 }, false, false });
+		EXPECT_EQ(tab->GetShellBrowser()->GetDirectory(), CreateSimplePidlForTest(drive));
+	}
+}
 
-		auto *currentEntry = tab->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-		ASSERT_NE(currentEntry, nullptr);
-		EXPECT_EQ(currentEntry->GetPidl(), CreateSimplePidlForTest(drive));
+TEST_F(DrivesToolbarTest, OpenOnMiddleClick)
+{
+	const auto &buttons = m_drivesToolbarView->GetButtons();
+	const auto &drives = m_driveModel.GetDrives();
+	ASSERT_EQ(buttons.size(), drives.size());
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	int numTabs = tabContainer->GetNumTabs();
+
+	// TODO: This should use std::views::zip once C++23 support is available.
+	for (const auto &[button, drive] : boost::combine(buttons, drives))
+	{
+		button->OnMiddleClicked(MouseEvent{ { 0, 0 }, false, false });
+
+		numTabs++;
+		ASSERT_EQ(tabContainer->GetNumTabs(), numTabs);
+		EXPECT_EQ(tabContainer->GetTabByIndex(numTabs - 1).GetShellBrowser()->GetDirectory(),
+			CreateSimplePidlForTest(drive));
 	}
 }
