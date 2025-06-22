@@ -12,11 +12,14 @@
 #include "TabEvents.h"
 #include "Win32ResourceLoader.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/PidlHelper.h"
 #include <gtest/gtest.h>
 #include <memory>
+#include <string>
 #include <vector>
 
 class BrowserWindowFake;
+class Tab;
 
 class BrowserTestBase : public testing::Test
 {
@@ -26,6 +29,8 @@ protected:
 
 	BrowserWindowFake *AddBrowser();
 	void RemoveBrowser(const BrowserWindowFake *browser);
+
+	static void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr);
 
 	Config m_config;
 	AcceleratorManager m_acceleratorManager;

@@ -26,13 +26,6 @@ protected:
 	{
 	}
 
-	void NavigateTab(Tab *tab, const std::wstring &path)
-	{
-		auto pidl = CreateSimplePidlForTest(path);
-		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
-	}
-
 	ShellBrowserEvents m_shellBrowserEvents;
 	TabList m_tabList;
 

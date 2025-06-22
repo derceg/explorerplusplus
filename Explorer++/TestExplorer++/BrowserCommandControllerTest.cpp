@@ -29,15 +29,6 @@ protected:
 	{
 	}
 
-	void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr)
-	{
-		auto pidl = CreateSimplePidlForTest(path);
-		auto navigateParams = NavigateParams::Normal(pidl.Raw());
-		tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
-
-		wil::assign_to_opt_param(outputPidl, pidl);
-	}
-
 	Config m_config;
 	SimulatedClipboardStore m_clipboardStore;
 	ResourceLoaderFake m_resourceLoader;

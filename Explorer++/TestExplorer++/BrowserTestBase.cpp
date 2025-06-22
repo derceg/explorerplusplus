@@ -5,6 +5,10 @@
 #include "pch.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
+#include "ShellTestHelper.h"
+#include <wil/common.h>
 
 BrowserTestBase::BrowserTestBase() :
 	m_cachedIcons(10),
@@ -30,4 +34,13 @@ void BrowserTestBase::RemoveBrowser(const BrowserWindowFake *browser)
 		[browser](const auto &currentBrowser) { return currentBrowser.get() == browser; });
 	ASSERT_TRUE(itr != m_browsers.end());
 	m_browsers.erase(itr);
+}
+
+void BrowserTestBase::NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl)
+{
+	auto pidl = CreateSimplePidlForTest(path);
+	auto navigateParams = NavigateParams::Normal(pidl.Raw());
+	tab->GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+
+	wil::assign_to_opt_param(outputPidl, pidl);
 }
