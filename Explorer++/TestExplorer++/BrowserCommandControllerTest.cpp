@@ -23,7 +23,8 @@ class BrowserCommandControllerTest : public BrowserTestBase
 protected:
 	BrowserCommandControllerTest() :
 		m_browser(AddBrowser()),
-		m_tab(m_browser->AddTab(L"c:\\")),
+		m_originalPath(L"c:\\"),
+		m_tab(m_browser->AddTab(m_originalPath)),
 		m_commandController(m_browser, &m_config, &m_clipboardStore, &m_resourceLoader)
 	{
 	}
@@ -42,6 +43,7 @@ protected:
 	ResourceLoaderFake m_resourceLoader;
 
 	BrowserWindowFake *const m_browser;
+	const std::wstring m_originalPath;
 	Tab *const m_tab;
 	BrowserCommandController m_commandController;
 };
@@ -141,6 +143,22 @@ TEST_F(BrowserCommandControllerTest, Back)
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 0);
 }
 
+TEST_F(BrowserCommandControllerTest, BackInNewTab)
+{
+	NavigateTab(m_tab, L"c:\\fake");
+
+	m_commandController.ExecuteCommand(IDM_GO_BACK, OpenFolderDisposition::ForegroundTab);
+
+	// The navigation should occur in a new tab, so the current tab should remain in the same
+	// folder.
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
+	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+		CreateSimplePidlForTest(m_originalPath));
+}
+
 TEST_F(BrowserCommandControllerTest, Forward)
 {
 	NavigateTab(m_tab, L"c:\\fake");
@@ -149,6 +167,22 @@ TEST_F(BrowserCommandControllerTest, Forward)
 
 	m_commandController.ExecuteCommand(IDM_GO_FORWARD);
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
+}
+
+TEST_F(BrowserCommandControllerTest, ForwardInNewTab)
+{
+	std::wstring path = L"c:\\fake";
+	NavigateTab(m_tab, path);
+
+	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
+
+	m_commandController.ExecuteCommand(IDM_GO_FORWARD, OpenFolderDisposition::ForegroundTab);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 0);
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
+	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+		CreateSimplePidlForTest(path));
 }
 
 TEST_F(BrowserCommandControllerTest, Up)
@@ -163,4 +197,17 @@ TEST_F(BrowserCommandControllerTest, Up)
 
 	PidlAbsolute pidlParent = CreateSimplePidlForTest(L"c:\\windows");
 	EXPECT_EQ(currentEntry->GetPidl(), pidlParent);
+}
+
+TEST_F(BrowserCommandControllerTest, UpInNewTab)
+{
+	NavigateTab(m_tab, L"c:\\windows\\system32");
+
+	m_commandController.ExecuteCommand(IDM_GO_UP, OpenFolderDisposition::ForegroundTab);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
+	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+		CreateSimplePidlForTest(L"c:\\windows"));
 }
