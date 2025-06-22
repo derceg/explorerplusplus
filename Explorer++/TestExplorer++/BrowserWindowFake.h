@@ -8,6 +8,7 @@
 #include "ShellBrowserFactoryFake.h"
 #include "TabContainer.h"
 #include "TabNavigationMock.h"
+#include "../Helper/PidlHelper.h"
 #include <wil/resource.h>
 
 class AcceleratorManager;
@@ -59,8 +60,9 @@ public:
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 
 	[[nodiscard]] int AddTabAndReturnId(const std::wstring &path,
-		const TabSettings &tabSettings = {});
-	Tab *AddTab(const std::wstring &path, const TabSettings &tabSettings = {});
+		const TabSettings &tabSettings = {}, PidlAbsolute *outputPidl = nullptr);
+	Tab *AddTab(const std::wstring &path, const TabSettings &tabSettings = {},
+		PidlAbsolute *outputPidl = nullptr);
 
 private:
 	static constexpr wchar_t CLASS_NAME[] = L"TestExplorer++BrowserWindowClass";

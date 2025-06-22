@@ -229,15 +229,21 @@ boost::signals2::connection BrowserWindowFake::AddMenuHelpTextRequestObserver(
 	return {};
 }
 
-int BrowserWindowFake::AddTabAndReturnId(const std::wstring &path, const TabSettings &tabSettings)
+int BrowserWindowFake::AddTabAndReturnId(const std::wstring &path, const TabSettings &tabSettings,
+	PidlAbsolute *outputPidl)
 {
-	const auto &tab = AddTab(path, tabSettings);
+	const auto &tab = AddTab(path, tabSettings, outputPidl);
 	return tab->GetId();
 }
 
-Tab *BrowserWindowFake::AddTab(const std::wstring &path, const TabSettings &tabSettings)
+Tab *BrowserWindowFake::AddTab(const std::wstring &path, const TabSettings &tabSettings,
+	PidlAbsolute *outputPidl)
 {
 	auto pidl = CreateSimplePidlForTest(path);
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
-	return &GetActiveTabContainer()->CreateNewTab(navigateParams, tabSettings);
+	auto &tab = GetActiveTabContainer()->CreateNewTab(navigateParams, tabSettings);
+
+	wil::assign_to_opt_param(outputPidl, pidl);
+
+	return &tab;
 }
