@@ -4,9 +4,10 @@
 
 #include "pch.h"
 #include "FrequentLocationsMenu.h"
-#include "AcceleratorManager.h"
-#include "BrowserWindowMock.h"
+#include "BrowserTestBase.h"
+#include "BrowserWindowFake.h"
 #include "FrequentLocationsModel.h"
+#include "FrequentLocationsTracker.h"
 #include "MenuViewFake.h"
 #include "MenuViewFakeTestHelper.h"
 #include "ShellIconLoaderFake.h"
@@ -14,40 +15,44 @@
 #include "../Helper/SystemClockImpl.h"
 #include <gtest/gtest.h>
 
-using namespace testing;
-
-class FrequentLocationsMenuTest : public Test
+class FrequentLocationsMenuTest : public BrowserTestBase
 {
 protected:
 	FrequentLocationsMenuTest() :
 		m_frequentLocationsModel(&m_systemClock),
-		m_menu(&m_menuView, &m_acceleratorManager, &m_frequentLocationsModel, &m_browserWindow,
+		m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
+		m_browser(AddBrowser()),
+		m_menu(&m_menuView, &m_acceleratorManager, &m_frequentLocationsModel, m_browser,
 			&m_shellIconLoader)
 	{
 	}
 
-	MenuViewFake m_menuView;
-	AcceleratorManager m_acceleratorManager;
 	SystemClockImpl m_systemClock;
 	FrequentLocationsModel m_frequentLocationsModel;
-	BrowserWindowMock m_browserWindow;
+	FrequentLocationsTracker m_frequentLocationsTracker;
 	ShellIconLoaderFake m_shellIconLoader;
+
+	BrowserWindowFake *const m_browser;
+
+	MenuViewFake m_menuView;
 	FrequentLocationsMenu m_menu;
 };
 
 TEST_F(FrequentLocationsMenuTest, CheckItems)
 {
-	PidlAbsolute fake1 = CreateSimplePidlForTest(L"C:\\Fake1");
-	m_frequentLocationsModel.RegisterLocationVisit(fake1);
-	m_frequentLocationsModel.RegisterLocationVisit(fake1);
+	std::wstring path1 = L"c:\\fake1";
+	m_browser->AddTab(path1);
+	m_browser->AddTab(path1);
 
-	PidlAbsolute fake2 = CreateSimplePidlForTest(L"C:\\Fake2");
-	m_frequentLocationsModel.RegisterLocationVisit(fake2);
+	std::wstring path2 = L"c:\\fake2";
+	m_browser->AddTab(path2);
 
-	PidlAbsolute fake3 = CreateSimplePidlForTest(L"C:\\Fake3");
-	m_frequentLocationsModel.RegisterLocationVisit(fake3);
-	m_frequentLocationsModel.RegisterLocationVisit(fake3);
-	m_frequentLocationsModel.RegisterLocationVisit(fake3);
+	std::wstring path3 = L"c:\\fake3";
+	m_browser->AddTab(path3);
+	m_browser->AddTab(path3);
+	m_browser->AddTab(path3);
 
-	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView, { fake3, fake1, fake2 });
+	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView,
+		{ CreateSimplePidlForTest(path3), CreateSimplePidlForTest(path1),
+			CreateSimplePidlForTest(path2) });
 }
