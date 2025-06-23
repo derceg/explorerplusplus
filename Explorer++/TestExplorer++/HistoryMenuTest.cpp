@@ -4,55 +4,56 @@
 
 #include "pch.h"
 #include "HistoryMenu.h"
-#include "AcceleratorManager.h"
-#include "BrowserWindowMock.h"
+#include "BrowserTestBase.h"
+#include "BrowserWindowFake.h"
 #include "HistoryModel.h"
+#include "HistoryTracker.h"
 #include "MenuViewFake.h"
 #include "MenuViewFakeTestHelper.h"
 #include "ShellIconLoaderFake.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
-using namespace testing;
-
-class HistoryMenuTest : public Test
+class HistoryMenuTest : public BrowserTestBase
 {
 protected:
 	HistoryMenuTest() :
-		m_menu(&m_menuView, &m_acceleratorManager, &m_historyModel, &m_browserWindow,
-			&m_shellIconLoader)
+		m_historyTracker(&m_historyModel, &m_navigationEvents),
+		m_browser(AddBrowser()),
+		m_menu(&m_menuView, &m_acceleratorManager, &m_historyModel, m_browser, &m_shellIconLoader)
 	{
 	}
 
-	MenuViewFake m_menuView;
-	AcceleratorManager m_acceleratorManager;
 	HistoryModel m_historyModel;
-	BrowserWindowMock m_browserWindow;
+	HistoryTracker m_historyTracker;
 	ShellIconLoaderFake m_shellIconLoader;
+
+	BrowserWindowFake *const m_browser;
+
+	MenuViewFake m_menuView;
 	HistoryMenu m_menu;
 };
 
 TEST_F(HistoryMenuTest, CheckItems)
 {
-	auto pidl1 = CreateSimplePidlForTest(L"c:\\windows");
-	m_historyModel.AddHistoryItem(pidl1);
+	PidlAbsolute pidl1;
+	m_browser->AddTab(L"c:\\windows", {}, &pidl1);
 
-	auto pidl2 = CreateSimplePidlForTest(L"d:\\project\\documents");
-	m_historyModel.AddHistoryItem(pidl2);
+	PidlAbsolute pidl2;
+	m_browser->AddTab(L"d:\\project\\documents", {}, &pidl2);
 
-	auto pidl3 = CreateSimplePidlForTest(L"c:\\users");
-	m_historyModel.AddHistoryItem(pidl3);
+	PidlAbsolute pidl3;
+	m_browser->AddTab(L"c:\\users", {}, &pidl3);
 
 	// Items should appear in the reverse order that they were added to the history (i.e. with the
 	// most recent item first).
 	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView, { pidl3, pidl2, pidl1 });
 
 	// The menu should automatically update when the global history changes.
-	auto pidl4 = CreateSimplePidlForTest(L"c:\\windows\\system32");
-	m_historyModel.AddHistoryItem(pidl4);
+	PidlAbsolute pidl4;
+	m_browser->AddTab(L"c:\\windows\\system32", {}, &pidl4);
 
-	auto pidl5 = CreateSimplePidlForTest(L"e:\\");
-	m_historyModel.AddHistoryItem(pidl5);
+	PidlAbsolute pidl5;
+	m_browser->AddTab(L"e:\\", {}, &pidl5);
 
 	MenuViewFakeTestHelper::CheckItemDetails(&m_menuView, { pidl5, pidl4, pidl3, pidl2, pidl1 });
 }
