@@ -47,7 +47,7 @@ TEST_F(TabContainerTest, TabSettingsOnCreation)
 	EXPECT_TRUE(m_tabContainer->IsTabSelected(*tab3));
 }
 
-TEST_F(TabContainerTest, OpenNewTabNextToCurrentOption)
+TEST_F(TabContainerTest, OpenNewTabNextToCurrentOptionInitialTab)
 {
 	m_config.openNewTabNextToCurrent = true;
 
@@ -55,6 +55,22 @@ TEST_F(TabContainerTest, OpenNewTabNextToCurrentOption)
 	// created to the right of the selected tab. When the first tab is created, there will be no
 	// selected tab, but that should still be a safe operation.
 	m_browser->AddTab(L"c:\\");
+}
+
+TEST_F(TabContainerTest, OpenNewTabNextToCurrentOption)
+{
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"d:\\");
+	m_browser->AddTab(L"e:\\");
+
+	m_tabContainer->SelectTabAtIndex(0);
+
+	m_config.openNewTabNextToCurrent = true;
+
+	// Since the openNewTabNextToCurrent option was set, this tab should be opened to the right of
+	// the selected tab (i.e. to the right of the first tab).
+	auto *tab4 = m_browser->AddTab(L"f:\\");
+	EXPECT_EQ(m_tabContainer->GetTabIndex(*tab4), 1);
 }
 
 TEST_F(TabContainerTest, TabText)
