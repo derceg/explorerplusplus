@@ -108,6 +108,10 @@ TEST_F(TabContextMenuTest, LockTab)
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::Locked);
+
+	// Selecting the item again should toggle the lock state.
+	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB, false, false);
+	EXPECT_EQ(tab->GetLockState(), Tab::LockState::NotLocked);
 }
 
 TEST_F(TabContextMenuTest, LockTabAndAddress)
@@ -120,6 +124,9 @@ TEST_F(TabContextMenuTest, LockTabAndAddress)
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::AddressLocked);
+
+	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS, false, false);
+	EXPECT_EQ(tab->GetLockState(), Tab::LockState::NotLocked);
 }
 
 TEST_F(TabContextMenuTest, CloseTab)
