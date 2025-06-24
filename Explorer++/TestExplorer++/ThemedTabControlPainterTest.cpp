@@ -8,12 +8,12 @@
 #include "ImageTestHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/GdiplusHelper.h"
+#include "../Helper/ImageHelper.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 #include <commctrl.h>
 #include <gdiplus.h>
 #include <memory>
-#include <optional>
 
 using namespace testing;
 
@@ -32,9 +32,24 @@ protected:
 			nullptr, nullptr, GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_parentWindow, nullptr);
 
+		int imageSize = 16;
+		m_imageList.reset(ImageList_Create(imageSize, imageSize, ILC_COLOR32 | ILC_MASK, 0, 1));
+		ASSERT_NE(m_imageList, nullptr);
+
+		std::unique_ptr<Gdiplus::Bitmap> gdiPlusBitmap;
+		BuildTestGdiplusBitmap(imageSize, imageSize, gdiPlusBitmap);
+
+		auto bitmap = ImageHelper::GdiplusBitmapToBitmap(gdiPlusBitmap.get());
+		ASSERT_NE(bitmap, nullptr);
+
+		m_imageIndex = ImageList_Add(m_imageList.get(), bitmap.get(), nullptr);
+		ASSERT_NE(m_imageIndex, -1);
+
 		m_tabControl.reset(
 			CreateTabControl(m_parentWindow.get(), WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE));
 		ASSERT_NE(m_tabControl, nullptr);
+
+		TabCtrl_SetImageList(m_tabControl.get(), m_imageList.get());
 
 		AddInitialTabs();
 
@@ -70,8 +85,9 @@ protected:
 		int index = TabCtrl_GetItemCount(m_tabControl.get());
 
 		TCITEM tcItem = {};
-		tcItem.mask = TCIF_TEXT;
+		tcItem.mask = TCIF_TEXT | TCIF_IMAGE;
 		tcItem.pszText = const_cast<wchar_t *>(text.c_str());
+		tcItem.iImage = m_imageIndex;
 		int insertedIndex = TabCtrl_InsertItem(m_tabControl.get(), index, &tcItem);
 		ASSERT_EQ(insertedIndex, index);
 	}
@@ -106,6 +122,8 @@ protected:
 
 	DarkModeColorProvider m_darkModeColorProvider;
 	wil::unique_hwnd m_parentWindow;
+	wil::unique_himagelist m_imageList;
+	int m_imageIndex;
 	wil::unique_hwnd m_tabControl;
 	std::unique_ptr<ThemedTabControlPainter> m_painter;
 	std::unique_ptr<Gdiplus::Bitmap> m_previousBitmap;

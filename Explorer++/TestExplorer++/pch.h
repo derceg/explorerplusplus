@@ -19,7 +19,10 @@
 #include <gtest/gtest.h>
 
 // Windows Header Files:
-#include <Windows.h>
+// clang-format off
+#include <windows.h>
+// clang-format on
+#include <commctrl.h>
 #include <windowsx.h>
 
 // WinRT Header Files:
