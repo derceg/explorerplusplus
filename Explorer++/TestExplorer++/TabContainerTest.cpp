@@ -314,7 +314,7 @@ TEST_F(TabContainerTest, CloseTab)
 	m_tabContainer->SelectTabAtIndex(0);
 
 	EXPECT_TRUE(m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId3)));
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
+	ASSERT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId2),
 			Property(&Tab::GetId, tabId4)));
 
@@ -322,10 +322,15 @@ TEST_F(TabContainerTest, CloseTab)
 	// tab.
 	EXPECT_TRUE(m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId1)));
 	EXPECT_EQ(m_tabContainer->GetSelectedTab().GetId(), tabId2);
-	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
+	ASSERT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId2), Property(&Tab::GetId, tabId4)));
 
+	m_tabContainer->SelectTabAtIndex(1);
+
+	// The last tab is selected, so closing it should result in the selection shifting to the
+	// previous tab.
 	EXPECT_TRUE(m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId4)));
+	EXPECT_EQ(m_tabContainer->GetSelectedTab().GetId(), tabId2);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(Property(&Tab::GetId, tabId2)));
 }
 
