@@ -6,6 +6,7 @@
 
 #include "AcceleratorManager.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "BrowserList.h"
 #include "Config.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
@@ -28,7 +29,7 @@ protected:
 	~BrowserTestBase();
 
 	BrowserWindowFake *AddBrowser();
-	void RemoveBrowser(const BrowserWindowFake *browser);
+	void RemoveBrowser(BrowserWindowFake *browser);
 
 	static void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr);
 
@@ -41,6 +42,8 @@ protected:
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
+
+	BrowserList m_browserList;
 
 private:
 	std::vector<std::unique_ptr<BrowserWindowFake>> m_browsers;

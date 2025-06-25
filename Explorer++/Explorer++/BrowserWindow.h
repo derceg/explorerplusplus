@@ -13,6 +13,7 @@ class BrowserCommandController;
 class BrowserPane;
 struct PreservedTab;
 class ShellBrowser;
+class Tab;
 class TabContainer;
 struct WindowStorageData;
 
@@ -55,7 +56,7 @@ public:
 	virtual TabContainer *GetActiveTabContainer() = 0;
 	virtual const TabContainer *GetActiveTabContainer() const = 0;
 	virtual void FocusActiveTab() = 0;
-	virtual void CreateTabFromPreservedTab(const PreservedTab *tab) = 0;
+	virtual Tab *CreateTabFromPreservedTab(const PreservedTab *tab) = 0;
 
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;

@@ -11,6 +11,7 @@
 #include <vector>
 
 class BrowserList;
+class Tab;
 class TabEvents;
 
 class TabRestorer : private boost::noncopyable
@@ -23,15 +24,15 @@ public:
 	const std::list<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
 	const PreservedTab *GetTabById(int id) const;
 	bool IsEmpty() const;
-	void RestoreLastTab();
-	void RestoreTabById(int id);
+	Tab *RestoreLastTab();
+	Tab *RestoreTabById(int id);
 
 	boost::signals2::connection AddItemsChangedObserver(
 		const ItemsChangedSignal::slot_type &observer);
 
 private:
 	void OnTabPreRemoval(const Tab &tab, int index);
-	void RestoreTabIntoBrowser(const PreservedTab *tab);
+	Tab *RestoreTabIntoBrowser(const PreservedTab *tab);
 
 	const BrowserList *const m_browserList;
 

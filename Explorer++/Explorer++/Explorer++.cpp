@@ -204,9 +204,9 @@ void Explorerplusplus::InitializeDisplayWindow()
 	ApplyDisplayWindowPosition();
 }
 
-void Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
+Tab *Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	GetActivePane()->GetTabContainer()->CreateNewTab(*tab);
+	return &GetActivePane()->GetTabContainer()->CreateNewTab(*tab);
 }
 
 HWND Explorerplusplus::GetHWND() const

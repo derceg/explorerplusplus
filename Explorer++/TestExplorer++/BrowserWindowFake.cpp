@@ -88,9 +88,9 @@ void BrowserWindowFake::FocusActiveTab()
 {
 }
 
-void BrowserWindowFake::CreateTabFromPreservedTab(const PreservedTab *tab)
+Tab *BrowserWindowFake::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	GetActiveTabContainer()->CreateNewTab(*tab);
+	return &GetActiveTabContainer()->CreateNewTab(*tab);
 }
 
 ShellBrowser *BrowserWindowFake::GetActiveShellBrowser()

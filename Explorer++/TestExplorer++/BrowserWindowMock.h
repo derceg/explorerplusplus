@@ -20,7 +20,7 @@ public:
 	MOCK_METHOD(TabContainer *, GetActiveTabContainer, (), (override));
 	MOCK_METHOD(const TabContainer *, GetActiveTabContainer, (), (const, override));
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
-	MOCK_METHOD(void, CreateTabFromPreservedTab, (const PreservedTab *tab), (override));
+	MOCK_METHOD(Tab *, CreateTabFromPreservedTab, (const PreservedTab *tab), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(const ShellBrowser *, GetActiveShellBrowser, (), (const, override));
 	MOCK_METHOD(void, StartMainToolbarCustomization, (), (override));

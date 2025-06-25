@@ -46,49 +46,56 @@ bool TabRestorer::IsEmpty() const
 	return m_closedTabs.empty();
 }
 
-void TabRestorer::RestoreLastTab()
+Tab *TabRestorer::RestoreLastTab()
 {
 	if (m_closedTabs.empty())
 	{
-		return;
+		return nullptr;
 	}
 
 	auto itr = m_closedTabs.begin();
-
-	auto lastClosedTab = itr->get();
-	RestoreTabIntoBrowser(lastClosedTab);
+	auto lastClosedTab = std::move(*itr);
 	m_closedTabs.erase(itr);
+
+	auto *restoredTab = RestoreTabIntoBrowser(lastClosedTab.get());
 	m_itemsChangedSignal();
+
+	return restoredTab;
 }
 
-void TabRestorer::RestoreTabById(int id)
+Tab *TabRestorer::RestoreTabById(int id)
 {
 	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(),
 		[id](const std::unique_ptr<PreservedTab> &preservedTab) { return preservedTab->id == id; });
 
 	if (itr == m_closedTabs.end())
 	{
-		return;
+		return nullptr;
 	}
 
-	auto closedTab = itr->get();
-	RestoreTabIntoBrowser(closedTab);
+	auto closedTab = std::move(*itr);
 	m_closedTabs.erase(itr);
+
+	auto *restoredTab = RestoreTabIntoBrowser(closedTab.get());
 	m_itemsChangedSignal();
+
+	return restoredTab;
 }
 
-void TabRestorer::RestoreTabIntoBrowser(const PreservedTab *tab)
+Tab *TabRestorer::RestoreTabIntoBrowser(const PreservedTab *tab)
 {
 	auto *originalBrowser = m_browserList->MaybeGetById(tab->browserId);
 	auto *targetBrowser = originalBrowser ? originalBrowser : m_browserList->GetLastActive();
 
 	if (!targetBrowser)
 	{
-		return;
+		return nullptr;
 	}
 
-	targetBrowser->CreateTabFromPreservedTab(tab);
+	auto *restoredTab = targetBrowser->CreateTabFromPreservedTab(tab);
 	targetBrowser->Activate();
+
+	return restoredTab;
 }
 
 boost::signals2::connection TabRestorer::AddItemsChangedObserver(

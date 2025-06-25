@@ -24,12 +24,17 @@ BrowserWindowFake *BrowserTestBase::AddBrowser()
 		&m_shellBrowserEvents, &m_navigationEvents, &m_cachedIcons, &m_bookmarkTree,
 		&m_acceleratorManager, &m_resourceLoader);
 	auto *rawBrowser = browser.get();
+
 	m_browsers.push_back(std::move(browser));
+	m_browserList.AddBrowser(rawBrowser);
+
 	return rawBrowser;
 }
 
-void BrowserTestBase::RemoveBrowser(const BrowserWindowFake *browser)
+void BrowserTestBase::RemoveBrowser(BrowserWindowFake *browser)
 {
+	m_browserList.RemoveBrowser(browser);
+
 	auto itr = std::ranges::find_if(m_browsers,
 		[browser](const auto &currentBrowser) { return currentBrowser.get() == browser; });
 	ASSERT_TRUE(itr != m_browsers.end());

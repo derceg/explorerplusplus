@@ -36,7 +36,7 @@ public:
 	TabContainer *GetActiveTabContainer() override;
 	const TabContainer *GetActiveTabContainer() const override;
 	void FocusActiveTab() override;
-	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
+	Tab *CreateTabFromPreservedTab(const PreservedTab *tab) override;
 	ShellBrowser *GetActiveShellBrowser() override;
 	const ShellBrowser *GetActiveShellBrowser() const override;
 	void StartMainToolbarCustomization() override;

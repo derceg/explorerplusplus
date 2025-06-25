@@ -100,7 +100,7 @@ public:
 	TabContainer *GetActiveTabContainer() override;
 	const TabContainer *GetActiveTabContainer() const override;
 	void FocusActiveTab() override;
-	void CreateTabFromPreservedTab(const PreservedTab *tab) override;
+	Tab *CreateTabFromPreservedTab(const PreservedTab *tab) override;
 
 	// Note that there is also GetActiveShellBrowserImpl() declared below. There are some places
 	// where this method can be used, as the calling code only uses methods from the ShellBrowser
