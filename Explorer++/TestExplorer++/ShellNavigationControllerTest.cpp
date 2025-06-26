@@ -6,6 +6,7 @@
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "NavigationRequestTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
+#include "ShellBrowser/PreservedFolderState.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
@@ -532,7 +533,7 @@ protected:
 	std::unique_ptr<ShellBrowserFake> BuildShellBrowserWithCurrentEntry(int currentEntry)
 	{
 		return std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation,
-			m_preservedEntries, currentEntry);
+			m_preservedEntries, currentEntry, PreservedFolderState{});
 	}
 
 	NavigationEvents m_navigationEvents;

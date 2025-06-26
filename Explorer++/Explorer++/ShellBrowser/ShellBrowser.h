@@ -10,6 +10,7 @@
 #include "../Helper/PidlHelper.h"
 #include <boost/signals2.hpp>
 
+struct FolderColumns;
 struct FolderSettings;
 class NavigationManager;
 class NavigationRequest;
@@ -32,7 +33,7 @@ public:
 	const PidlAbsolute &GetDirectory() const;
 	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
 
-	virtual FolderSettings GetFolderSettings() const = 0;
+	virtual const FolderSettings &GetFolderSettings() const = 0;
 	virtual ShellNavigationController *GetNavigationController() const = 0;
 
 	virtual ViewMode GetViewMode() const = 0;
@@ -42,6 +43,9 @@ public:
 	virtual void SetSortMode(SortMode sortMode) = 0;
 	virtual SortDirection GetSortDirection() const = 0;
 	virtual void SetSortDirection(SortDirection direction) = 0;
+
+	virtual void SetColumns(const FolderColumns &folderColumns) = 0;
+	virtual const FolderColumns &GetColumns() = 0;
 
 	virtual bool IsAutoArrangeEnabled() const = 0;
 	virtual void SetAutoArrangeEnabled(bool enabled) = 0;

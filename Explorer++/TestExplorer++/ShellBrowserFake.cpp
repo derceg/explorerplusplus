@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "ShellBrowserFake.h"
 #include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/PreservedFolderState.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
@@ -12,23 +13,22 @@
 ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
 	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
-	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
-	std::shared_ptr<concurrencpp::executor> originalExecutor) :
-	ShellBrowserFake(navigationEvents, tabNavigation, enumerationExecutor, originalExecutor)
+	const PreservedFolderState &preservedFolderState) :
+	ShellBrowserFake(navigationEvents, tabNavigation, preservedFolderState.folderSettings)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
 		navigationEvents, tabNavigation, preservedEntries, currentEntry);
 }
 
 ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
-	TabNavigationInterface *tabNavigation,
-	std::shared_ptr<concurrencpp::executor> enumerationExecutor,
-	std::shared_ptr<concurrencpp::executor> originalExecutor) :
-	m_shellEnumerator(std::make_unique<ShellEnumeratorFake>()),
+	TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
+	const FolderColumns &initialColumns) :
+	m_folderSettings(folderSettings),
+	m_folderColumns(initialColumns),
+	m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 	m_inlineExecutor(std::make_shared<concurrencpp::inline_executor>()),
-	m_navigationManager(this, navigationEvents, m_shellEnumerator,
-		enumerationExecutor ? enumerationExecutor : m_inlineExecutor,
-		originalExecutor ? originalExecutor : m_inlineExecutor),
+	m_navigationManager(this, navigationEvents, m_shellEnumerator, m_inlineExecutor,
+		m_inlineExecutor),
 	m_navigationController(std::make_unique<ShellNavigationController>(this, &m_navigationManager,
 		navigationEvents, tabNavigation, CreateSimplePidlForTest(L"c:\\initial_path")))
 {
@@ -67,9 +67,9 @@ const NavigationManager *ShellBrowserFake::GetNavigationManager() const
 	return &m_navigationManager;
 }
 
-FolderSettings ShellBrowserFake::GetFolderSettings() const
+const FolderSettings &ShellBrowserFake::GetFolderSettings() const
 {
-	return {};
+	return m_folderSettings;
 }
 
 ShellNavigationController *ShellBrowserFake::GetNavigationController() const
@@ -105,6 +105,16 @@ SortDirection ShellBrowserFake::GetSortDirection() const
 void ShellBrowserFake::SetSortDirection(SortDirection direction)
 {
 	m_folderSettings.sortDirection = direction;
+}
+
+void ShellBrowserFake::SetColumns(const FolderColumns &folderColumns)
+{
+	m_folderColumns = folderColumns;
+}
+
+const FolderColumns &ShellBrowserFake::GetColumns()
+{
+	return m_folderColumns;
 }
 
 bool ShellBrowserFake::IsAutoArrangeEnabled() const

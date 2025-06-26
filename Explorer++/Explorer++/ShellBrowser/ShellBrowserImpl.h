@@ -82,7 +82,7 @@ public:
 	HWND GetListView() const;
 
 	// ShellBrowser
-	FolderSettings GetFolderSettings() const override;
+	const FolderSettings &GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
@@ -90,6 +90,8 @@ public:
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;
 	void SetSortDirection(SortDirection direction) override;
+	void SetColumns(const FolderColumns &folderColumns) override;
+	const FolderColumns &GetColumns() override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanAutoSizeColumns() const override;
@@ -170,8 +172,6 @@ public:
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
 
 	std::vector<SortMode> GetAvailableSortModes() const;
-	void ImportAllColumns(const FolderColumns &folderColumns);
-	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 
 	// BrowserCommandTarget

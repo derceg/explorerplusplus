@@ -13,6 +13,7 @@
 #include <memory>
 
 class NavigationEvents;
+struct PreservedFolderState;
 class PreservedHistoryEntry;
 class ShellEnumeratorFake;
 class ShellNavigationController;
@@ -23,11 +24,9 @@ class ShellBrowserFake : public ShellBrowser
 public:
 	ShellBrowserFake(NavigationEvents *navigationEvents, TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
-		int currentEntry, std::shared_ptr<concurrencpp::executor> enumerationExecutor = nullptr,
-		std::shared_ptr<concurrencpp::executor> originalExecutor = nullptr);
+		int currentEntry, const PreservedFolderState &preservedFolderState);
 	ShellBrowserFake(NavigationEvents *navigationEvents, TabNavigationInterface *tabNavigation,
-		std::shared_ptr<concurrencpp::executor> enumerationExecutor = nullptr,
-		std::shared_ptr<concurrencpp::executor> originalExecutor = nullptr);
+		const FolderSettings &folderSettings = {}, const FolderColumns &initialColumns = {});
 	~ShellBrowserFake();
 
 	void NavigateToPath(const std::wstring &path,
@@ -35,7 +34,7 @@ public:
 		PidlAbsolute *outputPidl = nullptr);
 
 	// ShellBrowser
-	FolderSettings GetFolderSettings() const override;
+	const FolderSettings &GetFolderSettings() const override;
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
@@ -43,6 +42,8 @@ public:
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;
 	void SetSortDirection(SortDirection direction) override;
+	void SetColumns(const FolderColumns &folderColumns) override;
+	const FolderColumns &GetColumns() override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanAutoSizeColumns() const override;
@@ -77,10 +78,11 @@ protected:
 	const NavigationManager *GetNavigationManager() const override;
 
 private:
+	FolderSettings m_folderSettings;
+	FolderColumns m_folderColumns;
 	const std::shared_ptr<ShellEnumeratorFake> m_shellEnumerator;
 	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
-	FolderSettings m_folderSettings;
 	DestroyedSignal m_destroyedSignal;
 };

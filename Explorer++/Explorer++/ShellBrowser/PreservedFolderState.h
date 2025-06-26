@@ -12,6 +12,7 @@ class ShellBrowser;
 struct PreservedFolderState : private boost::noncopyable
 {
 public:
+	PreservedFolderState() = default;
 	PreservedFolderState(const ShellBrowser *shellBrowser);
 
 	FolderSettings folderSettings;

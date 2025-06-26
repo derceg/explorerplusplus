@@ -122,7 +122,7 @@ public:
 	int GetTabIndex(const Tab &tab) const;
 	int GetNumTabs() const;
 	int MoveTab(const Tab &tab, int newIndex);
-	void DuplicateTab(const Tab &tab);
+	Tab &DuplicateTab(const Tab &tab);
 	bool CloseTab(const Tab &tab);
 
 	/* TODO: Ideally, there would be a method of iterating over the tabs without

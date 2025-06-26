@@ -304,6 +304,31 @@ TEST_F(TabContainerTest, MoveTab)
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(tab4, tab3, tab1, tab2));
 }
 
+TEST_F(TabContainerTest, DuplicateTab)
+{
+	m_browser->AddTab(L"c:\\");
+
+	PidlAbsolute pidl;
+	const auto *tab2 = m_browser->AddTab(L"d:\\", {}, &pidl);
+
+	m_browser->AddTab(L"e:\\");
+
+	tab2->GetShellBrowser()->SetSortMode(SortMode::Size);
+	tab2->GetShellBrowser()->SetSortDirection(SortDirection::Descending);
+	tab2->GetShellBrowser()->SetViewMode(ViewMode::Details);
+	tab2->GetShellBrowser()->SetAutoArrangeEnabled(false);
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab2);
+
+	// The duplicate tab should be opened to the right of the original tab and be selected.
+	EXPECT_EQ(m_tabContainer->GetTabIndex(duplicatedTab), 2);
+	EXPECT_TRUE(m_tabContainer->IsTabSelected(duplicatedTab));
+
+	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetDirectory(), pidl);
+	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetFolderSettings(),
+		tab2->GetShellBrowser()->GetFolderSettings());
+}
+
 TEST_F(TabContainerTest, CloseTab)
 {
 	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");

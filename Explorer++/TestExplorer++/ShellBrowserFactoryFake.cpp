@@ -18,18 +18,15 @@ std::unique_ptr<ShellBrowser> ShellBrowserFactoryFake::Create(const PidlAbsolute
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
 {
 	UNREFERENCED_PARAMETER(initialPidl);
-	UNREFERENCED_PARAMETER(folderSettings);
-	UNREFERENCED_PARAMETER(initialColumns);
 
-	return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation);
+	return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation, folderSettings,
+		initialColumns ? *initialColumns : FolderColumns{});
 }
 
 std::unique_ptr<ShellBrowser> ShellBrowserFactoryFake::CreateFromPreserved(
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	UNREFERENCED_PARAMETER(preservedFolderState);
-
 	return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation, history,
-		currentEntry);
+		currentEntry, preservedFolderState);
 }

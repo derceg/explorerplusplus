@@ -590,12 +590,12 @@ void ShellBrowserImpl::ApplyHeaderSortArrow()
 	Header_SetItem(hHeader, iColumn, &hdItem);
 }
 
-void ShellBrowserImpl::ImportAllColumns(const FolderColumns &folderColumns)
+void ShellBrowserImpl::SetColumns(const FolderColumns &folderColumns)
 {
 	m_folderColumns = folderColumns;
 }
 
-FolderColumns ShellBrowserImpl::ExportAllColumns()
+const FolderColumns &ShellBrowserImpl::GetColumns()
 {
 	SaveColumnWidths();
 

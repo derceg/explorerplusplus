@@ -159,7 +159,7 @@ TabStorageData Tab::GetStorageData() const
 	storageData.pidl = m_shellBrowserImpl->GetDirectoryIdl().get();
 	storageData.directory = m_shellBrowserImpl->GetDirectoryPath();
 	storageData.folderSettings = m_shellBrowserImpl->GetFolderSettings();
-	storageData.columns = m_shellBrowserImpl->ExportAllColumns();
+	storageData.columns = m_shellBrowserImpl->GetColumns();
 
 	TabSettings tabSettings;
 

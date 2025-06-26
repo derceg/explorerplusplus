@@ -953,7 +953,7 @@ HWND ShellBrowserImpl::GetListView() const
 	return m_listView;
 }
 
-FolderSettings ShellBrowserImpl::GetFolderSettings() const
+const FolderSettings &ShellBrowserImpl::GetFolderSettings() const
 {
 	return m_folderSettings;
 }
