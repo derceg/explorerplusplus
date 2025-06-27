@@ -918,17 +918,9 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	case IDM_HELP_ONLINE_DOCUMENTATION:
 	case IDM_HELP_CHECKFORUPDATES:
 	case IDM_HELP_ABOUT:
+	case IDA_SELECT_PREVIOUS_TAB:
+	case IDA_SELECT_NEXT_TAB:
 		m_commandController.ExecuteCommand(id);
-		break;
-
-	case IDA_NEXTTAB:
-		GetActivePane()->GetTabContainer()->SelectAdjacentTab(
-			TabContainer::SelectionDirection::Next);
-		break;
-
-	case IDA_PREVIOUSTAB:
-		GetActivePane()->GetTabContainer()->SelectAdjacentTab(
-			TabContainer::SelectionDirection::Previous);
 		break;
 
 	case IDA_ADDRESSBAR:

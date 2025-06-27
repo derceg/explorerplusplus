@@ -394,6 +394,16 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		OnAbout();
 		break;
 
+	case IDA_SELECT_PREVIOUS_TAB:
+		m_browser->GetActiveTabContainer()->SelectAdjacentTab(
+			TabContainer::SelectionDirection::Previous);
+		break;
+
+	case IDA_SELECT_NEXT_TAB:
+		m_browser->GetActiveTabContainer()->SelectAdjacentTab(
+			TabContainer::SelectionDirection::Next);
+		break;
+
 	case IDA_HOME:
 		GetActiveShellBrowser()->GetNavigationController()->Navigate(m_config->defaultTabDirectory);
 		break;

@@ -451,8 +451,8 @@
 #define IDB_CLOSE_BUTTON_FLUENT_UI_48   693
 #define IDA_RESTORE_LAST_TAB            32767
 #define IDA_RESET_TEXT_SIZE             32768
-#define IDA_NEXTTAB                     40123
-#define IDA_PREVIOUSTAB                 40125
+#define IDA_SELECT_NEXT_TAB             40123
+#define IDA_SELECT_PREVIOUS_TAB         40125
 #define IDA_DUPLICATE_TAB               40247
 #define IDA_ADDRESSBAR                  40286
 #define IDA_COMBODROPDOWN               40287

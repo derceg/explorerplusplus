@@ -215,6 +215,18 @@ TEST_F(BrowserCommandControllerTest, UpInNewTab)
 		CreateSimplePidlForTest(L"c:\\windows"));
 }
 
+TEST_F(BrowserCommandControllerTest, SelectAdjacentTab)
+{
+	m_browser->AddTab(L"c:\\");
+
+	m_commandController.ExecuteCommand(IDA_SELECT_NEXT_TAB);
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	EXPECT_EQ(tabContainer->GetSelectedTabIndex(), 1);
+
+	m_commandController.ExecuteCommand(IDA_SELECT_PREVIOUS_TAB);
+	EXPECT_EQ(tabContainer->GetSelectedTabIndex(), 0);
+}
+
 TEST_F(BrowserCommandControllerTest, SelectTabAtIndex)
 {
 	m_browser->AddTab(L"c:\\");
