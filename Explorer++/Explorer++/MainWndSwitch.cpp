@@ -954,43 +954,16 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDA_HOME:
+	case IDA_SELECT_TAB_1:
+	case IDA_SELECT_TAB_2:
+	case IDA_SELECT_TAB_3:
+	case IDA_SELECT_TAB_4:
+	case IDA_SELECT_TAB_5:
+	case IDA_SELECT_TAB_6:
+	case IDA_SELECT_TAB_7:
+	case IDA_SELECT_TAB_8:
+	case IDA_SELECT_LAST_TAB:
 		m_commandController.ExecuteCommand(id);
-		break;
-
-	case IDA_TAB1:
-		OnSelectTabByIndex(0);
-		break;
-
-	case IDA_TAB2:
-		OnSelectTabByIndex(1);
-		break;
-
-	case IDA_TAB3:
-		OnSelectTabByIndex(2);
-		break;
-
-	case IDA_TAB4:
-		OnSelectTabByIndex(3);
-		break;
-
-	case IDA_TAB5:
-		OnSelectTabByIndex(4);
-		break;
-
-	case IDA_TAB6:
-		OnSelectTabByIndex(5);
-		break;
-
-	case IDA_TAB7:
-		OnSelectTabByIndex(6);
-		break;
-
-	case IDA_TAB8:
-		OnSelectTabByIndex(7);
-		break;
-
-	case IDA_LASTTAB:
-		OnSelectTabByIndex(-1);
 		break;
 
 	case IDA_RESTORE_LAST_TAB:

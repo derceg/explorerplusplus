@@ -202,3 +202,36 @@ TEST_F(BrowserCommandControllerTest, UpInNewTab)
 	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(L"c:\\windows"));
 }
+
+TEST_F(BrowserCommandControllerTest, SelectTabAtIndex)
+{
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+
+	m_commandController.ExecuteCommand(IDA_SELECT_TAB_4);
+	EXPECT_EQ(m_browser->GetActiveTabContainer()->GetSelectedTabIndex(), 3);
+}
+
+TEST_F(BrowserCommandControllerTest, SelectTabAtIndexPastEnd)
+{
+	m_browser->AddTab(L"c:\\");
+
+	// Attempting to select a tab past the last tab should result in the last tab being selected.
+	m_commandController.ExecuteCommand(IDA_SELECT_TAB_7);
+	EXPECT_EQ(m_browser->GetActiveTabContainer()->GetSelectedTabIndex(), 1);
+}
+
+TEST_F(BrowserCommandControllerTest, SelectLastTab)
+{
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"c:\\");
+
+	m_commandController.ExecuteCommand(IDA_SELECT_LAST_TAB);
+	EXPECT_EQ(m_browser->GetActiveTabContainer()->GetSelectedTabIndex(), 3);
+}

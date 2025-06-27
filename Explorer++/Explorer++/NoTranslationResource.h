@@ -459,15 +459,15 @@
 #define IDA_NEXTWINDOW                  40289
 #define IDA_PREVIOUSWINDOW              40350
 #define IDA_HOME                        40420
-#define IDA_TAB1                        40423
-#define IDA_TAB2                        40424
-#define IDA_TAB3                        40425
-#define IDA_TAB4                        40426
-#define IDA_TAB5                        40427
-#define IDA_TAB6                        40428
-#define IDA_TAB7                        40429
-#define IDA_TAB8                        40430
-#define IDA_LASTTAB                     40431
+#define IDA_SELECT_TAB_1                40423
+#define IDA_SELECT_TAB_2                40424
+#define IDA_SELECT_TAB_3                40425
+#define IDA_SELECT_TAB_4                40426
+#define IDA_SELECT_TAB_5                40427
+#define IDA_SELECT_TAB_6                40428
+#define IDA_SELECT_TAB_7                40429
+#define IDA_SELECT_TAB_8                40430
+#define IDA_SELECT_LAST_TAB             40431
 
 // Next default values for new objects
 // 

@@ -57,6 +57,8 @@ private:
 	void OnOpenOnlineDocumentation();
 	void OnCheckForUpdates();
 	void OnAbout();
+	void OnSelectTabAtIndex(int index);
+	void OnSelectLastTab();
 
 	ShellBrowser *GetActiveShellBrowser();
 	const ShellBrowser *GetActiveShellBrowser() const;

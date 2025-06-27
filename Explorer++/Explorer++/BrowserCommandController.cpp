@@ -13,11 +13,37 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SortModeMenuMappings.h"
 #include "SystemFontHelper.h"
+#include "TabContainer.h"
 #include "UpdateCheckDialog.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
 
 using namespace std::string_literals;
+
+namespace
+{
+
+constexpr bool AreSelectTabItemIdsContiguous()
+{
+	constexpr int ids[] = { IDA_SELECT_TAB_1, IDA_SELECT_TAB_2, IDA_SELECT_TAB_3, IDA_SELECT_TAB_4,
+		IDA_SELECT_TAB_5, IDA_SELECT_TAB_6, IDA_SELECT_TAB_7, IDA_SELECT_TAB_8 };
+
+	for (size_t i = 1; i < std::size(ids); i++)
+	{
+		if (ids[i] != (ids[i - 1] + 1))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+// It's assumed below that the select tab item IDs are contiguous, which is why this check is
+// present.
+static_assert(AreSelectTabItemIdsContiguous());
+
+}
 
 BrowserCommandController::BrowserCommandController(BrowserWindow *browser, Config *config,
 	ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader) :
@@ -368,6 +394,21 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->GetNavigationController()->Navigate(m_config->defaultTabDirectory);
 		break;
 
+	case IDA_SELECT_TAB_1:
+	case IDA_SELECT_TAB_2:
+	case IDA_SELECT_TAB_3:
+	case IDA_SELECT_TAB_4:
+	case IDA_SELECT_TAB_5:
+	case IDA_SELECT_TAB_6:
+	case IDA_SELECT_TAB_7:
+	case IDA_SELECT_TAB_8:
+		OnSelectTabAtIndex(command - IDA_SELECT_TAB_1);
+		break;
+
+	case IDA_SELECT_LAST_TAB:
+		OnSelectLastTab();
+		break;
+
 	default:
 		DCHECK(false);
 		break;
@@ -623,6 +664,31 @@ void BrowserCommandController::OnAbout()
 {
 	AboutDialog aboutDialog(m_resourceLoader, m_browser->GetHWND());
 	aboutDialog.ShowModalDialog();
+}
+
+void BrowserCommandController::OnSelectTabAtIndex(int index)
+{
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	int numTabs = tabContainer->GetNumTabs();
+	int selectionIndex;
+
+	if (index < numTabs)
+	{
+		selectionIndex = index;
+	}
+	else
+	{
+		selectionIndex = numTabs - 1;
+	}
+
+	tabContainer->SelectTabAtIndex(selectionIndex);
+}
+
+void BrowserCommandController::OnSelectLastTab()
+{
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	int numTabs = tabContainer->GetNumTabs();
+	tabContainer->SelectTabAtIndex(numTabs - 1);
 }
 
 ShellBrowser *BrowserCommandController::GetActiveShellBrowser()

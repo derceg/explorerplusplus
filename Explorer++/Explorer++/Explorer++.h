@@ -209,7 +209,6 @@ private:
 	void OnFocusNextWindow(FocusChangeDirection direction);
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryContentsChanged(const ShellBrowser *shellBrowser);
-	void OnSelectTabByIndex(int iTab);
 
 	/* Main menu handlers. */
 	void OnNewTab();

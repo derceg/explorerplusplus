@@ -274,30 +274,6 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	SetFocus(m_hActiveListView);
 }
 
-void Explorerplusplus::OnSelectTabByIndex(int iTab)
-{
-	int nTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
-	int newIndex;
-
-	if (iTab == -1)
-	{
-		newIndex = nTabs - 1;
-	}
-	else
-	{
-		if (iTab < nTabs)
-		{
-			newIndex = iTab;
-		}
-		else
-		{
-			newIndex = nTabs - 1;
-		}
-	}
-
-	GetActivePane()->GetTabContainer()->SelectTabAtIndex(newIndex);
-}
-
 bool Explorerplusplus::OnCloseTab()
 {
 	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
