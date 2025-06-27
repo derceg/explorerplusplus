@@ -941,10 +941,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDA_DUPLICATE_TAB:
-		GetActivePane()->GetTabContainer()->DuplicateTab(
-			GetActivePane()->GetTabContainer()->GetSelectedTab());
-		break;
-
 	case IDA_HOME:
 	case IDA_SELECT_TAB_1:
 	case IDA_SELECT_TAB_2:

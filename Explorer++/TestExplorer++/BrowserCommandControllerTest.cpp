@@ -227,6 +227,22 @@ TEST_F(BrowserCommandControllerTest, SelectAdjacentTab)
 	EXPECT_EQ(tabContainer->GetSelectedTabIndex(), 0);
 }
 
+TEST_F(BrowserCommandControllerTest, DuplicateTab)
+{
+	PidlAbsolute pidl;
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\project", {}, &pidl);
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	tabContainer->SelectTab(tabContainer->GetTab(tabId2));
+
+	m_commandController.ExecuteCommand(IDA_DUPLICATE_TAB);
+	ASSERT_EQ(tabContainer->GetNumTabs(), 3);
+
+	const auto &duplicatedTab = tabContainer->GetTabByIndex(2);
+	EXPECT_NE(duplicatedTab.GetId(), tabId2);
+	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetDirectory(), pidl);
+}
+
 TEST_F(BrowserCommandControllerTest, SelectTabAtIndex)
 {
 	m_browser->AddTab(L"c:\\");

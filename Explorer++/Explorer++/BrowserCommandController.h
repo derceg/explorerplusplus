@@ -58,6 +58,7 @@ private:
 	void OnOpenOnlineDocumentation();
 	void OnCheckForUpdates();
 	void OnAbout();
+	void OnDuplicateTab();
 	void OnSelectTabAtIndex(int index);
 	void OnSelectLastTab();
 

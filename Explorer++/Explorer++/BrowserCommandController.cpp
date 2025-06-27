@@ -404,6 +404,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 			TabContainer::SelectionDirection::Next);
 		break;
 
+	case IDA_DUPLICATE_TAB:
+		OnDuplicateTab();
+		break;
+
 	case IDA_HOME:
 		GetActiveShellBrowser()->GetNavigationController()->Navigate(m_config->defaultTabDirectory);
 		break;
@@ -684,6 +688,12 @@ void BrowserCommandController::OnAbout()
 {
 	AboutDialog aboutDialog(m_resourceLoader, m_browser->GetHWND());
 	aboutDialog.ShowModalDialog();
+}
+
+void BrowserCommandController::OnDuplicateTab()
+{
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	tabContainer->DuplicateTab(tabContainer->GetSelectedTab());
 }
 
 void BrowserCommandController::OnSelectTabAtIndex(int index)
