@@ -575,12 +575,12 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 
 Tab &TabContainer::GetTab(int tabId) const
 {
-	auto *tab = GetTabOptional(tabId);
+	auto *tab = MaybeGetTab(tabId);
 	CHECK(tab);
 	return *tab;
 }
 
-Tab *TabContainer::GetTabOptional(int tabId) const
+Tab *TabContainer::MaybeGetTab(int tabId) const
 {
 	auto itr = m_tabs.find(tabId);
 

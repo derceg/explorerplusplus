@@ -57,6 +57,18 @@ TEST_F(BrowserCommandControllerTest, SortBy)
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortDirection(), +SortDirection::Ascending);
 }
 
+TEST_F(BrowserCommandControllerTest, CloseTab)
+{
+	int tabId2 = m_browser->AddTabAndReturnId(L"c:\\");
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	tabContainer->SelectTab(tabContainer->GetTab(tabId2));
+
+	m_commandController.ExecuteCommand(IDM_FILE_CLOSETAB);
+	EXPECT_EQ(tabContainer->GetNumTabs(), 1);
+	EXPECT_EQ(tabContainer->MaybeGetTab(tabId2), nullptr);
+}
+
 TEST_F(BrowserCommandControllerTest, CopyFolderPath)
 {
 	std::wstring path = L"c:\\fake";

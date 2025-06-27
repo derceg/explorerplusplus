@@ -111,7 +111,7 @@ public:
 		const FolderColumns *initialColumns = nullptr);
 
 	Tab &GetTab(int tabId) const;
-	Tab *GetTabOptional(int tabId) const;
+	Tab *MaybeGetTab(int tabId) const;
 	void SelectTab(const Tab &tab);
 	void SelectAdjacentTab(SelectionDirection selectionDirection);
 	void SelectTabAtIndex(int index);

@@ -44,6 +44,7 @@ private:
 	bool CanStartCommandPrompt() const;
 
 	void OnSortBy(SortMode sortMode);
+	void OnCloseTab();
 	void StartCommandPrompt(LaunchProcessFlags flags = LaunchProcessFlags::None);
 	void CopyFolderPath() const;
 	void OnChangeMainFontSize(FontSizeType sizeType);

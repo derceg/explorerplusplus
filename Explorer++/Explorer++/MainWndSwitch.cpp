@@ -289,7 +289,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case MainToolbarButton::CloseTab:
 	case IDM_FILE_CLOSETAB:
-		OnCloseTab();
+		m_commandController.ExecuteCommand(IDM_FILE_CLOSETAB);
 		break;
 
 	case IDM_FILE_NEW_WINDOW:

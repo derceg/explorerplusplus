@@ -303,7 +303,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd, UINT Msg, WPA
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM wParam,
 	LPARAM lParam, int iTabId)
 {
-	const Tab *tab = m_tabContainer->GetTabOptional(iTabId);
+	const Tab *tab = m_tabContainer->MaybeGetTab(iTabId);
 
 	switch (Msg)
 	{

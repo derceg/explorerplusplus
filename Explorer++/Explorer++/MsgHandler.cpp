@@ -612,8 +612,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_CLOSE:
-		SendMessage(m_hContainer, WM_CANCELMODE, 0, 0);
-		OnCloseTab();
+		m_commandController.ExecuteCommand(IDM_FILE_CLOSETAB);
 		break;
 
 	case APPCOMMAND_CUT:

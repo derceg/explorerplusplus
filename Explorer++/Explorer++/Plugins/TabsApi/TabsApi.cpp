@@ -83,7 +83,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 
 std::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
-	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->MaybeGetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -238,7 +238,7 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)
 {
-	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->MaybeGetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -284,7 +284,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 void Plugins::TabsApi::refresh(int tabId)
 {
-	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->MaybeGetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -296,7 +296,7 @@ void Plugins::TabsApi::refresh(int tabId)
 
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
-	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->MaybeGetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -313,7 +313,7 @@ int Plugins::TabsApi::move(int tabId, int newIndex)
 
 bool Plugins::TabsApi::close(int tabId)
 {
-	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
+	auto tabInternal = m_tabContainer->MaybeGetTab(tabId);
 
 	if (!tabInternal)
 	{

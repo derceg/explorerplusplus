@@ -116,15 +116,15 @@ TEST_F(TabContainerTest, GetTab)
 	EXPECT_THAT(m_tabContainer->GetTab(tab2->GetId()), Ref(*tab2));
 }
 
-TEST_F(TabContainerTest, GetTabOptional)
+TEST_F(TabContainerTest, MaybeGetTab)
 {
 	const auto *tab1 = m_browser->AddTab(L"c:\\");
-	EXPECT_EQ(m_tabContainer->GetTabOptional(tab1->GetId()), tab1);
+	EXPECT_EQ(m_tabContainer->MaybeGetTab(tab1->GetId()), tab1);
 
 	const auto tab2 = m_browser->AddTab(L"d:\\");
-	EXPECT_EQ(m_tabContainer->GetTabOptional(tab2->GetId()), tab2);
+	EXPECT_EQ(m_tabContainer->MaybeGetTab(tab2->GetId()), tab2);
 
-	EXPECT_EQ(m_tabContainer->GetTabOptional(-1), nullptr);
+	EXPECT_EQ(m_tabContainer->MaybeGetTab(-1), nullptr);
 }
 
 TEST_F(TabContainerTest, GetSetSelectedTab)

@@ -141,6 +141,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	switch (command)
 	{
+	case IDM_FILE_CLOSETAB:
+		OnCloseTab();
+		break;
+
 	case IDM_FILE_SAVEDIRECTORYLISTING:
 		GetActiveShellBrowser()->SaveDirectoryListing();
 		break;
@@ -449,6 +453,12 @@ void BrowserCommandController::OnSortBy(SortMode sortMode)
 	{
 		shellBrowser->SetSortMode(sortMode);
 	}
+}
+
+void BrowserCommandController::OnCloseTab()
+{
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	tabContainer->CloseTab(tabContainer->GetSelectedTab());
 }
 
 void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)

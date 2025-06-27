@@ -274,12 +274,6 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	SetFocus(m_hActiveListView);
 }
 
-bool Explorerplusplus::OnCloseTab()
-{
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	return GetActivePane()->GetTabContainer()->CloseTab(tab);
-}
-
 void Explorerplusplus::ShowTabBar()
 {
 	m_bShowTabBar = true;
