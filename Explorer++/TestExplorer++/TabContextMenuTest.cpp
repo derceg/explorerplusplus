@@ -49,6 +49,22 @@ protected:
 	TabContainer *const m_tabContainer;
 };
 
+TEST_F(TabContextMenuTest, DuplicateTab)
+{
+	PidlAbsolute pidl;
+	auto *tab1 = m_browser->AddTab(L"c:\\users", {}, &pidl);
+
+	MenuViewFake menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1, m_tabContainer, &m_tabEvents,
+		&m_resourceLoader);
+
+	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB, false, false);
+	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
+
+	const auto &tab2 = m_tabContainer->GetTabByIndex(1);
+	EXPECT_EQ(tab2.GetShellBrowser()->GetDirectory(), pidl);
+}
+
 TEST_F(TabContextMenuTest, OpenParentInNewTab)
 {
 	auto *tab1 = m_browser->AddTab(L"c:\\windows\\system32");
