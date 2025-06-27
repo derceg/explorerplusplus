@@ -697,13 +697,8 @@ std::vector<Tab *> TabContainer::GetAllTabsInOrder() const
 
 Tab &TabContainer::DuplicateTab(const Tab &tab)
 {
-	auto *shellBrowser = tab.GetShellBrowser();
-	const auto &folderSettings = shellBrowser->GetFolderSettings();
-	const auto &folderColumns = shellBrowser->GetColumns();
-	auto navigateParams = NavigateParams::Normal(shellBrowser->GetDirectory().Raw());
-	return CreateNewTab(navigateParams,
-		TabSettings(_index = GetTabIndex(tab) + 1, _selected = true), &folderSettings,
-		&folderColumns);
+	PreservedTab preservedTab(tab, GetTabIndex(tab) + 1);
+	return CreateNewTab(preservedTab);
 }
 
 void TabContainer::OnTabMoved(int fromIndex, int toIndex)

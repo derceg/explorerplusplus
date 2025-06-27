@@ -83,6 +83,8 @@ New features:
 - It's now possible to delete a folder that's open in Explorer++.
   In that situation, the associated tab will navigate to the
   parent folder.
+- When duplicating a tab, the original tab's custom name, lock
+  state and history will now also be duplicated.
 - When a folder is opened in a tab and the folder icon changes,
   or the folder name changes (if the folder is virtual), that
   change will now be reflected in the UI. For example, the

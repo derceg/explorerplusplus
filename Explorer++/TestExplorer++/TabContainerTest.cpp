@@ -313,11 +313,6 @@ TEST_F(TabContainerTest, DuplicateTab)
 
 	m_browser->AddTab(L"e:\\");
 
-	tab2->GetShellBrowser()->SetSortMode(SortMode::Size);
-	tab2->GetShellBrowser()->SetSortDirection(SortDirection::Descending);
-	tab2->GetShellBrowser()->SetViewMode(ViewMode::Details);
-	tab2->GetShellBrowser()->SetAutoArrangeEnabled(false);
-
 	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab2);
 
 	// The duplicate tab should be opened to the right of the original tab and be selected.
@@ -325,8 +320,73 @@ TEST_F(TabContainerTest, DuplicateTab)
 	EXPECT_TRUE(m_tabContainer->IsTabSelected(duplicatedTab));
 
 	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetDirectory(), pidl);
+}
+
+TEST_F(TabContainerTest, DuplicateTabWithCustomName)
+{
+	auto *tab = m_browser->AddTab(L"c:\\");
+
+	std::wstring customName = L"Custom name";
+	tab->SetCustomName(customName);
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab);
+	EXPECT_EQ(duplicatedTab.GetName(), customName);
+}
+
+TEST_F(TabContainerTest, DuplicateTabWithLock)
+{
+	auto *tab = m_browser->AddTab(L"c:\\");
+
+	tab->SetLockState(Tab::LockState::Locked);
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab);
+	EXPECT_EQ(duplicatedTab.GetLockState(), Tab::LockState::Locked);
+}
+
+TEST_F(TabContainerTest, DuplicateTabWithAddressLock)
+{
+	auto *tab = m_browser->AddTab(L"c:\\");
+
+	tab->SetLockState(Tab::LockState::AddressLocked);
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab);
+	EXPECT_EQ(duplicatedTab.GetLockState(), Tab::LockState::AddressLocked);
+}
+
+TEST_F(TabContainerTest, DuplicateTabWithFolderSettings)
+{
+	const auto *tab = m_browser->AddTab(L"c:\\");
+
+	tab->GetShellBrowser()->SetSortMode(SortMode::Size);
+	tab->GetShellBrowser()->SetSortDirection(SortDirection::Descending);
+	tab->GetShellBrowser()->SetViewMode(ViewMode::Details);
+	tab->GetShellBrowser()->SetAutoArrangeEnabled(false);
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab);
 	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetFolderSettings(),
-		tab2->GetShellBrowser()->GetFolderSettings());
+		tab->GetShellBrowser()->GetFolderSettings());
+}
+
+TEST_F(TabContainerTest, DuplicateTabWithHistory)
+{
+	PidlAbsolute pidl;
+	auto *tab = m_browser->AddTab(L"c:\\", {}, &pidl);
+	NavigateTab(tab, L"d:\\");
+	NavigateTab(tab, L"e:\\");
+	tab->GetShellBrowser()->GetNavigationController()->GoBack();
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab);
+
+	// The history of the original tab should be duplicated.
+	const auto *navigationController = duplicatedTab.GetShellBrowser()->GetNavigationController();
+	ASSERT_EQ(navigationController->GetNumHistoryEntries(), 3);
+	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
+	EXPECT_EQ(navigationController->GetEntryAtIndex(0)->GetPidl(),
+		CreateSimplePidlForTest(L"c:\\"));
+	EXPECT_EQ(navigationController->GetEntryAtIndex(1)->GetPidl(),
+		CreateSimplePidlForTest(L"d:\\"));
+	EXPECT_EQ(navigationController->GetEntryAtIndex(2)->GetPidl(),
+		CreateSimplePidlForTest(L"e:\\"));
 }
 
 TEST_F(TabContainerTest, CloseTab)
