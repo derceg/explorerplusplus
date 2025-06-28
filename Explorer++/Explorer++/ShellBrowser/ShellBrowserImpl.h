@@ -53,7 +53,6 @@ class PreservedHistoryEntry;
 class Runtime;
 class ShellEnumeratorImpl;
 class ShellNavigationController;
-class TabNavigationInterface;
 class WindowSubclass;
 
 typedef struct
@@ -70,13 +69,12 @@ class ShellBrowserImpl :
 {
 public:
 	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
+		FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
@@ -371,8 +369,8 @@ private:
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
 	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
@@ -645,7 +643,6 @@ private:
 	NavigationState m_navigationState = NavigationState::NoFolderShown;
 	const HCURSOR m_progressCursor;
 
-	TabNavigationInterface *m_tabNavigation;
 	ScopedBrowserCommandTarget m_commandTarget;
 	FileActionHandler *m_fileActionHandler;
 

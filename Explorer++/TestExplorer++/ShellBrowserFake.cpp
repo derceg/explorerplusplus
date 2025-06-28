@@ -10,27 +10,25 @@
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
 
-ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
-	TabNavigationInterface *tabNavigation,
+ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserFake(navigationEvents, tabNavigation, preservedFolderState.folderSettings)
+	ShellBrowserFake(browser, navigationEvents, preservedFolderState.folderSettings)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
-		navigationEvents, tabNavigation, preservedEntries, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
+		&m_navigationManager, navigationEvents, preservedEntries, currentEntry);
 }
 
-ShellBrowserFake::ShellBrowserFake(NavigationEvents *navigationEvents,
-	TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-	const FolderColumns &initialColumns) :
+ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
+	const FolderSettings &folderSettings, const FolderColumns &initialColumns) :
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns),
 	m_shellEnumerator(std::make_shared<ShellEnumeratorFake>()),
 	m_inlineExecutor(std::make_shared<concurrencpp::inline_executor>()),
 	m_navigationManager(this, navigationEvents, m_shellEnumerator, m_inlineExecutor,
 		m_inlineExecutor),
-	m_navigationController(std::make_unique<ShellNavigationController>(this, &m_navigationManager,
-		navigationEvents, tabNavigation, CreateSimplePidlForTest(L"c:\\initial_path")))
+	m_navigationController(std::make_unique<ShellNavigationController>(this, browser,
+		&m_navigationManager, navigationEvents, CreateSimplePidlForTest(L"c:\\initial_path")))
 {
 }
 

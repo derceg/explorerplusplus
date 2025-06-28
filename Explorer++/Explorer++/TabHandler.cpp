@@ -308,16 +308,3 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const ShellBrowser *shellBr
 			nullptr);
 	}
 }
-
-// TabNavigationInterface
-void Explorerplusplus::CreateNewTab(NavigateParams &navigateParams, bool selected)
-{
-	GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
-		TabSettings(_selected = selected));
-}
-
-void Explorerplusplus::SelectTabById(int tabId)
-{
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
-	GetActivePane()->GetTabContainer()->SelectTab(tab);
-}

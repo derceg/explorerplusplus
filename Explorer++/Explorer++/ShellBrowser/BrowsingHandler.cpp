@@ -216,7 +216,7 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 
 	auto document = winrt::make_self<DocumentServiceProvider>();
 	document->RegisterService(IID_IFolderView,
-		winrt::make_self<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, true));
+		winrt::make_self<ShellView>(m_weakPtrFactory.GetWeakPtr(), true));
 
 	auto browserApp = winrt::make_self<WebBrowserApp>(m_owner, document.get());
 

@@ -1808,7 +1808,6 @@
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabMoved.h" />
-    <ClInclude Include="TabNavigationInterface.h" />
     <ClInclude Include="Plugins\TabsApi\TabProperties.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabRemoved.h" />
     <ClInclude Include="TabRestorer.h" />

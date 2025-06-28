@@ -6,13 +6,13 @@
 
 #include "ShellBrowser/ShellBrowserFactory.h"
 
+class BrowserWindow;
 class NavigationEvents;
-class TabNavigationMock;
 
 class ShellBrowserFactoryFake : public ShellBrowserFactory
 {
 public:
-	ShellBrowserFactoryFake(NavigationEvents *navigationEvents, TabNavigationMock *tabNavigation);
+	ShellBrowserFactoryFake(BrowserWindow *browser, NavigationEvents *navigationEvents);
 
 	std::unique_ptr<ShellBrowser> Create(const PidlAbsolute &initialPidl,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns) override;
@@ -21,6 +21,6 @@ public:
 		const PreservedFolderState &preservedFolderState) override;
 
 private:
+	BrowserWindow *const m_browser;
 	NavigationEvents *const m_navigationEvents;
-	TabNavigationMock *const m_tabNavigation;
 };

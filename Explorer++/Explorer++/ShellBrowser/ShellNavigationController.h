@@ -10,13 +10,13 @@
 #include <boost/signals2.hpp>
 #include <vector>
 
+class BrowserWindow;
 struct NavigateParams;
 class NavigationEvents;
 class NavigationManager;
 class NavigationRequest;
 class PreservedHistoryEntry;
 class ShellBrowser;
-class TabNavigationInterface;
 
 enum class NavigationTargetMode
 {
@@ -31,13 +31,12 @@ class ShellNavigationController :
 public:
 	// `initialPidl` here will be used to set up an initial entry. That then means that there will
 	// always be a current entry. That is, `GetCurrentEntry` will always return a non-null value.
-	ShellNavigationController(const ShellBrowser *shellBrowser,
+	ShellNavigationController(const ShellBrowser *shellBrowser, BrowserWindow *browser,
 		NavigationManager *navigationManager, NavigationEvents *navigationEvents,
-		TabNavigationInterface *tabNavigation, const PidlAbsolute &initialPidl);
+		const PidlAbsolute &initialPidl);
 
-	ShellNavigationController(const ShellBrowser *shellBrowser,
+	ShellNavigationController(const ShellBrowser *shellBrowser, BrowserWindow *browser,
 		NavigationManager *navigationManager, NavigationEvents *navigationEvents,
-		TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
@@ -64,9 +63,9 @@ private:
 
 	void OnNavigationCommitted(const NavigationRequest *request);
 
+	BrowserWindow *const m_browser;
 	NavigationManager *const m_navigationManager;
 
-	TabNavigationInterface *m_tabNavigation;
 	NavigationTargetMode m_navigationTargetMode = NavigationTargetMode::Normal;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

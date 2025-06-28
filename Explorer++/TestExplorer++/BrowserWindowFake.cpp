@@ -21,7 +21,7 @@ BrowserWindowFake::BrowserWindowFake(const Config *config, TabEvents *tabEvents,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	m_config(config),
 	m_window(CreateBrowserWindow()),
-	m_shellBrowserFactory(navigationEvents, &m_tabNavigation),
+	m_shellBrowserFactory(this, navigationEvents),
 	m_tabContainer(TabContainer::Create(MainTabView::Create(m_window.get(), config, resourceLoader),
 		this, &m_shellBrowserFactory, tabEvents, shellBrowserEvents, navigationEvents, nullptr,
 		cachedIcons, bookmarkTree, acceleratorManager, config, resourceLoader))

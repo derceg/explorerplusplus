@@ -7,7 +7,6 @@
 #include "BrowserWindow.h"
 #include "ShellBrowserFactoryFake.h"
 #include "TabContainer.h"
-#include "TabNavigationMock.h"
 #include "../Helper/PidlHelper.h"
 #include <wil/resource.h>
 
@@ -71,7 +70,6 @@ private:
 	static void RegisterBrowserWindowClass();
 
 	const Config *const m_config;
-	TabNavigationMock m_tabNavigation;
 
 	wil::unique_hwnd m_window;
 

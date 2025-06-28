@@ -8,7 +8,6 @@
 #include "../Helper/WinRTBaseWrapper.h"
 
 class ShellBrowserImpl;
-class TabNavigationInterface;
 
 // This isn't a complete implementation. There's only enough functionality to support the "New
 // Folder" item shown on the background context menu in a phone's virtual folder (when that phone is
@@ -16,8 +15,7 @@ class TabNavigationInterface;
 class ShellView : public winrt::implements<ShellView, IShellView, winrt::non_agile>
 {
 public:
-	ShellView(WeakPtr<ShellBrowserImpl> shellBrowserWeak, TabNavigationInterface *tabNavigation,
-		bool switchToTabOnSelect);
+	ShellView(WeakPtr<ShellBrowserImpl> shellBrowserWeak, bool switchToTabOnSelect);
 
 	// IShellView
 	IFACEMETHODIMP TranslateAccelerator(MSG *msg);
@@ -40,7 +38,6 @@ public:
 
 private:
 	const WeakPtr<ShellBrowserImpl> m_shellBrowserWeak;
-	TabNavigationInterface *const m_tabNavigation;
 	const bool m_switchToTabOnSelect;
 };
 

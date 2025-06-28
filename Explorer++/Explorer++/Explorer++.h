@@ -22,7 +22,6 @@
 #include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
-#include "TabNavigationInterface.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include "../Helper/ClipboardHelper.h"
@@ -79,11 +78,7 @@ namespace Plugins
 class PluginManager;
 }
 
-class Explorerplusplus :
-	public BrowserWindow,
-	public CoreInterface,
-	public PluginInterface,
-	public TabNavigationInterface
+class Explorerplusplus : public BrowserWindow, public CoreInterface, public PluginInterface
 {
 	friend LoadSaveRegistry;
 	friend LoadSaveXML;
@@ -260,10 +255,6 @@ private:
 	void CreateTabsFromStorageData(const WindowStorageData &storageData);
 	void CreateCommandLineTabs();
 	void OnTabListViewSelectionChanged(const ShellBrowser *shellBrowser);
-
-	/* TabNavigationInterface methods. */
-	void CreateNewTab(NavigateParams &navigateParams, bool selected) override;
-	void SelectTabById(int tabId) override;
 
 	void OnNavigationCommitted(const NavigationRequest *request);
 

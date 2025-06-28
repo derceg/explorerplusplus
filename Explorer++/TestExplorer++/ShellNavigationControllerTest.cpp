@@ -4,12 +4,12 @@
 
 #include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
+#include "BrowserWindowMock.h"
 #include "NavigationRequestTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/PreservedFolderState.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
-#include "TabNavigationMock.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"
 #include "../Helper/ShellHelper.h"
@@ -21,7 +21,7 @@ using namespace testing;
 class ShellNavigationControllerTest : public Test
 {
 protected:
-	ShellNavigationControllerTest() : m_shellBrowser(&m_navigationEvents, &m_tabNavigation)
+	ShellNavigationControllerTest() : m_shellBrowser(&m_browser, &m_navigationEvents)
 	{
 	}
 
@@ -31,7 +31,7 @@ protected:
 	}
 
 	NavigationEvents m_navigationEvents;
-	TabNavigationMock m_tabNavigation;
+	BrowserWindowMock m_browser;
 	ShellBrowserFake m_shellBrowser;
 };
 
@@ -308,7 +308,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params)));
 
 	// By default, all navigations should proceed in the current tab.
-	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
+	EXPECT_CALL(m_browser, OpenItem(An<PCIDLIST_ABSOLUTE>(), _)).Times(0);
 
 	auto *navigationController = GetNavigationController();
 	EXPECT_EQ(navigationController->GetNavigationTargetMode(), NavigationTargetMode::Normal);
@@ -327,7 +327,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 	// Although the navigation mode has been set, the navigation is an implicit refresh and should
 	// always proceed in the same tab.
 	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(expectedParams)));
-	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
+	EXPECT_CALL(m_browser, OpenItem(An<PCIDLIST_ABSOLUTE>(), _)).Times(0);
 
 	navigationController->Navigate(params);
 
@@ -336,7 +336,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 
 	// This is a navigation to a different directory, so the navigation mode above should now apply.
 	EXPECT_CALL(navigationStartedCallback, Call(_)).Times(0);
-	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params), _));
+	EXPECT_CALL(m_browser, OpenItem(params.pidl.Raw(), _));
 
 	navigationController->Navigate(params);
 
@@ -347,7 +347,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetMode)
 	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
 	// the tab, even though a navigation mode was applied above.
 	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params)));
-	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
+	EXPECT_CALL(m_browser, OpenItem(An<PCIDLIST_ABSOLUTE>(), _)).Times(0);
 
 	navigationController->Navigate(params);
 }
@@ -367,7 +367,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 	// The first navigation in a tab should always take place within that tab, regardless of the
 	// navigation mode in effect.
 	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params)));
-	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
+	EXPECT_CALL(m_browser, OpenItem(An<PCIDLIST_ABSOLUTE>(), _)).Times(0);
 
 	navigationController->Navigate(params);
 
@@ -376,7 +376,7 @@ TEST_F(ShellNavigationControllerTest, SetNavigationTargetModeFirstNavigation)
 
 	// Subsequent navigations should then open in a new tab when necessary.
 	EXPECT_CALL(navigationStartedCallback, Call(NavigateParamsMatch(params2))).Times(0);
-	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params2), _));
+	EXPECT_CALL(m_browser, OpenItem(params2.pidl.Raw(), _));
 
 	navigationController->Navigate(params2);
 }
@@ -532,12 +532,12 @@ protected:
 
 	std::unique_ptr<ShellBrowserFake> BuildShellBrowserWithCurrentEntry(int currentEntry)
 	{
-		return std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation,
+		return std::make_unique<ShellBrowserFake>(&m_browser, &m_navigationEvents,
 			m_preservedEntries, currentEntry, PreservedFolderState{});
 	}
 
 	NavigationEvents m_navigationEvents;
-	TabNavigationMock m_tabNavigation;
+	BrowserWindowMock m_browser;
 
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> m_preservedEntries;
 };

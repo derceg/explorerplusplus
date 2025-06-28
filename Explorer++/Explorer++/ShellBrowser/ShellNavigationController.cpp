@@ -4,19 +4,18 @@
 
 #include "stdafx.h"
 #include "ShellNavigationController.h"
+#include "BrowserWindow.h"
 #include "NavigationEvents.h"
 #include "NavigationManager.h"
 #include "NavigationRequest.h"
 #include "PreservedHistoryEntry.h"
-#include "TabNavigationInterface.h"
-#include "TestHelper.h"
 #include "../Helper/ShellHelper.h"
 
 ShellNavigationController::ShellNavigationController(const ShellBrowser *shellBrowser,
-	NavigationManager *navigationManager, NavigationEvents *navigationEvents,
-	TabNavigationInterface *tabNavigation, const PidlAbsolute &initialPidl) :
-	m_navigationManager(navigationManager),
-	m_tabNavigation(tabNavigation)
+	BrowserWindow *browser, NavigationManager *navigationManager,
+	NavigationEvents *navigationEvents, const PidlAbsolute &initialPidl) :
+	m_browser(browser),
+	m_navigationManager(navigationManager)
 {
 	Initialize(shellBrowser, navigationEvents);
 
@@ -25,12 +24,12 @@ ShellNavigationController::ShellNavigationController(const ShellBrowser *shellBr
 }
 
 ShellNavigationController::ShellNavigationController(const ShellBrowser *shellBrowser,
-	NavigationManager *navigationManager, NavigationEvents *navigationEvents,
-	TabNavigationInterface *tabNavigation,
+	BrowserWindow *browser, NavigationManager *navigationManager,
+	NavigationEvents *navigationEvents,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	NavigationController(CopyPreservedHistoryEntries(preservedEntries), currentEntry),
-	m_navigationManager(navigationManager),
-	m_tabNavigation(tabNavigation)
+	m_browser(browser),
+	m_navigationManager(navigationManager)
 {
 	Initialize(shellBrowser, navigationEvents);
 }
@@ -191,7 +190,7 @@ void ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	if (m_navigationTargetMode == NavigationTargetMode::ForceNewTab
 		&& !currentEntry->IsInitialEntry() && !navigateParams.overrideNavigationTargetMode)
 	{
-		m_tabNavigation->CreateNewTab(navigateParams, true);
+		m_browser->OpenItem(navigateParams.pidl.Raw(), OpenFolderDisposition::ForegroundTab);
 		return;
 	}
 

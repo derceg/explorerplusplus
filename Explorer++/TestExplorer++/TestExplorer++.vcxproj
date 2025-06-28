@@ -477,7 +477,6 @@
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />
-    <ClInclude Include="TabNavigationMock.h" />
     <ClInclude Include="TabStorageTestHelper.h" />
     <ClInclude Include="WindowStorageTestHelper.h" />
     <ClInclude Include="XmlStorageTestHelper.h" />

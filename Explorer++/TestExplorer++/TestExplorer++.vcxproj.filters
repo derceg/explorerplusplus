@@ -688,9 +688,6 @@
     <ClInclude Include="MovableModelHelper.h">
       <Filter>Storage</Filter>
     </ClInclude>
-    <ClInclude Include="TabNavigationMock.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowserFake.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>

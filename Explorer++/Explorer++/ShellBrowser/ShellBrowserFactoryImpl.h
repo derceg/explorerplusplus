@@ -9,13 +9,11 @@
 class App;
 class BrowserWindow;
 class FileActionHandler;
-class TabNavigationInterface;
 
 class ShellBrowserFactoryImpl : public ShellBrowserFactory
 {
 public:
-	ShellBrowserFactoryImpl(App *app, BrowserWindow *browser, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler);
+	ShellBrowserFactoryImpl(App *app, BrowserWindow *browser, FileActionHandler *fileActionHandler);
 
 	// ShellBrowserFactory
 	std::unique_ptr<ShellBrowser> Create(const PidlAbsolute &initialPidl,
@@ -27,6 +25,5 @@ public:
 private:
 	App *const m_app;
 	BrowserWindow *const m_browser;
-	TabNavigationInterface *const m_tabNavigation;
 	FileActionHandler *const m_fileActionHandler;
 };

@@ -12,20 +12,20 @@
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
 
+class BrowserWindow;
 class NavigationEvents;
 struct PreservedFolderState;
 class PreservedHistoryEntry;
 class ShellEnumeratorFake;
 class ShellNavigationController;
-class TabNavigationInterface;
 
 class ShellBrowserFake : public ShellBrowser
 {
 public:
-	ShellBrowserFake(NavigationEvents *navigationEvents, TabNavigationInterface *tabNavigation,
+	ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry, const PreservedFolderState &preservedFolderState);
-	ShellBrowserFake(NavigationEvents *navigationEvents, TabNavigationInterface *tabNavigation,
+	ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 		const FolderSettings &folderSettings = {}, const FolderColumns &initialColumns = {});
 	~ShellBrowserFake();
 

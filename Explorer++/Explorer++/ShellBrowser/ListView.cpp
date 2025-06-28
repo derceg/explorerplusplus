@@ -26,7 +26,6 @@
 #include "ShellBrowserContextMenuDelegate.h"
 #include "ShellNavigationController.h"
 #include "ShellView.h"
-#include "TabNavigationInterface.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/FileActionHandler.h"
@@ -350,21 +349,14 @@ void ShellBrowserImpl::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 
 	const ItemInfo_t &itemInfo = GetItemByIndex(m_middleButtonItem);
 
-	if (!WI_IsAnyFlagSet(itemInfo.wfd.dwFileAttributes,
-			FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_ARCHIVE))
+	if (WI_IsFlagClear(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 	{
 		return;
 	}
 
-	bool switchToNewTab = m_config->openTabsInForeground;
-
-	if (WI_IsFlagSet(keysDown, MK_SHIFT))
-	{
-		switchToNewTab = !switchToNewTab;
-	}
-
-	auto navigateParams = NavigateParams::Normal(itemInfo.pidlComplete.Raw());
-	m_tabNavigation->CreateNewTab(navigateParams, switchToNewTab);
+	m_browser->OpenItem(itemInfo.pidlComplete.Raw(),
+		DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
+			WI_IsFlagSet(keysDown, MK_SHIFT)));
 }
 
 void ShellBrowserImpl::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags)
@@ -479,7 +471,7 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 	serviceProvider->RegisterService(IID_IFolderView,
 		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr()));
 	serviceProvider->RegisterService(SID_DefView,
-		winrt::make<ShellView>(m_weakPtrFactory.GetWeakPtr(), m_tabNavigation, false));
+		winrt::make<ShellView>(m_weakPtrFactory.GetWeakPtr(), false));
 
 	ShellBackgroundContextMenu::Flags flags = ShellBackgroundContextMenu::Flags::None;
 

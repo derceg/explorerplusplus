@@ -5,12 +5,11 @@
 #include "pch.h"
 #include "ShellBrowserFactoryFake.h"
 #include "ShellBrowserFake.h"
-#include "TabNavigationMock.h"
 
-ShellBrowserFactoryFake::ShellBrowserFactoryFake(NavigationEvents *navigationEvents,
-	TabNavigationMock *tabNavigation) :
-	m_navigationEvents(navigationEvents),
-	m_tabNavigation(tabNavigation)
+ShellBrowserFactoryFake::ShellBrowserFactoryFake(BrowserWindow *browser,
+	NavigationEvents *navigationEvents) :
+	m_browser(browser),
+	m_navigationEvents(navigationEvents)
 {
 }
 
@@ -19,7 +18,7 @@ std::unique_ptr<ShellBrowser> ShellBrowserFactoryFake::Create(const PidlAbsolute
 {
 	UNREFERENCED_PARAMETER(initialPidl);
 
-	return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation, folderSettings,
+	return std::make_unique<ShellBrowserFake>(m_browser, m_navigationEvents, folderSettings,
 		initialColumns ? *initialColumns : FolderColumns{});
 }
 
@@ -27,6 +26,6 @@ std::unique_ptr<ShellBrowser> ShellBrowserFactoryFake::CreateFromPreserved(
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return std::make_unique<ShellBrowserFake>(m_navigationEvents, m_tabNavigation, history,
-		currentEntry, preservedFolderState);
+	return std::make_unique<ShellBrowserFake>(m_browser, m_navigationEvents, history, currentEntry,
+		preservedFolderState);
 }

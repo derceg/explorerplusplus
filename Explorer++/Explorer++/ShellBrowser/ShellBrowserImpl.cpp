@@ -40,34 +40,32 @@
 #include <list>
 
 ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserImpl(owner, app, browser, tabNavigation, fileActionHandler,
-		preservedFolderState.folderSettings, nullptr)
+	ShellBrowserImpl(owner, app, browser, fileActionHandler, preservedFolderState.folderSettings,
+		nullptr)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
-		m_app->GetNavigationEvents(), tabNavigation, history, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
+		&m_navigationManager, m_app->GetNavigationEvents(), history, currentEntry);
 
 	ChangeToInitialFolder();
 }
 
 ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
-	const FolderColumns *initialColumns) :
-	ShellBrowserImpl(owner, app, browser, tabNavigation, fileActionHandler, folderSettings,
-		initialColumns)
-{
-	m_navigationController = std::make_unique<ShellNavigationController>(this, &m_navigationManager,
-		m_app->GetNavigationEvents(), tabNavigation, initialPidl);
-
-	ChangeToInitialFolder();
-}
-
-ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
+	ShellBrowserImpl(owner, app, browser, fileActionHandler, folderSettings, initialColumns)
+{
+	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
+		&m_navigationManager, m_app->GetNavigationEvents(), initialPidl);
+
+	ChangeToInitialFolder();
+}
+
+ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
+	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+	const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(owner)),
 	m_listView(GetHWND()),
 	m_owner(owner),
@@ -84,7 +82,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 			? app->GetRuntime()->GetUiThreadExecutor()
 			: app->GetRuntime()->GetInlineExecutor()),
 	m_progressCursor(LoadCursor(nullptr, IDC_APPSTARTING)),
-	m_tabNavigation(tabNavigation),
 	m_commandTarget(browser->GetCommandTargetManager(), this),
 	m_fileActionHandler(fileActionHandler),
 	m_fontSetter(GetHWND(), app->GetConfig()),

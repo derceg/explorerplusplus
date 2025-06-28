@@ -10,7 +10,6 @@
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
 #include "TabEvents.h"
-#include "TabNavigationMock.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -21,14 +20,13 @@ class TabTest : public Test
 protected:
 	Tab BuildTab(const Tab::InitialData &initialData = {})
 	{
-		return Tab(std::make_unique<ShellBrowserFake>(&m_navigationEvents, &m_tabNavigation),
-			&m_browser, nullptr, &m_tabEvents, initialData);
+		return Tab(std::make_unique<ShellBrowserFake>(&m_browser, &m_navigationEvents), &m_browser,
+			nullptr, &m_tabEvents, initialData);
 	}
 
 	NavigationEvents m_navigationEvents;
-	TabNavigationMock m_tabNavigation;
-	BrowserWindowMock m_browser;
 	TabEvents m_tabEvents;
+	BrowserWindowMock m_browser;
 };
 
 TEST_F(TabTest, InitialData)

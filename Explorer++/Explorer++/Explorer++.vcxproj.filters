@@ -1071,9 +1071,6 @@
     <ClInclude Include="ShellBrowser\PreservedFolderState.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="TabNavigationInterface.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\NavigateParams.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
