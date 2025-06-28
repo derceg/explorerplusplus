@@ -55,3 +55,18 @@ bool BrowserWindow::IsShellBrowserActive(const ShellBrowser *shellBrowser) const
 {
 	return shellBrowser == GetActiveShellBrowser();
 }
+
+void BrowserWindow::OpenDefaultItem()
+{
+	OpenDefaultItem(OpenFolderDisposition::CurrentTab);
+}
+
+void BrowserWindow::OpenItem(const std::wstring &itemPath)
+{
+	OpenItem(itemPath, OpenFolderDisposition::CurrentTab);
+}
+
+void BrowserWindow::OpenItem(PCIDLIST_ABSOLUTE pidlItem)
+{
+	OpenItem(pidlItem, OpenFolderDisposition::CurrentTab);
+}

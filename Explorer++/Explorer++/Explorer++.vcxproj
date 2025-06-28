@@ -1692,7 +1692,6 @@
     <ClInclude Include="DriveWatcher.h" />
     <ClInclude Include="FilesFoldersOptionsPage.h" />
     <ClInclude Include="GeneralOptionsPage.h" />
-    <ClInclude Include="Navigator.h" />
     <ClInclude Include="OptionsPage.h" />
     <ClInclude Include="SearchTabsDialog.h" />
     <ClInclude Include="ShellChangeWatcher.h" />

@@ -36,6 +36,10 @@ public:
 	const TabContainer *GetActiveTabContainer() const override;
 	void FocusActiveTab() override;
 	Tab *CreateTabFromPreservedTab(const PreservedTab *tab) override;
+	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;
+	void OpenItem(const std::wstring &itemPath,
+		OpenFolderDisposition openFolderDisposition) override;
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 	ShellBrowser *GetActiveShellBrowser() override;
 	const ShellBrowser *GetActiveShellBrowser() const override;
 	void StartMainToolbarCustomization() override;
@@ -47,12 +51,6 @@ public:
 	void Close() override;
 
 	using BrowserWindow::SetLifecycleState;
-
-	// Navigator
-	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;
-	void OpenItem(const std::wstring &itemPath,
-		OpenFolderDisposition openFolderDisposition) override;
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
 	// MenuHelpTextHost
 	boost::signals2::connection AddMenuHelpTextRequestObserver(

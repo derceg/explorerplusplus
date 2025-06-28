@@ -93,50 +93,6 @@ Tab *BrowserWindowFake::CreateTabFromPreservedTab(const PreservedTab *tab)
 	return &GetActiveTabContainer()->CreateNewTab(*tab);
 }
 
-ShellBrowser *BrowserWindowFake::GetActiveShellBrowser()
-{
-	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
-}
-
-const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
-{
-	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
-}
-
-void BrowserWindowFake::StartMainToolbarCustomization()
-{
-}
-
-std::optional<std::wstring> BrowserWindowFake::RequestMenuHelpText(HMENU menu, UINT id) const
-{
-	UNREFERENCED_PARAMETER(menu);
-	UNREFERENCED_PARAMETER(id);
-
-	return std::nullopt;
-}
-
-WindowStorageData BrowserWindowFake::GetStorageData() const
-{
-	return { {}, WindowShowState::Normal };
-}
-
-bool BrowserWindowFake::IsActive() const
-{
-	return false;
-}
-
-void BrowserWindowFake::Activate()
-{
-}
-
-void BrowserWindowFake::TryClose()
-{
-}
-
-void BrowserWindowFake::Close()
-{
-}
-
 void BrowserWindowFake::OpenDefaultItem(OpenFolderDisposition openFolderDisposition)
 {
 	UNREFERENCED_PARAMETER(openFolderDisposition);
@@ -219,6 +175,50 @@ void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::NewTabAlternate:
 		break;
 	}
+}
+
+ShellBrowser *BrowserWindowFake::GetActiveShellBrowser()
+{
+	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
+}
+
+const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
+{
+	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
+}
+
+void BrowserWindowFake::StartMainToolbarCustomization()
+{
+}
+
+std::optional<std::wstring> BrowserWindowFake::RequestMenuHelpText(HMENU menu, UINT id) const
+{
+	UNREFERENCED_PARAMETER(menu);
+	UNREFERENCED_PARAMETER(id);
+
+	return std::nullopt;
+}
+
+WindowStorageData BrowserWindowFake::GetStorageData() const
+{
+	return { {}, WindowShowState::Normal };
+}
+
+bool BrowserWindowFake::IsActive() const
+{
+	return false;
+}
+
+void BrowserWindowFake::Activate()
+{
+}
+
+void BrowserWindowFake::TryClose()
+{
+}
+
+void BrowserWindowFake::Close()
+{
 }
 
 boost::signals2::connection BrowserWindowFake::AddMenuHelpTextRequestObserver(

@@ -1257,9 +1257,6 @@
     <ClInclude Include="DarkModeManager.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
-    <ClInclude Include="Navigator.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="CrashHandlerHelper.h">
       <Filter>Core</Filter>
     </ClInclude>

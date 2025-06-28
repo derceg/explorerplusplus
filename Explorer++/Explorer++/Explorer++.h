@@ -96,6 +96,12 @@ public:
 	const TabContainer *GetActiveTabContainer() const override;
 	void FocusActiveTab() override;
 	Tab *CreateTabFromPreservedTab(const PreservedTab *tab) override;
+	using BrowserWindow::OpenDefaultItem;
+	using BrowserWindow::OpenItem;
+	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;
+	void OpenItem(const std::wstring &itemPath,
+		OpenFolderDisposition openFolderDisposition) override;
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
 	// Note that there is also GetActiveShellBrowserImpl() declared below. There are some places
 	// where this method can be used, as the calling code only uses methods from the ShellBrowser
@@ -299,14 +305,6 @@ private:
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
 	void OnTreeViewHolderResized(int newWidth);
-
-	// Navigator
-	using Navigator::OpenDefaultItem;
-	using Navigator::OpenItem;
-	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;
-	void OpenItem(const std::wstring &itemPath,
-		OpenFolderDisposition openFolderDisposition) override;
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
 	void OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition);
 

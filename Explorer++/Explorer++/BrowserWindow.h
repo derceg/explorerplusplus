@@ -5,9 +5,11 @@
 #pragma once
 
 #include "BrowserCommandTargetManager.h"
-#include "Navigator.h"
+#include "NavigationHelper.h"
 #include "../Helper/MenuHelpTextHost.h"
 #include <boost/signals2.hpp>
+#include <shtypes.h>
+#include <string>
 
 class BrowserCommandController;
 class BrowserPane;
@@ -18,7 +20,7 @@ class TabContainer;
 struct WindowStorageData;
 
 // Each browser window contains one or more browser panes, with each pane containing a set of tabs.
-class BrowserWindow : public Navigator, public MenuHelpTextHost
+class BrowserWindow : public MenuHelpTextHost
 {
 public:
 	enum class LifecycleState
@@ -57,6 +59,16 @@ public:
 	virtual const TabContainer *GetActiveTabContainer() const = 0;
 	virtual void FocusActiveTab() = 0;
 	virtual Tab *CreateTabFromPreservedTab(const PreservedTab *tab) = 0;
+
+	void OpenDefaultItem();
+	virtual void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) = 0;
+
+	void OpenItem(const std::wstring &itemPath);
+	virtual void OpenItem(const std::wstring &itemPath,
+		OpenFolderDisposition openFolderDisposition) = 0;
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem);
+	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition) = 0;
 
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;

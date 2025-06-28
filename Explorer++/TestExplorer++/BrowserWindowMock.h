@@ -21,6 +21,11 @@ public:
 	MOCK_METHOD(const TabContainer *, GetActiveTabContainer, (), (const, override));
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
 	MOCK_METHOD(Tab *, CreateTabFromPreservedTab, (const PreservedTab *tab), (override));
+	MOCK_METHOD(void, OpenDefaultItem, (OpenFolderDisposition openFolderDisposition), (override));
+	MOCK_METHOD(void, OpenItem,
+		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
+	MOCK_METHOD(void, OpenItem,
+		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(const ShellBrowser *, GetActiveShellBrowser, (), (const, override));
 	MOCK_METHOD(void, StartMainToolbarCustomization, (), (override));
@@ -31,13 +36,6 @@ public:
 	MOCK_METHOD(void, Activate, (), (override));
 	MOCK_METHOD(void, TryClose, (), (override));
 	MOCK_METHOD(void, Close, (), (override));
-
-	// Navigator
-	MOCK_METHOD(void, OpenDefaultItem, (OpenFolderDisposition openFolderDisposition), (override));
-	MOCK_METHOD(void, OpenItem,
-		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
-	MOCK_METHOD(void, OpenItem,
-		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
 
 	// MenuHelpTextHost
 	MOCK_METHOD(boost::signals2::connection, AddMenuHelpTextRequestObserver,
