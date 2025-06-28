@@ -117,7 +117,7 @@ void TabContextMenu::OnMenuItemSelected(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case IDM_TAB_CONTEXT_MENU_NEW_TAB:
-		m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true });
 		break;
 
 	case IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB:
@@ -176,7 +176,7 @@ void TabContextMenu::OnOpenParentInNewTab()
 	if (SUCCEEDED(hr))
 	{
 		auto navigateParams = NavigateParams::Normal(pidlParent.get());
-		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
+		m_tabContainer->CreateNewTab(navigateParams, { .selected = true });
 	}
 }
 

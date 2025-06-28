@@ -117,16 +117,15 @@ void Explorerplusplus::OnNewTab()
 			FolderColumns cols = selectedTab.GetShellBrowserImpl()->GetColumns();
 
 			auto navigateParams = NavigateParams::Normal(pidl.get());
-			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
-				TabSettings(_selected = true), nullptr, &cols);
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, { .selected = true },
+				nullptr, &cols);
 			return;
 		}
 	}
 
 	/* Either no items are selected, or the focused + selected item was not a
 	 * folder; open the default tab directory. */
-	GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory(
-		TabSettings(_selected = true));
+	GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory({ .selected = true });
 }
 
 void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
@@ -223,8 +222,8 @@ void Explorerplusplus::CreateCommandLineTabs()
 		}
 
 		auto navigateParams = NavigateParams::Normal(parentPidl.get());
-		Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
-			TabSettings(_selected = true));
+		Tab &newTab =
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, { .selected = true });
 
 		if (ArePidlsEquivalent(newTab.GetShellBrowserImpl()->GetDirectoryIdl().get(),
 				parentPidl.get()))
@@ -254,8 +253,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 			continue;
 		}
 
-		GetActivePane()->GetTabContainer()->CreateNewTab(*absolutePath,
-			TabSettings(_selected = true));
+		GetActivePane()->GetTabContainer()->CreateNewTab(*absolutePath, { .selected = true });
 	}
 }
 

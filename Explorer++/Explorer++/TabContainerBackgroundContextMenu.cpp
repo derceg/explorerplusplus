@@ -52,7 +52,7 @@ void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case IDM_TAB_CONTAINER_NEW_TAB:
-		m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true });
 		break;
 
 	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:

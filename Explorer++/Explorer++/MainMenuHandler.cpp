@@ -109,8 +109,8 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, std::size(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(szPath,
-				TabSettings(_selected = true));
+			Tab &newTab =
+				GetActivePane()->GetTabContainer()->CreateNewTab(szPath, { .selected = true });
 
 			if (newTab.GetShellBrowserImpl()->GetDirectoryPath() == szPath)
 			{

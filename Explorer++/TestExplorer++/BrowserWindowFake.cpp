@@ -206,7 +206,7 @@ void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::ForegroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		GetActiveTabContainer()->CreateNewTab(navigateParams, TabSettings(_selected = true));
+		GetActiveTabContainer()->CreateNewTab(navigateParams, { .selected = true });
 	}
 	break;
 

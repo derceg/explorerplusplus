@@ -16,7 +16,6 @@
     "boost-multi-index",
     "boost-numeric-conversion",
     "boost-outcome",
-    "boost-parameter",
     "boost-pfr",
     "boost-range",
     "boost-signals2",

@@ -14,7 +14,6 @@
 #include "TabViewDelegate.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclass.h"
-#include <boost/parameter.hpp>
 #include <functional>
 #include <optional>
 #include <unordered_map>
@@ -34,51 +33,16 @@ class ShellBrowserEvents;
 class ShellBrowserFactory;
 class TabRestorer;
 
-BOOST_PARAMETER_NAME(name)
-BOOST_PARAMETER_NAME(index)
-BOOST_PARAMETER_NAME(selected)
-BOOST_PARAMETER_NAME(lockState)
-
-// The use of Boost Parameter here allows values to be set by name
-// during construction. It would be better (and simpler) for this to be
-// done using designated initializers, but that feature's not due to be
-// introduced until C++20.
-struct TabSettingsImpl
+// Used when creating a tab.
+struct TabSettings
 {
-	template <class ArgumentPack>
-	TabSettingsImpl(const ArgumentPack &args)
-	{
-		name = args[_name | std::nullopt];
-		lockState = args[_lockState | std::nullopt];
-		index = args[_index | std::nullopt];
-		selected = args[_selected | std::nullopt];
-	}
-
 	std::optional<std::wstring> name;
 	std::optional<Tab::LockState> lockState;
 	std::optional<int> index;
 	std::optional<bool> selected;
 
 	// This is only used in tests.
-	bool operator==(const TabSettingsImpl &) const = default;
-};
-
-// Used when creating a tab.
-struct TabSettings : TabSettingsImpl
-{
-	// clang-format off
-	BOOST_PARAMETER_CONSTRUCTOR(
-		TabSettings,
-		(TabSettingsImpl),
-		tag,
-		(optional
-			(name, (std::wstring))
-			(lockState, (Tab::LockState))
-			(index, (int))
-			(selected, (bool))
-		)
-	)
-	// clang-format on
+	bool operator==(const TabSettings &) const = default;
 };
 
 class TabContainer : public ShellDropTargetWindow<int>, private TabViewDelegate

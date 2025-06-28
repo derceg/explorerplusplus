@@ -276,7 +276,7 @@ LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	switch (uMsg)
 	{
 	case WM_LBUTTONDBLCLK:
-		CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		CreateNewTabInDefaultDirectory({ .selected = true });
 		break;
 
 	case WM_RBUTTONUP:
@@ -374,7 +374,7 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 		finalIndex = static_cast<int>(m_tabs.size()) - 1;
 	}
 
-	TabSettings tabSettings(_index = finalIndex, _selected = true);
+	TabSettings tabSettings{ .index = finalIndex, .selected = true };
 
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 	auto navigateParams =

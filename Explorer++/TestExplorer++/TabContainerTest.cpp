@@ -560,7 +560,7 @@ TEST_F(TabContainerTest, SelectedSignalOnSelectedTabCreation)
 	const Tab *callbackTab = nullptr;
 	EXPECT_CALL(callback, Call(_))
 		.WillOnce([&callbackTab](const auto &selectedTab) { callbackTab = &selectedTab; });
-	const auto *tab2 = m_browser->AddTab(L"c:\\", TabSettings(_selected = true));
+	const auto *tab2 = m_browser->AddTab(L"c:\\", { .selected = true });
 	EXPECT_EQ(tab2, callbackTab);
 }
 

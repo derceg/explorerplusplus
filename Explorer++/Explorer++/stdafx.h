@@ -82,7 +82,6 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index_container.hpp>
-#include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 
 // glog/logging.h includes windows.h, which specifically needs to be included after Winsock2.h

@@ -201,8 +201,7 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::ForegroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
-			TabSettings(_selected = true));
+		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, { .selected = true });
 	}
 	break;
 
