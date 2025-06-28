@@ -6,13 +6,12 @@
 #include "ApplicationExecutorImpl.h"
 #include "Application.h"
 #include "ApplicationHelper.h"
-#include "CoreInterface.h"
+#include "BrowserWindow.h"
 
 namespace Applications
 {
 
-ApplicationExecutorImpl::ApplicationExecutorImpl(CoreInterface *coreInterface) :
-	m_coreInterface(coreInterface)
+ApplicationExecutorImpl::ApplicationExecutorImpl(BrowserWindow *browser) : m_browser(browser)
 {
 }
 
@@ -27,7 +26,7 @@ void ApplicationExecutorImpl::Execute(const Application *application, std::wstri
 		combinedParameters += L" " + extraParameters;
 	}
 
-	m_coreInterface->OpenFileItem(applicationInfo.application, combinedParameters.c_str());
+	m_browser->OpenFileItem(applicationInfo.application, combinedParameters.c_str());
 }
 
 }

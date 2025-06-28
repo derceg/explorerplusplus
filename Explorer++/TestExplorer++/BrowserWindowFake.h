@@ -40,6 +40,8 @@ public:
 	void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
+	void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) override;
+	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters) override;
 	ShellBrowser *GetActiveShellBrowser() override;
 	const ShellBrowser *GetActiveShellBrowser() const override;
 	void StartMainToolbarCustomization() override;

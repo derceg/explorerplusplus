@@ -119,7 +119,7 @@ void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	if (WI_IsFlagClear(attributes, SFGAO_FOLDER)
 		|| WI_AreAllFlagsSet(attributes, SFGAO_FOLDER | SFGAO_STREAM))
 	{
-		// The item is a file. No action is taken to open files here.
+		OpenFileItem(pidlItem, L"");
 		return;
 	}
 
@@ -175,6 +175,19 @@ void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::NewTabAlternate:
 		break;
 	}
+}
+
+void BrowserWindowFake::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
+{
+	auto pidl = CreateSimplePidlForTest(itemPath);
+	OpenFileItem(pidl.Raw(), parameters);
+}
+
+void BrowserWindowFake::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters)
+{
+	// No action is taken to open files here.
+	UNREFERENCED_PARAMETER(pidlItem);
+	UNREFERENCED_PARAMETER(parameters);
 }
 
 ShellBrowser *BrowserWindowFake::GetActiveShellBrowser()

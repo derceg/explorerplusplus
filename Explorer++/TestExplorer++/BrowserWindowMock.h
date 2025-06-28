@@ -26,6 +26,10 @@ public:
 		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
 	MOCK_METHOD(void, OpenItem,
 		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
+	MOCK_METHOD(void, OpenFileItem, (const std::wstring &itemPath, const std::wstring &parameters),
+		(override));
+	MOCK_METHOD(void, OpenFileItem, (PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters),
+		(override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(const ShellBrowser *, GetActiveShellBrowser, (), (const, override));
 	MOCK_METHOD(void, StartMainToolbarCustomization, (), (override));

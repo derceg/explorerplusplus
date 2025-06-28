@@ -7,7 +7,7 @@
 #include "ApplicationExecutor.h"
 #include <string>
 
-class CoreInterface;
+class BrowserWindow;
 
 namespace Applications
 {
@@ -22,12 +22,12 @@ public:
 	// ensures that the overload is directly visible to users of this class.
 	using ApplicationExecutor::Execute;
 
-	ApplicationExecutorImpl(CoreInterface *coreInterface);
+	ApplicationExecutorImpl(BrowserWindow *browser);
 
 	void Execute(const Application *application, std::wstring extraParameters) override;
 
 private:
-	CoreInterface *const m_coreInterface;
+	BrowserWindow *const m_browser;
 };
 
 }

@@ -63,12 +63,18 @@ public:
 	void OpenDefaultItem();
 	virtual void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) = 0;
 
+	// Opens the specified item, either by navigating to it (if it's a folder), or opening it
+	// externally (if it's a file).
 	void OpenItem(const std::wstring &itemPath);
 	virtual void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition) = 0;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem);
 	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition) = 0;
+
+	// Opens the specified item externally, regardless of whether it's a file or a folder.
+	virtual void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) = 0;
+	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters) = 0;
 
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;

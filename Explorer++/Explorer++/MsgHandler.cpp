@@ -241,10 +241,10 @@ void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wst
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
 }
 
-void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters)
+void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters)
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
-	ExecuteFileAction(m_hContainer, pidl, L"", parameters,
+	ExecuteFileAction(m_hContainer, pidlItem, L"", parameters,
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
 }
 
