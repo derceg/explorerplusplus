@@ -42,6 +42,7 @@ private:
 	bool IsCommandContextSensitive(int command) const;
 
 	bool CanStartCommandPrompt() const;
+	bool CanChangeMainFontSize(FontSizeType sizeType) const;
 
 	void OnSortBy(SortMode sortMode);
 	void OnCloseTab();

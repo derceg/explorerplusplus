@@ -76,6 +76,12 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_EDIT_WILDCARDDESELECT:
 		return GetActiveShellBrowser()->CanStartWildcardSelection(SelectionType::Deselect);
 
+	case IDM_VIEW_DECREASE_TEXT_SIZE:
+		return CanChangeMainFontSize(FontSizeType::Decrease);
+
+	case IDM_VIEW_INCREASE_TEXT_SIZE:
+		return CanChangeMainFontSize(FontSizeType::Increase);
+
 	case IDM_VIEW_AUTOSIZECOLUMNS:
 		return GetActiveShellBrowser()->CanAutoSizeColumns();
 
@@ -127,6 +133,25 @@ bool BrowserCommandController::CanStartCommandPrompt() const
 	}
 
 	return true;
+}
+
+bool BrowserCommandController::CanChangeMainFontSize(FontSizeType sizeType) const
+{
+	auto &mainFont = m_config->mainFont.get();
+
+	if (!mainFont)
+	{
+		return true;
+	}
+
+	if (sizeType == FontSizeType::Decrease)
+	{
+		return mainFont->GetSize() > CustomFont::MINIMUM_SIZE;
+	}
+	else
+	{
+		return mainFont->GetSize() < CustomFont::MAXIMUM_SIZE;
+	}
 }
 
 void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition disposition)

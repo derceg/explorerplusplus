@@ -82,6 +82,25 @@ TEST_F(BrowserCommandControllerTest, CopyFolderPath)
 	EXPECT_THAT(*clipboardText, StrCaseEq(path));
 }
 
+TEST_F(BrowserCommandControllerTest, CanChangeMainFontSize)
+{
+	m_config.mainFont = std::nullopt;
+	EXPECT_TRUE(m_commandController.IsCommandEnabled(IDM_VIEW_DECREASE_TEXT_SIZE));
+	EXPECT_TRUE(m_commandController.IsCommandEnabled(IDM_VIEW_INCREASE_TEXT_SIZE));
+
+	m_config.mainFont = CustomFont(L"Font name", CustomFont::MINIMUM_SIZE + 1);
+	EXPECT_TRUE(m_commandController.IsCommandEnabled(IDM_VIEW_DECREASE_TEXT_SIZE));
+	EXPECT_TRUE(m_commandController.IsCommandEnabled(IDM_VIEW_INCREASE_TEXT_SIZE));
+
+	m_config.mainFont = CustomFont(L"Font name", CustomFont::MINIMUM_SIZE);
+	EXPECT_FALSE(m_commandController.IsCommandEnabled(IDM_VIEW_DECREASE_TEXT_SIZE));
+	EXPECT_TRUE(m_commandController.IsCommandEnabled(IDM_VIEW_INCREASE_TEXT_SIZE));
+
+	m_config.mainFont = CustomFont(L"Font name", CustomFont::MAXIMUM_SIZE);
+	EXPECT_TRUE(m_commandController.IsCommandEnabled(IDM_VIEW_DECREASE_TEXT_SIZE));
+	EXPECT_FALSE(m_commandController.IsCommandEnabled(IDM_VIEW_INCREASE_TEXT_SIZE));
+}
+
 TEST_F(BrowserCommandControllerTest, ChangeMainFontSize)
 {
 	const std::wstring fontName = L"Font name";
