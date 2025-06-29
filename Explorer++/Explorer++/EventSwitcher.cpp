@@ -12,22 +12,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 
-void Explorerplusplus::OnCopyUniversalPaths() const
-{
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		OnListViewCopyUniversalPaths();
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		OnTreeViewCopyUniversalPaths();
-	}
-}
-
 void Explorerplusplus::OnSetFileAttributes() const
 {
 	HWND hFocus;

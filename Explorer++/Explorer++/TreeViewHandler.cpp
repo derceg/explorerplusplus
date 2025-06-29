@@ -11,7 +11,6 @@
 #include "ResourceLoader.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "../Helper/BulkClipboardWriter.h"
 
 void Explorerplusplus::CreateFolderControls()
 {
@@ -34,30 +33,6 @@ void Explorerplusplus::CreateFolderControls()
 	m_shellTreeView =
 		ShellTreeView::Create(m_treeViewHolder->GetHWND(), m_app, this, &m_fileActionHandler);
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
-}
-
-void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
-{
-	auto pidl = m_shellTreeView->GetSelectedNodePidl();
-
-	std::wstring fullFileName;
-	GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
-
-	UNIVERSAL_NAME_INFO uni;
-	DWORD dwBufferSize = sizeof(uni);
-	DWORD dwRet = WNetGetUniversalName(fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
-		(void **) &uni, &dwBufferSize);
-
-	BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
-
-	if (dwRet == NO_ERROR)
-	{
-		clipboardWriter.WriteText(uni.lpUniversalName);
-	}
-	else
-	{
-		clipboardWriter.WriteText(fullFileName);
-	}
 }
 
 void Explorerplusplus::OnTreeViewSetFileAttributes() const

@@ -19,7 +19,7 @@ TEST(ClipboardHelperTest, CopyItemPathsToClipboard)
 	items.push_back(CreateSimplePidlForTest(L"c:\\item1"));
 	items.push_back(CreateSimplePidlForTest(L"c:\\item2"));
 	items.push_back(CreateSimplePidlForTest(L"c:\\item3"));
-	CopyItemPathsToClipboard(&clipboardStore, items);
+	CopyItemPathsToClipboard(&clipboardStore, items, PathType::Parsing);
 
 	Clipboard clipboard(&clipboardStore);
 	auto clipboardText = clipboard.ReadText();

@@ -15,7 +15,7 @@
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
 #include "UpdateCheckDialog.h"
-#include "../Helper/BulkClipboardWriter.h"
+#include "../Helper/ClipboardHelper.h"
 #include "../Helper/DpiCompatibility.h"
 
 using namespace std::string_literals;
@@ -439,6 +439,7 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 	{
 	// These commands are context-sensitive (i.e. they depend on the active target).
 	case IDM_FILE_COPYITEMPATH:
+	case IDM_FILE_COPYUNIVERSALFILEPATHS:
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 	case IDM_FILE_RENAME:
@@ -511,18 +512,7 @@ void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 void BrowserCommandController::CopyFolderPath() const
 {
 	const auto *shellBrowser = GetActiveShellBrowser();
-
-	wil::unique_cotaskmem_string path;
-	HRESULT hr = SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(),
-		SIGDN_DESKTOPABSOLUTEPARSING, &path);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	BulkClipboardWriter clipboardWriter(m_clipboardStore);
-	clipboardWriter.WriteText(path.get());
+	CopyItemPathsToClipboard(m_clipboardStore, { shellBrowser->GetDirectory() }, PathType::Parsing);
 }
 
 void BrowserCommandController::OnChangeMainFontSize(FontSizeType sizeType)

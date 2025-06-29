@@ -20,7 +20,6 @@
 #include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
-#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
@@ -141,43 +140,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	}
 
 	return 0;
-}
-
-void Explorerplusplus::OnListViewCopyUniversalPaths() const
-{
-	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
-	{
-		return;
-	}
-
-	std::wstring strUniversalPaths;
-	int iItem = -1;
-
-	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-	{
-		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
-
-		TCHAR szBuffer[1024];
-
-		DWORD dwBufferSize = std::size(szBuffer);
-		auto *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
-		DWORD dwRet = WNetGetUniversalName(fullFilename.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
-			reinterpret_cast<LPVOID>(puni), &dwBufferSize);
-
-		if (dwRet == NO_ERROR)
-		{
-			strUniversalPaths += puni->lpUniversalName + std::wstring(_T("\r\n"));
-		}
-		else
-		{
-			strUniversalPaths += fullFilename + std::wstring(_T("\r\n"));
-		}
-	}
-
-	strUniversalPaths = strUniversalPaths.substr(0, strUniversalPaths.size() - 2);
-
-	BulkClipboardWriter clipboardWriter(m_app->GetClipboardStore());
-	clipboardWriter.WriteText(strUniversalPaths);
 }
 
 void Explorerplusplus::OnListViewSetFileAttributes() const

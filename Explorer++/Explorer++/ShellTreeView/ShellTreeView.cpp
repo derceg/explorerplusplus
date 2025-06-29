@@ -32,7 +32,6 @@
 #include "ShellTreeViewContextMenuDelegate.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
-#include "../Helper/ClipboardHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DriveInfo.h"
@@ -1502,6 +1501,7 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 	switch (command)
 	{
 	case IDM_FILE_COPYITEMPATH:
+	case IDM_FILE_COPYUNIVERSALFILEPATHS:
 		// There should always be a selected item, meaning it should always be possible to copy the
 		// item's path.
 		return true;
@@ -1533,7 +1533,11 @@ void ShellTreeView::ExecuteCommand(int command)
 	switch (command)
 	{
 	case IDM_FILE_COPYITEMPATH:
-		CopySelectedItemPath();
+		CopySelectedItemPath(PathType::Parsing);
+		break;
+
+	case IDM_FILE_COPYUNIVERSALFILEPATHS:
+		CopySelectedItemPath(PathType::UniversalPath);
 		break;
 
 	case IDM_FILE_DELETE:
@@ -1570,10 +1574,10 @@ void ShellTreeView::ExecuteCommand(int command)
 	}
 }
 
-void ShellTreeView::CopySelectedItemPath() const
+void ShellTreeView::CopySelectedItemPath(PathType pathType) const
 {
 	auto pidl = GetSelectedNodePidl();
-	CopyItemPathsToClipboard(m_app->GetClipboardStore(), { pidl.get() });
+	CopyItemPathsToClipboard(m_app->GetClipboardStore(), { pidl.get() }, pathType);
 }
 
 void ShellTreeView::CopySelectedItemToFolder(TransferAction action)

@@ -1183,6 +1183,7 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 	switch (command)
 	{
 	case IDM_FILE_COPYITEMPATH:
+	case IDM_FILE_COPYUNIVERSALFILEPATHS:
 		return ListView_GetSelectedCount(m_listView) > 0;
 
 	case IDM_FILE_DELETE:
@@ -1212,7 +1213,11 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 	switch (command)
 	{
 	case IDM_FILE_COPYITEMPATH:
-		CopySelectedItemPaths();
+		CopySelectedItemPaths(PathType::Parsing);
+		break;
+
+	case IDM_FILE_COPYUNIVERSALFILEPATHS:
+		CopySelectedItemPaths(PathType::UniversalPath);
 		break;
 
 	case IDM_FILE_DELETE:
@@ -1249,10 +1254,10 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 	}
 }
 
-void ShellBrowserImpl::CopySelectedItemPaths() const
+void ShellBrowserImpl::CopySelectedItemPaths(PathType pathType) const
 {
 	auto selectedItems = GetSelectedItemPidls();
-	CopyItemPathsToClipboard(m_app->GetClipboardStore(), selectedItems);
+	CopyItemPathsToClipboard(m_app->GetClipboardStore(), selectedItems, pathType);
 }
 
 bool ShellBrowserImpl::CanCreateNewFolder() const

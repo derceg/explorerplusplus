@@ -36,7 +36,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYITEMPATH,
 		m_commandController.IsCommandEnabled(IDM_FILE_COPYITEMPATH));
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYUNIVERSALFILEPATHS, AnyItemsSelected());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYUNIVERSALFILEPATHS,
+		m_commandController.IsCommandEnabled(IDM_FILE_COPYUNIVERSALFILEPATHS));
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SETFILEATTRIBUTES, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPT,
 		m_commandController.IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));

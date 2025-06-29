@@ -315,11 +315,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case IDM_FILE_COPYFOLDERPATH:
 	case IDM_FILE_COPYITEMPATH:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_FILE_COPYUNIVERSALFILEPATHS:
-		OnCopyUniversalPaths();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_FILE_COPYCOLUMNTEXT:

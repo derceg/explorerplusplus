@@ -216,7 +216,6 @@ private:
 	/* Main menu handlers. */
 	void OnNewTab();
 	void OnCloneWindow();
-	void OnCopyUniversalPaths() const;
 	void OnSetFileAttributes() const;
 	void OnPaste();
 	void OnPasteShortcut();
@@ -244,13 +243,11 @@ private:
 
 	/* ListView private message handlers. */
 	LRESULT OnListViewKeyDown(LPARAM lParam);
-	void OnListViewCopyUniversalPaths() const;
 	void OnListViewSetFileAttributes() const;
 	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
 	void OnTreeViewSetFileAttributes() const;
-	void OnTreeViewCopyUniversalPaths() const;
 
 	/* Tabs. */
 	void InitializeTabs();

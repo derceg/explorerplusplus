@@ -8,6 +8,70 @@
 #include "DragDropHelper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <wil/com.h>
+#include <optional>
+
+namespace
+{
+
+std::optional<std::wstring> GetParsingPath(const PidlAbsolute &pidl)
+{
+	wil::unique_cotaskmem_string path;
+	HRESULT hr = SHGetNameFromIDList(pidl.Raw(), SIGDN_DESKTOPABSOLUTEPARSING, &path);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	return path.get();
+}
+
+std::optional<std::wstring> GetUniversalPath(const PidlAbsolute &pidl)
+{
+	wil::unique_cotaskmem_string path;
+	HRESULT hr = SHGetNameFromIDList(pidl.Raw(), SIGDN_DESKTOPABSOLUTEPARSING, &path);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	DWORD size = sizeof(UNIVERSAL_NAME_INFO);
+	auto nameInfo = MakeUniqueVariableSizeStruct<UNIVERSAL_NAME_INFO>(size);
+	DWORD res = WNetGetUniversalName(path.get(), UNIVERSAL_NAME_INFO_LEVEL, nameInfo.get(), &size);
+
+	if (res == ERROR_MORE_DATA)
+	{
+		// If the item has a universal name, it's expected this branch will be taken, since the
+		// original size allocated isn't large enough to hold anything.
+		nameInfo = MakeUniqueVariableSizeStruct<UNIVERSAL_NAME_INFO>(size);
+		res = WNetGetUniversalName(path.get(), UNIVERSAL_NAME_INFO_LEVEL, nameInfo.get(), &size);
+	}
+
+	if (res != NO_ERROR)
+	{
+		return path.get();
+	}
+
+	return nameInfo->lpUniversalName;
+}
+
+std::optional<std::wstring> GetPathOfType(const PidlAbsolute &pidl, PathType pathType)
+{
+	switch (pathType)
+	{
+	case PathType::Parsing:
+		return GetParsingPath(pidl);
+
+	case PathType::UniversalPath:
+		return GetUniversalPath(pidl);
+	}
+
+	DCHECK(false);
+	return std::nullopt;
+}
+
+}
 
 bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
 	PasteType pasteType)
@@ -71,21 +135,20 @@ bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObj
 }
 
 void CopyItemPathsToClipboard(ClipboardStore *clipboardStore,
-	const std::vector<PidlAbsolute> &items)
+	const std::vector<PidlAbsolute> &items, PathType pathType)
 {
 	std::vector<std::wstring> paths;
 
 	for (const auto &item : items)
 	{
-		wil::unique_cotaskmem_string path;
-		HRESULT hr = SHGetNameFromIDList(item.Raw(), SIGDN_DESKTOPABSOLUTEPARSING, &path);
+		auto path = GetPathOfType(item, pathType);
 
-		if (FAILED(hr))
+		if (!path)
 		{
 			continue;
 		}
 
-		paths.push_back(path.get());
+		paths.push_back(*path);
 	}
 
 	if (paths.empty())

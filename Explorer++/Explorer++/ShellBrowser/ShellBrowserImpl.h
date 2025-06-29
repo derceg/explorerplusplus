@@ -17,6 +17,7 @@
 #include "ShellChangeWatcher.h"
 #include "SortModes.h"
 #include "ViewModes.h"
+#include "../Helper/ClipboardHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
@@ -460,7 +461,7 @@ private:
 	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
 
-	void CopySelectedItemPaths() const;
+	void CopySelectedItemPaths(PathType pathType) const;
 	void ShowPropertiesForSelectedItems() const;
 	void OpenSelectedItems();
 	void DeleteSelectedItems(bool permanent);

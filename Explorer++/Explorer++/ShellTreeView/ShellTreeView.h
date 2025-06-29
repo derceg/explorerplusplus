@@ -9,6 +9,7 @@
 #include "MainFontSetter.h"
 #include "ScopedBrowserCommandTarget.h"
 #include "ShellChangeWatcher.h"
+#include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ShellDropTargetWindow.h"
@@ -151,7 +152,7 @@ private:
 	void CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action);
 	void OnClipboardUpdate();
 
-	void CopySelectedItemPath() const;
+	void CopySelectedItemPath(PathType pathType) const;
 	void CopySelectedItemToFolder(TransferAction action);
 
 	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;

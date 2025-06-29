@@ -16,7 +16,13 @@ enum class PasteType
 	Shortcut
 };
 
+enum class PathType
+{
+	Parsing,
+	UniversalPath
+};
+
 bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
 	PasteType pasteType);
 void CopyItemPathsToClipboard(ClipboardStore *clipboardStore,
-	const std::vector<PidlAbsolute> &items);
+	const std::vector<PidlAbsolute> &items, PathType pathType);
