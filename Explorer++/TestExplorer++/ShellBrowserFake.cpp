@@ -188,6 +188,11 @@ void ShellBrowserFake::SelectItemsMatchingPattern(const std::wstring &pattern,
 	UNREFERENCED_PARAMETER(selectionType);
 }
 
+bool ShellBrowserFake::CanClearSelection() const
+{
+	return false;
+}
+
 void ShellBrowserFake::ClearSelection()
 {
 }

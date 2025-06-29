@@ -70,6 +70,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
 		return CanStartCommandPrompt();
 
+	case IDM_EDIT_SELECTNONE:
+		return GetActiveShellBrowser()->CanClearSelection();
+
 	case IDM_EDIT_WILDCARDDESELECT:
 		return GetActiveShellBrowser()->CanStartWildcardSelection(SelectionType::Deselect);
 

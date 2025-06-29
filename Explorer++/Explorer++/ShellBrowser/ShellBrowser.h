@@ -65,6 +65,7 @@ public:
 	virtual void StartWildcardSelection(SelectionType selectionType) = 0;
 	virtual void SelectItemsMatchingPattern(const std::wstring &pattern,
 		SelectionType selectionType) = 0;
+	virtual bool CanClearSelection() const = 0;
 	virtual void ClearSelection() = 0;
 
 	virtual std::wstring GetFilterText() const = 0;

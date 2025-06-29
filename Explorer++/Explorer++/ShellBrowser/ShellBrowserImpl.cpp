@@ -1456,6 +1456,11 @@ void ShellBrowserImpl::SelectItemsMatchingPattern(const std::wstring &pattern,
 	}
 }
 
+bool ShellBrowserImpl::CanClearSelection() const
+{
+	return ListView_GetSelectedCount(m_listView) > 0;
+}
+
 void ShellBrowserImpl::ClearSelection()
 {
 	ListViewHelper::SelectAllItems(m_listView, false);

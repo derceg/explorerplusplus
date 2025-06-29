@@ -60,6 +60,7 @@ public:
 	void StartWildcardSelection(SelectionType selectionType) override;
 	void SelectItemsMatchingPattern(const std::wstring &pattern,
 		SelectionType selectionType) override;
+	bool CanClearSelection() const override;
 	void ClearSelection() override;
 	std::wstring GetFilterText() const override;
 	void SetFilterText(const std::wstring &filter) override;
