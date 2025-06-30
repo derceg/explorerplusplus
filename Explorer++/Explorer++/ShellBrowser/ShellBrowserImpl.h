@@ -152,8 +152,6 @@ public:
 	void SetCurrentColumns(const std::vector<Column_t> &columns);
 	static SortMode DetermineColumnSortMode(ColumnType columnType);
 
-	void SetFileAttributesForSelection();
-
 	void SelectItems(const std::vector<PidlAbsolute> &pidls);
 	uint64_t GetTotalDirectorySize();
 	uint64_t GetSelectionSize();
@@ -463,6 +461,7 @@ private:
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
 
 	void CopySelectedItemPaths(PathType pathType) const;
+	void SetFileAttributesForSelectedItems();
 	void ShowPropertiesForSelectedItems() const;
 	void OpenSelectedItems();
 	void DeleteSelectedItems(bool permanent);

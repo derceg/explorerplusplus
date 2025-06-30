@@ -20,6 +20,7 @@
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "Config.h"
+#include "DialogHelper.h"
 #include "FileOperations.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
@@ -1506,6 +1507,10 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 		// item's path.
 		return true;
 
+	case IDM_FILE_SETFILEATTRIBUTES:
+		return DialogHelper::CanShowSetFileAttributesDialogForItems(
+			{ GetSelectedNodePidl().get() });
+
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_CANDELETE);
@@ -1538,6 +1543,10 @@ void ShellTreeView::ExecuteCommand(int command)
 
 	case IDM_FILE_COPYUNIVERSALFILEPATHS:
 		CopySelectedItemPath(PathType::UniversalPath);
+		break;
+
+	case IDM_FILE_SETFILEATTRIBUTES:
+		SetFileAttributesForSelectedItem();
 		break;
 
 	case IDM_FILE_DELETE:
@@ -1578,6 +1587,13 @@ void ShellTreeView::CopySelectedItemPath(PathType pathType) const
 {
 	auto pidl = GetSelectedNodePidl();
 	CopyItemPathsToClipboard(m_app->GetClipboardStore(), { pidl.get() }, pathType);
+}
+
+void ShellTreeView::SetFileAttributesForSelectedItem()
+{
+	auto pidl = GetSelectedNodePidl();
+	DialogHelper::MaybeShowSetFileAttributesDialog(m_app->GetResourceLoader(), m_browser->GetHWND(),
+		{ { pidl.get() } });
 }
 
 void ShellTreeView::CopySelectedItemToFolder(TransferAction action)

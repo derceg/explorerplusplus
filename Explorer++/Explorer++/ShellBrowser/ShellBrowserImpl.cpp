@@ -10,6 +10,7 @@
 #include "ColorRuleModel.h"
 #include "ColumnDataRetrieval.h"
 #include "Config.h"
+#include "DialogHelper.h"
 #include "DirectoryOperationsHelper.h"
 #include "FileOperations.h"
 #include "FileProgressSink.h"
@@ -1186,6 +1187,9 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 	case IDM_FILE_COPYUNIVERSALFILEPATHS:
 		return ListView_GetSelectedCount(m_listView) > 0;
 
+	case IDM_FILE_SETFILEATTRIBUTES:
+		return DialogHelper::CanShowSetFileAttributesDialogForItems(GetSelectedItemPidls());
+
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETEPERMANENTLY:
 		return DoAllSelectedItemsHaveAttributes(SFGAO_CANDELETE);
@@ -1218,6 +1222,10 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 
 	case IDM_FILE_COPYUNIVERSALFILEPATHS:
 		CopySelectedItemPaths(PathType::UniversalPath);
+		break;
+
+	case IDM_FILE_SETFILEATTRIBUTES:
+		SetFileAttributesForSelectedItems();
 		break;
 
 	case IDM_FILE_DELETE:
@@ -1258,6 +1266,21 @@ void ShellBrowserImpl::CopySelectedItemPaths(PathType pathType) const
 {
 	auto selectedItems = GetSelectedItemPidls();
 	CopyItemPathsToClipboard(m_app->GetClipboardStore(), selectedItems, pathType);
+}
+
+void ShellBrowserImpl::SetFileAttributesForSelectedItems()
+{
+	std::vector<DialogHelper::ItemPidlAndFindData> selectedItems;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_listView, index, LVNI_SELECTED)) != -1)
+	{
+		const ItemInfo_t &item = GetItemByIndex(index);
+		selectedItems.emplace_back(item.pidlComplete, item.wfd);
+	}
+
+	DialogHelper::MaybeShowSetFileAttributesDialog(m_app->GetResourceLoader(), m_owner,
+		selectedItems);
 }
 
 bool ShellBrowserImpl::CanCreateNewFolder() const

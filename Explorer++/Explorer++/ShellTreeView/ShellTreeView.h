@@ -153,6 +153,7 @@ private:
 	void OnClipboardUpdate();
 
 	void CopySelectedItemPath(PathType pathType) const;
+	void SetFileAttributesForSelectedItem();
 	void CopySelectedItemToFolder(TransferAction action);
 
 	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;

@@ -216,7 +216,6 @@ private:
 	/* Main menu handlers. */
 	void OnNewTab();
 	void OnCloneWindow();
-	void OnSetFileAttributes() const;
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnResolveLink();
@@ -243,11 +242,7 @@ private:
 
 	/* ListView private message handlers. */
 	LRESULT OnListViewKeyDown(LPARAM lParam);
-	void OnListViewSetFileAttributes() const;
 	void OnListViewPaste();
-
-	/* TreeView private message handlers. */
-	void OnTreeViewSetFileAttributes() const;
 
 	/* Tabs. */
 	void InitializeTabs();
@@ -313,7 +308,6 @@ private:
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
 	/* File selection tests. */
-	BOOL AnyItemsSelected() const;
 	BOOL CanPaste(PasteType pasteType) const override;
 	bool CanPasteLink() const;
 	PidlAbsolute MaybeGetFocusedDirectory() const;

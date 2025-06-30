@@ -4,15 +4,29 @@
 
 #pragma once
 
-#include <msxml.h>
+#include "../Helper/PidlHelper.h"
+#include <optional>
+#include <vector>
+
+class ResourceLoader;
 
 namespace DialogHelper
 {
 
-void LoadDialogStatesFromRegistry(HKEY applicationKey);
-void SaveDialogStatesToRegistry(HKEY applicationKey);
+struct ItemPidlAndFindData
+{
+	ItemPidlAndFindData(const PidlAbsolute &pidl, std::optional<WIN32_FIND_DATA> findData = {}) :
+		pidl(pidl),
+		findData(findData)
+	{
+	}
 
-void LoadDialogStatesFromXML(IXMLDOMDocument *xmlDocument);
-void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode);
+	PidlAbsolute pidl;
+	std::optional<WIN32_FIND_DATA> findData;
+};
+
+bool CanShowSetFileAttributesDialogForItems(const std::vector<PidlAbsolute> &pidls);
+void MaybeShowSetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND parent,
+	const std::vector<ItemPidlAndFindData> &items);
 
 }

@@ -6,17 +6,15 @@
 #include "SetFileAttributesDialog.h"
 #include "MainResource.h"
 #include "../Helper/TimeHelper.h"
-#include <list>
 
 const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
 SetFileAttributesDialog::SetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
-	BaseDialog(resourceLoader, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None)
+	const std::vector<SetFileAttributesItem> &items) :
+	BaseDialog(resourceLoader, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None),
+	m_items(items)
 {
-	assert(!sfaiList.empty());
-
-	m_FileList = sfaiList;
+	CHECK(!m_items.empty());
 
 	m_psfadps = &SetFileAttributesDialogPersistentSettings::GetInstance();
 }
@@ -26,54 +24,56 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	InitializeAttributesStructure();
 	InitializeDateFields();
 
-	int nItems = static_cast<int>(m_FileList.size());
+	int numItems = static_cast<int>(m_items.size());
 
-	int nArchived = 0;
-	int nHidden = 0;
-	int nSystem = 0;
-	int nReadOnly = 0;
-	int nNotIndexed = 0;
+	int numArchived = 0;
+	int numHidden = 0;
+	int numSystem = 0;
+	int numReadOnly = 0;
+	int numNotIndexed = 0;
 
-	for (const auto &file : m_FileList)
+	for (const auto &item : m_items)
 	{
-		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_ARCHIVE))
+		if (WI_IsFlagSet(item.findData.dwFileAttributes, FILE_ATTRIBUTE_ARCHIVE))
 		{
-			nArchived++;
+			numArchived++;
 		}
 
-		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
+		if (WI_IsFlagSet(item.findData.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
 		{
-			nHidden++;
+			numHidden++;
 		}
 
-		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_SYSTEM))
+		if (WI_IsFlagSet(item.findData.dwFileAttributes, FILE_ATTRIBUTE_SYSTEM))
 		{
-			nSystem++;
+			numSystem++;
 		}
 
-		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_READONLY))
+		if (WI_IsFlagSet(item.findData.dwFileAttributes, FILE_ATTRIBUTE_READONLY))
 		{
-			nReadOnly++;
+			numReadOnly++;
 		}
 
-		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
+		if (WI_IsFlagSet(item.findData.dwFileAttributes, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
 		{
-			nNotIndexed++;
+			numNotIndexed++;
 		}
 	}
 
-	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_ARCHIVE), nArchived == 0 || nArchived == nItems);
-	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_HIDDEN), nHidden == 0 || nHidden == nItems);
-	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_SYSTEM), nSystem == 0 || nSystem == nItems);
-	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_READONLY), nReadOnly == 0 || nReadOnly == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_ARCHIVE),
+		numArchived == 0 || numArchived == numItems);
+	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_HIDDEN), numHidden == 0 || numHidden == numItems);
+	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_SYSTEM), numSystem == 0 || numSystem == numItems);
+	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_READONLY),
+		numReadOnly == 0 || numReadOnly == numItems);
 	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_NOT_INDEXED),
-		nNotIndexed == 0 || nNotIndexed == nItems);
+		numNotIndexed == 0 || numNotIndexed == numItems);
 
-	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_ARCHIVE), nArchived, nItems);
-	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_HIDDEN), nHidden, nItems);
-	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_SYSTEM), nSystem, nItems);
-	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_READONLY), nReadOnly, nItems);
-	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_NOT_INDEXED), nNotIndexed, nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_ARCHIVE), numArchived, numItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_HIDDEN), numHidden, numItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_SYSTEM), numSystem, numItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_READONLY), numReadOnly, numItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_NOT_INDEXED), numNotIndexed, numItems);
 
 	m_bModificationDateEnabled = FALSE;
 	m_bCreationDateEnabled = FALSE;
@@ -86,12 +86,12 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 
 void SetFileAttributesDialog::InitializeDateFields()
 {
-	WIN32_FIND_DATA *pwfd = &(m_FileList.begin()->wfd);
+	const auto &firstItem = m_items[0];
 
 	/* Use the dates of the first file... */
-	FileTimeToLocalSystemTime(&pwfd->ftLastWriteTime, &m_LocalWrite);
-	FileTimeToLocalSystemTime(&pwfd->ftCreationTime, &m_LocalCreation);
-	FileTimeToLocalSystemTime(&pwfd->ftLastAccessTime, &m_LocalAccess);
+	FileTimeToLocalSystemTime(&firstItem.findData.ftLastWriteTime, &m_LocalWrite);
+	FileTimeToLocalSystemTime(&firstItem.findData.ftCreationTime, &m_LocalCreation);
+	FileTimeToLocalSystemTime(&firstItem.findData.ftLastAccessTime, &m_LocalAccess);
 
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg, IDC_MODIFICATIONDATE), GDT_VALID, &m_LocalWrite);
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg, IDC_MODIFICATIONTIME), GDT_VALID, &m_LocalWrite);
@@ -283,7 +283,7 @@ void SetFileAttributesDialog::OnOk()
 		}
 	}
 
-	for (const auto &file : m_FileList)
+	for (const auto &item : m_items)
 	{
 		fileAttributes = allFileAttributes;
 
@@ -294,16 +294,16 @@ void SetFileAttributesDialog::OnOk()
 			initially, it will still have it applied, and vice versa). */
 			if (attribute.uChecked == BST_INDETERMINATE)
 			{
-				if (file.wfd.dwFileAttributes & attribute.Attribute)
+				if (item.findData.dwFileAttributes & attribute.Attribute)
 				{
 					fileAttributes |= attribute.Attribute;
 				}
 			}
 		}
 
-		SetFileAttributes(file.szFullFileName, fileAttributes);
+		SetFileAttributes(item.path.c_str(), fileAttributes);
 
-		HANDLE hFile = CreateFile(file.szFullFileName, FILE_WRITE_ATTRIBUTES, 0, nullptr,
+		HANDLE hFile = CreateFile(item.path.c_str(), FILE_WRITE_ATTRIBUTES, 0, nullptr,
 			OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
 		if (hFile != INVALID_HANDLE_VALUE)

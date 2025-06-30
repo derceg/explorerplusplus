@@ -22,7 +22,6 @@
 #include "ResourceLoader.h"
 #include "SelectColumnsDialog.h"
 #include "ServiceProvider.h"
-#include "SetFileAttributesDialog.h"
 #include "ShellBrowserContextMenuDelegate.h"
 #include "ShellNavigationController.h"
 #include "ShellView.h"
@@ -1179,28 +1178,6 @@ void ShellBrowserImpl::OnColumnMenuItemSelected(int menuItemId,
 	{
 		m_navigationController->Refresh();
 	}
-}
-
-void ShellBrowserImpl::SetFileAttributesForSelection()
-{
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
-	int index = -1;
-
-	while ((index = ListView_GetNextItem(m_listView, index, LVNI_SELECTED)) != -1)
-	{
-		NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
-
-		const ItemInfo_t &item = GetItemByIndex(index);
-		sfai.wfd = item.wfd;
-		StringCchCopy(sfai.szFullFileName, std::size(sfai.szFullFileName),
-			item.parsingName.c_str());
-
-		sfaiList.push_back(sfai);
-	}
-
-	SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(), m_listView,
-		sfaiList);
-	setFileAttributesDialog.ShowModalDialog();
 }
 
 bool ShellBrowserImpl::DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const

@@ -1208,6 +1208,7 @@
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
+    <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
@@ -1394,7 +1395,7 @@
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
-    <ClCompile Include="DialogHelper.cpp" />
+    <ClCompile Include="DialogStorageHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
     <ClCompile Include="DisplayWindow.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
@@ -1537,6 +1538,7 @@
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
+    <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="IconModel.h" />
     <ClInclude Include="IconUpdateCallback.h" />
@@ -1684,7 +1686,7 @@
     <ClInclude Include="TabXmlStorage.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
-    <ClInclude Include="DialogHelper.h" />
+    <ClInclude Include="DialogStorageHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />

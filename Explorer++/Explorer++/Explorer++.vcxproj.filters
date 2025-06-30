@@ -7,7 +7,7 @@
     <ClCompile Include="TabHandler.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="DialogHelper.cpp">
+    <ClCompile Include="DialogStorageHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="AboutDialog.cpp">
@@ -868,6 +868,9 @@
     <ClCompile Include="TabContainerBackgroundContextMenu.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
+    <ClCompile Include="DialogHelper.cpp">
+      <Filter>Dialog Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1287,7 +1290,7 @@
     <ClInclude Include="ColorRuleModelFactory.h">
       <Filter>Color Rules</Filter>
     </ClInclude>
-    <ClInclude Include="DialogHelper.h">
+    <ClInclude Include="DialogStorageHelper.h">
       <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="ShellTreeView\ShellTreeNode.h">
@@ -1817,6 +1820,9 @@
     </ClInclude>
     <ClInclude Include="TabContainerBackgroundContextMenu.h">
       <Filter>Tabs\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogHelper.h">
+      <Filter>Dialog Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

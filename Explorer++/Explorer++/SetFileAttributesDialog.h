@@ -7,15 +7,7 @@
 #include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <list>
-
-namespace NSetFileAttributesDialogExternal
-{
-struct SetFileAttributesInfo
-{
-	TCHAR szFullFileName[MAX_PATH];
-	WIN32_FIND_DATA wfd;
-};
-}
+#include <vector>
 
 class SetFileAttributesDialog;
 
@@ -37,11 +29,23 @@ private:
 		const SetFileAttributesDialogPersistentSettings &) = delete;
 };
 
+struct SetFileAttributesItem
+{
+	SetFileAttributesItem(const std::wstring &path, const WIN32_FIND_DATA &findData) :
+		path(path),
+		findData(findData)
+	{
+	}
+
+	std::wstring path;
+	WIN32_FIND_DATA findData;
+};
+
 class SetFileAttributesDialog : public BaseDialog
 {
 public:
 	SetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND hParent,
-		const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList);
+		const std::vector<SetFileAttributesItem> &items);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -76,7 +80,7 @@ private:
 	void OnOk();
 	void OnCancel();
 
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> m_FileList;
+	const std::vector<SetFileAttributesItem> m_items;
 	std::list<Attribute_t> m_AttributeList;
 
 	SetFileAttributesDialogPersistentSettings *m_psfadps;

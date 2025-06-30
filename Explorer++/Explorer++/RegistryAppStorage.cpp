@@ -9,7 +9,7 @@
 #include "ColorRuleRegistryStorage.h"
 #include "ConfigRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
-#include "DialogHelper.h"
+#include "DialogStorageHelper.h"
 #include "FrequentLocationsRegistryStorage.h"
 #include "MainRebarStorage.h"
 #include "TabStorage.h"
@@ -48,7 +48,7 @@ void RegistryAppStorage::LoadApplications(Applications::ApplicationModel *model)
 
 void RegistryAppStorage::LoadDialogStates()
 {
-	DialogHelper::LoadDialogStatesFromRegistry(m_applicationKey.get());
+	DialogStorageHelper::LoadDialogStatesFromRegistry(m_applicationKey.get());
 }
 
 void RegistryAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
@@ -88,7 +88,7 @@ void RegistryAppStorage::SaveApplications(const Applications::ApplicationModel *
 
 void RegistryAppStorage::SaveDialogStates()
 {
-	DialogHelper::SaveDialogStatesToRegistry(m_applicationKey.get());
+	DialogStorageHelper::SaveDialogStatesToRegistry(m_applicationKey.get());
 }
 
 void RegistryAppStorage::SaveDefaultColumns(const FolderColumns &defaultColumns)

@@ -9,32 +9,6 @@
 #include "DirectoryOperationsHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainer.h"
-#include "../Helper/ClipboardHelper.h"
-
-BOOL Explorerplusplus::AnyItemsSelected() const
-{
-	HWND hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-
-		if (ListView_GetSelectedCount(selectedTab.GetShellBrowserImpl()->GetListView()) > 0)
-		{
-			return TRUE;
-		}
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		if (TreeView_GetSelection(m_shellTreeView->GetHWND()) != nullptr)
-		{
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
 
 BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 {

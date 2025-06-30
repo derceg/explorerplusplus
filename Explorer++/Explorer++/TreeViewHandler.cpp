@@ -9,7 +9,6 @@
 #include "HolderWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 
 void Explorerplusplus::CreateFolderControls()
@@ -33,35 +32,6 @@ void Explorerplusplus::CreateFolderControls()
 	m_shellTreeView =
 		ShellTreeView::Create(m_treeViewHolder->GetHWND(), m_app, this, &m_fileActionHandler);
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
-}
-
-void Explorerplusplus::OnTreeViewSetFileAttributes() const
-{
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
-	NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
-
-	auto pidlItem = m_shellTreeView->GetSelectedNodePidl();
-
-	std::wstring fullFileName;
-	HRESULT hr = GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, fullFileName);
-
-	if (hr == S_OK)
-	{
-		StringCchCopy(sfai.szFullFileName, std::size(sfai.szFullFileName), fullFileName.c_str());
-
-		HANDLE hFindFile = FindFirstFile(sfai.szFullFileName, &sfai.wfd);
-
-		if (hFindFile != INVALID_HANDLE_VALUE)
-		{
-			FindClose(hFindFile);
-
-			sfaiList.push_back(sfai);
-
-			SetFileAttributesDialog setFileAttributesDialog(m_app->GetResourceLoader(),
-				m_hContainer, sfaiList);
-			setFileAttributesDialog.ShowModalDialog();
-		}
-	}
 }
 
 void Explorerplusplus::OnTreeViewHolderResized(int newWidth)

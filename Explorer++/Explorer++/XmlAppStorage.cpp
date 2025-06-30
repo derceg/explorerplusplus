@@ -9,7 +9,7 @@
 #include "ColorRuleXmlStorage.h"
 #include "ConfigXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
-#include "DialogHelper.h"
+#include "DialogStorageHelper.h"
 #include "FrequentLocationsXmlStorage.h"
 #include "MainRebarStorage.h"
 #include "TabStorage.h"
@@ -54,7 +54,7 @@ void XmlAppStorage::LoadApplications(Applications::ApplicationModel *model)
 
 void XmlAppStorage::LoadDialogStates()
 {
-	DialogHelper::LoadDialogStatesFromXML(m_xmlDocument.get());
+	DialogStorageHelper::LoadDialogStatesFromXML(m_xmlDocument.get());
 }
 
 void XmlAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
@@ -94,7 +94,7 @@ void XmlAppStorage::SaveApplications(const Applications::ApplicationModel *model
 
 void XmlAppStorage::SaveDialogStates()
 {
-	DialogHelper::SaveDialogStatesToXML(m_xmlDocument.get(), m_rootNode.get());
+	DialogStorageHelper::SaveDialogStatesToXML(m_xmlDocument.get(), m_rootNode.get());
 }
 
 void XmlAppStorage::SaveDefaultColumns(const FolderColumns &defaultColumns)

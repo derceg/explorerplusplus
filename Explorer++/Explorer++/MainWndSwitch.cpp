@@ -324,7 +324,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDM_FILE_SETFILEATTRIBUTES:
-		OnSetFileAttributes();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case MainToolbarButton::Delete:

@@ -12,7 +12,6 @@
 #include "MainToolbar.h"
 #include "ResourceHelper.h"
 #include "ServiceProvider.h"
-#include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -140,12 +139,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	}
 
 	return 0;
-}
-
-void Explorerplusplus::OnListViewSetFileAttributes() const
-{
-	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->SetFileAttributesForSelection();
 }
 
 void Explorerplusplus::OnListViewPaste()
