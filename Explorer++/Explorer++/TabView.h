@@ -178,6 +178,10 @@ private:
 	std::unique_ptr<MainFontSetter> m_tooltipFontSetter;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
+	// This will only be set after the left mouse button has gone down on a tab, but before a drag
+	// has been initiated.
+	std::optional<POINT> m_leftButtonDownPoint;
+
 	// A value will only be assigned here whilst a tab is being dragged.
 	std::optional<TabDragState> m_tabDragState;
 

@@ -7,6 +7,7 @@
 #include "SystemFontHelper.h"
 #include "TabViewDelegate.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
@@ -399,22 +400,38 @@ void TabView::OnLeftButtonDown(const POINT &pt)
 
 	SetCapture(m_hwnd);
 
-	DCHECK(!m_tabDragState);
-	m_tabDragState = { TabDragAnchor::None };
+	DCHECK(!m_leftButtonDownPoint);
+	m_leftButtonDownPoint = pt;
 }
 
 void TabView::OnLeftButtonUp()
 {
-	if (!m_tabDragState)
-	{
-		return;
-	}
-
 	ReleaseCapture();
 }
 
 void TabView::OnMouseMove(const POINT &pt)
 {
+	if (m_leftButtonDownPoint)
+	{
+		auto &dpiCompat = DpiCompatibility::GetInstance();
+		UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
+
+		RECT rect = { m_leftButtonDownPoint->x, m_leftButtonDownPoint->y, m_leftButtonDownPoint->x,
+			m_leftButtonDownPoint->y };
+		InflateRect(&rect, dpiCompat.GetSystemMetricsForDpi(SM_CXDRAG, dpi),
+			dpiCompat.GetSystemMetricsForDpi(SM_CYDRAG, dpi));
+
+		if (PtInRect(&rect, pt))
+		{
+			return;
+		}
+
+		m_leftButtonDownPoint.reset();
+
+		DCHECK(!m_tabDragState);
+		m_tabDragState = { TabDragAnchor::None };
+	}
+
 	if (!m_tabDragState)
 	{
 		return;
@@ -487,6 +504,7 @@ void TabView::OnCaptureChanged(HWND target)
 {
 	if (target != m_hwnd)
 	{
+		m_leftButtonDownPoint.reset();
 		m_tabDragState.reset();
 		m_middleClickItemIndex.reset();
 	}
