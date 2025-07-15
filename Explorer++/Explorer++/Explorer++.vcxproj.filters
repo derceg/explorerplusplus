@@ -76,9 +76,6 @@
     <ClCompile Include="IDropFilesCallback.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="TreeViewHandler.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="TaskbarThumbnails.cpp">
       <Filter>Core</Filter>
     </ClCompile>

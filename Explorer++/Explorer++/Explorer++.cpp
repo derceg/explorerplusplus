@@ -13,6 +13,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
+#include "HolderWindow.h"
 #include "MainFontSetter.h"
 #include "MainMenuSubMenuView.h"
 #include "MainRebarStorage.h"
@@ -24,6 +25,7 @@
 #include "Plugins/PluginManager.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellTreeView/ShellTreeView.h"
 #include "StatusBar.h"
 #include "StatusBarView.h"
 #include "TabRestorer.h"
@@ -202,6 +204,36 @@ void Explorerplusplus::InitializeDisplayWindow()
 	m_displayWindow = DisplayWindow::Create(m_hContainer, m_config);
 
 	ApplyDisplayWindowPosition();
+}
+
+void Explorerplusplus::CreateFolderControls()
+{
+	UINT holderStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+
+	if (m_config->showFolders.get())
+	{
+		holderStyle |= WS_VISIBLE;
+	}
+
+	m_treeViewHolder = HolderWindow::Create(m_hContainer,
+		m_app->GetResourceLoader()->LoadString(IDS_FOLDERS_WINDOW_TEXT), holderStyle,
+		m_app->GetResourceLoader()->LoadString(IDS_HIDE_FOLDERS_PANE), m_app->GetConfig(),
+		m_app->GetResourceLoader(), m_app->GetDarkModeManager(), m_app->GetDarkModeColorProvider());
+	m_treeViewHolder->SetCloseButtonClickedCallback(
+		[this]() { m_config->showFolders = !m_config->showFolders.get(); });
+	m_treeViewHolder->SetResizedCallback(
+		std::bind_front(&Explorerplusplus::OnTreeViewHolderResized, this));
+
+	m_shellTreeView =
+		ShellTreeView::Create(m_treeViewHolder->GetHWND(), m_app, this, &m_fileActionHandler);
+	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
+}
+
+void Explorerplusplus::OnTreeViewHolderResized(int newWidth)
+{
+	m_treeViewWidth = newWidth;
+
+	UpdateLayout();
 }
 
 Tab *Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)

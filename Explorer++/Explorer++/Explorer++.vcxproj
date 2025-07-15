@@ -1500,7 +1500,6 @@
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="ThirdPartyCreditsDialog.cpp" />
-    <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="UpdateCheckDialog.cpp" />
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="Version.cpp" />
