@@ -486,26 +486,16 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 
 bool TabContainer::CloseTab(const Tab &tab)
 {
-	const int nTabs = GetNumTabs();
-
-	if (nTabs == 1)
-	{
-		if (m_config->closeMainWindowOnTabClose)
-		{
-			m_browser->Close();
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/* The tab is locked. Don't close it. */
 	if (tab.GetLockState() == Tab::LockState::Locked
 		|| tab.GetLockState() == Tab::LockState::AddressLocked)
 	{
 		return false;
+	}
+
+	if (GetNumTabs() == 1)
+	{
+		m_browser->Close();
+		return true;
 	}
 
 	m_tabEvents->NotifyPreRemoval(tab, GetTabIndex(tab));

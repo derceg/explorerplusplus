@@ -62,7 +62,6 @@ struct Config
 	ValueWrapper<bool> useLargeToolbarIcons = false;
 	bool overwriteExistingFilesConfirmation = true;
 	ValueWrapper<bool> checkBoxSelection = false;
-	bool closeMainWindowOnTabClose = true;
 	bool confirmCloseTabs = false;
 	ValueWrapper<bool> synchronizeTreeview = true;
 	bool displayWindowVertical = false;

@@ -100,8 +100,6 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.checkBoxSelection);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ForceSize",
 		config.globalFolderSettings.forceSize);
-	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"CloseMainWindowOnTabClose",
-		config.closeMainWindowOnTabClose);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ShowTaskbarThumbnails",
 		config.showTaskbarThumbnails);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"SynchronizeTreeview",
@@ -285,8 +283,6 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"ForceSize", config.globalFolderSettings.forceSize);
 	RegistrySettings::SaveDword(settingsKey, L"SizeDisplayFormat",
 		config.globalFolderSettings.sizeDisplayFormat);
-	RegistrySettings::SaveDword(settingsKey, L"CloseMainWindowOnTabClose",
-		config.closeMainWindowOnTabClose);
 	RegistrySettings::SaveDword(settingsKey, L"ShowTabBarAtBottom",
 		config.showTabBarAtBottom.get());
 	RegistrySettings::SaveDword(settingsKey, L"OverwriteExistingFilesConfirmation",

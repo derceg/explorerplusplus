@@ -125,7 +125,6 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"AutoArrangeGlobal",
 		config.defaultFolderSettings.autoArrangeEnabled);
 	GetBoolSetting(settingsNode, L"CheckBoxSelection", config.checkBoxSelection);
-	GetBoolSetting(settingsNode, L"CloseMainWindowOnTabClose", config.closeMainWindowOnTabClose);
 	GetBoolSetting(settingsNode, L"ConfirmCloseTabs", config.confirmCloseTabs);
 	GetBoolSetting(settingsNode, L"DisableFolderSizesNetworkRemovable",
 		config.globalFolderSettings.disableFolderSizesNetworkRemovable);
@@ -290,9 +289,6 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		XMLSettings::EncodeBoolValue(config.defaultFolderSettings.autoArrangeEnabled));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"CheckBoxSelection", XMLSettings::EncodeBoolValue(config.checkBoxSelection.get()));
-	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"CloseMainWindowOnTabClose",
-		XMLSettings::EncodeBoolValue(config.closeMainWindowOnTabClose));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"ConfirmCloseTabs", XMLSettings::EncodeBoolValue(config.confirmCloseTabs));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
