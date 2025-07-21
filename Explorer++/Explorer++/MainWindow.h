@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include "BrowserWindow.h"
 #include "Tab.h"
 #include "../Helper/DropTargetWindow.h"
 #include "../Helper/WinRTBaseWrapper.h"
+#include <boost/signals2.hpp>
 
 class App;
-class BrowserWindow;
-class CoreInterface;
 class NavigationRequest;
 class ShellBrowser;
 class WindowSubclass;
@@ -18,15 +18,15 @@ class WindowSubclass;
 class MainWindow : private DropTargetInternal
 {
 public:
-	static MainWindow *Create(HWND hwnd, App *app, BrowserWindow *browser,
-		CoreInterface *coreInterface);
+	static MainWindow *Create(HWND hwnd, App *app, BrowserWindow *browser);
 
 private:
-	MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterface *coreInterface);
+	MainWindow(HWND hwnd, App *app, BrowserWindow *browser);
 	~MainWindow() = default;
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
 	void OnTabSelected(const Tab &tab);
@@ -47,7 +47,7 @@ private:
 
 	const HWND m_hwnd;
 	App *const m_app;
-	CoreInterface *const m_coreInterface;
+	BrowserWindow *const m_browser;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

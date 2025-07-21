@@ -24,6 +24,8 @@ public:
 	void AddBrowser(BrowserWindow *browser);
 	void RemoveBrowser(BrowserWindow *browser);
 
+	void WillRemoveBrowser(BrowserWindow *browser);
+
 	concurrencpp::generator<BrowserWindow *> GetList() const;
 	BrowserWindow *MaybeGetById(int id) const;
 	BrowserWindow *GetLastActive() const;

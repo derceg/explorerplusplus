@@ -20,10 +20,16 @@ void BrowserList::AddBrowser(BrowserWindow *browser)
 	browserAddedSignal.m_signal(browser);
 }
 
+void BrowserList::WillRemoveBrowser(BrowserWindow *browser)
+{
+	// The browser should still exist in the list at this point.
+	DCHECK(m_browsers.contains(browser));
+
+	willRemoveBrowserSignal.m_signal(browser);
+}
+
 void BrowserList::RemoveBrowser(BrowserWindow *browser)
 {
-	willRemoveBrowserSignal.m_signal(browser);
-
 	auto numRemoved = m_browsers.erase(browser);
 	DCHECK_EQ(numRemoved, 1u);
 

@@ -40,7 +40,6 @@ class AddressBar;
 class App;
 class BookmarksMainMenu;
 class BookmarksToolbar;
-class BrowserTracker;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
@@ -249,6 +248,10 @@ private:
 	void MaybeUpdateTabBarVisibility();
 	void OnTabCreated(const Tab &tab);
 	void OnTabSelected(const Tab &tab);
+	void OnTabPreRemoval(const Tab &tab, int index);
+	void OnTabRemoved(const Tab &tab);
+	static concurrencpp::null_result ScheduleFinishShutdown(WeakPtr<Explorerplusplus> self,
+		Runtime *runtime);
 	void ShowTabBar();
 	void HideTabBar();
 	void CreateInitialTabs(const WindowStorageData *storageData);
@@ -362,10 +365,11 @@ private:
 		PULARGE_INTEGER lTotalFolderSize);
 
 	bool ConfirmClose();
+	void BeginShutdown();
+	void FinishShutdown();
 
 	App *const m_app;
 	HWND m_hContainer;
-	std::unique_ptr<BrowserTracker> m_browserTracker;
 
 	BrowserCommandController m_commandController;
 

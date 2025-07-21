@@ -60,34 +60,42 @@ TEST_F(BrowserListTest, AddedSignal)
 	m_browserList.AddBrowser(&browser2);
 }
 
-TEST_F(BrowserListTest, RemovedSignals)
+TEST_F(BrowserListTest, RemovedSignal)
 {
-	MockFunction<void(BrowserWindow *)> willRemoveCallback;
-	m_browserList.willRemoveBrowserSignal.AddObserver(willRemoveCallback.AsStdFunction());
-
-	MockFunction<void(BrowserWindow *)> removedCallback;
-	m_browserList.browserRemovedSignal.AddObserver(removedCallback.AsStdFunction());
+	MockFunction<void(BrowserWindow *)> callback;
+	m_browserList.browserRemovedSignal.AddObserver(callback.AsStdFunction());
 
 	BrowserWindowMock browser1;
 	BrowserWindowMock browser2;
 	m_browserList.AddBrowser(&browser1);
 	m_browserList.AddBrowser(&browser2);
 
-	{
-		InSequence seq;
+	InSequence seq;
 
-		EXPECT_CALL(willRemoveCallback, Call(&browser1));
-		EXPECT_CALL(removedCallback, Call(&browser1));
-	}
+	EXPECT_CALL(callback, Call(&browser1));
+	EXPECT_CALL(callback, Call(&browser2));
+
 	m_browserList.RemoveBrowser(&browser1);
-
-	{
-		InSequence seq;
-
-		EXPECT_CALL(willRemoveCallback, Call(&browser2));
-		EXPECT_CALL(removedCallback, Call(&browser2));
-	}
 	m_browserList.RemoveBrowser(&browser2);
+}
+
+TEST_F(BrowserListTest, WillRemoveSignal)
+{
+	MockFunction<void(BrowserWindow *)> callback;
+	m_browserList.willRemoveBrowserSignal.AddObserver(callback.AsStdFunction());
+
+	BrowserWindowMock browser1;
+	BrowserWindowMock browser2;
+	m_browserList.AddBrowser(&browser1);
+	m_browserList.AddBrowser(&browser2);
+
+	InSequence seq;
+
+	EXPECT_CALL(callback, Call(&browser1));
+	EXPECT_CALL(callback, Call(&browser2));
+
+	m_browserList.WillRemoveBrowser(&browser1);
+	m_browserList.WillRemoveBrowser(&browser2);
 }
 
 TEST_F(BrowserListTest, LastActive)

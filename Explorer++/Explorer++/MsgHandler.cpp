@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "AddressBar.h"
 #include "App.h"
-#include "BrowserTracker.h"
 #include "ColorRule.h"
 #include "Config.h"
 #include "DarkModeManager.h"
@@ -501,8 +500,6 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 
 int Explorerplusplus::OnDestroy()
 {
-	SetLifecycleState(LifecycleState::Closing);
-
 	if (m_SHChangeNotifyID != 0)
 	{
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);

@@ -32,6 +32,10 @@ public:
 		// initialized and hasn't started closing.
 		Main,
 
+		// Indicates that the browser will close (e.g. because the last tab was closed), but the
+		// process hasn't started yet.
+		WillClose,
+
 		// Indicates that the browser has started closing.
 		Closing
 	};

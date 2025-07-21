@@ -6,7 +6,6 @@
 #include "MainWindow.h"
 #include "App.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -16,30 +15,32 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 
-MainWindow *MainWindow::Create(HWND hwnd, App *app, BrowserWindow *browser,
-	CoreInterface *coreInterface)
+MainWindow *MainWindow::Create(HWND hwnd, App *app, BrowserWindow *browser)
 {
-	return new MainWindow(hwnd, app, browser, coreInterface);
+	return new MainWindow(hwnd, app, browser);
 }
 
-MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser, CoreInterface *coreInterface) :
+MainWindow::MainWindow(HWND hwnd, App *app, BrowserWindow *browser) :
 	m_hwnd(hwnd),
 	m_app(app),
-	m_coreInterface(coreInterface)
+	m_browser(browser)
 {
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainWindow::WndProc, this)));
 
+	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
+		std::bind_front(&MainWindow::OnBrowserLifecycleStateChanged, this)));
+
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
-		std::bind_front(&MainWindow::OnTabSelected, this), TabEventScope::ForBrowser(*browser)));
+		std::bind_front(&MainWindow::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
 		std::bind_front(&MainWindow::OnDirectoryPropertiesChanged, this),
-		NavigationEventScope::ForActiveShellBrowser(*browser)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&MainWindow::OnNavigationCommitted, this),
-		NavigationEventScope::ForActiveShellBrowser(*browser)));
+		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
 	m_connections.push_back(m_app->GetConfig()->showFullTitlePath.addObserver(
 		std::bind_front(&MainWindow::OnShowFullTitlePathUpdated, this)));
@@ -69,6 +70,14 @@ LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void MainWindow::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
+{
+	if (updatedState == BrowserWindow::LifecycleState::Main)
+	{
+		UpdateWindowText();
+	}
 }
 
 void MainWindow::OnNavigationCommitted(const NavigationRequest *request)
@@ -115,7 +124,12 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 
 void MainWindow::UpdateWindowText()
 {
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
+	{
+		return;
+	}
+
+	const Tab &tab = m_browser->GetActiveTabContainer()->GetSelectedTab();
 	auto pidlDirectory = tab.GetShellBrowserImpl()->GetDirectoryIdl();
 
 	std::wstring folderDisplayName;

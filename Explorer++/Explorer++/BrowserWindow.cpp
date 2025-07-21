@@ -26,9 +26,13 @@ void BrowserWindow::SetLifecycleState(LifecycleState state)
 	{
 		CHECK(m_lifecycleState == LifecycleState::Starting);
 	}
-	else if (state == LifecycleState::Closing)
+	else if (state == LifecycleState::WillClose)
 	{
 		CHECK(m_lifecycleState == LifecycleState::Main);
+	}
+	else if (state == LifecycleState::Closing)
+	{
+		CHECK(m_lifecycleState == LifecycleState::WillClose);
 	}
 	else
 	{

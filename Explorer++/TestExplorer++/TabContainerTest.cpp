@@ -389,6 +389,29 @@ TEST_F(TabContainerTest, DuplicateTabWithHistory)
 		CreateSimplePidlForTest(L"e:\\"));
 }
 
+TEST_F(TabContainerTest, CloseAllTabs)
+{
+	m_browser->AddTab(L"c:\\");
+	m_browser->AddTab(L"d:\\");
+	m_browser->AddTab(L"e:\\");
+
+	m_tabContainer->CloseAllTabs();
+	EXPECT_EQ(m_tabContainer->GetNumTabs(), 0);
+}
+
+TEST_F(TabContainerTest, CloseAllTabsWhenLocked)
+{
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	m_tabContainer->GetTab(tabId1).SetLockState(Tab::LockState::Locked);
+
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+	m_tabContainer->GetTab(tabId2).SetLockState(Tab::LockState::AddressLocked);
+
+	// CloseAllTabs() should close every tab, regardless of the lock state of any individual tab.
+	m_tabContainer->CloseAllTabs();
+	EXPECT_EQ(m_tabContainer->GetNumTabs(), 0);
+}
+
 TEST_F(TabContainerTest, CloseTab)
 {
 	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
@@ -619,4 +642,34 @@ TEST_F(TabContainerTest, RemovedSignal)
 
 	EXPECT_CALL(callback, Call(Property(&Tab::GetId, tabId2)));
 	m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId2));
+}
+
+TEST_F(TabContainerTest, CloseAllTabsSignals)
+{
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
+
+	MockFunction<void(const Tab &tab, int index)> preRemovalCallback;
+	m_tabEvents.AddPreRemovalObserver(preRemovalCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(*m_browser));
+
+	MockFunction<void(const Tab &tab)> removedCallback;
+	m_tabEvents.AddRemovedObserver(removedCallback.AsStdFunction(),
+		TabEventScope::ForBrowser(*m_browser));
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(preRemovalCallback, Call(Property(&Tab::GetId, tabId1), 0));
+		EXPECT_CALL(removedCallback, Call(Property(&Tab::GetId, tabId1)));
+	}
+
+	{
+		InSequence seq;
+
+		EXPECT_CALL(preRemovalCallback, Call(Property(&Tab::GetId, tabId2), 1));
+		EXPECT_CALL(removedCallback, Call(Property(&Tab::GetId, tabId2)));
+	}
+
+	m_tabContainer->CloseAllTabs();
 }

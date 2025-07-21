@@ -484,18 +484,29 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	return tab;
 }
 
+void TabContainer::CloseAllTabs()
+{
+	int numTabs = GetNumTabs();
+
+	for (int i = numTabs - 1; i >= 0; i--)
+	{
+		bool closed = CloseTab(GetTabByIndex(i), CloseMode::Force);
+		DCHECK(closed);
+	}
+}
+
 bool TabContainer::CloseTab(const Tab &tab)
 {
-	if (tab.GetLockState() == Tab::LockState::Locked
-		|| tab.GetLockState() == Tab::LockState::AddressLocked)
+	return CloseTab(tab, CloseMode::Normal);
+}
+
+bool TabContainer::CloseTab(const Tab &tab, CloseMode closeMode)
+{
+	if ((tab.GetLockState() == Tab::LockState::Locked
+			|| tab.GetLockState() == Tab::LockState::AddressLocked)
+		&& closeMode == CloseMode::Normal)
 	{
 		return false;
-	}
-
-	if (GetNumTabs() == 1)
-	{
-		m_browser->Close();
-		return true;
 	}
 
 	m_tabEvents->NotifyPreRemoval(tab, GetTabIndex(tab));
@@ -523,7 +534,7 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 
 	const int index = GetTabIndex(tab);
 
-	if (IsTabSelected(tab))
+	if (IsTabSelected(tab) && m_tabs.size() > 1)
 	{
 		int newIndex;
 

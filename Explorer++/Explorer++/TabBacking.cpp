@@ -26,6 +26,7 @@ TabBacking::TabBacking(HWND parent, BrowserWindow *browser, CoreInterface *coreI
 	m_hwnd(CreateWindow(WC_STATIC, L"",
 		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | SS_NOTIFY, 0, 0, 0, 0, parent,
 		nullptr, GetModuleHandle(nullptr), nullptr)),
+	m_browser(browser),
 	m_coreInterface(coreInterface)
 {
 	std::tie(m_toolbar, m_toolbarImageList) = ToolbarHelper::CreateCloseButtonToolbar(m_hwnd,
@@ -40,14 +41,17 @@ TabBacking::TabBacking(HWND parent, BrowserWindow *browser, CoreInterface *coreI
 	m_toolbarTooltipFontSetter = std::make_unique<MainFontSetter>(
 		reinterpret_cast<HWND>(SendMessage(m_toolbar, TB_GETTOOLTIPS, 0, 0)), config);
 
+	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
+		std::bind_front(&TabBacking::OnBrowserLifecycleStateChanged, this)));
+
 	m_connections.push_back(tabEvents->AddCreatedObserver(
-		std::bind(&TabBacking::UpdateToolbar, this), TabEventScope::ForBrowser(*browser)));
+		std::bind(&TabBacking::UpdateToolbar, this), TabEventScope::ForBrowser(*m_browser)));
 	m_connections.push_back(tabEvents->AddSelectedObserver(
-		std::bind(&TabBacking::UpdateToolbar, this), TabEventScope::ForBrowser(*browser)));
+		std::bind(&TabBacking::UpdateToolbar, this), TabEventScope::ForBrowser(*m_browser)));
 	m_connections.push_back(tabEvents->AddRemovedObserver(
-		std::bind(&TabBacking::UpdateToolbar, this), TabEventScope::ForBrowser(*browser)));
+		std::bind(&TabBacking::UpdateToolbar, this), TabEventScope::ForBrowser(*m_browser)));
 	m_connections.push_back(tabEvents->AddUpdatedObserver(
-		std::bind_front(&TabBacking::OnTabUpdated, this), TabEventScope::ForBrowser(*browser)));
+		std::bind_front(&TabBacking::OnTabUpdated, this), TabEventScope::ForBrowser(*m_browser)));
 
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TabBacking::WndProc, this)));
@@ -56,6 +60,14 @@ TabBacking::TabBacking(HWND parent, BrowserWindow *browser, CoreInterface *coreI
 HWND TabBacking::GetHWND() const
 {
 	return m_hwnd;
+}
+
+void TabBacking::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
+{
+	if (updatedState == BrowserWindow::LifecycleState::Main)
+	{
+		UpdateToolbar();
+	}
 }
 
 void TabBacking::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
@@ -76,10 +88,15 @@ void TabBacking::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 
 void TabBacking::UpdateToolbar()
 {
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
+	{
+		return;
+	}
+
 	auto *tabContainer = m_coreInterface->GetTabContainer();
 	const Tab &selectedTab = tabContainer->GetSelectedTab();
 
-	if (tabContainer->GetNumTabs() > 1 && selectedTab.GetLockState() == Tab::LockState::NotLocked)
+	if (selectedTab.GetLockState() == Tab::LockState::NotLocked)
 	{
 		SendMessage(m_toolbar, TB_SETSTATE, CLOSE_BUTTON_ID, TBSTATE_ENABLED);
 	}

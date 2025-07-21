@@ -89,7 +89,7 @@ TEST_F(BrowserCommandTargetManagerTest, ChangeSignalOutsideOfMainLifecycle)
 	m_targetManager->ClearCurrentTarget();
 	check.Call(2);
 
-	m_browser->SetLifecycleState(BrowserWindow::LifecycleState::Closing);
+	m_browser->SetLifecycleState(BrowserWindow::LifecycleState::WillClose);
 
 	m_targetManager->SetCurrentTarget(&target);
 }

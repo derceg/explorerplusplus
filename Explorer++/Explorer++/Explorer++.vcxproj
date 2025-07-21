@@ -1284,7 +1284,6 @@
     <ClCompile Include="LocationVisitInfo.cpp" />
     <ClCompile Include="MainMenuSubMenuView.cpp" />
     <ClCompile Include="BrowserList.cpp" />
-    <ClCompile Include="BrowserTracker.cpp" />
     <ClCompile Include="MainRebarView.cpp" />
     <ClCompile Include="ModelessDialogHelper.cpp" />
     <ClCompile Include="ModelessDialogList.cpp" />
@@ -1626,7 +1625,6 @@
     <ClInclude Include="LocationVisitInfo.h" />
     <ClInclude Include="MainMenuSubMenuView.h" />
     <ClInclude Include="BrowserList.h" />
-    <ClInclude Include="BrowserTracker.h" />
     <ClInclude Include="MainRebarView.h" />
     <ClInclude Include="ModelessDialogHelper.h" />
     <ClInclude Include="ModelessDialogList.h" />

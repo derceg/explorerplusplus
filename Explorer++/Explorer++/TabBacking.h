@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include "BrowserWindow.h"
 #include "Tab.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <memory>
 #include <vector>
 
-class BrowserWindow;
 struct Config;
 class CoreInterface;
 class MainFontSetter;
@@ -32,6 +32,7 @@ private:
 	TabBacking(HWND parent, BrowserWindow *browser, CoreInterface *coreInterface,
 		const ResourceLoader *resourceLoader, const Config *config, TabEvents *tabEvents);
 
+	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateToolbar();
 
@@ -42,6 +43,7 @@ private:
 	void OnNcDestroy();
 
 	const HWND m_hwnd;
+	BrowserWindow *const m_browser;
 	CoreInterface *const m_coreInterface;
 	HWND m_toolbar = nullptr;
 	wil::unique_himagelist m_toolbarImageList;

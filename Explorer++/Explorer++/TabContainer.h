@@ -87,6 +87,12 @@ public:
 	int GetNumTabs() const;
 	int MoveTab(const Tab &tab, int newIndex);
 	Tab &DuplicateTab(const Tab &tab);
+
+	// Unlike CloseTab(), which will only close tabs that aren't locked, this will close all tabs,
+	// regardless of the lock state of any individual tab. This is needed when the parent window is
+	// being closed.
+	void CloseAllTabs();
+
 	bool CloseTab(const Tab &tab);
 
 	/* TODO: Ideally, there would be a method of iterating over the tabs without
@@ -110,6 +116,12 @@ private:
 			scrollTimer(timerManager)
 		{
 		}
+	};
+
+	enum class CloseMode
+	{
+		Normal,
+		Force
 	};
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
@@ -136,6 +148,7 @@ private:
 
 	void OnTabSelected(const Tab &tab);
 
+	bool CloseTab(const Tab &tab, CloseMode closeMode);
 	void RemoveTabFromControl(const Tab &tab);
 
 	// TabViewDelegate

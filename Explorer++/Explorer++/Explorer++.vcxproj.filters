@@ -595,9 +595,6 @@
     <ClCompile Include="StartupCommandLineProcessor.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserTracker.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="BrowserList.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1501,9 +1498,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="StartupCommandLineProcessor.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="BrowserTracker.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="BrowserList.h">

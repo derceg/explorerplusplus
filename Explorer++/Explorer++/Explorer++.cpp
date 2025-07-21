@@ -8,7 +8,6 @@
 #include "Application.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
-#include "BrowserTracker.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "FrequentLocationsMenu.h"
@@ -90,7 +89,7 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	ShowWindow(m_hContainer, ShowStateToNativeShowState(showState));
 	UpdateWindow(m_hContainer);
 
-	m_browserTracker = std::make_unique<BrowserTracker>(app->GetBrowserList(), this);
+	m_app->GetBrowserList()->AddBrowser(this);
 }
 
 Explorerplusplus::~Explorerplusplus() = default;
@@ -161,7 +160,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 		m_app->GetResourceLoader(), &m_iconFetcher, m_app->GetBookmarkTree(),
 		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_app, this, this);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_app, this);
 
 	InitializeMainMenu();
 
@@ -316,7 +315,38 @@ bool Explorerplusplus::ConfirmClose()
 
 void Explorerplusplus::Close()
 {
-	m_browserTracker.reset();
+	if (GetLifecycleState() != LifecycleState::Main)
+	{
+		return;
+	}
+
+	BeginShutdown();
+
+	// When the last tab is closed, the window will be destroyed.
+	GetActiveTabContainer()->CloseAllTabs();
+}
+
+void Explorerplusplus::BeginShutdown()
+{
+	if (GetLifecycleState() != LifecycleState::Main)
+	{
+		return;
+	}
+
+	SetLifecycleState(LifecycleState::WillClose);
+
+	m_app->GetBrowserList()->WillRemoveBrowser(this);
+
+	// Past this point, the remaining tabs will be closed, which can cause other UI updates. There's
+	// no need for that to be shown, however, since the window will be destroyed shortly afterwards.
+	ShowWindow(m_hContainer, SW_HIDE);
+}
+
+void Explorerplusplus::FinishShutdown()
+{
+	SetLifecycleState(LifecycleState::Closing);
+
+	m_app->GetBrowserList()->RemoveBrowser(this);
 
 	DestroyWindow(m_hContainer);
 }

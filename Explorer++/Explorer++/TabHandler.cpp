@@ -44,6 +44,11 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_app->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&Explorerplusplus::OnTabSelected, this), TabEventScope::ForBrowser(*this),
 		boost::signals2::at_front));
+	m_connections.push_back(m_app->GetTabEvents()->AddPreRemovalObserver(
+		std::bind_front(&Explorerplusplus::OnTabPreRemoval, this), TabEventScope::ForBrowser(*this),
+		boost::signals2::at_back));
+	m_connections.push_back(m_app->GetTabEvents()->AddRemovedObserver(
+		std::bind_front(&Explorerplusplus::OnTabRemoved, this), TabEventScope::ForBrowser(*this)));
 
 	m_connections.push_back(m_app->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this),
@@ -270,6 +275,45 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	/* Show the new listview. */
 	ShowWindow(m_hActiveListView, SW_SHOW);
 	SetFocus(m_hActiveListView);
+}
+
+void Explorerplusplus::OnTabPreRemoval(const Tab &tab, int index)
+{
+	UNREFERENCED_PARAMETER(index);
+
+	// It's only necessary to begin shutdown if it hasn't already started. Shutdown will be started
+	// elsewhere if the user explicitly closes the window. So, it's only necessary to shutdown here
+	// if the user implicitly closes the window by closing the last tab.
+	if (tab.GetTabContainer()->GetNumTabs() == 1 && GetLifecycleState() == LifecycleState::Main)
+	{
+		BeginShutdown();
+	}
+}
+
+void Explorerplusplus::OnTabRemoved(const Tab &tab)
+{
+	if (tab.GetTabContainer()->GetNumTabs() == 0)
+	{
+		// The last tab has been closed, so the window should be closed as well. However, it's not
+		// possible to close the window within this listener. Firstly, because there could be other
+		// listeners that run after this one. Secondly, because the Tab object relies on items that
+		// are owned by this class, so destroying this class (by destroying the window) needs to be
+		// done only after the listeners have all finished running.
+		ScheduleFinishShutdown(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime());
+	}
+}
+
+concurrencpp::null_result Explorerplusplus::ScheduleFinishShutdown(WeakPtr<Explorerplusplus> self,
+	Runtime *runtime)
+{
+	co_await concurrencpp::resume_on(runtime->GetUiThreadExecutor());
+
+	if (!self)
+	{
+		co_return;
+	}
+
+	self->FinishShutdown();
 }
 
 void Explorerplusplus::ShowTabBar()
