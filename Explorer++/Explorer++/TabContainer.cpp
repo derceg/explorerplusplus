@@ -351,8 +351,8 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 
 Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 {
-	auto shellBrowser = m_shellBrowserFactory->CreateFromPreserved(preservedTab.history,
-		preservedTab.currentEntry, preservedTab.preservedFolderState);
+	const auto &preservedShellBrowser = preservedTab.preservedShellBrowser;
+	auto shellBrowser = m_shellBrowserFactory->CreateFromPreserved(preservedShellBrowser);
 	Tab::InitialData initialTabData{ .useCustomName = preservedTab.useCustomName,
 		.customName = preservedTab.customName,
 		.lockState = preservedTab.lockState };
@@ -376,7 +376,7 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 
 	TabSettings tabSettings{ .index = finalIndex, .selected = true };
 
-	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
+	const auto *entry = preservedShellBrowser.history[preservedShellBrowser.currentEntry].get();
 	auto navigateParams =
 		NavigateParams::Normal(entry->GetPidl().Raw(), HistoryEntryType::ReplaceCurrentEntry);
 	return SetUpNewTab(*rawTab, navigateParams, tabSettings);

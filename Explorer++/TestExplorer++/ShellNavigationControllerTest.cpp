@@ -7,7 +7,7 @@
 #include "BrowserWindowMock.h"
 #include "NavigationRequestTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
-#include "ShellBrowser/PreservedFolderState.h"
+#include "ShellBrowser/PreservedShellBrowser.h"
 #include "ShellBrowserFake.h"
 #include "ShellTestHelper.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
@@ -519,32 +519,27 @@ TEST_F(ShellNavigationControllerTest, FirstNavigation)
 class ShellNavigationControllerPreservedTest : public Test
 {
 protected:
-	ShellNavigationControllerPreservedTest()
+	std::unique_ptr<PreservedShellBrowser> BuildPreservedShellBrowser(int currentEntry)
 	{
-		auto preservedEntry =
-			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake1"));
-		m_preservedEntries.push_back(std::move(preservedEntry));
+		std::vector<std::unique_ptr<PreservedHistoryEntry>> history;
+		history.push_back(
+			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake1")));
+		history.push_back(
+			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake2")));
 
-		preservedEntry =
-			std::make_unique<PreservedHistoryEntry>(CreateSimplePidlForTest(L"C:\\Fake2"));
-		m_preservedEntries.push_back(std::move(preservedEntry));
-	}
-
-	std::unique_ptr<ShellBrowserFake> BuildShellBrowserWithCurrentEntry(int currentEntry)
-	{
-		return std::make_unique<ShellBrowserFake>(&m_browser, &m_navigationEvents,
-			m_preservedEntries, currentEntry, PreservedFolderState{});
+		return std::make_unique<PreservedShellBrowser>(FolderSettings{}, FolderColumns{},
+			std::move(history), currentEntry);
 	}
 
 	NavigationEvents m_navigationEvents;
 	BrowserWindowMock m_browser;
-
-	std::vector<std::unique_ptr<PreservedHistoryEntry>> m_preservedEntries;
 };
 
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
 {
-	auto shellBrowser = BuildShellBrowserWithCurrentEntry(0);
+	auto preservedShellBrowser = BuildPreservedShellBrowser(0);
+	auto shellBrowser =
+		std::make_unique<ShellBrowserFake>(&m_browser, &m_navigationEvents, *preservedShellBrowser);
 	auto *navigationController = shellBrowser->GetNavigationController();
 
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 0);
@@ -555,7 +550,9 @@ TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
 
 TEST_F(ShellNavigationControllerPreservedTest, SecondIndexIsCurrent)
 {
-	auto shellBrowser = BuildShellBrowserWithCurrentEntry(1);
+	auto preservedShellBrowser = BuildPreservedShellBrowser(1);
+	auto shellBrowser =
+		std::make_unique<ShellBrowserFake>(&m_browser, &m_navigationEvents, *preservedShellBrowser);
 	auto *navigationController = shellBrowser->GetNavigationController();
 
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
@@ -566,13 +563,15 @@ TEST_F(ShellNavigationControllerPreservedTest, SecondIndexIsCurrent)
 
 TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 {
-	auto shellBrowser = BuildShellBrowserWithCurrentEntry(0);
+	auto preservedShellBrowser = BuildPreservedShellBrowser(0);
+	auto shellBrowser =
+		std::make_unique<ShellBrowserFake>(&m_browser, &m_navigationEvents, *preservedShellBrowser);
 	auto *navigationController = shellBrowser->GetNavigationController();
 
-	for (size_t i = 0; i < m_preservedEntries.size(); i++)
+	for (size_t i = 0; i < preservedShellBrowser->history.size(); i++)
 	{
 		auto entry = navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
-		EXPECT_EQ(entry->GetPidl(), m_preservedEntries[i]->GetPidl());
+		EXPECT_EQ(entry->GetPidl(), preservedShellBrowser->history[i]->GetPidl());
 	}
 }

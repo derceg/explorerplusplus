@@ -23,9 +23,8 @@ std::unique_ptr<ShellBrowser> ShellBrowserFactoryImpl::Create(const PidlAbsolute
 }
 
 std::unique_ptr<ShellBrowser> ShellBrowserFactoryImpl::CreateFromPreserved(
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-	const PreservedFolderState &preservedFolderState)
+	const PreservedShellBrowser &preservedShellBrowser)
 {
 	return std::make_unique<ShellBrowserImpl>(m_browser->GetHWND(), m_app, m_browser,
-		m_fileActionHandler, history, currentEntry, preservedFolderState);
+		m_fileActionHandler, preservedShellBrowser);
 }

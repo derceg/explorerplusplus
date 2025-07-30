@@ -277,7 +277,7 @@
     <ClCompile Include="DisplayWindow\MsgHandler.cpp">
       <Filter>DisplayWindow</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\PreservedFolderState.cpp">
+    <ClCompile Include="ShellBrowser\PreservedShellBrowser.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp">
@@ -1065,7 +1065,7 @@
     <ClInclude Include="TabRestorer.h">
       <Filter>Tabs</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\PreservedFolderState.h">
+    <ClInclude Include="ShellBrowser\PreservedShellBrowser.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\NavigateParams.h">

@@ -14,8 +14,7 @@
 
 class BrowserWindow;
 class NavigationEvents;
-struct PreservedFolderState;
-class PreservedHistoryEntry;
+struct PreservedShellBrowser;
 class ShellEnumeratorFake;
 class ShellNavigationController;
 
@@ -23,8 +22,7 @@ class ShellBrowserFake : public ShellBrowser
 {
 public:
 	ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
-		int currentEntry, const PreservedFolderState &preservedFolderState);
+		const PreservedShellBrowser &preservedShellBrowser);
 	ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 		const FolderSettings &folderSettings = {}, const FolderColumns &initialColumns = {});
 	~ShellBrowserFake();

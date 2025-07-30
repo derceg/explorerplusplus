@@ -65,7 +65,9 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 		return;
 	}
 
-	auto *currentEntry = closedTab->history.at(closedTab->currentEntry).get();
+	const auto &preservedShellBrowser = closedTab->preservedShellBrowser;
+	const auto *currentEntry =
+		preservedShellBrowser.history[preservedShellBrowser.currentEntry].get();
 
 	auto menuText = GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_INFOLDER);
 	auto helpText = GetFolderPathForDisplayWithFallback(currentEntry->GetPidl().Raw());

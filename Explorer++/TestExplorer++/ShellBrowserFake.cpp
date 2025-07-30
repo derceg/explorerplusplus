@@ -5,19 +5,19 @@
 #include "pch.h"
 #include "ShellBrowserFake.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/PreservedFolderState.h"
+#include "ShellBrowser/PreservedShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellEnumeratorFake.h"
 #include "ShellTestHelper.h"
 
 ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
-	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserFake(browser, navigationEvents, preservedFolderState.folderSettings,
-		preservedFolderState.folderColumns)
+	const PreservedShellBrowser &preservedShellBrowser) :
+	ShellBrowserFake(browser, navigationEvents, preservedShellBrowser.folderSettings,
+		preservedShellBrowser.folderColumns)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
-		&m_navigationManager, navigationEvents, preservedEntries, currentEntry);
+	m_navigationController =
+		std::make_unique<ShellNavigationController>(this, browser, &m_navigationManager,
+			navigationEvents, preservedShellBrowser.history, preservedShellBrowser.currentEntry);
 }
 
 ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,

@@ -1377,7 +1377,7 @@
     <ClCompile Include="ShellBrowser\Filtering.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\ShellNavigationController.cpp" />
-    <ClCompile Include="ShellBrowser\PreservedFolderState.cpp" />
+    <ClCompile Include="ShellBrowser\PreservedShellBrowser.cpp" />
     <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\WebBrowserApp.cpp" />
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp" />
@@ -1788,7 +1788,7 @@
     <ClInclude Include="ShellBrowser\HistoryEntry.h" />
     <ClInclude Include="ShellBrowser\ShellNavigationController.h" />
     <ClInclude Include="ShellBrowser\NavigateParams.h" />
-    <ClInclude Include="ShellBrowser\PreservedFolderState.h" />
+    <ClInclude Include="ShellBrowser\PreservedShellBrowser.h" />
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserImpl.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />

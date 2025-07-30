@@ -20,7 +20,7 @@
 #include "MainResource.h"
 #include "MassRenameDialog.h"
 #include "MergeFilesDialog.h"
-#include "PreservedFolderState.h"
+#include "PreservedShellBrowser.h"
 #include "ResourceLoader.h"
 #include "ServiceProvider.h"
 #include "ShellEnumeratorImpl.h"
@@ -41,14 +41,13 @@
 #include <list>
 
 ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-	FileActionHandler *fileActionHandler,
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserImpl(owner, app, browser, fileActionHandler, preservedFolderState.folderSettings,
-		&preservedFolderState.folderColumns)
+	FileActionHandler *fileActionHandler, const PreservedShellBrowser &preservedShellBrowser) :
+	ShellBrowserImpl(owner, app, browser, fileActionHandler, preservedShellBrowser.folderSettings,
+		&preservedShellBrowser.folderColumns)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
-		&m_navigationManager, m_app->GetNavigationEvents(), history, currentEntry);
+		&m_navigationManager, m_app->GetNavigationEvents(), preservedShellBrowser.history,
+		preservedShellBrowser.currentEntry);
 
 	ChangeToInitialFolder();
 }

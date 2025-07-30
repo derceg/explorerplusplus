@@ -4,30 +4,21 @@
 
 #pragma once
 
-#include "ShellBrowser/PreservedFolderState.h"
+#include "ShellBrowser/PreservedShellBrowser.h"
 #include "Tab.h"
 #include <boost/core/noncopyable.hpp>
-
-class PreservedHistoryEntry;
 
 struct PreservedTab : private boost::noncopyable
 {
 	PreservedTab(const Tab &tab, int index);
-	~PreservedTab();
 
-	int id;
-	int browserId;
-	int index;
+	const int id;
+	const int browserId;
+	const int index;
 
-	std::vector<std::unique_ptr<PreservedHistoryEntry>> history;
-	int currentEntry;
+	const bool useCustomName;
+	const std::wstring customName;
+	const Tab::LockState lockState;
 
-	bool useCustomName;
-	std::wstring customName;
-	Tab::LockState lockState;
-
-	PreservedFolderState preservedFolderState;
-
-private:
-	static std::vector<std::unique_ptr<PreservedHistoryEntry>> CopyHistoryEntries(const Tab &tab);
+	const PreservedShellBrowser preservedShellBrowser;
 };

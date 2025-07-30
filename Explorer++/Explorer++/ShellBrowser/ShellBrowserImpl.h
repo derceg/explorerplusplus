@@ -49,8 +49,7 @@ struct Config;
 class FileActionHandler;
 class IconFetcher;
 class NavigationRequest;
-struct PreservedFolderState;
-class PreservedHistoryEntry;
+struct PreservedShellBrowser;
 class Runtime;
 class ShellEnumeratorImpl;
 class ShellNavigationController;
@@ -70,9 +69,7 @@ class ShellBrowserImpl :
 {
 public:
 	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
-		FileActionHandler *fileActionHandler,
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-		const PreservedFolderState &preservedFolderState);
+		FileActionHandler *fileActionHandler, const PreservedShellBrowser &preservedShellBrowser);
 	ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 		FileActionHandler *fileActionHandler, const PidlAbsolute &initialPidl,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns);

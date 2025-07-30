@@ -17,8 +17,7 @@ public:
 	std::unique_ptr<ShellBrowser> Create(const PidlAbsolute &initialPidl,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns) override;
 	std::unique_ptr<ShellBrowser> CreateFromPreserved(
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-		const PreservedFolderState &preservedFolderState) override;
+		const PreservedShellBrowser &preservedShellBrowser) override;
 
 private:
 	BrowserWindow *const m_browser;

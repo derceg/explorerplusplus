@@ -23,9 +23,7 @@ std::unique_ptr<ShellBrowser> ShellBrowserFactoryFake::Create(const PidlAbsolute
 }
 
 std::unique_ptr<ShellBrowser> ShellBrowserFactoryFake::CreateFromPreserved(
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-	const PreservedFolderState &preservedFolderState)
+	const PreservedShellBrowser &preservedShellBrowser)
 {
-	return std::make_unique<ShellBrowserFake>(m_browser, m_navigationEvents, history, currentEntry,
-		preservedFolderState);
+	return std::make_unique<ShellBrowserFake>(m_browser, m_navigationEvents, preservedShellBrowser);
 }

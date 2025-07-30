@@ -6,12 +6,10 @@
 
 #include "../Helper/PidlHelper.h"
 #include <memory>
-#include <vector>
 
 struct FolderColumns;
 struct FolderSettings;
-struct PreservedFolderState;
-class PreservedHistoryEntry;
+struct PreservedShellBrowser;
 class ShellBrowser;
 
 class ShellBrowserFactory
@@ -22,6 +20,5 @@ public:
 	virtual std::unique_ptr<ShellBrowser> Create(const PidlAbsolute &initialPidl,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns) = 0;
 	virtual std::unique_ptr<ShellBrowser> CreateFromPreserved(
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
-		const PreservedFolderState &preservedFolderState) = 0;
+		const PreservedShellBrowser &preservedShellBrowser) = 0;
 };
