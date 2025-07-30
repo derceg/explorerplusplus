@@ -187,6 +187,26 @@ TEST_F(TabRestorerTest, RestoreTabWithCustomName)
 	EXPECT_EQ(restoredTab->GetName(), customName);
 }
 
+TEST_F(TabRestorerTest, RestoreTabWithColumns)
+{
+	auto *browser = AddBrowser();
+	browser->AddTab(L"c:\\");
+	int tabId2 = browser->AddTabAndReturnId(L"d:\\");
+
+	auto *tabContainer = browser->GetActiveTabContainer();
+
+	FolderColumns folderColumns;
+	folderColumns.realFolderColumns = { { ColumnType::Name, TRUE, 100 } };
+	tabContainer->GetTab(tabId2).GetShellBrowser()->SetAllColumnSets(folderColumns);
+
+	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+
+	auto *restoredTab = m_tabRestorer.RestoreTabById(tabId2);
+	ASSERT_NE(restoredTab, nullptr);
+
+	EXPECT_EQ(restoredTab->GetShellBrowser()->GetAllColumnSets(), folderColumns);
+}
+
 TEST_F(TabRestorerTest, StateDuringRestore)
 {
 	auto *browser = AddBrowser();

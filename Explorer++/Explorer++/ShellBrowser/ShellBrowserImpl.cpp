@@ -45,7 +45,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
 	ShellBrowserImpl(owner, app, browser, fileActionHandler, preservedFolderState.folderSettings,
-		nullptr)
+		&preservedFolderState.folderColumns)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
 		&m_navigationManager, m_app->GetNavigationEvents(), history, currentEntry);

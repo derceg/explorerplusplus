@@ -13,7 +13,8 @@
 ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserFake(browser, navigationEvents, preservedFolderState.folderSettings)
+	ShellBrowserFake(browser, navigationEvents, preservedFolderState.folderSettings,
+		preservedFolderState.folderColumns)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
 		&m_navigationManager, navigationEvents, preservedEntries, currentEntry);

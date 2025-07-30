@@ -367,6 +367,18 @@ TEST_F(TabContainerTest, DuplicateTabWithFolderSettings)
 		tab->GetShellBrowser()->GetFolderSettings());
 }
 
+TEST_F(TabContainerTest, DuplicateTabWithColumns)
+{
+	const auto *tab = m_browser->AddTab(L"c:\\");
+
+	FolderColumns folderColumns;
+	folderColumns.realFolderColumns = { { ColumnType::Name, TRUE, 100 } };
+	tab->GetShellBrowser()->SetAllColumnSets(folderColumns);
+
+	const auto &duplicatedTab = m_tabContainer->DuplicateTab(*tab);
+	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetAllColumnSets(), folderColumns);
+}
+
 TEST_F(TabContainerTest, DuplicateTabWithHistory)
 {
 	PidlAbsolute pidl;

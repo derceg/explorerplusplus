@@ -16,4 +16,5 @@ public:
 	PreservedFolderState(const ShellBrowser *shellBrowser);
 
 	FolderSettings folderSettings;
+	FolderColumns folderColumns;
 };

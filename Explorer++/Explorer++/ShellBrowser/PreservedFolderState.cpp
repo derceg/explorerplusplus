@@ -7,6 +7,7 @@
 #include "ShellBrowser.h"
 
 PreservedFolderState::PreservedFolderState(const ShellBrowser *shellBrowser) :
-	folderSettings(shellBrowser->GetFolderSettings())
+	folderSettings(shellBrowser->GetFolderSettings()),
+	folderColumns(shellBrowser->GetAllColumnSets())
 {
 }
