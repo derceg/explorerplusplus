@@ -65,11 +65,6 @@ void ShellBrowserImpl::ChangeFolders(const PidlAbsolute &directory)
 
 void ShellBrowserImpl::PrepareToChangeFolders()
 {
-	if (m_folderVisited)
-	{
-		SaveColumnWidths();
-	}
-
 	ClearPendingResults();
 
 	m_shellChangeWatcher.StopWatchingAll();

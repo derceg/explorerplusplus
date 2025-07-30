@@ -227,6 +227,10 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
+			case HDN_ITEMCHANGED:
+				OnListViewHeaderItemChanged(reinterpret_cast<NMHEADER *>(lParam));
+				break;
+
 			case NM_RCLICK:
 			{
 				DWORD messagePos = GetMessagePos();
@@ -1030,6 +1034,24 @@ void ShellBrowserImpl::OpenSelectedItems()
 	}
 }
 
+void ShellBrowserImpl::OnListViewHeaderItemChanged(const NMHEADER *changeInfo)
+{
+	if (!changeInfo->pitem || WI_IsFlagClear(changeInfo->pitem->mask, HDI_WIDTH))
+	{
+		return;
+	}
+
+	// The active columns should always match the columns in the control, so this view should always
+	// be non-empty.
+	auto view = *m_pActiveColumns
+		| std::views::filter([](const Column_t &column) { return column.checked; })
+		| std::views::drop(changeInfo->iItem);
+	CHECK(!view.empty());
+
+	auto &targetColumn = view.front();
+	targetColumn.width = changeInfo->pitem->cxy;
+}
+
 void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)
 {
 	wil::unique_hmenu headerPopupMenu(
@@ -1158,7 +1180,7 @@ void ShellBrowserImpl::OnShowMoreColumnsSelected()
 void ShellBrowserImpl::OnColumnMenuItemSelected(int menuItemId,
 	const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
-	auto currentColumns = GetCurrentColumns();
+	auto currentColumns = GetCurrentColumnSet();
 
 	ColumnType columnType = menuItemMappings.at(menuItemId);
 	auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
@@ -1171,7 +1193,7 @@ void ShellBrowserImpl::OnColumnMenuItemSelected(int menuItemId,
 
 	itr->checked = !itr->checked;
 
-	SetCurrentColumns(currentColumns);
+	SetCurrentColumnSet(currentColumns);
 
 	// If it was the first column that was changed, need to refresh all columns.
 	if (menuItemId == 1)

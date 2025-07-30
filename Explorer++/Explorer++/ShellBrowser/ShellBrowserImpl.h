@@ -89,8 +89,8 @@ public:
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;
 	void SetSortDirection(SortDirection direction) override;
-	void SetColumns(const FolderColumns &folderColumns) override;
-	const FolderColumns &GetColumns() override;
+	void SetAllColumnSets(const FolderColumns &folderColumns) override;
+	const FolderColumns &GetAllColumnSets() const override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanAutoSizeColumns() const override;
@@ -148,8 +148,8 @@ public:
 	std::wstring GetItemFullName(int index) const;
 
 	/* Column support. */
-	std::vector<Column_t> GetCurrentColumns();
-	void SetCurrentColumns(const std::vector<Column_t> &columns);
+	const std::vector<Column_t> &GetCurrentColumnSet() const;
+	void SetCurrentColumnSet(const std::vector<Column_t> &columns);
 	static SortMode DetermineColumnSortMode(ColumnType columnType);
 
 	void SelectItems(const std::vector<PidlAbsolute> &pidls);
@@ -456,6 +456,7 @@ private:
 	void OnShowGridlinesUpdated(BOOL newValue);
 	void OnOneClickActivateUpdated(BOOL newValue);
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
+	void OnListViewHeaderItemChanged(const NMHEADER *changeInfo);
 
 	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
@@ -504,7 +505,6 @@ private:
 	void SetActiveColumnSet();
 	void GetColumnInternal(ColumnType columnType, Column_t *pci) const;
 	Column_t GetFirstCheckedColumn();
-	void SaveColumnWidths();
 	void ProcessColumnResult(int columnResultId);
 	std::optional<int> GetColumnIndexByType(ColumnType columnType) const;
 	std::optional<ColumnType> GetColumnTypeByIndex(int index) const;

@@ -66,7 +66,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 			pnmHeader = (NMHEADER *) lParam;
 
-			auto currentColumns = m_pActiveShellBrowser->GetCurrentColumns();
+			auto currentColumns = m_pActiveShellBrowser->GetCurrentColumnSet();
 
 			i = 0;
 			auto itr = currentColumns.begin();
@@ -103,7 +103,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 			currentColumns.insert(itr, column);
 
-			m_pActiveShellBrowser->SetCurrentColumns(currentColumns);
+			m_pActiveShellBrowser->SetCurrentColumnSet(currentColumns);
 
 			Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();

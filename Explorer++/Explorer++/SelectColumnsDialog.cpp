@@ -34,7 +34,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	lvColumn.mask = 0;
 	ListView_InsertColumn(hListView, 0, &lvColumn);
 
-	auto currentColumns = m_shellBrowser->GetCurrentColumns();
+	auto currentColumns = m_shellBrowser->GetCurrentColumnSet();
 
 	std::sort(currentColumns.begin(), currentColumns.end(),
 		std::bind_front(&SelectColumnsDialog::CompareColumns, this));
@@ -188,7 +188,7 @@ void SelectColumnsDialog::OnOk()
 	HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
 	std::vector<Column_t> updatedColumns;
 
-	auto currentColumns = m_shellBrowser->GetCurrentColumns();
+	const auto &currentColumns = m_shellBrowser->GetCurrentColumnSet();
 
 	for (int i = 0; i < ListView_GetItemCount(hListView); i++)
 	{
@@ -211,7 +211,7 @@ void SelectColumnsDialog::OnOk()
 		updatedColumns.push_back(column);
 	}
 
-	m_shellBrowser->SetCurrentColumns(updatedColumns);
+	m_shellBrowser->SetCurrentColumnSet(updatedColumns);
 
 	if (m_bColumnsSwapped)
 	{

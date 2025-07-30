@@ -42,8 +42,8 @@ public:
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;
 	void SetSortDirection(SortDirection direction) override;
-	void SetColumns(const FolderColumns &folderColumns) override;
-	const FolderColumns &GetColumns() override;
+	void SetAllColumnSets(const FolderColumns &folderColumns) override;
+	const FolderColumns &GetAllColumnSets() const override;
 	bool IsAutoArrangeEnabled() const override;
 	void SetAutoArrangeEnabled(bool enabled) override;
 	bool CanAutoSizeColumns() const override;

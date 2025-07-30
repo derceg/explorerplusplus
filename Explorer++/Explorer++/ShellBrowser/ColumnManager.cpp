@@ -590,80 +590,22 @@ void ShellBrowserImpl::ApplyHeaderSortArrow()
 	Header_SetItem(hHeader, iColumn, &hdItem);
 }
 
-void ShellBrowserImpl::SetColumns(const FolderColumns &folderColumns)
+void ShellBrowserImpl::SetAllColumnSets(const FolderColumns &folderColumns)
 {
 	m_folderColumns = folderColumns;
 }
 
-const FolderColumns &ShellBrowserImpl::GetColumns()
+const FolderColumns &ShellBrowserImpl::GetAllColumnSets() const
 {
-	SaveColumnWidths();
-
 	return m_folderColumns;
 }
 
-void ShellBrowserImpl::SaveColumnWidths()
+const std::vector<Column_t> &ShellBrowserImpl::GetCurrentColumnSet() const
 {
-	std::vector<Column_t> *pActiveColumns = nullptr;
-	int iColumn = 0;
-
-	if (CompareVirtualFolders(CSIDL_CONTROLS))
-	{
-		pActiveColumns = &m_folderColumns.controlPanelColumns;
-	}
-	else if (CompareVirtualFolders(CSIDL_DRIVES))
-	{
-		pActiveColumns = &m_folderColumns.myComputerColumns;
-	}
-	else if (CompareVirtualFolders(CSIDL_BITBUCKET))
-	{
-		pActiveColumns = &m_folderColumns.recycleBinColumns;
-	}
-	else if (CompareVirtualFolders(CSIDL_PRINTERS))
-	{
-		pActiveColumns = &m_folderColumns.printersColumns;
-	}
-	else if (CompareVirtualFolders(CSIDL_CONNECTIONS))
-	{
-		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
-	}
-	else if (CompareVirtualFolders(CSIDL_NETWORK))
-	{
-		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
-	}
-	else
-	{
-		pActiveColumns = &m_folderColumns.realFolderColumns;
-	}
-
-	/* Only save column widths if the listview is currently in
-	details view. If it's not currently in details view, then
-	column widths have already been saved when the view changed. */
-	if (m_folderSettings.viewMode == +ViewMode::Details)
-	{
-		for (auto itr = pActiveColumns->begin(); itr != pActiveColumns->end(); itr++)
-		{
-			if (itr->checked)
-			{
-				itr->width = ListView_GetColumnWidth(m_listView, iColumn);
-
-				iColumn++;
-			}
-		}
-	}
-}
-
-std::vector<Column_t> ShellBrowserImpl::GetCurrentColumns()
-{
-	if (m_folderSettings.viewMode == +ViewMode::Details)
-	{
-		SaveColumnWidths();
-	}
-
 	return *m_pActiveColumns;
 }
 
-void ShellBrowserImpl::SetCurrentColumns(const std::vector<Column_t> &columns)
+void ShellBrowserImpl::SetCurrentColumnSet(const std::vector<Column_t> &columns)
 {
 	bool sortFolder = false;
 	int columnIndex = 0;

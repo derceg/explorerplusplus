@@ -119,7 +119,7 @@ void Explorerplusplus::OnNewTab()
 		if (WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 		{
 			auto pidl = selectedTab.GetShellBrowserImpl()->GetItemCompleteIdl(selectionIndex);
-			FolderColumns cols = selectedTab.GetShellBrowserImpl()->GetColumns();
+			const auto &cols = selectedTab.GetShellBrowserImpl()->GetAllColumnSets();
 
 			auto navigateParams = NavigateParams::Normal(pidl.get());
 			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, { .selected = true },

@@ -755,7 +755,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		/* Dump the columns from the current tab, and save
 		them as the default columns for the appropriate folder
 		type.. */
-		auto currentColumns = m_pActiveShellBrowser->GetCurrentColumns();
+		const auto &currentColumns = m_pActiveShellBrowser->GetCurrentColumnSet();
 		auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 
 		unique_pidl_absolute pidlDrives;

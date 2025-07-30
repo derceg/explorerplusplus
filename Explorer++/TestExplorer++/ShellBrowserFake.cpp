@@ -105,12 +105,12 @@ void ShellBrowserFake::SetSortDirection(SortDirection direction)
 	m_folderSettings.sortDirection = direction;
 }
 
-void ShellBrowserFake::SetColumns(const FolderColumns &folderColumns)
+void ShellBrowserFake::SetAllColumnSets(const FolderColumns &folderColumns)
 {
 	m_folderColumns = folderColumns;
 }
 
-const FolderColumns &ShellBrowserFake::GetColumns()
+const FolderColumns &ShellBrowserFake::GetAllColumnSets() const
 {
 	return m_folderColumns;
 }

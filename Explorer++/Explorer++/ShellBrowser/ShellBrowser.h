@@ -44,8 +44,8 @@ public:
 	virtual SortDirection GetSortDirection() const = 0;
 	virtual void SetSortDirection(SortDirection direction) = 0;
 
-	virtual void SetColumns(const FolderColumns &folderColumns) = 0;
-	virtual const FolderColumns &GetColumns() = 0;
+	virtual void SetAllColumnSets(const FolderColumns &folderColumns) = 0;
+	virtual const FolderColumns &GetAllColumnSets() const = 0;
 
 	virtual bool IsAutoArrangeEnabled() const = 0;
 	virtual void SetAutoArrangeEnabled(bool enabled) = 0;

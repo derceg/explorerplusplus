@@ -641,7 +641,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::CopyColumnInfoToClipboard()
 {
-	auto currentColumns = m_pActiveShellBrowser->GetCurrentColumns();
+	const auto &currentColumns = m_pActiveShellBrowser->GetCurrentColumnSet();
 
 	std::wstring strColumnInfo;
 	int nActiveColumns = 0;
