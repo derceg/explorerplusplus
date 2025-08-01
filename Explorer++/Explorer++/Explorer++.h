@@ -188,10 +188,6 @@ private:
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK ListViewSubclassProc(HWND ListView, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	void SetUpControlVisibilityConfigListeners();
 
 	/* Main window message handlers. */

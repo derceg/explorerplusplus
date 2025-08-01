@@ -92,3 +92,19 @@ Target CheckedNumericCast(Source source)
 		boost::numeric::conversion_traits<Target, Source>, CheckedOverflowHandler>;
 	return convertor::convert(source);
 }
+
+template <typename T>
+void MoveVectorItem(std::vector<T> &v, size_t oldIndex, size_t newIndex)
+{
+	CHECK(oldIndex < v.size());
+	CHECK(newIndex < v.size());
+
+	if (newIndex > oldIndex)
+	{
+		std::rotate(v.begin() + oldIndex, v.begin() + oldIndex + 1, v.begin() + newIndex + 1);
+	}
+	else
+	{
+		std::rotate(v.rend() - oldIndex - 1, v.rend() - oldIndex, v.rend() - newIndex);
+	}
+}

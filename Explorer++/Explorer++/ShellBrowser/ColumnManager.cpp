@@ -679,3 +679,22 @@ Column_t ShellBrowserImpl::GetFirstCheckedColumn()
 
 	return *itr;
 }
+
+size_t ShellBrowserImpl::GetColumnIndexFromDisplayIndex(int displayIndex)
+{
+	int currentDisplayIndex = 0;
+
+	auto itr = std::ranges::find_if(*m_pActiveColumns,
+		[&currentDisplayIndex, displayIndex](const Column_t &column)
+		{
+			if (!column.checked)
+			{
+				return false;
+			}
+
+			return currentDisplayIndex++ == displayIndex;
+		});
+	CHECK(itr != m_pActiveColumns->end());
+
+	return std::distance(m_pActiveColumns->begin(), itr);
+}

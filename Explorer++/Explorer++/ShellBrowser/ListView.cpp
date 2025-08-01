@@ -78,6 +78,10 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 	switch (uMsg)
 	{
+	case WM_MENUSELECT:
+		SendMessage(m_browser->GetHWND(), WM_MENUSELECT, wParam, lParam);
+		break;
+
 	// NM_DBLCLK for the listview is sent both on double clicks (by default), as well as in the
 	// situation when LVS_EX_ONECLICKACTIVATE is active (in which case it's sent on a single mouse
 	// click). Navigation up should only occur on a double click, which is why WM_LBUTTONDBLCLK is
@@ -139,6 +143,22 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 	case WM_SETFOCUS:
 		m_commandTarget.TargetFocused();
+		break;
+
+	case WM_NOTIFY:
+		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+		{
+		case HDN_ITEMCHANGED:
+			OnListViewHeaderItemChanged(reinterpret_cast<NMHEADER *>(lParam));
+			break;
+
+		case HDN_BEGINDRAG:
+			return false;
+
+		case HDN_ENDDRAG:
+			OnListViewHeaderEndDrag(reinterpret_cast<NMHEADER *>(lParam));
+			return true;
+		}
 		break;
 
 	case WM_APP_COLUMN_RESULT_READY:
@@ -227,10 +247,6 @@ LRESULT ShellBrowserImpl::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
-			case HDN_ITEMCHANGED:
-				OnListViewHeaderItemChanged(reinterpret_cast<NMHEADER *>(lParam));
-				break;
-
 			case NM_RCLICK:
 			{
 				DWORD messagePos = GetMessagePos();
@@ -1050,6 +1066,28 @@ void ShellBrowserImpl::OnListViewHeaderItemChanged(const NMHEADER *changeInfo)
 
 	auto &targetColumn = view.front();
 	targetColumn.width = changeInfo->pitem->cxy;
+}
+
+void ShellBrowserImpl::OnListViewHeaderEndDrag(const NMHEADER *changeInfo)
+{
+	if (!changeInfo->pitem || WI_IsFlagClear(changeInfo->pitem->mask, HDI_ORDER))
+	{
+		// It isn't expected that this would ever happen, since it would make it impossible to
+		// determine the new column index.
+		DCHECK(false);
+		return;
+	}
+
+	if (changeInfo->iItem == changeInfo->pitem->iOrder)
+	{
+		// The item hasn't actually moved.
+		return;
+	}
+
+	MoveVectorItem(*m_pActiveColumns, GetColumnIndexFromDisplayIndex(changeInfo->iItem),
+		GetColumnIndexFromDisplayIndex(changeInfo->pitem->iOrder));
+
+	m_navigationController->Refresh();
 }
 
 void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)

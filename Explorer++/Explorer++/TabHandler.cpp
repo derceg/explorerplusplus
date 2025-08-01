@@ -87,9 +87,7 @@ void Explorerplusplus::MaybeUpdateTabBarVisibility()
 
 void Explorerplusplus::OnTabCreated(const Tab &tab)
 {
-	/* TODO: This subclass needs to be removed. */
-	SetWindowSubclass(tab.GetShellBrowserImpl()->GetListView(), ListViewProcStub, 0,
-		reinterpret_cast<DWORD_PTR>(this));
+	UNREFERENCED_PARAMETER(tab);
 
 	// A tab has been created, so this call is needed in order to set the size and position of the
 	// tab's listview control.

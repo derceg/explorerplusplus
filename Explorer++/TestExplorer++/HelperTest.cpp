@@ -6,6 +6,8 @@
 #include "../Helper/Helper.h"
 #include <gtest/gtest.h>
 
+using namespace testing;
+
 TEST(BuildFileAttributesString, Empty)
 {
 	auto attributesString = BuildFileAttributesString(0);
@@ -51,4 +53,24 @@ TEST(HelperTest, GetExpandedEnvironmentVariable)
 	auto bar = GetExpandedEnvironmentVariable(L"BAR");
 	ASSERT_TRUE(bar.has_value());
 	EXPECT_EQ(bar.value(), L"FOO_VALUE/BAR_VALUE");
+}
+
+TEST(HelperTest, MoveVectorItem)
+{
+	std::vector<char> items = { 'a', 'b', 'c', 'd' };
+
+	MoveVectorItem(items, 0, 2);
+	EXPECT_THAT(items, ElementsAre('b', 'c', 'a', 'd'));
+
+	MoveVectorItem(items, 0, 3);
+	EXPECT_THAT(items, ElementsAre('c', 'a', 'd', 'b'));
+
+	MoveVectorItem(items, 1, 2);
+	EXPECT_THAT(items, ElementsAre('c', 'd', 'a', 'b'));
+
+	MoveVectorItem(items, 3, 2);
+	EXPECT_THAT(items, ElementsAre('c', 'd', 'b', 'a'));
+
+	MoveVectorItem(items, 3, 0);
+	EXPECT_THAT(items, ElementsAre('a', 'c', 'd', 'b'));
 }

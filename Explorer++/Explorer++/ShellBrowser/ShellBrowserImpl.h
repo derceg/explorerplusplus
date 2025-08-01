@@ -454,6 +454,7 @@ private:
 	void OnOneClickActivateUpdated(BOOL newValue);
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
 	void OnListViewHeaderItemChanged(const NMHEADER *changeInfo);
+	void OnListViewHeaderEndDrag(const NMHEADER *changeInfo);
 
 	bool DoAllSelectedItemsHaveAttributes(SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
@@ -502,6 +503,7 @@ private:
 	void SetActiveColumnSet();
 	void GetColumnInternal(ColumnType columnType, Column_t *pci) const;
 	Column_t GetFirstCheckedColumn();
+	size_t GetColumnIndexFromDisplayIndex(int displayIndex);
 	void ProcessColumnResult(int columnResultId);
 	std::optional<int> GetColumnIndexByType(ColumnType columnType) const;
 	std::optional<ColumnType> GetColumnTypeByIndex(int index) const;
