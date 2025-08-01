@@ -223,24 +223,8 @@ void TabContainer::Initialize(HWND parent)
 	m_view->windowDestroyedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnWindowDestroyed, this));
 
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TabContainer::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
-}
-
-LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_MENUSELECT:
-		/* Forward the message to the main window so it can
-		handle menu help. */
-		SendMessage(m_browser->GetHWND(), WM_MENUSELECT, wParam, lParam);
-		break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
 void TabContainer::OnTabDoubleClicked(Tab *tab, const MouseEvent &event)

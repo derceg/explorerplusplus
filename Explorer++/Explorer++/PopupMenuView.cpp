@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "PopupMenuView.h"
 #include "../Helper/Helper.h"
+#include "../Helper/MenuHelpTextHost.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclass.h"
 
@@ -18,7 +19,6 @@ void PopupMenuView::Show(HWND hwnd, const POINT &point)
 {
 	DCHECK_GT(GetMenuItemCount(m_menu.get()), 0);
 
-	// Subclass the parent window to allow middle clicks to be detected.
 	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&PopupMenuView::ParentWindowSubclass, this));
 
@@ -51,6 +51,11 @@ LRESULT PopupMenuView::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 {
 	switch (msg)
 	{
+	case WM_MENUSELECT:
+		m_menuHelpTextHost->MenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam),
+			HIWORD(wParam));
+		break;
+
 	case WM_MBUTTONUP:
 		OnMenuMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
 			WI_IsFlagSet(wParam, MK_CONTROL), WI_IsFlagSet(wParam, MK_SHIFT));

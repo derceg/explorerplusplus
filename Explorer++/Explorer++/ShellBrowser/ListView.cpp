@@ -78,10 +78,6 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 	switch (uMsg)
 	{
-	case WM_MENUSELECT:
-		SendMessage(m_browser->GetHWND(), WM_MENUSELECT, wParam, lParam);
-		break;
-
 	// NM_DBLCLK for the listview is sent both on double clicks (by default), as well as in the
 	// situation when LVS_EX_ONECLICKACTIVATE is active (in which case it's sent on a single mouse
 	// click). Navigation up should only occur on a double click, which is why WM_LBUTTONDBLCLK is

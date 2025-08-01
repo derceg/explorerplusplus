@@ -181,10 +181,6 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		SendMessage(m_hContainer, WM_INITMENU, wParam, lParam);
 		break;
 
-	case WM_MENUSELECT:
-		SendMessage(m_hContainer, WM_MENUSELECT, wParam, lParam);
-		break;
-
 	case WM_NOTIFY:
 		switch (((LPNMHDR) lParam)->code)
 		{

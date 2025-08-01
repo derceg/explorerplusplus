@@ -386,6 +386,11 @@ void Explorerplusplus::StartMainToolbarCustomization()
 	m_mainToolbar->StartCustomization();
 }
 
+void Explorerplusplus::MenuItemSelected(HMENU menu, UINT itemId, UINT flags)
+{
+	m_statusBar->OnMenuSelect(menu, itemId, flags);
+}
+
 boost::signals2::connection Explorerplusplus::AddMenuHelpTextRequestObserver(
 	const MenuHelpTextRequestSignal::slot_type &observer)
 {

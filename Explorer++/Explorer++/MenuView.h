@@ -54,6 +54,8 @@ protected:
 	void OnMenuWillShowForDpi(UINT dpi);
 	void OnMenuClosed();
 
+	MenuHelpTextHost *const m_menuHelpTextHost;
+
 private:
 	struct Item
 	{
@@ -76,7 +78,6 @@ private:
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
 
-	MenuHelpTextHost *const m_menuHelpTextHost;
 	boost::signals2::scoped_connection m_helpTextConnection;
 
 	std::unordered_map<UINT, Item> m_idToItemMap;

@@ -201,6 +201,11 @@ LRESULT ShellContextMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wPara
 {
 	switch (msg)
 	{
+	case WM_MENUSELECT:
+		m_menuHelpTextHost->MenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam),
+			HIWORD(wParam));
+		break;
+
 	case WM_MEASUREITEM:
 	case WM_DRAWITEM:
 	case WM_INITMENUPOPUP:

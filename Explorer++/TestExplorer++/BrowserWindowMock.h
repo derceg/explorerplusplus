@@ -42,6 +42,7 @@ public:
 	MOCK_METHOD(void, Close, (), (override));
 
 	// MenuHelpTextHost
+	MOCK_METHOD(void, MenuItemSelected, (HMENU menu, UINT itemId, UINT flags), (override));
 	MOCK_METHOD(boost::signals2::connection, AddMenuHelpTextRequestObserver,
 		(const MenuHelpTextRequestSignal::slot_type &observer), (override));
 };

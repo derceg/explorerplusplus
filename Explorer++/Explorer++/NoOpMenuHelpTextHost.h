@@ -27,6 +27,7 @@
 class NoOpMenuHelpTextHost final : public MenuHelpTextHost
 {
 public:
+	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override;
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 

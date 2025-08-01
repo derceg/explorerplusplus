@@ -19,6 +19,9 @@ class MenuHelpTextHost
 public:
 	virtual ~MenuHelpTextHost() = default;
 
+	// Notifies the host that a menu item has been selected.
+	virtual void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) = 0;
+
 	// Allows an observer to respond to help text requests from the host, in order to provide help
 	// text for a particular menu item.
 	virtual boost::signals2::connection AddMenuHelpTextRequestObserver(

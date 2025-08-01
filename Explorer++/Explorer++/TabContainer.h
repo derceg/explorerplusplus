@@ -133,7 +133,6 @@ private:
 		const AcceleratorManager *acceleratorManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 
-	LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
