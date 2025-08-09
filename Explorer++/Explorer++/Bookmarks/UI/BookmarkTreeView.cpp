@@ -370,7 +370,7 @@ void BookmarkTreeView::OnKeyDown(const NMTVKEYDOWN *pnmtvkd)
 		break;
 
 	case VK_DELETE:
-		DeleteSelection();
+		m_bookmarkTree->RemoveBookmarkItem(GetSelectedFolder());
 		break;
 	}
 }
@@ -445,25 +445,6 @@ void BookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
-bool BookmarkTreeView::CanDelete()
-{
-	auto hSelectedItem = TreeView_GetSelection(m_hTreeView);
-	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
-
-	return !m_bookmarkTree->IsPermanentNode(bookmarkFolder);
-}
-
-void BookmarkTreeView::DeleteSelection()
-{
-	auto hSelectedItem = TreeView_GetSelection(m_hTreeView);
-	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
-
-	if (!m_bookmarkTree->IsPermanentNode(bookmarkFolder))
-	{
-		m_bookmarkTree->RemoveBookmarkItem(bookmarkFolder);
-	}
-}
-
 void BookmarkTreeView::OnShowContextMenu(const POINT &ptScreen)
 {
 	HTREEITEM targetItem;
@@ -515,20 +496,17 @@ void BookmarkTreeView::StartRenamingFolder(BookmarkItem *folder)
 	TreeView_EditLabel(m_hTreeView, itr->second);
 }
 
-void BookmarkTreeView::CreateNewFolder()
+void BookmarkTreeView::CreateFolder(size_t index)
 {
-	auto selectedItem = TreeView_GetSelection(m_hTreeView);
-	auto selectedFolder = GetBookmarkFolderFromTreeView(selectedItem);
-	CreateNewFolder(selectedFolder);
+	CreateFolder(GetSelectedFolder(), index);
 }
 
-void BookmarkTreeView::CreateNewFolder(BookmarkItem *parentFolder)
+void BookmarkTreeView::CreateFolder(BookmarkItem *parentFolder, size_t index)
 {
 	std::wstring newBookmarkFolderName =
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
 	auto *addedFolder = m_bookmarkTree->AddBookmarkItem(parentFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt),
-		parentFolder->GetChildren().size());
+		std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt), index);
 
 	// The item should be added to the treeview once it's created.
 	auto itr = m_mapItem.find(addedFolder->GetGUID());
@@ -539,6 +517,37 @@ void BookmarkTreeView::CreateNewFolder(BookmarkItem *parentFolder)
 	TreeView_EditLabel(m_hTreeView, itr->second);
 }
 
+bool BookmarkTreeView::CanSelectAllItems() const
+{
+	return false;
+}
+
+void BookmarkTreeView::SelectAllItems()
+{
+}
+
+RawBookmarkItems BookmarkTreeView::GetSelectedItems() const
+{
+	return { GetSelectedFolder() };
+}
+
+RawBookmarkItems BookmarkTreeView::GetSelectedChildItems(const BookmarkItem *targetFolder) const
+{
+	UNREFERENCED_PARAMETER(targetFolder);
+
+	return {};
+}
+
+void BookmarkTreeView::SelectItem(const BookmarkItem *bookmarkItem)
+{
+	if (!bookmarkItem->IsFolder())
+	{
+		return;
+	}
+
+	SelectFolder(bookmarkItem->GetGUID());
+}
+
 void BookmarkTreeView::SelectFolder(const std::wstring &guid)
 {
 	auto itr = m_mapItem.find(guid);
@@ -547,7 +556,12 @@ void BookmarkTreeView::SelectFolder(const std::wstring &guid)
 	TreeView_SelectItem(m_hTreeView, itr->second);
 }
 
-BookmarkItem *BookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem)
+BookmarkItem *BookmarkTreeView::GetSelectedFolder() const
+{
+	return GetBookmarkFolderFromTreeView(TreeView_GetSelection(m_hTreeView));
+}
+
+BookmarkItem *BookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem) const
 {
 	TVITEM tvi;
 	tvi.mask = TVIF_HANDLE | TVIF_PARAM;

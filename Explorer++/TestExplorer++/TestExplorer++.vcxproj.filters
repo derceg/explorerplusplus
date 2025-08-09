@@ -485,6 +485,12 @@
     <ClCompile Include="ShellBrowserFactoryFake.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="OrganizeBookmarksContextMenuTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="CopiedBookmark.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -793,6 +799,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowserFactoryFake.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="CopiedBookmark.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

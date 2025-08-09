@@ -18,7 +18,7 @@ public:
 	virtual ~BookmarkTreeViewContextMenuDelegate() = default;
 
 	virtual void StartRenamingFolder(BookmarkItem *folder) = 0;
-	virtual void CreateNewFolder(BookmarkItem *parentFolder) = 0;
+	virtual void CreateFolder(BookmarkItem *parentFolder, size_t index) = 0;
 };
 
 class BookmarkTreeViewContextMenu : public MenuBase

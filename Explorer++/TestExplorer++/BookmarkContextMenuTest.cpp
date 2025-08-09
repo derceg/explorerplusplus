@@ -9,6 +9,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "CopiedBookmark.h"
 #include "MainResource.h"
 #include "MenuViewFake.h"
 #include "ResourceLoaderFake.h"
@@ -24,35 +25,10 @@ using namespace testing;
 class BookmarkContextMenuTestBase : public BrowserTestBase
 {
 protected:
-	struct CopiedBookmark
-	{
-		CopiedBookmark(const BookmarkItem *bookmark) :
-			type(bookmark->GetType()),
-			guid(bookmark->GetGUID()),
-			name(bookmark->GetName()),
-			location(bookmark->GetLocation())
-		{
-		}
-
-		BookmarkItem::Type type;
-		std::wstring guid;
-		std::wstring name;
-		std::wstring location;
-	};
-
 	BookmarkContextMenuTestBase() :
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab(L"c:\\original\\path"))
 	{
-	}
-
-	void ExpectClipboardBookmarkMatchesCopiedBookmark(const BookmarkItem *clipboardBookmark,
-		const CopiedBookmark *copiedBookmark)
-	{
-		EXPECT_EQ(clipboardBookmark->GetType(), copiedBookmark->type);
-		EXPECT_NE(clipboardBookmark->GetGUID(), copiedBookmark->guid);
-		EXPECT_EQ(clipboardBookmark->GetName(), copiedBookmark->name);
-		EXPECT_EQ(clipboardBookmark->GetLocation(), copiedBookmark->location);
 	}
 
 	AcceleratorManager m_acceleratorManager;
@@ -105,7 +81,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 	MenuViewFake menuView;
 	auto contextMenu = BuildContextMenu(&menuView);
 
-	CopiedBookmark copiedBookmark(m_bookmark);
+	CopiedBookmark copiedBookmark(*m_bookmark);
 	const auto *parentFolder = m_bookmark->GetParent();
 
 	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, false, false);
@@ -117,7 +93,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	ASSERT_EQ(clipboardItems.size(), 1u);
 
-	ExpectClipboardBookmarkMatchesCopiedBookmark(clipboardItems[0].get(), &copiedBookmark);
+	EXPECT_EQ(*clipboardItems[0], copiedBookmark);
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
@@ -125,7 +101,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 	MenuViewFake menuView;
 	auto contextMenu = BuildContextMenu(&menuView);
 
-	CopiedBookmark copiedBookmark(m_bookmark);
+	CopiedBookmark copiedBookmark(*m_bookmark);
 
 	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
 
@@ -133,7 +109,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	ASSERT_EQ(clipboardItems.size(), 1u);
 
-	ExpectClipboardBookmarkMatchesCopiedBookmark(clipboardItems[0].get(), &copiedBookmark);
+	EXPECT_EQ(*clipboardItems[0], copiedBookmark);
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
@@ -144,9 +120,9 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 	// the menu is built.
 	auto *bookmark = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"f:\\"), 0);
-	CopiedBookmark copiedBookmark(bookmark);
-	ASSERT_TRUE(
-		BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { bookmark }, false));
+	CopiedBookmark copiedBookmark(*bookmark);
+	ASSERT_TRUE(BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { bookmark },
+		ClipboardAction::Copy));
 
 	MenuViewFake menuView;
 	auto contextMenu = BuildContextMenu(&menuView);
@@ -157,7 +133,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 	ASSERT_EQ(parentFolder->GetChildren().size(), 2u);
 
 	const auto &pastedBookmark = parentFolder->GetChildren()[1];
-	ExpectClipboardBookmarkMatchesCopiedBookmark(pastedBookmark.get(), &copiedBookmark);
+	EXPECT_EQ(*pastedBookmark, copiedBookmark);
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Delete)

@@ -76,7 +76,7 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, m_acceleratorManager, m_resourceLoader,
+	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, m_acceleratorManager, m_resourceLoader,
 		m_bookmarkTree, m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
@@ -228,7 +228,8 @@ INT_PTR AddBookmarkDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDC_BOOKMARK_NEWFOLDER:
-			m_pBookmarkTreeView->CreateNewFolder();
+			m_bookmarkTreeView->CreateFolder(
+				m_bookmarkTreeView->GetSelectedFolder()->GetChildren().size());
 			break;
 
 		case IDOK:
@@ -258,9 +259,7 @@ void AddBookmarkDialog::OnOk()
 		return;
 	}
 
-	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
-	auto hSelected = TreeView_GetSelection(hTreeView);
-	*m_selectedParentFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
+	*m_selectedParentFolder = m_bookmarkTreeView->GetSelectedFolder();
 
 	m_bookmarkItem->SetName(name);
 
@@ -290,9 +289,8 @@ void AddBookmarkDialog::SaveTreeViewState()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
 
-	auto hSelected = TreeView_GetSelection(hTreeView);
-	const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
-	m_persistentSettings->m_guidSelected = bookmarkFolder->GetGUID();
+	const auto *selectedFolder = m_bookmarkTreeView->GetSelectedFolder();
+	m_persistentSettings->m_guidSelected = selectedFolder->GetGUID();
 
 	m_persistentSettings->m_setExpansion.clear();
 	SaveTreeViewExpansionState(hTreeView, TreeView_GetRoot(hTreeView));
@@ -304,7 +302,7 @@ void AddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView, HTREEITEM hIt
 
 	if (uState & TVIS_EXPANDED)
 	{
-		const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hItem);
+		const auto bookmarkFolder = m_bookmarkTreeView->GetBookmarkFolderFromTreeView(hItem);
 		m_persistentSettings->m_setExpansion.insert(bookmarkFolder->GetGUID());
 
 		auto hChild = TreeView_GetChild(hTreeView, hItem);
@@ -325,7 +323,7 @@ INT_PTR AddBookmarkDialog::OnClose()
 
 INT_PTR AddBookmarkDialog::OnNcDestroy()
 {
-	delete m_pBookmarkTreeView;
+	delete m_bookmarkTreeView;
 
 	return 0;
 }

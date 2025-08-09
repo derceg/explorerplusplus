@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "MenuViewFake.h"
+#include "../Helper/MenuHelper.h"
 
 MenuViewFake::MenuViewFake(MenuHelpTextHost *menuHelpTextHost) :
 	MenuView(menuHelpTextHost),
@@ -50,6 +51,11 @@ HBITMAP MenuViewFake::GetItemBitmap(UINT id) const
 	CHECK(res);
 
 	return menuItemInfo.hbmpItem;
+}
+
+bool MenuViewFake::IsItemEnabled(UINT id) const
+{
+	return MenuHelper::IsMenuItemEnabled(m_menu.get(), id, false);
 }
 
 HMENU MenuViewFake::GetMenu() const

@@ -21,7 +21,7 @@ class BookmarkTreeViewContextMenuDelegateMock : public BookmarkTreeViewContextMe
 {
 public:
 	MOCK_METHOD(void, StartRenamingFolder, (BookmarkItem * folder), (override));
-	MOCK_METHOD(void, CreateNewFolder, (BookmarkItem * parentFolder), (override));
+	MOCK_METHOD(void, CreateFolder, (BookmarkItem * parentFolder, size_t index), (override));
 };
 
 }
@@ -44,7 +44,7 @@ TEST(BookmarkTreeViewContextMenuTest, Selection)
 	EXPECT_CALL(delegate, StartRenamingFolder(targetFolder));
 	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
 
-	EXPECT_CALL(delegate, CreateNewFolder(targetFolder));
+	EXPECT_CALL(delegate, CreateFolder(targetFolder, targetFolder->GetChildren().size()));
 	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
 
 	MockFunction<void(const std::wstring &guid)> removedCallback;

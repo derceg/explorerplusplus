@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "OrganizeBookmarksContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
@@ -22,6 +23,7 @@ class BookmarkTree;
 class ResourceLoader;
 
 class BookmarkTreeView :
+	public OrganizeBookmarksContextMenuDelegate,
 	private BookmarkDropTargetWindow,
 	private BookmarkTreeViewContextMenuDelegate
 {
@@ -31,12 +33,18 @@ public:
 		const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 
-	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem);
+	// OrganizeBookmarksContextMenuDelegate
+	bool CanSelectAllItems() const override;
+	void SelectAllItems() override;
+	void CreateFolder(size_t index) override;
+	RawBookmarkItems GetSelectedItems() const override;
+	RawBookmarkItems GetSelectedChildItems(const BookmarkItem *targetFolder) const override;
+	void SelectItem(const BookmarkItem *bookmarkItem) override;
 
-	void CreateNewFolder();
+	BookmarkItem *GetSelectedFolder() const;
+	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem) const;
+
 	void SelectFolder(const std::wstring &guid);
-	bool CanDelete();
-	void DeleteSelection();
 
 	// Signals
 	SignalWrapper<BookmarkTreeView, void(BookmarkItem *bookmarkFolder)> selectionChangedSignal;
@@ -70,7 +78,7 @@ private:
 
 	// BookmarkTreeViewContextMenuDelegate
 	void StartRenamingFolder(BookmarkItem *folder) override;
-	void CreateNewFolder(BookmarkItem *parentFolder) override;
+	void CreateFolder(BookmarkItem *parentFolder, size_t index) override;
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);

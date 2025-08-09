@@ -23,6 +23,7 @@ public:
 	UINT GetItemId(int index) const;
 	std::wstring GetItemText(UINT id) const;
 	HBITMAP GetItemBitmap(UINT id) const;
+	bool IsItemEnabled(UINT id) const;
 
 private:
 	wil::unique_hmenu m_menu;

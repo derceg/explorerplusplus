@@ -328,12 +328,7 @@ void BookmarkListView::OnBookmarkIconAvailable(std::wstring_view guid, int iconI
 	ListView_SetItem(m_hListView, &item);
 }
 
-BookmarkItem *BookmarkListView::GetBookmarkItemFromListView(int iItem)
-{
-	return const_cast<BookmarkItem *>(std::as_const(*this).GetBookmarkItemFromListView(iItem));
-}
-
-const BookmarkItem *BookmarkListView::GetBookmarkItemFromListView(int iItem) const
+BookmarkItem *BookmarkListView::GetBookmarkItemFromListView(int iItem) const
 {
 	LVITEM lvi;
 	lvi.mask = LVIF_PARAM;
@@ -509,7 +504,7 @@ void BookmarkListView::OnShowContextMenu(const POINT &ptScreen)
 		keyboardGenerated = true;
 	}
 
-	auto rawBookmarkItems = GetSelectedBookmarkItems();
+	auto rawBookmarkItems = GetSelectedItems();
 
 	if (rawBookmarkItems.empty())
 	{
@@ -570,7 +565,7 @@ void BookmarkListView::OnMenuItemSelected(int menuItemId)
 		break;
 
 	case IDM_BOOKMARKS_NEW_FOLDER:
-		CreateNewFolder();
+		CreateFolder(m_currentBookmarkFolder->GetChildren().size());
 		break;
 
 	default:
@@ -615,8 +610,18 @@ std::optional<int> BookmarkListView::GetLastSelectedItemIndex() const
 	return ListViewHelper::GetLastSelectedItemIndex(m_hListView);
 }
 
-RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()
+RawBookmarkItems BookmarkListView::GetSelectedItems() const
 {
+	return GetSelectedChildItems(m_currentBookmarkFolder);
+}
+
+RawBookmarkItems BookmarkListView::GetSelectedChildItems(const BookmarkItem *targetFolder) const
+{
+	if (targetFolder != m_currentBookmarkFolder)
+	{
+		return {};
+	}
+
 	RawBookmarkItems bookmarksItems;
 	int index = -1;
 
@@ -643,20 +648,28 @@ void BookmarkListView::SelectItem(const BookmarkItem *bookmarkItem)
 	ListViewHelper::SelectItem(m_hListView, *index, true);
 }
 
-void BookmarkListView::CreateNewFolder()
+void BookmarkListView::CreateFolder(size_t index)
 {
-	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
-	auto rawBookmarkItem = bookmarkItem.get();
+	const auto *bookmarkFolder = m_bookmarkTree->AddBookmarkItem(m_currentBookmarkFolder,
+		std::make_unique<BookmarkItem>(std::nullopt,
+			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt),
+		index);
 
-	m_bookmarkTree->AddBookmarkItem(m_currentBookmarkFolder, std::move(bookmarkItem),
-		m_currentBookmarkFolder->GetChildren().size());
+	SelectItem(bookmarkFolder);
 
-	auto index = GetBookmarkItemIndex(rawBookmarkItem);
-	CHECK(index);
+	auto finalIndex = GetBookmarkItemIndex(bookmarkFolder);
+	CHECK(finalIndex);
+	ListView_EditLabel(m_hListView, *finalIndex);
+}
 
-	SetFocus(m_hListView);
-	ListView_EditLabel(m_hListView, *index);
+bool BookmarkListView::CanSelectAllItems() const
+{
+	return true;
+}
+
+void BookmarkListView::SelectAllItems()
+{
+	ListViewHelper::SelectAllItems(m_hListView, true);
 }
 
 void BookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)
@@ -776,7 +789,7 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 		break;
 
 	case VK_DELETE:
-		DeleteSelection();
+		BookmarkHelper::RemoveBookmarks(m_bookmarkTree, GetSelectedItems());
 		break;
 	}
 }
@@ -785,7 +798,7 @@ void BookmarkListView::OnBeginDrag()
 {
 	auto dropSource = winrt::make_self<DropSourceImpl>();
 
-	auto rawBookmarkItems = GetSelectedBookmarkItems();
+	auto rawBookmarkItems = GetSelectedItems();
 
 	if (rawBookmarkItems.empty())
 	{
@@ -825,26 +838,9 @@ void BookmarkListView::OnRename()
 	}
 }
 
-bool BookmarkListView::CanDelete()
-{
-	auto rawBookmarkItems = GetSelectedBookmarkItems();
-	bool nonPermanentNodeSelected = false;
-
-	for (BookmarkItem *bookmarkItem : rawBookmarkItems)
-	{
-		if (!m_bookmarkTree->IsPermanentNode(bookmarkItem))
-		{
-			nonPermanentNodeSelected = true;
-			break;
-		}
-	}
-
-	return nonPermanentNodeSelected;
-}
-
 void BookmarkListView::OnEnterPressed()
 {
-	RawBookmarkItems bookmarkItems = GetSelectedBookmarkItems();
+	RawBookmarkItems bookmarkItems = GetSelectedItems();
 
 	if (bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder())
 	{
@@ -859,19 +855,6 @@ void BookmarkListView::OnEnterPressed()
 			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_browser);
 
 			disposition = OpenFolderDisposition::BackgroundTab;
-		}
-	}
-}
-
-void BookmarkListView::DeleteSelection()
-{
-	auto rawBookmarkItems = GetSelectedBookmarkItems();
-
-	for (BookmarkItem *bookmarkItem : rawBookmarkItems)
-	{
-		if (!m_bookmarkTree->IsPermanentNode(bookmarkItem))
-		{
-			m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
 		}
 	}
 }

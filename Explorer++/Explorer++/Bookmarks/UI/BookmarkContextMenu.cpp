@@ -189,11 +189,11 @@ void BookmarkContextMenu::OnMenuItemSelected(UINT menuItemId)
 		break;
 
 	case IDM_BOOKMARK_CONTEXT_MENU_CUT:
-		OnCopy(true);
+		OnCopy(ClipboardAction::Cut);
 		break;
 
 	case IDM_BOOKMARK_CONTEXT_MENU_COPY:
-		OnCopy(false);
+		OnCopy(ClipboardAction::Copy);
 		break;
 
 	case IDM_BOOKMARK_CONTEXT_MENU_PASTE:
@@ -247,9 +247,9 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type,
 		m_parentWindow, m_browser, m_acceleratorManager, m_resourceLoader);
 }
 
-void BookmarkContextMenu::OnCopy(bool cut)
+void BookmarkContextMenu::OnCopy(ClipboardAction action)
 {
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, m_bookmarkItems, cut);
+	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, m_bookmarkItems, action);
 }
 
 void BookmarkContextMenu::OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex)
@@ -260,10 +260,7 @@ void BookmarkContextMenu::OnPaste(BookmarkItem *targetParentFolder, size_t targe
 
 void BookmarkContextMenu::OnDelete()
 {
-	for (auto *bookmarkItem : m_bookmarkItems)
-	{
-		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
-	}
+	BookmarkHelper::RemoveBookmarks(m_bookmarkTree, m_bookmarkItems);
 }
 
 void BookmarkContextMenu::OnShowProperties()

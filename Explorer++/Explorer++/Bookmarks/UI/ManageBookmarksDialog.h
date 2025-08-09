@@ -103,14 +103,6 @@ private:
 
 	// Organize menu
 	void ShowOrganizeMenu();
-	void SetOrganizeMenuItemStates(HMENU menu);
-	void OnOrganizeMenuItemSelected(int menuItemId);
-	void OnNewBookmark();
-	void OnNewFolder();
-	void OnCopy(bool cut);
-	void OnPaste();
-	void OnDelete();
-	void OnSelectAll();
 
 	void OnOk();
 	void OnCancel();

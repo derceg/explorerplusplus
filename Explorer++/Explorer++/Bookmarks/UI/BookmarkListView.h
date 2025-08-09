@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkNavigatorInterface.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "OrganizeBookmarksContextMenuDelegate.h"
 #include "ResourceHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
@@ -23,7 +24,10 @@ struct Config;
 class IconFetcher;
 class ResourceLoader;
 
-class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
+class BookmarkListView :
+	public BookmarkNavigatorInterface,
+	public OrganizeBookmarksContextMenuDelegate,
+	private BookmarkDropTargetWindow
 {
 public:
 	struct Column
@@ -38,18 +42,20 @@ public:
 		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
 		const std::vector<Column> &initialColumns, ClipboardStore *clipboardStore);
 
+	// BookmarkNavigatorInterface
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder,
 		const BookmarkHistoryEntry *entry = nullptr) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
-	std::optional<int> GetLastSelectedItemIndex() const;
-	RawBookmarkItems GetSelectedBookmarkItems();
-	void SelectItem(const BookmarkItem *bookmarkItem);
-	void CreateNewFolder();
-	bool CanDelete();
-	void DeleteSelection();
+	// OrganizeBookmarksContextMenuDelegate
+	bool CanSelectAllItems() const override;
+	void SelectAllItems() override;
+	void CreateFolder(size_t index) override;
+	RawBookmarkItems GetSelectedItems() const override;
+	RawBookmarkItems GetSelectedChildItems(const BookmarkItem *targetFolder) const override;
+	void SelectItem(const BookmarkItem *bookmarkItem) override;
 
 	std::vector<Column> GetColumns();
 	void ToggleColumn(BookmarkHelper::ColumnType columnType);
@@ -80,8 +86,7 @@ private:
 		BookmarkHelper::ColumnType columnType);
 	std::wstring FormatDate(const FILETIME *date);
 
-	BookmarkItem *GetBookmarkItemFromListView(int iItem);
-	const BookmarkItem *GetBookmarkItemFromListView(int iItem) const;
+	BookmarkItem *GetBookmarkItemFromListView(int iItem) const;
 
 	void SortItems();
 	static int CALLBACK SortBookmarksStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
@@ -93,6 +98,7 @@ private:
 	void ShowBackgroundContextMenu(const POINT &ptScreen);
 	void OnMenuItemSelected(int menuItemId);
 	void OnNewBookmark();
+	std::optional<int> GetLastSelectedItemIndex() const;
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnEndLabelEdit(const NMLVDISPINFO *dispInfo);

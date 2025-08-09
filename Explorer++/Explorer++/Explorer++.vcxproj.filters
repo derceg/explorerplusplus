@@ -865,6 +865,9 @@
     <ClCompile Include="DialogHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\UI\OrganizeBookmarksContextMenu.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1814,6 +1817,12 @@
     </ClInclude>
     <ClInclude Include="DialogHelper.h">
       <Filter>Dialog Support</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenuDelegate.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenu.h">
+      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

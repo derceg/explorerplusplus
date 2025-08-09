@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
+#include "../Helper/FileOperations.h"
 #include <boost/signals2.hpp>
 #include <vector>
 
@@ -36,7 +37,7 @@ private:
 	void OnOpenAll();
 	void OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *targetParentFolder,
 		size_t targetIndex);
-	void OnCopy(bool cut);
+	void OnCopy(ClipboardAction action);
 	void OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex);
 	void OnDelete();
 	void OnShowProperties();

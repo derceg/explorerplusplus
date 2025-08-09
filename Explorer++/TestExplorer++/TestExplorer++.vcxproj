@@ -243,7 +243,9 @@
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
+    <ClCompile Include="CopiedBookmark.cpp" />
     <ClCompile Include="MenuViewFake.cpp" />
+    <ClCompile Include="OrganizeBookmarksContextMenuTest.cpp" />
     <ClCompile Include="ResourceIconModelTest.cpp" />
     <ClCompile Include="ShellBrowserFactoryFake.cpp" />
     <ClCompile Include="SimulatedClipboardDataObject.cpp" />
@@ -437,6 +439,7 @@
     <ClInclude Include="BrowserTestBase.h" />
     <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowMock.h" />
+    <ClInclude Include="CopiedBookmark.h" />
     <ClInclude Include="MenuViewFake.h" />
     <ClInclude Include="ShellBrowserFactoryFake.h" />
     <ClInclude Include="SimulatedClipboardDataObject.h" />

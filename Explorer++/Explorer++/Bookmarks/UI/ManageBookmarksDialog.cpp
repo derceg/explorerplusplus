@@ -11,6 +11,9 @@
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
+#include "NoOpMenuHelpTextHost.h"
+#include "OrganizeBookmarksContextMenu.h"
+#include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "../Helper/Controls.h"
@@ -359,7 +362,7 @@ void ManageBookmarksDialog::ShowViewMenu()
 		return;
 	}
 
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKEWORD(TRUE, 0));
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(TRUE, 0));
 
 	int menuItemId =
 		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hDlg, nullptr);
@@ -369,7 +372,7 @@ void ManageBookmarksDialog::ShowViewMenu()
 		OnViewMenuItemSelected(menuItemId);
 	}
 
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKEWORD(FALSE, 0));
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(FALSE, 0));
 }
 
 void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
@@ -483,240 +486,40 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 
 void ManageBookmarksDialog::ShowOrganizeMenu()
 {
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU)));
+	HWND focus = GetFocus();
+	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
+	OrganizeBookmarksContextMenuDelegate *delegate = nullptr;
 
-	if (!parentMenu)
+	if (focus == treeView || IsChild(treeView, focus))
 	{
-		return;
+		delegate = m_bookmarkTreeView;
 	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	SetOrganizeMenuItemStates(menu);
+	else
+	{
+		delegate = m_bookmarkListView;
+	}
 
 	RECT rc;
-	BOOL res = static_cast<BOOL>(
-		SendMessage(m_hToolbar, TB_GETRECT, TOOLBAR_ID_ORGANIZE, reinterpret_cast<LPARAM>(&rc)));
-
-	if (!res)
-	{
-		return;
-	}
+	auto res =
+		SendMessage(m_hToolbar, TB_GETRECT, TOOLBAR_ID_ORGANIZE, reinterpret_cast<LPARAM>(&rc));
+	CHECK(res);
 
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
 	res = ClientToScreen(m_hToolbar, &pt);
+	CHECK(res);
 
-	if (!res)
-	{
-		return;
-	}
+	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(TRUE, 0));
+	DCHECK(res);
 
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKEWORD(TRUE, 0));
+	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
+	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_hDlg, m_bookmarkTree,
+		m_currentBookmarkFolder, delegate, m_clipboardStore, m_resourceLoader);
+	popupMenu.Show(m_hDlg, pt);
 
-	int menuItemId =
-		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hDlg, nullptr);
-
-	if (menuItemId != 0)
-	{
-		OnOrganizeMenuItemSelected(menuItemId);
-	}
-
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKEWORD(FALSE, 0));
-}
-
-void ManageBookmarksDialog::SetOrganizeMenuItemStates(HMENU menu)
-{
-	HWND focus = GetFocus();
-	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
-	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
-
-	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_NEWBOOKMARK,
-		focus == listView || focus == treeView);
-	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_NEWFOLDER, focus == listView || focus == treeView);
-	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_SELECTALL, focus == listView);
-
-	bool canDelete = false;
-
-	if (focus == listView)
-	{
-		canDelete = m_bookmarkListView->CanDelete();
-	}
-	else if (focus == treeView)
-	{
-		canDelete = m_bookmarkTreeView->CanDelete();
-	}
-
-	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_DELETE, canDelete);
-}
-
-void ManageBookmarksDialog::OnOrganizeMenuItemSelected(int menuItemId)
-{
-	switch (menuItemId)
-	{
-	case IDM_MB_ORGANIZE_NEWBOOKMARK:
-		OnNewBookmark();
-		break;
-
-	case IDM_MB_ORGANIZE_NEWFOLDER:
-		OnNewFolder();
-		break;
-
-	case IDM_MB_ORGANIZE_CUT:
-		OnCopy(true);
-		break;
-
-	case IDM_MB_ORGANIZE_COPY:
-		OnCopy(false);
-		break;
-
-	case IDM_MB_ORGANIZE_PASTE:
-		OnPaste();
-		break;
-
-	case IDM_MB_ORGANIZE_DELETE:
-		OnDelete();
-		break;
-
-	case IDM_MB_ORGANIZE_SELECTALL:
-		OnSelectAll();
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
-}
-
-void ManageBookmarksDialog::OnNewBookmark()
-{
-	HWND focus = GetFocus();
-	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
-	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
-
-	if (focus != listView && focus != treeView)
-	{
-		return;
-	}
-
-	std::optional<size_t> targetIndex;
-
-	if (focus == listView)
-	{
-		auto lastSelectedItemIndex = m_bookmarkListView->GetLastSelectedItemIndex();
-
-		if (lastSelectedItemIndex)
-		{
-			targetIndex = *lastSelectedItemIndex + 1;
-		}
-		else
-		{
-			targetIndex = m_currentBookmarkFolder->GetChildren().size();
-		}
-	}
-
-	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, focus, m_browserWindow, m_acceleratorManager,
-		m_resourceLoader);
-
-	if (!bookmark || focus != listView || bookmark->GetParent() != m_currentBookmarkFolder)
-	{
-		return;
-	}
-
-	m_bookmarkListView->SelectItem(bookmark);
-}
-
-void ManageBookmarksDialog::OnNewFolder()
-{
-	HWND focus = GetFocus();
-
-	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
-	{
-		m_bookmarkListView->CreateNewFolder();
-	}
-	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
-	{
-		m_bookmarkTreeView->CreateNewFolder();
-	}
-}
-
-void ManageBookmarksDialog::OnCopy(bool cut)
-{
-	HWND focus = GetFocus();
-	RawBookmarkItems selectedItems;
-
-	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
-	{
-		selectedItems = m_bookmarkListView->GetSelectedBookmarkItems();
-	}
-	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
-	{
-		// The treeview selection and current folder are always the same, as
-		// they're kept in sync with each other.
-		selectedItems.push_back(m_currentBookmarkFolder);
-	}
-
-	if (selectedItems.empty())
-	{
-		return;
-	}
-
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, selectedItems, cut);
-}
-
-void ManageBookmarksDialog::OnPaste()
-{
-	HWND focus = GetFocus();
-	size_t targetIndex;
-
-	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
-	{
-		auto lastSelectedItemindex = m_bookmarkListView->GetLastSelectedItemIndex();
-
-		if (lastSelectedItemindex)
-		{
-			targetIndex = *lastSelectedItemindex + 1;
-		}
-		else
-		{
-			targetIndex = m_currentBookmarkFolder->GetChildren().size();
-		}
-	}
-	else
-	{
-		targetIndex = m_currentBookmarkFolder->GetChildren().size();
-	}
-
-	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, m_currentBookmarkFolder,
-		targetIndex);
-}
-
-void ManageBookmarksDialog::OnDelete()
-{
-	HWND focus = GetFocus();
-
-	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
-	{
-		m_bookmarkListView->DeleteSelection();
-	}
-	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
-	{
-		m_bookmarkTreeView->DeleteSelection();
-	}
-}
-
-void ManageBookmarksDialog::OnSelectAll()
-{
-	HWND focus = GetFocus();
-	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	if (focus == listView)
-	{
-		ListViewHelper::SelectAllItems(listView, true);
-	}
+	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));
+	DCHECK(res);
 }
 
 void ManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder)

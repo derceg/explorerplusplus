@@ -6,6 +6,7 @@
 
 #include "Bookmarks/BookmarkItem.h"
 #include "NavigationHelper.h"
+#include "../Helper/FileOperations.h"
 #include <optional>
 
 class AcceleratorManager;
@@ -45,11 +46,13 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	HWND parentWindow);
+void RemoveBookmarks(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems);
+
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser);
 
 bool CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
-	const RawBookmarkItems &bookmarkItems, bool cut);
+	const RawBookmarkItems &bookmarkItems, ClipboardAction action);
 void PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentFolder, size_t index);
 

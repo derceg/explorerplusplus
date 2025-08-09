@@ -20,29 +20,104 @@
 #include <glog/logging.h>
 #include <algorithm>
 
-int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
-int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
-int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
-int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
-int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+namespace
+{
+
+int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+{
+	size_t firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
+	size_t secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
+	return static_cast<int>(firstIndex) - static_cast<int>(secondIndex);
+}
+
+int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+{
+	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str());
+}
+
+int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+{
+	if (firstItem->IsFolder() && secondItem->IsFolder())
+	{
+		return SortByName(firstItem, secondItem);
+	}
+	else
+	{
+		return firstItem->GetLocation().compare(secondItem->GetLocation());
+	}
+}
+
+int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+{
+	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
+	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
+	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated);
+}
+
+int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+{
+	FILETIME firstItemDateModified = firstItem->GetDateModified();
+	FILETIME secondItemDateModified = secondItem->GetDateModified();
+	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
+}
 
 void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
-	OpenFolderDisposition disposition, const std::wstring &currentDirectory,
-	BrowserWindow *browser);
+	OpenFolderDisposition disposition, const std::wstring &currentDirectory, BrowserWindow *browser)
+{
+	DCHECK(bookmarkItem->IsBookmark());
 
-BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid);
+	auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(
+		bookmarkItem->GetLocation(), currentDirectory, EnvVarsExpansion::Expand);
 
-bool BookmarkHelper::IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+	if (!absolutePath)
+	{
+		return;
+	}
+
+	browser->OpenItem(*absolutePath, disposition);
+}
+
+BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid)
+{
+	if (bookmarkItem->GetGUID() == guid)
+	{
+		return bookmarkItem;
+	}
+
+	if (!bookmarkItem->IsFolder())
+	{
+		return nullptr;
+	}
+
+	for (auto &child : bookmarkItem->GetChildren())
+	{
+		BookmarkItem *result = GetBookmarkItemByIdResursive(child.get(), guid);
+
+		if (result)
+		{
+			return result;
+		}
+	}
+
+	return nullptr;
+}
+
+}
+
+namespace BookmarkHelper
+{
+
+bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	return bookmarkItem->IsFolder();
 }
 
-bool BookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	return bookmarkItem->IsBookmark();
 }
 
-int CALLBACK BookmarkHelper::Sort(ColumnType columnType, const BookmarkItem *firstItem,
+int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {
 	if (firstItem->IsFolder() && secondItem->IsBookmark())
@@ -88,47 +163,8 @@ int CALLBACK BookmarkHelper::Sort(ColumnType columnType, const BookmarkItem *fir
 	}
 }
 
-int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	size_t firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
-	size_t secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
-	return static_cast<int>(firstIndex) - static_cast<int>(secondIndex);
-}
-
-int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str());
-}
-
-int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	if (firstItem->IsFolder() && secondItem->IsFolder())
-	{
-		return SortByName(firstItem, secondItem);
-	}
-	else
-	{
-		return firstItem->GetLocation().compare(secondItem->GetLocation());
-	}
-}
-
-int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
-	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
-	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated);
-}
-
-int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	FILETIME firstItemDateModified = firstItem->GetDateModified();
-	FILETIME secondItemDateModified = secondItem->GetDateModified();
-	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
-}
-
-void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
-	const ResourceLoader *resourceLoader, HWND parentWindow, BrowserWindow *browser,
-	const AcceleratorManager *acceleratorManager)
+void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
+	HWND parentWindow, BrowserWindow *browser, const AcceleratorManager *acceleratorManager)
 {
 	std::wstring bookmarkAllTabsText =
 		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
@@ -157,7 +193,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree,
 	}
 }
 
-BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
+BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
 	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader, std::optional<std::wstring> customDialogTitle)
@@ -166,12 +202,19 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 
 	if (type == BookmarkItem::Type::Bookmark)
 	{
-		const auto *shellBrowser = browser->GetActiveShellBrowser();
-		const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
+		std::wstring name;
+		std::wstring location;
 
-		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_INFOLDER),
-			GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING));
+		if (browser)
+		{
+			const auto *shellBrowser = browser->GetActiveShellBrowser();
+			const auto &directory = shellBrowser->GetDirectory();
+
+			name = GetDisplayNameWithFallback(directory.Raw(), SHGDN_INFOLDER);
+			location = GetDisplayNameWithFallback(directory.Raw(), SHGDN_FORPARSING);
+		}
+
+		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, name, location);
 	}
 	else
 	{
@@ -210,7 +253,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	return nullptr;
 }
 
-void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
+void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	HWND parentWindow)
 {
@@ -247,9 +290,17 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 	}
 }
 
+void RemoveBookmarks(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems)
+{
+	for (auto *bookmarkItem : bookmarkItems)
+	{
+		bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+	}
+}
+
 // If the specified item is a bookmark, it will be opened directly. If the item is a bookmark
 // folder, each child bookmark will be opened.
-void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
+void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, BrowserWindow *browser)
 {
 	// It doesn't make any sense to open a folder in the current tab.
@@ -292,26 +343,10 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 	}
 }
 
-void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
-	OpenFolderDisposition disposition, const std::wstring &currentDirectory, BrowserWindow *browser)
-{
-	DCHECK(bookmarkItem->IsBookmark());
-
-	auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(
-		bookmarkItem->GetLocation(), currentDirectory, EnvVarsExpansion::Expand);
-
-	if (!absolutePath)
-	{
-		return;
-	}
-
-	browser->OpenItem(*absolutePath, disposition);
-}
-
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part
 // of the specified bookmark tree.
-bool BookmarkHelper::CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
-	const RawBookmarkItems &bookmarkItems, bool cut)
+bool CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
+	const RawBookmarkItems &bookmarkItems, ClipboardAction action)
 {
 	OwnedRefBookmarkItems ownedBookmarkItems;
 
@@ -324,22 +359,16 @@ bool BookmarkHelper::CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkT
 	BookmarkClipboard bookmarkClipboard(clipboardStore);
 	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
 
-	if (cut && res)
+	if (action == ClipboardAction::Cut && res)
 	{
-		for (auto bookmarkItem : bookmarkItems)
-		{
-			if (!bookmarkTree->IsPermanentNode(bookmarkItem))
-			{
-				bookmarkTree->RemoveBookmarkItem(bookmarkItem);
-			}
-		}
+		RemoveBookmarks(bookmarkTree, bookmarkItems);
 	}
 
 	return res;
 }
 
 // Note that the parent folder must be a part of the specified bookmark tree.
-void BookmarkHelper::PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
+void PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentFolder, size_t index)
 {
 	DCHECK(parentFolder->IsFolder());
@@ -356,39 +385,12 @@ void BookmarkHelper::PasteBookmarkItems(ClipboardStore *clipboardStore, Bookmark
 	}
 }
 
-BookmarkItem *BookmarkHelper::GetBookmarkItemById(BookmarkTree *bookmarkTree,
-	std::wstring_view guid)
+BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid)
 {
 	return GetBookmarkItemByIdResursive(bookmarkTree->GetRoot(), guid);
 }
 
-BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid)
-{
-	if (bookmarkItem->GetGUID() == guid)
-	{
-		return bookmarkItem;
-	}
-
-	if (!bookmarkItem->IsFolder())
-	{
-		return nullptr;
-	}
-
-	for (auto &child : bookmarkItem->GetChildren())
-	{
-		BookmarkItem *result = GetBookmarkItemByIdResursive(child.get(), guid);
-
-		if (result)
-		{
-			return result;
-		}
-	}
-
-	return nullptr;
-}
-
-bool BookmarkHelper::IsAncestor(const BookmarkItem *bookmarkItem,
-	const BookmarkItem *possibleAncestor)
+bool IsAncestor(const BookmarkItem *bookmarkItem, const BookmarkItem *possibleAncestor)
 {
 	if (bookmarkItem == possibleAncestor)
 	{
@@ -403,4 +405,6 @@ bool BookmarkHelper::IsAncestor(const BookmarkItem *bookmarkItem,
 	}
 
 	return IsAncestor(parent, possibleAncestor);
+}
+
 }

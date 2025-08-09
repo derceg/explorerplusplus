@@ -76,7 +76,7 @@ private:
 	const AcceleratorManager *const m_acceleratorManager;
 	std::optional<std::wstring> m_customDialogTitle;
 
-	BookmarkTreeView *m_pBookmarkTreeView;
+	BookmarkTreeView *m_bookmarkTreeView;
 
 	AddBookmarkDialogPersistentSettings *m_persistentSettings;
 };

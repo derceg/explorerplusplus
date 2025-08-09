@@ -56,7 +56,7 @@ void BookmarkTreeViewContextMenu::OnMenuItemSelected(UINT menuItemId)
 		break;
 
 	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER:
-		m_delegate->CreateNewFolder(m_targetFolder);
+		m_delegate->CreateFolder(m_targetFolder, m_targetFolder->GetChildren().size());
 		break;
 
 	default:
@@ -67,11 +67,5 @@ void BookmarkTreeViewContextMenu::OnMenuItemSelected(UINT menuItemId)
 
 void BookmarkTreeViewContextMenu::DeleteItem()
 {
-	if (m_bookmarkTree->IsPermanentNode(m_targetFolder))
-	{
-		DCHECK(false);
-		return;
-	}
-
 	m_bookmarkTree->RemoveBookmarkItem(m_targetFolder);
 }

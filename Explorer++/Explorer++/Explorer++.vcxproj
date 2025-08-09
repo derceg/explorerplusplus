@@ -1200,6 +1200,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="BackgroundContextMenuDelegate.cpp" />
     <ClCompile Include="BaseDialog.cpp" />
+    <ClCompile Include="Bookmarks\UI\OrganizeBookmarksContextMenu.cpp" />
     <ClCompile Include="BookmarkTreeViewContextMenu.cpp" />
     <ClCompile Include="BrowserCommandTargetManager.cpp" />
     <ClCompile Include="BrowserWindow.cpp" />
@@ -1526,6 +1527,8 @@
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="BackgroundContextMenuDelegate.h" />
     <ClInclude Include="BaseDialog.h" />
+    <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenu.h" />
+    <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenuDelegate.h" />
     <ClInclude Include="BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
     <ClInclude Include="ClangCLLibs.h" />

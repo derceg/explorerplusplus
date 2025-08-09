@@ -144,7 +144,6 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 {
 	if (IsPermanentNode(bookmarkItem))
 	{
-		DCHECK(false);
 		return;
 	}
 

@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BookmarkTreeHelper.h"
+#include "Bookmarks/BookmarkHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -135,6 +136,18 @@ TEST_F(BookmarkTreeTest, RemoveChildren)
 	EXPECT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
 	EXPECT_EQ(m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
 	EXPECT_EQ(m_bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
+}
+
+TEST_F(BookmarkTreeTest, RemovePermanentNode)
+{
+	auto *bookmarkFolder = m_bookmarkTree.GetBookmarksToolbarFolder();
+	auto guid = bookmarkFolder->GetGUID();
+	m_bookmarkTree.RemoveBookmarkItem(bookmarkFolder);
+
+	// Attempting to remove a permanent node should have no effect (i.e. the folder shouldn't be
+	// removed).
+	auto *retrievedBookmarkFolder = BookmarkHelper::GetBookmarkItemById(&m_bookmarkTree, guid);
+	EXPECT_EQ(retrievedBookmarkFolder, bookmarkFolder);
 }
 
 class BookmarkTreeObserverTest : public Test
