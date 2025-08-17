@@ -70,10 +70,23 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
 
-	const auto *currentEntry =
-		m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-	ASSERT_NE(currentEntry, nullptr);
-	EXPECT_EQ(currentEntry->GetPidl(), CreateSimplePidlForTest(m_bookmark->GetLocation()));
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetDirectory(),
+		CreateSimplePidlForTest(m_bookmark->GetLocation()));
+}
+
+TEST_F(BookmarkContextMenuSingleBookmarkTest, OpenInNewTab)
+{
+	MenuViewFake menuView;
+	auto contextMenu = BuildContextMenu(&menuView);
+
+	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB, false, false);
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
+
+	const auto &tab = tabContainer->GetTabByIndex(1);
+	EXPECT_EQ(tab.GetShellBrowser()->GetDirectory(),
+		CreateSimplePidlForTest(m_bookmark->GetLocation()));
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
@@ -146,4 +159,50 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Delete)
 
 	EXPECT_CALL(removedCallback, Call(m_bookmark->GetGUID()));
 	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, false, false);
+}
+
+class BookmarkContextMenuMultipleBookmarksTest : public BookmarkContextMenuTestBase
+{
+protected:
+	BookmarkContextMenuMultipleBookmarksTest()
+	{
+		m_bookmarkItems.push_back(m_bookmarkTree.AddBookmarkItem(
+			m_bookmarkTree.GetBookmarksToolbarFolder(),
+			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\bookmarked\\folder"),
+			0));
+		m_bookmarkItems.push_back(
+			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
+				std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\projects"), 1));
+		m_bookmarkItems.push_back(
+			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
+				std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"e:\\documents"), 2));
+	}
+
+	std::unique_ptr<BookmarkContextMenu> BuildContextMenu(MenuView *menuView)
+	{
+		return std::make_unique<BookmarkContextMenu>(menuView, &m_acceleratorManager,
+			&m_bookmarkTree, m_bookmarkItems, &m_resourceLoader, m_browser, m_browser->GetHWND(),
+			&m_clipboardStore);
+	}
+
+	RawBookmarkItems m_bookmarkItems;
+};
+
+TEST_F(BookmarkContextMenuMultipleBookmarksTest, OpenAll)
+{
+	MenuViewFake menuView;
+	auto contextMenu = BuildContextMenu(&menuView);
+
+	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL, false, false);
+
+	auto *tabContainer = m_browser->GetActiveTabContainer();
+	int numBookmarks = static_cast<int>(m_bookmarkItems.size());
+	ASSERT_EQ(tabContainer->GetNumTabs(), numBookmarks + 1);
+
+	for (int i = 0; i < numBookmarks; i++)
+	{
+		const auto &tab = tabContainer->GetTabByIndex(i + 1);
+		EXPECT_EQ(tab.GetShellBrowser()->GetDirectory(),
+			CreateSimplePidlForTest(m_bookmarkItems[i]->GetLocation()));
+	}
 }
