@@ -37,6 +37,17 @@ TEST_F(BookmarkXmlStorageTest, V2Load)
 	PerformLoadTest(L"bookmarks-v2.xml", &referenceBookmarkTree, true);
 }
 
+TEST_F(BookmarkXmlStorageTest, V2LoadUpdateObserverInvokedOnce)
+{
+	std::wstring xmlFilePath = GetResourcePath(L"bookmarks-v2.xml");
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
+
+	BookmarkTree loadedBookmarkTree;
+	BookmarkXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedBookmarkTree);
+
+	PerformV2UpdateObserverInvokedOnceTest(&loadedBookmarkTree);
+}
+
 TEST_F(BookmarkXmlStorageTest, V2Save)
 {
 	BookmarkTree referenceBookmarkTree;
@@ -67,4 +78,15 @@ TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
 	BuildV1NestedShowOnToolbarLoadReferenceTree(&referenceBookmarkTree);
 
 	PerformLoadTest(L"bookmarks-v1-nested-show-on-toolbar.xml", &referenceBookmarkTree, false);
+}
+
+TEST_F(BookmarkXmlStorageTest, V1LoadUpdateObserverInvokedOnce)
+{
+	std::wstring xmlFilePath = GetResourcePath(L"bookmarks-v1.xml");
+	auto xmlDocumentData = LoadXmlDocument(xmlFilePath);
+
+	BookmarkTree loadedBookmarkTree;
+	BookmarkXmlStorage::Load(xmlDocumentData.rootNode.get(), &loadedBookmarkTree);
+
+	PerformV1UpdateObserverInvokedOnceTest(&loadedBookmarkTree);
 }

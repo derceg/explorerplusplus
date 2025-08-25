@@ -6,6 +6,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BookmarkTreeHelper.h"
 #include "Bookmarks/BookmarkHelper.h"
+#include "GTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -148,6 +149,42 @@ TEST_F(BookmarkTreeTest, RemovePermanentNode)
 	// removed).
 	auto *retrievedBookmarkFolder = BookmarkHelper::GetBookmarkItemById(&m_bookmarkTree, guid);
 	EXPECT_EQ(retrievedBookmarkFolder, bookmarkFolder);
+}
+
+using BookmarkTreeDeathTest = BookmarkTreeTest;
+
+TEST_F(BookmarkTreeDeathTest, AddChildParentNotInTree)
+{
+	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
+	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+
+	// The parent isn't in the tree, so this call should fail.
+	EXPECT_CHECK_DEATH(m_bookmarkTree.AddBookmarkItem(folder.get(), std::move(bookmark)));
+}
+
+TEST_F(BookmarkTreeDeathTest, MoveItemNotInTree)
+{
+	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
+	auto *bookmark =
+		folder->AddChild(std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\"));
+
+	EXPECT_CHECK_DEATH(
+		m_bookmarkTree.MoveBookmarkItem(bookmark, m_bookmarkTree.GetBookmarksMenuFolder(), 0));
+}
+
+TEST_F(BookmarkTreeDeathTest, MoveItemDestinationNotInTree)
+{
+	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
+	auto *bookmark = m_bookmarkTree.GetBookmarksToolbarFolder()->AddChild(
+		std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\"));
+
+	EXPECT_CHECK_DEATH(m_bookmarkTree.MoveBookmarkItem(bookmark, folder.get(), 0));
+}
+
+TEST_F(BookmarkTreeDeathTest, RemoveItemNotInTree)
+{
+	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+	EXPECT_CHECK_DEATH(m_bookmarkTree.RemoveBookmarkItem(bookmark.get()));
 }
 
 class BookmarkTreeObserverTest : public Test

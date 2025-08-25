@@ -34,6 +34,16 @@ TEST_F(BookmarkRegistryStorageTest, V2Load)
 	PerformLoadTest(L"bookmarks-v2.reg", &referenceBookmarkTree, true);
 }
 
+TEST_F(BookmarkRegistryStorageTest, V2LoadUpdateObserverInvokedOnce)
+{
+	ImportRegistryResource(L"bookmarks-v2.reg");
+
+	BookmarkTree loadedBookmarkTree;
+	BookmarkRegistryStorage::Load(m_applicationTestKey.get(), &loadedBookmarkTree);
+
+	PerformV2UpdateObserverInvokedOnceTest(&loadedBookmarkTree);
+}
+
 TEST_F(BookmarkRegistryStorageTest, V2Save)
 {
 	BookmarkTree referenceBookmarkTree;
@@ -61,4 +71,14 @@ TEST_F(BookmarkRegistryStorageTest, V1NestedShowOnToolbarLoad)
 	BuildV1NestedShowOnToolbarLoadReferenceTree(&referenceBookmarkTree);
 
 	PerformLoadTest(L"bookmarks-v1-nested-show-on-toolbar.reg", &referenceBookmarkTree, false);
+}
+
+TEST_F(BookmarkRegistryStorageTest, V1LoadUpdateObserverInvokedOnce)
+{
+	ImportRegistryResource(L"bookmarks-v1.reg");
+
+	BookmarkTree loadedBookmarkTree;
+	BookmarkRegistryStorage::Load(m_applicationTestKey.get(), &loadedBookmarkTree);
+
+	PerformV1UpdateObserverInvokedOnceTest(&loadedBookmarkTree);
 }

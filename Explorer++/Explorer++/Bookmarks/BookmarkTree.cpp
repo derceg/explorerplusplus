@@ -83,14 +83,16 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
 		return nullptr;
 	}
 
+	// For an item to be added to the tree, the parent item should already be part of the tree.
+	CHECK(IsInTree(parent));
+
 	bookmarkItem->VisitRecursively(
 		[this](BookmarkItem *currentItem)
 		{
 			currentItem->ClearOriginalGUID();
 
-			// Adds an observer to each bookmark item that's being added. This is
-			// needed so that this class can broadcast an event whenever an
-			// individual bookmark item is updated.
+			// Adds an observer to each bookmark item that's being added. This is needed so that
+			// this class can broadcast an event whenever an individual bookmark item is updated.
 			currentItem->updatedSignal.AddObserver(
 				std::bind_front(&BookmarkTree::OnBookmarkItemUpdated, this),
 				boost::signals2::at_front);
@@ -115,6 +117,9 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 		DCHECK(false);
 		return;
 	}
+
+	CHECK(IsInTree(bookmarkItem));
+	CHECK(IsInTree(newParent));
 
 	BookmarkItem *oldParent = bookmarkItem->GetParent();
 	size_t oldIndex = oldParent->GetChildIndex(bookmarkItem);
@@ -147,6 +152,8 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 		return;
 	}
 
+	CHECK(IsInTree(bookmarkItem));
+
 	bookmarkItemPreRemovalSignal.m_signal(*bookmarkItem);
 
 	BookmarkItem *parent = bookmarkItem->GetParent();
@@ -157,6 +164,11 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 	size_t childIndex = parent->GetChildIndex(bookmarkItem);
 	parent->RemoveChild(childIndex);
 	bookmarkItemRemovedSignal.m_signal(guid);
+}
+
+bool BookmarkTree::IsInTree(const BookmarkItem *bookmarkItem)
+{
+	return BookmarkHelper::GetBookmarkItemById(this, bookmarkItem->GetGUID());
 }
 
 void BookmarkTree::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,

@@ -37,6 +37,7 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	EXPECT_EQ(parentFolder.GetChildren().size(), 1U);
 	EXPECT_FALSE(parentFolder.HasChildFolder());
+	EXPECT_EQ(parentFolder.GetChildAtIndex(0), rawBookmark);
 	EXPECT_EQ(parentFolder.GetChildIndex(rawBookmark), 0U);
 
 	EXPECT_EQ(rawBookmark->GetParent(), &parentFolder);
@@ -48,6 +49,7 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	EXPECT_EQ(parentFolder.GetChildren().size(), 2U);
 	EXPECT_TRUE(parentFolder.HasChildFolder());
+	EXPECT_EQ(parentFolder.GetChildAtIndex(1), rawFolder);
 	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 1U);
 
 	EXPECT_EQ(rawFolder->GetParent(), &parentFolder);
@@ -56,6 +58,7 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	EXPECT_EQ(parentFolder.GetChildren().size(), 1U);
 	EXPECT_TRUE(parentFolder.HasChildFolder());
+	EXPECT_EQ(parentFolder.GetChildAtIndex(0), rawFolder);
 	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 0U);
 
 	EXPECT_EQ(rawBookmark->GetParent(), nullptr);

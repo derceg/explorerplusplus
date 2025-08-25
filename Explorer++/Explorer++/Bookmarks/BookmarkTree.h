@@ -51,6 +51,8 @@ private:
 	static inline const TCHAR *MENU_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000003");
 	static inline const TCHAR *OTHER_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000004");
 
+	bool IsInTree(const BookmarkItem *bookmarkItem);
+
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
 	BookmarkItem m_root;

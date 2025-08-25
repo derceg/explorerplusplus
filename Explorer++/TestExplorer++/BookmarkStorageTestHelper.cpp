@@ -3,8 +3,12 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
+#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+using namespace testing;
 
 void CompareFolders(const BookmarkItem *firstFolder, const BookmarkItem *secondFolder,
 	bool compareGuids);
@@ -147,4 +151,33 @@ void CompareBookmarks(const BookmarkItem *firstBookmark, const BookmarkItem *sec
 
 	EXPECT_EQ(firstBookmark->GetName(), secondBookmark->GetName());
 	EXPECT_EQ(firstBookmark->GetLocation(), secondBookmark->GetLocation());
+}
+
+void PerformV2UpdateObserverInvokedOnceTest(BookmarkTree *loadedBookmarkTree)
+{
+	MockFunction<void(BookmarkItem & bookmarkItem, BookmarkItem::PropertyType propertyType)>
+		callback;
+	loadedBookmarkTree->bookmarkItemUpdatedSignal.AddObserver(callback.AsStdFunction());
+
+	auto *nestedBookmark = BookmarkHelper::GetBookmarkItemById(loadedBookmarkTree,
+		L"CC620AF8-6761-4A1C-A7CD-CD23F5054FBD");
+	ASSERT_NE(nestedBookmark, nullptr);
+
+	// When loading a nested item, only a single update observer should be added by the BookmarkTree
+	// class. So, this callback should only be invoked a single time.
+	EXPECT_CALL(callback, Call(Ref(*nestedBookmark), BookmarkItem::PropertyType::Name));
+	nestedBookmark->SetName(L"Updated name");
+}
+
+void PerformV1UpdateObserverInvokedOnceTest(BookmarkTree *loadedBookmarkTree)
+{
+	MockFunction<void(BookmarkItem & bookmarkItem, BookmarkItem::PropertyType propertyType)>
+		callback;
+	loadedBookmarkTree->bookmarkItemUpdatedSignal.AddObserver(callback.AsStdFunction());
+
+	auto *folder1 = loadedBookmarkTree->GetBookmarksToolbarFolder()->GetChildAtIndex(1);
+	auto *bookmark = folder1->GetChildAtIndex(0);
+
+	EXPECT_CALL(callback, Call(Ref(*bookmark), BookmarkItem::PropertyType::Name));
+	bookmark->SetName(L"Updated name");
 }

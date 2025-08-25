@@ -21,9 +21,8 @@ const wchar_t bookmarksKeyPath[] = L"Bookmarksv2";
 void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 	const std::wstring &name);
-void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
-	BookmarkItem *parentBookmarkItem);
-std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
+BookmarkItems LoadBookmarkChildren(HKEY parentKey);
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key);
 
 void Save(HKEY parentKey, const BookmarkTree *bookmarkTree);
 void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
@@ -56,8 +55,7 @@ namespace BookmarkRegistryStorage
 
 void Load(HKEY applicationKey, BookmarkTree *bookmarkTree)
 {
-	// The V2 key always takes precedence (i.e. it will be used even if the V1
-	// key exists).
+	// The V2 key always takes precedence (i.e. it will be used even if the V1 key exists).
 	wil::unique_hkey bookmarksKey;
 	LSTATUS res = RegOpenKeyEx(applicationKey, V2::bookmarksKeyPath, 0, KEY_READ, &bookmarksKey);
 
@@ -112,46 +110,53 @@ void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkIte
 	wil::unique_hkey childKey;
 	LSTATUS res = RegOpenKeyEx(parentKey, name.c_str(), 0, KEY_READ, &childKey);
 
-	if (res == ERROR_SUCCESS)
+	if (res != ERROR_SUCCESS)
 	{
-		FILETIME dateCreated;
-		bool dateRes =
-			RegistrySettings::ReadDateTime(childKey.get(), _T("DateCreated"), dateCreated);
+		return;
+	}
 
-		if (dateRes)
-		{
-			bookmarkItem->SetDateCreated(dateCreated);
-		}
+	FILETIME dateCreated;
+	bool dateRes = RegistrySettings::ReadDateTime(childKey.get(), _T("DateCreated"), dateCreated);
 
-		FILETIME dateModified;
-		dateRes = RegistrySettings::ReadDateTime(childKey.get(), _T("DateModified"), dateModified);
+	if (dateRes)
+	{
+		bookmarkItem->SetDateCreated(dateCreated);
+	}
 
-		if (dateRes)
-		{
-			bookmarkItem->SetDateModified(dateModified);
-		}
+	FILETIME dateModified;
+	dateRes = RegistrySettings::ReadDateTime(childKey.get(), _T("DateModified"), dateModified);
 
-		LoadBookmarkChildren(childKey.get(), bookmarkTree, bookmarkItem);
+	if (dateRes)
+	{
+		bookmarkItem->SetDateModified(dateModified);
+	}
+
+	auto children = LoadBookmarkChildren(childKey.get());
+
+	for (auto &child : children)
+	{
+		bookmarkTree->AddBookmarkItem(bookmarkItem, std::move(child));
 	}
 }
 
-void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
-	BookmarkItem *parentBookmarkItem)
+BookmarkItems LoadBookmarkChildren(HKEY parentKey)
 {
+	BookmarkItems children;
 	wil::unique_hkey childKey;
 	int index = 0;
 
 	while (RegOpenKeyEx(parentKey, std::to_wstring(index).c_str(), 0, KEY_READ, &childKey)
 		== ERROR_SUCCESS)
 	{
-		auto childBookmarkItem = LoadBookmarkItem(childKey.get(), bookmarkTree);
-		bookmarkTree->AddBookmarkItem(parentBookmarkItem, std::move(childBookmarkItem), index);
+		children.push_back(LoadBookmarkItem(childKey.get()));
 
 		index++;
 	}
+
+	return children;
 }
 
-std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree)
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key)
 {
 	DWORD type;
 	RegistrySettings::ReadDword(key, _T("Type"), type);
@@ -184,7 +189,12 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkT
 
 	if (type == static_cast<int>(BookmarkItem::Type::Folder))
 	{
-		LoadBookmarkChildren(key, bookmarkTree, bookmarkItem.get());
+		auto children = LoadBookmarkChildren(key);
+
+		for (auto &child : children)
+		{
+			bookmarkItem->AddChild(std::move(child));
+		}
 	}
 
 	return bookmarkItem;
@@ -280,40 +290,37 @@ void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
 
 		if (!parentBookmarkItem)
 		{
-			// In v1 of the bookmarks system, any bookmark items could be shown
-			// on the bookmarks toolbar. For example, a bookmark could be shown
-			// even if it's parent folder wasn't being shown.
-			// In the current model, only bookmark items in the bookmarks
-			// toolbar folder will be shown on the toolbar. Additionally, this
-			// only applies to direct children of the folder and not any
-			// children at a greater depth.
-			// These two models are incompatible with each other. Therefore,
-			// when loading v1 bookmark items, they'll only be added to the
-			// toolbar folder if they're direct children of the root (and they
-			// have the appropriate toolbar flag set).
-			// There's no way to add a child item to the bookmarks toolbar,
-			// without adding its top-level parent instead, so attempting to do
-			// that would be more complicated and possibly surprising (since it
-			// would mean that if you chose to display a grandchild bookmark on
-			// the toolbar, but not its parents, the grandparent is what would
-			// end up being displayed on the toolbar, not the grandchild).
+			// In v1 of the bookmarks system, any bookmark items could be shown on the bookmarks
+			// toolbar. For example, a bookmark could be shown even if it's parent folder wasn't
+			// being shown.
+			//
+			// In the current model, only bookmark items in the bookmarks toolbar folder will be
+			// shown on the toolbar. Additionally, this only applies to direct children of the
+			// folder and not any children at a greater depth.
+			//
+			// These two models are incompatible with each other. Therefore, when loading v1
+			// bookmark items, they'll only be added to the toolbar folder if they're direct
+			// children of the root (and they have the appropriate toolbar flag set).
+			//
+			// There's no way to add a child item to the bookmarks toolbar, without adding its
+			// top-level parent instead, so attempting to do that would be more complicated and
+			// possibly surprising (since it would mean that if you chose to display a grandchild
+			// bookmark on the toolbar, but not its parents, the grandparent is what would end up
+			// being displayed on the toolbar, not the grandchild).
 			if (showOnToolbar)
 			{
 				bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksToolbarFolder(),
-					std::move(childBookmarkItem),
-					bookmarkTree->GetBookmarksToolbarFolder()->GetChildren().size());
+					std::move(childBookmarkItem));
 			}
 			else
 			{
 				bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksMenuFolder(),
-					std::move(childBookmarkItem),
-					bookmarkTree->GetBookmarksMenuFolder()->GetChildren().size());
+					std::move(childBookmarkItem));
 			}
 		}
 		else
 		{
-			bookmarkTree->AddBookmarkItem(parentBookmarkItem, std::move(childBookmarkItem),
-				parentBookmarkItem->GetChildren().size());
+			parentBookmarkItem->AddChild(std::move(childBookmarkItem));
 		}
 
 		index++;

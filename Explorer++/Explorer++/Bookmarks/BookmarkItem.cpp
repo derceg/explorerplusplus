@@ -182,6 +182,19 @@ std::unique_ptr<BookmarkItem> BookmarkItem::RemoveChild(size_t index)
 	return erasedItem;
 }
 
+BookmarkItem *BookmarkItem::GetChildAtIndex(size_t index)
+{
+	return const_cast<BookmarkItem *>(std::as_const(*this).GetChildAtIndex(index));
+}
+
+const BookmarkItem *BookmarkItem::GetChildAtIndex(size_t index) const
+{
+	DCHECK(IsFolder());
+
+	CHECK(index < m_children.size());
+	return m_children[index].get();
+}
+
 size_t BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const
 {
 	DCHECK(IsFolder());

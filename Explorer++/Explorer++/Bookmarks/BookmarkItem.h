@@ -95,6 +95,8 @@ public:
 	std::unique_ptr<BookmarkItem> RemoveChild(size_t index);
 	bool HasChildFolder() const;
 
+	BookmarkItem *GetChildAtIndex(size_t index);
+	const BookmarkItem *GetChildAtIndex(size_t index) const;
 	size_t GetChildIndex(const BookmarkItem *bookmarkItem) const;
 	const std::unique_ptr<BookmarkItem> &GetChildOwnedPtr(const BookmarkItem *bookmarkItem) const;
 

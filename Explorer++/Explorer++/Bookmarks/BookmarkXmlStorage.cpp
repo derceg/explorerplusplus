@@ -21,9 +21,8 @@ const wchar_t bookmarksKeyNodeName[] = L"Bookmarksv2";
 void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
 void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *bookmarkItem, const std::wstring &name);
-void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
-	BookmarkItem *parentBookmarkItem);
-std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
+BookmarkItems LoadBookmarkChildren(IXMLDOMNode *parentNode);
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode);
 
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const BookmarkTree *bookmarkTree);
@@ -115,25 +114,31 @@ void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	auto queryString = wil::make_bstr_nothrow((L"./PermanentItem[@name='" + name + L"']").c_str());
 	HRESULT hr = parentNode->selectSingleNode(queryString.get(), &childNode);
 
-	if (hr == S_OK)
+	if (hr != S_OK)
 	{
-		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
-		childNode->get_attributes(&attributeMap);
+		return;
+	}
 
-		FILETIME dateCreated;
-		XMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
-		bookmarkItem->SetDateCreated(dateCreated);
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
+	childNode->get_attributes(&attributeMap);
 
-		FILETIME dateModified;
-		XMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
-		bookmarkItem->SetDateModified(dateModified);
+	FILETIME dateCreated;
+	XMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
+	bookmarkItem->SetDateCreated(dateCreated);
 
-		LoadBookmarkChildren(childNode.get(), bookmarkTree, bookmarkItem);
+	FILETIME dateModified;
+	XMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
+	bookmarkItem->SetDateModified(dateModified);
+
+	auto children = LoadBookmarkChildren(childNode.get());
+
+	for (auto &child : children)
+	{
+		bookmarkTree->AddBookmarkItem(bookmarkItem, std::move(child));
 	}
 }
 
-void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
-	BookmarkItem *parentBookmarkItem)
+BookmarkItems LoadBookmarkChildren(IXMLDOMNode *parentNode)
 {
 	auto makeQueryString = [](int index)
 	{
@@ -141,21 +146,23 @@ void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 			(L"./Bookmark[@name='" + std::to_wstring(index) + L"']").c_str());
 	};
 
+	BookmarkItems children;
 	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
 	int index = 0;
 	auto queryString = makeQueryString(index);
 
 	while (parentNode->selectSingleNode(queryString.get(), &childNode) == S_OK)
 	{
-		auto childBookmarkItem = LoadBookmarkItem(childNode.get(), bookmarkTree);
-		bookmarkTree->AddBookmarkItem(parentBookmarkItem, std::move(childBookmarkItem), index);
+		children.push_back(LoadBookmarkItem(childNode.get()));
 
 		index++;
 		queryString = makeQueryString(index);
 	}
+
+	return children;
 }
 
-std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	parentNode->get_attributes(&attributeMap);
@@ -191,7 +198,12 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, Bookmark
 
 	if (type == static_cast<int>(BookmarkItem::Type::Folder))
 	{
-		LoadBookmarkChildren(parentNode, bookmarkTree, bookmarkItem.get());
+		auto children = LoadBookmarkChildren(parentNode);
+
+		for (auto &child : children)
+		{
+			bookmarkItem->AddChild(std::move(child));
+		}
 	}
 
 	return bookmarkItem;
@@ -301,20 +313,17 @@ void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 			if (showOnToolbar)
 			{
 				bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksToolbarFolder(),
-					std::move(childBookmarkItem),
-					bookmarkTree->GetBookmarksToolbarFolder()->GetChildren().size());
+					std::move(childBookmarkItem));
 			}
 			else
 			{
 				bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksMenuFolder(),
-					std::move(childBookmarkItem),
-					bookmarkTree->GetBookmarksMenuFolder()->GetChildren().size());
+					std::move(childBookmarkItem));
 			}
 		}
 		else
 		{
-			bookmarkTree->AddBookmarkItem(parentBookmarkItem, std::move(childBookmarkItem),
-				parentBookmarkItem->GetChildren().size());
+			parentBookmarkItem->AddChild(std::move(childBookmarkItem));
 		}
 	}
 }
