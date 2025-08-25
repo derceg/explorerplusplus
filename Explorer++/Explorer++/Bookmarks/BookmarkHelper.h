@@ -56,8 +56,6 @@ bool CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTre
 void PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentFolder, size_t index);
 
-BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);
-
 bool IsAncestor(const BookmarkItem *bookmarkItem, const BookmarkItem *possibleAncestor);
 
 }

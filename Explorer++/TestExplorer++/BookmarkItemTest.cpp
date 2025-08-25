@@ -6,6 +6,8 @@
 #include "Bookmarks/BookmarkItem.h"
 #include <gtest/gtest.h>
 
+using namespace testing;
+
 TEST(BookmarkItemTest, CreateAndUpdate)
 {
 	BookmarkItem bookmarkFolder(std::nullopt, L"Test folder", std::nullopt);
@@ -69,4 +71,24 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 	EXPECT_FALSE(parentFolder.HasChildFolder());
 
 	EXPECT_EQ(rawFolder->GetParent(), nullptr);
+}
+
+TEST(BookmarkItemTest, VisitRecursively)
+{
+	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt);
+	auto *childFolder = folder->AddChild(
+		std::make_unique<BookmarkItem>(std::nullopt, L"Child folder", std::nullopt));
+	auto *bookmark1 =
+		childFolder->AddChild(std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"C:\\"));
+	auto *grandchildFolder = childFolder->AddChild(
+		std::make_unique<BookmarkItem>(std::nullopt, L"Grandchild folder", std::nullopt));
+	auto *bookmark2 = grandchildFolder->AddChild(
+		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"D:\\"));
+	auto *bookmark3 =
+		folder->AddChild(std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"E:\\"));
+
+	std::vector<BookmarkItem *> items;
+	folder->VisitRecursively([&items](BookmarkItem *currentItem) { items.push_back(currentItem); });
+	EXPECT_THAT(items,
+		ElementsAre(folder.get(), childFolder, bookmark1, grandchildFolder, bookmark2, bookmark3));
 }

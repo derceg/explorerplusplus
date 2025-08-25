@@ -57,7 +57,7 @@ DWORD BookmarkDropper::GetDropEffect(const BookmarkItem *targetFolder, size_t in
 
 		if (extractedInfo.bookmarkItems.size() == 1)
 		{
-			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree,
+			auto *existingBookmarkItem = m_bookmarkTree->MaybeGetBookmarkItemById(
 				*extractedInfo.bookmarkItems[0]->GetOriginalGUID());
 
 			if (!existingBookmarkItem
@@ -107,8 +107,8 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *targetFolder, size_t index)
 		}
 		else if (targetEffect == DROPEFFECT_MOVE)
 		{
-			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree,
-				*bookmarkItem->GetOriginalGUID());
+			auto *existingBookmarkItem =
+				m_bookmarkTree->MaybeGetBookmarkItemById(*bookmarkItem->GetOriginalGUID());
 
 			if (existingBookmarkItem
 				&& CanDropBookmarkItemAtLocation(existingBookmarkItem, targetFolder, index + i))

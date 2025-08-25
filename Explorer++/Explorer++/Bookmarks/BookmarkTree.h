@@ -7,6 +7,8 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "../Helper/SignalWrapper.h"
 #include <tchar.h>
+#include <string>
+#include <unordered_map>
 
 class BookmarkTree
 {
@@ -20,6 +22,9 @@ public:
 	const BookmarkItem *GetBookmarksMenuFolder() const;
 	BookmarkItem *GetOtherBookmarksFolder();
 	const BookmarkItem *GetOtherBookmarksFolder() const;
+
+	BookmarkItem *MaybeGetBookmarkItemById(const std::wstring &guid);
+	const BookmarkItem *MaybeGetBookmarkItemById(const std::wstring &guid) const;
 
 	bool CanAddChildren(const BookmarkItem *bookmarkItem) const;
 	bool IsPermanentNode(const BookmarkItem *bookmarkItem) const;
@@ -51,12 +56,13 @@ private:
 	static inline const TCHAR *MENU_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000003");
 	static inline const TCHAR *OTHER_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000004");
 
-	bool IsInTree(const BookmarkItem *bookmarkItem);
-
+	void AddIdsRecursive(BookmarkItem *bookmarkItem);
+	bool IsInTree(const BookmarkItem *bookmarkItem) const;
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
 	BookmarkItem m_root;
-	BookmarkItem *m_bookmarksToolbar;
-	BookmarkItem *m_bookmarksMenu;
-	BookmarkItem *m_otherBookmarks;
+	BookmarkItem *const m_bookmarksToolbar;
+	BookmarkItem *const m_bookmarksMenu;
+	BookmarkItem *const m_otherBookmarks;
+	std::unordered_map<std::wstring, BookmarkItem *> m_idToBookmarkMap;
 };

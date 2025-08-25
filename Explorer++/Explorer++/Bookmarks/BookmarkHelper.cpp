@@ -77,31 +77,6 @@ void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
 	browser->OpenItem(*absolutePath, disposition);
 }
 
-BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid)
-{
-	if (bookmarkItem->GetGUID() == guid)
-	{
-		return bookmarkItem;
-	}
-
-	if (!bookmarkItem->IsFolder())
-	{
-		return nullptr;
-	}
-
-	for (auto &child : bookmarkItem->GetChildren())
-	{
-		BookmarkItem *result = GetBookmarkItemByIdResursive(child.get(), guid);
-
-		if (result)
-		{
-			return result;
-		}
-	}
-
-	return nullptr;
-}
-
 }
 
 namespace BookmarkHelper
@@ -383,11 +358,6 @@ void PasteBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTr
 
 		i++;
 	}
-}
-
-BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid)
-{
-	return GetBookmarkItemByIdResursive(bookmarkTree->GetRoot(), guid);
 }
 
 bool IsAncestor(const BookmarkItem *bookmarkItem, const BookmarkItem *possibleAncestor)

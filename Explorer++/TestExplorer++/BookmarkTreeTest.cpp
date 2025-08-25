@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BookmarkTreeHelper.h"
-#include "Bookmarks/BookmarkHelper.h"
 #include "GTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -147,8 +146,31 @@ TEST_F(BookmarkTreeTest, RemovePermanentNode)
 
 	// Attempting to remove a permanent node should have no effect (i.e. the folder shouldn't be
 	// removed).
-	auto *retrievedBookmarkFolder = BookmarkHelper::GetBookmarkItemById(&m_bookmarkTree, guid);
+	auto *retrievedBookmarkFolder = m_bookmarkTree.MaybeGetBookmarkItemById(guid);
 	EXPECT_EQ(retrievedBookmarkFolder, bookmarkFolder);
+}
+
+TEST_F(BookmarkTreeTest, MaybeGetBookmarkItemById)
+{
+	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt);
+	auto *rawFolder = folder.get();
+	auto *rawBookmark =
+		folder->AddChild(std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"C:\\"));
+
+	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(folder));
+
+	m_bookmarkTree.GetRoot()->VisitRecursively(
+		[this](BookmarkItem *currentItem)
+		{
+			EXPECT_EQ(m_bookmarkTree.MaybeGetBookmarkItemById(currentItem->GetGUID()), currentItem);
+		});
+
+	auto folderGuid = rawFolder->GetGUID();
+	auto bookmarkGuid = rawBookmark->GetGUID();
+
+	m_bookmarkTree.RemoveBookmarkItem(rawFolder);
+	EXPECT_EQ(m_bookmarkTree.MaybeGetBookmarkItemById(folderGuid), nullptr);
+	EXPECT_EQ(m_bookmarkTree.MaybeGetBookmarkItemById(bookmarkGuid), nullptr);
 }
 
 using BookmarkTreeDeathTest = BookmarkTreeTest;

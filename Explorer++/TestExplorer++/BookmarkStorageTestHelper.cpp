@@ -3,7 +3,6 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -159,8 +158,8 @@ void PerformV2UpdateObserverInvokedOnceTest(BookmarkTree *loadedBookmarkTree)
 		callback;
 	loadedBookmarkTree->bookmarkItemUpdatedSignal.AddObserver(callback.AsStdFunction());
 
-	auto *nestedBookmark = BookmarkHelper::GetBookmarkItemById(loadedBookmarkTree,
-		L"CC620AF8-6761-4A1C-A7CD-CD23F5054FBD");
+	auto *nestedBookmark =
+		loadedBookmarkTree->MaybeGetBookmarkItemById(L"CC620AF8-6761-4A1C-A7CD-CD23F5054FBD");
 	ASSERT_NE(nestedBookmark, nullptr);
 
 	// When loading a nested item, only a single update observer should be added by the BookmarkTree

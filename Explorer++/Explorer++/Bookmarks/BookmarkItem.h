@@ -16,8 +16,8 @@ class BookmarkItem;
 
 using BookmarkItems = std::vector<std::unique_ptr<BookmarkItem>>;
 
-// Represents both a bookmark and a bookmark folder. Each folder has the ability
-// to contain other bookmark items.
+// Represents both a bookmark and a bookmark folder. Each folder has the ability to contain other
+// bookmark items.
 class BookmarkItem : private boost::noncopyable
 {
 public:
@@ -74,14 +74,14 @@ public:
 	BookmarkItem *GetParent();
 	const BookmarkItem *GetParent() const;
 
-	std::wstring GetGUID() const;
-	std::optional<std::wstring> GetOriginalGUID() const;
+	const std::wstring &GetGUID() const;
+	const std::optional<std::wstring> &GetOriginalGUID() const;
 	void ClearOriginalGUID();
 
-	std::wstring GetName() const;
+	const std::wstring &GetName() const;
 	void SetName(std::wstring_view name);
 
-	std::wstring GetLocation() const;
+	const std::wstring &GetLocation() const;
 	void SetLocation(std::wstring_view location);
 
 	FILETIME GetDateCreated() const;
@@ -109,14 +109,13 @@ public:
 		updatedSignal;
 
 private:
-	// Used exclusively when deserializing. The advantage here mainly comes from
-	// the second of these methods. It allows the list of children to be
-	// directly imported. Without that method, you would have to call AddChild()
-	// for each child item and there's no need to do that when you already have
-	// a list of the children in the correct format.
-	// Also note that the first method has a dummy parameter added to the end.
-	// This is because the method would be ambiguous otherwise (it would clash with
-	// the public constructor).
+	// Used exclusively when deserializing. The advantage here mainly comes from the second of these
+	// methods. It allows the list of children to be directly imported. Without that method, you
+	// would have to call AddChild() for each child item and there's no need to do that when you
+	// already have a list of the children in the correct format.
+	//
+	// Also note that the first method has a dummy parameter added to the end. This is because the
+	// method would be ambiguous otherwise (it would clash with the public constructor).
 	BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, std::wstring location,
 		bool internal);
 	BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, BookmarkItems &&children);
@@ -128,9 +127,8 @@ private:
 	const Type m_type;
 	std::wstring m_guid = CreateGUID();
 
-	// If this item was deserialized from a dragged bookmark item or one on the
-	// clipboard, this will contain the guid associated with the original item
-	// (the one that was dragged or copied).
+	// If this item was deserialized from a dragged bookmark item or one on the clipboard, this will
+	// contain the guid associated with the original item (the one that was dragged or copied).
 	std::optional<std::wstring> m_originalGuid;
 
 	BookmarkItem *m_parent = nullptr;

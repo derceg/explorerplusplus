@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
-#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
@@ -145,8 +144,8 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 		return *m_customDialogTitle;
 	}
 
-	auto existingBookmarkItem =
-		BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, m_bookmarkItem->GetGUID());
+	auto *existingBookmarkItem =
+		m_bookmarkTree->MaybeGetBookmarkItemById(m_bookmarkItem->GetGUID());
 	UINT stringId;
 
 	if (existingBookmarkItem)

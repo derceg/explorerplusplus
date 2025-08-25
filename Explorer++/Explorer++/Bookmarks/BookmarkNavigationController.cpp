@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "Bookmarks/BookmarkNavigationController.h"
-#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkNavigatorInterface.h"
+#include "Bookmarks/BookmarkTree.h"
 
 BookmarkNavigationController::BookmarkNavigationController(BookmarkTree *bookmarkTree,
 	BookmarkNavigatorInterface *navigator) :
@@ -19,7 +19,7 @@ BookmarkNavigationController::BookmarkNavigationController(BookmarkTree *bookmar
 
 void BookmarkNavigationController::Navigate(const BookmarkHistoryEntry *entry)
 {
-	auto bookmarkFolder = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, entry->getGuid());
+	auto *bookmarkFolder = m_bookmarkTree->MaybeGetBookmarkItemById(entry->getGuid());
 
 	if (!bookmarkFolder)
 	{

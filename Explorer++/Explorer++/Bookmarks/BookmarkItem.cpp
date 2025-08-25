@@ -73,12 +73,12 @@ const BookmarkItem *BookmarkItem::GetParent() const
 	return m_parent;
 }
 
-std::wstring BookmarkItem::GetGUID() const
+const std::wstring &BookmarkItem::GetGUID() const
 {
 	return m_guid;
 }
 
-std::optional<std::wstring> BookmarkItem::GetOriginalGUID() const
+const std::optional<std::wstring> &BookmarkItem::GetOriginalGUID() const
 {
 	return m_originalGuid;
 }
@@ -88,7 +88,7 @@ void BookmarkItem::ClearOriginalGUID()
 	m_originalGuid.reset();
 }
 
-std::wstring BookmarkItem::GetName() const
+const std::wstring &BookmarkItem::GetName() const
 {
 	return m_name;
 }
@@ -102,7 +102,7 @@ void BookmarkItem::SetName(std::wstring_view name)
 	updatedSignal.m_signal(*this, PropertyType::Name);
 }
 
-std::wstring BookmarkItem::GetLocation() const
+const std::wstring &BookmarkItem::GetLocation() const
 {
 	return m_location;
 }

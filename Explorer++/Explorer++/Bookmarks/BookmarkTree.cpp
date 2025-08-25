@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "Bookmarks/BookmarkHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include <glog/logging.h>
@@ -12,25 +11,18 @@
 BookmarkTree::BookmarkTree() :
 	m_root(ROOT_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS),
-		std::nullopt)
-{
-	auto bookmarksToolbarFolder = std::make_unique<BookmarkItem>(TOOLBAR_FOLDER_GUID,
+		std::nullopt),
+	m_bookmarksToolbar(m_root.AddChild(std::make_unique<BookmarkItem>(TOOLBAR_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSTOOLBAR),
-		std::nullopt);
-	m_bookmarksToolbar = bookmarksToolbarFolder.get();
-	m_root.AddChild(std::move(bookmarksToolbarFolder));
-
-	auto bookmarksMenuFolder = std::make_unique<BookmarkItem>(MENU_FOLDER_GUID,
+		std::nullopt))),
+	m_bookmarksMenu(m_root.AddChild(std::make_unique<BookmarkItem>(MENU_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU),
-		std::nullopt);
-	m_bookmarksMenu = bookmarksMenuFolder.get();
-	m_root.AddChild(std::move(bookmarksMenuFolder));
-
-	auto otherBookmarksFolder = std::make_unique<BookmarkItem>(OTHER_FOLDER_GUID,
+		std::nullopt))),
+	m_otherBookmarks(m_root.AddChild(std::make_unique<BookmarkItem>(OTHER_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS),
-		std::nullopt);
-	m_otherBookmarks = otherBookmarksFolder.get();
-	m_root.AddChild(std::move(otherBookmarksFolder));
+		std::nullopt)))
+{
+	AddIdsRecursive(&m_root);
 }
 
 BookmarkItem *BookmarkTree::GetRoot()
@@ -68,6 +60,23 @@ const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
 	return m_otherBookmarks;
 }
 
+BookmarkItem *BookmarkTree::MaybeGetBookmarkItemById(const std::wstring &guid)
+{
+	return const_cast<BookmarkItem *>(std::as_const(*this).MaybeGetBookmarkItemById(guid));
+}
+
+const BookmarkItem *BookmarkTree::MaybeGetBookmarkItemById(const std::wstring &guid) const
+{
+	auto itr = m_idToBookmarkMap.find(guid);
+
+	if (itr == m_idToBookmarkMap.end())
+	{
+		return nullptr;
+	}
+
+	return itr->second;
+}
+
 BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
 	std::unique_ptr<BookmarkItem> bookmarkItem)
 {
@@ -98,6 +107,8 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
 				boost::signals2::at_front);
 		});
 
+	AddIdsRecursive(bookmarkItem.get());
+
 	if (index > parent->GetChildren().size())
 	{
 		index = parent->GetChildren().size();
@@ -107,6 +118,17 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
 	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
 
 	return rawBookmarkItem;
+}
+
+void BookmarkTree::AddIdsRecursive(BookmarkItem *bookmarkItem)
+{
+	bookmarkItem->VisitRecursively(
+		[this](BookmarkItem *currentItem)
+		{
+			auto [itr, didInsert] =
+				m_idToBookmarkMap.insert({ currentItem->GetGUID(), currentItem });
+			CHECK(didInsert);
+		});
 }
 
 void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent,
@@ -156,6 +178,13 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 
 	bookmarkItemPreRemovalSignal.m_signal(*bookmarkItem);
 
+	bookmarkItem->VisitRecursively(
+		[this](BookmarkItem *currentItem)
+		{
+			auto numErased = m_idToBookmarkMap.erase(currentItem->GetGUID());
+			CHECK_EQ(numErased, 1u);
+		});
+
 	BookmarkItem *parent = bookmarkItem->GetParent();
 	DCHECK_NOTNULL(bookmarkItem->GetParent());
 
@@ -166,9 +195,9 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 	bookmarkItemRemovedSignal.m_signal(guid);
 }
 
-bool BookmarkTree::IsInTree(const BookmarkItem *bookmarkItem)
+bool BookmarkTree::IsInTree(const BookmarkItem *bookmarkItem) const
 {
-	return BookmarkHelper::GetBookmarkItemById(this, bookmarkItem->GetGUID());
+	return m_idToBookmarkMap.contains(bookmarkItem->GetGUID());
 }
 
 void BookmarkTree::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
