@@ -236,6 +236,7 @@
     <ClCompile Include="BookmarksToolbarTest.cpp" />
     <ClCompile Include="BookmarkStorageTestHelper.cpp" />
     <ClCompile Include="BookmarkTreeViewContextMenuTest.cpp" />
+    <ClCompile Include="BookmarkTreePresenterTest.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="BrowserCommandControllerTest.cpp" />
     <ClCompile Include="BrowserCommandTargetFake.cpp" />
@@ -346,6 +347,7 @@
     <ClCompile Include="TabListTest.cpp" />
     <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
+    <ClCompile Include="TreeViewTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
     <ClCompile Include="PasteSymLinksServerClientTest.cpp" />

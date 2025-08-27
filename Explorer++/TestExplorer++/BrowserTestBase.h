@@ -10,6 +10,7 @@
 #include "Config.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
+#include "SimulatedClipboardStore.h"
 #include "TabEvents.h"
 #include "Win32ResourceLoader.h"
 #include "../Helper/CachedIcons.h"
@@ -38,6 +39,7 @@ protected:
 	BookmarkTree m_bookmarkTree;
 	CachedIcons m_cachedIcons;
 	Win32ResourceLoader m_resourceLoader;
+	SimulatedClipboardStore m_clipboardStore;
 
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;

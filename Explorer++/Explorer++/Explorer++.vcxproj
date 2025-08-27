@@ -1200,8 +1200,10 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="BackgroundContextMenuDelegate.cpp" />
     <ClCompile Include="BaseDialog.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeViewAdapter.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeViewContextMenu.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeViewNode.cpp" />
     <ClCompile Include="Bookmarks\UI\OrganizeBookmarksContextMenu.cpp" />
-    <ClCompile Include="BookmarkTreeViewContextMenu.cpp" />
     <ClCompile Include="BrowserCommandTargetManager.cpp" />
     <ClCompile Include="BrowserWindow.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
@@ -1305,6 +1307,9 @@
     <ClCompile Include="TabList.cpp" />
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="ToolbarContextMenu.cpp" />
+    <ClCompile Include="TreeView.cpp" />
+    <ClCompile Include="TreeViewAdapter.cpp" />
+    <ClCompile Include="TreeViewNode.cpp" />
     <ClCompile Include="UIThreadExecutor.cpp" />
     <ClCompile Include="MenuBase.cpp" />
     <ClCompile Include="MenuView.cpp" />
@@ -1389,7 +1394,7 @@
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkTreePresenter.cpp" />
     <ClCompile Include="ColorRuleEditorDialog.cpp" />
     <ClCompile Include="Plugins\CommandApi\Events\CommandInvoked.cpp" />
     <ClCompile Include="CommandLine.cpp" />
@@ -1527,9 +1532,11 @@
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="BackgroundContextMenuDelegate.h" />
     <ClInclude Include="BaseDialog.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeViewAdapter.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeViewContextMenu.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeViewNode.h" />
     <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenuDelegate.h" />
-    <ClInclude Include="BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="ChangeNotifyMode.h" />
     <ClInclude Include="ClangCLLibs.h" />
     <ClInclude Include="ColorProvider.h" />
@@ -1649,6 +1656,10 @@
     <ClInclude Include="TabList.h" />
     <ClInclude Include="TestHelper.h" />
     <ClInclude Include="ToolbarContextMenu.h" />
+    <ClInclude Include="TreeView.h" />
+    <ClInclude Include="TreeViewAdapter.h" />
+    <ClInclude Include="TreeViewDelegate.h" />
+    <ClInclude Include="TreeViewNode.h" />
     <ClInclude Include="UIThreadExecutor.h" />
     <ClInclude Include="MenuBase.h" />
     <ClInclude Include="MenuView.h" />
@@ -1729,7 +1740,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h" />
     <ClInclude Include="Bookmarks\BookmarkStorage.h" />
     <ClInclude Include="Bookmarks\BookmarkTree.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkTreePresenter.h" />
     <ClInclude Include="Bookmarks\BookmarkXmlStorage.h" />
     <ClInclude Include="ColorRuleEditorDialog.h" />
     <ClInclude Include="Plugins\CommandApi\Events\CommandInvoked.h" />

@@ -13,6 +13,7 @@
 class AcceleratorManager;
 class BookmarkTree;
 class CachedIcons;
+class ClipboardStore;
 struct Config;
 class NavigationEvents;
 class ResourceLoader;
@@ -25,7 +26,7 @@ class BrowserWindowFake : public BrowserWindow
 public:
 	BrowserWindowFake(const Config *config, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	// BrowserWindow

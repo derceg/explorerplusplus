@@ -201,6 +201,9 @@ Bug fixes:
   a non-printable character. See #299.
 - Fixed an issue that caused the icons shown in the address bar
   dropdown to all be the same.
+- In the manage bookmarks dialog, the treeview shown on the left
+  wouldn't be updated correctly when pasting a bookmark folder
+  that contained nested folders.
 
 Misc:
 - ARM64 builds are now available.

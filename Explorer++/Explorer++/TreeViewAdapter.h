@@ -1,0 +1,54 @@
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+#pragma once
+
+#include "TreeViewNode.h"
+#include "../Helper/SignalWrapper.h"
+#include <memory>
+#include <unordered_set>
+
+// Represents a set of nodes displayed in a TreeView. The nodes are stored hierarchically, in the
+// same way they're displayed in the view. This is designed to act as a bride between an existing
+// model and a TreeView.
+class TreeViewAdapter
+{
+public:
+	TreeViewAdapter();
+	virtual ~TreeViewAdapter() = default;
+
+	TreeViewNode *GetRoot();
+	const TreeViewNode *GetRoot() const;
+
+	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node);
+	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node,
+		size_t index);
+	void NotifyNodeUpdated(TreeViewNode *node);
+	void MoveNode(TreeViewNode *node, TreeViewNode *newParent, size_t index);
+	void RemoveNode(TreeViewNode *node);
+
+	// Signals
+	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeAddedSignal;
+	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeUpdatedSignal;
+	SignalWrapper<TreeViewAdapter,
+		void(TreeViewNode *node, const TreeViewNode *oldParent, size_t oldIndex,
+			const TreeViewNode *newParent, size_t newIndex)>
+		nodeMovedSignal;
+	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeRemovedSignal;
+
+private:
+	class RootTreeViewNode : public TreeViewNode
+	{
+	public:
+		std::wstring GetText() const override;
+		std::optional<int> GetIconIndex() const override;
+		bool CanRename() const override;
+		bool CanRemove() const override;
+	};
+
+	bool IsInTree(const TreeViewNode *node) const;
+
+	RootTreeViewNode m_rootNode;
+	std::unordered_set<const TreeViewNode *> m_nodes;
+};

@@ -6,50 +6,51 @@
 #include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "Bookmarks/UI/BookmarkTreeView.h"
+#include "Bookmarks/UI/BookmarkTreePresenter.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
+#include "TreeView.h"
 #include "../Helper/WindowHelper.h"
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/iterator_range.hpp>
 
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 AddBookmarkDialog::AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
-	std::optional<std::wstring> customDialogTitle) :
+	BookmarkItem **selectedParentFolder, ClipboardStore *clipboardStore,
+	const AcceleratorManager *acceleratorManager, std::optional<std::wstring> customDialogTitle) :
 	BaseDialog(resourceLoader, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
+	m_clipboardStore(clipboardStore),
 	m_acceleratorManager(acceleratorManager),
 	m_customDialogTitle(customDialogTitle)
 {
 	m_persistentSettings = &AddBookmarkDialogPersistentSettings::GetInstance();
 
-	/* If the singleton settings class has not been initialized
-	yet, mark the root bookmark as selected and expanded. This
-	is only needed the first time this dialog is shown, as
-	selection and expansion info will be saved each time after
-	that. */
-	if (!m_persistentSettings->m_bInitialized)
+	if (!m_persistentSettings->m_initialized)
 	{
-		m_persistentSettings->m_guidSelected =
+		m_persistentSettings->m_selectedBookmarkId =
 			m_bookmarkTree->GetBookmarksToolbarFolder()->GetGUID();
 
-		m_persistentSettings->m_bInitialized = true;
+		m_persistentSettings->m_initialized = true;
 	}
 
 	BookmarkItem *parent = bookmarkItem->GetParent();
 
 	if (parent)
 	{
-		m_persistentSettings->m_guidSelected = parent->GetGUID();
+		m_persistentSettings->m_selectedBookmarkId = parent->GetGUID();
 	}
 	else if (defaultParentSelection)
 	{
-		m_persistentSettings->m_guidSelected = defaultParentSelection->GetGUID();
+		m_persistentSettings->m_selectedBookmarkId = defaultParentSelection->GetGUID();
 	}
 }
+
+AddBookmarkDialog::~AddBookmarkDialog() = default;
 
 INT_PTR AddBookmarkDialog::OnInitDialog()
 {
@@ -73,10 +74,10 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 		EnableWindow(GetDlgItem(m_hDlg, IDOK), FALSE);
 	}
 
-	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
-
-	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, m_acceleratorManager, m_resourceLoader,
-		m_bookmarkTree, m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
+	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
+		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW)), m_acceleratorManager,
+		m_resourceLoader, m_bookmarkTree, m_clipboardStore,
+		m_persistentSettings->m_expandedBookmarkIds, m_persistentSettings->m_selectedBookmarkId);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
@@ -227,8 +228,8 @@ INT_PTR AddBookmarkDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDC_BOOKMARK_NEWFOLDER:
-			m_bookmarkTreeView->CreateFolder(
-				m_bookmarkTreeView->GetSelectedFolder()->GetChildren().size());
+			m_bookmarkTreePresenter->CreateFolder(
+				m_bookmarkTreePresenter->GetSelectedFolder()->GetChildren().size());
 			break;
 
 		case IDOK:
@@ -258,7 +259,7 @@ void AddBookmarkDialog::OnOk()
 		return;
 	}
 
-	*m_selectedParentFolder = m_bookmarkTreeView->GetSelectedFolder();
+	*m_selectedParentFolder = m_bookmarkTreePresenter->GetSelectedFolder();
 
 	m_bookmarkItem->SetName(name);
 
@@ -286,32 +287,13 @@ void AddBookmarkDialog::SaveState()
 
 void AddBookmarkDialog::SaveTreeViewState()
 {
-	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
+	const auto *selectedFolder = m_bookmarkTreePresenter->GetSelectedFolder();
+	m_persistentSettings->m_selectedBookmarkId = selectedFolder->GetGUID();
 
-	const auto *selectedFolder = m_bookmarkTreeView->GetSelectedFolder();
-	m_persistentSettings->m_guidSelected = selectedFolder->GetGUID();
-
-	m_persistentSettings->m_setExpansion.clear();
-	SaveTreeViewExpansionState(hTreeView, TreeView_GetRoot(hTreeView));
-}
-
-void AddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView, HTREEITEM hItem)
-{
-	UINT uState = TreeView_GetItemState(hTreeView, hItem, TVIS_EXPANDED);
-
-	if (uState & TVIS_EXPANDED)
-	{
-		const auto bookmarkFolder = m_bookmarkTreeView->GetBookmarkFolderFromTreeView(hItem);
-		m_persistentSettings->m_setExpansion.insert(bookmarkFolder->GetGUID());
-
-		auto hChild = TreeView_GetChild(hTreeView, hItem);
-		SaveTreeViewExpansionState(hTreeView, hChild);
-
-		while ((hChild = TreeView_GetNextSibling(hTreeView, hChild)) != nullptr)
-		{
-			SaveTreeViewExpansionState(hTreeView, hChild);
-		}
-	}
+	m_persistentSettings->m_expandedBookmarkIds =
+		boost::copy_range<std::unordered_set<std::wstring>>(
+			m_bookmarkTreePresenter->GetExpandedBookmarks()
+			| boost::adaptors::transformed(std::mem_fn(&BookmarkItem::GetGUID)));
 }
 
 INT_PTR AddBookmarkDialog::OnClose()
@@ -320,17 +302,10 @@ INT_PTR AddBookmarkDialog::OnClose()
 	return 0;
 }
 
-INT_PTR AddBookmarkDialog::OnNcDestroy()
-{
-	delete m_bookmarkTreeView;
-
-	return 0;
-}
-
 AddBookmarkDialogPersistentSettings::AddBookmarkDialogPersistentSettings() :
-	DialogSettings(SETTINGS_KEY)
+	DialogSettings(SETTINGS_KEY),
+	m_initialized(false)
 {
-	m_bInitialized = false;
 }
 
 AddBookmarkDialogPersistentSettings &AddBookmarkDialogPersistentSettings::GetInstance()

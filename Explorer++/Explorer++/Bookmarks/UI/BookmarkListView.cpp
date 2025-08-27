@@ -589,8 +589,8 @@ void BookmarkListView::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, m_hListView, m_browser, m_acceleratorManager,
-		m_resourceLoader);
+		m_currentBookmarkFolder, targetIndex, m_hListView, m_browser, m_clipboardStore,
+		m_acceleratorManager, m_resourceLoader);
 
 	if (!bookmark)
 	{

@@ -119,8 +119,8 @@ void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
 void OrganizeBookmarksContextMenu::OnNewBookmark()
 {
 	auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_targetFolder, GetTargetIndex(), m_parentWindow, nullptr, m_acceleratorManager,
-		m_resourceLoader);
+		m_targetFolder, GetTargetIndex(), m_parentWindow, nullptr, m_clipboardStore,
+		m_acceleratorManager, m_resourceLoader);
 
 	if (!bookmark || bookmark->GetParent() != m_targetFolder)
 	{

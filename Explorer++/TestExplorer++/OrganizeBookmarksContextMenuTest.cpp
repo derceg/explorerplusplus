@@ -194,9 +194,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, Cut)
 
 	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
-	ASSERT_EQ(clipboardItems.size(), 1u);
-
-	EXPECT_EQ(*clipboardItems[0], copiedBookmark);
+	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, Copy)
@@ -213,9 +211,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, Copy)
 
 	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
-	ASSERT_EQ(clipboardItems.size(), 1u);
-
-	EXPECT_EQ(*clipboardItems[0], copiedBookmark);
+	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteWithNoSelection)
@@ -230,8 +226,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteWithNoSelection)
 
 	menuView.SelectItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE, false, false);
 	ASSERT_EQ(m_targetFolder->GetChildren().size(), 3u);
-	auto *pastedBookmark = m_targetFolder->GetChildren()[2].get();
-	EXPECT_EQ(*pastedBookmark, copiedBookmark);
+	EXPECT_THAT(m_targetFolder->GetChildren()[2], Pointee(copiedBookmark));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteWithSelection)
@@ -246,8 +241,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteWithSelection)
 
 	menuView.SelectItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE, false, false);
 	ASSERT_EQ(m_targetFolder->GetChildren().size(), 3u);
-	auto *pastedBookmark = m_targetFolder->GetChildren()[1].get();
-	EXPECT_EQ(*pastedBookmark, copiedBookmark);
+	EXPECT_THAT(m_targetFolder->GetChildren()[1], Pointee(copiedBookmark));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAll)

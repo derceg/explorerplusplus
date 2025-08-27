@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "BookmarkTreeViewContextMenu.h"
+#include "Bookmarks/UI/BookmarkTreeViewContextMenu.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
 #include "MenuView.h"

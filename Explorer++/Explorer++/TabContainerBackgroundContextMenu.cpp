@@ -15,12 +15,13 @@
 TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
 	TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, BrowserWindow *browser,
-	const ResourceLoader *resourceLoader) :
+	ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_tabContainer(tabContainer),
 	m_tabRestorer(tabRestorer),
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
+	m_clipboardStore(clipboardStore),
 	m_resourceLoader(resourceLoader)
 {
 	BuildMenu();
@@ -61,7 +62,7 @@ void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
 
 	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
 		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_resourceLoader, m_browser->GetHWND(),
-			m_browser, m_acceleratorManager);
+			m_browser, m_clipboardStore, m_acceleratorManager);
 		break;
 
 	default:

@@ -10,12 +10,14 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
+#include <memory>
 #include <unordered_set>
+#include <vector>
 
 class AcceleratorManager;
 class BookmarkNavigationController;
 class BookmarkTree;
-class BookmarkTreeView;
+class BookmarkTreePresenter;
 class BrowserWindow;
 class ClipboardStore;
 struct Config;
@@ -44,8 +46,8 @@ private:
 
 	std::vector<BookmarkListView::Column> m_listViewColumns;
 
-	bool m_bInitialized;
-	std::unordered_set<std::wstring> m_setExpansion;
+	bool m_initialized;
+	std::unordered_set<std::wstring> m_expandedBookmarkIds;
 };
 
 class ManageBookmarksDialog : public BaseDialog
@@ -55,7 +57,6 @@ public:
 		HWND hParent, BrowserWindow *browserWindow, const Config *config,
 		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
 		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
-	~ManageBookmarksDialog();
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -76,6 +77,7 @@ private:
 	static const int TOOLBAR_ID_VIEWS = 10003;
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
+	~ManageBookmarksDialog() = default;
 
 	void AddDynamicControls() override;
 	std::vector<ResizableDialogControl> GetResizableControls() override;
@@ -122,8 +124,8 @@ private:
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 
-	BookmarkTreeView *m_bookmarkTreeView = nullptr;
-	BookmarkListView *m_bookmarkListView = nullptr;
+	std::unique_ptr<BookmarkTreePresenter> m_bookmarkTreePresenter;
+	std::unique_ptr<BookmarkListView> m_bookmarkListView;
 
 	std::unique_ptr<BookmarkNavigationController> m_navigationController;
 

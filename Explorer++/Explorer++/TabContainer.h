@@ -22,6 +22,7 @@ class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class CachedIcons;
+class ClipboardStore;
 struct Config;
 class MainTabView;
 struct NavigateParams;
@@ -60,8 +61,8 @@ public:
 		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		const AcceleratorManager *acceleratorManager, const Config *config,
-		const ResourceLoader *resourceLoader);
+		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
+		const Config *config, const ResourceLoader *resourceLoader);
 
 	MainTabView *GetView();
 
@@ -130,8 +131,8 @@ private:
 		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		const AcceleratorManager *acceleratorManager, const Config *config,
-		const ResourceLoader *resourceLoader);
+		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
+		const Config *config, const ResourceLoader *resourceLoader);
 
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -182,6 +183,7 @@ private:
 	IconFetcherImpl m_iconFetcher;
 	CachedIcons *const m_cachedIcons;
 	BookmarkTree *const m_bookmarkTree;
+	ClipboardStore *const m_clipboardStore;
 	const AcceleratorManager *const m_acceleratorManager;
 	const Config *const m_config;
 	const ResourceLoader *const m_resourceLoader;

@@ -244,7 +244,7 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		m_parentWindow, m_browser, m_acceleratorManager, m_resourceLoader);
+		m_parentWindow, m_browser, m_clipboardStore, m_acceleratorManager, m_resourceLoader);
 }
 
 void BookmarkContextMenu::OnCopy(ClipboardAction action)
@@ -266,6 +266,6 @@ void BookmarkContextMenu::OnDelete()
 void BookmarkContextMenu::OnShowProperties()
 {
 	DCHECK_EQ(m_bookmarkItems.size(), 1U);
-	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree, m_acceleratorManager,
-		m_resourceLoader, m_parentWindow);
+	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree, m_clipboardStore,
+		m_acceleratorManager, m_resourceLoader, m_parentWindow);
 }

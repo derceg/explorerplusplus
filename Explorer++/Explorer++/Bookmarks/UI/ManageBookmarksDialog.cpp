@@ -8,7 +8,7 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkNavigationController.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "Bookmarks/UI/BookmarkTreeView.h"
+#include "Bookmarks/UI/BookmarkTreePresenter.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
@@ -16,11 +16,13 @@
 #include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
+#include "TreeView.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclass.h"
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <glog/logging.h>
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
@@ -40,16 +42,10 @@ ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoade
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 
-	if (!m_persistentSettings->m_bInitialized)
+	if (!m_persistentSettings->m_initialized)
 	{
-		m_persistentSettings->m_bInitialized = true;
+		m_persistentSettings->m_initialized = true;
 	}
-}
-
-ManageBookmarksDialog::~ManageBookmarksDialog()
-{
-	delete m_bookmarkTreeView;
-	delete m_bookmarkListView;
 }
 
 INT_PTR ManageBookmarksDialog::OnInitDialog()
@@ -59,7 +55,7 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	SetupListView();
 
 	m_navigationController =
-		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView);
+		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView.get());
 	m_navigationController->Navigate(m_bookmarkTree->GetBookmarksToolbarFolder());
 
 	SetFocus(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW));
@@ -181,20 +177,19 @@ void ManageBookmarksDialog::SetupToolbar()
 
 void ManageBookmarksDialog::SetupTreeView()
 {
-	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
+	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
+		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW)),
+		m_acceleratorManager, m_resourceLoader, m_bookmarkTree, m_clipboardStore,
+		m_persistentSettings->m_expandedBookmarkIds);
 
-	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, m_acceleratorManager, m_resourceLoader,
-		m_bookmarkTree, m_persistentSettings->m_setExpansion);
-
-	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
+	m_connections.push_back(m_bookmarkTreePresenter->selectionChangedSignal.AddObserver(
 		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
 }
 
 void ManageBookmarksDialog::SetupListView()
 {
-	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	m_bookmarkListView = new BookmarkListView(hListView, m_resourceInstance, m_bookmarkTree,
+	m_bookmarkListView = std::make_unique<BookmarkListView>(
+		GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW), m_resourceInstance, m_bookmarkTree,
 		m_browserWindow, m_config, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
 		m_persistentSettings->m_listViewColumns, m_clipboardStore);
 
@@ -492,11 +487,11 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 
 	if (focus == treeView || IsChild(treeView, focus))
 	{
-		delegate = m_bookmarkTreeView;
+		delegate = m_bookmarkTreePresenter.get();
 	}
 	else
 	{
-		delegate = m_bookmarkListView;
+		delegate = m_bookmarkListView.get();
 	}
 
 	RECT rc;
@@ -538,7 +533,7 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder,
 	UNREFERENCED_PARAMETER(entry);
 
 	m_currentBookmarkFolder = bookmarkFolder;
-	m_bookmarkTreeView->SelectFolder(bookmarkFolder->GetGUID());
+	m_bookmarkTreePresenter->SelectItem(bookmarkFolder);
 
 	UpdateToolbarState();
 }
@@ -583,12 +578,17 @@ void ManageBookmarksDialog::SaveState()
 {
 	m_persistentSettings->SaveDialogPosition(m_hDlg);
 
+	m_persistentSettings->m_expandedBookmarkIds =
+		boost::copy_range<std::unordered_set<std::wstring>>(
+			m_bookmarkTreePresenter->GetExpandedBookmarks()
+			| boost::adaptors::transformed(std::mem_fn(&BookmarkItem::GetGUID)));
+
 	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 ManageBookmarksDialogPersistentSettings::ManageBookmarksDialogPersistentSettings() :
 	DialogSettings(SETTINGS_KEY),
-	m_bInitialized(false)
+	m_initialized(false)
 {
 	SetupDefaultColumns();
 }

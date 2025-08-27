@@ -37,15 +37,16 @@ int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-	HWND parentWindow, BrowserWindow *browser, const AcceleratorManager *acceleratorManager);
+	HWND parentWindow, BrowserWindow *browser, ClipboardStore *clipboardStore,
+	const AcceleratorManager *acceleratorManager);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader,
+	BrowserWindow *browser, ClipboardStore *clipboardStore,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	HWND parentWindow);
+	ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader, HWND parentWindow);
 void RemoveBookmarks(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems);
 
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,

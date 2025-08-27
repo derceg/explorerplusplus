@@ -250,7 +250,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarksMainMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkTreePresenter.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp">
@@ -748,9 +748,6 @@
     <ClCompile Include="ShellBrowser\ColumnHelper.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkTreeViewContextMenu.cpp">
-      <Filter>Bookmarks\UI</Filter>
-    </ClCompile>
     <ClCompile Include="TabList.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -866,6 +863,24 @@
       <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="Bookmarks\UI\OrganizeBookmarksContextMenu.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeView.cpp">
+      <Filter>Views\TreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeViewNode.cpp">
+      <Filter>Views\TreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeViewAdapter.cpp">
+      <Filter>Views\TreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeViewAdapter.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeViewNode.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeViewContextMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1110,7 +1125,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkTreePresenter.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h">
@@ -1674,9 +1689,6 @@
     <ClInclude Include="ShellBrowser\ColumnHelper.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkTreeViewContextMenu.h">
-      <Filter>Bookmarks\UI</Filter>
-    </ClInclude>
     <ClInclude Include="IconSet.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -1822,6 +1834,27 @@
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\OrganizeBookmarksContextMenu.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeViewAdapter.h">
+      <Filter>Views\TreeView</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeViewNode.h">
+      <Filter>Views\TreeView</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeView.h">
+      <Filter>Views\TreeView</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeViewNode.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeViewAdapter.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeViewDelegate.h">
+      <Filter>Views\TreeView</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeViewContextMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2063,6 +2096,9 @@
     </Filter>
     <Filter Include="Menus\UI\Views">
       <UniqueIdentifier>{68655611-30b7-4b1a-b7d3-24da8afb8b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views\TreeView">
+      <UniqueIdentifier>{ab2d98af-8b57-452e-af03-fc0fa64f4ad3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

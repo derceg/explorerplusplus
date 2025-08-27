@@ -870,13 +870,13 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	case MainToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 		BookmarkHelper::AddBookmarkItem(m_app->GetBookmarkTree(), BookmarkItem::Type::Bookmark,
-			nullptr, std::nullopt, hwnd, this, m_app->GetAcceleratorManager(),
-			m_app->GetResourceLoader());
+			nullptr, std::nullopt, hwnd, this, m_app->GetClipboardStore(),
+			m_app->GetAcceleratorManager(), m_app->GetResourceLoader());
 		break;
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
 		BookmarkHelper::BookmarkAllTabs(m_app->GetBookmarkTree(), m_app->GetResourceLoader(), hwnd,
-			this, m_app->GetAcceleratorManager());
+			this, m_app->GetClipboardStore(), m_app->GetAcceleratorManager());
 		break;
 
 	case MainToolbarButton::Bookmarks:

@@ -104,9 +104,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 
 	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
-	ASSERT_EQ(clipboardItems.size(), 1u);
-
-	EXPECT_EQ(*clipboardItems[0], copiedBookmark);
+	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
@@ -120,9 +118,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 
 	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
-	ASSERT_EQ(clipboardItems.size(), 1u);
-
-	EXPECT_EQ(*clipboardItems[0], copiedBookmark);
+	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
@@ -144,9 +140,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 
 	const auto *parentFolder = m_bookmark->GetParent();
 	ASSERT_EQ(parentFolder->GetChildren().size(), 2u);
-
-	const auto &pastedBookmark = parentFolder->GetChildren()[1];
-	EXPECT_EQ(*pastedBookmark, copiedBookmark);
+	EXPECT_THAT(parentFolder->GetChildren()[1], Pointee(copiedBookmark));
 }
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Delete)

@@ -491,6 +491,12 @@
     <ClCompile Include="CopiedBookmark.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkTreePresenterTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeViewTest.cpp">
+      <Filter>Views\TreeView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -657,6 +663,9 @@
     </Filter>
     <Filter Include="Menus\UI\Views">
       <UniqueIdentifier>{b80d11e6-4361-4b55-9b78-470549e95b2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views\TreeView">
+      <UniqueIdentifier>{a854fac4-d195-46db-abea-988ded0af263}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

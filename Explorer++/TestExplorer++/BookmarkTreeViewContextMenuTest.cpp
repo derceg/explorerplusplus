@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "BookmarkTreeViewContextMenu.h"
+#include "Bookmarks/UI/BookmarkTreeViewContextMenu.h"
 #include "AcceleratorManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"

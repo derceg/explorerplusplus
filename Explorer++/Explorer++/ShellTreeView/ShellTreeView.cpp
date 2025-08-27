@@ -797,8 +797,6 @@ LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 		break;
 	}
 
-	// If the ctrl key is down, this key sequence is likely a modifier. Stop any other pressed key
-	// from been used in an incremental search.
 	if (IsKeyDown(VK_CONTROL))
 	{
 		return 1;

@@ -76,11 +76,7 @@ void ResourceHelper::AddIconToImageList(HIMAGELIST imageList, const ResourceLoad
 	wil::unique_hbitmap bitmap =
 		resourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
-
-	if (imagePosition == -1)
-	{
-		return;
-	}
+	CHECK_NE(imagePosition, -1);
 
 	imageListMappings.insert({ icon, imagePosition });
 }
