@@ -39,7 +39,6 @@ public:
 	/* User functions. */
 	unique_pidl_absolute GetSelectedNodePidl() const;
 	void SetShowHidden(BOOL bShowHidden);
-	void RefreshAllIcons();
 
 	/* Sorting. */
 	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
@@ -206,9 +205,6 @@ private:
 	void ScrollTreeViewForDrop(const POINT &pt);
 	void OnDropExpandTimer();
 	HRESULT OnBeginDrag(const ShellTreeNode *node);
-
-	/* Icon refresh. */
-	void RefreshAllIconsInternal(HTREEITEM hFirstSibling);
 
 	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
