@@ -26,7 +26,7 @@ private:
 class UpdateCheckDialog : public BaseDialog
 {
 public:
-	UpdateCheckDialog(const ResourceLoader *resourceLoader, HWND hParent);
+	static UpdateCheckDialog *Create(const ResourceLoader *resourceLoader, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -48,6 +48,9 @@ private:
 	static const int STATUS_TIMER_ELAPSED = 800;
 
 	static const TCHAR VERSION_FILE_URL[];
+
+	UpdateCheckDialog(const ResourceLoader *resourceLoader, HWND hParent);
+	~UpdateCheckDialog() = default;
 
 	static DWORD WINAPI UpdateCheckThread(LPVOID pParam);
 	static void PerformUpdateCheck(HWND hDlg);

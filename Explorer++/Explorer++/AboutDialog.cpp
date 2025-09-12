@@ -13,6 +13,11 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+AboutDialog *AboutDialog::Create(const ResourceLoader *resourceLoader, HWND hParent)
+{
+	return new AboutDialog(resourceLoader, hParent);
+}
+
 AboutDialog::AboutDialog(const ResourceLoader *resourceLoader, HWND hParent) :
 	BaseDialog(resourceLoader, IDD_ABOUT, hParent, DialogSizingType::None)
 {
@@ -120,8 +125,9 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 		}
 		else if (pnmhdr->idFrom == IDC_THIRD_PARTY_CREDITS_LINK)
 		{
-			ThirdPartyCreditsDialog thirdPartyCreditsDialog(m_resourceLoader, m_hDlg);
-			thirdPartyCreditsDialog.ShowModalDialog();
+			auto *thirdPartyCreditsDialog =
+				ThirdPartyCreditsDialog::Create(m_resourceLoader, m_hDlg);
+			thirdPartyCreditsDialog->ShowModalDialog();
 		}
 	}
 	break;

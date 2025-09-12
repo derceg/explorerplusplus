@@ -89,8 +89,8 @@ public:
 		ColorRule *existingColorRule = nullptr;
 	};
 
-	ColorRuleEditorDialog(const ResourceLoader *resourceLoader, HWND parent, ColorRuleModel *model,
-		std::unique_ptr<EditDetails> editDetails);
+	static ColorRuleEditorDialog *Create(const ResourceLoader *resourceLoader, HWND parent,
+		ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -100,6 +100,10 @@ protected:
 	void SaveState() override;
 
 private:
+	ColorRuleEditorDialog(const ResourceLoader *resourceLoader, HWND parent, ColorRuleModel *model,
+		std::unique_ptr<EditDetails> editDetails);
+	~ColorRuleEditorDialog() = default;
+
 	LRESULT StaticColorControlProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnChangeColor();

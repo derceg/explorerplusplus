@@ -30,6 +30,14 @@ const TCHAR MassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename"
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
+MassRenameDialog *MassRenameDialog::Create(const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND hParent, const std::list<std::wstring> &FullFilenameList,
+	FileActionHandler *pFileActionHandler)
+{
+	return new MassRenameDialog(resourceLoader, resourceInstance, hParent, FullFilenameList,
+		pFileActionHandler);
+}
+
 MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 	HWND hParent, const std::list<std::wstring> &FullFilenameList,
 	FileActionHandler *pFileActionHandler) :

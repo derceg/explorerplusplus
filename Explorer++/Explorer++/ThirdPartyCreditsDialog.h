@@ -9,7 +9,7 @@
 class ThirdPartyCreditsDialog : public BaseDialog
 {
 public:
-	ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader, HWND parent);
+	static ThirdPartyCreditsDialog *Create(const ResourceLoader *resourceLoader, HWND parent);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -18,6 +18,9 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
+	ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader, HWND parent);
+	~ThirdPartyCreditsDialog() = default;
+
 	INT_PTR OnLinkNotification(const ENLINK *linkNotificationDetails);
 
 	void OnLinkClicked(const ENLINK *linkNotificationDetails);

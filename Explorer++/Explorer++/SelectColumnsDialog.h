@@ -31,7 +31,7 @@ private:
 class SelectColumnsDialog : public BaseDialog
 {
 public:
-	SelectColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static SelectColumnsDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		ShellBrowserImpl *shellBrowser);
 
 protected:
@@ -48,6 +48,10 @@ private:
 		Up,
 		Down
 	};
+
+	SelectColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		ShellBrowserImpl *shellBrowser);
+	~SelectColumnsDialog() = default;
 
 	bool CompareColumns(const Column_t &column1, const Column_t &column2);
 

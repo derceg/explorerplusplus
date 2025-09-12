@@ -31,6 +31,14 @@ const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles"
 
 bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
 
+MergeFilesDialog *MergeFilesDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
+	BOOL bShowFriendlyDates)
+{
+	return new MergeFilesDialog(resourceLoader, hParent, strOutputDirectory, filePaths,
+		bShowFriendlyDates);
+}
+
 MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
 	BOOL bShowFriendlyDates) :

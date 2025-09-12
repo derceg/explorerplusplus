@@ -38,9 +38,9 @@ void Explorerplusplus::OnDestroyFiles()
 		fullFilenameList.push_back(fullFilename);
 	}
 
-	DestroyFilesDialog destroyFilesDialog(m_app->GetResourceLoader(), m_hContainer,
+	auto *destroyFilesDialog = DestroyFilesDialog::Create(m_app->GetResourceLoader(), m_hContainer,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
-	destroyFilesDialog.ShowModalDialog();
+	destroyFilesDialog->ShowModalDialog();
 }
 
 void Explorerplusplus::OnSearch()
@@ -51,28 +51,32 @@ void Explorerplusplus::OnSearch()
 			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryPath();
 
-			return new SearchDialog(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
+			return SearchDialog::Create(m_app->GetResourceLoader(), m_hContainer, currentDirectory,
 				m_app->GetBrowserList());
 		});
 }
 
 void Explorerplusplus::OnCustomizeColors()
 {
-	CustomizeColorsDialog customizeColorsDialog(m_app->GetResourceLoader(), m_hContainer,
-		m_app->GetColorRuleModel());
-	customizeColorsDialog.ShowModalDialog();
+	auto *customizeColorsDialog = CustomizeColorsDialog::Create(m_app->GetResourceLoader(),
+		m_hContainer, m_app->GetColorRuleModel());
+	customizeColorsDialog->ShowModalDialog();
 }
 
 void Explorerplusplus::OnRunScript()
 {
-	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"ScriptingDialog", [this]
-		{ return new ScriptingDialog(m_app->GetResourceLoader(), m_hContainer, this, m_config); });
+	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"ScriptingDialog",
+		[this]
+		{
+			return ScriptingDialog::Create(m_app->GetResourceLoader(), m_hContainer, this,
+				m_config);
+		});
 }
 
 void Explorerplusplus::OnShowOptions()
 {
 	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"OptionsDialog",
-		[this] { return new OptionsDialog(m_hContainer, m_app, m_config, this); });
+		[this] { return OptionsDialog::Create(m_hContainer, m_app, m_config, this); });
 }
 
 void Explorerplusplus::OnSearchTabs()

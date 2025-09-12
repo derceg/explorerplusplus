@@ -17,6 +17,12 @@ const TCHAR DestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFi
 const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] =
 	_T("OverwriteMethod");
 
+DestroyFilesDialog *DestroyFilesDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates)
+{
+	return new DestroyFilesDialog(resourceLoader, hParent, FullFilenameList, bShowFriendlyDates);
+}
+
 DestroyFilesDialog::DestroyFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
 	BaseDialog(resourceLoader, IDD_DESTROYFILES, hParent, DialogSizingType::Both)

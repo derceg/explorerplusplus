@@ -1207,8 +1207,9 @@ void ShellBrowserImpl::OnListViewHeaderMenuItemSelected(int menuItemId,
 
 void ShellBrowserImpl::OnShowMoreColumnsSelected()
 {
-	SelectColumnsDialog selectColumnsDialog(m_app->GetResourceLoader(), m_listView, this);
-	selectColumnsDialog.ShowModalDialog();
+	auto *selectColumnsDialog =
+		SelectColumnsDialog::Create(m_app->GetResourceLoader(), m_listView, this);
+	selectColumnsDialog->ShowModalDialog();
 }
 
 void ShellBrowserImpl::OnColumnMenuItemSelected(int menuItemId,

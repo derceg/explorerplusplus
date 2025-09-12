@@ -31,7 +31,8 @@ private:
 class DisplayColoursDialog : public BaseDialog
 {
 public:
-	DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND hParent, Config *config);
+	static DisplayColoursDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
+		Config *config);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -58,6 +59,9 @@ private:
 
 	static const int NUM_COLORS = 3;
 	static const int TICK_REQUENCY = 10;
+
+	DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND hParent, Config *config);
+	~DisplayColoursDialog() = default;
 
 	void OnRestoreDefaults();
 	void OnChooseFont();

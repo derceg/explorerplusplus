@@ -10,7 +10,7 @@
 class AboutDialog : public BaseDialog
 {
 public:
-	AboutDialog(const ResourceLoader *resourceLoader, HWND hParent);
+	static AboutDialog *Create(const ResourceLoader *resourceLoader, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -19,6 +19,9 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
+	AboutDialog(const ResourceLoader *resourceLoader, HWND hParent);
+	~AboutDialog() = default;
+
 	wil::unique_hicon m_icon;
 	wil::unique_hicon m_mainIcon;
 };

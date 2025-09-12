@@ -19,12 +19,16 @@ class WindowSubclass;
 class OptionsDialog : public BaseDialog
 {
 public:
-	OptionsDialog(HWND parent, App *app, Config *config, CoreInterface *coreInterface);
+	static OptionsDialog *Create(HWND parent, App *app, Config *config,
+		CoreInterface *coreInterface);
 
 private:
 	// The amount of horizontal spacing between the navigation controls on the left side of the
 	// dialog and the content pages on the right side.
 	static constexpr auto NAVIGATION_CONTENT_HORIZONTAL_SPACING = 4_px;
+
+	OptionsDialog(HWND parent, App *app, Config *config, CoreInterface *coreInterface);
+	~OptionsDialog() = default;
 
 	INT_PTR OnInitDialog() override;
 	void SetupSearchField();
@@ -55,7 +59,6 @@ private:
 	void OnSettingChanged();
 
 	INT_PTR OnDestroy() override;
-	INT_PTR OnNcDestroy() override;
 
 	App *const m_app;
 	Config *const m_config;

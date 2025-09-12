@@ -61,6 +61,7 @@ private:
 
 	SearchTabsDialog(HWND parent, std::unique_ptr<SearchTabsModel> model,
 		const ResourceLoader *resourceLoader);
+	~SearchTabsDialog() = default;
 
 	INT_PTR OnInitDialog() override;
 	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
@@ -87,7 +88,6 @@ private:
 	void OnCancel();
 	INT_PTR OnClose() override;
 	void SaveState() override;
-	INT_PTR OnNcDestroy() override;
 
 	const std::unique_ptr<SearchTabsModel> m_model;
 	std::unique_ptr<WindowSubclass> m_editSubclass;

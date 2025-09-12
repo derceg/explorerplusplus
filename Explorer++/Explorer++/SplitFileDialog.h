@@ -68,9 +68,8 @@ private:
 class SplitFileDialog : public BaseDialog
 {
 public:
-	SplitFileDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static SplitFileDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		const std::wstring &strFullFilename);
-	~SplitFileDialog();
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -100,6 +99,10 @@ private:
 
 	static const UINT_PTR ELPASED_TIMER_ID = 1;
 	static const UINT_PTR ELPASED_TIMER_TIMEOUT = 1000;
+
+	SplitFileDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::wstring &strFullFilename);
+	~SplitFileDialog();
 
 	void OnOk();
 	void OnCancel();

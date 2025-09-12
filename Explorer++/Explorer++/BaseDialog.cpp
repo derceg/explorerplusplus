@@ -180,3 +180,9 @@ std::vector<ResizableDialogControl> BaseDialog::GetResizableControls()
 void BaseDialog::SaveState()
 {
 }
+
+INT_PTR BaseDialog::OnNcDestroy()
+{
+	delete this;
+	return 0;
+}

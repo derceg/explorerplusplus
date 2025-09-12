@@ -10,6 +10,12 @@
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
+DisplayColoursDialog *DisplayColoursDialog::Create(const ResourceLoader *resourceLoader,
+	HWND hParent, Config *config)
+{
+	return new DisplayColoursDialog(resourceLoader, hParent, config);
+}
+
 DisplayColoursDialog::DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	Config *config) :
 	BaseDialog(resourceLoader, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),

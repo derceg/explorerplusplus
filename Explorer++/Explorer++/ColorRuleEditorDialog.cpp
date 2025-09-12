@@ -18,6 +18,12 @@ const TCHAR ColorRuleEditorDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorR
 
 const TCHAR ColorRuleEditorDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
 
+ColorRuleEditorDialog *ColorRuleEditorDialog::Create(const ResourceLoader *resourceLoader,
+	HWND parent, ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails)
+{
+	return new ColorRuleEditorDialog(resourceLoader, parent, model, std::move(editDetails));
+}
+
 ColorRuleEditorDialog::ColorRuleEditorDialog(const ResourceLoader *resourceLoader, HWND parent,
 	ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails) :
 	BaseDialog(resourceLoader, IDD_NEW_COLOR_RULE, parent, DialogSizingType::None),

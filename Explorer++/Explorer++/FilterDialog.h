@@ -44,7 +44,8 @@ private:
 class FilterDialog : public BaseDialog
 {
 public:
-	FilterDialog(const ResourceLoader *resourceLoader, HWND hParent, ShellBrowser *shellBrowser);
+	static FilterDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
+		ShellBrowser *shellBrowser);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -54,6 +55,9 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	FilterDialog(const ResourceLoader *resourceLoader, HWND hParent, ShellBrowser *shellBrowser);
+	~FilterDialog() = default;
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 

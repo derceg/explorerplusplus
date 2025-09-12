@@ -190,9 +190,9 @@ void TabContextMenu::OnRefreshAllTabs()
 
 void TabContextMenu::OnRenameTab()
 {
-	RenameTabDialog renameTabDialog(m_tab->GetBrowser()->GetHWND(), m_tab, m_tabEvents,
-		m_resourceLoader);
-	renameTabDialog.ShowModalDialog();
+	auto *renameTabDialog = RenameTabDialog::Create(m_tab->GetBrowser()->GetHWND(), m_tab,
+		m_tabEvents, m_resourceLoader);
+	renameTabDialog->ShowModalDialog();
 }
 
 void TabContextMenu::OnLockTab()

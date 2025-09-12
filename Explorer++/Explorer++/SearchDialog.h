@@ -134,9 +134,8 @@ private:
 class SearchDialog : public BaseDialog
 {
 public:
-	SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static SearchDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		std::wstring_view searchDirectory, BrowserList *browserList);
-	~SearchDialog();
 
 	/* Sorting methods. */
 	int CALLBACK SortResults(LPARAM lParam1, LPARAM lParam2);
@@ -149,7 +148,6 @@ protected:
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnNotify(NMHDR *pnmhdr) override;
 	INT_PTR OnClose() override;
-	INT_PTR OnNcDestroy() override;
 
 	INT_PTR OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -159,6 +157,10 @@ private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ID = 0;
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
+
+	SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		std::wstring_view searchDirectory, BrowserList *browserList);
+	~SearchDialog();
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;

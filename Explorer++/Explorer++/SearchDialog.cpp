@@ -60,6 +60,12 @@ const TCHAR SearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("SortA
 const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
+SearchDialog *SearchDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	std::wstring_view searchDirectory, BrowserList *browserList)
+{
+	return new SearchDialog(resourceLoader, hParent, searchDirectory, browserList);
+}
+
 SearchDialog::SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	std::wstring_view searchDirectory, BrowserList *browserList) :
 	BaseDialog(resourceLoader, IDD_SEARCH, hParent, DialogSizingType::Both),
@@ -836,13 +842,6 @@ INT_PTR SearchDialog::OnTimer(int iTimerID)
 INT_PTR SearchDialog::OnClose()
 {
 	DestroyWindow(m_hDlg);
-
-	return 0;
-}
-
-INT_PTR SearchDialog::OnNcDestroy()
-{
-	delete this;
 
 	return 0;
 }

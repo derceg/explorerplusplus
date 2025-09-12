@@ -601,8 +601,9 @@ void BrowserCommandController::OnResetMainFontSize()
 
 void BrowserCommandController::OnChangeDisplayColors()
 {
-	DisplayColoursDialog displayColoursDialog(m_resourceLoader, m_browser->GetHWND(), m_config);
-	displayColoursDialog.ShowModalDialog();
+	auto *displayColoursDialog =
+		DisplayColoursDialog::Create(m_resourceLoader, m_browser->GetHWND(), m_config);
+	displayColoursDialog->ShowModalDialog();
 }
 
 void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
@@ -699,14 +700,14 @@ void BrowserCommandController::OnOpenOnlineDocumentation()
 
 void BrowserCommandController::OnCheckForUpdates()
 {
-	UpdateCheckDialog updateCheckDialog(m_resourceLoader, m_browser->GetHWND());
-	updateCheckDialog.ShowModalDialog();
+	auto *updateCheckDialog = UpdateCheckDialog::Create(m_resourceLoader, m_browser->GetHWND());
+	updateCheckDialog->ShowModalDialog();
 }
 
 void BrowserCommandController::OnAbout()
 {
-	AboutDialog aboutDialog(m_resourceLoader, m_browser->GetHWND());
-	aboutDialog.ShowModalDialog();
+	auto *aboutDialog = AboutDialog::Create(m_resourceLoader, m_browser->GetHWND());
+	aboutDialog->ShowModalDialog();
 }
 
 void BrowserCommandController::OnDuplicateTab()

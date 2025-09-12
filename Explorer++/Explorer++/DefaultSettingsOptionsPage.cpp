@@ -102,9 +102,9 @@ void DefaultSettingsOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDC_BUTTON_DEFAULTCOLUMNS:
 		{
-			SetDefaultColumnsDialog setDefaultColumnsDialog(m_resourceLoader, GetDialog(),
-				m_config->globalFolderSettings.folderColumns);
-			setDefaultColumnsDialog.ShowModalDialog();
+			auto *setDefaultColumnsDialog = SetDefaultColumnsDialog::Create(m_resourceLoader,
+				GetDialog(), m_config->globalFolderSettings.folderColumns);
+			setDefaultColumnsDialog->ShowModalDialog();
 		}
 		break;
 		}

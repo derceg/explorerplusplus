@@ -9,6 +9,12 @@
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
+ThirdPartyCreditsDialog *ThirdPartyCreditsDialog::Create(const ResourceLoader *resourceLoader,
+	HWND parent)
+{
+	return new ThirdPartyCreditsDialog(resourceLoader, parent);
+}
+
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(const ResourceLoader *resourceLoader,
 	HWND parent) :
 	BaseDialog(resourceLoader, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)

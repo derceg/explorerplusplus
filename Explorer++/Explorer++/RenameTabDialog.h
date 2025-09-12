@@ -31,7 +31,7 @@ private:
 class RenameTabDialog : public BaseDialog
 {
 public:
-	RenameTabDialog(HWND parent, Tab *tab, TabEvents *tabEvents,
+	static RenameTabDialog *Create(HWND parent, Tab *tab, TabEvents *tabEvents,
 		const ResourceLoader *resourceLoader);
 
 protected:
@@ -42,6 +42,10 @@ protected:
 	void SaveState() override;
 
 private:
+	RenameTabDialog(HWND parent, Tab *tab, TabEvents *tabEvents,
+		const ResourceLoader *resourceLoader);
+	~RenameTabDialog() = default;
+
 	void OnUseFolderName();
 	void OnUseCustomName();
 	void OnOk();

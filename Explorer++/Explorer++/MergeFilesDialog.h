@@ -52,10 +52,9 @@ private:
 class MergeFilesDialog : public BaseDialog
 {
 public:
-	MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static MergeFilesDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
 		BOOL bShowFriendlyDates);
-	~MergeFilesDialog();
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -67,6 +66,11 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
+		BOOL bShowFriendlyDates);
+	~MergeFilesDialog();
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 

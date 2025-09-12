@@ -54,7 +54,7 @@ private:
 class SetDefaultColumnsDialog : public BaseDialog
 {
 public:
-	SetDefaultColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static SetDefaultColumnsDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		FolderColumns &folderColumns);
 
 protected:
@@ -64,6 +64,10 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
+	SetDefaultColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		FolderColumns &folderColumns);
+	~SetDefaultColumnsDialog() = default;
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 

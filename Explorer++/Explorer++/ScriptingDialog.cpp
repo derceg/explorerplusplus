@@ -10,6 +10,12 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 
+ScriptingDialog *ScriptingDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	PluginInterface *pluginInterface, const Config *config)
+{
+	return new ScriptingDialog(resourceLoader, hParent, pluginInterface, config);
+}
+
 ScriptingDialog::ScriptingDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	PluginInterface *pluginInterface, const Config *config) :
 	BaseDialog(resourceLoader, IDD_SCRIPTING, hParent, DialogSizingType::Both),
@@ -123,12 +129,5 @@ void ScriptingDialog::AppendToLog(const std::wstring &command, const std::wstrin
 INT_PTR ScriptingDialog::OnClose()
 {
 	DestroyWindow(m_hDlg);
-	return 0;
-}
-
-INT_PTR ScriptingDialog::OnNcDestroy()
-{
-	delete this;
-
 	return 0;
 }

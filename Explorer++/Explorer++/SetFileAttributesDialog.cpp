@@ -9,6 +9,12 @@
 
 const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
+SetFileAttributesDialog *SetFileAttributesDialog::Create(const ResourceLoader *resourceLoader,
+	HWND hParent, const std::vector<SetFileAttributesItem> &items)
+{
+	return new SetFileAttributesDialog(resourceLoader, hParent, items);
+}
+
 SetFileAttributesDialog::SetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::vector<SetFileAttributesItem> &items) :
 	BaseDialog(resourceLoader, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None),

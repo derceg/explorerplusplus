@@ -44,8 +44,9 @@ private:
 class MassRenameDialog : public BaseDialog
 {
 public:
-	MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
+	static MassRenameDialog *Create(const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, HWND hParent, const std::list<std::wstring> &FullFilenameList,
+		FileActionHandler *pFileActionHandler);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -55,6 +56,10 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
+		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
+	~MassRenameDialog() = default;
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 

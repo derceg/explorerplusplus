@@ -86,9 +86,9 @@ void ColorRuleListView::OnDoubleClick(const NMITEMACTIVATE *itemActivate)
 
 	auto *colorRule = m_model->GetItemAtIndex(itemActivate->iItem);
 
-	ColorRuleEditorDialog editorDialog(m_resourceLoader, GetParent(m_listView), m_model,
-		ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
-	editorDialog.ShowModalDialog();
+	auto *editorDialog = ColorRuleEditorDialog::Create(m_resourceLoader, GetParent(m_listView),
+		m_model, ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
+	editorDialog->ShowModalDialog();
 }
 
 void ColorRuleListView::InsertColumns()

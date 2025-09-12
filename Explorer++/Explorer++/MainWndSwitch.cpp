@@ -884,7 +884,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"ManageBookmarksDialog",
 			[this, hwnd]
 			{
-				return new ManageBookmarksDialog(m_app->GetResourceLoader(),
+				return ManageBookmarksDialog::Create(m_app->GetResourceLoader(),
 					m_app->GetResourceInstance(), hwnd, this, m_config,
 					m_app->GetAcceleratorManager(), &m_iconFetcher, m_app->GetBookmarkTree(),
 					m_app->GetClipboardStore());

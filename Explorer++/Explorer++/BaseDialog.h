@@ -12,10 +12,12 @@
 
 class ResourceLoader;
 
-/* Provides a degree of abstraction off a standard dialog.
-For instance, provides the ability for a class to manage
-a dialog without having to handle the dialog procedure
-directly. */
+// Provides a degree of abstraction off a standard dialog. For instance, provides the ability for a
+// class to manage a dialog without having to handle the dialog procedure directly.
+//
+// A derived instance should only be allocated with new, since this class will destroy the instance
+// automatically in WM_NCDESTROY. In practice, that means that a derived class should have a private
+// constructor and private destructor, with instance creation provided via a static helper method.
 class BaseDialog : public MessageForwarder, private boost::noncopyable
 {
 public:
@@ -30,14 +32,13 @@ public:
 	static const int RETURN_CANCEL = 0;
 	static const int RETURN_OK = 1;
 
-	virtual ~BaseDialog() = default;
-
 	INT_PTR ShowModalDialog();
 	HWND ShowModelessDialog(std::function<void()> dialogDestroyedObserver);
 
 protected:
 	BaseDialog(const ResourceLoader *resourceLoader, int iResource, HWND hParent,
 		DialogSizingType dialogSizingType);
+	virtual ~BaseDialog() = default;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;
 
@@ -57,6 +58,7 @@ private:
 	virtual void AddDynamicControls();
 	virtual std::vector<ResizableDialogControl> GetResizableControls();
 	virtual void SaveState();
+	INT_PTR OnNcDestroy() override final;
 
 	const int m_iResource;
 	const HWND m_hParent;

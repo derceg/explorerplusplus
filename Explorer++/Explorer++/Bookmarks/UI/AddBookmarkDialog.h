@@ -42,12 +42,11 @@ private:
 class AddBookmarkDialog : public BaseDialog
 {
 public:
-	AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static AddBookmarkDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
-	~AddBookmarkDialog();
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -57,6 +56,13 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
+		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
+		std::optional<std::wstring> customDialogTitle);
+	~AddBookmarkDialog();
+
 	AddBookmarkDialog &operator=(const AddBookmarkDialog &abd);
 
 	void UpdateDialogForBookmarkFolder();

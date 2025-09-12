@@ -51,7 +51,7 @@ private:
 class WildcardSelectDialog : public BaseDialog
 {
 public:
-	WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND parent,
+	static WildcardSelectDialog *Create(const ResourceLoader *resourceLoader, HWND parent,
 		ShellBrowser *shellBrowser, SelectionType selectionType);
 
 protected:
@@ -60,6 +60,10 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
+	WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND parent,
+		ShellBrowser *shellBrowser, SelectionType selectionType);
+	~WildcardSelectDialog() = default;
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 

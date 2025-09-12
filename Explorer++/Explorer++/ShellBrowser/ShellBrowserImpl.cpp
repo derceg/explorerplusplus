@@ -1034,9 +1034,9 @@ void ShellBrowserImpl::StartRenamingMultipleItems(const std::vector<PidlAbsolute
 		return;
 	}
 
-	MassRenameDialog massRenameDialog(m_app->GetResourceLoader(), m_resourceInstance, m_listView,
-		fullFilenameList, m_fileActionHandler);
-	massRenameDialog.ShowModalDialog();
+	auto *massRenameDialog = MassRenameDialog::Create(m_app->GetResourceLoader(),
+		m_resourceInstance, m_listView, fullFilenameList, m_fileActionHandler);
+	massRenameDialog->ShowModalDialog();
 }
 
 HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(ClipboardAction action)
@@ -1326,8 +1326,8 @@ void ShellBrowserImpl::SplitFile()
 		return;
 	}
 
-	SplitFileDialog splitFileDialog(m_app->GetResourceLoader(), m_owner, *itemPath);
-	splitFileDialog.ShowModalDialog();
+	auto *splitFileDialog = SplitFileDialog::Create(m_app->GetResourceLoader(), m_owner, *itemPath);
+	splitFileDialog->ShowModalDialog();
 }
 
 std::optional<std::wstring> ShellBrowserImpl::GetFilePathForSplit() const
@@ -1375,9 +1375,9 @@ void ShellBrowserImpl::MergeFiles()
 		return;
 	}
 
-	MergeFilesDialog mergeFilesDialog(m_app->GetResourceLoader(), m_owner,
+	auto *mergeFilesDialog = MergeFilesDialog::Create(m_app->GetResourceLoader(), m_owner,
 		m_directoryState.directory, *items, m_config->globalFolderSettings.showFriendlyDates);
-	mergeFilesDialog.ShowModalDialog();
+	mergeFilesDialog->ShowModalDialog();
 }
 
 std::optional<std::vector<std::wstring>> ShellBrowserImpl::GetFilePathsForMerge() const
@@ -1457,9 +1457,9 @@ bool ShellBrowserImpl::CanStartWildcardSelection(SelectionType selectionType) co
 
 void ShellBrowserImpl::StartWildcardSelection(SelectionType selectionType)
 {
-	WildcardSelectDialog wilcardSelectDialog(m_app->GetResourceLoader(), m_owner, this,
-		selectionType);
-	wilcardSelectDialog.ShowModalDialog();
+	auto *wilcardSelectDialog =
+		WildcardSelectDialog::Create(m_app->GetResourceLoader(), m_owner, this, selectionType);
+	wilcardSelectDialog->ShowModalDialog();
 }
 
 void ShellBrowserImpl::SelectItemsMatchingPattern(const std::wstring &pattern,

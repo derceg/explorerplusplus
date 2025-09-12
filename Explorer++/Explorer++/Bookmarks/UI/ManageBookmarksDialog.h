@@ -53,10 +53,10 @@ private:
 class ManageBookmarksDialog : public BaseDialog
 {
 public:
-	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, BrowserWindow *browserWindow, const Config *config,
-		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
+	static ManageBookmarksDialog *Create(const ResourceLoader *resourceLoader,
+		HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
+		const Config *config, const AcceleratorManager *acceleratorManager,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -64,7 +64,6 @@ protected:
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 	INT_PTR OnDestroy() override;
-	INT_PTR OnNcDestroy() override;
 
 	void SaveState() override;
 
@@ -76,8 +75,13 @@ private:
 	static const int TOOLBAR_ID_ORGANIZE = 10002;
 	static const int TOOLBAR_ID_VIEWS = 10003;
 
-	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
+	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
+		HWND hParent, BrowserWindow *browserWindow, const Config *config,
+		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
 	~ManageBookmarksDialog() = default;
+
+	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
 
 	void AddDynamicControls() override;
 	std::vector<ResizableDialogControl> GetResizableControls() override;

@@ -62,7 +62,7 @@ public:
 		Application *existingApplication = nullptr;
 	};
 
-	ApplicationEditorDialog(HWND parent, const ResourceLoader *resourceLoader,
+	static ApplicationEditorDialog *Create(HWND parent, const ResourceLoader *resourceLoader,
 		ApplicationModel *model, std::unique_ptr<EditDetails> editDetails);
 
 protected:
@@ -71,6 +71,10 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
+	ApplicationEditorDialog(HWND parent, const ResourceLoader *resourceLoader,
+		ApplicationModel *model, std::unique_ptr<EditDetails> editDetails);
+	~ApplicationEditorDialog() = default;
+
 	void OnChooseFile();
 
 	void OnOk();

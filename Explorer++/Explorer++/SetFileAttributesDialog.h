@@ -44,7 +44,7 @@ struct SetFileAttributesItem
 class SetFileAttributesDialog : public BaseDialog
 {
 public:
-	SetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static SetFileAttributesDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		const std::vector<SetFileAttributesItem> &items);
 
 protected:
@@ -69,6 +69,10 @@ private:
 		Created,
 		Accessed
 	};
+
+	SetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::vector<SetFileAttributesItem> &items);
+	~SetFileAttributesDialog() = default;
 
 	void InitializeAttributesStructure();
 

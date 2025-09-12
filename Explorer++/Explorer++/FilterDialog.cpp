@@ -17,6 +17,12 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
+FilterDialog *FilterDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	ShellBrowser *shellBrowser)
+{
+	return new FilterDialog(resourceLoader, hParent, shellBrowser);
+}
+
 FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	ShellBrowser *shellBrowser) :
 	BaseDialog(resourceLoader, IDD_FILTER, hParent, DialogSizingType::Horizontal),

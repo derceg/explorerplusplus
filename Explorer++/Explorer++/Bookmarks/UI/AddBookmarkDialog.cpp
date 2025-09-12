@@ -16,6 +16,16 @@
 
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
+AddBookmarkDialog *AddBookmarkDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
+	BookmarkItem **selectedParentFolder, ClipboardStore *clipboardStore,
+	const AcceleratorManager *acceleratorManager, std::optional<std::wstring> customDialogTitle)
+{
+	return new AddBookmarkDialog(resourceLoader, hParent, bookmarkTree, bookmarkItem,
+		defaultParentSelection, selectedParentFolder, clipboardStore, acceleratorManager,
+		customDialogTitle);
+}
+
 AddBookmarkDialog::AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
 	BookmarkItem **selectedParentFolder, ClipboardStore *clipboardStore,

@@ -27,6 +27,15 @@
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
+ManageBookmarksDialog *ManageBookmarksDialog::Create(const ResourceLoader *resourceLoader,
+	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
+	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
+	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore)
+{
+	return new ManageBookmarksDialog(resourceLoader, resourceInstance, hParent, browserWindow,
+		config, acceleratorManager, iconFetcher, bookmarkTree, clipboardStore);
+}
+
 ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
@@ -564,13 +573,6 @@ INT_PTR ManageBookmarksDialog::OnClose()
 INT_PTR ManageBookmarksDialog::OnDestroy()
 {
 	m_persistentSettings->m_listViewColumns = m_bookmarkListView->GetColumns();
-	return 0;
-}
-
-INT_PTR ManageBookmarksDialog::OnNcDestroy()
-{
-	delete this;
-
 	return 0;
 }
 

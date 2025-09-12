@@ -17,6 +17,12 @@
 
 CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
+CustomizeColorsDialog *CustomizeColorsDialog::Create(const ResourceLoader *resourceLoader,
+	HWND parent, ColorRuleModel *model)
+{
+	return new CustomizeColorsDialog(resourceLoader, parent, model);
+}
+
 CustomizeColorsDialog::CustomizeColorsDialog(const ResourceLoader *resourceLoader, HWND parent,
 	ColorRuleModel *model) :
 	BaseDialog(resourceLoader, IDD_CUSTOMIZE_COLORS, parent, DialogSizingType::Both),
@@ -129,10 +135,10 @@ void CustomizeColorsDialog::SaveState()
 
 void CustomizeColorsDialog::OnNew()
 {
-	ColorRuleEditorDialog editorDialog(m_resourceLoader, m_hDlg, m_model,
+	auto *editorDialog = ColorRuleEditorDialog::Create(m_resourceLoader, m_hDlg, m_model,
 		ColorRuleEditorDialog::EditDetails::AddNewColorRule(
 			std::make_unique<ColorRule>(L"", L"", false, 0, DEFAULT_INITIAL_COLOR)));
-	editorDialog.ShowModalDialog();
+	editorDialog->ShowModalDialog();
 }
 
 void CustomizeColorsDialog::OnEdit()
@@ -144,9 +150,9 @@ void CustomizeColorsDialog::OnEdit()
 		return;
 	}
 
-	ColorRuleEditorDialog editorDialog(m_resourceLoader, m_hDlg, m_model,
+	auto *editorDialog = ColorRuleEditorDialog::Create(m_resourceLoader, m_hDlg, m_model,
 		ColorRuleEditorDialog::EditDetails::EditColorRule(selectedColorRule));
-	editorDialog.ShowModalDialog();
+	editorDialog->ShowModalDialog();
 }
 
 void CustomizeColorsDialog::OnMove(MovementDirection direction)

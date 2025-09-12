@@ -33,6 +33,12 @@ const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
+SplitFileDialog *SplitFileDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	const std::wstring &strFullFilename)
+{
+	return new SplitFileDialog(resourceLoader, hParent, strFullFilename);
+}
+
 SplitFileDialog::SplitFileDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::wstring &strFullFilename) :
 	BaseDialog(resourceLoader, IDD_SPLITFILE, hParent, DialogSizingType::None),

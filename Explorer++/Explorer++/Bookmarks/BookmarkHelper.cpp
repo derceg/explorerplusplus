@@ -202,10 +202,10 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog addBookmarkDialog(resourceLoader, parentWindow, bookmarkTree,
+	auto *addBookmarkDialog = AddBookmarkDialog::Create(resourceLoader, parentWindow, bookmarkTree,
 		bookmarkItem.get(), defaultParentSelection, &selectedParentFolder, clipboardStore,
 		acceleratorManager, customDialogTitle);
-	auto res = addBookmarkDialog.ShowModalDialog();
+	auto res = addBookmarkDialog->ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
 	{
@@ -241,9 +241,9 @@ void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	}
 
 	BookmarkItem *selectedParentFolder = nullptr;
-	AddBookmarkDialog addBookmarkDialog(resourceLoader, parentWindow, bookmarkTree, bookmarkItem,
-		nullptr, &selectedParentFolder, clipboardStore, acceleratorManager);
-	auto res = addBookmarkDialog.ShowModalDialog();
+	auto *addBookmarkDialog = AddBookmarkDialog::Create(resourceLoader, parentWindow, bookmarkTree,
+		bookmarkItem, nullptr, &selectedParentFolder, clipboardStore, acceleratorManager);
+	auto res = addBookmarkDialog->ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
 	{

@@ -9,7 +9,7 @@ class PluginInterface;
 class ScriptingDialog : public BaseDialog
 {
 public:
-	ScriptingDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static ScriptingDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		PluginInterface *pluginInterface, const Config *config);
 
 protected:
@@ -17,9 +17,12 @@ protected:
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	void OnRun();
 	INT_PTR OnClose() override;
-	INT_PTR OnNcDestroy() override;
 
 private:
+	ScriptingDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		PluginInterface *pluginInterface, const Config *config);
+	~ScriptingDialog() = default;
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 
 	std::wstring FormatResult(const sol::protected_function_result &result);

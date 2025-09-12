@@ -33,8 +33,8 @@ private:
 class CustomizeColorsDialog : public BaseDialog
 {
 public:
-	CustomizeColorsDialog(const ResourceLoader *resourceLoader, HWND parent, ColorRuleModel *model);
-	~CustomizeColorsDialog();
+	static CustomizeColorsDialog *Create(const ResourceLoader *resourceLoader, HWND parent,
+		ColorRuleModel *model);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -51,6 +51,9 @@ private:
 		Up,
 		Down
 	};
+
+	CustomizeColorsDialog(const ResourceLoader *resourceLoader, HWND parent, ColorRuleModel *model);
+	~CustomizeColorsDialog();
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;

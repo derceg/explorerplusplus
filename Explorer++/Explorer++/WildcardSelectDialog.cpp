@@ -16,6 +16,12 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("Wildcar
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
+WildcardSelectDialog *WildcardSelectDialog::Create(const ResourceLoader *resourceLoader,
+	HWND parent, ShellBrowser *shellBrowser, SelectionType selectionType)
+{
+	return new WildcardSelectDialog(resourceLoader, parent, shellBrowser, selectionType);
+}
+
 WildcardSelectDialog::WildcardSelectDialog(const ResourceLoader *resourceLoader, HWND parent,
 	ShellBrowser *shellBrowser, SelectionType selectionType) :
 	BaseDialog(resourceLoader, IDD_WILDCARDSELECT, parent, DialogSizingType::Horizontal),

@@ -81,8 +81,9 @@ void MaybeShowSetFileAttributesDialog(const ResourceLoader *resourceLoader, HWND
 		return;
 	}
 
-	SetFileAttributesDialog setFileAttributesDialog(resourceLoader, parent, dialogItems);
-	setFileAttributesDialog.ShowModalDialog();
+	auto *setFileAttributesDialog =
+		SetFileAttributesDialog::Create(resourceLoader, parent, dialogItems);
+	setFileAttributesDialog->ShowModalDialog();
 }
 
 }

@@ -62,10 +62,11 @@ void ApplicationContextMenuController::OnNew()
 {
 	auto index = m_model->GetItemIndex(m_application);
 
-	ApplicationEditorDialog editorDialog(m_browser->GetHWND(), m_resourceLoader, m_model,
-		ApplicationEditorDialog::EditDetails::AddNewApplication(
-			std::make_unique<Application>(L"", L""), index));
-	editorDialog.ShowModalDialog();
+	auto *editorDialog =
+		ApplicationEditorDialog::Create(m_browser->GetHWND(), m_resourceLoader, m_model,
+			ApplicationEditorDialog::EditDetails::AddNewApplication(
+				std::make_unique<Application>(L"", L""), index));
+	editorDialog->ShowModalDialog();
 }
 
 void ApplicationContextMenuController::OnDelete()
@@ -84,9 +85,9 @@ void ApplicationContextMenuController::OnDelete()
 
 void ApplicationContextMenuController::OnShowProperties()
 {
-	ApplicationEditorDialog editorDialog(m_browser->GetHWND(), m_resourceLoader, m_model,
-		ApplicationEditorDialog::EditDetails::EditApplication(m_application));
-	editorDialog.ShowModalDialog();
+	auto *editorDialog = ApplicationEditorDialog::Create(m_browser->GetHWND(), m_resourceLoader,
+		m_model, ApplicationEditorDialog::EditDetails::EditApplication(m_application));
+	editorDialog->ShowModalDialog();
 }
 
 }

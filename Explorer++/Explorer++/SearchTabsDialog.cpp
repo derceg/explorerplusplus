@@ -376,13 +376,6 @@ void SearchTabsDialog::SaveState()
 	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
-INT_PTR SearchTabsDialog::OnNcDestroy()
-{
-	delete this;
-
-	return 0;
-}
-
 SearchTabsDialogPersistentSettings::SearchTabsDialogPersistentSettings() :
 	DialogSettings(SETTINGS_KEY.c_str())
 {

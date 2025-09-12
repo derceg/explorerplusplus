@@ -41,7 +41,7 @@ private:
 class DestroyFilesDialog : public BaseDialog
 {
 public:
-	DestroyFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	static DestroyFilesDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
 
 protected:
@@ -50,6 +50,10 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
+	DestroyFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
+	~DestroyFilesDialog() = default;
+
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 

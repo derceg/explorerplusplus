@@ -25,6 +25,12 @@
 #include "../Helper/WindowSubclass.h"
 #include <boost/algorithm/string/predicate.hpp>
 
+OptionsDialog *OptionsDialog::Create(HWND parent, App *app, Config *config,
+	CoreInterface *coreInterface)
+{
+	return new OptionsDialog(parent, app, config, coreInterface);
+}
+
 OptionsDialog::OptionsDialog(HWND parent, App *app, Config *config, CoreInterface *coreInterface) :
 	BaseDialog(app->GetResourceLoader(), IDD_OPTIONS, parent, DialogSizingType::Both),
 	m_app(app),
@@ -409,12 +415,5 @@ void OptionsDialog::OnSettingChanged()
 INT_PTR OptionsDialog::OnDestroy()
 {
 	m_lastSelectedPageId = *m_currentPageId;
-	return 0;
-}
-
-INT_PTR OptionsDialog::OnNcDestroy()
-{
-	delete this;
-
 	return 0;
 }

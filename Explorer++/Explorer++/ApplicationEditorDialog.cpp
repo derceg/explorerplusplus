@@ -13,6 +13,13 @@
 namespace Applications
 {
 
+ApplicationEditorDialog *ApplicationEditorDialog::Create(HWND parent,
+	const ResourceLoader *resourceLoader, ApplicationModel *model,
+	std::unique_ptr<EditDetails> editDetails)
+{
+	return new ApplicationEditorDialog(parent, resourceLoader, model, std::move(editDetails));
+}
+
 ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, const ResourceLoader *resourceLoader,
 	ApplicationModel *model, std::unique_ptr<EditDetails> editDetails) :
 	BaseDialog(resourceLoader, IDD_EDITAPPLICATIONBUTTON, parent, DialogSizingType::None),
