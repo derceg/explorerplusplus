@@ -45,8 +45,6 @@ class DisplayWindow;
 class DrivesToolbar;
 class HistoryMenu;
 class HolderWindow;
-class LoadSaveRegistry;
-class LoadSaveXML;
 class MainFontSetter;
 class MainMenuSubMenuView;
 class MainRebarView;
@@ -79,9 +77,6 @@ class PluginManager;
 
 class Explorerplusplus : public BrowserWindow, public CoreInterface, public PluginInterface
 {
-	friend LoadSaveRegistry;
-	friend LoadSaveXML;
-
 public:
 	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
 
