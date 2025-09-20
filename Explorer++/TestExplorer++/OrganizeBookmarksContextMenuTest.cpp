@@ -75,11 +75,11 @@ protected:
 	}
 
 	std::unique_ptr<OrganizeBookmarksContextMenu> BuildContextMenu(MenuView *menuView,
-		OrganizeBookmarksContextMenuDelegate *delegate)
+		OrganizeBookmarksContextMenuDelegate *delegate, BookmarkItem *targetFolder = nullptr)
 	{
 		return std::make_unique<OrganizeBookmarksContextMenu>(menuView, &m_acceleratorManager,
-			nullptr, &m_bookmarkTree, m_targetFolder, delegate, &m_clipboardStore,
-			&m_resourceLoader);
+			nullptr, &m_bookmarkTree, targetFolder ? targetFolder : m_targetFolder, delegate,
+			&m_clipboardStore, &m_resourceLoader);
 	}
 
 	AcceleratorManager m_acceleratorManager;
@@ -145,7 +145,23 @@ TEST_F(OrganizeBookmarksContextMenuTest, SelectAllDisabledState)
 	EXPECT_FALSE(menuView.IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
 }
 
-TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledState)
+TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithNoChildItems)
+{
+	auto *emptyFolder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
+		std::make_unique<BookmarkItem>(std::nullopt, L"Empty folder", std::nullopt));
+
+	MenuViewFake menuView;
+	OrganizeBookmarksContextMenuDelegateFake delegate;
+	delegate.SetCanSelectAllItems(true);
+	auto menu = BuildContextMenu(&menuView, &delegate, emptyFolder);
+
+	// Although the delegate allows all items to be selected, there are no child items in the target
+	// folder, so there's nothing to select. Therefore, the select all menu item should remain
+	// disabled.
+	EXPECT_FALSE(menuView.IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
+}
+
+TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithChildItems)
 {
 	MenuViewFake menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;

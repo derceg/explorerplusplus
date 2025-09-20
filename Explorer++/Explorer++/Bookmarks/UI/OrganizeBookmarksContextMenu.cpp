@@ -70,7 +70,7 @@ void OrganizeBookmarksContextMenu::BuildMenu()
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, canDelete);
 
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
-		m_delegate->CanSelectAllItems());
+		!m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems());
 }
 
 void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
