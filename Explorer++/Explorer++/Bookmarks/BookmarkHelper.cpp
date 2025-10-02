@@ -23,44 +23,6 @@
 namespace
 {
 
-int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	size_t firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
-	size_t secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
-	return static_cast<int>(firstIndex) - static_cast<int>(secondIndex);
-}
-
-int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str());
-}
-
-int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	if (firstItem->IsFolder() && secondItem->IsFolder())
-	{
-		return SortByName(firstItem, secondItem);
-	}
-	else
-	{
-		return firstItem->GetLocation().compare(secondItem->GetLocation());
-	}
-}
-
-int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
-	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
-	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated);
-}
-
-int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
-{
-	FILETIME firstItemDateModified = firstItem->GetDateModified();
-	FILETIME secondItemDateModified = secondItem->GetDateModified();
-	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
-}
-
 void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, const std::wstring &currentDirectory, BrowserWindow *browser)
 {
@@ -90,52 +52,6 @@ bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	return bookmarkItem->IsBookmark();
-}
-
-int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
-{
-	if (firstItem->IsFolder() && secondItem->IsBookmark())
-	{
-		return -1;
-	}
-	else if (firstItem->IsBookmark() && secondItem->IsFolder())
-	{
-		return 1;
-	}
-	else
-	{
-		int iRes = 0;
-
-		switch (columnType)
-		{
-		case ColumnType::Default:
-			iRes = SortByDefault(firstItem, secondItem);
-			break;
-
-		case ColumnType::Name:
-			iRes = SortByName(firstItem, secondItem);
-			break;
-
-		case ColumnType::Location:
-			iRes = SortByLocation(firstItem, secondItem);
-			break;
-
-		case ColumnType::DateCreated:
-			iRes = SortByDateAdded(firstItem, secondItem);
-			break;
-
-		case ColumnType::DateModified:
-			iRes = SortByDateModified(firstItem, secondItem);
-			break;
-
-		default:
-			DCHECK(false);
-			break;
-		}
-
-		return iRes;
-	}
 }
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,

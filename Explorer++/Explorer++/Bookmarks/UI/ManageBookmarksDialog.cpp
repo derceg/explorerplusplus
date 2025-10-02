@@ -8,8 +8,10 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkNavigationController.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "Bookmarks/UI/BookmarkListPresenter.h"
 #include "Bookmarks/UI/BookmarkTreePresenter.h"
 #include "BrowserWindow.h"
+#include "ListView.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
 #include "OrganizeBookmarksContextMenu.h"
@@ -30,16 +32,17 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog *ManageBookmarksDialog::Create(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore)
+	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore, const KeyboardState *keyboardState)
 {
 	return new ManageBookmarksDialog(resourceLoader, resourceInstance, hParent, browserWindow,
-		config, acceleratorManager, iconFetcher, bookmarkTree, clipboardStore);
+		config, acceleratorManager, iconFetcher, bookmarkTree, clipboardStore, keyboardState);
 }
 
 ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore) :
+	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
+	const KeyboardState *keyboardState) :
 	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
@@ -47,14 +50,10 @@ ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoade
 	m_acceleratorManager(acceleratorManager),
 	m_iconFetcher(iconFetcher),
 	m_bookmarkTree(bookmarkTree),
-	m_clipboardStore(clipboardStore)
+	m_clipboardStore(clipboardStore),
+	m_keyboardState(keyboardState)
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
-
-	if (!m_persistentSettings->m_initialized)
-	{
-		m_persistentSettings->m_initialized = true;
-	}
 }
 
 INT_PTR ManageBookmarksDialog::OnInitDialog()
@@ -63,8 +62,8 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	SetupTreeView();
 	SetupListView();
 
-	m_navigationController =
-		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView.get());
+	m_navigationController = std::make_unique<BookmarkNavigationController>(m_bookmarkTree,
+		m_bookmarkListPresenter.get());
 	m_navigationController->Navigate(m_bookmarkTree->GetBookmarksToolbarFolder());
 
 	SetFocus(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW));
@@ -197,12 +196,14 @@ void ManageBookmarksDialog::SetupTreeView()
 
 void ManageBookmarksDialog::SetupListView()
 {
-	m_bookmarkListView = std::make_unique<BookmarkListView>(
-		GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW), m_resourceInstance, m_bookmarkTree,
-		m_browserWindow, m_config, m_acceleratorManager, m_resourceLoader, m_iconFetcher,
-		m_persistentSettings->m_listViewColumns, m_clipboardStore);
+	m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(
+		std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
+			m_keyboardState, m_resourceLoader),
+		m_resourceInstance, m_bookmarkTree, m_persistentSettings->m_listViewColumnModel,
+		std::nullopt, SortDirection::Ascending, m_browserWindow, m_config, m_acceleratorManager,
+		m_resourceLoader, m_iconFetcher, m_clipboardStore);
 
-	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
+	m_connections.push_back(m_bookmarkListPresenter->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
 }
 
@@ -325,15 +326,14 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	auto columnsMenu = m_bookmarkListView->BuildColumnsMenu();
+	auto columnsMenu = m_bookmarkListPresenter->BuildColumnsMenu();
 
 	if (!columnsMenu)
 	{
 		return;
 	}
 
-	MenuHelper::EnableItem(columnsMenu.get(), static_cast<UINT>(BookmarkHelper::ColumnType::Name),
-		FALSE);
+	MenuHelper::EnableItem(columnsMenu.get(), BookmarkColumn::Name, FALSE);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -381,46 +381,46 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
 {
-	UINT itemToCheck;
+	auto sortColumn = m_bookmarkListPresenter->GetSortColumn();
+	UINT itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
 
-	switch (m_bookmarkListView->GetSortColumn())
+	if (sortColumn)
 	{
-	case BookmarkHelper::ColumnType::Default:
-		itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
-		break;
+		switch (*sortColumn)
+		{
+		case BookmarkColumn::Name:
+			itemToCheck = IDM_MB_VIEW_SORTBYNAME;
+			break;
 
-	case BookmarkHelper::ColumnType::Name:
-		itemToCheck = IDM_MB_VIEW_SORTBYNAME;
-		break;
+		case BookmarkColumn::Location:
+			itemToCheck = IDM_MB_VIEW_SORTBYLOCATION;
+			break;
 
-	case BookmarkHelper::ColumnType::Location:
-		itemToCheck = IDM_MB_VIEW_SORTBYLOCATION;
-		break;
+		case BookmarkColumn::DateCreated:
+			itemToCheck = IDM_MB_VIEW_SORTBYADDED;
+			break;
 
-	case BookmarkHelper::ColumnType::DateCreated:
-		itemToCheck = IDM_MB_VIEW_SORTBYADDED;
-		break;
+		case BookmarkColumn::DateModified:
+			itemToCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
+			break;
 
-	case BookmarkHelper::ColumnType::DateModified:
-		itemToCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
-		break;
-
-	default:
-		itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
-		break;
+		default:
+			DCHECK(false);
+			break;
+		}
 	}
 
 	CheckMenuRadioItem(menu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, itemToCheck,
 		MF_BYCOMMAND);
 
-	if (m_bookmarkListView->GetSortColumn() == BookmarkHelper::ColumnType::Default)
+	if (!sortColumn)
 	{
 		MenuHelper::EnableItem(menu, IDM_MB_VIEW_SORTASCENDING, FALSE);
 		MenuHelper::EnableItem(menu, IDM_MB_VIEW_SORTDESCENDING, FALSE);
 	}
 	else
 	{
-		if (m_bookmarkListView->GetSortAscending())
+		if (m_bookmarkListPresenter->GetSortDirection() == +SortDirection::Ascending)
 		{
 			itemToCheck = IDM_MB_VIEW_SORTASCENDING;
 		}
@@ -438,54 +438,66 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 {
 	switch (menuItemId)
 	{
-	case static_cast<int>(BookmarkHelper::ColumnType::Name):
-		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::Name);
+	case BookmarkColumn::Name:
+		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::Name);
 		break;
 
-	case static_cast<int>(BookmarkHelper::ColumnType::Location):
-		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::Location);
+	case BookmarkColumn::Location:
+		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::Location);
 		break;
 
-	case static_cast<int>(BookmarkHelper::ColumnType::DateCreated):
-		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::DateCreated);
+	case BookmarkColumn::DateCreated:
+		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::DateCreated);
 		break;
 
-	case static_cast<int>(BookmarkHelper::ColumnType::DateModified):
-		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::DateModified);
+	case BookmarkColumn::DateModified:
+		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::DateModified);
 		break;
 
 	case IDM_MB_VIEW_SORT_BY_DEFAULT:
-		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::Default);
+		m_bookmarkListPresenter->SetSortDetails(std::nullopt, SortDirection::Ascending);
 		break;
 
 	case IDM_MB_VIEW_SORTBYNAME:
-		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::Name);
+		UpdateSortColumn(BookmarkColumn::Name);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLOCATION:
-		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::Location);
+		UpdateSortColumn(BookmarkColumn::Location);
 		break;
 
 	case IDM_MB_VIEW_SORTBYADDED:
-		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::DateCreated);
+		UpdateSortColumn(BookmarkColumn::DateCreated);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::DateModified);
+		UpdateSortColumn(BookmarkColumn::DateModified);
 		break;
 
 	case IDM_MB_VIEW_SORTASCENDING:
-		m_bookmarkListView->SetSortAscending(true);
+		m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
+			SortDirection::Ascending);
 		break;
 
 	case IDM_MB_VIEW_SORTDESCENDING:
-		m_bookmarkListView->SetSortAscending(false);
+		m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
+			SortDirection::Descending);
 		break;
 
 	default:
 		DCHECK(false);
 		break;
 	}
+}
+
+void ManageBookmarksDialog::UpdateSortColumn(BookmarkColumn sortColumn)
+{
+	if (m_bookmarkListPresenter->GetSortColumn() == sortColumn)
+	{
+		return;
+	}
+
+	m_bookmarkListPresenter->SetSortDetails(sortColumn, SortDirection::Ascending);
 }
 
 void ManageBookmarksDialog::ShowOrganizeMenu()
@@ -500,7 +512,7 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 	}
 	else
 	{
-		delegate = m_bookmarkListView.get();
+		delegate = m_bookmarkListPresenter.get();
 	}
 
 	RECT rc;
@@ -542,7 +554,7 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder,
 	UNREFERENCED_PARAMETER(entry);
 
 	m_currentBookmarkFolder = bookmarkFolder;
-	m_bookmarkTreePresenter->SelectItem(bookmarkFolder);
+	m_bookmarkTreePresenter->SelectOnly(bookmarkFolder);
 
 	UpdateToolbarState();
 }
@@ -570,12 +582,6 @@ INT_PTR ManageBookmarksDialog::OnClose()
 	return 0;
 }
 
-INT_PTR ManageBookmarksDialog::OnDestroy()
-{
-	m_persistentSettings->m_listViewColumns = m_bookmarkListView->GetColumns();
-	return 0;
-}
-
 void ManageBookmarksDialog::SaveState()
 {
 	m_persistentSettings->SaveDialogPosition(m_hDlg);
@@ -585,43 +591,18 @@ void ManageBookmarksDialog::SaveState()
 			m_bookmarkTreePresenter->GetExpandedBookmarks()
 			| boost::adaptors::transformed(std::mem_fn(&BookmarkItem::GetGUID)));
 
+	m_persistentSettings->m_listViewColumnModel = *m_bookmarkListPresenter->GetColumnModel();
+
 	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 ManageBookmarksDialogPersistentSettings::ManageBookmarksDialogPersistentSettings() :
-	DialogSettings(SETTINGS_KEY),
-	m_initialized(false)
+	DialogSettings(SETTINGS_KEY)
 {
-	SetupDefaultColumns();
 }
 
 ManageBookmarksDialogPersistentSettings &ManageBookmarksDialogPersistentSettings::GetInstance()
 {
 	static ManageBookmarksDialogPersistentSettings mbdps;
 	return mbdps;
-}
-
-void ManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
-{
-	BookmarkListView::Column column;
-
-	column.columnType = BookmarkHelper::ColumnType::Name;
-	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	column.active = true;
-	m_listViewColumns.push_back(column);
-
-	column.columnType = BookmarkHelper::ColumnType::Location;
-	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	column.active = true;
-	m_listViewColumns.push_back(column);
-
-	column.columnType = BookmarkHelper::ColumnType::DateCreated;
-	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	column.active = false;
-	m_listViewColumns.push_back(column);
-
-	column.columnType = BookmarkHelper::ColumnType::DateModified;
-	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	column.active = false;
-	m_listViewColumns.push_back(column);
 }

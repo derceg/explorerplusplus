@@ -1200,6 +1200,10 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="BackgroundContextMenuDelegate.cpp" />
     <ClCompile Include="BaseDialog.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkColumnHelper.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkColumnModel.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkListViewItem.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkListViewModel.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewAdapter.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewNode.cpp" />
@@ -1213,6 +1217,9 @@
     <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="ListView.cpp" />
+    <ClCompile Include="ListViewColumnModel.cpp" />
+    <ClCompile Include="ListViewModel.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
@@ -1346,7 +1353,6 @@
     <ClCompile Include="GeneralOptionsPage.cpp" />
     <ClCompile Include="OptionsPage.cpp" />
     <ClCompile Include="SearchTabsDialog.cpp" />
-    <ClCompile Include="ShellBrowser\SortModes.cpp" />
     <ClCompile Include="ShellChangeWatcher.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
     <ClCompile Include="TabsOptionsPage.cpp" />
@@ -1392,7 +1398,7 @@
     <ClCompile Include="ShellView.cpp" />
     <ClCompile Include="SortMenuBuilder.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkListPresenter.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreePresenter.cpp" />
     <ClCompile Include="ColorRuleEditorDialog.cpp" />
@@ -1532,6 +1538,11 @@
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="BackgroundContextMenuDelegate.h" />
     <ClInclude Include="BaseDialog.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkColumn.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkColumnHelper.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkColumnModel.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkListViewItem.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkListViewModel.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewAdapter.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewNode.h" />
@@ -1550,6 +1561,14 @@
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="IconModel.h" />
     <ClInclude Include="IconUpdateCallback.h" />
+    <ClInclude Include="InsertMarkPosition.h" />
+    <ClInclude Include="ItemStateOp.h" />
+    <ClInclude Include="ListView.h" />
+    <ClInclude Include="ListViewColumn.h" />
+    <ClInclude Include="ListViewColumnModel.h" />
+    <ClInclude Include="ListViewDelegate.h" />
+    <ClInclude Include="ListViewItem.h" />
+    <ClInclude Include="ListViewModel.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MouseEvent.h" />
@@ -1731,7 +1750,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h" />
     <ClInclude Include="Bookmarks\BookmarkHelper.h" />
     <ClInclude Include="Bookmarks\BookmarkItem.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarkListView.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkListPresenter.h" />
     <ClInclude Include="Bookmarks\BookmarkNavigationController.h" />
     <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h" />
     <ClInclude Include="Bookmarks\BookmarkRegistryStorage.h" />

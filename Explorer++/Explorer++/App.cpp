@@ -472,6 +472,11 @@ ThemeManager *App::GetThemeManager()
 	return &m_themeManager;
 }
 
+KeyboardState *App::GetKeyboardState()
+{
+	return &m_keyboardState;
+}
+
 HistoryModel *App::GetHistoryModel()
 {
 	return &m_historyModel;

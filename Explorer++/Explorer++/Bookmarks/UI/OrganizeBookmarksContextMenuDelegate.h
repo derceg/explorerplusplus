@@ -17,9 +17,11 @@ public:
 	virtual bool CanSelectAllItems() const = 0;
 	virtual void SelectAllItems() = 0;
 
-	virtual void CreateFolder(size_t index) = 0;
+	// Instructs the view to clear the current selection and select only the specified bookmark
+	// item.
+	virtual void SelectOnly(const BookmarkItem *bookmarkItem) = 0;
 
 	virtual RawBookmarkItems GetSelectedItems() const = 0;
 	virtual RawBookmarkItems GetSelectedChildItems(const BookmarkItem *targetFolder) const = 0;
-	virtual void SelectItem(const BookmarkItem *bookmarkItem) = 0;
+	virtual void CreateFolder(size_t index) = 0;
 };

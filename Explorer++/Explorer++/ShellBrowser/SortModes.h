@@ -83,12 +83,3 @@ BETTER_ENUM(SortMode, int,
 	MediaYear = 64
 )
 // clang-format on
-
-// clang-format off
-BETTER_ENUM(SortDirection, int,
-	Ascending = 0,
-	Descending = 1
-)
-// clang-format on
-
-SortDirection InvertSortDirection(SortDirection direction);

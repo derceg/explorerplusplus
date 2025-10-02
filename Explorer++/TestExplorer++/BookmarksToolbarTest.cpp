@@ -10,7 +10,7 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "Config.h"
-#include "IconFetcher.h"
+#include "IconFetcherFake.h"
 #include "ResourceLoaderFake.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -18,47 +18,6 @@
 #include "SimulatedClipboardStore.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
-
-namespace
-{
-
-class IconFetcherFake : public IconFetcher
-{
-public:
-	void QueueIconTask(std::wstring_view path, Callback callback) override
-	{
-		UNREFERENCED_PARAMETER(path);
-		UNREFERENCED_PARAMETER(callback);
-	}
-
-	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override
-	{
-		UNREFERENCED_PARAMETER(pidl);
-		UNREFERENCED_PARAMETER(callback);
-	}
-
-	void ClearQueue() override
-	{
-	}
-
-	int GetCachedIconIndexOrDefault(const std::wstring &itemPath,
-		DefaultIconType defaultIconType) const override
-	{
-		UNREFERENCED_PARAMETER(itemPath);
-		UNREFERENCED_PARAMETER(defaultIconType);
-
-		return 0;
-	}
-
-	std::optional<int> GetCachedIconIndex(const std::wstring &itemPath) const override
-	{
-		UNREFERENCED_PARAMETER(itemPath);
-
-		return std::nullopt;
-	}
-};
-
-}
 
 class BookmarksToolbarTest : public BrowserTestBase
 {

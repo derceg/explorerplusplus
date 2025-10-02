@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Bookmarks/UI/BookmarkTreePresenter.h"
 #include "AcceleratorManager.h"
+#include "BookmarkTestHelper.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI//BookmarkTreeViewNode.h"
@@ -25,16 +26,6 @@
 #include <vector>
 
 using namespace testing;
-
-namespace
-{
-
-MATCHER_P(CreateFolderMatcher, expectedParentFolder, "")
-{
-	return arg.IsFolder() && arg.GetParent() == expectedParentFolder;
-}
-
-}
 
 class BookmarkTreePresenterTest : public Test
 {
@@ -169,12 +160,12 @@ TEST_F(BookmarkTreePresenterTest, SelectedFolder)
 
 	auto presenter = BuildPresenter();
 
-	presenter->SelectItem(m_bookmarkTree.GetBookmarksMenuFolder());
+	presenter->SelectOnly(m_bookmarkTree.GetBookmarksMenuFolder());
 	EXPECT_EQ(presenter->GetSelectedFolder(), m_bookmarkTree.GetBookmarksMenuFolder());
 	EXPECT_THAT(presenter->GetSelectedItems(),
 		ElementsAre(m_bookmarkTree.GetBookmarksMenuFolder()));
 
-	presenter->SelectItem(folder1);
+	presenter->SelectOnly(folder1);
 	EXPECT_EQ(presenter->GetSelectedFolder(), folder1);
 	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(folder1));
 }
@@ -187,10 +178,10 @@ TEST_F(BookmarkTreePresenterTest, SelectBookmark)
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\"));
 
 	auto presenter = BuildPresenter();
-	presenter->SelectItem(folder1);
+	presenter->SelectOnly(folder1);
 
 	// Attempting to select a bookmark should have no effect (since the view only displays folders).
-	presenter->SelectItem(bookmark1);
+	presenter->SelectOnly(bookmark1);
 	EXPECT_EQ(presenter->GetSelectedFolder(), folder1);
 }
 
@@ -211,11 +202,11 @@ TEST_F(BookmarkTreePresenterTest, CreateFolder)
 
 	InSequence seq;
 
-	presenter->SelectItem(folder1);
+	presenter->SelectOnly(folder1);
 	EXPECT_CALL(callback, Call(CreateFolderMatcher(folder1), 0));
 	presenter->CreateFolder(0);
 
-	presenter->SelectItem(folder2);
+	presenter->SelectOnly(folder2);
 	EXPECT_CALL(callback, Call(CreateFolderMatcher(folder2), 1));
 	presenter->CreateFolder(1);
 }

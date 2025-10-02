@@ -292,9 +292,6 @@
     <ClCompile Include="FrequentLocationsStorageTestHelper.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
-    <ClCompile Include="FakeSystemClock.cpp">
-      <Filter>Helper\Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="HistoryMenuTest.cpp">
       <Filter>History\UI</Filter>
     </ClCompile>
@@ -497,6 +494,39 @@
     <ClCompile Include="TreeViewTest.cpp">
       <Filter>Views\TreeView</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkListPresenterTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="IconFetcherFake.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewTest.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewColumnModelTest.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewModelTest.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="FakeSystemClock.cpp">
+      <Filter>Helper\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardStateFake.cpp">
+      <Filter>Helper\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewColumnModelFake.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewItemFake.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewModelFake.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarkColumnHelperTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -667,6 +697,12 @@
     <Filter Include="Views\TreeView">
       <UniqueIdentifier>{a854fac4-d195-46db-abea-988ded0af263}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Views\ListView">
+      <UniqueIdentifier>{8c10322e-e2b2-4218-817e-3c990a2e615d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Environment">
+      <UniqueIdentifier>{19137768-f568-4c36-9bbb-2093f179d535}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -751,9 +787,6 @@
     <ClInclude Include="FrequentLocationsStorageTestHelper.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
-    <ClInclude Include="FakeSystemClock.h">
-      <Filter>Helper\Miscellaneous</Filter>
-    </ClInclude>
     <ClInclude Include="MenuViewFakeTestHelper.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
@@ -811,6 +844,27 @@
     </ClInclude>
     <ClInclude Include="CopiedBookmark.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="IconFetcherFake.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewColumnModelFake.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewItemFake.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewModelFake.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkTestHelper.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="FakeSystemClock.h">
+      <Filter>Helper\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardStateFake.h">
+      <Filter>Helper\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

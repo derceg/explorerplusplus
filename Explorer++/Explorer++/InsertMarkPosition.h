@@ -4,7 +4,8 @@
 
 #pragma once
 
-namespace HeaderHelper
+enum class InsertMarkPosition
 {
-void AddOrRemoveFormatOptions(HWND header, int index, int formatOptions, bool add);
-}
+	Before,
+	After
+};

@@ -238,7 +238,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarkContextMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkListPresenter.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp">
@@ -420,9 +420,6 @@
     </ClCompile>
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp">
       <Filter>ShellTreeView</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellBrowser\SortModes.cpp">
-      <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="OptionsPage.cpp">
       <Filter>Dialogs\Options</Filter>
@@ -883,6 +880,27 @@
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewContextMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkColumnHelper.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkListViewItem.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkColumnModel.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkListViewModel.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ListView.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewModel.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewColumnModel.cpp">
+      <Filter>Views\ListView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1113,7 +1131,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarkContextMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarkListView.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkListPresenter.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkMenu.h">
@@ -1857,6 +1875,45 @@
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewContextMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
+    <ClInclude Include="ListView.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewDelegate.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewModel.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewColumn.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewItem.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkColumn.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkListViewItem.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkListViewModel.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkColumnHelper.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkColumnModel.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewColumnModel.h">
+      <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="InsertMarkPosition.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemStateOp.h">
+      <Filter>Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2099,6 +2156,9 @@
     </Filter>
     <Filter Include="Views\TreeView">
       <UniqueIdentifier>{ab2d98af-8b57-452e-af03-fc0fa64f4ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views\ListView">
+      <UniqueIdentifier>{ecab8bbc-283b-49fc-af94-27be3f54e391}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

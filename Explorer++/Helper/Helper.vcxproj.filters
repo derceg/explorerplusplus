@@ -115,9 +115,6 @@
     <ClCompile Include="DataExchangeHelper.cpp">
       <Filter>Data Exchange</Filter>
     </ClCompile>
-    <ClCompile Include="HeaderHelper.cpp">
-      <Filter>Control Support</Filter>
-    </ClCompile>
     <ClCompile Include="RichEditHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
@@ -158,9 +155,6 @@
       <Filter>Miscellaneous</Filter>
     </ClCompile>
     <ClCompile Include="Console.cpp">
-      <Filter>Miscellaneous</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemClockImpl.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
     <ClCompile Include="ScopedStopSource.cpp">
@@ -204,6 +198,12 @@
     </ClCompile>
     <ClCompile Include="FileDialogs.cpp">
       <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemClockImpl.cpp">
+      <Filter>Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardStateImpl.cpp">
+      <Filter>Environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -327,9 +327,6 @@
     <ClInclude Include="DataExchangeHelper.h">
       <Filter>Data Exchange</Filter>
     </ClInclude>
-    <ClInclude Include="HeaderHelper.h">
-      <Filter>Control Support</Filter>
-    </ClInclude>
     <ClInclude Include="RichEditHelper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
@@ -385,12 +382,6 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemClock.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemClockImpl.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="Base64Wrapper.h">
@@ -465,6 +456,21 @@
     <ClInclude Include="FileDialogs.h">
       <Filter>Control Support</Filter>
     </ClInclude>
+    <ClInclude Include="SortDirection.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemClockImpl.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemClock.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardStateImpl.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardState.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
@@ -502,6 +508,12 @@
     </Filter>
     <Filter Include="Signals">
       <UniqueIdentifier>{3df411e3-c5d3-4d69-b183-e478238937e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types">
+      <UniqueIdentifier>{3a3e3f62-63fc-46d6-924f-f4eccb0076d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Environment">
+      <UniqueIdentifier>{52d49072-ff88-40cb-a3f6-adaf82a3dd53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -48,7 +48,7 @@ public:
 	void CreateFolder(size_t index) override;
 	RawBookmarkItems GetSelectedItems() const override;
 	RawBookmarkItems GetSelectedChildItems(const BookmarkItem *targetFolder) const override;
-	void SelectItem(const BookmarkItem *bookmarkItem) override;
+	void SelectOnly(const BookmarkItem *bookmarkItem) override;
 
 	BookmarkItem *GetSelectedFolder() const;
 	RawBookmarkItems GetExpandedBookmarks() const;

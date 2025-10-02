@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/NavigationRequest.h"
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 // Verifies that the NavigateParams stored by the specified NavigationRequest match the expected
 // NavigateParams.

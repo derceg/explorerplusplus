@@ -11,6 +11,7 @@
 #include "ApplicationEditorDialog.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
+#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
@@ -887,7 +888,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 				return ManageBookmarksDialog::Create(m_app->GetResourceLoader(),
 					m_app->GetResourceInstance(), hwnd, this, m_config,
 					m_app->GetAcceleratorManager(), &m_iconFetcher, m_app->GetBookmarkTree(),
-					m_app->GetClipboardStore());
+					m_app->GetClipboardStore(), m_app->GetKeyboardState());
 			});
 		break;
 

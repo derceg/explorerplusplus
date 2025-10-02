@@ -5,7 +5,7 @@
 #pragma once
 
 #include "BaseDialog.h"
-#include "Bookmarks/UI/BookmarkListView.h"
+#include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "ResourceHelper.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -15,6 +15,9 @@
 #include <vector>
 
 class AcceleratorManager;
+class BookmarkHistoryEntry;
+class BookmarkItem;
+class BookmarkListPresenter;
 class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreePresenter;
@@ -22,6 +25,7 @@ class BrowserWindow;
 class ClipboardStore;
 struct Config;
 class IconFetcher;
+class KeyboardState;
 class ManageBookmarksDialog;
 class WindowSubclass;
 
@@ -34,7 +38,6 @@ private:
 	friend ManageBookmarksDialog;
 
 	static const TCHAR SETTINGS_KEY[];
-	static const int DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH = 180;
 
 	ManageBookmarksDialogPersistentSettings();
 
@@ -42,11 +45,7 @@ private:
 	ManageBookmarksDialogPersistentSettings &operator=(
 		const ManageBookmarksDialogPersistentSettings &);
 
-	void SetupDefaultColumns();
-
-	std::vector<BookmarkListView::Column> m_listViewColumns;
-
-	bool m_initialized;
+	BookmarkColumnModel m_listViewColumnModel;
 	std::unordered_set<std::wstring> m_expandedBookmarkIds;
 };
 
@@ -56,14 +55,14 @@ public:
 	static ManageBookmarksDialog *Create(const ResourceLoader *resourceLoader,
 		HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
 		const Config *config, const AcceleratorManager *acceleratorManager,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
+		const KeyboardState *keyboardState);
 
 protected:
 	INT_PTR OnInitDialog() override;
 	INT_PTR OnAppCommand(HWND hwnd, UINT uCmd, UINT uDevice, DWORD dwKeys) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
-	INT_PTR OnDestroy() override;
 
 	void SaveState() override;
 
@@ -78,7 +77,8 @@ private:
 	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 		HWND hParent, BrowserWindow *browserWindow, const Config *config,
 		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore);
+		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
+		const KeyboardState *keyboardState);
 	~ManageBookmarksDialog() = default;
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
@@ -106,6 +106,7 @@ private:
 	void ShowViewMenu();
 	void SetViewMenuItemStates(HMENU menu);
 	void OnViewMenuItemSelected(int menuItemId);
+	void UpdateSortColumn(BookmarkColumn sortColumn);
 
 	// Organize menu
 	void ShowOrganizeMenu();
@@ -125,11 +126,12 @@ private:
 	IconFetcher *const m_iconFetcher;
 	BookmarkTree *const m_bookmarkTree;
 	ClipboardStore *const m_clipboardStore;
+	const KeyboardState *const m_keyboardState;
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 
 	std::unique_ptr<BookmarkTreePresenter> m_bookmarkTreePresenter;
-	std::unique_ptr<BookmarkListView> m_bookmarkListView;
+	std::unique_ptr<BookmarkListPresenter> m_bookmarkListPresenter;
 
 	std::unique_ptr<BookmarkNavigationController> m_navigationController;
 

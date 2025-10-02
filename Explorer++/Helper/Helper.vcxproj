@@ -802,6 +802,7 @@
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileDialogs.cpp" />
+    <ClCompile Include="KeyboardStateImpl.cpp" />
     <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
@@ -819,7 +820,6 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="GdiplusHelper.cpp" />
-    <ClCompile Include="HeaderHelper.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="DataObjectImpl.cpp" />
     <ClCompile Include="DropSourceImpl.cpp" />
@@ -908,6 +908,7 @@
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="FileDialogs.h" />
+    <ClInclude Include="KeyboardState.h" />
     <ClInclude Include="MenuHelpTextHost.h" />
     <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
@@ -923,15 +924,16 @@
     <ClInclude Include="ShellItemContextMenuDelegate.h" />
     <ClInclude Include="SignalHelper.h" />
     <ClInclude Include="SignalWrapper.h" />
+    <ClInclude Include="SortDirection.h" />
     <ClInclude Include="SystemClipboardStore.h" />
     <ClInclude Include="SystemClock.h" />
     <ClInclude Include="SystemClockImpl.h" />
+    <ClInclude Include="KeyboardStateImpl.h" />
     <ClInclude Include="UniqueResources.h" />
     <ClInclude Include="ShellContextMenu.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="GdiplusHelper.h" />
-    <ClInclude Include="HeaderHelper.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="DataObjectImpl.h" />
     <ClInclude Include="DropSourceImpl.h" />

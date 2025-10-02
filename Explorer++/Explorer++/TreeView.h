@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "InsertMarkPosition.h"
+#include "ItemStateOp.h"
 #include "TreeViewDelegate.h"
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
@@ -23,12 +25,6 @@ using ConstRawTreeViewNodes = std::vector<const TreeViewNode *>;
 class TreeView
 {
 public:
-	enum class InsertMarkPosition
-	{
-		Before,
-		After
-	};
-
 	TreeView(HWND hwnd);
 	~TreeView();
 
@@ -58,12 +54,6 @@ public:
 	ConstRawTreeViewNodes GetAllNodesDepthFirstForTesting() const;
 
 private:
-	enum class StateOp
-	{
-		Set,
-		Clear
-	};
-
 	struct PtrHash
 	{
 		using is_transparent = void;
@@ -93,6 +83,7 @@ private:
 	void MoveNode(TreeViewNode *node, const TreeViewNode *oldParent, size_t oldIndex,
 		const TreeViewNode *newParent, size_t newIndex);
 	void RemoveNode(TreeViewNode *node);
+	void RemoveAllNodes();
 
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnShowContextMenu(const POINT &ptScreen);
@@ -104,7 +95,7 @@ private:
 	void OnSelectionChanged(const NMTREEVIEW *notifyInfo);
 	void OnBeginDrag(const NMTREEVIEW *notifyInfo);
 
-	void UpdateItemState(const TreeViewNode *node, UINT state, StateOp stateOp);
+	void UpdateNodeState(const TreeViewNode *node, UINT state, ItemStateOp stateOp);
 
 	void GetAllNodesDepthFirstForTesting(HTREEITEM firstSiblingHandle,
 		ConstRawTreeViewNodes &nodes) const;

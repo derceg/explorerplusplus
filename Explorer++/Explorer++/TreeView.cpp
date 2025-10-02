@@ -37,9 +37,7 @@ void TreeView::SetAdapter(TreeViewAdapter *adapter)
 	m_connections.push_back(
 		m_adapter->nodeRemovedSignal.AddObserver(std::bind_front(&TreeView::RemoveNode, this)));
 
-	auto res = TreeView_DeleteAllItems(m_hwnd);
-	CHECK(res);
-
+	RemoveAllNodes();
 	AddNodeRecursive(m_adapter->GetRoot());
 }
 
@@ -188,6 +186,12 @@ void TreeView::RemoveNode(TreeViewNode *node)
 		res = TreeView_SetItem(m_hwnd, &tvItem);
 		CHECK(res);
 	}
+}
+
+void TreeView::RemoveAllNodes()
+{
+	auto res = TreeView_DeleteAllItems(m_hwnd);
+	CHECK(res);
 }
 
 LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -513,21 +517,21 @@ bool TreeView::IsNodeHighlighted(const TreeViewNode *node) const
 
 void TreeView::HighlightNode(const TreeViewNode *node)
 {
-	UpdateItemState(node, TVIS_DROPHILITED, StateOp::Set);
+	UpdateNodeState(node, TVIS_DROPHILITED, ItemStateOp::Set);
 }
 
 void TreeView::UnhighlightNode(const TreeViewNode *node)
 {
-	UpdateItemState(node, TVIS_DROPHILITED, StateOp::Clear);
+	UpdateNodeState(node, TVIS_DROPHILITED, ItemStateOp::Clear);
 }
 
-void TreeView::UpdateItemState(const TreeViewNode *node, UINT state, StateOp stateOp)
+void TreeView::UpdateNodeState(const TreeViewNode *node, UINT state, ItemStateOp stateOp)
 {
 	TVITEM tvItem = {};
 	tvItem.mask = TVIF_STATE;
 	tvItem.hItem = GetHandleForNode(node);
 	tvItem.stateMask = state;
-	tvItem.state = (stateOp == StateOp::Set) ? state : 0;
+	tvItem.state = (stateOp == ItemStateOp::Set) ? state : 0;
 	auto res = TreeView_SetItem(m_hwnd, &tvItem);
 	CHECK(res);
 }

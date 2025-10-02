@@ -8,6 +8,7 @@
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/PidlHelper.h"
+#include "../Helper/SortDirection.h"
 #include <boost/signals2.hpp>
 
 struct FolderColumns;

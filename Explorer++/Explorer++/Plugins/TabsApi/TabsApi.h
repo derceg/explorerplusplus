@@ -7,6 +7,7 @@
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
+#include "../Helper/SortDirection.h"
 #include <sol/forward.hpp>
 #include <optional>
 

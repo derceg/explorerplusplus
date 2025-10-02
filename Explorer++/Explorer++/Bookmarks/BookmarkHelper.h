@@ -21,20 +21,8 @@ using RawBookmarkItems = std::vector<BookmarkItem *>;
 namespace BookmarkHelper
 {
 
-enum class ColumnType
-{
-	Default = 0,
-	Name = 1,
-	Location = 2,
-	DateCreated = 3,
-	DateModified = 4
-};
-
 bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
-
-int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 	HWND parentWindow, BrowserWindow *browser, ClipboardStore *clipboardStore,

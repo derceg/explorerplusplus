@@ -30,6 +30,7 @@
 #include "TabRestorer.h"
 #include "ThemeManager.h"
 #include "../Helper/ClipboardWatcher.h"
+#include "../Helper/KeyboardStateImpl.h"
 #include "../Helper/SystemClipboardStore.h"
 #include "../Helper/SystemClockImpl.h"
 #include "../Helper/UniqueResources.h"
@@ -80,6 +81,7 @@ public:
 	DarkModeManager *GetDarkModeManager();
 	DarkModeColorProvider *GetDarkModeColorProvider();
 	ThemeManager *GetThemeManager();
+	KeyboardState *GetKeyboardState();
 	HistoryModel *GetHistoryModel();
 	FrequentLocationsModel *GetFrequentLocationsModel();
 	DriveModel *GetDriveModel();
@@ -138,6 +140,7 @@ private:
 	TabList m_tabList;
 	TabRestorer m_tabRestorer;
 	SystemClockImpl m_systemClock;
+	KeyboardStateImpl m_keyboardState;
 
 	HistoryModel m_historyModel;
 	HistoryTracker m_historyTracker;

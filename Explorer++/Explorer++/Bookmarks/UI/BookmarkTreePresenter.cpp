@@ -215,7 +215,7 @@ RawBookmarkItems BookmarkTreePresenter::GetSelectedChildItems(
 	return {};
 }
 
-void BookmarkTreePresenter::SelectItem(const BookmarkItem *bookmarkItem)
+void BookmarkTreePresenter::SelectOnly(const BookmarkItem *bookmarkItem)
 {
 	if (!bookmarkItem->IsFolder())
 	{
@@ -317,7 +317,7 @@ void BookmarkTreePresenter::UpdateUiForDropLocation(const DropLocation &dropLoca
 	else
 	{
 		TreeViewNode *node;
-		TreeView::InsertMarkPosition position;
+		InsertMarkPosition position;
 
 		auto &children = dropLocation.parentFolder->GetChildren();
 		auto insertItr = children.begin() + dropLocation.position;
@@ -337,12 +337,12 @@ void BookmarkTreePresenter::UpdateUiForDropLocation(const DropLocation &dropLoca
 				[](auto &child) { return child->IsFolder(); });
 
 			node = m_adapter->GetNodeForBookmark(previousFolderItr->get());
-			position = TreeView::InsertMarkPosition::After;
+			position = InsertMarkPosition::After;
 		}
 		else
 		{
 			node = m_adapter->GetNodeForBookmark(nextFolderItr->get());
-			position = TreeView::InsertMarkPosition::Before;
+			position = InsertMarkPosition::Before;
 		}
 
 		m_view->ShowInsertMark(node, position);

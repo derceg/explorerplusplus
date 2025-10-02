@@ -127,7 +127,7 @@ void OrganizeBookmarksContextMenu::OnNewBookmark()
 		return;
 	}
 
-	m_delegate->SelectItem(bookmark);
+	m_delegate->SelectOnly(bookmark);
 }
 
 void OrganizeBookmarksContextMenu::OnNewFolder()

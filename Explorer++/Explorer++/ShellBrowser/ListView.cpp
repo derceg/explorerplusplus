@@ -1074,6 +1074,12 @@ void ShellBrowserImpl::OnListViewHeaderEndDrag(const NMHEADER *changeInfo)
 		return;
 	}
 
+	if (changeInfo->pitem->iOrder == -1)
+	{
+		// The drag was cancelled.
+		return;
+	}
+
 	if (changeInfo->iItem == changeInfo->pitem->iOrder)
 	{
 		// The item hasn't actually moved.

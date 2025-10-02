@@ -9,6 +9,7 @@
 #include "SortModes.h"
 #include "ValueWrapper.h"
 #include "ViewModes.h"
+#include "../Helper/SortDirection.h"
 #include "../Helper/StringHelper.h"
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;

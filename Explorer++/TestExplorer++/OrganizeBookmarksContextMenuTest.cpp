@@ -40,7 +40,7 @@ public:
 	MOCK_METHOD(RawBookmarkItems, GetSelectedItems, (), (const, override));
 	MOCK_METHOD(RawBookmarkItems, GetSelectedChildItems, (const BookmarkItem *targetFolder),
 		(const, override));
-	MOCK_METHOD(void, SelectItem, (const BookmarkItem *bookmarkItem), (override));
+	MOCK_METHOD(void, SelectOnly, (const BookmarkItem *bookmarkItem), (override));
 
 	void SetCanSelectAllItems(bool canSelectAllItems)
 	{
