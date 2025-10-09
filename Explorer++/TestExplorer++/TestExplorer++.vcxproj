@@ -230,6 +230,7 @@
     <ClCompile Include="ApplicationToolbarStorageTestHelper.cpp" />
     <ClCompile Include="ApplicationToolbarTest.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
+    <ClCompile Include="AutoResetTest.cpp" />
     <ClCompile Include="BookmarkColumnHelperTest.cpp" />
     <ClCompile Include="BookmarkContextMenuTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />

@@ -527,6 +527,9 @@
     <ClCompile Include="BookmarkColumnHelperTest.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="AutoResetTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

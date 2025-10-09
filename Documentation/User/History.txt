@@ -204,6 +204,8 @@ Bug fixes:
 - In the manage bookmarks dialog, the treeview shown on the left
   wouldn't be updated correctly when pasting a bookmark folder
   that contained nested folders.
+- In the manage bookmarks dialog, if the current folder was
+  moved, duplicate bookmark items could appear in the listview.
 
 Misc:
 - ARM64 builds are now available.

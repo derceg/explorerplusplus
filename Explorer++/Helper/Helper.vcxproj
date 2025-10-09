@@ -883,6 +883,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\targetver.h" />
+    <ClInclude Include="AutoReset.h" />
     <ClInclude Include="Base64Wrapper.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="BetterEnumsWrapper.h" />

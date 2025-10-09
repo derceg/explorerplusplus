@@ -6,6 +6,7 @@
 #include "TreeView.h"
 #include "TestHelper.h"
 #include "TreeViewAdapter.h"
+#include "../Helper/AutoReset.h"
 #include "../Helper/Helper.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
@@ -110,6 +111,13 @@ void TreeView::AddNode(TreeViewNode *node)
 		auto res = TreeView_SetItem(m_hwnd, &tvParentItem);
 		CHECK(res);
 	}
+
+	if (!TreeView_GetSelection(m_hwnd))
+	{
+		// There should always be a selected node. If there isn't, then this is the first node being
+		// added and it should be selected.
+		SelectNode(node);
+	}
 }
 
 void TreeView::UpdateNode(TreeViewNode *node)
@@ -143,8 +151,22 @@ void TreeView::MoveNode(TreeViewNode *node, const TreeViewNode *oldParent, size_
 	UNREFERENCED_PARAMETER(newParent);
 	UNREFERENCED_PARAMETER(newIndex);
 
+	auto *selectedNode = GetSelectedNode();
+
+	// The node being moved (or one of its descendants) may be selected. When the node is removed,
+	// that will then result in the selection changing. Setting this here ensures that no selection
+	// change event will be raised.
+	//
+	// Therefore, although the selection can temporarily change below, from the point of view of
+	// external clients, the selection remains unchanged.
+	AutoReset autoReset(&m_blockSelectionChangeEvent, true);
+
 	RemoveNode(node);
 	AddNodeRecursive(node);
+
+	// The selection is restored here, since the calls above may have changed it. If the selection
+	// wasn't changed, this call is unnecessary, but won't have any impact.
+	SelectNode(selectedNode);
 }
 
 void TreeView::RemoveNode(TreeViewNode *node)
@@ -387,6 +409,11 @@ LRESULT TreeView::EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void TreeView::OnSelectionChanged(const NMTREEVIEW *notifyInfo)
 {
+	if (m_blockSelectionChangeEvent)
+	{
+		return;
+	}
+
 	m_delegate->OnSelectionChanged(GetNodeForHandle(notifyInfo->itemNew.hItem));
 }
 

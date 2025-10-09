@@ -471,6 +471,9 @@
     <ClInclude Include="KeyboardState.h">
       <Filter>Environment</Filter>
     </ClInclude>
+    <ClInclude Include="AutoReset.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

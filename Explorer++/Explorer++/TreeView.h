@@ -112,6 +112,7 @@ private:
 	boost::bimap<boost::bimaps::unordered_set_of<HTREEITEM>,
 		boost::bimaps::unordered_set_of<TreeViewNode *, PtrHash, std::equal_to<void>>>
 		m_handleToNodeMap;
+	bool m_blockSelectionChangeEvent = false;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::unique_ptr<WindowSubclass> m_editSubclass;
 	std::vector<boost::signals2::scoped_connection> m_connections;

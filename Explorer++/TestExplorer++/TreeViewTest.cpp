@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "TreeView.h"
 #include "TreeViewAdapter.h"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 #include <memory>
@@ -38,6 +39,21 @@ public:
 	}
 };
 
+class TreeViewDelegateMock : public TreeViewDelegate
+{
+public:
+	MOCK_METHOD(bool, OnNodeRenamed, (TreeViewNode * targetNode, const std::wstring &name),
+		(override));
+	MOCK_METHOD(void, OnNodeRemoved, (TreeViewNode * targetNode), (override));
+	MOCK_METHOD(void, OnNodeCopied, (TreeViewNode * targetNode), (override));
+	MOCK_METHOD(void, OnNodeCut, (TreeViewNode * targetNode), (override));
+	MOCK_METHOD(void, OnPaste, (TreeViewNode * targetNode), (override));
+	MOCK_METHOD(void, OnSelectionChanged, (TreeViewNode * selectedNode), (override));
+	MOCK_METHOD(void, OnShowContextMenu, (TreeViewNode * targetNode, const POINT &ptScreen),
+		(override));
+	MOCK_METHOD(void, OnBeginDrag, (TreeViewNode * targetNode), (override));
+};
+
 }
 
 class TreeViewTest : public Test
@@ -55,11 +71,13 @@ protected:
 
 		m_treeView = std::make_unique<TreeView>(m_treeViewWindow.get());
 		m_treeView->SetAdapter(&m_adapter);
+		m_treeView->SetDelegate(&m_delegate);
 	}
 
 	wil::unique_hwnd m_parentWindow;
 	wil::unique_hwnd m_treeViewWindow;
 	TreeViewAdapter m_adapter;
+	TreeViewDelegateMock m_delegate;
 	std::unique_ptr<TreeView> m_treeView;
 };
 
@@ -90,6 +108,36 @@ TEST_F(TreeViewTest, MoveNodeDoesntCollapseParent)
 	// topLevelNode1 still has a child, so it shouldn't be collapsed.
 	m_adapter.MoveNode(childNode1, topLevelNode2, 0);
 	EXPECT_TRUE(m_treeView->IsNodeExpanded(topLevelNode1));
+}
+
+TEST_F(TreeViewTest, MoveSelectedNode)
+{
+	auto *topLevelNode1 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	auto *topLevelNode2 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	m_treeView->SelectNode(topLevelNode2);
+
+	// The node being moved is selected, so it should still be selected after the move and no
+	// selection change notification should be generated.
+	EXPECT_CALL(m_delegate, OnSelectionChanged(_)).Times(0);
+	m_adapter.MoveNode(topLevelNode2, topLevelNode1, 0);
+	EXPECT_EQ(m_treeView->GetSelectedNode(), topLevelNode2);
+}
+
+TEST_F(TreeViewTest, MoveNonSelectedNode)
+{
+	auto *topLevelNode1 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	auto *topLevelNode2 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	m_treeView->SelectNode(topLevelNode1);
+
+	// The node being moved isn't selected, so the selection shouldn't change and no selection
+	// change notification should be generated.
+	EXPECT_CALL(m_delegate, OnSelectionChanged(_)).Times(0);
+	m_adapter.MoveNode(topLevelNode2, topLevelNode1, 0);
+	EXPECT_EQ(m_treeView->GetSelectedNode(), topLevelNode1);
 }
 
 TEST_F(TreeViewTest, ExpandNodeWithNoChildren)
