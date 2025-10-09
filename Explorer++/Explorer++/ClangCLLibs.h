@@ -64,7 +64,6 @@
 	#pragma comment(lib, EPP_BOOST_LIB_NAME(container))
 	#pragma comment(lib, EPP_BOOST_LIB_NAME(date_time))
 	#pragma comment(lib, EPP_BOOST_LIB_NAME(locale))
-	#pragma comment(lib, EPP_BOOST_LIB_NAME(system))
 	#pragma comment(lib, EPP_BOOST_LIB_NAME(thread))
 	#pragma comment(lib, "CLI11.lib")
 	#pragma comment(lib, "concurrencpp.lib")
