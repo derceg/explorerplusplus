@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreePresenter.h"
 #include "MainResource.h"
+#include "PlatformContext.h"
 #include "ResourceLoader.h"
 #include "TreeView.h"
 #include "../Helper/WindowHelper.h"
@@ -18,24 +19,24 @@ const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmar
 
 AddBookmarkDialog *AddBookmarkDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder, ClipboardStore *clipboardStore,
-	const AcceleratorManager *acceleratorManager, std::optional<std::wstring> customDialogTitle)
+	BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
+	PlatformContext *platformContext, std::optional<std::wstring> customDialogTitle)
 {
 	return new AddBookmarkDialog(resourceLoader, hParent, bookmarkTree, bookmarkItem,
-		defaultParentSelection, selectedParentFolder, clipboardStore, acceleratorManager,
+		defaultParentSelection, selectedParentFolder, acceleratorManager, platformContext,
 		customDialogTitle);
 }
 
 AddBookmarkDialog::AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder, ClipboardStore *clipboardStore,
-	const AcceleratorManager *acceleratorManager, std::optional<std::wstring> customDialogTitle) :
+	BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
+	PlatformContext *platformContext, std::optional<std::wstring> customDialogTitle) :
 	BaseDialog(resourceLoader, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
-	m_clipboardStore(clipboardStore),
 	m_acceleratorManager(acceleratorManager),
+	m_platformContext(platformContext),
 	m_customDialogTitle(customDialogTitle)
 {
 	m_persistentSettings = &AddBookmarkDialogPersistentSettings::GetInstance();
@@ -85,9 +86,11 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	}
 
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
-		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW)), m_acceleratorManager,
-		m_resourceLoader, m_bookmarkTree, m_clipboardStore,
-		m_persistentSettings->m_expandedBookmarkIds, m_persistentSettings->m_selectedBookmarkId);
+		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW),
+			m_platformContext->GetKeyboardState()),
+		m_acceleratorManager, m_resourceLoader, m_bookmarkTree,
+		m_platformContext->GetClipboardStore(), m_persistentSettings->m_expandedBookmarkIds,
+		m_persistentSettings->m_selectedBookmarkId);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);

@@ -15,6 +15,7 @@
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
 #include "OrganizeBookmarksContextMenu.h"
+#include "PlatformContext.h"
 #include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
@@ -32,17 +33,16 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog *ManageBookmarksDialog::Create(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore, const KeyboardState *keyboardState)
+	BookmarkTree *bookmarkTree, PlatformContext *platformContext)
 {
 	return new ManageBookmarksDialog(resourceLoader, resourceInstance, hParent, browserWindow,
-		config, acceleratorManager, iconFetcher, bookmarkTree, clipboardStore, keyboardState);
+		config, acceleratorManager, iconFetcher, bookmarkTree, platformContext);
 }
 
 ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
 	HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
-	const KeyboardState *keyboardState) :
+	BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
 	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
@@ -50,8 +50,7 @@ ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoade
 	m_acceleratorManager(acceleratorManager),
 	m_iconFetcher(iconFetcher),
 	m_bookmarkTree(bookmarkTree),
-	m_clipboardStore(clipboardStore),
-	m_keyboardState(keyboardState)
+	m_platformContext(platformContext)
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 }
@@ -186,9 +185,10 @@ void ManageBookmarksDialog::SetupToolbar()
 void ManageBookmarksDialog::SetupTreeView()
 {
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
-		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW)),
-		m_acceleratorManager, m_resourceLoader, m_bookmarkTree, m_clipboardStore,
-		m_persistentSettings->m_expandedBookmarkIds);
+		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW),
+			m_platformContext->GetKeyboardState()),
+		m_acceleratorManager, m_resourceLoader, m_bookmarkTree,
+		m_platformContext->GetClipboardStore(), m_persistentSettings->m_expandedBookmarkIds);
 
 	m_connections.push_back(m_bookmarkTreePresenter->selectionChangedSignal.AddObserver(
 		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
@@ -198,10 +198,10 @@ void ManageBookmarksDialog::SetupListView()
 {
 	m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(
 		std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
-			m_keyboardState, m_resourceLoader),
+			m_platformContext->GetKeyboardState(), m_resourceLoader),
 		m_resourceInstance, m_bookmarkTree, m_persistentSettings->m_listViewColumnModel,
 		std::nullopt, SortDirection::Ascending, m_browserWindow, m_config, m_acceleratorManager,
-		m_resourceLoader, m_iconFetcher, m_clipboardStore);
+		m_resourceLoader, m_iconFetcher, m_platformContext);
 
 	m_connections.push_back(m_bookmarkListPresenter->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
@@ -531,7 +531,7 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_hDlg, m_bookmarkTree,
-		m_currentBookmarkFolder, delegate, m_clipboardStore, m_resourceLoader);
+		m_currentBookmarkFolder, delegate, m_resourceLoader, m_platformContext);
 	popupMenu.Show(m_hDlg, pt);
 
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));

@@ -17,14 +17,15 @@
 
 BrowserWindowFake::BrowserWindowFake(const Config *config, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
+	CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	PlatformContext *platformContext) :
 	m_config(config),
 	m_window(CreateBrowserWindow()),
 	m_shellBrowserFactory(this, navigationEvents),
 	m_tabContainer(TabContainer::Create(MainTabView::Create(m_window.get(), config, resourceLoader),
 		this, &m_shellBrowserFactory, tabEvents, shellBrowserEvents, navigationEvents, nullptr,
-		cachedIcons, bookmarkTree, clipboardStore, acceleratorManager, config, resourceLoader))
+		cachedIcons, bookmarkTree, acceleratorManager, config, resourceLoader, platformContext))
 {
 }
 

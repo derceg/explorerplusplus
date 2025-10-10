@@ -509,11 +509,11 @@
     <ClCompile Include="ListViewModelTest.cpp">
       <Filter>Views\ListView</Filter>
     </ClCompile>
-    <ClCompile Include="FakeSystemClock.cpp">
-      <Filter>Helper\Environment</Filter>
+    <ClCompile Include="SystemClockFake.cpp">
+      <Filter>Helper\Platform</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardStateFake.cpp">
-      <Filter>Helper\Environment</Filter>
+      <Filter>Helper\Platform</Filter>
     </ClCompile>
     <ClCompile Include="ListViewColumnModelFake.cpp">
       <Filter>Views\ListView</Filter>
@@ -529,6 +529,9 @@
     </ClCompile>
     <ClCompile Include="AutoResetTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformContextFake.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -703,7 +706,7 @@
     <Filter Include="Views\ListView">
       <UniqueIdentifier>{8c10322e-e2b2-4218-817e-3c990a2e615d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Helper\Environment">
+    <Filter Include="Helper\Platform">
       <UniqueIdentifier>{19137768-f568-4c36-9bbb-2093f179d535}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -863,11 +866,14 @@
     <ClInclude Include="BookmarkTestHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="FakeSystemClock.h">
-      <Filter>Helper\Environment</Filter>
+    <ClInclude Include="SystemClockFake.h">
+      <Filter>Helper\Platform</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardStateFake.h">
-      <Filter>Helper\Environment</Filter>
+      <Filter>Helper\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformContextFake.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,19 +4,15 @@
 
 #include "pch.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
-#include "AcceleratorManager.h"
 #include "Bookmarks/BookmarkClipboard.h"
-#include "Bookmarks/BookmarkTree.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
 #include "MainResource.h"
 #include "MenuViewFake.h"
-#include "ResourceLoaderFake.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
-#include "SimulatedClipboardStore.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -30,12 +26,6 @@ protected:
 		m_tab(m_browser->AddTab(L"c:\\original\\path"))
 	{
 	}
-
-	AcceleratorManager m_acceleratorManager;
-	ResourceLoaderFake m_resourceLoader;
-	SimulatedClipboardStore m_clipboardStore;
-
-	BookmarkTree m_bookmarkTree;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
@@ -55,7 +45,7 @@ protected:
 	{
 		return std::make_unique<BookmarkContextMenu>(menuView, &m_acceleratorManager,
 			&m_bookmarkTree, RawBookmarkItems{ m_bookmark }, &m_resourceLoader, m_browser,
-			m_browser->GetHWND(), &m_clipboardStore);
+			m_browser->GetHWND(), &m_platformContext);
 	}
 
 	BookmarkItem *const m_bookmark;
@@ -102,7 +92,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 	// Cutting the bookmark should have removed it from the tree.
 	ASSERT_TRUE(parentFolder->GetChildren().empty());
 
-	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
+	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -116,7 +106,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 
 	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
 
-	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
+	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -130,8 +120,8 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 	auto *bookmark = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"f:\\"), 0);
 	CopiedBookmark copiedBookmark(*bookmark);
-	ASSERT_TRUE(BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { bookmark },
-		ClipboardAction::Copy));
+	ASSERT_TRUE(BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(),
+		&m_bookmarkTree, { bookmark }, ClipboardAction::Copy));
 
 	MenuViewFake menuView;
 	auto contextMenu = BuildContextMenu(&menuView);
@@ -176,7 +166,7 @@ protected:
 	{
 		return std::make_unique<BookmarkContextMenu>(menuView, &m_acceleratorManager,
 			&m_bookmarkTree, m_bookmarkItems, &m_resourceLoader, m_browser, m_browser->GetHWND(),
-			&m_clipboardStore);
+			&m_platformContext);
 	}
 
 	RawBookmarkItems m_bookmarkItems;

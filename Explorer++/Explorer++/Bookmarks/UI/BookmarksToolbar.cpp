@@ -123,24 +123,24 @@ private:
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore)
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext)
 {
 	return new BookmarksToolbar(view, browser, acceleratorManager, resourceLoader, iconFetcher,
-		bookmarkTree, clipboardStore);
+		bookmarkTree, platformContext);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore) :
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_browser(browser),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_bookmarkTree(bookmarkTree),
-	m_clipboardStore(clipboardStore),
+	m_platformContext(platformContext),
 	m_bookmarkMenu(bookmarkTree, resourceLoader, browser, acceleratorManager, iconFetcher,
-		view->GetHWND(), clipboardStore)
+		view->GetHWND(), platformContext)
 {
 	Initialize(iconFetcher, resourceLoader);
 }
@@ -303,7 +303,7 @@ void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const Mo
 
 	PopupMenuView popupMenu(m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_clipboardStore);
+		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_platformContext);
 	popupMenu.Show(m_browser->GetHWND(), ptScreen);
 }
 

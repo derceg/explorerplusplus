@@ -22,7 +22,7 @@ BrowserWindowFake *BrowserTestBase::AddBrowser()
 {
 	auto browser = std::make_unique<BrowserWindowFake>(&m_config, &m_tabEvents,
 		&m_shellBrowserEvents, &m_navigationEvents, &m_cachedIcons, &m_bookmarkTree,
-		&m_clipboardStore, &m_acceleratorManager, &m_resourceLoader);
+		&m_acceleratorManager, &m_resourceLoader, &m_platformContext);
 	auto *rawBrowser = browser.get();
 
 	m_browsers.push_back(std::move(browser));

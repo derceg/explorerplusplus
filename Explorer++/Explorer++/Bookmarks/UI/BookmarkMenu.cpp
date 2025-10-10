@@ -14,12 +14,12 @@
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 	BrowserWindow *browserWindow, const AcceleratorManager *acceleratorManager,
-	IconFetcher *iconFetcher, HWND parentWindow, ClipboardStore *clipboardStore) :
+	IconFetcher *iconFetcher, HWND parentWindow, PlatformContext *platformContext) :
 	m_bookmarkTree(bookmarkTree),
 	m_parentWindow(parentWindow),
 	m_menuBuilder(resourceLoader, iconFetcher),
 	m_controller(bookmarkTree, browserWindow, acceleratorManager, resourceLoader, parentWindow,
-		clipboardStore)
+		platformContext)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parentWindow,
 		std::bind_front(&BookmarkMenu::ParentWindowSubclass, this)));

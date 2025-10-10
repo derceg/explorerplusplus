@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "FakeSystemClock.h"
+#include "SystemClockFake.h"
 
-SystemClock::TimePoint FakeSystemClock::Now()
+SystemClock::TimePoint SystemClockFake::Now()
 {
 	return TimePoint(m_secondsSinceEpoch++);
 }

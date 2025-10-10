@@ -901,6 +901,9 @@
     <ClCompile Include="ListViewColumnModel.cpp">
       <Filter>Views\ListView</Filter>
     </ClCompile>
+    <ClCompile Include="PlatformContextImpl.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1913,6 +1916,12 @@
     </ClInclude>
     <ClInclude Include="ItemStateOp.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformContext.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformContextImpl.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

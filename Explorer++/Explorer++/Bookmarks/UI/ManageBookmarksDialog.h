@@ -22,11 +22,10 @@ class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreePresenter;
 class BrowserWindow;
-class ClipboardStore;
 struct Config;
 class IconFetcher;
-class KeyboardState;
 class ManageBookmarksDialog;
+class PlatformContext;
 class WindowSubclass;
 
 class ManageBookmarksDialogPersistentSettings : public DialogSettings
@@ -55,8 +54,7 @@ public:
 	static ManageBookmarksDialog *Create(const ResourceLoader *resourceLoader,
 		HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
 		const Config *config, const AcceleratorManager *acceleratorManager,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
-		const KeyboardState *keyboardState);
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -77,8 +75,7 @@ private:
 	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
 		HWND hParent, BrowserWindow *browserWindow, const Config *config,
 		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
-		const KeyboardState *keyboardState);
+		BookmarkTree *bookmarkTree, PlatformContext *platformContext);
 	~ManageBookmarksDialog() = default;
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
@@ -125,8 +122,7 @@ private:
 	const AcceleratorManager *const m_acceleratorManager;
 	IconFetcher *const m_iconFetcher;
 	BookmarkTree *const m_bookmarkTree;
-	ClipboardStore *const m_clipboardStore;
-	const KeyboardState *const m_keyboardState;
+	PlatformContext *const m_platformContext;
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 

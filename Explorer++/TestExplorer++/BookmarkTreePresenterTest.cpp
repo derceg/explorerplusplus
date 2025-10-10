@@ -11,7 +11,7 @@
 #include "Bookmarks/UI//BookmarkTreeViewNode.h"
 #include "Bookmarks/UI/BookmarkTreeViewAdapter.h"
 #include "CopiedBookmark.h"
-#include "SimulatedClipboardStore.h"
+#include "PlatformContextFake.h"
 #include "TreeView.h"
 #include "Win32ResourceLoader.h"
 #include <boost/range/adaptor/transformed.hpp>
@@ -51,8 +51,10 @@ protected:
 		const std::optional<std::wstring> &initiallySelectedBookmarkId = std::nullopt)
 	{
 		return std::make_unique<BookmarkTreePresenter>(
-			std::make_unique<TreeView>(m_treeViewWindow.get()), &m_acceleratorManager,
-			&m_resourceLoader, &m_bookmarkTree, &m_clipboardStore, initiallyExpandedBookmarkIds,
+			std::make_unique<TreeView>(m_treeViewWindow.get(),
+				m_platformContext.GetKeyboardState()),
+			&m_acceleratorManager, &m_resourceLoader, &m_bookmarkTree,
+			m_platformContext.GetClipboardStore(), initiallyExpandedBookmarkIds,
 			initiallySelectedBookmarkId);
 	}
 
@@ -72,9 +74,9 @@ protected:
 		}
 	}
 
+	PlatformContextFake m_platformContext;
 	AcceleratorManager m_acceleratorManager;
 	Win32ResourceLoader m_resourceLoader;
-	SimulatedClipboardStore m_clipboardStore;
 	BookmarkTree m_bookmarkTree;
 
 	wil::unique_hwnd m_parentWindow;
@@ -297,9 +299,9 @@ TEST_F(BookmarkTreePresenterTest, PasteWithNestedFolder)
 
 	auto presenter = BuildPresenter();
 
-	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { folder1 },
-		ClipboardAction::Copy);
-	BookmarkHelper::PasteBookmarkItems(&m_clipboardStore, &m_bookmarkTree,
+	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
+		{ folder1 }, ClipboardAction::Copy);
+	BookmarkHelper::PasteBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
 		m_bookmarkTree.GetOtherBookmarksFolder(), 0);
 	VerifyViewItems(presenter.get());
 }
@@ -346,7 +348,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeCopied)
 	auto *adaptor = presenter->GetAdaptorForTesting();
 	delegate->OnNodeCopied(adaptor->GetNodeForBookmark(folder1));
 
-	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
+	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -365,7 +367,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeCut)
 	delegate->OnNodeCut(adaptor->GetNodeForBookmark(folder1));
 	EXPECT_TRUE(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().empty());
 
-	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
+	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -376,8 +378,8 @@ TEST_F(BookmarkTreePresenterTest, OnPaste)
 		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
 
 	CopiedBookmark copiedBookmark(*folder1);
-	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { folder1 },
-		ClipboardAction::Copy);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
+		{ folder1 }, ClipboardAction::Copy);
 
 	auto presenter = BuildPresenter();
 

@@ -13,9 +13,9 @@
 class AcceleratorManager;
 class BookmarkTree;
 class CachedIcons;
-class ClipboardStore;
 struct Config;
 class NavigationEvents;
+class PlatformContext;
 class ResourceLoader;
 class ShellBrowserEvents;
 class Tab;
@@ -26,8 +26,9 @@ class BrowserWindowFake : public BrowserWindow
 public:
 	BrowserWindowFake(const Config *config, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		PlatformContext *platformContext);
 
 	// BrowserWindow
 	HWND GetHWND() const override;

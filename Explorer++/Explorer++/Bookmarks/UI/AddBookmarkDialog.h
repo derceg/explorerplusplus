@@ -17,7 +17,7 @@ class AddBookmarkDialog;
 class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreePresenter;
-class ClipboardStore;
+class PlatformContext;
 
 class AddBookmarkDialogPersistentSettings : public DialogSettings
 {
@@ -45,7 +45,7 @@ public:
 	static AddBookmarkDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
-		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
+		const AcceleratorManager *acceleratorManager, PlatformContext *platformContext,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:
@@ -59,7 +59,7 @@ private:
 	AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
-		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
+		const AcceleratorManager *acceleratorManager, PlatformContext *platformContext,
 		std::optional<std::wstring> customDialogTitle);
 	~AddBookmarkDialog();
 
@@ -80,8 +80,8 @@ private:
 	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_bookmarkItem;
 	BookmarkItem **m_selectedParentFolder;
-	ClipboardStore *const m_clipboardStore;
 	const AcceleratorManager *const m_acceleratorManager;
+	PlatformContext *const m_platformContext;
 	std::optional<std::wstring> m_customDialogTitle;
 
 	std::unique_ptr<BookmarkTreePresenter> m_bookmarkTreePresenter;

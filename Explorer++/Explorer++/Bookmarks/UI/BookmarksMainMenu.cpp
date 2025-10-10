@@ -28,7 +28,7 @@ BookmarksMainMenu::BookmarksMainMenu(App *app, BrowserWindow *browserWindow,
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(resourceLoader, iconFetcher),
 	m_controller(bookmarkTree, browserWindow, app->GetAcceleratorManager(),
-		app->GetResourceLoader(), coreInterface->GetMainWindow(), app->GetClipboardStore())
+		app->GetResourceLoader(), coreInterface->GetMainWindow(), app->GetPlatformContext())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));

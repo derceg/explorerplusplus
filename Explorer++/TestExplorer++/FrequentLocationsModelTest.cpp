@@ -4,9 +4,9 @@
 
 #include "pch.h"
 #include "FrequentLocationsModel.h"
-#include "FakeSystemClock.h"
 #include "FrequentLocationsStorageTestHelper.h"
 #include "ShellTestHelper.h"
+#include "SystemClockFake.h"
 #include "../Helper/StringHelper.h"
 #include <gtest/gtest.h>
 
@@ -84,7 +84,7 @@ protected:
 	{
 	}
 
-	FakeSystemClock m_systemClock;
+	SystemClockFake m_systemClock;
 	FrequentLocationsModel m_frequentLocationsModel;
 };
 

@@ -258,6 +258,7 @@
     <ClCompile Include="ListViewTest.cpp" />
     <ClCompile Include="MenuViewFake.cpp" />
     <ClCompile Include="OrganizeBookmarksContextMenuTest.cpp" />
+    <ClCompile Include="PlatformContextFake.cpp" />
     <ClCompile Include="ResourceIconModelTest.cpp" />
     <ClCompile Include="ShellBrowserFactoryFake.cpp" />
     <ClCompile Include="SimulatedClipboardDataObject.cpp" />
@@ -312,7 +313,7 @@
     <ClCompile Include="EventScopeTest.cpp" />
     <ClCompile Include="ExecutorTestHelper.cpp" />
     <ClCompile Include="ExecutorTestBase.cpp" />
-    <ClCompile Include="FakeSystemClock.cpp" />
+    <ClCompile Include="SystemClockFake.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
     <ClCompile Include="FileSystemChangeWatcherTest.cpp" />
     <ClCompile Include="FrequentLocationsMenuTest.cpp" />
@@ -460,6 +461,7 @@
     <ClInclude Include="ListViewItemFake.h" />
     <ClInclude Include="ListViewModelFake.h" />
     <ClInclude Include="MenuViewFake.h" />
+    <ClInclude Include="PlatformContextFake.h" />
     <ClInclude Include="ShellBrowserFactoryFake.h" />
     <ClInclude Include="SimulatedClipboardDataObject.h" />
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
@@ -472,7 +474,7 @@
     <ClInclude Include="ExecutorTestHelper.h" />
     <ClInclude Include="ExecutorTestBase.h" />
     <ClInclude Include="ExecutorWrapper.h" />
-    <ClInclude Include="FakeSystemClock.h" />
+    <ClInclude Include="SystemClockFake.h" />
     <ClInclude Include="FrequentLocationsStorageTestHelper.h" />
     <ClInclude Include="GeneratorTestHelper.h" />
     <ClInclude Include="GTestHelper.h" />

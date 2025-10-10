@@ -14,6 +14,7 @@
 #include "ListView.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
+#include "PlatformContext.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
@@ -29,7 +30,7 @@ BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection, BrowserWindow *browser,
 	const Config *config, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
-	ClipboardStore *clipboardStore) :
+	PlatformContext *platformContext) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(std::move(view)),
 	m_resourceInstance(resourceInstance),
@@ -38,7 +39,7 @@ BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	m_config(config),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
-	m_clipboardStore(clipboardStore)
+	m_platformContext(platformContext)
 {
 	m_view->AddExtendedStyles(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP);
 
@@ -224,19 +225,20 @@ void BookmarkListPresenter::OnItemsDeleted(const std::vector<ListViewItem *> &it
 
 void BookmarkListPresenter::OnItemsCopied(const std::vector<ListViewItem *> &items)
 {
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, GetBookmarksForItems(items),
-		ClipboardAction::Copy);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		GetBookmarksForItems(items), ClipboardAction::Copy);
 }
 
 void BookmarkListPresenter::OnItemsCut(const std::vector<ListViewItem *> &items)
 {
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, GetBookmarksForItems(items),
-		ClipboardAction::Cut);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		GetBookmarksForItems(items), ClipboardAction::Cut);
 }
 
 void BookmarkListPresenter::OnPaste(ListViewItem *lastSelectedItemOpt)
 {
-	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, m_currentBookmarkFolder,
+	BookmarkHelper::PasteBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		m_currentBookmarkFolder,
 		lastSelectedItemOpt ? m_model->GetItemIndex(lastSelectedItemOpt) + 1
 							: m_currentBookmarkFolder->GetChildren().size());
 }
@@ -296,7 +298,7 @@ void BookmarkListPresenter::OnNewBookmark()
 
 	const auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree,
 		BookmarkItem::Type::Bookmark, m_currentBookmarkFolder, targetIndex, m_view->GetHWND(),
-		m_browser, m_clipboardStore, m_acceleratorManager, m_resourceLoader);
+		m_browser, m_acceleratorManager, m_resourceLoader, m_platformContext);
 
 	if (!bookmark)
 	{
@@ -317,7 +319,7 @@ void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		GetBookmarksForItems(items), m_resourceLoader, m_browser, m_view->GetHWND(),
-		m_clipboardStore);
+		m_platformContext);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 

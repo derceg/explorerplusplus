@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
 #include "MenuView.h"
+#include "PlatformContext.h"
 #include "ResourceLoader.h"
 #include "../Helper/ClipboardStore.h"
 #include <algorithm>
@@ -16,14 +17,14 @@
 BookmarkContextMenu::BookmarkContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
 	const RawBookmarkItems &bookmarkItems, const ResourceLoader *resourceLoader,
-	BrowserWindow *browser, HWND parentWindow, ClipboardStore *clipboardStore) :
+	BrowserWindow *browser, HWND parentWindow, PlatformContext *platformContext) :
 	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItems(bookmarkItems),
 	m_resourceLoader(resourceLoader),
 	m_browser(browser),
 	m_parentWindow(parentWindow),
-	m_clipboardStore(clipboardStore)
+	m_platformContext(platformContext)
 {
 	BuildMenu();
 
@@ -94,7 +95,8 @@ void BookmarkContextMenu::BuildMenu()
 
 	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, !permanentNodeSelected);
 	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE,
-		m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()));
+		m_platformContext->GetClipboardStore()->IsDataAvailable(
+			BookmarkClipboard::GetClipboardFormat()));
 	m_menuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, !permanentNodeSelected);
 
 	if (m_bookmarkItems.size() == 1)
@@ -244,18 +246,19 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		m_parentWindow, m_browser, m_clipboardStore, m_acceleratorManager, m_resourceLoader);
+		m_parentWindow, m_browser, m_acceleratorManager, m_resourceLoader, m_platformContext);
 }
 
 void BookmarkContextMenu::OnCopy(ClipboardAction action)
 {
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, m_bookmarkItems, action);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		m_bookmarkItems, action);
 }
 
 void BookmarkContextMenu::OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex)
 {
-	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, targetParentFolder,
-		targetIndex);
+	BookmarkHelper::PasteBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		targetParentFolder, targetIndex);
 }
 
 void BookmarkContextMenu::OnDelete()
@@ -266,6 +269,6 @@ void BookmarkContextMenu::OnDelete()
 void BookmarkContextMenu::OnShowProperties()
 {
 	DCHECK_EQ(m_bookmarkItems.size(), 1U);
-	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree, m_clipboardStore,
-		m_acceleratorManager, m_resourceLoader, m_parentWindow);
+	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree, m_parentWindow,
+		m_acceleratorManager, m_resourceLoader, m_platformContext);
 }

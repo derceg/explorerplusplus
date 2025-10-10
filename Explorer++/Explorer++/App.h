@@ -21,6 +21,7 @@
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
 #include "ModelessDialogList.h"
+#include "PlatformContextImpl.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
@@ -30,9 +31,6 @@
 #include "TabRestorer.h"
 #include "ThemeManager.h"
 #include "../Helper/ClipboardWatcher.h"
-#include "../Helper/KeyboardStateImpl.h"
-#include "../Helper/SystemClipboardStore.h"
-#include "../Helper/SystemClockImpl.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
@@ -58,8 +56,8 @@ public:
 	const CommandLine::Settings *GetCommandLineSettings() const;
 	bool GetSavePreferencesToXmlFile() const;
 	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
+	PlatformContext *GetPlatformContext();
 	Runtime *GetRuntime();
-	ClipboardStore *GetClipboardStore();
 	ClipboardWatcher *GetClipboardWatcher();
 	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
@@ -81,7 +79,6 @@ public:
 	DarkModeManager *GetDarkModeManager();
 	DarkModeColorProvider *GetDarkModeColorProvider();
 	ThemeManager *GetThemeManager();
-	KeyboardState *GetKeyboardState();
 	HistoryModel *GetHistoryModel();
 	FrequentLocationsModel *GetFrequentLocationsModel();
 	DriveModel *GetDriveModel();
@@ -114,9 +111,9 @@ private:
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	bool m_savePreferencesToXmlFile = false;
+	PlatformContextImpl m_platformContext;
 	Runtime m_runtime;
 	EventWindow m_eventWindow;
-	SystemClipboardStore m_clipboardStore;
 	ClipboardWatcher m_clipboardWatcher;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
@@ -139,8 +136,6 @@ private:
 	NavigationEvents m_navigationEvents;
 	TabList m_tabList;
 	TabRestorer m_tabRestorer;
-	SystemClockImpl m_systemClock;
-	KeyboardStateImpl m_keyboardState;
 
 	HistoryModel m_historyModel;
 	HistoryTracker m_historyTracker;

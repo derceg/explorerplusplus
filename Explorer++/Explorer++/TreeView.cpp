@@ -7,11 +7,13 @@
 #include "TestHelper.h"
 #include "TreeViewAdapter.h"
 #include "../Helper/AutoReset.h"
-#include "../Helper/Helper.h"
+#include "../Helper/KeyboardState.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
 
-TreeView::TreeView(HWND hwnd) : m_hwnd(hwnd)
+TreeView::TreeView(HWND hwnd, const KeyboardState *keyboardState) :
+	m_hwnd(hwnd),
+	m_keyboardState(keyboardState)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
 		std::bind_front(&TreeView::ParentWndProc, this)));
@@ -299,32 +301,37 @@ LRESULT TreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 		break;
 
 	case 'C':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		if (m_keyboardState->IsCtrlDown() && !m_keyboardState->IsShiftDown()
+			&& !m_keyboardState->IsAltDown())
 		{
 			m_delegate->OnNodeCopied(GetSelectedNode());
 		}
 		break;
 
 	case 'X':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		if (m_keyboardState->IsCtrlDown() && !m_keyboardState->IsShiftDown()
+			&& !m_keyboardState->IsAltDown())
 		{
 			m_delegate->OnNodeCut(GetSelectedNode());
 		}
 		break;
 
 	case 'V':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		if (m_keyboardState->IsCtrlDown() && !m_keyboardState->IsShiftDown()
+			&& !m_keyboardState->IsAltDown())
 		{
 			m_delegate->OnPaste(GetSelectedNode());
 		}
 		break;
 
 	case VK_INSERT:
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		if (m_keyboardState->IsCtrlDown() && !m_keyboardState->IsShiftDown()
+			&& !m_keyboardState->IsAltDown())
 		{
 			m_delegate->OnNodeCopied(GetSelectedNode());
 		}
-		if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		if (!m_keyboardState->IsCtrlDown() && m_keyboardState->IsShiftDown()
+			&& !m_keyboardState->IsAltDown())
 		{
 			m_delegate->OnPaste(GetSelectedNode());
 		}
@@ -337,7 +344,7 @@ LRESULT TreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 
 	// If the ctrl key is down, this key sequence is likely a modifier. Stop any other pressed key
 	// from been used in an incremental search.
-	if (IsKeyDown(VK_CONTROL))
+	if (m_keyboardState->IsCtrlDown())
 	{
 		return 1;
 	}

@@ -4,24 +4,18 @@
 
 #include "pch.h"
 #include "Bookmarks/UI/BookmarkListPresenter.h"
-#include "AcceleratorManager.h"
 #include "BookmarkTestHelper.h"
 #include "Bookmarks/BookmarkClipboard.h"
-#include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "Bookmarks/UI/BookmarkListViewItem.h"
 #include "Bookmarks/UI/BookmarkListViewModel.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "Config.h"
 #include "CopiedBookmark.h"
 #include "IconFetcherFake.h"
-#include "KeyboardStateFake.h"
 #include "ListView.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellTestHelper.h"
-#include "SimulatedClipboardStore.h"
-#include "Win32ResourceLoader.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 
@@ -32,7 +26,6 @@ class BookmarkListPresenterTest : public BrowserTestBase
 protected:
 	BookmarkListPresenterTest() :
 		m_resourceInstance(GetModuleHandle(nullptr)),
-		m_resourceLoader(m_resourceInstance, IconSet::Color, nullptr, nullptr),
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab(L"c:\\initial\\folder"))
 	{
@@ -53,10 +46,11 @@ protected:
 	auto BuildPresenter(const BookmarkColumnModel &columnModel = BookmarkColumnModel())
 	{
 		return std::make_unique<BookmarkListPresenter>(
-			std::make_unique<ListView>(m_listViewWindow.get(), &m_keyboardState, &m_resourceLoader),
+			std::make_unique<ListView>(m_listViewWindow.get(), m_platformContext.GetKeyboardState(),
+				&m_resourceLoader),
 			m_resourceInstance, &m_bookmarkTree, columnModel, std::nullopt,
 			SortDirection::Ascending, m_browser, &m_config, &m_acceleratorManager,
-			&m_resourceLoader, &m_iconFetcher, &m_clipboardStore);
+			&m_resourceLoader, &m_iconFetcher, &m_platformContext);
 	}
 
 	void VerifyViewItems(const BookmarkListPresenter *presenter)
@@ -81,14 +75,8 @@ protected:
 		}
 	}
 
-	Config m_config;
-	AcceleratorManager m_acceleratorManager;
 	HINSTANCE m_resourceInstance;
-	Win32ResourceLoader m_resourceLoader;
-	SimulatedClipboardStore m_clipboardStore;
-	KeyboardStateFake m_keyboardState;
 	IconFetcherFake m_iconFetcher;
-	BookmarkTree m_bookmarkTree;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
@@ -510,7 +498,7 @@ TEST_F(BookmarkListPresenterTest, OnItemsCopied)
 	CopiedBookmark copiedBookmark(*bookmark);
 	delegate->OnItemsCopied({ model->GetItemForBookmark(bookmark) });
 
-	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
+	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -530,7 +518,7 @@ TEST_F(BookmarkListPresenterTest, OnItemsCut)
 	delegate->OnItemsCut({ model->GetItemForBookmark(bookmark) });
 	EXPECT_TRUE(targetFolder->GetChildren().empty());
 
-	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
+	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -541,8 +529,8 @@ TEST_F(BookmarkListPresenterTest, OnPaste)
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\"));
 
 	CopiedBookmark copiedBookmark(*bookmark);
-	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { bookmark },
-		ClipboardAction::Copy);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
+		{ bookmark }, ClipboardAction::Copy);
 
 	auto *targetFolder = m_bookmarkTree.GetBookmarksToolbarFolder();
 	m_bookmarkTree.AddBookmarkItem(targetFolder,

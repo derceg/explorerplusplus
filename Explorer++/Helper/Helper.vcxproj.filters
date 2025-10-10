@@ -200,10 +200,10 @@
       <Filter>Control Support</Filter>
     </ClCompile>
     <ClCompile Include="SystemClockImpl.cpp">
-      <Filter>Environment</Filter>
+      <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardStateImpl.cpp">
-      <Filter>Environment</Filter>
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -460,16 +460,16 @@
       <Filter>Types</Filter>
     </ClInclude>
     <ClInclude Include="SystemClockImpl.h">
-      <Filter>Environment</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="SystemClock.h">
-      <Filter>Environment</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardStateImpl.h">
-      <Filter>Environment</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardState.h">
-      <Filter>Environment</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="AutoReset.h">
       <Filter>Miscellaneous</Filter>
@@ -515,7 +515,7 @@
     <Filter Include="Types">
       <UniqueIdentifier>{3a3e3f62-63fc-46d6-924f-f4eccb0076d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Environment">
+    <Filter Include="Platform">
       <UniqueIdentifier>{52d49072-ff88-40cb-a3f6-adaf82a3dd53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

@@ -4,7 +4,9 @@
 
 #include "pch.h"
 #include "TreeView.h"
+#include "KeyboardStateFake.h"
 #include "TreeViewAdapter.h"
+#include "../Helper/Helper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/resource.h>
@@ -30,12 +32,12 @@ public:
 
 	bool CanRename() const override
 	{
-		return false;
+		return true;
 	}
 
 	bool CanRemove() const override
 	{
-		return false;
+		return true;
 	}
 };
 
@@ -65,15 +67,16 @@ protected:
 			GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_parentWindow, nullptr);
 
-		m_treeViewWindow.reset(CreateWindow(WC_TREEVIEW, L"", WS_POPUP, 0, 0, 0, 0,
+		m_treeViewWindow.reset(CreateWindow(WC_TREEVIEW, L"", WS_POPUP, 0, 0, 1000, 1000,
 			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_treeViewWindow, nullptr);
 
-		m_treeView = std::make_unique<TreeView>(m_treeViewWindow.get());
+		m_treeView = std::make_unique<TreeView>(m_treeViewWindow.get(), &m_keyboardState);
 		m_treeView->SetAdapter(&m_adapter);
 		m_treeView->SetDelegate(&m_delegate);
 	}
 
+	KeyboardStateFake m_keyboardState;
 	wil::unique_hwnd m_parentWindow;
 	wil::unique_hwnd m_treeViewWindow;
 	TreeViewAdapter m_adapter;
@@ -83,61 +86,53 @@ protected:
 
 TEST_F(TreeViewTest, MoveNodeCollapsesParent)
 {
-	auto *topLevelNode1 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	auto *childNode = m_adapter.AddNode(topLevelNode1, std::make_unique<FakeTreeViewNode>());
-	auto *topLevelNode2 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	m_treeView->ExpandNode(topLevelNode1);
+	auto *node1 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	auto *childNode = m_adapter.AddNode(node1, std::make_unique<FakeTreeViewNode>());
+	auto *node2 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	m_treeView->ExpandNode(node1);
 
-	// Since topLevelNode1 no longer has any children after the move, it should be collapsed.
-	m_adapter.MoveNode(childNode, topLevelNode2, 0);
-	EXPECT_FALSE(m_treeView->IsNodeExpanded(topLevelNode1));
+	// Since node1 no longer has any children after the move, it should be collapsed.
+	m_adapter.MoveNode(childNode, node2, 0);
+	EXPECT_FALSE(m_treeView->IsNodeExpanded(node1));
 }
 
 TEST_F(TreeViewTest, MoveNodeDoesntCollapseParent)
 {
-	auto *topLevelNode1 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	auto *childNode1 = m_adapter.AddNode(topLevelNode1, std::make_unique<FakeTreeViewNode>());
-	m_adapter.AddNode(topLevelNode1, std::make_unique<FakeTreeViewNode>());
-	auto *topLevelNode2 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	m_treeView->ExpandNode(topLevelNode1);
+	auto *node1 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	auto *childNode1 = m_adapter.AddNode(node1, std::make_unique<FakeTreeViewNode>());
+	m_adapter.AddNode(node1, std::make_unique<FakeTreeViewNode>());
+	auto *node2 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	m_treeView->ExpandNode(node1);
 
-	// topLevelNode1 still has a child, so it shouldn't be collapsed.
-	m_adapter.MoveNode(childNode1, topLevelNode2, 0);
-	EXPECT_TRUE(m_treeView->IsNodeExpanded(topLevelNode1));
+	// node1 still has a child, so it shouldn't be collapsed.
+	m_adapter.MoveNode(childNode1, node2, 0);
+	EXPECT_TRUE(m_treeView->IsNodeExpanded(node1));
 }
 
 TEST_F(TreeViewTest, MoveSelectedNode)
 {
-	auto *topLevelNode1 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	auto *topLevelNode2 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	m_treeView->SelectNode(topLevelNode2);
+	auto *node1 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	auto *node2 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	m_treeView->SelectNode(node2);
 
 	// The node being moved is selected, so it should still be selected after the move and no
 	// selection change notification should be generated.
 	EXPECT_CALL(m_delegate, OnSelectionChanged(_)).Times(0);
-	m_adapter.MoveNode(topLevelNode2, topLevelNode1, 0);
-	EXPECT_EQ(m_treeView->GetSelectedNode(), topLevelNode2);
+	m_adapter.MoveNode(node2, node1, 0);
+	EXPECT_EQ(m_treeView->GetSelectedNode(), node2);
 }
 
 TEST_F(TreeViewTest, MoveNonSelectedNode)
 {
-	auto *topLevelNode1 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	auto *topLevelNode2 =
-		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
-	m_treeView->SelectNode(topLevelNode1);
+	auto *node1 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	auto *node2 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	m_treeView->SelectNode(node1);
 
 	// The node being moved isn't selected, so the selection shouldn't change and no selection
 	// change notification should be generated.
 	EXPECT_CALL(m_delegate, OnSelectionChanged(_)).Times(0);
-	m_adapter.MoveNode(topLevelNode2, topLevelNode1, 0);
-	EXPECT_EQ(m_treeView->GetSelectedNode(), topLevelNode1);
+	m_adapter.MoveNode(node2, node1, 0);
+	EXPECT_EQ(m_treeView->GetSelectedNode(), node1);
 }
 
 TEST_F(TreeViewTest, ExpandNodeWithNoChildren)
@@ -146,6 +141,19 @@ TEST_F(TreeViewTest, ExpandNodeWithNoChildren)
 	const auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
 	m_treeView->ExpandNode(node);
 	EXPECT_FALSE(m_treeView->IsNodeExpanded(node));
+}
+
+TEST_F(TreeViewTest, ItemPosition)
+{
+	const auto *node1 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	const auto *node2 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+
+	auto node1Rect = m_treeView->GetNodeRect(node1);
+	POINT node1Origin = { node1Rect.left, node1Rect.top };
+	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1Origin), node1);
+	EXPECT_EQ(m_treeView->MaybeGetNextVisibleNode(node1Origin), node2);
 }
 
 TEST_F(TreeViewTest, HighlightedNode)
@@ -157,4 +165,57 @@ TEST_F(TreeViewTest, HighlightedNode)
 
 	m_treeView->UnhighlightNode(node);
 	EXPECT_FALSE(m_treeView->IsNodeHighlighted(node));
+}
+
+TEST_F(TreeViewTest, InsertMark)
+{
+	m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+	const auto *node2 =
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+
+	m_treeView->ShowInsertMark(node2, InsertMarkPosition::Before);
+	m_treeView->RemoveInsertMark();
+}
+
+class TreeViewKeyPressTest : public TreeViewTest
+{
+protected:
+	void SetUp() override
+	{
+		TreeViewTest::SetUp();
+
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+		m_node2 = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+		m_treeView->SelectNode(m_node2);
+	}
+
+	TreeViewNode *m_node2 = nullptr;
+};
+
+TEST_F(TreeViewKeyPressTest, Copy)
+{
+	EXPECT_CALL(m_delegate, OnNodeCopied(m_node2));
+	m_keyboardState.SetCtrlDown(true);
+	SendSimulatedKeyPress(m_treeViewWindow.get(), 'C');
+}
+
+TEST_F(TreeViewKeyPressTest, Cut)
+{
+	EXPECT_CALL(m_delegate, OnNodeCut(m_node2));
+	m_keyboardState.SetCtrlDown(true);
+	SendSimulatedKeyPress(m_treeViewWindow.get(), 'X');
+}
+
+TEST_F(TreeViewKeyPressTest, Paste)
+{
+	EXPECT_CALL(m_delegate, OnPaste(m_node2));
+	m_keyboardState.SetCtrlDown(true);
+	SendSimulatedKeyPress(m_treeViewWindow.get(), 'V');
+}
+
+TEST_F(TreeViewKeyPressTest, Delete)
+{
+	EXPECT_CALL(m_delegate, OnNodeRemoved(m_node2));
+	SendSimulatedKeyPress(m_treeViewWindow.get(), VK_DELETE);
 }

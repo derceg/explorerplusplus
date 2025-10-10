@@ -149,15 +149,16 @@ ShellBrowserImpl::~ShellBrowserImpl()
 {
 	m_destroyedSignal();
 
-	if (m_clipboardDataObject
-		&& m_app->GetClipboardStore()->IsDataObjectCurrent(m_clipboardDataObject.get()))
+	auto *clipboardStore = m_app->GetPlatformContext()->GetClipboardStore();
+
+	if (m_clipboardDataObject && clipboardStore->IsDataObjectCurrent(m_clipboardDataObject.get()))
 	{
 		// Ensure that any data that was copied to the clipboard remains there. Technically, this
 		// only needs to be done when the application is closed. However, determining whether the
 		// application set the current data on the clipboard when the tab that set the data has
 		// already been closed is difficult, so the easiest thing to do is just flush the clipboard
 		// here.
-		m_app->GetClipboardStore()->FlushDataObject();
+		clipboardStore->FlushDataObject();
 	}
 
 	DestroyWindow(m_listView);
@@ -1052,12 +1053,14 @@ HRESULT ShellBrowserImpl::CopyItemsToClipboard(const std::vector<PidlAbsolute> &
 		return E_UNEXPECTED;
 	}
 
+	auto *clipboardStore = m_app->GetPlatformContext()->GetClipboardStore();
+
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
 	if (action == ClipboardAction::Copy)
 	{
-		hr = CopyFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
+		hr = CopyFiles(clipboardStore, items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1066,7 +1069,7 @@ HRESULT ShellBrowserImpl::CopyItemsToClipboard(const std::vector<PidlAbsolute> &
 	}
 	else
 	{
-		hr = CutFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
+		hr = CutFiles(clipboardStore, items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1098,7 +1101,8 @@ void ShellBrowserImpl::UpdateCurrentClipboardObject(
 void ShellBrowserImpl::OnClipboardUpdate()
 {
 	if (m_clipboardDataObject
-		&& !m_app->GetClipboardStore()->IsDataObjectCurrent(m_clipboardDataObject.get()))
+		&& !m_app->GetPlatformContext()->GetClipboardStore()->IsDataObjectCurrent(
+			m_clipboardDataObject.get()))
 	{
 		RestoreStateOfCutItems();
 
@@ -1133,15 +1137,15 @@ void ShellBrowserImpl::PasteShortcut()
 
 void ShellBrowserImpl::PasteHardLinks()
 {
-	auto pastedItems =
-		ClipboardOperations::PasteHardLinks(m_app->GetClipboardStore(), GetDirectoryPath());
+	auto pastedItems = ClipboardOperations::PasteHardLinks(
+		m_app->GetPlatformContext()->GetClipboardStore(), GetDirectoryPath());
 	OnInternalPaste(pastedItems);
 }
 
 void ShellBrowserImpl::PasteSymLinks()
 {
-	auto pastedItems =
-		ClipboardOperations::PasteSymLinks(m_app->GetClipboardStore(), GetDirectoryPath());
+	auto pastedItems = ClipboardOperations::PasteSymLinks(
+		m_app->GetPlatformContext()->GetClipboardStore(), GetDirectoryPath());
 	OnInternalPaste(pastedItems);
 }
 
@@ -1264,7 +1268,8 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 void ShellBrowserImpl::CopySelectedItemPaths(PathType pathType) const
 {
 	auto selectedItems = GetSelectedItemPidls();
-	CopyItemPathsToClipboard(m_app->GetClipboardStore(), selectedItems, pathType);
+	CopyItemPathsToClipboard(m_app->GetPlatformContext()->GetClipboardStore(), selectedItems,
+		pathType);
 }
 
 void ShellBrowserImpl::SetFileAttributesForSelectedItems()

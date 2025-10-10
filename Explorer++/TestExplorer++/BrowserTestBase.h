@@ -8,9 +8,9 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserList.h"
 #include "Config.h"
+#include "PlatformContextFake.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
-#include "SimulatedClipboardStore.h"
 #include "TabEvents.h"
 #include "Win32ResourceLoader.h"
 #include "../Helper/CachedIcons.h"
@@ -34,12 +34,13 @@ protected:
 
 	static void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr);
 
+	PlatformContextFake m_platformContext;
+
 	Config m_config;
 	AcceleratorManager m_acceleratorManager;
 	BookmarkTree m_bookmarkTree;
 	CachedIcons m_cachedIcons;
 	Win32ResourceLoader m_resourceLoader;
-	SimulatedClipboardStore m_clipboardStore;
 
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;

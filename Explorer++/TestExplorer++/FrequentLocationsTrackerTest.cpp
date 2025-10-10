@@ -6,7 +6,6 @@
 #include "FrequentLocationsTracker.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "FakeSystemClock.h"
 #include "FrequentLocationsModel.h"
 #include <gtest/gtest.h>
 
@@ -17,12 +16,11 @@ class FrequentLocationsTrackerTest : public BrowserTestBase
 {
 protected:
 	FrequentLocationsTrackerTest() :
-		m_frequentLocationsModel(&m_systemClock),
+		m_frequentLocationsModel(m_platformContext.GetSystemClock()),
 		m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents)
 	{
 	}
 
-	FakeSystemClock m_systemClock;
 	FrequentLocationsModel m_frequentLocationsModel;
 	FrequentLocationsTracker m_frequentLocationsTracker;
 };

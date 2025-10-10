@@ -8,7 +8,7 @@ class AcceleratorManager;
 class BookmarkItem;
 class BookmarkTree;
 class BrowserWindow;
-class ClipboardStore;
+class PlatformContext;
 class ResourceLoader;
 
 class BookmarkMenuController
@@ -16,7 +16,7 @@ class BookmarkMenuController
 public:
 	BookmarkMenuController(BookmarkTree *bookmarkTree, BrowserWindow *browser,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		HWND parentWindow, ClipboardStore *clipboardStore);
+		HWND parentWindow, PlatformContext *platformContext);
 
 	void OnMenuItemSelected(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
@@ -30,5 +30,5 @@ private:
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	const HWND m_parentWindow;
-	ClipboardStore *const m_clipboardStore;
+	PlatformContext *const m_platformContext;
 };

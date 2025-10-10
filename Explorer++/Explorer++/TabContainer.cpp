@@ -183,20 +183,20 @@ TabContainer *TabContainer::Create(MainTabView *view, BrowserWindow *browser,
 	ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 	TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
-	const Config *config, const ResourceLoader *resourceLoader)
+	const AcceleratorManager *acceleratorManager, const Config *config,
+	const ResourceLoader *resourceLoader, PlatformContext *platformContext)
 {
 	return new TabContainer(view, browser, shellBrowserFactory, tabEvents, shellBrowserEvents,
-		navigationEvents, tabRestorer, cachedIcons, bookmarkTree, clipboardStore,
-		acceleratorManager, config, resourceLoader);
+		navigationEvents, tabRestorer, cachedIcons, bookmarkTree, acceleratorManager, config,
+		resourceLoader, platformContext);
 }
 
 TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 	ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 	TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
-	const Config *config, const ResourceLoader *resourceLoader) :
+	const AcceleratorManager *acceleratorManager, const Config *config,
+	const ResourceLoader *resourceLoader, PlatformContext *platformContext) :
 	ShellDropTargetWindow(view->GetHWND()),
 	m_view(view),
 	m_browser(browser),
@@ -209,10 +209,10 @@ TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),
-	m_clipboardStore(clipboardStore),
 	m_acceleratorManager(acceleratorManager),
 	m_config(config),
 	m_resourceLoader(resourceLoader),
+	m_platformContext(platformContext),
 	m_iPreviousTabSelectionId(-1)
 {
 	Initialize(GetParent(m_view->GetHWND()));
@@ -283,7 +283,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	PopupMenuView popupMenu(m_browser);
 	TabContainerBackgroundContextMenu menu(&popupMenu, m_acceleratorManager, this, m_tabRestorer,
-		m_bookmarkTree, m_browser, m_clipboardStore, m_resourceLoader);
+		m_bookmarkTree, m_browser, m_resourceLoader, m_platformContext);
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

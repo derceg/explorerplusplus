@@ -1225,6 +1225,7 @@
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
+    <ClCompile Include="PlatformContextImpl.cpp" />
     <ClCompile Include="ResourceIconModel.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
@@ -1575,6 +1576,8 @@
     <ClInclude Include="NoOpMenuHelpTextHost.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
+    <ClInclude Include="PlatformContext.h" />
+    <ClInclude Include="PlatformContextImpl.h" />
     <ClInclude Include="ResourceIconModel.h" />
     <ClInclude Include="SelectionType.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />

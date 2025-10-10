@@ -11,8 +11,8 @@
 
 class BookmarkItem;
 class BookmarkTree;
-class ClipboardStore;
 class OrganizeBookmarksContextMenuDelegate;
+class PlatformContext;
 class ResourceLoader;
 
 class OrganizeBookmarksContextMenu : public MenuBase
@@ -20,8 +20,8 @@ class OrganizeBookmarksContextMenu : public MenuBase
 public:
 	OrganizeBookmarksContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		HWND parentWindow, BookmarkTree *bookmarkTree, BookmarkItem *targetFolder,
-		OrganizeBookmarksContextMenuDelegate *delegate, ClipboardStore *clipboardStore,
-		const ResourceLoader *resourceLoader);
+		OrganizeBookmarksContextMenuDelegate *delegate, const ResourceLoader *resourceLoader,
+		PlatformContext *platformContext);
 
 private:
 	void BuildMenu();
@@ -41,7 +41,7 @@ private:
 	BookmarkTree *const m_bookmarkTree;
 	BookmarkItem *m_targetFolder = nullptr;
 	OrganizeBookmarksContextMenuDelegate *const m_delegate;
-	ClipboardStore *const m_clipboardStore;
 	const ResourceLoader *const m_resourceLoader;
+	PlatformContext *const m_platformContext;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -13,8 +13,8 @@ class AcceleratorManager;
 class BookmarkItem;
 class BookmarkTree;
 class BrowserWindow;
-class ClipboardStore;
 class IconFetcher;
+class PlatformContext;
 class ResourceLoader;
 
 // Although it's not necessary, this class is effectively designed to be held
@@ -26,7 +26,7 @@ class BookmarkMenu
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
 		BrowserWindow *browserWindow, const AcceleratorManager *acceleratorManager,
-		IconFetcher *iconFetcher, HWND parentWindow, ClipboardStore *clipboardStore);
+		IconFetcher *iconFetcher, HWND parentWindow, PlatformContext *platformContext);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

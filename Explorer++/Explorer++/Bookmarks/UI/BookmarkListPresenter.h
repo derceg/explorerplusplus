@@ -21,10 +21,10 @@ class BookmarkIconManager;
 class BookmarkListViewModel;
 class BookmarkTree;
 class BrowserWindow;
-class ClipboardStore;
 struct Config;
 class IconFetcher;
 class ListView;
+class PlatformContext;
 class ResourceLoader;
 
 // Displays a set of bookmarks and bookmark folders within a ListView instance.
@@ -40,7 +40,7 @@ public:
 		std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
 		BrowserWindow *browser, const Config *config, const AcceleratorManager *acceleratorManager,
 		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
-		ClipboardStore *clipboardStore);
+		PlatformContext *platformContext);
 	~BookmarkListPresenter();
 
 	ListView *GetView();
@@ -115,8 +115,8 @@ private:
 	const Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
+	PlatformContext *const m_platformContext;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
-	ClipboardStore *const m_clipboardStore;
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 	BookmarkNavigationCompletedSignal m_navigationCompletedSignal;
 

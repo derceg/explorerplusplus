@@ -55,13 +55,13 @@ bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 }
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceLoader,
-	HWND parentWindow, BrowserWindow *browser, ClipboardStore *clipboardStore,
-	const AcceleratorManager *acceleratorManager)
+	HWND parentWindow, BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
+	PlatformContext *platformContext)
 {
 	std::wstring bookmarkAllTabsText =
 		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr,
-		std::nullopt, parentWindow, browser, clipboardStore, acceleratorManager, resourceLoader,
+		std::nullopt, parentWindow, browser, acceleratorManager, resourceLoader, platformContext,
 		bookmarkAllTabsText);
 
 	if (!bookmarkFolder)
@@ -87,8 +87,8 @@ void BookmarkAllTabs(BookmarkTree *bookmarkTree, const ResourceLoader *resourceL
 
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	BrowserWindow *browser, ClipboardStore *clipboardStore,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader, PlatformContext *platformContext,
 	std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
@@ -119,8 +119,8 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 	BookmarkItem *selectedParentFolder = nullptr;
 
 	auto *addBookmarkDialog = AddBookmarkDialog::Create(resourceLoader, parentWindow, bookmarkTree,
-		bookmarkItem.get(), defaultParentSelection, &selectedParentFolder, clipboardStore,
-		acceleratorManager, customDialogTitle);
+		bookmarkItem.get(), defaultParentSelection, &selectedParentFolder, acceleratorManager,
+		platformContext, customDialogTitle);
 	auto res = addBookmarkDialog->ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
@@ -146,9 +146,9 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 	return nullptr;
 }
 
-void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, HWND parentWindow)
+void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HWND parentWindow,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	PlatformContext *platformContext)
 {
 	if (bookmarkTree->IsPermanentNode(bookmarkItem))
 	{
@@ -158,7 +158,7 @@ void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 
 	BookmarkItem *selectedParentFolder = nullptr;
 	auto *addBookmarkDialog = AddBookmarkDialog::Create(resourceLoader, parentWindow, bookmarkTree,
-		bookmarkItem, nullptr, &selectedParentFolder, clipboardStore, acceleratorManager);
+		bookmarkItem, nullptr, &selectedParentFolder, acceleratorManager, platformContext);
 	auto res = addBookmarkDialog->ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)

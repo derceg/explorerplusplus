@@ -9,7 +9,7 @@
 
 // A fake clock that increments the time by 1 second (starting from the system_clock epoch) every
 // time Now() is called.
-class FakeSystemClock : public SystemClock
+class SystemClockFake : public SystemClock
 {
 public:
 	TimePoint Now() override;

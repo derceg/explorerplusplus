@@ -50,7 +50,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_tabList(&m_tabEvents),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
-	m_frequentLocationsModel(&m_systemClock),
+	m_frequentLocationsModel(m_platformContext.GetSystemClock()),
 	m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
 	m_driveWatcher(&m_eventWindow),
 	m_driveModel(std::make_unique<DriveEnumeratorImpl>(), &m_driveWatcher),
@@ -357,14 +357,14 @@ void App::SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile)
 	m_savePreferencesToXmlFile = savePreferencesToXmlFile;
 }
 
+PlatformContext *App::GetPlatformContext()
+{
+	return &m_platformContext;
+}
+
 Runtime *App::GetRuntime()
 {
 	return &m_runtime;
-}
-
-ClipboardStore *App::GetClipboardStore()
-{
-	return &m_clipboardStore;
 }
 
 ClipboardWatcher *App::GetClipboardWatcher()
@@ -470,11 +470,6 @@ DarkModeColorProvider *App::GetDarkModeColorProvider()
 ThemeManager *App::GetThemeManager()
 {
 	return &m_themeManager;
-}
-
-KeyboardState *App::GetKeyboardState()
-{
-	return &m_keyboardState;
 }
 
 HistoryModel *App::GetHistoryModel()

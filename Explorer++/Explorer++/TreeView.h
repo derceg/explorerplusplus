@@ -15,6 +15,7 @@
 #include <memory>
 #include <vector>
 
+class KeyboardState;
 class TreeViewAdapter;
 class TreeViewNode;
 class WindowSubclass;
@@ -25,7 +26,7 @@ using ConstRawTreeViewNodes = std::vector<const TreeViewNode *>;
 class TreeView
 {
 public:
-	TreeView(HWND hwnd);
+	TreeView(HWND hwnd, const KeyboardState *keyboardState);
 	~TreeView();
 
 	HWND GetHWND() const;
@@ -108,6 +109,7 @@ private:
 	TreeViewAdapter *m_adapter = nullptr;
 	NoOpDelegate m_noOpDelegate;
 	TreeViewDelegate *m_delegate = &m_noOpDelegate;
+	const KeyboardState *const m_keyboardState;
 	wil::unique_himagelist m_imageList;
 	boost::bimap<boost::bimaps::unordered_set_of<HTREEITEM>,
 		boost::bimaps::unordered_set_of<TreeViewNode *, PtrHash, std::equal_to<void>>>

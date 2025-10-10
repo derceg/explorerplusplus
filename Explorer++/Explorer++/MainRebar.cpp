@@ -278,7 +278,7 @@ void Explorerplusplus::CreateBookmarksToolbar()
 
 	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this,
 		m_app->GetAcceleratorManager(), m_app->GetResourceLoader(), &m_iconFetcher,
-		m_app->GetBookmarkTree(), m_app->GetClipboardStore());
+		m_app->GetBookmarkTree(), m_app->GetPlatformContext());
 	m_bookmarksToolbar->GetView()->AddToolbarSizeUpdatedObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
 			m_bookmarksToolbar->GetView()->GetHWND()));

@@ -54,7 +54,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 void Explorerplusplus::OnListViewPaste()
 {
-	auto clipboardObject = m_app->GetClipboardStore()->GetDataObject();
+	auto clipboardObject = m_app->GetPlatformContext()->GetClipboardStore()->GetDataObject();
 
 	if (!clipboardObject)
 	{

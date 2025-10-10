@@ -82,7 +82,8 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK_HELP_TEXT));
 
-		if (!m_app->GetClipboardStore()->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()))
+		if (!m_app->GetPlatformContext()->GetClipboardStore()->IsDataAvailable(
+				BookmarkClipboard::GetClipboardFormat()))
 		{
 			m_menuView->EnableItem(IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK, false);
 		}
@@ -157,16 +158,16 @@ void ToolbarContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	auto *bookmarkTree = m_app->GetBookmarkTree();
 	BookmarkHelper::AddBookmarkItem(bookmarkTree, type, bookmarkTree->GetBookmarksToolbarFolder(),
-		std::nullopt, m_browser->GetHWND(), m_browser, m_app->GetClipboardStore(),
-		m_app->GetAcceleratorManager(), m_app->GetResourceLoader());
+		std::nullopt, m_browser->GetHWND(), m_browser, m_app->GetAcceleratorManager(),
+		m_app->GetResourceLoader(), m_app->GetPlatformContext());
 }
 
 void ToolbarContextMenu::OnPasteBookmark()
 {
 	auto *bookmarkTree = m_app->GetBookmarkTree();
 	auto *bookmarksToolbarFolder = bookmarkTree->GetBookmarksToolbarFolder();
-	BookmarkHelper::PasteBookmarkItems(m_app->GetClipboardStore(), bookmarkTree,
-		bookmarksToolbarFolder, bookmarksToolbarFolder->GetChildren().size());
+	BookmarkHelper::PasteBookmarkItems(m_app->GetPlatformContext()->GetClipboardStore(),
+		bookmarkTree, bookmarksToolbarFolder, bookmarksToolbarFolder->GetChildren().size());
 }
 
 void ToolbarContextMenu::OnNewApplication()

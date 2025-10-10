@@ -22,12 +22,12 @@ class AcceleratorManager;
 class BookmarkTree;
 class BrowserWindow;
 class CachedIcons;
-class ClipboardStore;
 struct Config;
 class MainTabView;
 struct NavigateParams;
 class NavigationEvents;
 class NavigationRequest;
+class PlatformContext;
 struct PreservedTab;
 class ResourceLoader;
 class ShellBrowserEvents;
@@ -61,8 +61,8 @@ public:
 		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
-		const Config *config, const ResourceLoader *resourceLoader);
+		const AcceleratorManager *acceleratorManager, const Config *config,
+		const ResourceLoader *resourceLoader, PlatformContext *platformContext);
 
 	MainTabView *GetView();
 
@@ -131,8 +131,8 @@ private:
 		ShellBrowserFactory *shellBrowserFactory, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		TabRestorer *tabRestorer, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		ClipboardStore *clipboardStore, const AcceleratorManager *acceleratorManager,
-		const Config *config, const ResourceLoader *resourceLoader);
+		const AcceleratorManager *acceleratorManager, const Config *config,
+		const ResourceLoader *resourceLoader, PlatformContext *platformContext);
 
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -183,10 +183,10 @@ private:
 	IconFetcherImpl m_iconFetcher;
 	CachedIcons *const m_cachedIcons;
 	BookmarkTree *const m_bookmarkTree;
-	ClipboardStore *const m_clipboardStore;
 	const AcceleratorManager *const m_acceleratorManager;
 	const Config *const m_config;
 	const ResourceLoader *const m_resourceLoader;
+	PlatformContext *const m_platformContext;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	std::vector<int> m_tabSelectionHistory;

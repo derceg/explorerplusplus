@@ -14,13 +14,13 @@
 
 BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	HWND parentWindow, ClipboardStore *clipboardStore) :
+	HWND parentWindow, PlatformContext *platformContext) :
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_parentWindow(parentWindow),
-	m_clipboardStore(clipboardStore)
+	m_platformContext(platformContext)
 {
 }
 
@@ -44,6 +44,6 @@ void BookmarkMenuController::OnMenuItemRightClicked(BookmarkItem *bookmarkItem, 
 {
 	PopupMenuView popupMenu(m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-		{ bookmarkItem }, m_resourceLoader, m_browser, m_parentWindow, m_clipboardStore);
+		{ bookmarkItem }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
 	popupMenu.Show(m_parentWindow, pt);
 }

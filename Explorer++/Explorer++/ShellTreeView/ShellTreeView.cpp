@@ -148,10 +148,11 @@ HWND ShellTreeView::CreateTreeView(HWND parent)
 ShellTreeView::~ShellTreeView()
 {
 	auto *clipboardDataObject = m_cutCopiedItemManager.GetCutCopiedClipboardDataObject();
+	auto *clipboardStore = m_app->GetPlatformContext()->GetClipboardStore();
 
-	if (clipboardDataObject && m_app->GetClipboardStore()->IsDataObjectCurrent(clipboardDataObject))
+	if (clipboardDataObject && clipboardStore->IsDataObjectCurrent(clipboardDataObject))
 	{
-		m_app->GetClipboardStore()->FlushDataObject();
+		clipboardStore->FlushDataObject();
 	}
 
 	m_iconThreadPool.clear_queue();
@@ -1507,7 +1508,8 @@ void ShellTreeView::ExecuteCommand(int command)
 void ShellTreeView::CopySelectedItemPath(PathType pathType) const
 {
 	auto pidl = GetSelectedNodePidl();
-	CopyItemPathsToClipboard(m_app->GetClipboardStore(), { pidl.get() }, pathType);
+	CopyItemPathsToClipboard(m_app->GetPlatformContext()->GetClipboardStore(), { pidl.get() },
+		pathType);
 }
 
 void ShellTreeView::SetFileAttributesForSelectedItem()
@@ -1580,16 +1582,18 @@ void ShellTreeView::CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction 
 
 void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action)
 {
+	auto *clipboardStore = m_app->GetPlatformContext()->GetClipboardStore();
+
 	auto *node = GetNodeFromTreeViewItem(treeItem);
 	auto pidl = node->GetFullPidl();
-
 	std::vector<PidlAbsolute> items = { pidl.get() };
+
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
 	if (action == ClipboardAction::Copy)
 	{
-		hr = CopyFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
+		hr = CopyFiles(clipboardStore, items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1598,7 +1602,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction acti
 	}
 	else
 	{
-		hr = CutFiles(m_app->GetClipboardStore(), items, &clipboardDataObject);
+		hr = CutFiles(clipboardStore, items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1609,7 +1613,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction acti
 
 void ShellTreeView::Paste()
 {
-	auto clipboardObject = m_app->GetClipboardStore()->GetDataObject();
+	auto clipboardObject = m_app->GetPlatformContext()->GetClipboardStore()->GetDataObject();
 
 	if (!clipboardObject)
 	{
@@ -1652,7 +1656,8 @@ void ShellTreeView::OnClipboardUpdate()
 	auto *clipboardDataObject = m_cutCopiedItemManager.GetCutCopiedClipboardDataObject();
 
 	if (clipboardDataObject
-		&& !m_app->GetClipboardStore()->IsDataObjectCurrent(clipboardDataObject))
+		&& !m_app->GetPlatformContext()->GetClipboardStore()->IsDataObjectCurrent(
+			clipboardDataObject))
 	{
 		m_cutCopiedItemManager.ClearCutCopiedItem();
 	}

@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "MenuView.h"
 #include "OrganizeBookmarksContextMenuDelegate.h"
+#include "PlatformContext.h"
 #include "ResourceLoader.h"
 #include "../Helper/ClipboardStore.h"
 #include <algorithm>
@@ -17,14 +18,14 @@
 OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, HWND parentWindow, BookmarkTree *bookmarkTree,
 	BookmarkItem *targetFolder, OrganizeBookmarksContextMenuDelegate *delegate,
-	ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader) :
+	const ResourceLoader *resourceLoader, PlatformContext *platformContext) :
 	MenuBase(menuView, acceleratorManager),
 	m_parentWindow(parentWindow),
 	m_bookmarkTree(bookmarkTree),
 	m_targetFolder(targetFolder),
 	m_delegate(delegate),
-	m_clipboardStore(clipboardStore),
-	m_resourceLoader(resourceLoader)
+	m_resourceLoader(resourceLoader),
+	m_platformContext(platformContext)
 {
 	BuildMenu();
 
@@ -65,7 +66,8 @@ void OrganizeBookmarksContextMenu::BuildMenu()
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, !selectedBookmarkItems.empty());
 
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
-		m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()));
+		m_platformContext->GetClipboardStore()->IsDataAvailable(
+			BookmarkClipboard::GetClipboardFormat()));
 
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, canDelete);
 
@@ -119,8 +121,8 @@ void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
 void OrganizeBookmarksContextMenu::OnNewBookmark()
 {
 	auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_targetFolder, GetTargetIndex(), m_parentWindow, nullptr, m_clipboardStore,
-		m_acceleratorManager, m_resourceLoader);
+		m_targetFolder, GetTargetIndex(), m_parentWindow, nullptr, m_acceleratorManager,
+		m_resourceLoader, m_platformContext);
 
 	if (!bookmark || bookmark->GetParent() != m_targetFolder)
 	{
@@ -144,13 +146,14 @@ void OrganizeBookmarksContextMenu::OnCopy(ClipboardAction action)
 		return;
 	}
 
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, selectedItems, action);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		selectedItems, action);
 }
 
 void OrganizeBookmarksContextMenu::OnPaste()
 {
-	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, m_targetFolder,
-		GetTargetIndex());
+	BookmarkHelper::PasteBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		m_targetFolder, GetTargetIndex());
 }
 
 void OrganizeBookmarksContextMenu::OnDelete()
