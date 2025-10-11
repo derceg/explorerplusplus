@@ -68,13 +68,11 @@ void TreeView::AddNode(TreeViewNode *node)
 	tvItem.pszText = text.data();
 	tvItem.cChildren = node->GetChildren().empty() ? 0 : 1;
 
-	auto iconIndex = node->GetIconIndex();
-
-	if (iconIndex)
+	if (m_imageList)
 	{
 		WI_SetAllFlags(tvItem.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE);
-		tvItem.iImage = *iconIndex;
-		tvItem.iSelectedImage = *iconIndex;
+		tvItem.iImage = I_IMAGECALLBACK;
+		tvItem.iSelectedImage = I_IMAGECALLBACK;
 	}
 
 	auto *parentNode = node->GetParent();
@@ -235,6 +233,10 @@ LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		{
 			switch (reinterpret_cast<NMHDR *>(lParam)->code)
 			{
+			case TVN_GETDISPINFO:
+				OnGetDispInfo(reinterpret_cast<NMTVDISPINFO *>(lParam));
+				break;
+
 			case TVN_KEYDOWN:
 				return OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 
@@ -290,6 +292,25 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 	}
 
 	m_delegate->OnShowContextMenu(targetNode, ptScreenFinal);
+}
+
+void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
+{
+	const auto *node = GetNodeForHandle(dispInfo->item.hItem);
+
+	if (WI_IsAnyFlagSet(dispInfo->item.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE))
+	{
+		// The image index and selected image index will only be set to I_IMAGECALLBACK if an image
+		// list is set, so that's the only time this message should be received and GetIconIndex()
+		// should return an icon index.
+		auto iconIndex = node->GetIconIndex();
+		CHECK(iconIndex);
+
+		dispInfo->item.iImage = *iconIndex;
+		dispInfo->item.iSelectedImage = *iconIndex;
+	}
+
+	WI_SetFlag(dispInfo->item.mask, TVIF_DI_SETITEM);
 }
 
 LRESULT TreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)

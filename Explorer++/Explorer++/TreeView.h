@@ -88,6 +88,7 @@ private:
 
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnShowContextMenu(const POINT &ptScreen);
+	void OnGetDispInfo(NMTVDISPINFO *dispInfo);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
 	void OnDeletePressed();
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
