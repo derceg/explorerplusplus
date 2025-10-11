@@ -8,11 +8,9 @@
 #include "AsyncIconFetcher.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "Config.h"
 #include "Runtime.h"
 #include "RuntimeTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
 #include "Tab.h"
@@ -36,13 +34,9 @@ protected:
 	{
 	}
 
-	Config m_config;
 	Runtime m_runtime;
-
 	std::shared_ptr<CachedIcons> m_cachedIcons;
 	std::shared_ptr<AsyncIconFetcher> m_iconFetcher;
-
-	ShellBrowserEvents m_shellBrowserEvents;
 
 	BrowserWindowFake *const m_browser;
 	AddressBarView *const m_addressBarView;

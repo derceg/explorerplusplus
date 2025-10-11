@@ -12,14 +12,13 @@
 #include "MenuViewFakeTestHelper.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellTestHelper.h"
-#include "../Helper/SystemClockImpl.h"
 #include <gtest/gtest.h>
 
 class FrequentLocationsMenuTest : public BrowserTestBase
 {
 protected:
 	FrequentLocationsMenuTest() :
-		m_frequentLocationsModel(&m_systemClock),
+		m_frequentLocationsModel(m_platformContext.GetSystemClock()),
 		m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
 		m_browser(AddBrowser()),
 		m_menu(&m_menuView, &m_acceleratorManager, &m_frequentLocationsModel, m_browser,
@@ -27,7 +26,6 @@ protected:
 	{
 	}
 
-	SystemClockImpl m_systemClock;
 	FrequentLocationsModel m_frequentLocationsModel;
 	FrequentLocationsTracker m_frequentLocationsTracker;
 	ShellIconLoaderFake m_shellIconLoader;

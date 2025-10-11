@@ -9,7 +9,6 @@
 #include "ApplicationToolbarView.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "Config.h"
 #include "ShellTestHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include <boost/range/combine.hpp>
@@ -58,7 +57,6 @@ protected:
 		}
 	}
 
-	Config m_config;
 	std::unique_ptr<ApplicationModel> m_applicationModel;
 	ApplicationExecutorMock m_applicationExecutor;
 

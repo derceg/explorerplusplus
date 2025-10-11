@@ -6,7 +6,6 @@
 #include "DrivesToolbar.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "Config.h"
 #include "DriveEnumeratorFake.h"
 #include "DriveModel.h"
 #include "DriveWatcherFake.h"
@@ -44,8 +43,6 @@ protected:
 			EXPECT_EQ(button->GetText(), drive.substr(0, 1));
 		}
 	}
-
-	Config m_config;
 
 	DriveWatcherFake m_driveWatcher;
 	DriveModel m_driveModel;

@@ -6,13 +6,10 @@
 #include "BrowserCommandController.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "Config.h"
 #include "MainResource.h"
-#include "ResourceLoaderFake.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
-#include "SimulatedClipboardStore.h"
 #include "../Helper/Clipboard.h"
 #include <gtest/gtest.h>
 
@@ -25,13 +22,10 @@ protected:
 		m_browser(AddBrowser()),
 		m_originalPath(L"c:\\"),
 		m_tab(m_browser->AddTab(m_originalPath)),
-		m_commandController(m_browser, &m_config, &m_clipboardStore, &m_resourceLoader)
+		m_commandController(m_browser, &m_config, m_platformContext.GetClipboardStore(),
+			&m_resourceLoader)
 	{
 	}
-
-	Config m_config;
-	SimulatedClipboardStore m_clipboardStore;
-	ResourceLoaderFake m_resourceLoader;
 
 	BrowserWindowFake *const m_browser;
 	const std::wstring m_originalPath;
@@ -76,7 +70,7 @@ TEST_F(BrowserCommandControllerTest, CopyFolderPath)
 
 	m_commandController.ExecuteCommand(IDM_FILE_COPYFOLDERPATH);
 
-	Clipboard clipboard(&m_clipboardStore);
+	Clipboard clipboard(m_platformContext.GetClipboardStore());
 	auto clipboardText = clipboard.ReadText();
 	ASSERT_TRUE(clipboardText.has_value());
 	EXPECT_THAT(*clipboardText, StrCaseEq(path));

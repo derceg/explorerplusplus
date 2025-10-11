@@ -8,7 +8,6 @@
 #include "BrowserWindowFake.h"
 #include "GeneratorTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTestHelper.h"
 #include "TabList.h"
@@ -26,9 +25,7 @@ protected:
 	{
 	}
 
-	ShellBrowserEvents m_shellBrowserEvents;
 	TabList m_tabList;
-
 	SearchTabsModel m_model;
 };
 
