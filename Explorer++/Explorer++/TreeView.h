@@ -69,7 +69,7 @@ private:
 	{
 	public:
 		bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) override;
-		void OnNodeRemoved(TreeViewNode *targetNode) override;
+		void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) override;
 		void OnNodeCopied(TreeViewNode *targetNode) override;
 		void OnNodeCut(TreeViewNode *targetNode) override;
 		void OnPaste(TreeViewNode *targetNode) override;
@@ -90,7 +90,7 @@ private:
 	void OnShowContextMenu(const POINT &ptScreen);
 	void OnGetDispInfo(NMTVDISPINFO *dispInfo);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
-	void OnDeletePressed();
+	void OnDeletePressed(RemoveMode removeMode);
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	LRESULT EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

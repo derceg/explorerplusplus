@@ -899,6 +899,7 @@
     <ClInclude Include="Controls.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
+    <ClInclude Include="RemoveMode.h" />
     <ClInclude Include="DetoursHelper.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DisableUnaligned.h" />

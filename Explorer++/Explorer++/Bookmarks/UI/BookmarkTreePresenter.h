@@ -68,7 +68,7 @@ private:
 
 	// TreeViewDelegate
 	bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) override;
-	void OnNodeRemoved(TreeViewNode *targetNode) override;
+	void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) override;
 	void OnNodeCopied(TreeViewNode *targetNode) override;
 	void OnNodeCut(TreeViewNode *targetNode) override;
 	void OnPaste(TreeViewNode *targetNode) override;

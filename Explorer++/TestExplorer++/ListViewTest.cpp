@@ -26,7 +26,8 @@ class ListViewDelegateMock : public ListViewDelegate
 public:
 	MOCK_METHOD(bool, OnItemRenamed, (ListViewItem * item, const std::wstring &name), (override));
 	MOCK_METHOD(void, OnItemsActivated, (const std::vector<ListViewItem *> &items), (override));
-	MOCK_METHOD(void, OnItemsDeleted, (const std::vector<ListViewItem *> &items), (override));
+	MOCK_METHOD(void, OnItemsRemoved,
+		(const std::vector<ListViewItem *> &items, RemoveMode removeMode), (override));
 	MOCK_METHOD(void, OnItemsCopied, (const std::vector<ListViewItem *> &items), (override));
 	MOCK_METHOD(void, OnItemsCut, (const std::vector<ListViewItem *> &items), (override));
 	MOCK_METHOD(void, OnPaste, (ListViewItem * lastSelectedItemOpt), (override));
@@ -409,7 +410,11 @@ TEST_F(ListViewKeyPressTest, Paste)
 
 TEST_F(ListViewKeyPressTest, Delete)
 {
-	EXPECT_CALL(m_delegate, OnItemsDeleted(ElementsAre(m_item1)));
+	EXPECT_CALL(m_delegate, OnItemsRemoved(ElementsAre(m_item1), RemoveMode::Standard));
+	SendSimulatedKeyPress(m_listViewWindow.get(), VK_DELETE);
+
+	EXPECT_CALL(m_delegate, OnItemsRemoved(ElementsAre(m_item1), RemoveMode::Permanent));
+	m_keyboardState.SetShiftDown(true);
 	SendSimulatedKeyPress(m_listViewWindow.get(), VK_DELETE);
 }
 
@@ -417,6 +422,6 @@ TEST_F(ListViewKeyPressTest, NoSelection)
 {
 	// Key presses like this should have no effect if no items are selected.
 	m_listView->DeselectAllItems();
-	EXPECT_CALL(m_delegate, OnItemsDeleted(_)).Times(0);
+	EXPECT_CALL(m_delegate, OnItemsRemoved(_, _)).Times(0);
 	SendSimulatedKeyPress(m_listViewWindow.get(), VK_DELETE);
 }

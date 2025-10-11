@@ -741,7 +741,11 @@ void ListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 
 	case VK_DELETE:
 		WithNonEmptySelection(
-			[this](const auto &selectedItems) { m_delegate->OnItemsDeleted(selectedItems); });
+			[this](const auto &selectedItems)
+			{
+				m_delegate->OnItemsRemoved(selectedItems,
+					m_keyboardState->IsShiftDown() ? RemoveMode::Permanent : RemoveMode::Standard);
+			});
 		break;
 	}
 }
@@ -1029,9 +1033,11 @@ void ListView::NoOpDelegate::OnItemsActivated(const std::vector<ListViewItem *> 
 	UNREFERENCED_PARAMETER(items);
 }
 
-void ListView::NoOpDelegate::OnItemsDeleted(const std::vector<ListViewItem *> &items)
+void ListView::NoOpDelegate::OnItemsRemoved(const std::vector<ListViewItem *> &items,
+	RemoveMode removeMode)
 {
 	UNREFERENCED_PARAMETER(items);
+	UNREFERENCED_PARAMETER(removeMode);
 }
 
 void ListView::NoOpDelegate::OnItemsCopied(const std::vector<ListViewItem *> &items)

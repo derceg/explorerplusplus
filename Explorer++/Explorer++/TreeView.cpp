@@ -359,7 +359,8 @@ LRESULT TreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 		break;
 
 	case VK_DELETE:
-		OnDeletePressed();
+		OnDeletePressed(
+			m_keyboardState->IsShiftDown() ? RemoveMode::Permanent : RemoveMode::Standard);
 		break;
 	}
 
@@ -373,7 +374,7 @@ LRESULT TreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 	return 0;
 }
 
-void TreeView::OnDeletePressed()
+void TreeView::OnDeletePressed(RemoveMode removeMode)
 {
 	auto *node = GetSelectedNode();
 
@@ -382,7 +383,7 @@ void TreeView::OnDeletePressed()
 		return;
 	}
 
-	m_delegate->OnNodeRemoved(node);
+	m_delegate->OnNodeRemoved(node, removeMode);
 }
 
 bool TreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
@@ -675,9 +676,10 @@ bool TreeView::NoOpDelegate::OnNodeRenamed(TreeViewNode *targetNode, const std::
 	return false;
 }
 
-void TreeView::NoOpDelegate::OnNodeRemoved(TreeViewNode *targetNode)
+void TreeView::NoOpDelegate::OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode)
 {
 	UNREFERENCED_PARAMETER(targetNode);
+	UNREFERENCED_PARAMETER(removeMode);
 }
 
 void TreeView::NoOpDelegate::OnNodeCopied(TreeViewNode *targetNode)

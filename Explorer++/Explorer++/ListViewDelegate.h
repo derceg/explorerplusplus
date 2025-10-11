@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/RemoveMode.h"
 #include <string>
 #include <vector>
 
@@ -17,7 +18,8 @@ public:
 
 	virtual void OnItemsActivated(const std::vector<ListViewItem *> &items) = 0;
 	virtual bool OnItemRenamed(ListViewItem *item, const std::wstring &name) = 0;
-	virtual void OnItemsDeleted(const std::vector<ListViewItem *> &items) = 0;
+	virtual void OnItemsRemoved(const std::vector<ListViewItem *> &items,
+		RemoveMode removeMode) = 0;
 	virtual void OnItemsCopied(const std::vector<ListViewItem *> &items) = 0;
 	virtual void OnItemsCut(const std::vector<ListViewItem *> &items) = 0;
 	virtual void OnPaste(ListViewItem *lastSelectedItemOpt) = 0;

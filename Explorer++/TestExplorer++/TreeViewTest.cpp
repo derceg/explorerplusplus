@@ -46,7 +46,8 @@ class TreeViewDelegateMock : public TreeViewDelegate
 public:
 	MOCK_METHOD(bool, OnNodeRenamed, (TreeViewNode * targetNode, const std::wstring &name),
 		(override));
-	MOCK_METHOD(void, OnNodeRemoved, (TreeViewNode * targetNode), (override));
+	MOCK_METHOD(void, OnNodeRemoved, (TreeViewNode * targetNode, RemoveMode removeMode),
+		(override));
 	MOCK_METHOD(void, OnNodeCopied, (TreeViewNode * targetNode), (override));
 	MOCK_METHOD(void, OnNodeCut, (TreeViewNode * targetNode), (override));
 	MOCK_METHOD(void, OnPaste, (TreeViewNode * targetNode), (override));
@@ -216,6 +217,10 @@ TEST_F(TreeViewKeyPressTest, Paste)
 
 TEST_F(TreeViewKeyPressTest, Delete)
 {
-	EXPECT_CALL(m_delegate, OnNodeRemoved(m_node2));
+	EXPECT_CALL(m_delegate, OnNodeRemoved(m_node2, RemoveMode::Standard));
+	SendSimulatedKeyPress(m_treeViewWindow.get(), VK_DELETE);
+
+	EXPECT_CALL(m_delegate, OnNodeRemoved(m_node2, RemoveMode::Permanent));
+	m_keyboardState.SetShiftDown(true);
 	SendSimulatedKeyPress(m_treeViewWindow.get(), VK_DELETE);
 }

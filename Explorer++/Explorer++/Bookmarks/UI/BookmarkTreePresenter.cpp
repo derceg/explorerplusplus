@@ -98,8 +98,10 @@ bool BookmarkTreePresenter::OnNodeRenamed(TreeViewNode *targetNode, const std::w
 	return true;
 }
 
-void BookmarkTreePresenter::OnNodeRemoved(TreeViewNode *targetNode)
+void BookmarkTreePresenter::OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode)
 {
+	UNREFERENCED_PARAMETER(removeMode);
+
 	m_bookmarkTree->RemoveBookmarkItem(m_adapter->GetBookmarkForNode(targetNode));
 }
 

@@ -474,6 +474,9 @@
     <ClInclude Include="AutoReset.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="RemoveMode.h">
+      <Filter>Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

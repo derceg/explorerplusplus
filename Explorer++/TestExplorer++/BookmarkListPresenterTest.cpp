@@ -466,7 +466,7 @@ TEST_F(BookmarkListPresenterTest, OnItemRenamed)
 	EXPECT_EQ(bookmark->GetName(), updatedName);
 }
 
-TEST_F(BookmarkListPresenterTest, OnItemsDeleted)
+TEST_F(BookmarkListPresenterTest, OnItemsRemoved)
 {
 	auto *targetFolder = m_bookmarkTree.GetOtherBookmarksFolder();
 	auto *bookmark = m_bookmarkTree.AddBookmarkItem(targetFolder,
@@ -479,8 +479,9 @@ TEST_F(BookmarkListPresenterTest, OnItemsDeleted)
 
 	auto *delegate = presenter->GetDelegateForTesting();
 	auto *model = presenter->GetModelForTesting();
-	delegate->OnItemsDeleted(
-		{ model->GetItemForBookmark(bookmark), model->GetItemForBookmark(folder) });
+	delegate->OnItemsRemoved(
+		{ model->GetItemForBookmark(bookmark), model->GetItemForBookmark(folder) },
+		RemoveMode::Standard);
 	EXPECT_EQ(targetFolder->GetChildren().size(), 0u);
 }
 

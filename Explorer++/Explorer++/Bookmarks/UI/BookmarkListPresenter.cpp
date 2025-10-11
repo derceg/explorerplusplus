@@ -218,8 +218,11 @@ bool BookmarkListPresenter::OnItemRenamed(ListViewItem *item, const std::wstring
 	return true;
 }
 
-void BookmarkListPresenter::OnItemsDeleted(const std::vector<ListViewItem *> &items)
+void BookmarkListPresenter::OnItemsRemoved(const std::vector<ListViewItem *> &items,
+	RemoveMode removeMode)
 {
+	UNREFERENCED_PARAMETER(removeMode);
+
 	BookmarkHelper::RemoveBookmarks(m_bookmarkTree, GetBookmarksForItems(items));
 }
 

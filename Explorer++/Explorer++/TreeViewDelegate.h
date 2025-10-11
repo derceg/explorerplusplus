@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/RemoveMode.h"
 #include <string>
 
 class TreeViewNode;
@@ -15,7 +16,7 @@ public:
 	virtual ~TreeViewDelegate() = default;
 
 	virtual bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) = 0;
-	virtual void OnNodeRemoved(TreeViewNode *targetNode) = 0;
+	virtual void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) = 0;
 	virtual void OnNodeCopied(TreeViewNode *targetNode) = 0;
 	virtual void OnNodeCut(TreeViewNode *targetNode) = 0;
 	virtual void OnPaste(TreeViewNode *targetNode) = 0;

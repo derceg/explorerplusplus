@@ -330,7 +330,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeRemoved)
 	auto *delegate = presenter->GetDelegateForTesting();
 	auto *adaptor = presenter->GetAdaptorForTesting();
 	auto guid = folder1->GetGUID();
-	delegate->OnNodeRemoved(adaptor->GetNodeForBookmark(folder1));
+	delegate->OnNodeRemoved(adaptor->GetNodeForBookmark(folder1), RemoveMode::Standard);
 
 	EXPECT_EQ(m_bookmarkTree.MaybeGetBookmarkItemById(guid), nullptr);
 }

@@ -81,7 +81,7 @@ private:
 	// ListViewDelegate
 	void OnItemsActivated(const std::vector<ListViewItem *> &items) override;
 	bool OnItemRenamed(ListViewItem *item, const std::wstring &name) override;
-	void OnItemsDeleted(const std::vector<ListViewItem *> &items) override;
+	void OnItemsRemoved(const std::vector<ListViewItem *> &items, RemoveMode removeMode) override;
 	void OnItemsCopied(const std::vector<ListViewItem *> &items) override;
 	void OnItemsCut(const std::vector<ListViewItem *> &items) override;
 	void OnPaste(ListViewItem *lastSelectedItemOpt) override;
