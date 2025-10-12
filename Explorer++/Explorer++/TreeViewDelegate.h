@@ -25,4 +25,5 @@ public:
 	virtual void OnSelectionChanged(TreeViewNode *selectedNode) = 0;
 	virtual void OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen) = 0;
 	virtual void OnBeginDrag(TreeViewNode *targetNode) = 0;
+	virtual void OnBeginRightButtonDrag(TreeViewNode *targetNode) = 0;
 };

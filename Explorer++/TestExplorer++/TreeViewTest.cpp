@@ -58,6 +58,7 @@ public:
 	MOCK_METHOD(void, OnShowContextMenu, (TreeViewNode * targetNode, const POINT &ptScreen),
 		(override));
 	MOCK_METHOD(void, OnBeginDrag, (TreeViewNode * targetNode), (override));
+	MOCK_METHOD(void, OnBeginRightButtonDrag, (TreeViewNode * targetNode), (override));
 };
 
 }

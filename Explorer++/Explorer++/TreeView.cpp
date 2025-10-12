@@ -318,6 +318,10 @@ LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			case TVN_BEGINDRAG:
 				OnBeginDrag(reinterpret_cast<NMTREEVIEW *>(lParam));
 				break;
+
+			case TVN_BEGINRDRAG:
+				OnBeginRightButtonDrag(reinterpret_cast<NMTREEVIEW *>(lParam));
+				break;
 			}
 		}
 		break;
@@ -514,6 +518,11 @@ void TreeView::OnSelectionChanged(const NMTREEVIEW *notifyInfo)
 void TreeView::OnBeginDrag(const NMTREEVIEW *notifyInfo)
 {
 	m_delegate->OnBeginDrag(GetNodeForHandle(notifyInfo->itemNew.hItem));
+}
+
+void TreeView::OnBeginRightButtonDrag(const NMTREEVIEW *notifyInfo)
+{
+	m_delegate->OnBeginRightButtonDrag(GetNodeForHandle(notifyInfo->itemNew.hItem));
 }
 
 void TreeView::SetImageList(wil::unique_himagelist imageList)
@@ -780,6 +789,11 @@ void TreeView::NoOpDelegate::OnShowContextMenu(TreeViewNode *targetNode, const P
 }
 
 void TreeView::NoOpDelegate::OnBeginDrag(TreeViewNode *targetNode)
+{
+	UNREFERENCED_PARAMETER(targetNode);
+}
+
+void TreeView::NoOpDelegate::OnBeginRightButtonDrag(TreeViewNode *targetNode)
 {
 	UNREFERENCED_PARAMETER(targetNode);
 }

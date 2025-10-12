@@ -204,6 +204,11 @@ void BookmarkTreePresenter::OnBeginDrag(TreeViewNode *targetNode)
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
+void BookmarkTreePresenter::OnBeginRightButtonDrag(TreeViewNode *targetNode)
+{
+	UNREFERENCED_PARAMETER(targetNode);
+}
+
 void BookmarkTreePresenter::StartRenamingFolder(BookmarkItem *folder)
 {
 	m_view->StartRenamingNode(m_adapter->GetNodeForBookmark(folder));

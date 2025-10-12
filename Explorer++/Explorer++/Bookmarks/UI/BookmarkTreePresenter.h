@@ -87,6 +87,7 @@ private:
 	void OnSelectionChanged(TreeViewNode *selectedNode) override;
 	void OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen) override;
 	void OnBeginDrag(TreeViewNode *targetNode) override;
+	void OnBeginRightButtonDrag(TreeViewNode *targetNode) override;
 
 	// BookmarkTreeViewContextMenuDelegate
 	void StartRenamingFolder(BookmarkItem *folder) override;

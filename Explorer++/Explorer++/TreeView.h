@@ -78,6 +78,7 @@ private:
 		void OnSelectionChanged(TreeViewNode *selectedNode) override;
 		void OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen) override;
 		void OnBeginDrag(TreeViewNode *targetNode) override;
+		void OnBeginRightButtonDrag(TreeViewNode *targetNode) override;
 	};
 
 	void AddNodeRecursive(TreeViewNode *node);
@@ -103,6 +104,7 @@ private:
 	LRESULT EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnSelectionChanged(const NMTREEVIEW *notifyInfo);
 	void OnBeginDrag(const NMTREEVIEW *notifyInfo);
+	void OnBeginRightButtonDrag(const NMTREEVIEW *notifyInfo);
 
 	void UpdateNodeState(const TreeViewNode *node, UINT state, ItemStateOp stateOp);
 
