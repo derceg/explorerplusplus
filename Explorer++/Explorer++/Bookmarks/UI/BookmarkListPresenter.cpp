@@ -539,7 +539,7 @@ void BookmarkListPresenter::UpdateUiForDropLocation(const DropLocation &dropLoca
 	}
 	else
 	{
-		m_view->HighlightItem(m_model->GetItemForBookmark(dropLocation.parentFolder));
+		m_view->SetItemHighlighted(m_model->GetItemForBookmark(dropLocation.parentFolder), true);
 		m_highlightedItemGuid = dropLocation.parentFolder->GetGUID();
 	}
 }
@@ -561,7 +561,7 @@ void BookmarkListPresenter::RemoveDropHighlight()
 
 	if (bookmarkItem)
 	{
-		m_view->UnhighlightItem(m_model->GetItemForBookmark(bookmarkItem));
+		m_view->SetItemHighlighted(m_model->GetItemForBookmark(bookmarkItem), false);
 	}
 
 	m_highlightedItemGuid.reset();

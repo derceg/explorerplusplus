@@ -59,8 +59,7 @@ public:
 	RECT GetItemRect(const ListViewItem *item) const;
 	ListViewItem *MaybeGetItemAtPoint(const POINT &pt);
 	bool IsItemHighlighted(const ListViewItem *item) const;
-	void HighlightItem(const ListViewItem *item);
-	void UnhighlightItem(const ListViewItem *item);
+	void SetItemHighlighted(const ListViewItem *item, bool highlighted);
 	void ShowInsertMark(const ListViewItem *targetItem, InsertMarkPosition position);
 	void RemoveInsertMark();
 	int FindNextItemIndex(const POINT &pt) const;

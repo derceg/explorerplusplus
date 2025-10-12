@@ -167,14 +167,25 @@ TEST_F(TreeViewTest, ItemPosition)
 	EXPECT_EQ(m_treeView->MaybeGetNextVisibleNode(node1Origin), node2);
 }
 
+TEST_F(TreeViewTest, GhostedNode)
+{
+	const auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+
+	m_treeView->SetNodeGhosted(node, true);
+	EXPECT_TRUE(m_treeView->IsNodeGhosted(node));
+
+	m_treeView->SetNodeGhosted(node, false);
+	EXPECT_FALSE(m_treeView->IsNodeGhosted(node));
+}
+
 TEST_F(TreeViewTest, HighlightedNode)
 {
 	const auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
 
-	m_treeView->HighlightNode(node);
+	m_treeView->SetNodeHighlighted(node, true);
 	EXPECT_TRUE(m_treeView->IsNodeHighlighted(node));
 
-	m_treeView->UnhighlightNode(node);
+	m_treeView->SetNodeHighlighted(node, false);
 	EXPECT_FALSE(m_treeView->IsNodeHighlighted(node));
 }
 

@@ -639,20 +639,26 @@ TreeViewNode *TreeView::MaybeGetNextVisibleNode(const POINT &pt)
 	return GetNodeForHandle(handle);
 }
 
+bool TreeView::IsNodeGhosted(const TreeViewNode *node) const
+{
+	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_CUT);
+	return WI_IsFlagSet(state, TVIS_CUT);
+}
+
+void TreeView::SetNodeGhosted(const TreeViewNode *node, bool ghosted)
+{
+	UpdateNodeState(node, TVIS_CUT, ghosted ? ItemStateOp::Set : ItemStateOp::Clear);
+}
+
 bool TreeView::IsNodeHighlighted(const TreeViewNode *node) const
 {
 	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_DROPHILITED);
 	return WI_IsFlagSet(state, TVIS_DROPHILITED);
 }
 
-void TreeView::HighlightNode(const TreeViewNode *node)
+void TreeView::SetNodeHighlighted(const TreeViewNode *node, bool highlighted)
 {
-	UpdateNodeState(node, TVIS_DROPHILITED, ItemStateOp::Set);
-}
-
-void TreeView::UnhighlightNode(const TreeViewNode *node)
-{
-	UpdateNodeState(node, TVIS_DROPHILITED, ItemStateOp::Clear);
+	UpdateNodeState(node, TVIS_DROPHILITED, highlighted ? ItemStateOp::Set : ItemStateOp::Clear);
 }
 
 void TreeView::UpdateNodeState(const TreeViewNode *node, UINT state, ItemStateOp stateOp)

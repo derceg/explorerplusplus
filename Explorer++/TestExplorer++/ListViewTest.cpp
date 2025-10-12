@@ -328,10 +328,10 @@ TEST_F(ListViewTest, HighlightedItem)
 
 	auto listView = BuildListView();
 
-	listView->HighlightItem(item);
+	listView->SetItemHighlighted(item, true);
 	EXPECT_TRUE(listView->IsItemHighlighted(item));
 
-	listView->UnhighlightItem(item);
+	listView->SetItemHighlighted(item, false);
 	EXPECT_FALSE(listView->IsItemHighlighted(item));
 }
 

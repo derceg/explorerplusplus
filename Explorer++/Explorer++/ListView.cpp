@@ -307,14 +307,9 @@ bool ListView::IsItemHighlighted(const ListViewItem *item) const
 	return WI_IsFlagSet(state, LVIS_DROPHILITED);
 }
 
-void ListView::HighlightItem(const ListViewItem *item)
+void ListView::SetItemHighlighted(const ListViewItem *item, bool highlighted)
 {
-	UpdateItemState(item, LVIS_DROPHILITED, ItemStateOp::Set);
-}
-
-void ListView::UnhighlightItem(const ListViewItem *item)
-{
-	UpdateItemState(item, LVIS_DROPHILITED, ItemStateOp::Clear);
+	UpdateItemState(item, LVIS_DROPHILITED, highlighted ? ItemStateOp::Set : ItemStateOp::Clear);
 }
 
 void ListView::UpdateItemState(const ListViewItem *item, UINT state, ItemStateOp stateOp)

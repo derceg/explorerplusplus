@@ -45,9 +45,10 @@ public:
 	RECT GetNodeRect(const TreeViewNode *node) const;
 	TreeViewNode *MaybeGetNodeAtPoint(const POINT &pt);
 	TreeViewNode *MaybeGetNextVisibleNode(const POINT &pt);
+	bool IsNodeGhosted(const TreeViewNode *node) const;
+	void SetNodeGhosted(const TreeViewNode *node, bool ghosted);
 	bool IsNodeHighlighted(const TreeViewNode *node) const;
-	void HighlightNode(const TreeViewNode *node);
-	void UnhighlightNode(const TreeViewNode *node);
+	void SetNodeHighlighted(const TreeViewNode *node, bool highlighted);
 	void ShowInsertMark(const TreeViewNode *targetNode, InsertMarkPosition position);
 	void RemoveInsertMark();
 

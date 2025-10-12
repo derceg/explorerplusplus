@@ -349,7 +349,7 @@ void BookmarkTreePresenter::UpdateUiForDropLocation(const DropLocation &dropLoca
 	{
 		m_view->RemoveInsertMark();
 
-		m_view->HighlightNode(m_adapter->GetNodeForBookmark(dropLocation.parentFolder));
+		m_view->SetNodeHighlighted(m_adapter->GetNodeForBookmark(dropLocation.parentFolder), true);
 		m_highlightedItemGuid = dropLocation.parentFolder->GetGUID();
 	}
 	else
@@ -404,7 +404,7 @@ void BookmarkTreePresenter::RemoveDropHighlight()
 
 	if (bookmarkFolder)
 	{
-		m_view->UnhighlightNode(m_adapter->GetNodeForBookmark(bookmarkFolder));
+		m_view->SetNodeHighlighted(m_adapter->GetNodeForBookmark(bookmarkFolder), false);
 	}
 
 	m_highlightedItemGuid.reset();
