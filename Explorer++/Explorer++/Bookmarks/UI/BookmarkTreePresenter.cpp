@@ -9,7 +9,9 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeViewAdapter.h"
 #include "Bookmarks/UI/BookmarkTreeViewNode.h"
+#include "BrowserList.h"
 #include "MainResource.h"
+#include "MouseEvent.h"
 #include "NoOpMenuHelpTextHost.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
@@ -23,17 +25,27 @@
 #include <wil/resource.h>
 
 BookmarkTreePresenter::BookmarkTreePresenter(std::unique_ptr<TreeView> view,
+	BookmarkTree *bookmarkTree, const BrowserList *browserListOpt, ClipboardStore *clipboardStore,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
 	const std::unordered_set<std::wstring> &initiallyExpandedBookmarkIds,
-	const std::optional<std::wstring> &initiallySelectedBookmarkId) :
+	const std::optional<std::wstring> &initiallySelectedBookmarkId,
+	MiddleClickOpenPolicy middleClickOpenPolicy) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(std::move(view)),
+	m_bookmarkTree(bookmarkTree),
+	m_browserListOpt(browserListOpt),
+	m_clipboardStore(clipboardStore),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
-	m_bookmarkTree(bookmarkTree),
-	m_clipboardStore(clipboardStore)
+	m_middleClickOpenPolicy(middleClickOpenPolicy)
 {
+	if (m_middleClickOpenPolicy == MiddleClickOpenPolicy::Enabled)
+	{
+		// For the middle-click-to-open functionality to work, a BrowserList instance must be
+		// supplied.
+		CHECK(m_browserListOpt);
+	}
+
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(m_view->GetHWND());
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
@@ -83,6 +95,25 @@ TreeView *BookmarkTreePresenter::GetView()
 const TreeView *BookmarkTreePresenter::GetView() const
 {
 	return m_view.get();
+}
+
+void BookmarkTreePresenter::OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event)
+{
+	if (m_middleClickOpenPolicy == MiddleClickOpenPolicy::Disabled)
+	{
+		return;
+	}
+
+	auto *browser = m_browserListOpt->GetLastActive();
+
+	if (!browser)
+	{
+		return;
+	}
+
+	auto *bookmarkFolder = m_adapter->GetBookmarkForNode(targetNode);
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkFolder,
+		DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey), browser);
 }
 
 bool BookmarkTreePresenter::OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name)

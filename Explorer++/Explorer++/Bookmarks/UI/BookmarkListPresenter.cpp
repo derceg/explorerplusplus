@@ -11,6 +11,7 @@
 #include "Bookmarks/UI/BookmarkColumnHelper.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkListViewModel.h"
+#include "BrowserList.h"
 #include "ListView.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
@@ -27,15 +28,15 @@
 
 BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	HINSTANCE resourceInstance, BookmarkTree *bookmarkTree, const BookmarkColumnModel &columnModel,
-	std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection, BrowserWindow *browser,
-	const Config *config, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
-	PlatformContext *platformContext) :
+	std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
+	const BrowserList *browserList, const Config *config,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+	IconFetcher *iconFetcher, PlatformContext *platformContext) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(std::move(view)),
 	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
-	m_browser(browser),
+	m_browserList(browserList),
 	m_config(config),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
@@ -193,11 +194,18 @@ void BookmarkListPresenter::OnItemsActivated(const std::vector<ListViewItem *> &
 	}
 	else
 	{
+		auto *browser = m_browserList->GetLastActive();
+
+		if (!browser)
+		{
+			return;
+		}
+
 		OpenFolderDisposition disposition = OpenFolderDisposition::NewTabDefault;
 
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
-			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_browser);
+			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, browser);
 
 			disposition = OpenFolderDisposition::BackgroundTab;
 		}
@@ -301,7 +309,7 @@ void BookmarkListPresenter::OnNewBookmark()
 
 	const auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree,
 		BookmarkItem::Type::Bookmark, m_currentBookmarkFolder, targetIndex, m_view->GetHWND(),
-		m_browser, m_acceleratorManager, m_resourceLoader, m_platformContext);
+		nullptr, m_acceleratorManager, m_resourceLoader, m_platformContext);
 
 	if (!bookmark)
 	{
@@ -319,9 +327,16 @@ void BookmarkListPresenter::OnNewBookmark()
 void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
 	const POINT &ptScreen)
 {
+	auto *browser = m_browserList->GetLastActive();
+
+	if (!browser)
+	{
+		return;
+	}
+
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-		GetBookmarksForItems(items), m_resourceLoader, m_browser, m_view->GetHWND(),
+		GetBookmarksForItems(items), m_resourceLoader, browser, m_view->GetHWND(),
 		m_platformContext);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }

@@ -886,9 +886,9 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 			[this, hwnd]
 			{
 				return ManageBookmarksDialog::Create(m_app->GetResourceLoader(),
-					m_app->GetResourceInstance(), hwnd, this, m_config,
-					m_app->GetAcceleratorManager(), &m_iconFetcher, m_app->GetBookmarkTree(),
-					m_app->GetPlatformContext());
+					m_app->GetResourceInstance(), hwnd, m_app->GetBookmarkTree(),
+					m_app->GetBrowserList(), m_config, m_app->GetAcceleratorManager(),
+					&m_iconFetcher, m_app->GetPlatformContext());
 			});
 		break;
 

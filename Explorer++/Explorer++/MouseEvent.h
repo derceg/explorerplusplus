@@ -18,6 +18,12 @@ struct MouseEvent
 	const POINT ptClient;
 	const bool shiftKey;
 	const bool ctrlKey;
+
+	bool operator==(const MouseEvent &other) const
+	{
+		return ptClient.x == other.ptClient.x && ptClient.y == other.ptClient.y
+			&& shiftKey == other.shiftKey && ctrlKey == other.ctrlKey;
+	}
 };
 
 using MouseEventCallback = std::function<void(const MouseEvent &event)>;

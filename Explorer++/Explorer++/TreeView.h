@@ -13,6 +13,7 @@
 #include <wil/resource.h>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 class KeyboardState;
@@ -68,6 +69,7 @@ private:
 	class NoOpDelegate : public TreeViewDelegate
 	{
 	public:
+		void OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event) override;
 		bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) override;
 		void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) override;
 		void OnNodeCopied(TreeViewNode *targetNode) override;
@@ -85,6 +87,11 @@ private:
 		const TreeViewNode *newParent, size_t newIndex);
 	void RemoveNode(TreeViewNode *node);
 	void RemoveAllNodes();
+
+	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnCaptureChanged(HWND target);
+	void OnMiddleButtonDown(const POINT &pt);
+	void OnMiddleButtonUp(const POINT &pt);
 
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnShowContextMenu(const POINT &ptScreen);
@@ -115,6 +122,7 @@ private:
 	boost::bimap<boost::bimaps::unordered_set_of<HTREEITEM>,
 		boost::bimaps::unordered_set_of<TreeViewNode *, PtrHash, std::equal_to<void>>>
 		m_handleToNodeMap;
+	std::optional<int> m_middleClickNodeId;
 	bool m_blockSelectionChangeEvent = false;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::unique_ptr<WindowSubclass> m_editSubclass;

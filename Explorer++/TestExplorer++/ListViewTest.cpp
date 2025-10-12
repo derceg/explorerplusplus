@@ -51,15 +51,15 @@ protected:
 
 		// The control needs to have a non-zero width/height so that calls to
 		// ListView::MaybeGetItemAtPoint() succeed.
-		m_listViewWindow.reset(CreateWindow(WC_LISTVIEW, L"", WS_POPUP | LVS_REPORT, 0, 0, 1000,
-			1000, m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr));
+		m_listViewWindow = CreateWindow(WC_LISTVIEW, L"", WS_POPUP | LVS_REPORT, 0, 0, 1000, 1000,
+			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		ASSERT_NE(m_listViewWindow, nullptr);
 	}
 
 	std::unique_ptr<ListView> BuildListView(ListViewModel *model = nullptr)
 	{
 		auto listView =
-			std::make_unique<ListView>(m_listViewWindow.get(), &m_keyboardState, &m_resourceLoader);
+			std::make_unique<ListView>(m_listViewWindow, &m_keyboardState, &m_resourceLoader);
 		listView->SetModel(model ? model : &m_model);
 		return listView;
 	}
@@ -69,7 +69,7 @@ protected:
 		auto index = m_model.GetColumnModel()->MaybeGetColumnVisibleIndex(columnId);
 		ASSERT_TRUE(index.has_value());
 
-		HWND header = ListView_GetHeader(m_listViewWindow.get());
+		HWND header = ListView_GetHeader(m_listViewWindow);
 		ASSERT_NE(header, nullptr);
 
 		RECT rect;
@@ -90,7 +90,7 @@ protected:
 	ResourceLoaderFake m_resourceLoader;
 
 	wil::unique_hwnd m_parentWindow;
-	wil::unique_hwnd m_listViewWindow;
+	HWND m_listViewWindow = nullptr;
 	ListViewModelFake m_model;
 };
 
@@ -187,7 +187,7 @@ TEST_F(ListViewTest, ColumnResized)
 		columnModel->GetColumnById(columnModel->GetColumnIdAtVisibleIndex(targetIndex));
 
 	int updatedWidth = column.width + 10;
-	auto res = ListView_SetColumnWidth(m_listViewWindow.get(), targetIndex, updatedWidth);
+	auto res = ListView_SetColumnWidth(m_listViewWindow, targetIndex, updatedWidth);
 	ASSERT_TRUE(res);
 	EXPECT_EQ(column.width, updatedWidth);
 }
@@ -373,13 +373,13 @@ protected:
 TEST_F(ListViewKeyPressTest, Enter)
 {
 	EXPECT_CALL(m_delegate, OnItemsActivated(ElementsAre(m_item1)));
-	SendSimulatedKeyPress(m_listViewWindow.get(), VK_RETURN);
+	SendSimulatedKeyPress(m_listViewWindow, VK_RETURN);
 }
 
 TEST_F(ListViewKeyPressTest, SelectAll)
 {
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_listViewWindow.get(), 'A');
+	SendSimulatedKeyPress(m_listViewWindow, 'A');
 	EXPECT_THAT(m_listView->GetSelectedItems(), ElementsAre(m_item1, m_item2));
 }
 
@@ -387,14 +387,14 @@ TEST_F(ListViewKeyPressTest, Copy)
 {
 	EXPECT_CALL(m_delegate, OnItemsCopied(ElementsAre(m_item1)));
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_listViewWindow.get(), 'C');
+	SendSimulatedKeyPress(m_listViewWindow, 'C');
 }
 
 TEST_F(ListViewKeyPressTest, Cut)
 {
 	EXPECT_CALL(m_delegate, OnItemsCut(ElementsAre(m_item1)));
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_listViewWindow.get(), 'X');
+	SendSimulatedKeyPress(m_listViewWindow, 'X');
 }
 
 TEST_F(ListViewKeyPressTest, Paste)
@@ -405,17 +405,17 @@ TEST_F(ListViewKeyPressTest, Paste)
 	// So, no item should be passed to OnPaste().
 	EXPECT_CALL(m_delegate, OnPaste(nullptr));
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_listViewWindow.get(), 'V');
+	SendSimulatedKeyPress(m_listViewWindow, 'V');
 }
 
 TEST_F(ListViewKeyPressTest, Delete)
 {
 	EXPECT_CALL(m_delegate, OnItemsRemoved(ElementsAre(m_item1), RemoveMode::Standard));
-	SendSimulatedKeyPress(m_listViewWindow.get(), VK_DELETE);
+	SendSimulatedKeyPress(m_listViewWindow, VK_DELETE);
 
 	EXPECT_CALL(m_delegate, OnItemsRemoved(ElementsAre(m_item1), RemoveMode::Permanent));
 	m_keyboardState.SetShiftDown(true);
-	SendSimulatedKeyPress(m_listViewWindow.get(), VK_DELETE);
+	SendSimulatedKeyPress(m_listViewWindow, VK_DELETE);
 }
 
 TEST_F(ListViewKeyPressTest, NoSelection)
@@ -423,5 +423,5 @@ TEST_F(ListViewKeyPressTest, NoSelection)
 	// Key presses like this should have no effect if no items are selected.
 	m_listView->DeselectAllItems();
 	EXPECT_CALL(m_delegate, OnItemsRemoved(_, _)).Times(0);
-	SendSimulatedKeyPress(m_listViewWindow.get(), VK_DELETE);
+	SendSimulatedKeyPress(m_listViewWindow, VK_DELETE);
 }

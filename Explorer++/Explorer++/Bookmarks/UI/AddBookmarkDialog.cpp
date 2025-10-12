@@ -88,9 +88,10 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
 		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW),
 			m_platformContext->GetKeyboardState()),
-		m_acceleratorManager, m_resourceLoader, m_bookmarkTree,
-		m_platformContext->GetClipboardStore(), m_persistentSettings->m_expandedBookmarkIds,
-		m_persistentSettings->m_selectedBookmarkId);
+		m_bookmarkTree, nullptr, m_platformContext->GetClipboardStore(), m_acceleratorManager,
+		m_resourceLoader, m_persistentSettings->m_expandedBookmarkIds,
+		m_persistentSettings->m_selectedBookmarkId,
+		BookmarkTreePresenter::MiddleClickOpenPolicy::Disabled);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);

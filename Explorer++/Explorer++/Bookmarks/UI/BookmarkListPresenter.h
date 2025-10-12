@@ -20,7 +20,7 @@ class BookmarkColumnModel;
 class BookmarkIconManager;
 class BookmarkListViewModel;
 class BookmarkTree;
-class BrowserWindow;
+class BrowserList;
 struct Config;
 class IconFetcher;
 class ListView;
@@ -38,9 +38,9 @@ public:
 	BookmarkListPresenter(std::unique_ptr<ListView> view, HINSTANCE resourceInstance,
 		BookmarkTree *bookmarkTree, const BookmarkColumnModel &columnModel,
 		std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
-		BrowserWindow *browser, const Config *config, const AcceleratorManager *acceleratorManager,
-		const ResourceLoader *resourceLoader, IconFetcher *iconFetcher,
-		PlatformContext *platformContext);
+		const BrowserList *browserList, const Config *config,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
+		IconFetcher *iconFetcher, PlatformContext *platformContext);
 	~BookmarkListPresenter();
 
 	ListView *GetView();
@@ -111,7 +111,7 @@ private:
 	const std::unique_ptr<ListView> m_view;
 	HINSTANCE m_resourceInstance;
 	BookmarkTree *const m_bookmarkTree;
-	BrowserWindow *const m_browser;
+	const BrowserList *const m_browserList;
 	const Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;

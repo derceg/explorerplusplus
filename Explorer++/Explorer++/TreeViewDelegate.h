@@ -7,6 +7,7 @@
 #include "../Helper/RemoveMode.h"
 #include <string>
 
+struct MouseEvent;
 class TreeViewNode;
 
 // // Allows the TreeView controller to be notified of events that occur within the view.
@@ -15,6 +16,7 @@ class TreeViewDelegate
 public:
 	virtual ~TreeViewDelegate() = default;
 
+	virtual void OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event) = 0;
 	virtual bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) = 0;
 	virtual void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) = 0;
 	virtual void OnNodeCopied(TreeViewNode *targetNode) = 0;

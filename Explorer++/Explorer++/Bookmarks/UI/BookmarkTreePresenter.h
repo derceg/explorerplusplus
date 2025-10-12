@@ -20,6 +20,7 @@ class AcceleratorManager;
 class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreeViewAdapter;
+class BrowserList;
 class ClipboardStore;
 class ResourceLoader;
 class TreeView;
@@ -32,11 +33,21 @@ class BookmarkTreePresenter :
 	private BookmarkTreeViewContextMenuDelegate
 {
 public:
-	BookmarkTreePresenter(std::unique_ptr<TreeView> view,
+	enum class MiddleClickOpenPolicy
+	{
+		// Indicates that nothing will happen if a folder in the tree is middle-clicked.
+		Disabled,
+
+		// Indicates that the items within a folder will be opened if that folder is middle-clicked.
+		Enabled
+	};
+
+	BookmarkTreePresenter(std::unique_ptr<TreeView> view, BookmarkTree *bookmarkTree,
+		const BrowserList *browserListOpt, ClipboardStore *clipboardStore,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		BookmarkTree *bookmarkTree, ClipboardStore *clipboardStore,
 		const std::unordered_set<std::wstring> &initiallyExpandedBookmarkIds,
-		const std::optional<std::wstring> &initiallySelectedBookmarkId = std::nullopt);
+		const std::optional<std::wstring> &initiallySelectedBookmarkId = std::nullopt,
+		MiddleClickOpenPolicy middleClickOpenPolicy = MiddleClickOpenPolicy::Enabled);
 	~BookmarkTreePresenter();
 
 	TreeView *GetView();
@@ -67,6 +78,7 @@ private:
 		const std::optional<std::wstring> &initiallySelectedBookmarkId);
 
 	// TreeViewDelegate
+	void OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event) override;
 	bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) override;
 	void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) override;
 	void OnNodeCopied(TreeViewNode *targetNode) override;
@@ -87,11 +99,13 @@ private:
 	void RemoveDropHighlight();
 
 	const std::unique_ptr<TreeView> m_view;
+	BookmarkTree *const m_bookmarkTree;
+	const BrowserList *const m_browserListOpt;
+	ClipboardStore *const m_clipboardStore;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
+	const MiddleClickOpenPolicy m_middleClickOpenPolicy;
 	IconImageListMapping m_imageListMappings;
-	BookmarkTree *const m_bookmarkTree;
-	ClipboardStore *const m_clipboardStore;
 	std::unique_ptr<BookmarkTreeViewAdapter> m_adapter;
 
 	// This will only be set when an item is being dragged over a folder in the view.

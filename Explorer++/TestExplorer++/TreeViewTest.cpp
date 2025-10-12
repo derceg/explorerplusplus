@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "TreeView.h"
 #include "KeyboardStateFake.h"
+#include "MouseEvent.h"
 #include "TreeViewAdapter.h"
 #include "../Helper/Helper.h"
 #include <gmock/gmock.h>
@@ -44,6 +45,8 @@ public:
 class TreeViewDelegateMock : public TreeViewDelegate
 {
 public:
+	MOCK_METHOD(void, OnNodeMiddleClicked, (TreeViewNode * targetNode, const MouseEvent &event),
+		(override));
 	MOCK_METHOD(bool, OnNodeRenamed, (TreeViewNode * targetNode, const std::wstring &name),
 		(override));
 	MOCK_METHOD(void, OnNodeRemoved, (TreeViewNode * targetNode, RemoveMode removeMode),
@@ -68,18 +71,24 @@ protected:
 			GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_parentWindow, nullptr);
 
-		m_treeViewWindow.reset(CreateWindow(WC_TREEVIEW, L"", WS_POPUP, 0, 0, 1000, 1000,
-			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr));
+		m_treeViewWindow = CreateWindow(WC_TREEVIEW, L"", WS_POPUP, 0, 0, 1000, 1000,
+			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		ASSERT_NE(m_treeViewWindow, nullptr);
 
-		m_treeView = std::make_unique<TreeView>(m_treeViewWindow.get(), &m_keyboardState);
+		m_treeView = std::make_unique<TreeView>(m_treeViewWindow, &m_keyboardState);
 		m_treeView->SetAdapter(&m_adapter);
 		m_treeView->SetDelegate(&m_delegate);
 	}
 
+	static void SimulateMiddleClick(HWND hwnd, const POINT &ptClient)
+	{
+		SendMessage(hwnd, WM_MBUTTONDOWN, 0, MAKELPARAM(ptClient.x, ptClient.y));
+		SendMessage(hwnd, WM_MBUTTONUP, 0, MAKELPARAM(ptClient.x, ptClient.y));
+	}
+
 	KeyboardStateFake m_keyboardState;
 	wil::unique_hwnd m_parentWindow;
-	wil::unique_hwnd m_treeViewWindow;
+	HWND m_treeViewWindow = nullptr;
 	TreeViewAdapter m_adapter;
 	TreeViewDelegateMock m_delegate;
 	std::unique_ptr<TreeView> m_treeView;
@@ -178,6 +187,16 @@ TEST_F(TreeViewTest, InsertMark)
 	m_treeView->RemoveInsertMark();
 }
 
+TEST_F(TreeViewTest, MiddleClick)
+{
+	auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<FakeTreeViewNode>());
+
+	auto rect = m_treeView->GetNodeRect(node);
+	POINT pt = { rect.left, rect.top };
+	EXPECT_CALL(m_delegate, OnNodeMiddleClicked(node, MouseEvent(pt, false, false)));
+	SimulateMiddleClick(m_treeViewWindow, pt);
+}
+
 class TreeViewKeyPressTest : public TreeViewTest
 {
 protected:
@@ -198,29 +217,29 @@ TEST_F(TreeViewKeyPressTest, Copy)
 {
 	EXPECT_CALL(m_delegate, OnNodeCopied(m_node2));
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_treeViewWindow.get(), 'C');
+	SendSimulatedKeyPress(m_treeViewWindow, 'C');
 }
 
 TEST_F(TreeViewKeyPressTest, Cut)
 {
 	EXPECT_CALL(m_delegate, OnNodeCut(m_node2));
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_treeViewWindow.get(), 'X');
+	SendSimulatedKeyPress(m_treeViewWindow, 'X');
 }
 
 TEST_F(TreeViewKeyPressTest, Paste)
 {
 	EXPECT_CALL(m_delegate, OnPaste(m_node2));
 	m_keyboardState.SetCtrlDown(true);
-	SendSimulatedKeyPress(m_treeViewWindow.get(), 'V');
+	SendSimulatedKeyPress(m_treeViewWindow, 'V');
 }
 
 TEST_F(TreeViewKeyPressTest, Delete)
 {
 	EXPECT_CALL(m_delegate, OnNodeRemoved(m_node2, RemoveMode::Standard));
-	SendSimulatedKeyPress(m_treeViewWindow.get(), VK_DELETE);
+	SendSimulatedKeyPress(m_treeViewWindow, VK_DELETE);
 
 	EXPECT_CALL(m_delegate, OnNodeRemoved(m_node2, RemoveMode::Permanent));
 	m_keyboardState.SetShiftDown(true);
-	SendSimulatedKeyPress(m_treeViewWindow.get(), VK_DELETE);
+	SendSimulatedKeyPress(m_treeViewWindow, VK_DELETE);
 }

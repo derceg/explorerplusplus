@@ -6,6 +6,15 @@
 #include "TreeViewNode.h"
 #include <algorithm>
 
+TreeViewNode::TreeViewNode() : m_id(m_idCounter++)
+{
+}
+
+int TreeViewNode::GetId() const
+{
+	return m_id;
+}
+
 const TreeViewNode *TreeViewNode::GetParent() const
 {
 	return m_parent;

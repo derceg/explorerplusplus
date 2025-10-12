@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TreeView.h"
+#include "MouseEvent.h"
 #include "TestHelper.h"
 #include "TreeViewAdapter.h"
 #include "../Helper/AutoReset.h"
@@ -15,6 +16,8 @@ TreeView::TreeView(HWND hwnd, const KeyboardState *keyboardState) :
 	m_hwnd(hwnd),
 	m_keyboardState(keyboardState)
 {
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TreeView::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
 		std::bind_front(&TreeView::ParentWndProc, this)));
 }
@@ -214,6 +217,68 @@ void TreeView::RemoveAllNodes()
 {
 	auto res = TreeView_DeleteAllItems(m_hwnd);
 	CHECK(res);
+}
+
+LRESULT TreeView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_CAPTURECHANGED:
+		OnCaptureChanged(reinterpret_cast<HWND>(lParam));
+		break;
+
+	case WM_MBUTTONDOWN:
+		OnMiddleButtonDown({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+		break;
+
+	case WM_MBUTTONUP:
+		OnMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void TreeView::OnCaptureChanged(HWND target)
+{
+	if (target != m_hwnd)
+	{
+		m_middleClickNodeId.reset();
+	}
+}
+
+void TreeView::OnMiddleButtonDown(const POINT &pt)
+{
+	const auto *node = MaybeGetNodeAtPoint(pt);
+
+	if (!node)
+	{
+		return;
+	}
+
+	SetCapture(m_hwnd);
+
+	m_middleClickNodeId = node->GetId();
+}
+
+void TreeView::OnMiddleButtonUp(const POINT &pt)
+{
+	if (!m_middleClickNodeId)
+	{
+		return;
+	}
+
+	auto releaseCapture = wil::scope_exit([] { ReleaseCapture(); });
+
+	auto *node = MaybeGetNodeAtPoint(pt);
+
+	if (!node || node->GetId() != *m_middleClickNodeId)
+	{
+		return;
+	}
+
+	m_delegate->OnNodeMiddleClicked(node,
+		{ pt, m_keyboardState->IsShiftDown(), m_keyboardState->IsCtrlDown() });
 }
 
 LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -667,6 +732,12 @@ const TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle) const
 	auto itr = m_handleToNodeMap.left.find(handle);
 	CHECK(itr != m_handleToNodeMap.left.end());
 	return itr->second;
+}
+
+void TreeView::NoOpDelegate::OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event)
+{
+	UNREFERENCED_PARAMETER(targetNode);
+	UNREFERENCED_PARAMETER(event);
 }
 
 bool TreeView::NoOpDelegate::OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name)

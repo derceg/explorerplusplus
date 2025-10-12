@@ -31,25 +31,22 @@ protected:
 	{
 	}
 
-	void SetUp() override
+	auto BuildPresenter(const BookmarkColumnModel &columnModel = BookmarkColumnModel())
 	{
 		m_parentWindow.reset(CreateWindow(WC_STATIC, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
 			GetModuleHandle(nullptr), nullptr));
-		ASSERT_NE(m_parentWindow, nullptr);
+		CHECK(m_parentWindow);
 
-		m_listViewWindow.reset(CreateWindow(WC_LISTVIEW, L"",
+		HWND listViewWindow = CreateWindow(WC_LISTVIEW, L"",
 			WS_POPUP | LVS_REPORT | LVS_EDITLABELS | LVS_SHAREIMAGELISTS, 0, 0, 0, 0,
-			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr));
-		ASSERT_NE(m_listViewWindow, nullptr);
-	}
+			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
+		CHECK(listViewWindow);
 
-	auto BuildPresenter(const BookmarkColumnModel &columnModel = BookmarkColumnModel())
-	{
-		return std::make_unique<BookmarkListPresenter>(
-			std::make_unique<ListView>(m_listViewWindow.get(), m_platformContext.GetKeyboardState(),
-				&m_resourceLoader),
+		return std::make_unique<BookmarkListPresenter>(std::make_unique<ListView>(listViewWindow,
+														   m_platformContext.GetKeyboardState(),
+														   &m_resourceLoader),
 			m_resourceInstance, &m_bookmarkTree, columnModel, std::nullopt,
-			SortDirection::Ascending, m_browser, &m_config, &m_acceleratorManager,
+			SortDirection::Ascending, &m_browserList, &m_config, &m_acceleratorManager,
 			&m_resourceLoader, &m_iconFetcher, &m_platformContext);
 	}
 
@@ -82,7 +79,6 @@ protected:
 	Tab *const m_tab;
 
 	wil::unique_hwnd m_parentWindow;
-	wil::unique_hwnd m_listViewWindow;
 };
 
 TEST_F(BookmarkListPresenterTest, Items)
@@ -414,6 +410,7 @@ TEST_F(BookmarkListPresenterTest, OnBookmarkActivated)
 	auto *delegate = presenter->GetDelegateForTesting();
 	auto *model = presenter->GetModelForTesting();
 	delegate->OnItemsActivated({ model->GetItemForBookmark(bookmark) });
+	ASSERT_EQ(m_browser->GetActiveTabContainer()->GetNumTabs(), 2);
 
 	// Activating a bookmark should result in the bookmark being opened in a new tab.
 	const auto &tab = m_browser->GetActiveTabContainer()->GetTabByIndex(1);
@@ -438,6 +435,7 @@ TEST_F(BookmarkListPresenterTest, OnMultipleItemsActivated)
 	auto *model = presenter->GetModelForTesting();
 	delegate->OnItemsActivated(
 		{ model->GetItemForBookmark(folder), model->GetItemForBookmark(bookmark2) });
+	ASSERT_EQ(m_browser->GetActiveTabContainer()->GetNumTabs(), 3);
 
 	// Each of the activated items should be opened. That is, the bookmark contained within the
 	// activated folder should be opened in one tab and the second bookmark in another tab.

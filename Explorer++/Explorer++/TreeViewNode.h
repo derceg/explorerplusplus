@@ -19,7 +19,10 @@ using TreeViewNodes = std::vector<std::unique_ptr<TreeViewNode>>;
 class TreeViewNode : private boost::noncopyable
 {
 public:
+	TreeViewNode();
 	virtual ~TreeViewNode() = default;
+
+	int GetId() const;
 
 	virtual std::wstring GetText() const = 0;
 	virtual std::optional<int> GetIconIndex() const = 0;
@@ -40,6 +43,9 @@ public:
 	void VisitRecursively(std::function<void(TreeViewNode *currentNode)> callback);
 
 private:
+	static inline int m_idCounter = 1;
+	const int m_id;
+
 	TreeViewNode *m_parent = nullptr;
 	TreeViewNodes m_children;
 };
