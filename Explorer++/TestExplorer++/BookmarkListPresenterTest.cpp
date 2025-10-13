@@ -13,6 +13,7 @@
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
 #include "IconFetcherFake.h"
+#include "LabelEditHandler.h"
 #include "ListView.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellTestHelper.h"
@@ -42,9 +43,9 @@ protected:
 			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		CHECK(listViewWindow);
 
-		return std::make_unique<BookmarkListPresenter>(std::make_unique<ListView>(listViewWindow,
-														   m_platformContext.GetKeyboardState(),
-														   &m_resourceLoader),
+		return std::make_unique<BookmarkListPresenter>(
+			std::make_unique<ListView>(listViewWindow, m_platformContext.GetKeyboardState(),
+				LabelEditHandler::CreateForTest, &m_resourceLoader),
 			m_resourceInstance, &m_bookmarkTree, columnModel, std::nullopt,
 			SortDirection::Ascending, &m_browserList, &m_config, &m_acceleratorManager,
 			&m_resourceLoader, &m_iconFetcher, &m_platformContext);

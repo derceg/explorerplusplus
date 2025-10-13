@@ -12,9 +12,11 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
 
-TreeView::TreeView(HWND hwnd, const KeyboardState *keyboardState) :
+TreeView::TreeView(HWND hwnd, const KeyboardState *keyboardState,
+	LabelEditHandlerFactory labelEditHandlerFactory) :
 	m_hwnd(hwnd),
-	m_keyboardState(keyboardState)
+	m_keyboardState(keyboardState),
+	m_labelEditHandlerFactory(labelEditHandlerFactory)
 {
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TreeView::WndProc, this)));
@@ -466,16 +468,13 @@ bool TreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
 
 	HWND editControl = TreeView_GetEditControl(m_hwnd);
 	CHECK(editControl);
-	m_editSubclass = std::make_unique<WindowSubclass>(editControl,
-		std::bind_front(&TreeView::EditWndProc, this));
+	m_labelEditHandlerFactory(editControl, node->IsFile());
 
 	return false;
 }
 
 bool TreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 {
-	m_editSubclass.reset();
-
 	if (!dispInfo->item.pszText)
 	{
 		// Editing was cancelled.
@@ -484,25 +483,6 @@ bool TreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 
 	return m_delegate->OnNodeRenamed(GetNodeForHandle(dispInfo->item.hItem),
 		dispInfo->item.pszText);
-}
-
-LRESULT TreeView::EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_GETDLGCODE:
-		switch (wParam)
-		{
-		// The control may be shown within a dialog. The keys here are used when editing and should
-		// be handled by the edit control, not the parent dialog (if any).
-		case VK_ESCAPE:
-		case VK_RETURN:
-			return DLGC_WANTALLKEYS;
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 void TreeView::OnSelectionChanged(const NMTREEVIEW *notifyInfo)

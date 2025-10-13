@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "TreeView.h"
 #include "KeyboardStateFake.h"
+#include "LabelEditHandler.h"
 #include "MouseEvent.h"
 #include "TreeViewAdapter.h"
 #include "../Helper/Helper.h"
@@ -39,6 +40,11 @@ public:
 	bool CanRemove() const override
 	{
 		return true;
+	}
+
+	bool IsFile() const override
+	{
+		return false;
 	}
 };
 
@@ -76,7 +82,8 @@ protected:
 			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		ASSERT_NE(m_treeViewWindow, nullptr);
 
-		m_treeView = std::make_unique<TreeView>(m_treeViewWindow, &m_keyboardState);
+		m_treeView = std::make_unique<TreeView>(m_treeViewWindow, &m_keyboardState,
+			LabelEditHandler::CreateForTest);
 		m_treeView->SetAdapter(&m_adapter);
 		m_treeView->SetDelegate(&m_delegate);
 	}

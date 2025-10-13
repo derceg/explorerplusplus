@@ -16,6 +16,7 @@ public:
 	std::optional<int> GetIconIndex() const override;
 	bool CanRename() const override;
 	bool CanRemove() const override;
+	bool IsFile() const override;
 
 	const std::wstring &GetName() const;
 	void SetName(const std::wstring &name);

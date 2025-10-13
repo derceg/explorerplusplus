@@ -10,6 +10,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkListPresenter.h"
 #include "Bookmarks/UI/BookmarkTreePresenter.h"
+#include "LabelEditHandler.h"
 #include "ListView.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
@@ -187,7 +188,7 @@ void ManageBookmarksDialog::SetupTreeView()
 {
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
 		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW),
-			m_platformContext->GetKeyboardState()),
+			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog),
 		m_bookmarkTree, m_browserList, m_platformContext->GetClipboardStore(), m_acceleratorManager,
 		m_resourceLoader, m_persistentSettings->m_expandedBookmarkIds);
 
@@ -199,7 +200,8 @@ void ManageBookmarksDialog::SetupListView()
 {
 	m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(
 		std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
-			m_platformContext->GetKeyboardState(), m_resourceLoader),
+			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog,
+			m_resourceLoader),
 		m_resourceInstance, m_bookmarkTree, m_persistentSettings->m_listViewColumnModel,
 		std::nullopt, SortDirection::Ascending, m_browserList, m_config, m_acceleratorManager,
 		m_resourceLoader, m_iconFetcher, m_platformContext);

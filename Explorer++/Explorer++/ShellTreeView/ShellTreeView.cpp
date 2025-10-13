@@ -22,7 +22,7 @@
 #include "Config.h"
 #include "DialogHelper.h"
 #include "FileOperations.h"
-#include "ItemNameEditControl.h"
+#include "LabelEditHandler.h"
 #include "MainResource.h"
 #include "OpenItemsContextMenuDelegate.h"
 #include "ResourceLoader.h"
@@ -1293,7 +1293,7 @@ bool ShellTreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
 	HWND editControl = TreeView_GetEditControl(m_hTreeView);
 	SetWindowText(editControl, editingName.get());
 
-	ItemNameEditControl::CreateNew(editControl, nullptr, false);
+	LabelEditHandler::CreateForMainWindow(editControl, m_app->GetAcceleratorManager(), false);
 
 	return false;
 }

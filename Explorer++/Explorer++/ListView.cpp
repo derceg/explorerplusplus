@@ -15,9 +15,10 @@
 #include <wil/common.h>
 
 ListView::ListView(HWND hwnd, const KeyboardState *keyboardState,
-	const ResourceLoader *resourceLoader) :
+	LabelEditHandlerFactory labelEditHandlerFactory, const ResourceLoader *resourceLoader) :
 	m_hwnd(hwnd),
 	m_keyboardState(keyboardState),
+	m_labelEditHandlerFactory(labelEditHandlerFactory),
 	m_resourceLoader(resourceLoader)
 {
 	m_windowSubclasses.push_back(
@@ -663,6 +664,10 @@ bool ListView::OnBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 	{
 		return true;
 	}
+
+	HWND editControl = ListView_GetEditControl(m_hwnd);
+	CHECK(editControl);
+	m_labelEditHandlerFactory(editControl, item->IsFile());
 
 	return false;
 }

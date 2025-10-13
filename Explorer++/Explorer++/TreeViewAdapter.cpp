@@ -131,3 +131,9 @@ bool TreeViewAdapter::RootTreeViewNode::CanRemove() const
 	DCHECK(false);
 	return false;
 }
+
+bool TreeViewAdapter::RootTreeViewNode::IsFile() const
+{
+	DCHECK(false);
+	return false;
+}

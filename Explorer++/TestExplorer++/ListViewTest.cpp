@@ -6,6 +6,7 @@
 #include "ListView.h"
 #include "GeneratorTestHelper.h"
 #include "KeyboardStateFake.h"
+#include "LabelEditHandler.h"
 #include "ListViewColumnModelFake.h"
 #include "ListViewItemFake.h"
 #include "ListViewModelFake.h"
@@ -58,8 +59,8 @@ protected:
 
 	std::unique_ptr<ListView> BuildListView(ListViewModel *model = nullptr)
 	{
-		auto listView =
-			std::make_unique<ListView>(m_listViewWindow, &m_keyboardState, &m_resourceLoader);
+		auto listView = std::make_unique<ListView>(m_listViewWindow, &m_keyboardState,
+			LabelEditHandler::CreateForTest, &m_resourceLoader);
 		listView->SetModel(model ? model : &m_model);
 		return listView;
 	}

@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreePresenter.h"
+#include "LabelEditHandler.h"
 #include "MainResource.h"
 #include "PlatformContext.h"
 #include "ResourceLoader.h"
@@ -87,7 +88,7 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
 		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW),
-			m_platformContext->GetKeyboardState()),
+			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog),
 		m_bookmarkTree, nullptr, m_platformContext->GetClipboardStore(), m_acceleratorManager,
 		m_resourceLoader, m_persistentSettings->m_expandedBookmarkIds,
 		m_persistentSettings->m_selectedBookmarkId,

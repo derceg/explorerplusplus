@@ -484,7 +484,7 @@
     <ClCompile Include="BrowserPane.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ItemNameEditControl.cpp">
+    <ClCompile Include="LabelEditHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="IconFetcherImpl.cpp">
@@ -1398,7 +1398,7 @@
     <ClInclude Include="BrowserPane.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ItemNameEditControl.h">
+    <ClInclude Include="LabelEditHandler.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="IconFetcher.h">

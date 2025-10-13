@@ -13,7 +13,7 @@
 #include "FolderView.h"
 #include "IconFetcher.h"
 #include "ItemData.h"
-#include "ItemNameEditControl.h"
+#include "LabelEditHandler.h"
 #include "MainResource.h"
 #include "NavigateParams.h"
 #include "NewMenuClient.h"
@@ -1440,7 +1440,7 @@ BOOL ShellBrowserImpl::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		SetWindowText(editControl, item.editingName.c_str());
 	}
 
-	ItemNameEditControl::CreateNew(editControl, m_acceleratorManager,
+	LabelEditHandler::CreateForMainWindow(editControl, m_acceleratorManager,
 		WI_IsFlagClear(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
 
 	return FALSE;

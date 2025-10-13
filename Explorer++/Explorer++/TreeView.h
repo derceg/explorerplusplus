@@ -17,6 +17,7 @@
 #include <vector>
 
 class KeyboardState;
+class LabelEditHandler;
 class TreeViewAdapter;
 class TreeViewNode;
 class WindowSubclass;
@@ -27,7 +28,10 @@ using ConstRawTreeViewNodes = std::vector<const TreeViewNode *>;
 class TreeView
 {
 public:
-	TreeView(HWND hwnd, const KeyboardState *keyboardState);
+	using LabelEditHandlerFactory = std::function<LabelEditHandler *(HWND hwnd, bool itemIsFile)>;
+
+	TreeView(HWND hwnd, const KeyboardState *keyboardState,
+		LabelEditHandlerFactory labelEditHandlerFactory);
 	~TreeView();
 
 	HWND GetHWND() const;
@@ -102,7 +106,6 @@ private:
 	void OnDeletePressed(RemoveMode removeMode);
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
-	LRESULT EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnSelectionChanged(const NMTREEVIEW *notifyInfo);
 	void OnBeginDrag(const NMTREEVIEW *notifyInfo);
 	void OnBeginRightButtonDrag(const NMTREEVIEW *notifyInfo);
@@ -121,6 +124,7 @@ private:
 	NoOpDelegate m_noOpDelegate;
 	TreeViewDelegate *m_delegate = &m_noOpDelegate;
 	const KeyboardState *const m_keyboardState;
+	LabelEditHandlerFactory m_labelEditHandlerFactory;
 	wil::unique_himagelist m_imageList;
 	boost::bimap<boost::bimaps::unordered_set_of<HTREEITEM>,
 		boost::bimaps::unordered_set_of<TreeViewNode *, PtrHash, std::equal_to<void>>>
@@ -128,6 +132,5 @@ private:
 	std::optional<int> m_middleClickNodeId;
 	bool m_blockSelectionChangeEvent = false;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-	std::unique_ptr<WindowSubclass> m_editSubclass;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

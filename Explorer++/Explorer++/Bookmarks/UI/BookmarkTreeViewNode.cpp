@@ -36,6 +36,11 @@ bool BookmarkTreeViewNode::CanRemove() const
 	return !m_bookmarkTree->IsPermanentNode(m_bookmarkFolder);
 }
 
+bool BookmarkTreeViewNode::IsFile() const
+{
+	return false;
+}
+
 BookmarkItem *BookmarkTreeViewNode::GetBookmarkFolder()
 {
 	return m_bookmarkFolder;

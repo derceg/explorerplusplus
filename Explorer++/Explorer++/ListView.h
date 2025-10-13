@@ -17,6 +17,7 @@
 #include <vector>
 
 class KeyboardState;
+class LabelEditHandler;
 class ListViewItem;
 class ListViewModel;
 class ResourceLoader;
@@ -25,6 +26,8 @@ class WindowSubclass;
 class ListView
 {
 public:
+	using LabelEditHandlerFactory = std::function<LabelEditHandler *(HWND hwnd, bool itemIsFile)>;
+
 	enum class ImageListType
 	{
 		SmallIcons,
@@ -39,7 +42,8 @@ public:
 		bool operator==(const ColumnSortArrowDetails &) const = default;
 	};
 
-	ListView(HWND hwnd, const KeyboardState *keyboardState, const ResourceLoader *resourceLoader);
+	ListView(HWND hwnd, const KeyboardState *keyboardState,
+		LabelEditHandlerFactory labelEditHandlerFactory, const ResourceLoader *resourceLoader);
 	~ListView();
 
 	HWND GetHWND() const;
@@ -178,6 +182,7 @@ private:
 	NoOpDelegate m_noOpDelegate;
 	ListViewDelegate *m_delegate = &m_noOpDelegate;
 	const KeyboardState *const m_keyboardState;
+	LabelEditHandlerFactory m_labelEditHandlerFactory;
 	const ResourceLoader *const m_resourceLoader;
 	std::optional<ListViewColumnId> m_previousSortColumnId;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

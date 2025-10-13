@@ -1329,7 +1329,7 @@
     <ClCompile Include="TabHistoryMenu.cpp" />
     <ClCompile Include="HistoryModel.cpp" />
     <ClCompile Include="IconFetcherImpl.cpp" />
-    <ClCompile Include="ItemNameEditControl.cpp" />
+    <ClCompile Include="LabelEditHandler.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
     <ClCompile Include="FontHelper.cpp" />
     <ClCompile Include="MainRebarXmlStorage.cpp" />
@@ -1697,7 +1697,7 @@
     <ClInclude Include="HistoryModel.h" />
     <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="IconFetcherImpl.h" />
-    <ClInclude Include="ItemNameEditControl.h" />
+    <ClInclude Include="LabelEditHandler.h" />
     <ClInclude Include="Literals.h" />
     <ClInclude Include="MainFontSetter.h" />
     <ClInclude Include="FontHelper.h" />

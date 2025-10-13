@@ -11,6 +11,7 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
+#include "LabelEditHandler.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellTestHelper.h"
 #include "TabContainer.h"
@@ -48,8 +49,9 @@ protected:
 			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		CHECK(treeViewWindow);
 
-		return std::make_unique<BookmarkTreePresenter>(
-			std::make_unique<TreeView>(treeViewWindow, m_platformContext.GetKeyboardState()),
+		return std::make_unique<BookmarkTreePresenter>(std::make_unique<TreeView>(treeViewWindow,
+														   m_platformContext.GetKeyboardState(),
+														   LabelEditHandler::CreateForTest),
 			&m_bookmarkTree, &m_browserList, m_platformContext.GetClipboardStore(),
 			&m_acceleratorManager, &m_resourceLoader, initiallyExpandedBookmarkIds,
 			initiallySelectedBookmarkId);

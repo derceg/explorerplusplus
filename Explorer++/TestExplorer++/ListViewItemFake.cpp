@@ -35,6 +35,11 @@ bool ListViewItemFake::CanRemove() const
 	return false;
 }
 
+bool ListViewItemFake::IsFile() const
+{
+	return false;
+}
+
 const std::wstring &ListViewItemFake::GetName() const
 {
 	return m_name;

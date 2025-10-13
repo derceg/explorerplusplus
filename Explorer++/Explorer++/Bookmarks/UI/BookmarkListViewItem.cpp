@@ -105,6 +105,11 @@ bool BookmarkListViewItem::CanRemove() const
 	return !m_bookmarkTree->IsPermanentNode(m_bookmarkItem);
 }
 
+bool BookmarkListViewItem::IsFile() const
+{
+	return false;
+}
+
 const BookmarkItem *BookmarkListViewItem::GetBookmarkItem() const
 {
 	return m_bookmarkItem;

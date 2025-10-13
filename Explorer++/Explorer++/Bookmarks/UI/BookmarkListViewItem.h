@@ -26,6 +26,7 @@ public:
 	std::optional<int> GetIconIndex() const override;
 	bool CanRename() const override;
 	bool CanRemove() const override;
+	bool IsFile() const override;
 
 	BookmarkItem *GetBookmarkItem();
 	const BookmarkItem *GetBookmarkItem() const;

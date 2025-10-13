@@ -28,6 +28,7 @@ public:
 	virtual std::optional<int> GetIconIndex() const = 0;
 	virtual bool CanRename() const = 0;
 	virtual bool CanRemove() const = 0;
+	virtual bool IsFile() const = 0;
 
 	TreeViewNode *GetParent();
 	const TreeViewNode *GetParent() const;
