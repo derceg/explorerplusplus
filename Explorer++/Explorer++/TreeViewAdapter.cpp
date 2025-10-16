@@ -20,6 +20,11 @@ const TreeViewNode *TreeViewAdapter::GetRoot() const
 	return &m_rootNode;
 }
 
+bool TreeViewAdapter::IsRoot(const TreeViewNode *node) const
+{
+	return node == &m_rootNode;
+}
+
 TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node)
 {
 	return AddNode(parentNode, std::move(node), parentNode->GetChildren().size());
@@ -30,12 +35,15 @@ TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr
 {
 	CHECK(IsInTree(parentNode));
 
-	node->VisitRecursively(
-		[this](TreeViewNode *currentNode)
-		{
-			auto [itr, didInsert] = m_nodes.insert(currentNode);
-			CHECK(didInsert);
-		});
+	for (auto *currentNode : node->GetNodesDepthFirst())
+	{
+		auto [itr, didInsert] = m_nodes.insert(currentNode);
+		CHECK(didInsert);
+
+		// The observer here doesn't need to be removed, since this class owns the node.
+		std::ignore = currentNode->AddUpdatedObserver(
+			std::bind_front(&TreeViewAdapter::NotifyNodeUpdated, this, currentNode));
+	}
 
 	if (index > parentNode->GetChildren().size())
 	{
@@ -47,11 +55,11 @@ TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr
 	return newNode;
 }
 
-void TreeViewAdapter::NotifyNodeUpdated(TreeViewNode *node)
+void TreeViewAdapter::NotifyNodeUpdated(TreeViewNode *node, TreeViewNode::Property property)
 {
 	CHECK(IsInTree(node));
 
-	nodeUpdatedSignal.m_signal(node);
+	nodeUpdatedSignal.m_signal(node, property);
 }
 
 void TreeViewAdapter::MoveNode(TreeViewNode *node, TreeViewNode *newParent, size_t index)
@@ -87,12 +95,11 @@ void TreeViewAdapter::RemoveNode(TreeViewNode *node)
 {
 	CHECK(IsInTree(node));
 
-	node->VisitRecursively(
-		[this](TreeViewNode *currentNode)
-		{
-			auto numErased = m_nodes.erase(currentNode);
-			CHECK_EQ(numErased, 1u);
-		});
+	for (auto *currentNode : node->GetNodesDepthFirst())
+	{
+		auto numErased = m_nodes.erase(currentNode);
+		CHECK_EQ(numErased, 1u);
+	}
 
 	auto *parentNode = node->GetParent();
 	CHECK(parentNode);
@@ -104,6 +111,16 @@ void TreeViewAdapter::RemoveNode(TreeViewNode *node)
 bool TreeViewAdapter::IsInTree(const TreeViewNode *node) const
 {
 	return m_nodes.contains(node);
+}
+
+void TreeViewAdapter::OnNodeExpanding(TreeViewNode *node)
+{
+	UNREFERENCED_PARAMETER(node);
+}
+
+void TreeViewAdapter::OnNodeCollapsing(TreeViewNode *node)
+{
+	UNREFERENCED_PARAMETER(node);
 }
 
 std::wstring TreeViewAdapter::RootTreeViewNode::GetText() const

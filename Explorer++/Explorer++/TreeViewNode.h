@@ -5,7 +5,8 @@
 #pragma once
 
 #include <boost/core/noncopyable.hpp>
-#include <functional>
+#include <boost/signals2.hpp>
+#include <concurrencpp/concurrencpp.h>
 #include <memory>
 #include <optional>
 #include <string>
@@ -19,6 +20,15 @@ using TreeViewNodes = std::vector<std::unique_ptr<TreeViewNode>>;
 class TreeViewNode : private boost::noncopyable
 {
 public:
+	enum class Property
+	{
+		Text,
+		Icon,
+		MayLazyLoadChildren
+	};
+
+	using UpdatedSignal = boost::signals2::signal<void(Property property)>;
+
 	TreeViewNode();
 	virtual ~TreeViewNode() = default;
 
@@ -29,6 +39,10 @@ public:
 	virtual bool CanRename() const = 0;
 	virtual bool CanRemove() const = 0;
 	virtual bool IsFile() const = 0;
+
+	// Called only when GetChildren() returns no results. If true, indicates that the node may lazy
+	// load children on expansion.
+	virtual bool GetMayLazyLoadChildren() const;
 
 	TreeViewNode *GetParent();
 	const TreeViewNode *GetParent() const;
@@ -41,7 +55,16 @@ public:
 	size_t GetChildIndex(const TreeViewNode *node) const;
 	const TreeViewNodes &GetChildren() const;
 
-	void VisitRecursively(std::function<void(TreeViewNode *currentNode)> callback);
+	concurrencpp::generator<TreeViewNode *> GetNodesDepthFirst();
+
+	[[nodiscard]] boost::signals2::connection AddUpdatedObserver(
+		const typename UpdatedSignal::slot_type &observer);
+
+protected:
+	void NotifyUpdated(Property property)
+	{
+		m_updatedSignal(property);
+	}
 
 private:
 	static inline int m_idCounter = 1;
@@ -49,4 +72,6 @@ private:
 
 	TreeViewNode *m_parent = nullptr;
 	TreeViewNodes m_children;
+
+	UpdatedSignal m_updatedSignal;
 };

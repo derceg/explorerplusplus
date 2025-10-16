@@ -56,12 +56,15 @@ void TreeView::SetDelegate(TreeViewDelegate *delegate)
 
 void TreeView::AddNodeRecursive(TreeViewNode *node)
 {
-	node->VisitRecursively([this](TreeViewNode *currentNode) { AddNode(currentNode); });
+	for (auto *currentNode : node->GetNodesDepthFirst())
+	{
+		AddNode(currentNode);
+	}
 }
 
 void TreeView::AddNode(TreeViewNode *node)
 {
-	if (node == m_adapter->GetRoot())
+	if (m_adapter->IsRoot(node))
 	{
 		return;
 	}
@@ -71,7 +74,7 @@ void TreeView::AddNode(TreeViewNode *node)
 	TVITEMEX tvItem = {};
 	tvItem.mask = TVIF_TEXT | TVIF_CHILDREN;
 	tvItem.pszText = text.data();
-	tvItem.cChildren = node->GetChildren().empty() ? 0 : 1;
+	tvItem.cChildren = I_CHILDRENCALLBACK;
 
 	if (m_imageList)
 	{
@@ -82,8 +85,7 @@ void TreeView::AddNode(TreeViewNode *node)
 
 	auto *parentNode = node->GetParent();
 
-	HTREEITEM parentHandle =
-		(parentNode == m_adapter->GetRoot()) ? nullptr : GetHandleForNode(parentNode);
+	HTREEITEM parentHandle = m_adapter->IsRoot(parentNode) ? nullptr : GetHandleForNode(parentNode);
 	size_t position = parentNode->GetChildIndex(node);
 	HTREEITEM insertAfterHandle;
 
@@ -125,24 +127,50 @@ void TreeView::AddNode(TreeViewNode *node)
 	}
 }
 
-void TreeView::UpdateNode(TreeViewNode *node)
+void TreeView::UpdateNode(TreeViewNode *node, TreeViewNode::Property property)
 {
-	std::wstring text = node->GetText();
+	std::wstring nodeText;
 
 	TVITEMEX tvItem = {};
-	tvItem.mask = TVIF_TEXT | TVIF_CHILDREN;
 	tvItem.hItem = GetHandleForNode(node);
-	tvItem.pszText = text.data();
-	tvItem.cChildren = node->GetChildren().empty() ? 0 : 1;
 
-	auto iconIndex = node->GetIconIndex();
-
-	if (iconIndex)
+	switch (property)
 	{
+	case TreeViewNode::Property::Text:
+		WI_SetFlag(tvItem.mask, TVIF_TEXT);
+		nodeText = node->GetText();
+		tvItem.pszText = nodeText.data();
+		break;
+
+	case TreeViewNode::Property::Icon:
+	{
+		// The icon for a node should only be updated if images are being displayed.
+		CHECK(m_imageList);
+
+		// Additionally, an icon index should be returned here.
+		auto iconIndex = node->GetIconIndex();
+		CHECK(iconIndex);
+
 		WI_SetAllFlags(tvItem.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE);
 		tvItem.iImage = *iconIndex;
 		tvItem.iSelectedImage = *iconIndex;
 	}
+	break;
+
+	case TreeViewNode::Property::MayLazyLoadChildren:
+		if (!node->GetChildren().empty())
+		{
+			// This hint is only valid when the node has no children. If the node currently has
+			// children, the hint can be ignored.
+			return;
+		}
+
+		WI_SetFlag(tvItem.mask, TVIF_CHILDREN);
+		tvItem.cChildren = IsNodeExpandable(node) ? 1 : 0;
+		break;
+	}
+
+	CHECK(tvItem.mask != 0);
 
 	auto res = TreeView_SetItem(m_hwnd, &tvItem);
 	CHECK(res);
@@ -181,35 +209,24 @@ void TreeView::RemoveNode(TreeViewNode *node)
 	// parent node.
 	auto handle = GetHandleForNode(node);
 	auto parentHandle = TreeView_GetParent(m_hwnd, handle);
-	bool shouldCollapseParent = parentHandle && TreeView_GetPrevSibling(m_hwnd, handle) == nullptr
-		&& TreeView_GetNextSibling(m_hwnd, handle) == nullptr;
-
-	if (shouldCollapseParent)
-	{
-		// The node to be removed is the only node under the parent node. The parent node needs to
-		// be collapsed before the child node is removed. Attempting to collapse the parent node
-		// after its only child has been removed will fail. Not collapsing the node will result in
-		// the unusual situation where the node will immediately re-expand if a child is added
-		// again.
-		CollapseNode(GetNodeForHandle(parentHandle));
-	}
 
 	auto res = TreeView_DeleteItem(m_hwnd, handle);
 	CHECK(res);
 
-	node->VisitRecursively(
-		[this](TreeViewNode *currentNode)
-		{
-			auto numErased = m_handleToNodeMap.right.erase(currentNode);
-			CHECK_EQ(numErased, 1u);
-		});
-
-	if (shouldCollapseParent)
+	for (auto *currentNode : node->GetNodesDepthFirst())
 	{
+		auto numErased = m_handleToNodeMap.right.erase(currentNode);
+		CHECK_EQ(numErased, 1u);
+	}
+
+	if (parentHandle && !TreeView_GetChild(m_hwnd, parentHandle))
+	{
+		// Note that passing I_CHILDRENCALLBACK here will reset the expansion state of the item
+		// (i.e. TVIS_EXPANDED and TVIS_EXPANDEDONCE will be reset).
 		TVITEM tvItem = {};
 		tvItem.mask = TVIF_CHILDREN;
 		tvItem.hItem = parentHandle;
-		tvItem.cChildren = 0;
+		tvItem.cChildren = I_CHILDRENCALLBACK;
 		res = TreeView_SetItem(m_hwnd, &tvItem);
 		CHECK(res);
 	}
@@ -304,6 +321,10 @@ LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 				OnGetDispInfo(reinterpret_cast<NMTVDISPINFO *>(lParam));
 				break;
 
+			case TVN_ITEMEXPANDING:
+				OnNodeExpanding(reinterpret_cast<NMTREEVIEW *>(lParam));
+				break;
+
 			case TVN_KEYDOWN:
 				return OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 
@@ -381,7 +402,26 @@ void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
 		dispInfo->item.iSelectedImage = *iconIndex;
 	}
 
+	if (WI_IsFlagSet(dispInfo->item.mask, TVIF_CHILDREN))
+	{
+		dispInfo->item.cChildren = IsNodeExpandable(node) ? 1 : 0;
+	}
+
 	WI_SetFlag(dispInfo->item.mask, TVIF_DI_SETITEM);
+}
+
+void TreeView::OnNodeExpanding(const NMTREEVIEW *notifyInfo)
+{
+	auto *node = GetNodeForHandle(notifyInfo->itemNew.hItem);
+
+	if (notifyInfo->action == TVE_EXPAND)
+	{
+		m_adapter->OnNodeExpanding(node);
+	}
+	else
+	{
+		m_adapter->OnNodeCollapsing(node);
+	}
 }
 
 LRESULT TreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
@@ -546,32 +586,49 @@ void TreeView::StartRenamingNode(const TreeViewNode *node)
 	CHECK(res);
 }
 
+bool TreeView::IsNodeExpandable(const TreeViewNode *node) const
+{
+	return !node->GetChildren().empty() || node->GetMayLazyLoadChildren();
+}
+
 bool TreeView::IsNodeExpanded(const TreeViewNode *node) const
 {
 	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_EXPANDED);
 	return WI_IsFlagSet(state, TVIS_EXPANDED);
 }
 
-void TreeView::ExpandNode(const TreeViewNode *node)
+// ExpandNode() and CollapseNode() both take a non-const TreeViewNode *, since the adapter may
+// choose to modify the node in response to the notification that a node has expanded or collapsed.
+// For example, the adapter can lazily load children when a node is expanded and remove all children
+// when a node is collapsed.
+void TreeView::ExpandNode(TreeViewNode *node)
 {
-	if (node->GetChildren().empty())
+	if (!IsNodeExpandable(node))
 	{
 		return;
 	}
 
 	auto res = TreeView_Expand(m_hwnd, GetHandleForNode(node), TVE_EXPAND);
-	CHECK(res);
+
+	// Expanding the node can fail if the node doesn't add any children when expanded.
+	CHECK(node->GetChildren().empty() || res);
 }
 
-void TreeView::CollapseNode(const TreeViewNode *node)
+void TreeView::CollapseNode(TreeViewNode *node)
 {
 	if (!IsNodeExpanded(node))
 	{
 		return;
 	}
 
+	// The collapse below is programmatically initiated, so no TVN_ITEMEXPANDING notification will
+	// be sent. Therefore, the adapter will be manually notified.
+	m_adapter->OnNodeCollapsing(node);
+
 	auto res = TreeView_Expand(m_hwnd, GetHandleForNode(node), TVE_COLLAPSE);
-	CHECK(res);
+
+	// Collapsing the node can fail if the node removes all of its children when collapsed.
+	CHECK(node->GetChildren().empty() || res);
 }
 
 RECT TreeView::GetNodeRect(const TreeViewNode *node) const
@@ -673,16 +730,17 @@ RawTreeViewNodes TreeView::GetExpandedNodes()
 	}
 
 	RawTreeViewNodes expandedNodes;
-	m_adapter->GetRoot()->VisitRecursively(
-		[this, &expandedNodes](TreeViewNode *currentNode)
-		{
-			if (currentNode == m_adapter->GetRoot() || !IsNodeExpanded(currentNode))
-			{
-				return;
-			}
 
-			expandedNodes.push_back(currentNode);
-		});
+	for (auto *currentNode : m_adapter->GetRoot()->GetNodesDepthFirst())
+	{
+		if (m_adapter->IsRoot(currentNode) || !IsNodeExpanded(currentNode))
+		{
+			continue;
+		}
+
+		expandedNodes.push_back(currentNode);
+	}
+
 	return expandedNodes;
 }
 
@@ -708,6 +766,18 @@ void TreeView::GetAllNodesDepthFirstForTesting(HTREEITEM firstSiblingHandle,
 			GetAllNodesDepthFirstForTesting(childHandle, nodes);
 		}
 	}
+}
+
+bool TreeView::IsExpanderShownForTesting(const TreeViewNode *node) const
+{
+	CHECK(IsInTest());
+
+	TVITEM tvItem = {};
+	tvItem.mask = TVIF_HANDLE | TVIF_CHILDREN;
+	tvItem.hItem = GetHandleForNode(node);
+	auto res = TreeView_GetItem(m_hwnd, &tvItem);
+	CHECK(res);
+	return tvItem.cChildren != 0;
 }
 
 HTREEITEM TreeView::GetHandleForNode(const TreeViewNode *node) const

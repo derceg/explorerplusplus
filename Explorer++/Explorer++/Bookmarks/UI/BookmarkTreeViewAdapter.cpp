@@ -75,12 +75,15 @@ void BookmarkTreeViewAdapter::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, si
 void BookmarkTreeViewAdapter::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 	BookmarkItem::PropertyType propertyType)
 {
-	if (!bookmarkItem.IsFolder() || propertyType != BookmarkItem::PropertyType::Name)
+	if (!bookmarkItem.IsFolder())
 	{
 		return;
 	}
 
-	NotifyNodeUpdated(GetNodeForBookmark(&bookmarkItem));
+	if (propertyType == BookmarkItem::PropertyType::Name)
+	{
+		NotifyNodeUpdated(GetNodeForBookmark(&bookmarkItem), TreeViewNode::Property::Text);
+	}
 }
 
 void BookmarkTreeViewAdapter::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,
@@ -173,7 +176,7 @@ BookmarkItem *BookmarkTreeViewAdapter::GetBookmarkForNode(TreeViewNode *node)
 
 const BookmarkItem *BookmarkTreeViewAdapter::GetBookmarkForNode(const TreeViewNode *node) const
 {
-	CHECK(node != GetRoot());
+	CHECK(!IsRoot(node));
 	return static_cast<const BookmarkTreeViewNode *>(node)->GetBookmarkFolder();
 }
 

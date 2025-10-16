@@ -20,22 +20,33 @@ public:
 
 	TreeViewNode *GetRoot();
 	const TreeViewNode *GetRoot() const;
+	bool IsRoot(const TreeViewNode *node) const;
 
-	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node);
-	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node,
-		size_t index);
-	void NotifyNodeUpdated(TreeViewNode *node);
-	void MoveNode(TreeViewNode *node, TreeViewNode *newParent, size_t index);
-	void RemoveNode(TreeViewNode *node);
+	// The tree can use this notification to lazily load the children of the specified node, if
+	// appropriate.
+	virtual void OnNodeExpanding(TreeViewNode *node);
+
+	// The tree can use this notification to remove the children of the specified node, if
+	// appropriate.
+	virtual void OnNodeCollapsing(TreeViewNode *node);
 
 	// Signals
 	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeAddedSignal;
-	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeUpdatedSignal;
+	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node, TreeViewNode::Property property)>
+		nodeUpdatedSignal;
 	SignalWrapper<TreeViewAdapter,
 		void(TreeViewNode *node, const TreeViewNode *oldParent, size_t oldIndex,
 			const TreeViewNode *newParent, size_t newIndex)>
 		nodeMovedSignal;
 	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeRemovedSignal;
+
+protected:
+	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node);
+	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node,
+		size_t index);
+	void NotifyNodeUpdated(TreeViewNode *node, TreeViewNode::Property property);
+	void MoveNode(TreeViewNode *node, TreeViewNode *newParent, size_t index);
+	void RemoveNode(TreeViewNode *node);
 
 private:
 	class RootTreeViewNode : public TreeViewNode

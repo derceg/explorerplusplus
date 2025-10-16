@@ -15,6 +15,12 @@ int TreeViewNode::GetId() const
 	return m_id;
 }
 
+bool TreeViewNode::GetMayLazyLoadChildren() const
+{
+	// By default, it's assumed that nodes are loaded eagerly.
+	return false;
+}
+
 const TreeViewNode *TreeViewNode::GetParent() const
 {
 	return m_parent;
@@ -75,12 +81,22 @@ const TreeViewNodes &TreeViewNode::GetChildren() const
 	return m_children;
 }
 
-void TreeViewNode::VisitRecursively(std::function<void(TreeViewNode *currentNode)> callback)
+concurrencpp::generator<TreeViewNode *> TreeViewNode::GetNodesDepthFirst()
 {
-	callback(this);
+	co_yield this;
 
 	for (auto &child : m_children)
 	{
-		child->VisitRecursively(callback);
+		// TODO: This can use std::ranges::elements_of() once C++23 support is available.
+		for (auto *node : child->GetNodesDepthFirst())
+		{
+			co_yield node;
+		}
 	}
+}
+
+boost::signals2::connection TreeViewNode::AddUpdatedObserver(
+	const typename UpdatedSignal::slot_type &observer)
+{
+	return m_updatedSignal.connect(observer);
 }

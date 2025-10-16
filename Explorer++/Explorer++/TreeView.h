@@ -7,6 +7,7 @@
 #include "InsertMarkPosition.h"
 #include "ItemStateOp.h"
 #include "TreeViewDelegate.h"
+#include "TreeViewNode.h"
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <boost/signals2.hpp>
@@ -19,7 +20,6 @@
 class KeyboardState;
 class LabelEditHandler;
 class TreeViewAdapter;
-class TreeViewNode;
 class WindowSubclass;
 
 using RawTreeViewNodes = std::vector<TreeViewNode *>;
@@ -44,8 +44,8 @@ public:
 	void SelectNode(const TreeViewNode *node);
 	void StartRenamingNode(const TreeViewNode *node);
 	bool IsNodeExpanded(const TreeViewNode *node) const;
-	void ExpandNode(const TreeViewNode *node);
-	void CollapseNode(const TreeViewNode *node);
+	void ExpandNode(TreeViewNode *node);
+	void CollapseNode(TreeViewNode *node);
 	RECT GetNodeRect(const TreeViewNode *node) const;
 	TreeViewNode *MaybeGetNodeAtPoint(const POINT &pt);
 	TreeViewNode *MaybeGetNextVisibleNode(const POINT &pt);
@@ -59,6 +59,7 @@ public:
 	RawTreeViewNodes GetExpandedNodes();
 
 	ConstRawTreeViewNodes GetAllNodesDepthFirstForTesting() const;
+	bool IsExpanderShownForTesting(const TreeViewNode *node) const;
 
 private:
 	struct PtrHash
@@ -88,7 +89,7 @@ private:
 
 	void AddNodeRecursive(TreeViewNode *node);
 	void AddNode(TreeViewNode *node);
-	void UpdateNode(TreeViewNode *node);
+	void UpdateNode(TreeViewNode *node, TreeViewNode::Property property);
 	void MoveNode(TreeViewNode *node, const TreeViewNode *oldParent, size_t oldIndex,
 		const TreeViewNode *newParent, size_t newIndex);
 	void RemoveNode(TreeViewNode *node);
@@ -102,6 +103,7 @@ private:
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnShowContextMenu(const POINT &ptScreen);
 	void OnGetDispInfo(NMTVDISPINFO *dispInfo);
+	void OnNodeExpanding(const NMTREEVIEW *notifyInfo);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
 	void OnDeletePressed(RemoveMode removeMode);
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
@@ -110,6 +112,7 @@ private:
 	void OnBeginDrag(const NMTREEVIEW *notifyInfo);
 	void OnBeginRightButtonDrag(const NMTREEVIEW *notifyInfo);
 
+	bool IsNodeExpandable(const TreeViewNode *node) const;
 	void UpdateNodeState(const TreeViewNode *node, UINT state, ItemStateOp stateOp);
 
 	void GetAllNodesDepthFirstForTesting(HTREEITEM firstSiblingHandle,
