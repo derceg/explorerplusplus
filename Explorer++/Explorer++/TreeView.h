@@ -38,6 +38,7 @@ public:
 	void SetAdapter(TreeViewAdapter *adapter);
 	void SetDelegate(TreeViewDelegate *delegate);
 
+	void AddExtendedStyles(DWORD styles);
 	void SetImageList(wil::unique_himagelist imageList);
 	TreeViewNode *GetSelectedNode();
 	const TreeViewNode *GetSelectedNode() const;

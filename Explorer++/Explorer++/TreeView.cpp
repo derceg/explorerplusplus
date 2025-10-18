@@ -54,6 +54,11 @@ void TreeView::SetDelegate(TreeViewDelegate *delegate)
 	m_delegate = delegate ? delegate : &m_noOpDelegate;
 }
 
+void TreeView::AddExtendedStyles(DWORD styles)
+{
+	TreeView_SetExtendedStyle(m_hwnd, styles, styles);
+}
+
 void TreeView::AddNodeRecursive(TreeViewNode *node)
 {
 	for (auto *currentNode : node->GetNodesDepthFirst())
