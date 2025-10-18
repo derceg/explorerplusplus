@@ -77,9 +77,11 @@ void TreeView::AddNode(TreeViewNode *node)
 	std::wstring text = node->GetText();
 
 	TVITEMEX tvItem = {};
-	tvItem.mask = TVIF_TEXT | TVIF_CHILDREN;
+	tvItem.mask = TVIF_TEXT | TVIF_CHILDREN | TVIF_STATE;
 	tvItem.pszText = text.data();
 	tvItem.cChildren = I_CHILDRENCALLBACK;
+	tvItem.stateMask = TVIS_CUT;
+	tvItem.state = node->IsGhosted() ? TVIS_CUT : 0;
 
 	if (m_imageList)
 	{
@@ -161,6 +163,12 @@ void TreeView::UpdateNode(TreeViewNode *node, TreeViewNode::Property property)
 		tvItem.iSelectedImage = *iconIndex;
 	}
 	break;
+
+	case TreeViewNode::Property::Ghosted:
+		WI_SetFlag(tvItem.mask, TVIF_STATE);
+		tvItem.stateMask = TVIS_CUT;
+		tvItem.state = node->IsGhosted() ? TVIS_CUT : 0;
+		break;
 
 	case TreeViewNode::Property::MayLazyLoadChildren:
 		if (!node->GetChildren().empty())
@@ -681,17 +689,6 @@ TreeViewNode *TreeView::MaybeGetNextVisibleNode(const POINT &pt)
 	return GetNodeForHandle(handle);
 }
 
-bool TreeView::IsNodeGhosted(const TreeViewNode *node) const
-{
-	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_CUT);
-	return WI_IsFlagSet(state, TVIS_CUT);
-}
-
-void TreeView::SetNodeGhosted(const TreeViewNode *node, bool ghosted)
-{
-	UpdateNodeState(node, TVIS_CUT, ghosted ? ItemStateOp::Set : ItemStateOp::Clear);
-}
-
 bool TreeView::IsNodeHighlighted(const TreeViewNode *node) const
 {
 	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_DROPHILITED);
@@ -788,6 +785,14 @@ std::wstring TreeView::GetNodeTextForTesting(const TreeViewNode *node) const
 	CHECK(res);
 
 	return text;
+}
+
+bool TreeView::IsNodeGhostedForTesting(const TreeViewNode *node) const
+{
+	CHECK(IsInTest());
+
+	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_CUT);
+	return WI_IsFlagSet(state, TVIS_CUT);
 }
 
 bool TreeView::IsExpanderShownForTesting(const TreeViewNode *node) const

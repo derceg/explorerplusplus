@@ -24,6 +24,7 @@ public:
 	{
 		Text,
 		Icon,
+		Ghosted,
 		MayLazyLoadChildren
 	};
 
@@ -38,6 +39,7 @@ public:
 	virtual std::optional<int> GetIconIndex() const = 0;
 	virtual bool CanRename() const = 0;
 	virtual bool CanRemove() const = 0;
+	virtual bool IsGhosted() const = 0;
 	virtual bool IsFile() const = 0;
 
 	// Called only when GetChildren() returns no results. If true, indicates that the node may lazy

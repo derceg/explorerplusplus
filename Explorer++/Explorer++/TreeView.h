@@ -50,8 +50,6 @@ public:
 	RECT GetNodeRect(const TreeViewNode *node) const;
 	TreeViewNode *MaybeGetNodeAtPoint(const POINT &pt);
 	TreeViewNode *MaybeGetNextVisibleNode(const POINT &pt);
-	bool IsNodeGhosted(const TreeViewNode *node) const;
-	void SetNodeGhosted(const TreeViewNode *node, bool ghosted);
 	bool IsNodeHighlighted(const TreeViewNode *node) const;
 	void SetNodeHighlighted(const TreeViewNode *node, bool highlighted);
 	void ShowInsertMark(const TreeViewNode *targetNode, InsertMarkPosition position);
@@ -61,6 +59,7 @@ public:
 
 	ConstRawTreeViewNodes GetAllNodesDepthFirstForTesting() const;
 	std::wstring GetNodeTextForTesting(const TreeViewNode *node) const;
+	bool IsNodeGhostedForTesting(const TreeViewNode *node) const;
 	bool IsExpanderShownForTesting(const TreeViewNode *node) const;
 
 private:

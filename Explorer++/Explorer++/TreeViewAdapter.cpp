@@ -149,6 +149,12 @@ bool TreeViewAdapter::RootTreeViewNode::CanRemove() const
 	return false;
 }
 
+bool TreeViewAdapter::RootTreeViewNode::IsGhosted() const
+{
+	DCHECK(false);
+	return false;
+}
+
 bool TreeViewAdapter::RootTreeViewNode::IsFile() const
 {
 	DCHECK(false);

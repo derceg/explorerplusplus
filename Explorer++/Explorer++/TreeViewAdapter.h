@@ -56,6 +56,7 @@ private:
 		std::optional<int> GetIconIndex() const override;
 		bool CanRename() const override;
 		bool CanRemove() const override;
+		bool IsGhosted() const override;
 		bool IsFile() const override;
 	};
 

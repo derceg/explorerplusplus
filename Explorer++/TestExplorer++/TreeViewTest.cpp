@@ -44,10 +44,24 @@ public:
 		return true;
 	}
 
+	bool IsGhosted() const override
+	{
+		return m_isGhosted;
+	}
+
 	bool IsFile() const override
 	{
 		return false;
 	}
+
+	void SetIsGhosted(bool isGhosted)
+	{
+		m_isGhosted = isGhosted;
+		NotifyUpdated(Property::Ghosted);
+	}
+
+private:
+	bool m_isGhosted = false;
 };
 
 class TreeViewAdapterMock : public TreeViewAdapter
@@ -198,13 +212,15 @@ TEST_F(TreeViewTest, ItemPosition)
 
 TEST_F(TreeViewTest, GhostedNode)
 {
-	const auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<TreeViewNodeFake>());
+	auto node = std::make_unique<TreeViewNodeFake>();
+	auto *rawNode = node.get();
 
-	m_treeView->SetNodeGhosted(node, true);
-	EXPECT_TRUE(m_treeView->IsNodeGhosted(node));
+	rawNode->SetIsGhosted(true);
+	m_adapter.AddNode(m_adapter.GetRoot(), std::move(node));
+	EXPECT_TRUE(m_treeView->IsNodeGhostedForTesting(rawNode));
 
-	m_treeView->SetNodeGhosted(node, false);
-	EXPECT_FALSE(m_treeView->IsNodeGhosted(node));
+	rawNode->SetIsGhosted(false);
+	EXPECT_FALSE(m_treeView->IsNodeGhostedForTesting(rawNode));
 }
 
 TEST_F(TreeViewTest, HighlightedNode)
