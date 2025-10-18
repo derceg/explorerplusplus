@@ -59,6 +59,7 @@ public:
 	RawTreeViewNodes GetExpandedNodes();
 
 	ConstRawTreeViewNodes GetAllNodesDepthFirstForTesting() const;
+	std::wstring GetNodeTextForTesting(const TreeViewNode *node) const;
 	bool IsExpanderShownForTesting(const TreeViewNode *node) const;
 
 private:

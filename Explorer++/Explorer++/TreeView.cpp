@@ -768,6 +768,23 @@ void TreeView::GetAllNodesDepthFirstForTesting(HTREEITEM firstSiblingHandle,
 	}
 }
 
+std::wstring TreeView::GetNodeTextForTesting(const TreeViewNode *node) const
+{
+	CHECK(IsInTest());
+
+	wchar_t text[260];
+
+	TVITEM tvItem = {};
+	tvItem.mask = TVIF_HANDLE | TVIF_TEXT;
+	tvItem.hItem = GetHandleForNode(node);
+	tvItem.pszText = text;
+	tvItem.cchTextMax = std::size(text);
+	auto res = TreeView_GetItem(m_hwnd, &tvItem);
+	CHECK(res);
+
+	return text;
+}
+
 bool TreeView::IsExpanderShownForTesting(const TreeViewNode *node) const
 {
 	CHECK(IsInTest());

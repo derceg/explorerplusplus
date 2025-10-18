@@ -59,7 +59,8 @@ protected:
 
 	void VerifyViewItems(const BookmarkTreePresenter *presenter)
 	{
-		const auto treeViewItems = presenter->GetView()->GetAllNodesDepthFirstForTesting();
+		const auto *view = presenter->GetView();
+		const auto treeViewItems = view->GetAllNodesDepthFirstForTesting();
 		const auto bookmarkItems = GetBookmarkFoldersDepthFirst();
 		ASSERT_EQ(treeViewItems.size(), bookmarkItems.size());
 
@@ -69,7 +70,7 @@ protected:
 			boost::combine(treeViewItems, bookmarkItems))
 		{
 			EXPECT_EQ(adaptor->GetBookmarkForNode(treeViewItem), bookmarkItem);
-			EXPECT_EQ(treeViewItem->GetText(), bookmarkItem->GetName());
+			EXPECT_EQ(view->GetNodeTextForTesting(treeViewItem), bookmarkItem->GetName());
 		}
 	}
 
