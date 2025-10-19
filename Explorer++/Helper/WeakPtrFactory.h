@@ -4,12 +4,10 @@
 
 #pragma once
 
+#include "WeakPtr.h"
 #include "WeakState.h"
 #include <boost/core/noncopyable.hpp>
 #include <memory>
-
-template <class T>
-class WeakPtr;
 
 // This has a similar function to weak_ptr_factory in the Chromium codebase. The class is intended
 // to be used by an object on a single thread. For example, an object created on the main thread
@@ -32,7 +30,19 @@ public:
 		m_state->Invalidate();
 	}
 
-	WeakPtr<T> GetWeakPtr() const
+	WeakPtr<T> GetWeakPtr()
+		requires(!std::is_const_v<T>)
+	{
+		return WeakPtr<T>(m_state);
+	}
+
+	WeakPtr<T, const T> GetWeakPtr() const
+	{
+		return WeakPtr<T, const T>(m_state);
+	}
+
+	WeakPtr<T> GetMutableWeakPtr() const
+		requires(!std::is_const_v<T>)
 	{
 		return WeakPtr<T>(m_state);
 	}

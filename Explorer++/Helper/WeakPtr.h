@@ -13,25 +13,26 @@ class WeakPtrFactory;
 // This class is designed to be used from a single thread only, since it has no way of guaranteeing
 // that the wrapped object will stay alive. In the intended use case, where an object is created and
 // deleted on a single thread, checking whether the object is live on that thread is safe.
-template <class T>
+template <class Data, class View = Data>
+	requires(std::same_as<View, Data> || std::same_as<std::remove_const_t<View>, Data>)
 class WeakPtr
 {
 public:
-	WeakPtr() : m_state(std::make_shared<WeakState<T>>())
+	WeakPtr() : m_state(std::make_shared<WeakState<Data>>())
 	{
 	}
 
-	T *Get() const
+	View *Get() const
 	{
 		return m_state->Get();
 	}
 
-	T *operator->() const
+	View *operator->() const
 	{
 		return m_state->CheckedGet();
 	}
 
-	T &operator*() const
+	View &operator*() const
 	{
 		return *m_state->CheckedGet();
 	}
@@ -43,15 +44,15 @@ public:
 
 	void Reset()
 	{
-		m_state = std::make_shared<WeakState<T>>();
+		m_state = std::make_shared<WeakState<Data>>();
 	}
 
 private:
-	friend class WeakPtrFactory<T>;
+	friend class WeakPtrFactory<Data>;
 
-	WeakPtr(std::shared_ptr<const WeakState<T>> state) : m_state(state)
+	WeakPtr(std::shared_ptr<const WeakState<Data>> state) : m_state(state)
 	{
 	}
 
-	std::shared_ptr<const WeakState<T>> m_state;
+	std::shared_ptr<const WeakState<Data>> m_state;
 };

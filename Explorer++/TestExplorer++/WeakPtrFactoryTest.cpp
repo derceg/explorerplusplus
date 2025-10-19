@@ -115,6 +115,35 @@ TEST(WeakPtrFactoryTest, InvalidateWeakPtrs)
 	EXPECT_EQ(weakPtr2.Get(), weakFactoryOwner.get());
 }
 
+TEST(WeakPtrFactoryTest, ConstUnderlyingType)
+{
+	int data;
+	WeakPtrFactory<const int> weakPtrFactory(&data);
+
+	auto weakPtr = weakPtrFactory.GetWeakPtr();
+	EXPECT_TRUE(std::is_const_v<std::remove_reference_t<decltype(*weakPtr)>>);
+}
+
+TEST(WeakPtrFactoryTest, GetConstWeakPtr)
+{
+	int data;
+	WeakPtrFactory<int> weakPtrFactory(&data);
+
+	const auto &constWeakPtrFactory = weakPtrFactory;
+	auto weakPtr = constWeakPtrFactory.GetWeakPtr();
+	EXPECT_TRUE(std::is_const_v<std::remove_reference_t<decltype(*weakPtr)>>);
+}
+
+TEST(WeakPtrFactoryTest, GetMutableWeakPtr)
+{
+	int data;
+	WeakPtrFactory<int> weakPtrFactory(&data);
+
+	const auto &constWeakPtrFactory = weakPtrFactory;
+	auto weakPtr = constWeakPtrFactory.GetMutableWeakPtr();
+	EXPECT_FALSE(std::is_const_v<std::remove_reference_t<decltype(*weakPtr)>>);
+}
+
 TEST(WeakPtrFactoryDeathTest, UseAfterInvalidation)
 {
 	auto weakFactoryOwner = std::make_unique<WeakFactoryOwner>();

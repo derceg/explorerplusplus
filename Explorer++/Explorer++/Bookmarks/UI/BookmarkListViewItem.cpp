@@ -78,7 +78,8 @@ std::optional<int> BookmarkListViewItem::GetIconIndex() const
 	if (!m_iconIndex)
 	{
 		m_iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem,
-			std::bind_front(&BookmarkListViewItem::OnIconAvailable, m_weakPtrFactory.GetWeakPtr()));
+			std::bind_front(&BookmarkListViewItem::OnIconAvailable,
+				m_weakPtrFactory.GetMutableWeakPtr()));
 	}
 
 	return m_iconIndex;
