@@ -169,8 +169,6 @@ void BookmarkTreePresenter::OnSelectionChanged(TreeViewNode *selectedNode)
 
 void BookmarkTreePresenter::OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen)
 {
-	m_view->SelectNode(targetNode);
-
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	BookmarkTreeViewContextMenu contextMenu(&popupMenu, m_acceleratorManager, this, m_bookmarkTree,
 		m_adapter->GetBookmarkForNode(targetNode), m_resourceLoader);

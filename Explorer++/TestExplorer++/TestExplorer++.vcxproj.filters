@@ -533,6 +533,12 @@
     <ClCompile Include="PlatformContextFake.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="TreeViewAdapterTest.cpp">
+      <Filter>Views\TreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeViewNodeFake.cpp">
+      <Filter>Views\TreeView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -874,6 +880,9 @@
     </ClInclude>
     <ClInclude Include="PlatformContextFake.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeViewNodeFake.h">
+      <Filter>Views\TreeView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

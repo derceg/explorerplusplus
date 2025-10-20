@@ -359,6 +359,8 @@
     <ClCompile Include="TabListTest.cpp" />
     <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
+    <ClCompile Include="TreeViewAdapterTest.cpp" />
+    <ClCompile Include="TreeViewNodeFake.cpp" />
     <ClCompile Include="TreeViewTest.cpp" />
     <ClCompile Include="UIThreadExecutorTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
@@ -501,6 +503,7 @@
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />
     <ClInclude Include="TabStorageTestHelper.h" />
+    <ClInclude Include="TreeViewNodeFake.h" />
     <ClInclude Include="WindowStorageTestHelper.h" />
     <ClInclude Include="XmlStorageTestHelper.h" />
   </ItemGroup>

@@ -8,6 +8,7 @@
 #include "LabelEditHandler.h"
 #include "MouseEvent.h"
 #include "TreeViewAdapter.h"
+#include "TreeViewNodeFake.h"
 #include "../Helper/Helper.h"
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -20,49 +21,6 @@ using namespace testing;
 
 namespace
 {
-
-class TreeViewNodeFake : public TreeViewNode
-{
-public:
-	std::wstring GetText() const override
-	{
-		return L"";
-	}
-
-	std::optional<int> GetIconIndex() const override
-	{
-		return std::nullopt;
-	}
-
-	bool CanRename() const override
-	{
-		return true;
-	}
-
-	bool CanRemove() const override
-	{
-		return true;
-	}
-
-	bool IsGhosted() const override
-	{
-		return m_isGhosted;
-	}
-
-	bool IsFile() const override
-	{
-		return false;
-	}
-
-	void SetIsGhosted(bool isGhosted)
-	{
-		m_isGhosted = isGhosted;
-		NotifyUpdated(Property::Ghosted);
-	}
-
-private:
-	bool m_isGhosted = false;
-};
 
 class TreeViewAdapterMock : public TreeViewAdapter
 {

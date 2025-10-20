@@ -7,7 +7,7 @@
 
 TreeViewAdapter::TreeViewAdapter()
 {
-	m_nodes.insert(&m_rootNode);
+	m_idToNodeMap.insert({ m_rootNode.GetId(), &m_rootNode });
 }
 
 TreeViewNode *TreeViewAdapter::GetRoot()
@@ -25,6 +25,18 @@ bool TreeViewAdapter::IsRoot(const TreeViewNode *node) const
 	return node == &m_rootNode;
 }
 
+TreeViewNode *TreeViewAdapter::MaybeGetNodeById(int id)
+{
+	auto itr = m_idToNodeMap.find(id);
+
+	if (itr == m_idToNodeMap.end())
+	{
+		return nullptr;
+	}
+
+	return itr->second;
+}
+
 TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node)
 {
 	return AddNode(parentNode, std::move(node), parentNode->GetChildren().size());
@@ -37,7 +49,7 @@ TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr
 
 	for (auto *currentNode : node->GetNodesDepthFirst())
 	{
-		auto [itr, didInsert] = m_nodes.insert(currentNode);
+		auto [itr, didInsert] = m_idToNodeMap.insert({ currentNode->GetId(), currentNode });
 		CHECK(didInsert);
 
 		// The observer here doesn't need to be removed, since this class owns the node.
@@ -97,7 +109,7 @@ void TreeViewAdapter::RemoveNode(TreeViewNode *node)
 
 	for (auto *currentNode : node->GetNodesDepthFirst())
 	{
-		auto numErased = m_nodes.erase(currentNode);
+		auto numErased = m_idToNodeMap.erase(currentNode->GetId());
 		CHECK_EQ(numErased, 1u);
 	}
 
@@ -110,7 +122,7 @@ void TreeViewAdapter::RemoveNode(TreeViewNode *node)
 
 bool TreeViewAdapter::IsInTree(const TreeViewNode *node) const
 {
-	return m_nodes.contains(node);
+	return m_idToNodeMap.contains(node->GetId());
 }
 
 void TreeViewAdapter::OnNodeExpanding(TreeViewNode *node)

@@ -370,6 +370,7 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 {
 	TreeViewNode *targetNode = nullptr;
 	POINT ptScreenFinal;
+	bool highlightTargetNode = false;
 
 	if (ptScreen.x == -1 && ptScreen.y == -1)
 	{
@@ -394,9 +395,24 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 		{
 			return;
 		}
+
+		highlightTargetNode = true;
+	}
+
+	int targetNodeId = targetNode->GetId();
+
+	if (highlightTargetNode)
+	{
+		SetNodeHighlighted(targetNode, true);
 	}
 
 	m_delegate->OnShowContextMenu(targetNode, ptScreenFinal);
+
+	// The delegate can delete the node in the callback above.
+	if (highlightTargetNode && m_adapter->MaybeGetNodeById(targetNodeId))
+	{
+		SetNodeHighlighted(targetNode, false);
+	}
 }
 
 void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)

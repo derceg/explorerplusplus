@@ -7,7 +7,7 @@
 #include "TreeViewNode.h"
 #include "../Helper/SignalWrapper.h"
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
 
 // Represents a set of nodes displayed in a TreeView. The nodes are stored hierarchically, in the
 // same way they're displayed in the view. This is designed to act as a bride between an existing
@@ -21,6 +21,7 @@ public:
 	TreeViewNode *GetRoot();
 	const TreeViewNode *GetRoot() const;
 	bool IsRoot(const TreeViewNode *node) const;
+	TreeViewNode *MaybeGetNodeById(int id);
 
 	// The tree can use this notification to lazily load the children of the specified node, if
 	// appropriate.
@@ -63,5 +64,5 @@ private:
 	bool IsInTree(const TreeViewNode *node) const;
 
 	RootTreeViewNode m_rootNode;
-	std::unordered_set<const TreeViewNode *> m_nodes;
+	std::unordered_map<int, TreeViewNode *> m_idToNodeMap;
 };
