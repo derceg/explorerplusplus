@@ -21,6 +21,11 @@ std::wstring BookmarkTreeViewNode::GetText() const
 	return m_bookmarkFolder->GetName();
 }
 
+std::optional<std::wstring> BookmarkTreeViewNode::MaybeGetEditingText() const
+{
+	return std::nullopt;
+}
+
 std::optional<int> BookmarkTreeViewNode::GetIconIndex() const
 {
 	return m_bookmarkFolderIconIndex;

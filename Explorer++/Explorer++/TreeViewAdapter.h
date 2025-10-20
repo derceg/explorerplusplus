@@ -54,6 +54,7 @@ private:
 	{
 	public:
 		std::wstring GetText() const override;
+		std::optional<std::wstring> MaybeGetEditingText() const override;
 		std::optional<int> GetIconIndex() const override;
 		bool CanRename() const override;
 		bool CanRemove() const override;

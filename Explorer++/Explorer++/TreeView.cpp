@@ -535,8 +535,14 @@ bool TreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
 		return true;
 	}
 
-	HWND editControl = TreeView_GetEditControl(m_hwnd);
-	CHECK(editControl);
+	HWND editControl = GetEditControl();
+	auto editingText = node->MaybeGetEditingText();
+
+	if (editingText)
+	{
+		SetWindowText(editControl, editingText->c_str());
+	}
+
 	m_labelEditHandlerFactory(editControl, node->IsFile());
 
 	return false;
@@ -613,6 +619,11 @@ void TreeView::StartRenamingNode(const TreeViewNode *node)
 	TreeView_EnsureVisible(m_hwnd, handle);
 	auto res = TreeView_EditLabel(m_hwnd, handle);
 	CHECK(res);
+}
+
+void TreeView::CancelRenaming()
+{
+	TreeView_EndEditLabelNow(m_hwnd, true);
 }
 
 bool TreeView::IsNodeExpandable(const TreeViewNode *node) const
@@ -768,6 +779,32 @@ RawTreeViewNodes TreeView::GetExpandedNodes()
 	return expandedNodes;
 }
 
+HWND TreeView::GetEditControl() const
+{
+	HWND editControl = TreeView_GetEditControl(m_hwnd);
+	CHECK(editControl);
+	return editControl;
+}
+
+HTREEITEM TreeView::GetHandleForNode(const TreeViewNode *node) const
+{
+	auto itr = m_handleToNodeMap.right.find(node);
+	CHECK(itr != m_handleToNodeMap.right.end());
+	return itr->second;
+}
+
+TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle)
+{
+	return const_cast<TreeViewNode *>(std::as_const(*this).GetNodeForHandle(handle));
+}
+
+const TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle) const
+{
+	auto itr = m_handleToNodeMap.left.find(handle);
+	CHECK(itr != m_handleToNodeMap.left.end());
+	return itr->second;
+}
+
 ConstRawTreeViewNodes TreeView::GetAllNodesDepthFirstForTesting() const
 {
 	CHECK(IsInTest());
@@ -809,6 +846,12 @@ std::wstring TreeView::GetNodeTextForTesting(const TreeViewNode *node) const
 	return text;
 }
 
+HWND TreeView::GetEditControlForTesting() const
+{
+	CHECK(IsInTest());
+	return GetEditControl();
+}
+
 bool TreeView::IsNodeGhostedForTesting(const TreeViewNode *node) const
 {
 	CHECK(IsInTest());
@@ -827,25 +870,6 @@ bool TreeView::IsExpanderShownForTesting(const TreeViewNode *node) const
 	auto res = TreeView_GetItem(m_hwnd, &tvItem);
 	CHECK(res);
 	return tvItem.cChildren != 0;
-}
-
-HTREEITEM TreeView::GetHandleForNode(const TreeViewNode *node) const
-{
-	auto itr = m_handleToNodeMap.right.find(node);
-	CHECK(itr != m_handleToNodeMap.right.end());
-	return itr->second;
-}
-
-TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle)
-{
-	return const_cast<TreeViewNode *>(std::as_const(*this).GetNodeForHandle(handle));
-}
-
-const TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle) const
-{
-	auto itr = m_handleToNodeMap.left.find(handle);
-	CHECK(itr != m_handleToNodeMap.left.end());
-	return itr->second;
 }
 
 void TreeView::NoOpDelegate::OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event)

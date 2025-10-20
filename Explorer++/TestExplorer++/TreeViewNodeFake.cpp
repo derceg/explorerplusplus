@@ -7,7 +7,12 @@
 
 std::wstring TreeViewNodeFake::GetText() const
 {
-	return L"";
+	return m_text;
+}
+
+std::optional<std::wstring> TreeViewNodeFake::MaybeGetEditingText() const
+{
+	return m_editingText;
 }
 
 std::optional<int> TreeViewNodeFake::GetIconIndex() const
@@ -33,6 +38,22 @@ bool TreeViewNodeFake::IsGhosted() const
 bool TreeViewNodeFake::IsFile() const
 {
 	return false;
+}
+
+void TreeViewNodeFake::SetText(const std::wstring &text)
+{
+	m_text = text;
+	NotifyUpdated(TreeViewNode::Property::Text);
+}
+
+void TreeViewNodeFake::SetEditingText(const std::wstring &editingText)
+{
+	m_editingText = editingText;
+}
+
+void TreeViewNodeFake::ClearEditingText()
+{
+	m_editingText.reset();
 }
 
 void TreeViewNodeFake::SetIsGhosted(bool isGhosted)

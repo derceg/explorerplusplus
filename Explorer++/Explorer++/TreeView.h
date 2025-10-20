@@ -61,6 +61,7 @@ public:
 	const TreeViewNode *GetSelectedNode() const;
 	void SelectNode(const TreeViewNode *node);
 	void StartRenamingNode(const TreeViewNode *node);
+	void CancelRenaming();
 	bool IsNodeExpanded(const TreeViewNode *node) const;
 	void ExpandNode(TreeViewNode *node);
 	void CollapseNode(TreeViewNode *node);
@@ -76,6 +77,7 @@ public:
 
 	ConstRawTreeViewNodes GetAllNodesDepthFirstForTesting() const;
 	std::wstring GetNodeTextForTesting(const TreeViewNode *node) const;
+	HWND GetEditControlForTesting() const;
 	bool IsNodeGhostedForTesting(const TreeViewNode *node) const;
 	bool IsExpanderShownForTesting(const TreeViewNode *node) const;
 
@@ -135,6 +137,8 @@ private:
 
 	void GetAllNodesDepthFirstForTesting(HTREEITEM firstSiblingHandle,
 		ConstRawTreeViewNodes &nodes) const;
+
+	HWND GetEditControl() const;
 
 	HTREEITEM GetHandleForNode(const TreeViewNode *node) const;
 	TreeViewNode *GetNodeForHandle(HTREEITEM handle);

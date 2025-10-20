@@ -143,6 +143,12 @@ std::wstring TreeViewAdapter::RootTreeViewNode::GetText() const
 	return L"";
 }
 
+std::optional<std::wstring> TreeViewAdapter::RootTreeViewNode::MaybeGetEditingText() const
+{
+	DCHECK(false);
+	return std::nullopt;
+}
+
 std::optional<int> TreeViewAdapter::RootTreeViewNode::GetIconIndex() const
 {
 	DCHECK(false);

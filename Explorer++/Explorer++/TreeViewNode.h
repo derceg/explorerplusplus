@@ -36,6 +36,12 @@ public:
 	int GetId() const;
 
 	virtual std::wstring GetText() const = 0;
+
+	// The text used when editing can differ from the node's display text. For example, a drive has
+	// a display name that's built from the drive letter and label. When editing, only the label
+	// appears, however.
+	virtual std::optional<std::wstring> MaybeGetEditingText() const = 0;
+
 	virtual std::optional<int> GetIconIndex() const = 0;
 	virtual bool CanRename() const = 0;
 	virtual bool CanRemove() const = 0;

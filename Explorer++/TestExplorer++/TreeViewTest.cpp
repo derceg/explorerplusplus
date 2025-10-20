@@ -10,6 +10,7 @@
 #include "TreeViewAdapter.h"
 #include "TreeViewNodeFake.h"
 #include "../Helper/Helper.h"
+#include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <gmock/gmock.h>
@@ -62,8 +63,8 @@ protected:
 			GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_parentWindow, nullptr);
 
-		m_treeViewWindow = CreateWindow(WC_TREEVIEW, L"", WS_POPUP, 0, 0, 1000, 1000,
-			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
+		m_treeViewWindow = CreateWindow(WC_TREEVIEW, L"", WS_POPUP | TVS_EDITLABELS, 0, 0, 1000,
+			1000, m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		ASSERT_NE(m_treeViewWindow, nullptr);
 	}
 
@@ -242,6 +243,27 @@ TEST_F(TreeViewTest, ExpandCollapseCallbacks)
 
 	EXPECT_CALL(m_adapter, OnNodeCollapsing(node));
 	m_treeView->CollapseNode(node);
+}
+
+TEST_F(TreeViewTest, EditingText)
+{
+	auto node = std::make_unique<TreeViewNodeFake>();
+	auto *rawNode = node.get();
+	m_adapter.AddNode(m_adapter.GetRoot(), std::move(node));
+
+	std::wstring text = L"Text";
+	rawNode->SetText(text);
+
+	std::wstring editingText = L"Editing text";
+	rawNode->SetEditingText(editingText);
+	m_treeView->StartRenamingNode(rawNode);
+	EXPECT_EQ(GetWindowString(m_treeView->GetEditControlForTesting()), editingText);
+
+	m_treeView->CancelRenaming();
+
+	rawNode->ClearEditingText();
+	m_treeView->StartRenamingNode(rawNode);
+	EXPECT_EQ(GetWindowString(m_treeView->GetEditControlForTesting()), text);
 }
 
 class TreeViewKeyPressTest : public TreeViewTest
