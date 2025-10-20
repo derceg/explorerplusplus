@@ -375,9 +375,9 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 	if (ptScreen.x == -1 && ptScreen.y == -1)
 	{
 		auto *selectedNode = GetSelectedNode();
-		auto nodeRect = GetNodeRect(selectedNode);
+		auto textRect = GetNodeRect(selectedNode, NodeRectType::Text);
 
-		ptScreenFinal = { nodeRect.left, nodeRect.top + (nodeRect.bottom - nodeRect.top) / 2 };
+		ptScreenFinal = { textRect.left, textRect.top + (textRect.bottom - textRect.top) / 2 };
 		ClientToScreen(m_hwnd, &ptScreenFinal);
 
 		targetNode = selectedNode;
@@ -660,10 +660,11 @@ void TreeView::CollapseNode(TreeViewNode *node)
 	CHECK(node->GetChildren().empty() || res);
 }
 
-RECT TreeView::GetNodeRect(const TreeViewNode *node) const
+RECT TreeView::GetNodeRect(const TreeViewNode *node, NodeRectType rectType) const
 {
 	RECT nodeRect;
-	auto res = TreeView_GetItemRect(m_hwnd, GetHandleForNode(node), &nodeRect, false);
+	auto res = TreeView_GetItemRect(m_hwnd, GetHandleForNode(node), &nodeRect,
+		rectType == NodeRectType::Text ? true : false);
 	CHECK(res);
 	return nodeRect;
 }
@@ -689,7 +690,7 @@ TreeViewNode *TreeView::MaybeGetNextVisibleNode(const POINT &pt)
 	for (handle = TreeView_GetFirstVisible(m_hwnd); handle != nullptr;
 		handle = TreeView_GetNextVisible(m_hwnd, handle))
 	{
-		auto rect = GetNodeRect(GetNodeForHandle(handle));
+		auto rect = GetNodeRect(GetNodeForHandle(handle), NodeRectType::EntireLine);
 
 		if (pt.y < rect.top)
 		{

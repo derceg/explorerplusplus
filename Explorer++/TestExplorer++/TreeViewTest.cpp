@@ -162,7 +162,7 @@ TEST_F(TreeViewTest, ItemPosition)
 	const auto *node2 =
 		m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<TreeViewNodeFake>());
 
-	auto node1Rect = m_treeView->GetNodeRect(node1);
+	auto node1Rect = m_treeView->GetNodeRect(node1, TreeView::NodeRectType::EntireLine);
 	POINT node1Origin = { node1Rect.left, node1Rect.top };
 	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1Origin), node1);
 	EXPECT_EQ(m_treeView->MaybeGetNextVisibleNode(node1Origin), node2);
@@ -206,7 +206,7 @@ TEST_F(TreeViewTest, MiddleClick)
 {
 	auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<TreeViewNodeFake>());
 
-	auto rect = m_treeView->GetNodeRect(node);
+	auto rect = m_treeView->GetNodeRect(node, TreeView::NodeRectType::EntireLine);
 	POINT pt = { rect.left, rect.top };
 	EXPECT_CALL(m_delegate, OnNodeMiddleClicked(node, MouseEvent(pt, false, false)));
 	SimulateMiddleClick(m_treeViewWindow, pt);

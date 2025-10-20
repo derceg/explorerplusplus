@@ -295,7 +295,7 @@ BookmarkTreePresenter::DropLocation BookmarkTreePresenter::GetDropLocation(const
 	{
 		auto *bookmarkFolder = m_adapter->GetBookmarkForNode(node);
 
-		auto nodeRect = m_view->GetNodeRect(node);
+		auto nodeRect = m_view->GetNodeRect(node, TreeView::NodeRectType::EntireLine);
 
 		RECT folderCentralRect = nodeRect;
 		int indent =

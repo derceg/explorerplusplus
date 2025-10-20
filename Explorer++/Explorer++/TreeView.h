@@ -30,6 +30,12 @@ class TreeView
 public:
 	using LabelEditHandlerFactory = std::function<LabelEditHandler *(HWND hwnd, bool itemIsFile)>;
 
+	enum class NodeRectType
+	{
+		Text,
+		EntireLine
+	};
+
 	TreeView(HWND hwnd, const KeyboardState *keyboardState,
 		LabelEditHandlerFactory labelEditHandlerFactory);
 	~TreeView();
@@ -47,7 +53,7 @@ public:
 	bool IsNodeExpanded(const TreeViewNode *node) const;
 	void ExpandNode(TreeViewNode *node);
 	void CollapseNode(TreeViewNode *node);
-	RECT GetNodeRect(const TreeViewNode *node) const;
+	RECT GetNodeRect(const TreeViewNode *node, NodeRectType rectType) const;
 	TreeViewNode *MaybeGetNodeAtPoint(const POINT &pt);
 	TreeViewNode *MaybeGetNextVisibleNode(const POINT &pt);
 	bool IsNodeHighlighted(const TreeViewNode *node) const;
