@@ -164,8 +164,16 @@ TEST_F(TreeViewTest, ItemPosition)
 
 	auto node1Rect = m_treeView->GetNodeRect(node1, TreeView::NodeRectType::EntireLine);
 	POINT node1Origin = { node1Rect.left, node1Rect.top };
-	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1Origin), node1);
+	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1Origin, TreeView::HitTestScope::IconOrText),
+		nullptr);
+	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1Origin, TreeView::HitTestScope::Row), node1);
 	EXPECT_EQ(m_treeView->MaybeGetNextVisibleNode(node1Origin), node2);
+
+	auto node1TextRect = m_treeView->GetNodeRect(node1, TreeView::NodeRectType::Text);
+	POINT node1TextOrigin = { node1TextRect.left, node1TextRect.top };
+	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1TextOrigin, TreeView::HitTestScope::IconOrText),
+		node1);
+	EXPECT_EQ(m_treeView->MaybeGetNodeAtPoint(node1TextOrigin, TreeView::HitTestScope::Row), node1);
 }
 
 TEST_F(TreeViewTest, GhostedNode)
@@ -206,9 +214,21 @@ TEST_F(TreeViewTest, MiddleClick)
 {
 	auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<TreeViewNodeFake>());
 
-	auto rect = m_treeView->GetNodeRect(node, TreeView::NodeRectType::EntireLine);
+	auto rect = m_treeView->GetNodeRect(node, TreeView::NodeRectType::Text);
 	POINT pt = { rect.left, rect.top };
 	EXPECT_CALL(m_delegate, OnNodeMiddleClicked(node, MouseEvent(pt, false, false)));
+	SimulateMiddleClick(m_treeViewWindow, pt);
+}
+
+TEST_F(TreeViewTest, MiddleClickOutsideIconText)
+{
+	auto *node = m_adapter.AddNode(m_adapter.GetRoot(), std::make_unique<TreeViewNodeFake>());
+
+	// Here, the node is middle-clicked, though outside of the icon/text bounds. So, no middle click
+	// event should be generated.
+	auto rect = m_treeView->GetNodeRect(node, TreeView::NodeRectType::EntireLine);
+	POINT pt = { rect.left, rect.top };
+	EXPECT_CALL(m_delegate, OnNodeMiddleClicked(_, _)).Times(0);
 	SimulateMiddleClick(m_treeViewWindow, pt);
 }
 

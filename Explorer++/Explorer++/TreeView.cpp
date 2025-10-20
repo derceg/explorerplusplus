@@ -281,7 +281,7 @@ void TreeView::OnCaptureChanged(HWND target)
 
 void TreeView::OnMiddleButtonDown(const POINT &pt)
 {
-	const auto *node = MaybeGetNodeAtPoint(pt);
+	const auto *node = MaybeGetNodeAtPoint(pt, HitTestScope::IconOrText);
 
 	if (!node)
 	{
@@ -302,7 +302,7 @@ void TreeView::OnMiddleButtonUp(const POINT &pt)
 
 	auto releaseCapture = wil::scope_exit([] { ReleaseCapture(); });
 
-	auto *node = MaybeGetNodeAtPoint(pt);
+	auto *node = MaybeGetNodeAtPoint(pt, HitTestScope::IconOrText);
 
 	if (!node || node->GetId() != *m_middleClickNodeId)
 	{
@@ -389,7 +389,7 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 		POINT ptClient = ptScreen;
 		ScreenToClient(m_hwnd, &ptClient);
 
-		targetNode = MaybeGetNodeAtPoint(ptClient);
+		targetNode = MaybeGetNodeAtPoint(ptClient, HitTestScope::IconOrText);
 
 		if (!targetNode)
 		{
@@ -669,13 +669,18 @@ RECT TreeView::GetNodeRect(const TreeViewNode *node, NodeRectType rectType) cons
 	return nodeRect;
 }
 
-TreeViewNode *TreeView::MaybeGetNodeAtPoint(const POINT &pt)
+TreeViewNode *TreeView::MaybeGetNodeAtPoint(const POINT &pt, HitTestScope scope)
 {
 	TVHITTESTINFO hitTestInfo = {};
 	hitTestInfo.pt = pt;
 	auto handle = TreeView_HitTest(m_hwnd, &hitTestInfo);
 
 	if (!handle)
+	{
+		return nullptr;
+	}
+
+	if (scope == HitTestScope::IconOrText && WI_AreAllFlagsClear(hitTestInfo.flags, TVHT_ONITEM))
 	{
 		return nullptr;
 	}

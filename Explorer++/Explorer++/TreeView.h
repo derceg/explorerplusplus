@@ -36,6 +36,17 @@ public:
 		EntireLine
 	};
 
+	enum class HitTestScope
+	{
+		// Indicates that a node will be returned if the specified point is over the node's icon or
+		// text.
+		IconOrText,
+
+		// Indicates that a node will be returned if the specified point is anywhere within the
+		// node's row.
+		Row
+	};
+
 	TreeView(HWND hwnd, const KeyboardState *keyboardState,
 		LabelEditHandlerFactory labelEditHandlerFactory);
 	~TreeView();
@@ -54,7 +65,7 @@ public:
 	void ExpandNode(TreeViewNode *node);
 	void CollapseNode(TreeViewNode *node);
 	RECT GetNodeRect(const TreeViewNode *node, NodeRectType rectType) const;
-	TreeViewNode *MaybeGetNodeAtPoint(const POINT &pt);
+	TreeViewNode *MaybeGetNodeAtPoint(const POINT &pt, HitTestScope scope);
 	TreeViewNode *MaybeGetNextVisibleNode(const POINT &pt);
 	bool IsNodeHighlighted(const TreeViewNode *node) const;
 	void SetNodeHighlighted(const TreeViewNode *node, bool highlighted);

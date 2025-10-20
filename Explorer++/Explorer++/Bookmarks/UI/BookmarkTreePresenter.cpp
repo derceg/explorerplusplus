@@ -285,7 +285,7 @@ BookmarkTreePresenter::DropLocation BookmarkTreePresenter::GetDropLocation(const
 	POINT ptClient = pt;
 	ScreenToClient(m_view->GetHWND(), &ptClient);
 
-	auto *node = m_view->MaybeGetNodeAtPoint(ptClient);
+	auto *node = m_view->MaybeGetNodeAtPoint(ptClient, TreeView::HitTestScope::Row);
 
 	BookmarkItem *parentFolder = nullptr;
 	size_t position;
