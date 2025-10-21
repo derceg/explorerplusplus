@@ -81,8 +81,6 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browser,
 
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_iFolderIcon));
 
-	m_bDragCancelled = FALSE;
-	m_bDragAllowed = FALSE;
 	m_bShowHidden = TRUE;
 
 	AddRootItems();
@@ -164,30 +162,6 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		m_commandTarget.TargetFocused();
 		break;
 
-	case WM_RBUTTONDOWN:
-		if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
-		{
-			TVHITTESTINFO tvhti;
-
-			tvhti.pt.x = LOWORD(lParam);
-			tvhti.pt.y = HIWORD(lParam);
-
-			/* Test to see if the mouse click was
-			on an item or not. */
-			TreeView_HitTest(m_hTreeView, &tvhti);
-
-			if (!(tvhti.flags & LVHT_NOWHERE))
-			{
-				m_bDragAllowed = TRUE;
-			}
-		}
-		break;
-
-	case WM_RBUTTONUP:
-		m_bDragCancelled = FALSE;
-		m_bDragAllowed = FALSE;
-		break;
-
 	case WM_MBUTTONDOWN:
 	{
 		POINT pt;
@@ -201,51 +175,6 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
 		OnMiddleButtonUp(&pt, static_cast<UINT>(wParam));
-	}
-	break;
-
-	case WM_MOUSEMOVE:
-	{
-		if (!IsWithinDrag() && !m_bDragCancelled && m_bDragAllowed)
-		{
-			if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
-			{
-				TVHITTESTINFO tvhti;
-				TVITEM tvItem;
-				POINT pt;
-				DWORD dwPos;
-				HRESULT hr;
-				BOOL bRet;
-
-				dwPos = GetMessagePos();
-				pt.x = GET_X_LPARAM(dwPos);
-				pt.y = GET_Y_LPARAM(dwPos);
-				MapWindowPoints(HWND_DESKTOP, m_hTreeView, &pt, 1);
-
-				tvhti.pt = pt;
-
-				/* Test to see if the mouse click was
-				on an item or not. */
-				TreeView_HitTest(m_hTreeView, &tvhti);
-
-				if (!(tvhti.flags & LVHT_NOWHERE))
-				{
-					tvItem.mask = TVIF_PARAM | TVIF_HANDLE;
-					tvItem.hItem = tvhti.hItem;
-					bRet = TreeView_GetItem(m_hTreeView, &tvItem);
-
-					if (bRet)
-					{
-						hr = OnBeginDrag(reinterpret_cast<ShellTreeNode *>(tvItem.lParam));
-
-						if (hr == DRAGDROP_S_CANCEL)
-						{
-							m_bDragCancelled = TRUE;
-						}
-					}
-				}
-			}
-		}
 	}
 	break;
 
@@ -288,6 +217,13 @@ LRESULT ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
 			case TVN_BEGINDRAG:
+			{
+				auto *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
+				OnBeginDrag(reinterpret_cast<ShellTreeNode *>(pnmTreeView->itemNew.lParam));
+			}
+			break;
+
+			case TVN_BEGINRDRAG:
 			{
 				auto *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
 				OnBeginDrag(reinterpret_cast<ShellTreeNode *>(pnmTreeView->itemNew.lParam));
@@ -1211,19 +1147,17 @@ void ShellTreeView::SetShowHidden(BOOL bShowHidden)
 	m_bShowHidden = bShowHidden;
 }
 
-HRESULT ShellTreeView::OnBeginDrag(const ShellTreeNode *node)
+void ShellTreeView::OnBeginDrag(const ShellTreeNode *node)
 {
 	auto pidl = node->GetFullPidl();
 
 	m_performingDrag = true;
 	m_draggedItemPidl = pidl.get();
 
-	HRESULT hr = StartDragForShellItems({ pidl.get() });
+	StartDragForShellItems({ pidl.get() });
 
 	m_draggedItemPidl = nullptr;
 	m_performingDrag = false;
-
-	return hr;
 }
 
 void ShellTreeView::StartRenamingSelectedItem()

@@ -29,8 +29,6 @@ public:
 	IFACEMETHODIMP DragLeave();
 	IFACEMETHODIMP Drop(IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect);
 
-	bool IsWithinDrag() const;
-
 private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -42,6 +40,4 @@ private:
 	DropTargetInternal *m_dropTargetInternal;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-
-	bool m_withinDrag;
 };

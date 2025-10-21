@@ -106,8 +106,3 @@ void BookmarkDropTargetWindow::SetBlockDrop(bool blockDrop)
 
 	m_blockDrop = blockDrop;
 }
-
-bool BookmarkDropTargetWindow::IsWithinDrag() const
-{
-	return m_dropTargetWindow->IsWithinDrag();
-}

@@ -7,8 +7,7 @@
 
 DropTargetWindow::DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal) :
 	m_hwnd(hwnd),
-	m_dropTargetInternal(dropTargetInternal),
-	m_withinDrag(false)
+	m_dropTargetInternal(dropTargetInternal)
 {
 	RegisterDragDrop(hwnd, this);
 
@@ -42,8 +41,6 @@ IFACEMETHODIMP DropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keySta
 
 	*effect = m_dropTargetInternal->DragEnter(dataObject, keyState, pt, *effect);
 
-	m_withinDrag = true;
-
 	return S_OK;
 }
 
@@ -74,8 +71,6 @@ IFACEMETHODIMP DropTargetWindow::DragLeave()
 
 	m_dropTargetInternal->DragLeave();
 
-	m_withinDrag = false;
-
 	return S_OK;
 }
 
@@ -93,8 +88,6 @@ IFACEMETHODIMP DropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, P
 
 	*effect = m_dropTargetInternal->Drop(dataObject, keyState, pt, *effect);
 
-	m_withinDrag = false;
-
 	return S_OK;
 }
 
@@ -107,9 +100,4 @@ IDropTargetHelper *DropTargetWindow::GetDropTargetHelper()
 	}
 
 	return m_dropTargetHelper;
-}
-
-bool DropTargetWindow::IsWithinDrag() const
-{
-	return m_withinDrag;
 }

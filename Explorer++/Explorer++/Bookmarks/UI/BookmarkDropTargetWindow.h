@@ -27,7 +27,6 @@ protected:
 	virtual void ResetDropUiState() = 0;
 
 	void SetBlockDrop(bool blockDrop);
-	bool IsWithinDrag() const;
 
 private:
 	// DropTargetInternal methods.

@@ -260,11 +260,5 @@ void ShellDropTargetWindow<DropTargetItemIdentifierType>::ResetDropState()
 	m_previousTargetInfo.reset();
 }
 
-template <typename DropTargetItemIdentifierType>
-bool ShellDropTargetWindow<DropTargetItemIdentifierType>::IsWithinDrag() const
-{
-	return m_dropTargetWindow->IsWithinDrag();
-}
-
 template class ShellDropTargetWindow<int>;
 template class ShellDropTargetWindow<HTREEITEM>;

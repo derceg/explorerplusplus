@@ -204,7 +204,7 @@ private:
 	void UpdateUiForTargetItem(HTREEITEM targetItem);
 	void ScrollTreeViewForDrop(const POINT &pt);
 	void OnDropExpandTimer();
-	HRESULT OnBeginDrag(const ShellTreeNode *node);
+	void OnBeginDrag(const ShellTreeNode *node);
 
 	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
@@ -258,8 +258,6 @@ private:
 	/* Drag and drop. */
 	HTREEITEM m_dropExpandItem;
 	concurrencpp::timer m_dropExpandTimer;
-	BOOL m_bDragCancelled;
-	BOOL m_bDragAllowed;
 	bool m_performingDrag = false;
 	PCIDLIST_ABSOLUTE m_draggedItemPidl = nullptr;
 

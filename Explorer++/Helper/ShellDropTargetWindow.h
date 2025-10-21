@@ -15,7 +15,6 @@ class ShellDropTargetWindow : private DropTargetInternal
 {
 public:
 	HWND GetHWND() const;
-	bool IsWithinDrag() const;
 
 protected:
 	ShellDropTargetWindow(HWND hwnd);
