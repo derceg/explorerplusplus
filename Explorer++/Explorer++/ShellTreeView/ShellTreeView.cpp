@@ -87,8 +87,6 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browser,
 
 	AddRootItems();
 
-	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
-
 	StartDirectoryMonitoringForDrives();
 
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
@@ -160,11 +158,6 @@ ShellTreeView::~ShellTreeView()
 
 LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (m_getDragImageMessage != 0 && msg == m_getDragImageMessage)
-	{
-		return FALSE;
-	}
-
 	switch (msg)
 	{
 	case WM_SETFOCUS:
@@ -1220,17 +1213,12 @@ void ShellTreeView::SetShowHidden(BOOL bShowHidden)
 
 HRESULT ShellTreeView::OnBeginDrag(const ShellTreeNode *node)
 {
-	wil::com_ptr_nothrow<IDataObject> dataObject;
 	auto pidl = node->GetFullPidl();
-	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
-	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
 	m_performingDrag = true;
 	m_draggedItemPidl = pidl.get();
 
-	DWORD effect;
-	HRESULT hr = SHDoDragDrop(m_hTreeView, dataObject.get(), nullptr,
-		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);
+	HRESULT hr = StartDragForShellItems({ pidl.get() });
 
 	m_draggedItemPidl = nullptr;
 	m_performingDrag = false;

@@ -47,6 +47,52 @@ HRESULT ClearDropDescription(IDataObject *dataObject)
 	return SetDropDescription(dataObject, DROPIMAGE_INVALID, L"", L"");
 }
 
+HRESULT StartDragForShellItems(const std::vector<PCIDLIST_ABSOLUTE> &items,
+	std::optional<DWORD> preferredDropEffect)
+{
+	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
+	RETURN_IF_FAILED(SHCreateShellItemArrayFromIDLists(static_cast<UINT>(items.size()),
+		items.data(), &shellItemArray));
+
+	SFGAOF attributes = SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK;
+	RETURN_IF_FAILED(shellItemArray->GetAttributes(SIATTRIBFLAGS_AND, attributes, &attributes));
+
+	if (WI_AreAllFlagsClear(attributes, SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK))
+	{
+		// The root desktop folder is at least one item that can't be copied/moved/linked. In a
+		// situation like that, it's not possible to start a drag at all.
+		return DRAGDROP_S_CANCEL;
+	}
+
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
+
+	DWORD allowedEffects = 0;
+
+	if (WI_IsFlagSet(attributes, SFGAO_CANCOPY))
+	{
+		WI_SetFlag(allowedEffects, DROPEFFECT_COPY);
+	}
+
+	if (WI_IsFlagSet(attributes, SFGAO_CANMOVE))
+	{
+		WI_SetFlag(allowedEffects, DROPEFFECT_MOVE);
+	}
+
+	if (WI_IsFlagSet(attributes, SFGAO_CANLINK))
+	{
+		WI_SetFlag(allowedEffects, DROPEFFECT_LINK);
+	}
+
+	if (preferredDropEffect && WI_AreAllFlagsSet(allowedEffects, *preferredDropEffect))
+	{
+		RETURN_IF_FAILED(SetPreferredDropEffect(dataObject.get(), *preferredDropEffect));
+	}
+
+	DWORD effect;
+	return SHDoDragDrop(nullptr, dataObject.get(), nullptr, allowedEffects, &effect);
+}
+
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
 	IDataObject **dataObjectOut)
 {

@@ -10,6 +10,7 @@
 #include <wil/result.h>
 #include <ShlObj.h>
 #include <shtypes.h>
+#include <optional>
 
 wil::unique_stg_medium GetStgMediumForGlobal(wil::unique_hglobal global);
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect);
@@ -17,6 +18,8 @@ HRESULT GetPreferredDropEffect(IDataObject *dataObject, DWORD &effect);
 HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const std::wstring &message,
 	const std::wstring &insert);
 HRESULT ClearDropDescription(IDataObject *dataObject);
+HRESULT StartDragForShellItems(const std::vector<PCIDLIST_ABSOLUTE> &items,
+	std::optional<DWORD> preferredDropEffect = std::nullopt);
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
 	IDataObject **dataObjectOut);
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &items,

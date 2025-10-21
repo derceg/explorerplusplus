@@ -84,9 +84,9 @@ IUnknown *ShellBrowserImpl::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPid
 	return m_dropServiceProvider.get();
 }
 
-bool ShellBrowserImpl::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
+bool ShellBrowserImpl::IsTargetSourceOfDrop(int targetItem)
 {
-	if (m_performingDrag && dataObject == m_draggedDataObject && targetItem == -1)
+	if (m_performingDrag && targetItem == -1)
 	{
 		return true;
 	}

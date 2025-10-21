@@ -10,17 +10,14 @@
 #include "NavigationHelper.h"
 #include "RuntimeHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
-#include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabEvents.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
-#include <wil/com.h>
-#include <wil/common.h>
 
 AddressBar *AddressBar::Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
@@ -87,10 +84,9 @@ void AddressBar::OnEnterPressed()
 {
 	std::wstring path = m_view->GetText();
 
-	auto *shellBrowser = m_browser->GetActiveShellBrowser();
-	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
+	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	std::wstring currentDirectory =
-		GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING);
+		GetDisplayNameWithFallback(shellBrowser->GetDirectory().Raw(), SHGDN_FORPARSING);
 
 	// When entering a path in the address bar in Windows Explorer, environment variables will be
 	// expanded. The behavior here is designed to match that.
@@ -141,52 +137,9 @@ void AddressBar::OnEscapePressed()
 
 void AddressBar::OnBeginDrag()
 {
-	auto *shellBrowser = m_browser->GetActiveShellBrowser();
-	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
-	auto pidlDirectory = currentEntry->GetPidl();
-
-	SFGAOF attributes = SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK;
-	HRESULT hr = GetItemAttributes(pidlDirectory.Raw(), &attributes);
-
-	if (FAILED(hr)
-		|| WI_AreAllFlagsClear(attributes, SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK))
-	{
-		// The root desktop folder is at least one item that can't be copied/moved/linked to. In a
-		// situation like that, it's not possible to start a drag at all.
-		return;
-	}
-
-	wil::com_ptr_nothrow<IDataObject> dataObject;
-	std::vector<PCIDLIST_ABSOLUTE> items = { pidlDirectory.Raw() };
-	hr = CreateDataObjectForShellTransfer(items, &dataObject);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	DWORD allowedEffects = 0;
-
-	if (WI_IsFlagSet(attributes, SFGAO_CANCOPY))
-	{
-		WI_SetFlag(allowedEffects, DROPEFFECT_COPY);
-	}
-
-	if (WI_IsFlagSet(attributes, SFGAO_CANMOVE))
-	{
-		WI_SetFlag(allowedEffects, DROPEFFECT_MOVE);
-	}
-
-	if (WI_IsFlagSet(attributes, SFGAO_CANLINK))
-	{
-		WI_SetFlag(allowedEffects, DROPEFFECT_LINK);
-
-		hr = SetPreferredDropEffect(dataObject.get(), DROPEFFECT_LINK);
-		DCHECK(SUCCEEDED(hr));
-	}
-
-	DWORD effect;
-	SHDoDragDrop(nullptr, dataObject.get(), nullptr, allowedEffects, &effect);
+	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
+	const auto &pidl = shellBrowser->GetDirectory();
+	StartDragForShellItems({ pidl.Raw() }, DROPEFFECT_LINK);
 }
 
 void AddressBar::OnFocused()
@@ -217,9 +170,9 @@ void AddressBar::UpdateTextAndIcon(const ShellBrowser *shellBrowser, IconUpdateT
 	// ignored once they complete.
 	m_scopedStopSource = std::make_unique<ScopedStopSource>();
 
-	auto entry = shellBrowser->GetNavigationController()->GetCurrentEntry();
+	const auto &pidl = shellBrowser->GetDirectory();
 
-	auto cachedIconIndex = m_iconFetcher->MaybeGetCachedIconIndex(entry->GetPidl().Raw());
+	auto cachedIconIndex = m_iconFetcher->MaybeGetCachedIconIndex(pidl.Raw());
 	int iconIndex;
 
 	if (cachedIconIndex)
@@ -228,15 +181,15 @@ void AddressBar::UpdateTextAndIcon(const ShellBrowser *shellBrowser, IconUpdateT
 	}
 	else
 	{
-		iconIndex = m_iconFetcher->GetDefaultIconIndex(entry->GetPidl().Raw());
+		iconIndex = m_iconFetcher->GetDefaultIconIndex(pidl.Raw());
 	}
 
 	if (iconUpdateType == IconUpdateType::AlwaysFetch || !cachedIconIndex)
 	{
-		RetrieveUpdatedIcon(m_weakPtrFactory.GetWeakPtr(), entry->GetPidl());
+		RetrieveUpdatedIcon(m_weakPtrFactory.GetWeakPtr(), pidl);
 	}
 
-	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(entry->GetPidl().Raw());
+	auto fullPathForDisplay = GetFolderPathForDisplayWithFallback(pidl.Raw());
 	m_view->UpdateTextAndIcon(fullPathForDisplay, iconIndex);
 }
 

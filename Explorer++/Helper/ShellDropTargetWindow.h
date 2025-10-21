@@ -51,8 +51,7 @@ private:
 
 	// This will be used to detect whether the target directory is the source directory (to ensure
 	// that an item dragged and dropped within a single directory doesn't get moved or copied).
-	virtual bool IsTargetSourceOfDrop(DropTargetItemIdentifierType targetItem,
-		IDataObject *dataObject) = 0;
+	virtual bool IsTargetSourceOfDrop(DropTargetItemIdentifierType targetItem) = 0;
 
 	virtual void UpdateUiForDrop(DropTargetItemIdentifierType targetItem, const POINT &pt) = 0;
 	virtual void ResetDropUiState() = 0;

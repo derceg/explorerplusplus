@@ -342,6 +342,8 @@ private:
 
 		ListViewGroupSet groups;
 
+		bool isCurrentFolderDragSource = false;
+
 		DirectoryState() :
 			virtualFolder(false),
 			itemIDCounter(0),
@@ -443,7 +445,7 @@ private:
 	std::vector<PidlAbsolute> GetSelectedItemPidls() const;
 	void OnListViewBeginDrag(const NMLISTVIEW *info);
 	void OnListViewBeginRightClickDrag(const NMLISTVIEW *info);
-	HRESULT StartDrag(int draggedItem, const POINT &startPoint);
+	void StartDrag(int draggedItem, const POINT &startPoint);
 	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	LRESULT OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDraw);
@@ -615,7 +617,7 @@ private:
 	int GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
-	bool IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject) override;
+	bool IsTargetSourceOfDrop(int targetItem) override;
 	void UpdateUiForDrop(int targetItem, const POINT &pt) override;
 	void ResetDropUiState() override;
 
@@ -719,12 +721,10 @@ private:
 	std::vector<std::wstring> m_cutFileNames;
 
 	/* Drag and drop related data. */
-	UINT m_getDragImageMessage;
 	winrt::com_ptr<ServiceProvider> m_dropServiceProvider;
 	std::vector<PidlAbsolute> m_draggedItems;
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
-	IDataObject *m_draggedDataObject;
 
 	DestroyedSignal m_destroyedSignal;
 

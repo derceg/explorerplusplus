@@ -736,10 +736,9 @@ IUnknown *TabContainer::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 	return nullptr;
 }
 
-bool TabContainer::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
+bool TabContainer::IsTargetSourceOfDrop(int targetItem)
 {
 	UNREFERENCED_PARAMETER(targetItem);
-	UNREFERENCED_PARAMETER(dataObject);
 
 	return false;
 }

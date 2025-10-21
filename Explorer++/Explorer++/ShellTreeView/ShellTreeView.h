@@ -196,7 +196,7 @@ private:
 	HTREEITEM GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(HTREEITEM targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
-	bool IsTargetSourceOfDrop(HTREEITEM targetItem, IDataObject *dataObject) override;
+	bool IsTargetSourceOfDrop(HTREEITEM targetItem) override;
 	void UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt) override;
 	void ResetDropUiState() override;
 
@@ -256,7 +256,6 @@ private:
 	concurrencpp::timer m_selectionChangedTimer;
 
 	/* Drag and drop. */
-	UINT m_getDragImageMessage;
 	HTREEITEM m_dropExpandItem;
 	concurrencpp::timer m_dropExpandTimer;
 	BOOL m_bDragCancelled;

@@ -34,6 +34,8 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ShellItemContextMenu.h"
 #include "../Helper/WinRTBaseWrapper.h"
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <glog/logging.h>
 #include <wil/common.h>
 #include <format>
@@ -66,16 +68,6 @@ std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory);
 
 LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (m_getDragImageMessage != 0 && uMsg == m_getDragImageMessage)
-	{
-		// The listview control has built-in handling for this message (DI_GETDRAGIMAGE). It will,
-		// by default, build an image based on the item being dragged. However, that's undesirable
-		// here. When using SHDoDragDrop(), the drag image will be set up by that method. If the
-		// listview is allowed to process the DI_GETDRAGIMAGE message, it will set the default
-		// image. So, returning FALSE here allows SHDoDragDrop() to set up the image itself.
-		return FALSE;
-	}
-
 	switch (uMsg)
 	{
 	// NM_DBLCLK for the listview is sent both on double clicks (by default), as well as in the
@@ -1307,21 +1299,18 @@ void ShellBrowserImpl::OnListViewBeginRightClickDrag(const NMLISTVIEW *info)
 	StartDrag(info->iItem, info->ptAction);
 }
 
-HRESULT ShellBrowserImpl::StartDrag(int draggedItem, const POINT &startPoint)
+void ShellBrowserImpl::StartDrag(int draggedItem, const POINT &startPoint)
 {
 	auto pidls = GetSelectedItemPidls();
 
 	if (pidls.empty())
 	{
-		return E_UNEXPECTED;
+		return;
 	}
 
-	wil::com_ptr_nothrow<IDataObject> dataObject;
-	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(pidls, &dataObject));
-
 	m_performingDrag = true;
-	m_draggedDataObject = dataObject.get();
 	m_draggedItems = pidls;
+	m_directoryState.isCurrentFolderDragSource = true;
 
 	POINT ptItem;
 	ListView_GetItemPosition(m_listView, draggedItem, &ptItem);
@@ -1332,15 +1321,13 @@ HRESULT ShellBrowserImpl::StartDrag(int draggedItem, const POINT &startPoint)
 	m_ptDraggedOffset.x = ptOrigin.x + startPoint.x - ptItem.x;
 	m_ptDraggedOffset.y = ptOrigin.y + startPoint.y - ptItem.y;
 
-	DWORD finalEffect;
-	HRESULT hr = SHDoDragDrop(m_listView, dataObject.get(), nullptr,
-		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &finalEffect);
+	auto rawPidls = boost::copy_range<std::vector<PCIDLIST_ABSOLUTE>>(
+		pidls | boost::adaptors::transformed([](const auto &pidl) { return pidl.Raw(); }));
+	StartDragForShellItems(rawPidls);
 
+	m_directoryState.isCurrentFolderDragSource = false;
 	m_draggedItems.clear();
-	m_draggedDataObject = nullptr;
 	m_performingDrag = false;
-
-	return hr;
 }
 
 bool ShellBrowserImpl::CanAutoSizeColumns() const

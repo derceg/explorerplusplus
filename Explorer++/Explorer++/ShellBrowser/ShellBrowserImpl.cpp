@@ -106,7 +106,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	m_shellWindowRegistered(false),
 	m_folderColumns(
 		initialColumns ? *initialColumns : app->GetConfig()->globalFolderSettings.folderColumns),
-	m_draggedDataObject(nullptr),
 	m_weakPtrFactory(this)
 {
 	InitializeListView();
@@ -126,8 +125,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 
 	m_connections.push_back(m_app->GetClipboardWatcher()->updateSignal.AddObserver(
 		std::bind_front(&ShellBrowserImpl::OnClipboardUpdate, this)));
-
-	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
 	m_performingDrag = false;
 	m_nCurrentColumns = 0;

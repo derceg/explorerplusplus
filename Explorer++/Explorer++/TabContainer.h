@@ -160,7 +160,7 @@ private:
 	int GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
-	bool IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject) override;
+	bool IsTargetSourceOfDrop(int targetItem) override;
 	void UpdateUiForDrop(int targetItem, const POINT &pt) override;
 	void ResetDropUiState() override;
 
