@@ -96,17 +96,18 @@ bool ShellBrowserImpl::IsTargetSourceOfDrop(int targetItem)
 
 void ShellBrowserImpl::UpdateUiForDrop(int targetItem, const POINT &pt)
 {
-	ListView_SetItemState(m_listView, -1, 0, LVIS_DROPHILITED);
+	ResetDropUiState();
 
 	if (targetItem != -1)
 	{
 		ListView_SetItemState(m_listView, targetItem, LVIS_DROPHILITED, LVIS_DROPHILITED);
+
+		m_directoryState.highlightedItemInternalIndex = GetItemInternalIndex(targetItem);
 	}
 
 	ScrollListViewForDrop(pt);
 }
 
-/* TODO: This isn't declared. */
 int CALLBACK SortTemporaryStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	auto *pShellBrowser = reinterpret_cast<ShellBrowserImpl *>(lParamSort);
@@ -403,6 +404,20 @@ void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 void ShellBrowserImpl::ResetDropUiState()
 {
 	ListViewHelper::PositionInsertMark(m_listView, nullptr);
+	RemoveDropHighlight();
+}
 
-	ListView_SetItemState(m_listView, -1, 0, LVIS_DROPHILITED);
+void ShellBrowserImpl::RemoveDropHighlight()
+{
+	if (!m_directoryState.highlightedItemInternalIndex)
+	{
+		return;
+	}
+
+	if (auto index = LocateItemByInternalIndex(*m_directoryState.highlightedItemInternalIndex))
+	{
+		ListView_SetItemState(m_listView, *index, 0, LVIS_DROPHILITED);
+	}
+
+	m_directoryState.highlightedItemInternalIndex.reset();
 }

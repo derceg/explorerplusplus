@@ -342,7 +342,9 @@ private:
 
 		ListViewGroupSet groups;
 
+		// Drag and drop
 		bool isCurrentFolderDragSource = false;
+		std::optional<int> highlightedItemInternalIndex;
 
 		DirectoryState() :
 			virtualFolder(false),
@@ -620,6 +622,8 @@ private:
 	bool IsTargetSourceOfDrop(int targetItem) override;
 	void UpdateUiForDrop(int targetItem, const POINT &pt) override;
 	void ResetDropUiState() override;
+
+	void RemoveDropHighlight();
 
 	/* Drag and Drop support. */
 	void RepositionLocalFiles(const POINT *ppt);
