@@ -1151,13 +1151,7 @@ void ShellTreeView::OnBeginDrag(const ShellTreeNode *node)
 {
 	auto pidl = node->GetFullPidl();
 
-	m_performingDrag = true;
-	m_draggedItemPidl = pidl.get();
-
 	StartDragForShellItems({ pidl.get() });
-
-	m_draggedItemPidl = nullptr;
-	m_performingDrag = false;
 }
 
 void ShellTreeView::StartRenamingSelectedItem()

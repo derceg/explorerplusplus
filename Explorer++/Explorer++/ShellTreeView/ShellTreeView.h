@@ -258,8 +258,6 @@ private:
 	/* Drag and drop. */
 	HTREEITEM m_dropExpandItem;
 	concurrencpp::timer m_dropExpandTimer;
-	bool m_performingDrag = false;
-	PCIDLIST_ABSOLUTE m_draggedItemPidl = nullptr;
 
 	CutCopiedItemManager m_cutCopiedItemManager;
 
