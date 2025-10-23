@@ -106,12 +106,16 @@ void TreeView::AddNode(TreeViewNode *node)
 		insertAfterHandle = GetHandleForNode(previousNode);
 	}
 
+	LOG(INFO) << "Adding node. Current node count: " << TreeView_GetCount(m_hwnd);
+
 	TVINSERTSTRUCT tvInsertData = {};
 	tvInsertData.hParent = parentHandle;
 	tvInsertData.hInsertAfter = insertAfterHandle;
 	tvInsertData.itemex = tvItem;
 	auto handle = TreeView_InsertItem(m_hwnd, &tvInsertData);
 	CHECK(handle);
+
+	LOG(INFO) << "Storing node handle";
 
 	auto [itr, didInsert] = m_handleToNodeMap.insert({ handle, node });
 	CHECK(didInsert);
@@ -417,6 +421,8 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 
 void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
 {
+	LOG(INFO) << "Processing TVN_GETDISPINFO";
+
 	const auto *node = GetNodeForHandle(dispInfo->item.hItem);
 
 	if (WI_IsAnyFlagSet(dispInfo->item.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE))
@@ -441,6 +447,8 @@ void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
 
 void TreeView::OnNodeExpanding(const NMTREEVIEW *notifyInfo)
 {
+	LOG(INFO) << "Processing TVN_ITEMEXPANDING";
+
 	auto *node = GetNodeForHandle(notifyInfo->itemNew.hItem);
 
 	if (notifyInfo->action == TVE_EXPAND)
@@ -562,6 +570,8 @@ bool TreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 
 void TreeView::OnSelectionChanged(const NMTREEVIEW *notifyInfo)
 {
+	LOG(INFO) << "Processing TVN_SELCHANGED";
+
 	if (m_blockSelectionChangeEvent)
 	{
 		return;
@@ -802,6 +812,7 @@ const TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle) const
 {
 	auto itr = m_handleToNodeMap.left.find(handle);
 	LOG(INFO) << "Number of handles stored: " << m_handleToNodeMap.size();
+	LOG(INFO) << "Number of nodes in tree: " << TreeView_GetCount(m_hwnd);
 	CHECK(itr != m_handleToNodeMap.left.end());
 	return itr->second;
 }
