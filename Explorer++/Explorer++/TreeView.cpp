@@ -77,18 +77,10 @@ void TreeView::AddNode(TreeViewNode *node)
 	std::wstring text = node->GetText();
 
 	TVITEMEX tvItem = {};
-	tvItem.mask = TVIF_TEXT | TVIF_CHILDREN | TVIF_STATE;
+	tvItem.mask = TVIF_TEXT | TVIF_STATE;
 	tvItem.pszText = text.data();
-	tvItem.cChildren = I_CHILDRENCALLBACK;
 	tvItem.stateMask = TVIS_CUT;
 	tvItem.state = node->IsGhosted() ? TVIS_CUT : 0;
-
-	if (m_imageList)
-	{
-		WI_SetAllFlags(tvItem.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE);
-		tvItem.iImage = I_IMAGECALLBACK;
-		tvItem.iSelectedImage = I_IMAGECALLBACK;
-	}
 
 	auto *parentNode = node->GetParent();
 
@@ -106,8 +98,6 @@ void TreeView::AddNode(TreeViewNode *node)
 		insertAfterHandle = GetHandleForNode(previousNode);
 	}
 
-	LOG(INFO) << "Adding node. Current node count: " << TreeView_GetCount(m_hwnd);
-
 	TVINSERTSTRUCT tvInsertData = {};
 	tvInsertData.hParent = parentHandle;
 	tvInsertData.hInsertAfter = insertAfterHandle;
@@ -115,10 +105,31 @@ void TreeView::AddNode(TreeViewNode *node)
 	auto handle = TreeView_InsertItem(m_hwnd, &tvInsertData);
 	CHECK(handle);
 
-	LOG(INFO) << "Storing node handle";
-
 	auto [itr, didInsert] = m_handleToNodeMap.insert({ handle, node });
 	CHECK(didInsert);
+
+	// TreeView_InsertItem() can result in a TVN_GETDISPINFO message being dispatched (to query the
+	// callback properties). That message can't be processed properly until the handle has been
+	// inserted into the map above. Therefore, the callback properties will only be set after the
+	// node has been inserted and the map has been updated.
+	//
+	// Alternatively, it would be possible to store a pointer to the node in TVITEM::lParam. But
+	// then there would still need to be some way to go from a node to a handle. It's easiest just
+	// to use a single structure to store both mappings.
+	TVITEM tvItemUpdate = {};
+	tvItemUpdate.mask = TVIF_CHILDREN;
+	tvItemUpdate.hItem = handle;
+	tvItemUpdate.cChildren = I_CHILDRENCALLBACK;
+
+	if (m_imageList)
+	{
+		WI_SetAllFlags(tvItemUpdate.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE);
+		tvItemUpdate.iImage = I_IMAGECALLBACK;
+		tvItemUpdate.iSelectedImage = I_IMAGECALLBACK;
+	}
+
+	auto res = TreeView_SetItem(m_hwnd, &tvItemUpdate);
+	CHECK(res);
 
 	if (parentHandle)
 	{
@@ -126,7 +137,7 @@ void TreeView::AddNode(TreeViewNode *node)
 		tvParentItem.mask = TVIF_CHILDREN;
 		tvParentItem.hItem = parentHandle;
 		tvParentItem.cChildren = 1;
-		auto res = TreeView_SetItem(m_hwnd, &tvParentItem);
+		res = TreeView_SetItem(m_hwnd, &tvParentItem);
 		CHECK(res);
 	}
 
@@ -421,8 +432,6 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 
 void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
 {
-	LOG(INFO) << "Processing TVN_GETDISPINFO";
-
 	const auto *node = GetNodeForHandle(dispInfo->item.hItem);
 
 	if (WI_IsAnyFlagSet(dispInfo->item.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE))
@@ -447,8 +456,6 @@ void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
 
 void TreeView::OnNodeExpanding(const NMTREEVIEW *notifyInfo)
 {
-	LOG(INFO) << "Processing TVN_ITEMEXPANDING";
-
 	auto *node = GetNodeForHandle(notifyInfo->itemNew.hItem);
 
 	if (notifyInfo->action == TVE_EXPAND)
@@ -570,8 +577,6 @@ bool TreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 
 void TreeView::OnSelectionChanged(const NMTREEVIEW *notifyInfo)
 {
-	LOG(INFO) << "Processing TVN_SELCHANGED";
-
 	if (m_blockSelectionChangeEvent)
 	{
 		return;
@@ -811,8 +816,6 @@ TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle)
 const TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle) const
 {
 	auto itr = m_handleToNodeMap.left.find(handle);
-	LOG(INFO) << "Number of handles stored: " << m_handleToNodeMap.size();
-	LOG(INFO) << "Number of nodes in tree: " << TreeView_GetCount(m_hwnd);
 	CHECK(itr != m_handleToNodeMap.left.end());
 	return itr->second;
 }
