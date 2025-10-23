@@ -801,6 +801,7 @@ TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle)
 const TreeViewNode *TreeView::GetNodeForHandle(HTREEITEM handle) const
 {
 	auto itr = m_handleToNodeMap.left.find(handle);
+	LOG(INFO) << "Number of handles stored: " << m_handleToNodeMap.size();
 	CHECK(itr != m_handleToNodeMap.left.end());
 	return itr->second;
 }
