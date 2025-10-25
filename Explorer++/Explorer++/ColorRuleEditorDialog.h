@@ -7,6 +7,7 @@
 #include "BaseDialog.h"
 #include "ColorRule.h"
 #include "../Helper/DialogSettings.h"
+#include "../Helper/PassKey.h"
 #include <memory>
 #include <vector>
 
@@ -47,12 +48,7 @@ public:
 	class EditDetails
 	{
 	private:
-		struct Token
-		{
-		private:
-			Token() = default;
-			friend EditDetails;
-		};
+		using PassKey = PassKey<EditDetails>;
 
 	public:
 		enum class Type
@@ -61,14 +57,14 @@ public:
 			NewItem
 		};
 
-		EditDetails(Type type, Token) : type(type)
+		EditDetails(Type type, PassKey) : type(type)
 		{
 		}
 
 		static std::unique_ptr<EditDetails> AddNewColorRule(std::unique_ptr<ColorRule> colorRule,
 			std::optional<size_t> index = std::nullopt)
 		{
-			auto editDetails = std::make_unique<EditDetails>(Type::NewItem, Token());
+			auto editDetails = std::make_unique<EditDetails>(Type::NewItem, PassKey());
 			editDetails->newColorRule = std::move(colorRule);
 			editDetails->index = index;
 			return editDetails;
@@ -76,7 +72,7 @@ public:
 
 		static std::unique_ptr<EditDetails> EditColorRule(ColorRule *colorRule)
 		{
-			auto editDetails = std::make_unique<EditDetails>(Type::ExistingItem, Token());
+			auto editDetails = std::make_unique<EditDetails>(Type::ExistingItem, PassKey());
 			editDetails->existingColorRule = colorRule;
 			return editDetails;
 		}

@@ -6,6 +6,7 @@
 
 #include "Application.h"
 #include "BaseDialog.h"
+#include "../Helper/PassKey.h"
 #include <memory>
 #include <optional>
 
@@ -20,12 +21,7 @@ public:
 	class EditDetails
 	{
 	private:
-		struct Token
-		{
-		private:
-			Token() = default;
-			friend EditDetails;
-		};
+		using PassKey = PassKey<EditDetails>;
 
 	public:
 		enum class Type
@@ -34,14 +30,14 @@ public:
 			NewItem
 		};
 
-		EditDetails(Type type, Token) : type(type)
+		EditDetails(Type type, PassKey) : type(type)
 		{
 		}
 
 		static std::unique_ptr<EditDetails> AddNewApplication(
 			std::unique_ptr<Application> application, std::optional<size_t> index = std::nullopt)
 		{
-			auto editDetails = std::make_unique<EditDetails>(Type::NewItem, Token());
+			auto editDetails = std::make_unique<EditDetails>(Type::NewItem, PassKey());
 			editDetails->newApplication = std::move(application);
 			editDetails->index = index;
 			return editDetails;
@@ -49,7 +45,7 @@ public:
 
 		static std::unique_ptr<EditDetails> EditApplication(Application *application)
 		{
-			auto editDetails = std::make_unique<EditDetails>(Type::ExistingItem, Token());
+			auto editDetails = std::make_unique<EditDetails>(Type::ExistingItem, PassKey());
 			editDetails->existingApplication = application;
 			return editDetails;
 		}

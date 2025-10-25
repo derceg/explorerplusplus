@@ -31,7 +31,7 @@ HRESULT FileSystemChangeWatcher::MaybeCreateInternal(const PidlAbsolute &pidl,
 	std::wstring parsingName;
 	RETURN_IF_FAILED(GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingName));
 
-	auto watcher = std::make_unique<FileSystemChangeWatcher>(parsingName, callback, Token{});
+	auto watcher = std::make_unique<FileSystemChangeWatcher>(parsingName, callback, PassKey());
 	RETURN_IF_FAILED(
 		watcher->m_changeReader.create(parsingName.c_str(), behavior == Behavior::Recursive, filter,
 			std::bind_front(&FileSystemChangeWatcher::OnChange,
@@ -43,7 +43,7 @@ HRESULT FileSystemChangeWatcher::MaybeCreateInternal(const PidlAbsolute &pidl,
 }
 
 FileSystemChangeWatcher::FileSystemChangeWatcher(const std::wstring &path, Callback callback,
-	Token) :
+	PassKey) :
 	m_path(path),
 	m_callback(callback)
 {

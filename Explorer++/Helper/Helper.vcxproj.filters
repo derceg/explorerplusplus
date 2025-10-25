@@ -477,6 +477,9 @@
     <ClInclude Include="RemoveMode.h">
       <Filter>Types</Filter>
     </ClInclude>
+    <ClInclude Include="PassKey.h">
+      <Filter>Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

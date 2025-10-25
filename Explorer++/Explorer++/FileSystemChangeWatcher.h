@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/PassKey.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
@@ -15,12 +16,7 @@
 class FileSystemChangeWatcher
 {
 private:
-	struct Token
-	{
-	private:
-		Token() = default;
-		friend FileSystemChangeWatcher;
-	};
+	using PassKey = PassKey<FileSystemChangeWatcher>;
 
 public:
 	enum class Event
@@ -48,7 +44,7 @@ public:
 		wil::FolderChangeEvents filter, std::shared_ptr<concurrencpp::executor> uiThreadExecutor,
 		Callback callback, Behavior behavior = Behavior::NonRecursive);
 
-	FileSystemChangeWatcher(const std::wstring &path, Callback callback, Token);
+	FileSystemChangeWatcher(const std::wstring &path, Callback callback, PassKey);
 
 private:
 	static HRESULT MaybeCreateInternal(const PidlAbsolute &pidl, wil::FolderChangeEvents filter,
