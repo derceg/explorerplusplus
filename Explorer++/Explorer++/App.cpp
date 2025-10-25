@@ -367,6 +367,11 @@ Runtime *App::GetRuntime()
 	return &m_runtime;
 }
 
+ShellChangeManager *App::GetShellChangeManager()
+{
+	return &m_shellChangeManager;
+}
+
 ClipboardWatcher *App::GetClipboardWatcher()
 {
 	return &m_clipboardWatcher;

@@ -68,9 +68,7 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browser,
 		CoUninitialize),
 	m_subfoldersResultIDCounter(0),
 	m_cachedIcons(app->GetCachedIcons()),
-	m_dropExpandItem(nullptr),
-	m_shellChangeWatcher(GetHWND(),
-		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this))
+	m_dropExpandItem(nullptr)
 {
 	TreeView_SetExtendedStyle(m_hTreeView, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 
@@ -84,8 +82,6 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browser,
 	m_bShowHidden = TRUE;
 
 	AddRootItems();
-
-	StartDirectoryMonitoringForDrives();
 
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
 		[this](BrowserWindow::LifecycleState updatedState)

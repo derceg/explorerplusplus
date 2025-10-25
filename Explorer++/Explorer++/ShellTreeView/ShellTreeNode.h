@@ -9,6 +9,7 @@
 #include <vector>
 
 class FileSystemChangeWatcher;
+class ShellChangeWatcher;
 class ShellTreeNode;
 
 using ShellTreeNodes = std::vector<std::unique_ptr<ShellTreeNode>>;
@@ -28,6 +29,7 @@ class ShellTreeNode
 {
 public:
 	ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl, IShellItem2 *shellItem);
+	~ShellTreeNode();
 
 	int GetId() const;
 	IShellItem2 *GetShellItem() const;
@@ -36,9 +38,8 @@ public:
 
 	void UpdateItemDetails(PCIDLIST_ABSOLUTE simpleUpdatedPidl);
 
-	ULONG GetChangeNotifyId() const;
-	void SetChangeNotifyId(ULONG changeNotifyId);
-	void ResetChangeNotifyId();
+	const ShellChangeWatcher *GetShellChangeWatcher() const;
+	void SetShellChangeWatcher(std::unique_ptr<ShellChangeWatcher> shellChangeWatcher);
 
 	const FileSystemChangeWatcher *GetFileSystemChangeWatcher() const;
 	void SetFileSystemChangeWatcher(
@@ -79,10 +80,7 @@ private:
 	// node.
 	wil::com_ptr_nothrow<IShellItem2> m_shellItem;
 
-	// This will be non-zero if the directory associated with this item is being monitored for
-	// changes.
-	ULONG m_changeNotifyId = 0;
-
+	std::unique_ptr<ShellChangeWatcher> m_shellChangeWatcher;
 	std::unique_ptr<FileSystemChangeWatcher> m_fileSystemChangeWatcher;
 
 	ShellTreeNode *m_parent = nullptr;

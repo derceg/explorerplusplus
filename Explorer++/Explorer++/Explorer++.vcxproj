@@ -1230,6 +1230,7 @@
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp" />
+    <ClCompile Include="ShellChangeManager.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
     <ClCompile Include="TabBacking.cpp" />
@@ -1583,6 +1584,7 @@
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserFactory.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h" />
+    <ClInclude Include="ShellChangeManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />
     <ClInclude Include="TabContextMenu.h" />

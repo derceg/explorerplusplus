@@ -67,8 +67,6 @@ void ShellBrowserImpl::PrepareToChangeFolders()
 {
 	ClearPendingResults();
 
-	m_shellChangeWatcher.StopWatchingAll();
-
 	ListView_DeleteAllItems(m_listView);
 
 	if (m_folderVisited)

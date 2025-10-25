@@ -4,116 +4,27 @@
 
 #include "stdafx.h"
 #include "ShellChangeWatcher.h"
-#include "../Helper/StringHelper.h"
-#include "../Helper/WindowSubclass.h"
-#include <glog/logging.h>
 
-ShellChangeWatcher::ShellChangeWatcher(HWND hwnd,
-	ProcessNotificationsCallback processNotificationsCallback) :
-	m_hwnd(hwnd),
-	m_processNotificationsCallback(processNotificationsCallback)
+std::unique_ptr<ShellChangeWatcher> ShellChangeWatcher::MaybeCreate(ShellChangeManager *manager,
+	const PidlAbsolute &pidl, LONG events, ShellChangeManager::Callback callback, bool recursive)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(hwnd,
-		std::bind_front(&ShellChangeWatcher::WndProc, this)));
+	auto id = manager->StartWatching(pidl, events, callback, recursive);
+
+	if (!id)
+	{
+		return nullptr;
+	}
+
+	return std::make_unique<ShellChangeWatcher>(manager, *id, PassKey());
+}
+
+ShellChangeWatcher::ShellChangeWatcher(ShellChangeManager *manager, UINT id, PassKey) :
+	m_manager(manager),
+	m_id(id)
+{
 }
 
 ShellChangeWatcher::~ShellChangeWatcher()
 {
-	StopWatchingAll();
-}
-
-ULONG ShellChangeWatcher::StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events, bool recursive)
-{
-	SHChangeNotifyEntry entry;
-	entry.pidl = pidl;
-	entry.fRecursive = recursive;
-	ULONG changeNotifyId = SHChangeNotifyRegister(m_hwnd,
-		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery, events, WM_APP_SHELL_NOTIFY,
-		1, &entry);
-
-	if (changeNotifyId == 0)
-	{
-		std::wstring path;
-		HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, path);
-
-		if (SUCCEEDED(hr))
-		{
-			LOG(WARNING) << "Couldn't monitor directory \"" << wstrToUtf8Str(path)
-						 << "\" for changes.";
-		}
-
-		return 0;
-	}
-
-	auto insertionResult = m_changeNotifyIds.insert(changeNotifyId);
-
-	// Change IDs are unique, so there should never be an attempt to insert a duplicate ID.
-	DCHECK(insertionResult.second);
-
-	return changeNotifyId;
-}
-
-void ShellChangeWatcher::StopWatching(ULONG changeNotifyId)
-{
-	auto res = SHChangeNotifyDeregister(changeNotifyId);
-	DCHECK(res);
-
-	auto numErased = m_changeNotifyIds.erase(changeNotifyId);
-	DCHECK_EQ(numErased, 1u);
-}
-
-void ShellChangeWatcher::StopWatchingAll()
-{
-	m_shellChangeNotifications.clear();
-	KillTimer(m_hwnd, PROCESS_SHELL_CHANGES_TIMER_ID);
-
-	for (ULONG changeNotifyId : m_changeNotifyIds)
-	{
-		auto res = SHChangeNotifyDeregister(changeNotifyId);
-		DCHECK(res);
-	}
-
-	m_changeNotifyIds.clear();
-}
-
-LRESULT ShellChangeWatcher::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_APP_SHELL_NOTIFY:
-		OnShellNotify(wParam, lParam);
-		break;
-
-	case WM_TIMER:
-		if (wParam == PROCESS_SHELL_CHANGES_TIMER_ID)
-		{
-			OnProcessShellChangeNotifications();
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-void ShellChangeWatcher::OnShellNotify(WPARAM wParam, LPARAM lParam)
-{
-	PIDLIST_ABSOLUTE *pidls;
-	LONG event;
-	HANDLE lock = SHChangeNotification_Lock(reinterpret_cast<HANDLE>(wParam),
-		static_cast<DWORD>(lParam), &pidls, &event);
-
-	m_shellChangeNotifications.emplace_back(event, pidls[0], pidls[1]);
-
-	SHChangeNotification_Unlock(lock);
-
-	SetTimer(m_hwnd, PROCESS_SHELL_CHANGES_TIMER_ID, PROCESS_SHELL_CHANGES_TIMEOUT, nullptr);
-}
-
-void ShellChangeWatcher::OnProcessShellChangeNotifications()
-{
-	KillTimer(m_hwnd, PROCESS_SHELL_CHANGES_TIMER_ID);
-
-	m_processNotificationsCallback(m_shellChangeNotifications);
-
-	m_shellChangeNotifications.clear();
+	m_manager->StopWatching(m_id);
 }

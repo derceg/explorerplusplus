@@ -904,6 +904,9 @@
     <ClCompile Include="PlatformContextImpl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ShellChangeManager.cpp">
+      <Filter>Directory Change Watching</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1922,6 +1925,9 @@
     </ClInclude>
     <ClInclude Include="PlatformContextImpl.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellChangeManager.h">
+      <Filter>Directory Change Watching</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

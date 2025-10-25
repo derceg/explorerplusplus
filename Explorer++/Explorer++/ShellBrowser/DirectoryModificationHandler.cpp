@@ -32,10 +32,12 @@ void ShellBrowserImpl::StartDirectoryMonitoring()
 
 void ShellBrowserImpl::StartDirectoryMonitoringViaShellChangeWatcher()
 {
-	m_shellChangeWatcher.StartWatching(m_directoryState.pidlDirectory.Raw(),
+	m_directoryState.shellChangeWatcher = ShellChangeWatcher::MaybeCreate(
+		m_app->GetShellChangeManager(), m_directoryState.pidlDirectory,
 		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
 			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM | SHCNE_DRIVEADD
-			| SHCNE_DRIVEREMOVED);
+			| SHCNE_DRIVEREMOVED,
+		std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotification, this));
 
 	unique_pidl_absolute rootPidl;
 	HRESULT hr = GetRootPidl(wil::out_param(rootPidl));
@@ -44,19 +46,23 @@ void ShellBrowserImpl::StartDirectoryMonitoringViaShellChangeWatcher()
 	{
 		// Monitoring a folder allows direct deletion of the folder to be detected. In that case, a
 		// SHCNE_RMDIR notification will be sent.
+		//
 		// It doesn't, however, allow indirect deletion to be detected. For example, if a parent
 		// folder is deleted or renamed, no notification will be sent.
+		//
 		// Therefore, it's necessary to globally monitor SHCNE_RMDIR notifications here, to detect
 		// when a parent folder is deleted. It's also necessary to globally monitor SHCNE_UPDATEDIR
 		// notifications, for at least two reasons:
 		//
 		// 1. SHCNE_RMDIR isn't sent consistently. It may or may not be sent when a parent folder is
-		// deleted.
+		//    deleted.
 		// 2. When a parent folder is renamed, only a SHCNE_UPDATEDIR notification will be sent.
 		//
 		// This pair of notifications is also what Explorer uses to navigate away from a folder that
 		// no longer exists.
-		m_shellChangeWatcher.StartWatching(rootPidl.get(), SHCNE_RMDIR | SHCNE_UPDATEDIR, true);
+		m_directoryState.rootShellChangeWatcher = ShellChangeWatcher::MaybeCreate(
+			m_app->GetShellChangeManager(), rootPidl.get(), SHCNE_RMDIR | SHCNE_UPDATEDIR,
+			std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotification, this), true);
 	}
 }
 
@@ -68,52 +74,40 @@ void ShellBrowserImpl::StartDirectoryMonitoringViaFileSystemChangeWatcher()
 			std::bind_front(&ShellBrowserImpl::ProcessFileSystemChangeNotification, this));
 }
 
-void ShellBrowserImpl::ProcessShellChangeNotifications(
-	const std::vector<ShellChangeNotification> &shellChangeNotifications)
+void ShellBrowserImpl::ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
+	const PidlAbsolute &simplePidl2)
 {
-	ScopedRedrawDisabler redrawDisabler(m_listView);
-
-	for (const auto &change : shellChangeNotifications)
-	{
-		ProcessShellChangeNotification(change);
-	}
-
-	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
-}
-
-void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotification &change)
-{
-	switch (change.event)
+	switch (event)
 	{
 	case SHCNE_DRIVEADD:
 	case SHCNE_MKDIR:
 	case SHCNE_CREATE:
-		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE))
 		{
-			OnItemAdded(change.pidl1.get());
+			OnItemAdded(simplePidl1.Raw());
 		}
 		break;
 
 	case SHCNE_RENAMEFOLDER:
 	case SHCNE_RENAMEITEM:
-		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE)
-			&& ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl2.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE)
+			&& ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl2.Raw(), TRUE))
 		{
-			OnItemRenamed(change.pidl1.get(), change.pidl2.get());
+			OnItemRenamed(simplePidl1.Raw(), simplePidl2.Raw());
 		}
-		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw()))
 		{
-			OnCurrentDirectoryRenamed(m_weakPtrFactory.GetWeakPtr(), change.pidl2.get(),
+			OnCurrentDirectoryRenamed(m_weakPtrFactory.GetWeakPtr(), simplePidl2.Raw(),
 				m_app->GetRuntime());
 		}
 		break;
 
 	case SHCNE_UPDATEITEM:
-		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE))
 		{
-			OnItemModified(change.pidl1.get());
+			OnItemModified(simplePidl1.Raw());
 		}
-		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw()))
 		{
 			// This can be triggered in the following sorts of situations:
 			//
@@ -125,14 +119,14 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		break;
 
 	case SHCNE_UPDATEDIR:
-		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get()))
+		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw()))
 		{
 			// It's not safe to perform an immediate refresh here, since doing so would clear
 			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
 			// through. Therefore, the function below will perform the refresh asynchronously.
 			RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime());
 		}
-		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.Raw(), false))
+		else if (ILIsParent(simplePidl1.Raw(), m_directoryState.pidlDirectory.Raw(), false))
 		{
 			// A parent folder has been updated. It's possible this folder may no longer exist (e.g.
 			// because a parent was renamed or removed). A navigation to a parent item may be
@@ -150,12 +144,12 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		// that directory. However, if the user has just changed directories, a notification could
 		// still come in for the previous directory. Therefore, it's important to verify that the
 		// item is actually a child of the current directory.
-		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get(), TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE))
 		{
-			OnItemRemoved(change.pidl1.get());
+			OnItemRemoved(simplePidl1.Raw());
 		}
-		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), change.pidl1.get())
-			|| ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.Raw(), false))
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw())
+			|| ILIsParent(simplePidl1.Raw(), m_directoryState.pidlDirectory.Raw(), false))
 		{
 			// The current folder has been deleted, either directly, or by deleting one of its
 			// parents. That makes it necessary to navigate to another folder. For similarity with
@@ -165,6 +159,8 @@ void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotificat
 		}
 		break;
 	}
+
+	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
 }
 
 void ShellBrowserImpl::ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,

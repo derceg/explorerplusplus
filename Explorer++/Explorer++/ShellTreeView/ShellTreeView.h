@@ -8,7 +8,6 @@
 #include "FileSystemChangeWatcher.h"
 #include "MainFontSetter.h"
 #include "ScopedBrowserCommandTarget.h"
-#include "ShellChangeWatcher.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileOperations.h"
@@ -158,15 +157,13 @@ private:
 	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;
 
 	// Directory monitoring
-	void StartDirectoryMonitoringForDrives();
 	void StartDirectoryMonitoringForNode(ShellTreeNode *node);
 	void StopDirectoryMonitoringForNode(ShellTreeNode *node);
 	void StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node);
 	void RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node);
 	void RestartDirectoryMonitoringForNode(ShellTreeNode *node);
-	void ProcessShellChangeNotifications(
-		const std::vector<ShellChangeNotification> &shellChangeNotifications);
-	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
+		const PidlAbsolute &simplePidl2);
 	void ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
 		const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
@@ -260,7 +257,4 @@ private:
 	concurrencpp::timer m_dropExpandTimer;
 
 	CutCopiedItemManager m_cutCopiedItemManager;
-
-	// Directory monitoring
-	ShellChangeWatcher m_shellChangeWatcher;
 };

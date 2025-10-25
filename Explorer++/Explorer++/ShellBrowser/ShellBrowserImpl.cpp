@@ -101,8 +101,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	m_acceleratorManager(app->GetAcceleratorManager()),
 	m_config(app->GetConfig()),
 	m_folderSettings(folderSettings),
-	m_shellChangeWatcher(GetHWND(),
-		std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotifications, this)),
 	m_shellWindowRegistered(false),
 	m_folderColumns(
 		initialColumns ? *initialColumns : app->GetConfig()->globalFolderSettings.folderColumns),

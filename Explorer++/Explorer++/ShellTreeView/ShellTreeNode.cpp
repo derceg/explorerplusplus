@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellTreeNode.h"
 #include "FileSystemChangeWatcher.h"
+#include "ShellChangeWatcher.h"
 
 ShellTreeNode::ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl,
 	IShellItem2 *shellItem) :
@@ -14,6 +15,8 @@ ShellTreeNode::ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl,
 	m_shellItem(shellItem)
 {
 }
+
+ShellTreeNode::~ShellTreeNode() = default;
 
 int ShellTreeNode::GetId() const
 {
@@ -129,22 +132,14 @@ bool ShellTreeNode::ShouldRecreateShellItem(PCIDLIST_ABSOLUTE simpleUpdatedPidl)
 	return false;
 }
 
-ULONG ShellTreeNode::GetChangeNotifyId() const
+const ShellChangeWatcher *ShellTreeNode::GetShellChangeWatcher() const
 {
-	return m_changeNotifyId;
+	return m_shellChangeWatcher.get();
 }
 
-void ShellTreeNode::SetChangeNotifyId(ULONG changeNotifyId)
+void ShellTreeNode::SetShellChangeWatcher(std::unique_ptr<ShellChangeWatcher> shellChangeWatcher)
 {
-	// The directory for an item should only be monitored once.
-	assert(m_changeNotifyId == 0);
-
-	m_changeNotifyId = changeNotifyId;
-}
-
-void ShellTreeNode::ResetChangeNotifyId()
-{
-	m_changeNotifyId = 0;
+	m_shellChangeWatcher = std::move(shellChangeWatcher);
 }
 
 const FileSystemChangeWatcher *ShellTreeNode::GetFileSystemChangeWatcher() const

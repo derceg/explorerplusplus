@@ -306,6 +306,10 @@ private:
 		bool virtualFolder;
 		int itemIDCounter;
 
+		// Directory monitoring
+		std::unique_ptr<ShellChangeWatcher> shellChangeWatcher;
+		std::unique_ptr<ShellChangeWatcher> rootShellChangeWatcher;
+
 		/* Stores information on files that have
 		been created and are awaiting insertion
 		into the listview. */
@@ -516,9 +520,8 @@ private:
 	void StartDirectoryMonitoring();
 	void StartDirectoryMonitoringViaShellChangeWatcher();
 	void StartDirectoryMonitoringViaFileSystemChangeWatcher();
-	void ProcessShellChangeNotifications(
-		const std::vector<ShellChangeNotification> &shellChangeNotifications);
-	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
+		const PidlAbsolute &simplePidl2);
 	void ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
 		const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
@@ -698,9 +701,6 @@ private:
 
 	const Config *m_config;
 	FolderSettings m_folderSettings;
-
-	// Directory monitoring
-	ShellChangeWatcher m_shellChangeWatcher;
 
 	int m_middleButtonItem;
 

@@ -4,53 +4,24 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
-#include <memory>
-#include <set>
-#include <vector>
-
-class WindowSubclass;
-
-struct ShellChangeNotification
-{
-	LONG event;
-	unique_pidl_absolute pidl1;
-	unique_pidl_absolute pidl2;
-
-	ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
-		event(event),
-		pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
-		pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
-	{
-	}
-};
+#include "ShellChangeManager.h"
+#include "../Helper/PassKey.h"
+#include "../Helper/PidlHelper.h"
 
 class ShellChangeWatcher
 {
-public:
-	using ProcessNotificationsCallback =
-		std::function<void(const std::vector<ShellChangeNotification> &shellNotifications)>;
+private:
+	using PassKey = PassKey<ShellChangeWatcher>;
 
-	ShellChangeWatcher(HWND hwnd, ProcessNotificationsCallback processNotificationsCallback);
+public:
+	static std::unique_ptr<ShellChangeWatcher> MaybeCreate(ShellChangeManager *manager,
+		const PidlAbsolute &pidl, LONG events, ShellChangeManager::Callback callback,
+		bool recursive = false);
+
+	ShellChangeWatcher(ShellChangeManager *manager, UINT id, PassKey);
 	~ShellChangeWatcher();
 
-	ULONG StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events, bool recursive = false);
-	void StopWatching(ULONG changeNotifyId);
-	void StopWatchingAll();
-
 private:
-	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 200;
-
-	static const UINT_PTR PROCESS_SHELL_CHANGES_TIMER_ID = 200;
-	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
-
-	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void OnShellNotify(WPARAM wParam, LPARAM lParam);
-	void OnProcessShellChangeNotifications();
-
-	HWND m_hwnd;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-	std::set<ULONG> m_changeNotifyIds;
-	std::vector<ShellChangeNotification> m_shellChangeNotifications;
-	ProcessNotificationsCallback m_processNotificationsCallback;
+	ShellChangeManager *const m_manager;
+	const UINT m_id;
 };

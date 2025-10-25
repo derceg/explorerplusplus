@@ -6,27 +6,9 @@
 #include "ShellTreeView.h"
 #include "App.h"
 #include "FeatureList.h"
+#include "ShellChangeWatcher.h"
 #include "ShellTreeNode.h"
 #include "../Helper/ScopedRedrawDisabler.h"
-
-// Starts monitoring for drive additions and removals, since they won't necessarily trigger updates
-// in the parent folder.
-void ShellTreeView::StartDirectoryMonitoringForDrives()
-{
-	if (m_config->changeNotifyMode != ChangeNotifyMode::Shell)
-	{
-		return;
-	}
-
-	// A pidl is needed in order to start monitoring, though in this case it's not relevant, since
-	// only drive events are monitored. Therefore, the pidl for the root folder (which should always
-	// be available) is used.
-	unique_pidl_absolute pidl;
-	[[maybe_unused]] HRESULT hr = GetRootPidl(wil::out_param(pidl));
-	assert(SUCCEEDED(hr));
-
-	m_shellChangeWatcher.StartWatching(pidl.get(), SHCNE_DRIVEADD | SHCNE_DRIVEREMOVED);
-}
 
 void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
@@ -35,9 +17,12 @@ void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 	// well. Those items will be displayed and need to be updated when necessary.
 	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
 	{
-		node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(node->GetFullPidl().get(),
+		node->SetShellChangeWatcher(ShellChangeWatcher::MaybeCreate(m_app->GetShellChangeManager(),
+			node->GetFullPidl().get(),
 			SHCNE_CREATE | SHCNE_MKDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_ATTRIBUTES
-				| SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_DELETE | SHCNE_RMDIR));
+				| SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_DELETE | SHCNE_RMDIR | SHCNE_DRIVEADD
+				| SHCNE_DRIVEREMOVED,
+			std::bind_front(&ShellTreeView::ProcessShellChangeNotification, this)));
 	}
 	else
 	{
@@ -52,11 +37,8 @@ void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 
 void ShellTreeView::StopDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if (node->GetChangeNotifyId() != 0)
-	{
-		m_shellChangeWatcher.StopWatching(node->GetChangeNotifyId());
-		node->ResetChangeNotifyId();
-	}
+	node->SetShellChangeWatcher(nullptr);
+	node->SetFileSystemChangeWatcher(nullptr);
 }
 
 void ShellTreeView::StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node)
@@ -85,7 +67,7 @@ void ShellTreeView::RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *
 
 void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if ((m_config->changeNotifyMode == ChangeNotifyMode::Shell && node->GetChangeNotifyId() == 0)
+	if ((m_config->changeNotifyMode == ChangeNotifyMode::Shell && !node->GetShellChangeWatcher())
 		|| (m_config->changeNotifyMode == ChangeNotifyMode::Filesystem
 			&& !node->GetFileSystemChangeWatcher()))
 	{
@@ -98,44 +80,34 @@ void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 	StartDirectoryMonitoringForNode(node);
 }
 
-void ShellTreeView::ProcessShellChangeNotifications(
-	const std::vector<ShellChangeNotification> &shellChangeNotifications)
+void ShellTreeView::ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
+	const PidlAbsolute &simplePidl2)
 {
-	ScopedRedrawDisabler redrawDisabler(m_hTreeView);
-
-	for (const auto &change : shellChangeNotifications)
-	{
-		ProcessShellChangeNotification(change);
-	}
-}
-
-void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification &change)
-{
-	switch (change.event)
+	switch (event)
 	{
 	case SHCNE_DRIVEADD:
 	case SHCNE_MKDIR:
 	case SHCNE_CREATE:
-		OnItemAdded(change.pidl1.get());
+		OnItemAdded(simplePidl1.Raw());
 		break;
 
 	case SHCNE_RENAMEFOLDER:
 	case SHCNE_RENAMEITEM:
-		OnItemUpdated(change.pidl1.get(), change.pidl2.get());
+		OnItemUpdated(simplePidl1.Raw(), simplePidl2.Raw());
 		break;
 
 	case SHCNE_UPDATEITEM:
-		OnItemUpdated(change.pidl1.get(), nullptr);
+		OnItemUpdated(simplePidl1.Raw(), nullptr);
 		break;
 
 	case SHCNE_DRIVEREMOVED:
 	case SHCNE_RMDIR:
 	case SHCNE_DELETE:
-		OnItemRemoved(change.pidl1.get());
+		OnItemRemoved(simplePidl1.Raw());
 		break;
 
 	case SHCNE_UPDATEDIR:
-		OnDirectoryUpdated(change.pidl1.get());
+		OnDirectoryUpdated(simplePidl1.Raw());
 		break;
 	}
 }
