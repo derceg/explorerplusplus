@@ -315,13 +315,8 @@ HRESULT ShellTreeView::ParseShellFolderNameAndCheckExistence(const std::wstring 
 
 void ShellTreeView::AddShellNamespaceRootItem()
 {
-	unique_pidl_absolute rootPidl;
-	HRESULT hr = GetRootPidl(wil::out_param(rootPidl));
-
-	if (SUCCEEDED(hr))
-	{
-		AddRootItem(rootPidl.get());
-	}
+	auto rootPidl = GetRootPidl();
+	AddRootItem(rootPidl.Raw());
 }
 
 HTREEITEM ShellTreeView::AddRootItem(PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter)

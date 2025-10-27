@@ -371,8 +371,8 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ScopedTestDir.cpp" />
-    <ClCompile Include="FileSystemChangeWatcherTest.cpp">
-      <Filter>Directory Change Watching</Filter>
+    <ClCompile Include="FileSystemWatcherTest.cpp">
+      <Filter>Directory Watching</Filter>
     </ClCompile>
     <ClCompile Include="DriveEnumeratorFake.cpp">
       <Filter>Drives Toolbar</Filter>
@@ -658,9 +658,6 @@
     <Filter Include="Address Bar\UI">
       <UniqueIdentifier>{6c73ac98-1cc0-4623-a442-9c888d81bba3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Directory Change Watching">
-      <UniqueIdentifier>{8b1f57ff-8a2e-4dd6-a57c-e8cdbb41507c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Drives Toolbar\UI">
       <UniqueIdentifier>{6b63741e-00c8-4e5e-b404-820a4aa03f6e}</UniqueIdentifier>
     </Filter>
@@ -714,6 +711,9 @@
     </Filter>
     <Filter Include="Helper\Platform">
       <UniqueIdentifier>{19137768-f568-4c36-9bbb-2093f179d535}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Directory Watching">
+      <UniqueIdentifier>{8b1f57ff-8a2e-4dd6-a57c-e8cdbb41507c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

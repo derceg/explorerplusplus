@@ -1230,7 +1230,7 @@
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp" />
-    <ClCompile Include="ShellChangeManager.cpp" />
+    <ClCompile Include="ShellWatcherManager.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
     <ClCompile Include="TabBacking.cpp" />
@@ -1275,7 +1275,7 @@
     <ClCompile Include="EventScope.cpp" />
     <ClCompile Include="EventWindow.cpp" />
     <ClCompile Include="FeatureList.cpp" />
-    <ClCompile Include="FileSystemChangeWatcher.cpp" />
+    <ClCompile Include="FileSystemWatcher.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="FrequentLocationsMenu.cpp" />
     <ClCompile Include="FrequentLocationsModel.cpp" />
@@ -1355,7 +1355,7 @@
     <ClCompile Include="GeneralOptionsPage.cpp" />
     <ClCompile Include="OptionsPage.cpp" />
     <ClCompile Include="SearchTabsDialog.cpp" />
-    <ClCompile Include="ShellChangeWatcher.cpp" />
+    <ClCompile Include="ShellWatcher.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
     <ClCompile Include="TabsOptionsPage.cpp" />
     <ClCompile Include="Theme.cpp" />
@@ -1560,6 +1560,7 @@
     <ClInclude Include="ConfigXmlStorage.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="DialogHelper.h" />
+    <ClInclude Include="DirectoryWatcher.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="IconModel.h" />
     <ClInclude Include="IconUpdateCallback.h" />
@@ -1584,7 +1585,7 @@
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserFactory.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h" />
-    <ClInclude Include="ShellChangeManager.h" />
+    <ClInclude Include="ShellWatcherManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />
     <ClInclude Include="TabContextMenu.h" />
@@ -1635,7 +1636,7 @@
     <ClInclude Include="ExitCode.h" />
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
-    <ClInclude Include="FileSystemChangeWatcher.h" />
+    <ClInclude Include="FileSystemWatcher.h" />
     <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="FrequentLocationsMenu.h" />
     <ClInclude Include="FrequentLocationsModel.h" />
@@ -1731,7 +1732,7 @@
     <ClInclude Include="GeneralOptionsPage.h" />
     <ClInclude Include="OptionsPage.h" />
     <ClInclude Include="SearchTabsDialog.h" />
-    <ClInclude Include="ShellChangeWatcher.h" />
+    <ClInclude Include="ShellWatcher.h" />
     <ClInclude Include="ShellTreeView\ShellTreeNode.h" />
     <ClInclude Include="TabsOptionsPage.h" />
     <ClInclude Include="Theme.h" />

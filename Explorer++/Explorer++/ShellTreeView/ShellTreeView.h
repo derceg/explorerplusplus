@@ -5,7 +5,7 @@
 #pragma once
 
 #include "BrowserCommandTarget.h"
-#include "FileSystemChangeWatcher.h"
+#include "DirectoryWatcher.h"
 #include "MainFontSetter.h"
 #include "ScopedBrowserCommandTarget.h"
 #include "../Helper/ClipboardHelper.h"
@@ -162,9 +162,7 @@ private:
 	void StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node);
 	void RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node);
 	void RestartDirectoryMonitoringForNode(ShellTreeNode *node);
-	void ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
-		const PidlAbsolute &simplePidl2);
-	void ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+	void ProcessDirectoryChangeNotification(DirectoryWatcher::Event event,
 		const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl, PCIDLIST_ABSOLUTE simpleUpdatedPidl);

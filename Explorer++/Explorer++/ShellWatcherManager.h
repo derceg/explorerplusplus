@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "DirectoryWatcher.h"
 #include "../Helper/PidlHelper.h"
 #include <wil/resource.h>
-#include <functional>
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -46,18 +46,15 @@ class WindowSubclass;
 // pattern. Additionally, duplicate message IDs can be detected, so even if StartWatching() was
 // called enough times, there isn't going to be a situation where the wrong callback is invoked.
 //
-// Rather than calling methods on this class directly, ShellChangeWatcher should be used to watch an
-// item, since it will automatically stop the watch on destruction.
-class ShellChangeManager
+// Rather than calling methods on this class directly, ShellWatcher should be used to watch an item,
+// since it will automatically stop the watch on destruction.
+class ShellWatcherManager
 {
 public:
-	using Callback = std::function<void(LONG event, const PidlAbsolute &simplePidl1,
-		const PidlAbsolute &simplePidl2)>;
+	~ShellWatcherManager();
 
-	~ShellChangeManager();
-
-	std::optional<UINT> StartWatching(const PidlAbsolute &pidl, LONG events, Callback callback,
-		bool recursive);
+	std::optional<UINT> StartWatching(const PidlAbsolute &pidl, DirectoryWatcher::Filters filters,
+		DirectoryWatcher::Callback callback, DirectoryWatcher::Behavior behavior);
 	void StopWatching(UINT id);
 
 private:
@@ -72,7 +69,7 @@ private:
 	struct WatchDetails
 	{
 		ULONG changeNotifyId;
-		Callback callback;
+		DirectoryWatcher::Callback callback;
 	};
 
 	struct ChangeDetails
@@ -84,6 +81,7 @@ private:
 	};
 
 	UINT GetNextMessageId();
+	static LONG FiltersToShellChangeEvents(DirectoryWatcher::Filters filters);
 
 	void EnsureWindow();
 	static ATOM RegisterWindowClass();
@@ -91,6 +89,7 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnChangeNotify(UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnProcessChanges();
+	static DirectoryWatcher::Event ShellChangeEventToEvent(LONG event);
 
 	wil::unique_hwnd m_hwnd;
 	std::unique_ptr<WindowSubclass> m_subclass;

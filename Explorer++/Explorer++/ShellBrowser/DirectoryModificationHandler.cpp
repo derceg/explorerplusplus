@@ -20,76 +20,39 @@
 
 void ShellBrowserImpl::StartDirectoryMonitoring()
 {
+	m_directoryState.directoryWatcher = m_app->MaybeCreateDirectoryWatcher(
+		m_directoryState.pidlDirectory, DirectoryWatcher::Filters::All,
+		std::bind_front(&ShellBrowserImpl::ProcessDirectoryChangeNotification, this));
+
 	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
 	{
-		StartDirectoryMonitoringViaShellChangeWatcher();
-	}
-	else
-	{
-		StartDirectoryMonitoringViaFileSystemChangeWatcher();
-	}
-}
-
-void ShellBrowserImpl::StartDirectoryMonitoringViaShellChangeWatcher()
-{
-	m_directoryState.shellChangeWatcher = ShellChangeWatcher::MaybeCreate(
-		m_app->GetShellChangeManager(), m_directoryState.pidlDirectory,
-		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
-			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM | SHCNE_DRIVEADD
-			| SHCNE_DRIVEREMOVED,
-		std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotification, this));
-
-	unique_pidl_absolute rootPidl;
-	HRESULT hr = GetRootPidl(wil::out_param(rootPidl));
-
-	if (SUCCEEDED(hr))
-	{
-		// Monitoring a folder allows direct deletion of the folder to be detected. In that case, a
-		// SHCNE_RMDIR notification will be sent.
+		// Monitoring a folder allows direct deletion of the folder to be detected. It doesn't,
+		// however, allow indirect deletion to be detected. For example, if a parent folder is
+		// deleted, no notification will be sent. Therefore, it's necessary to globally monitor
+		// removal notifications here, to detect when a parent folder is deleted.
 		//
-		// It doesn't, however, allow indirect deletion to be detected. For example, if a parent
-		// folder is deleted or renamed, no notification will be sent.
-		//
-		// Therefore, it's necessary to globally monitor SHCNE_RMDIR notifications here, to detect
-		// when a parent folder is deleted. It's also necessary to globally monitor SHCNE_UPDATEDIR
-		// notifications, for at least two reasons:
-		//
-		// 1. SHCNE_RMDIR isn't sent consistently. It may or may not be sent when a parent folder is
-		//    deleted.
-		// 2. When a parent folder is renamed, only a SHCNE_UPDATEDIR notification will be sent.
-		//
-		// This pair of notifications is also what Explorer uses to navigate away from a folder that
-		// no longer exists.
-		m_directoryState.rootShellChangeWatcher = ShellChangeWatcher::MaybeCreate(
-			m_app->GetShellChangeManager(), rootPidl.get(), SHCNE_RMDIR | SHCNE_UPDATEDIR,
-			std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotification, this), true);
+		// This will also implicitly monitor directory update events, which is useful when a parent
+		// folder is renamed.
+		m_directoryState.rootDirectoryWatcher = m_app->MaybeCreateDirectoryWatcher(GetRootPidl(),
+			DirectoryWatcher::Filters::DirectoryRemoved,
+			std::bind_front(&ShellBrowserImpl::ProcessDirectoryChangeNotification, this),
+			DirectoryWatcher::Behavior::Recursive);
 	}
 }
 
-void ShellBrowserImpl::StartDirectoryMonitoringViaFileSystemChangeWatcher()
-{
-	m_directoryState.fileSystemChangeWatcher =
-		FileSystemChangeWatcher::MaybeCreate(m_directoryState.pidlDirectory.Raw(),
-			wil::FolderChangeEvents::All, m_app->GetRuntime()->GetUiThreadExecutor(),
-			std::bind_front(&ShellBrowserImpl::ProcessFileSystemChangeNotification, this));
-}
-
-void ShellBrowserImpl::ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
-	const PidlAbsolute &simplePidl2)
+void ShellBrowserImpl::ProcessDirectoryChangeNotification(DirectoryWatcher::Event event,
+	const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2)
 {
 	switch (event)
 	{
-	case SHCNE_DRIVEADD:
-	case SHCNE_MKDIR:
-	case SHCNE_CREATE:
+	case DirectoryWatcher::Event::Added:
 		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE))
 		{
 			OnItemAdded(simplePidl1.Raw());
 		}
 		break;
 
-	case SHCNE_RENAMEFOLDER:
-	case SHCNE_RENAMEITEM:
+	case DirectoryWatcher::Event::Renamed:
 		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE)
 			&& ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl2.Raw(), TRUE))
 		{
@@ -102,7 +65,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(LONG event, const PidlAbso
 		}
 		break;
 
-	case SHCNE_UPDATEITEM:
+	case DirectoryWatcher::Event::Modified:
 		if (ILIsParent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw(), TRUE))
 		{
 			OnItemModified(simplePidl1.Raw());
@@ -118,12 +81,12 @@ void ShellBrowserImpl::ProcessShellChangeNotification(LONG event, const PidlAbso
 		}
 		break;
 
-	case SHCNE_UPDATEDIR:
+	case DirectoryWatcher::Event::DirectoryContentsChanged:
 		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.Raw(), simplePidl1.Raw()))
 		{
-			// It's not safe to perform an immediate refresh here, since doing so would clear
-			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
-			// through. Therefore, the function below will perform the refresh asynchronously.
+			// It's not safe to perform an immediate refresh here, since the set of changes is being
+			// iterated through by the directory watcher. Therefore, the function below will perform
+			// the refresh asynchronously.
 			RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime());
 		}
 		else if (ILIsParent(simplePidl1.Raw(), m_directoryState.pidlDirectory.Raw(), false))
@@ -137,9 +100,7 @@ void ShellBrowserImpl::ProcessShellChangeNotification(LONG event, const PidlAbso
 		}
 		break;
 
-	case SHCNE_DRIVEREMOVED:
-	case SHCNE_RMDIR:
-	case SHCNE_DELETE:
+	case DirectoryWatcher::Event::Removed:
 		// Only the current directory is monitored, so notifications should only arrive for items in
 		// that directory. However, if the user has just changed directories, a notification could
 		// still come in for the previous directory. Therefore, it's important to verify that the
@@ -157,35 +118,6 @@ void ShellBrowserImpl::ProcessShellChangeNotification(LONG event, const PidlAbso
 			NavigateUpToClosestExistingItemIfNecessary(m_weakPtrFactory.GetWeakPtr(),
 				m_directoryState.pidlDirectory, m_app->GetRuntime());
 		}
-		break;
-	}
-
-	m_app->GetShellBrowserEvents()->NotifyItemsChanged(this);
-}
-
-void ShellBrowserImpl::ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
-	const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2)
-{
-	switch (event)
-	{
-	case FileSystemChangeWatcher::Event::Added:
-		OnItemAdded(simplePidl1.Raw());
-		break;
-
-	case FileSystemChangeWatcher::Event::Modified:
-		OnItemModified(simplePidl1.Raw());
-		break;
-
-	case FileSystemChangeWatcher::Event::Renamed:
-		OnItemRenamed(simplePidl1.Raw(), simplePidl2.Raw());
-		break;
-
-	case FileSystemChangeWatcher::Event::Removed:
-		OnItemRemoved(simplePidl1.Raw());
-		break;
-
-	case FileSystemChangeWatcher::Event::ChangesLost:
-		RefreshDirectoryAfterUpdate(m_weakPtrFactory.GetWeakPtr(), m_app->GetRuntime());
 		break;
 	}
 

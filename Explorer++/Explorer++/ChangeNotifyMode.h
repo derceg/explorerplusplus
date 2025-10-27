@@ -6,11 +6,11 @@
 
 enum class ChangeNotifyMode
 {
-	// Indicates that `ShellChangeWatcher` will be used to watch directories for changes.
-	// Internally, that class uses `SHChangeNotifyRegister` to perform the watch.
+	// Indicates that `ShellWatcher` will be used to watch directories for changes. Internally, that
+	// class uses `SHChangeNotifyRegister` to perform the watch.
 	Shell,
 
-	// Indicates that `FileSystemChangeWatcher` will be used to watch directories for changes.
-	// Internally, that class uses `ReadDirectoryChangesW` to perform the watch.
+	// Indicates that `FileSystemWatcher` will be used to watch directories for changes. Internally,
+	// that class uses `ReadDirectoryChangesW` to perform the watch.
 	Filesystem
 };

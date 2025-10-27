@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "FileSystemChangeWatcher.h"
+#include "FileSystemWatcher.h"
 #include "ExecutorWrapper.h"
 #include "MessageLoop.h"
 #include "ScopedTestDir.h"
@@ -16,10 +16,10 @@
 using namespace std::chrono_literals;
 using namespace testing;
 
-class FileSystemChangeWatcherTest : public Test
+class FileSystemWatcherTest : public Test
 {
 protected:
-	FileSystemChangeWatcherTest() : m_uiThreadExecutor(std::make_shared<UIThreadExecutor>())
+	FileSystemWatcherTest() : m_uiThreadExecutor(std::make_shared<UIThreadExecutor>())
 	{
 	}
 
@@ -30,10 +30,9 @@ protected:
 		ASSERT_HRESULT_SUCCEEDED(hr);
 	}
 
-	std::unique_ptr<FileSystemChangeWatcher> CreateWatcher(
-		FileSystemChangeWatcher::Event eventToObserve)
+	std::unique_ptr<FileSystemWatcher> CreateWatcher(DirectoryWatcher::Event eventToObserve)
 	{
-		std::unique_ptr<FileSystemChangeWatcher> watcher;
+		std::unique_ptr<FileSystemWatcher> watcher;
 		CreateWatcher(watcher, eventToObserve);
 		return watcher;
 	}
@@ -48,19 +47,19 @@ protected:
 	ScopedTestDir m_scopedTestDir;
 	PidlAbsolute m_scopedTestDirPidl;
 	ExecutorWrapper<UIThreadExecutor> m_uiThreadExecutor;
-	MockFunction<void(FileSystemChangeWatcher::Event event, const PidlAbsolute &simplePidl1,
+	MockFunction<void(DirectoryWatcher::Event event, const PidlAbsolute &simplePidl1,
 		const PidlAbsolute &simplePidl2)>
 		m_callback;
 	MessageLoop m_messageLoop;
 
 private:
-	void CreateWatcher(std::unique_ptr<FileSystemChangeWatcher> &watcher,
-		FileSystemChangeWatcher::Event eventToObserve)
+	void CreateWatcher(std::unique_ptr<FileSystemWatcher> &watcher,
+		DirectoryWatcher::Event eventToObserve)
 	{
-		watcher = FileSystemChangeWatcher::MaybeCreate(m_scopedTestDirPidl,
-			wil::FolderChangeEvents::All, m_uiThreadExecutor.Get(),
-			[this, eventToObserve](FileSystemChangeWatcher::Event event,
-				const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2)
+		watcher = FileSystemWatcher::MaybeCreate(m_scopedTestDirPidl,
+			DirectoryWatcher::Filters::All, m_uiThreadExecutor.Get(),
+			[this, eventToObserve](DirectoryWatcher::Event event, const PidlAbsolute &simplePidl1,
+				const PidlAbsolute &simplePidl2)
 			{
 				if (event == eventToObserve)
 				{
@@ -72,29 +71,27 @@ private:
 	}
 };
 
-TEST_F(FileSystemChangeWatcherTest, AddItem)
+TEST_F(FileSystemWatcherTest, AddItem)
 {
-	auto watcher = CreateWatcher(FileSystemChangeWatcher::Event::Added);
+	auto watcher = CreateWatcher(DirectoryWatcher::Event::Added);
 
 	auto newItemPath = m_scopedTestDir.GetPath() / L"new-item";
 	auto newItemPidl = CreateSimplePidlForTest(newItemPath, nullptr, ShellItemType::Folder);
 
-	EXPECT_CALL(m_callback,
-		Call(FileSystemChangeWatcher::Event::Added, newItemPidl, PidlAbsolute{}));
+	EXPECT_CALL(m_callback, Call(DirectoryWatcher::Event::Added, newItemPidl, PidlAbsolute{}));
 	std::filesystem::create_directory(newItemPath);
 
 	WaitForNotifications();
 }
 
-TEST_F(FileSystemChangeWatcherTest, ModifyItem)
+TEST_F(FileSystemWatcherTest, ModifyItem)
 {
-	auto watcher = CreateWatcher(FileSystemChangeWatcher::Event::Modified);
+	auto watcher = CreateWatcher(DirectoryWatcher::Event::Modified);
 
 	auto itemPath = m_scopedTestDir.GetPath() / L"item";
 	auto itemPidl = CreateSimplePidlForTest(itemPath, nullptr, ShellItemType::File);
 
-	EXPECT_CALL(m_callback,
-		Call(FileSystemChangeWatcher::Event::Modified, itemPidl, PidlAbsolute{}));
+	EXPECT_CALL(m_callback, Call(DirectoryWatcher::Event::Modified, itemPidl, PidlAbsolute{}));
 
 	{
 		std::ofstream stream(itemPath);
@@ -104,9 +101,9 @@ TEST_F(FileSystemChangeWatcherTest, ModifyItem)
 	WaitForNotifications();
 }
 
-TEST_F(FileSystemChangeWatcherTest, RenameItem)
+TEST_F(FileSystemWatcherTest, RenameItem)
 {
-	auto watcher = CreateWatcher(FileSystemChangeWatcher::Event::Renamed);
+	auto watcher = CreateWatcher(DirectoryWatcher::Event::Renamed);
 
 	auto originalItemPath = m_scopedTestDir.GetPath() / L"original-item";
 	auto originalItemPidl =
@@ -116,7 +113,7 @@ TEST_F(FileSystemChangeWatcherTest, RenameItem)
 	auto updatedItemPidl = CreateSimplePidlForTest(updatedItemPath, nullptr, ShellItemType::Folder);
 
 	EXPECT_CALL(m_callback,
-		Call(FileSystemChangeWatcher::Event::Renamed, originalItemPidl, updatedItemPidl));
+		Call(DirectoryWatcher::Event::Renamed, originalItemPidl, updatedItemPidl));
 
 	std::filesystem::create_directory(originalItemPath);
 	std::filesystem::rename(originalItemPath, updatedItemPath);
@@ -124,15 +121,14 @@ TEST_F(FileSystemChangeWatcherTest, RenameItem)
 	WaitForNotifications();
 }
 
-TEST_F(FileSystemChangeWatcherTest, RemoveItem)
+TEST_F(FileSystemWatcherTest, RemoveItem)
 {
-	auto watcher = CreateWatcher(FileSystemChangeWatcher::Event::Removed);
+	auto watcher = CreateWatcher(DirectoryWatcher::Event::Removed);
 
 	auto itemPath = m_scopedTestDir.GetPath() / L"item";
 	auto itemPidl = CreateSimplePidlForTest(itemPath, nullptr, ShellItemType::Folder);
 
-	EXPECT_CALL(m_callback,
-		Call(FileSystemChangeWatcher::Event::Removed, itemPidl, PidlAbsolute{}));
+	EXPECT_CALL(m_callback, Call(DirectoryWatcher::Event::Removed, itemPidl, PidlAbsolute{}));
 
 	std::filesystem::create_directory(itemPath);
 	std::filesystem::remove(itemPath);
@@ -140,17 +136,17 @@ TEST_F(FileSystemChangeWatcherTest, RemoveItem)
 	WaitForNotifications();
 }
 
-TEST_F(FileSystemChangeWatcherTest, ResumeAfterDestruction)
+TEST_F(FileSystemWatcherTest, ResumeAfterDestruction)
 {
-	auto watcher = CreateWatcher(FileSystemChangeWatcher::Event::Added);
+	auto watcher = CreateWatcher(DirectoryWatcher::Event::Added);
 
 	auto itemPath = m_scopedTestDir.GetPath() / L"item";
 	std::filesystem::create_directory(itemPath);
 
-	// To transfer back to the UI thread, the FileSystemChangeWatcher instance will queue a task to
+	// To transfer back to the UI thread, the FileSystemWatcher instance will queue a task to
 	// UIThreadExecutor. That ultimately involves posting a message. This will wait (with a timeout)
 	// until that message has been posted. It's important to do this before the
-	// FileSystemChangeWatcher instance is destroyed, otherwise the instance could be destroyed too
+	// FileSystemWatcher instance is destroyed, otherwise the instance could be destroyed too
 	// early (before any change notifications have been processed).
 	std::chrono::milliseconds timeoutInMs = TIMEOUT_DURATION;
 	auto res = MsgWaitForMultipleObjectsEx(0, nullptr, static_cast<DWORD>(timeoutInMs.count()),
@@ -160,6 +156,6 @@ TEST_F(FileSystemChangeWatcherTest, ResumeAfterDestruction)
 	watcher.reset();
 
 	// This should result in the queued task being processed. This should be a safe operation, even
-	// though the FileSystemChangeWatcher instance has been destroyed.
+	// though the FileSystemWatcher instance has been destroyed.
 	m_messageLoop.RunUntilIdle();
 }

@@ -14,12 +14,14 @@
 #include "DefaultAccelerators.h"
 #include "DriveEnumeratorImpl.h"
 #include "ExitCode.h"
+#include "FileSystemWatcher.h"
 #include "LanguageHelper.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
 #include "RegistryAppStorage.h"
 #include "RegistryAppStorageFactory.h"
 #include "ResourceHelper.h"
+#include "ShellWatcher.h"
 #include "TabStorage.h"
 #include "UIThreadExecutor.h"
 #include "Win32ResourceLoader.h"
@@ -367,9 +369,19 @@ Runtime *App::GetRuntime()
 	return &m_runtime;
 }
 
-ShellChangeManager *App::GetShellChangeManager()
+std::unique_ptr<DirectoryWatcher> App::MaybeCreateDirectoryWatcher(const PidlAbsolute &pidl,
+	DirectoryWatcher::Filters filters, DirectoryWatcher::Callback callback,
+	DirectoryWatcher::Behavior behavior)
 {
-	return &m_shellChangeManager;
+	if (m_config.changeNotifyMode == ChangeNotifyMode::Shell)
+	{
+		return ShellWatcher::MaybeCreate(&m_shellWatcherManager, pidl, filters, callback, behavior);
+	}
+	else
+	{
+		return FileSystemWatcher::MaybeCreate(pidl, filters, m_runtime.GetUiThreadExecutor(),
+			callback, behavior);
+	}
 }
 
 ClipboardWatcher *App::GetClipboardWatcher()

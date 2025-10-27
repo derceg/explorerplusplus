@@ -315,7 +315,7 @@
     <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="SystemClockFake.cpp" />
     <ClCompile Include="FeatureListTest.cpp" />
-    <ClCompile Include="FileSystemChangeWatcherTest.cpp" />
+    <ClCompile Include="FileSystemWatcherTest.cpp" />
     <ClCompile Include="FrequentLocationsMenuTest.cpp" />
     <ClCompile Include="FrequentLocationsModelTest.cpp" />
     <ClCompile Include="FrequentLocationsRegistryStorageTest.cpp" />

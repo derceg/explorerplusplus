@@ -258,17 +258,22 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *
 	}
 }
 
-HRESULT GetRootPidl(PIDLIST_ABSOLUTE *pidl)
+PidlAbsolute GetRootPidl()
 {
 	// While using SHGetKnownFolderIDList() with FOLDERID_Desktop would be simpler than the method
 	// used here, that method fails in Windows PE (with ERROR_FILE_NOT_FOUND). That failure is
 	// unusual, since although the filesystem desktop folder doesn't exist, the virtual desktop
 	// folder at the root of the shell namespace is still accessible and the pidl returned by
 	// SHGetKnownFolderIDList() represents the root folder.
+	//
 	// Retrieving the pidl using the method below works consistently, however.
 	wil::com_ptr_nothrow<IShellFolder> desktop;
-	RETURN_IF_FAILED(SHGetDesktopFolder(&desktop));
-	return SHGetIDListFromObject(desktop.get(), pidl);
+	FAIL_FAST_IF_FAILED(SHGetDesktopFolder(&desktop));
+
+	PidlAbsolute pidl;
+	FAIL_FAST_IF_FAILED(SHGetIDListFromObject(desktop.get(), PidlOutParam(pidl)));
+
+	return pidl;
 }
 
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)

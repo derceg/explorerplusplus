@@ -3,16 +3,16 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "FileSystemChangeWatcher.h"
+#include "FileSystemWatcher.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 
-std::unique_ptr<FileSystemChangeWatcher> FileSystemChangeWatcher::MaybeCreate(
-	const PidlAbsolute &pidl, wil::FolderChangeEvents filter,
-	std::shared_ptr<concurrencpp::executor> uiThreadExecutor, Callback callback, Behavior behavior)
+std::unique_ptr<FileSystemWatcher> FileSystemWatcher::MaybeCreate(const PidlAbsolute &pidl,
+	Filters filters, std::shared_ptr<concurrencpp::executor> uiThreadExecutor, Callback callback,
+	Behavior behavior)
 {
-	std::unique_ptr<FileSystemChangeWatcher> watcher;
-	HRESULT hr = MaybeCreateInternal(pidl, filter, uiThreadExecutor, callback, behavior, watcher);
+	std::unique_ptr<FileSystemWatcher> watcher;
+	HRESULT hr = MaybeCreateInternal(pidl, filters, uiThreadExecutor, callback, behavior, watcher);
 
 	if (FAILED(hr))
 	{
@@ -24,33 +24,61 @@ std::unique_ptr<FileSystemChangeWatcher> FileSystemChangeWatcher::MaybeCreate(
 	return watcher;
 }
 
-HRESULT FileSystemChangeWatcher::MaybeCreateInternal(const PidlAbsolute &pidl,
-	wil::FolderChangeEvents filter, std::shared_ptr<concurrencpp::executor> uiThreadExecutor,
-	Callback callback, Behavior behavior, std::unique_ptr<FileSystemChangeWatcher> &outputWatcher)
+HRESULT FileSystemWatcher::MaybeCreateInternal(const PidlAbsolute &pidl, Filters filters,
+	std::shared_ptr<concurrencpp::executor> uiThreadExecutor, Callback callback, Behavior behavior,
+	std::unique_ptr<FileSystemWatcher> &outputWatcher)
 {
 	std::wstring parsingName;
 	RETURN_IF_FAILED(GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingName));
 
-	auto watcher = std::make_unique<FileSystemChangeWatcher>(parsingName, callback, PassKey());
-	RETURN_IF_FAILED(
-		watcher->m_changeReader.create(parsingName.c_str(), behavior == Behavior::Recursive, filter,
-			std::bind_front(&FileSystemChangeWatcher::OnChange,
-				watcher->m_weakPtrFactory.GetWeakPtr(), uiThreadExecutor)));
+	auto watcher = std::make_unique<FileSystemWatcher>(parsingName, callback, PassKey());
+	RETURN_IF_FAILED(watcher->m_changeReader.create(parsingName.c_str(),
+		behavior == Behavior::Recursive, FiltersToWilChangeEvents(filters),
+		std::bind_front(&FileSystemWatcher::OnChange, watcher->m_weakPtrFactory.GetWeakPtr(),
+			uiThreadExecutor)));
 
 	outputWatcher = std::move(watcher);
 
 	return S_OK;
 }
 
-FileSystemChangeWatcher::FileSystemChangeWatcher(const std::wstring &path, Callback callback,
-	PassKey) :
+wil::FolderChangeEvents FileSystemWatcher::FiltersToWilChangeEvents(Filters filters)
+{
+	wil::FolderChangeEvents changeEvents = wil::FolderChangeEvents::None;
+
+	if (WI_IsAnyFlagSet(filters, Filters::FileAdded | Filters::FileRenamed | Filters::FileRemoved))
+	{
+		WI_SetFlag(changeEvents, wil::FolderChangeEvents::FileName);
+	}
+
+	if (WI_IsAnyFlagSet(filters,
+			Filters::DirectoryAdded | Filters::DirectoryRenamed | Filters::DirectoryRemoved))
+	{
+		WI_SetFlag(changeEvents, wil::FolderChangeEvents::DirectoryName);
+	}
+
+	if (WI_IsFlagSet(filters, Filters::Modified))
+	{
+		WI_SetAllFlags(changeEvents,
+			wil::FolderChangeEvents::FileSize | wil::FolderChangeEvents::LastWriteTime
+				| wil::FolderChangeEvents::Security);
+	}
+
+	if (WI_IsFlagSet(filters, Filters::Attributes))
+	{
+		WI_SetFlag(changeEvents, wil::FolderChangeEvents::Attributes);
+	}
+
+	return changeEvents;
+}
+
+FileSystemWatcher::FileSystemWatcher(const std::wstring &path, Callback callback, PassKey) :
 	m_path(path),
 	m_callback(callback)
 {
 }
 
-concurrencpp::null_result FileSystemChangeWatcher::OnChange(
-	WeakPtr<FileSystemChangeWatcher> weakSelf,
+concurrencpp::null_result FileSystemWatcher::OnChange(WeakPtr<FileSystemWatcher> weakSelf,
 	std::shared_ptr<concurrencpp::executor> uiThreadExecutor, wil::FolderChangeEvent event,
 	PCWSTR fileName)
 {
@@ -66,7 +94,7 @@ concurrencpp::null_result FileSystemChangeWatcher::OnChange(
 	weakSelf->ProcessChangeNotification(event, fileNameCopy);
 }
 
-void FileSystemChangeWatcher::ProcessChangeNotification(wil::FolderChangeEvent event,
+void FileSystemWatcher::ProcessChangeNotification(wil::FolderChangeEvent event,
 	const std::wstring &fileName)
 {
 	// This call can legitimately fail, however, it's likely that can only happen if:
@@ -107,10 +135,6 @@ void FileSystemChangeWatcher::ProcessChangeNotification(wil::FolderChangeEvent e
 		m_callback(Event::Added, simplePidl, {});
 		break;
 
-	case wil::FolderChangeEvent::Modified:
-		m_callback(Event::Modified, simplePidl, {});
-		break;
-
 	case wil::FolderChangeEvent::RenameOldName:
 		if (m_renamedItemOldPidl.HasValue())
 		{
@@ -133,12 +157,16 @@ void FileSystemChangeWatcher::ProcessChangeNotification(wil::FolderChangeEvent e
 		m_renamedItemOldPidl.Reset();
 		break;
 
+	case wil::FolderChangeEvent::Modified:
+		m_callback(Event::Modified, simplePidl, {});
+		break;
+
 	case wil::FolderChangeEvent::Removed:
 		m_callback(Event::Removed, simplePidl, {});
 		break;
 
 	case wil::FolderChangeEvent::ChangesLost:
-		m_callback(Event::ChangesLost, simplePidl, {});
+		m_callback(Event::DirectoryContentsChanged, simplePidl, {});
 		break;
 	}
 }

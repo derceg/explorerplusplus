@@ -7,14 +7,13 @@
 #include "BrowserCommandTarget.h"
 #include "ClipboardOperations.h"
 #include "Columns.h"
-#include "FileSystemChangeWatcher.h"
+#include "DirectoryWatcher.h"
 #include "FolderSettings.h"
 #include "MainFontSetter.h"
 #include "NavigationManager.h"
 #include "ScopedBrowserCommandTarget.h"
 #include "ServiceProvider.h"
 #include "ShellBrowser.h"
-#include "ShellChangeWatcher.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/ClipboardHelper.h"
@@ -303,19 +302,17 @@ private:
 	{
 		PidlAbsolute pidlDirectory;
 		std::wstring directory;
-		bool virtualFolder;
-		int itemIDCounter;
-
-		// Directory monitoring
-		std::unique_ptr<ShellChangeWatcher> shellChangeWatcher;
-		std::unique_ptr<ShellChangeWatcher> rootShellChangeWatcher;
+		bool virtualFolder = false;
+		int itemIDCounter = 0;
 
 		/* Stores information on files that have
 		been created and are awaiting insertion
 		into the listview. */
 		std::vector<AwaitingAdd_t> awaitingAddList;
 
-		std::unique_ptr<FileSystemChangeWatcher> fileSystemChangeWatcher;
+		// Directory monitoring
+		std::unique_ptr<DirectoryWatcher> directoryWatcher;
+		std::unique_ptr<DirectoryWatcher> rootDirectoryWatcher;
 
 		std::unordered_set<int> filteredItemsList;
 
@@ -330,13 +327,12 @@ private:
 		// it has been added.
 		PidlAbsolute queuedRenameItem;
 
-		int numItems;
-		int numFilesSelected;
-		int numFoldersSelected;
-		uint64_t totalDirSize;
-		uint64_t fileSelectionSize;
+		int numItems = 0;
+		int numFilesSelected = 0;
+		int numFoldersSelected = 0;
+		uint64_t totalDirSize = 0;
+		uint64_t fileSelectionSize = 0;
 
-		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
 		// Thumbnails
@@ -349,17 +345,6 @@ private:
 		// Drag and drop
 		bool isCurrentFolderDragSource = false;
 		std::optional<int> highlightedItemInternalIndex;
-
-		DirectoryState() :
-			virtualFolder(false),
-			itemIDCounter(0),
-			numItems(0),
-			numFilesSelected(0),
-			numFoldersSelected(0),
-			totalDirSize(0),
-			fileSelectionSize(0)
-		{
-		}
 	};
 
 	enum class NavigationState
@@ -518,11 +503,7 @@ private:
 
 	// Directory change handling
 	void StartDirectoryMonitoring();
-	void StartDirectoryMonitoringViaShellChangeWatcher();
-	void StartDirectoryMonitoringViaFileSystemChangeWatcher();
-	void ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
-		const PidlAbsolute &simplePidl2);
-	void ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+	void ProcessDirectoryChangeNotification(DirectoryWatcher::Event event,
 		const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void AddItem(PCIDLIST_ABSOLUTE pidl);

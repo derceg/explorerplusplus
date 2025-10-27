@@ -4,8 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeNode.h"
-#include "FileSystemChangeWatcher.h"
-#include "ShellChangeWatcher.h"
+#include "DirectoryWatcher.h"
 
 ShellTreeNode::ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl,
 	IShellItem2 *shellItem) :
@@ -132,25 +131,14 @@ bool ShellTreeNode::ShouldRecreateShellItem(PCIDLIST_ABSOLUTE simpleUpdatedPidl)
 	return false;
 }
 
-const ShellChangeWatcher *ShellTreeNode::GetShellChangeWatcher() const
+const DirectoryWatcher *ShellTreeNode::GetDirectoryWatcher() const
 {
-	return m_shellChangeWatcher.get();
+	return m_directoryWatcher.get();
 }
 
-void ShellTreeNode::SetShellChangeWatcher(std::unique_ptr<ShellChangeWatcher> shellChangeWatcher)
+void ShellTreeNode::SetDirectoryWatcher(std::unique_ptr<DirectoryWatcher> directoryWatcher)
 {
-	m_shellChangeWatcher = std::move(shellChangeWatcher);
-}
-
-const FileSystemChangeWatcher *ShellTreeNode::GetFileSystemChangeWatcher() const
-{
-	return m_fileSystemChangeWatcher.get();
-}
-
-void ShellTreeNode::SetFileSystemChangeWatcher(
-	std::unique_ptr<FileSystemChangeWatcher> fileSystemChangeWatcher)
-{
-	m_fileSystemChangeWatcher = std::move(fileSystemChangeWatcher);
+	m_directoryWatcher = std::move(directoryWatcher);
 }
 
 ShellTreeNode *ShellTreeNode::GetParent()

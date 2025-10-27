@@ -3,12 +3,12 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellChangeManager.h"
+#include "ShellWatcherManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowSubclass.h"
 
-ShellChangeManager::~ShellChangeManager()
+ShellWatcherManager::~ShellWatcherManager()
 {
 	// If a watch hasn't been stopped by this point, it means a client has a dangling pointer
 	// somewhere. In other words, each client requires a pointer to this class to be able to call
@@ -17,8 +17,9 @@ ShellChangeManager::~ShellChangeManager()
 	CHECK(m_messageIdToWatchDetailsMap.empty());
 }
 
-std::optional<UINT> ShellChangeManager::StartWatching(const PidlAbsolute &pidl, LONG events,
-	Callback callback, bool recursive)
+std::optional<UINT> ShellWatcherManager::StartWatching(const PidlAbsolute &pidl,
+	DirectoryWatcher::Filters filters, DirectoryWatcher::Callback callback,
+	DirectoryWatcher::Behavior behavior)
 {
 	EnsureWindow();
 
@@ -26,10 +27,10 @@ std::optional<UINT> ShellChangeManager::StartWatching(const PidlAbsolute &pidl, 
 
 	SHChangeNotifyEntry entry;
 	entry.pidl = pidl.Raw();
-	entry.fRecursive = recursive;
+	entry.fRecursive = (behavior == DirectoryWatcher::Behavior::Recursive);
 	ULONG changeNotifyId = SHChangeNotifyRegister(m_hwnd.get(),
-		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery, events, messageId, 1,
-		&entry);
+		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+		FiltersToShellChangeEvents(filters), messageId, 1, &entry);
 
 	if (changeNotifyId == 0)
 	{
@@ -52,7 +53,7 @@ std::optional<UINT> ShellChangeManager::StartWatching(const PidlAbsolute &pidl, 
 	return messageId;
 }
 
-void ShellChangeManager::StopWatching(UINT id)
+void ShellWatcherManager::StopWatching(UINT id)
 {
 	auto itr = m_messageIdToWatchDetailsMap.find(id);
 	CHECK(itr != m_messageIdToWatchDetailsMap.end());
@@ -63,7 +64,7 @@ void ShellChangeManager::StopWatching(UINT id)
 	m_messageIdToWatchDetailsMap.erase(itr);
 }
 
-UINT ShellChangeManager::GetNextMessageId()
+UINT ShellWatcherManager::GetNextMessageId()
 {
 	UINT id = m_messageIdCounter;
 
@@ -77,7 +78,56 @@ UINT ShellChangeManager::GetNextMessageId()
 	return id;
 }
 
-void ShellChangeManager::EnsureWindow()
+LONG ShellWatcherManager::FiltersToShellChangeEvents(DirectoryWatcher::Filters filters)
+{
+	// Multiple notifications can be combined into a single SHCNE_UPDATEDIR notification by the
+	// shell, so that notification should always be included.
+	LONG changeEvents = SHCNE_UPDATEDIR;
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::FileAdded))
+	{
+		WI_SetFlag(changeEvents, SHCNE_CREATE);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::FileRenamed))
+	{
+		WI_SetFlag(changeEvents, SHCNE_RENAMEITEM);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::FileRemoved))
+	{
+		WI_SetFlag(changeEvents, SHCNE_DELETE);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::DirectoryAdded))
+	{
+		WI_SetAllFlags(changeEvents, SHCNE_MKDIR | SHCNE_DRIVEADD);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::DirectoryRenamed))
+	{
+		WI_SetFlag(changeEvents, SHCNE_RENAMEFOLDER);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::DirectoryRemoved))
+	{
+		WI_SetAllFlags(changeEvents, SHCNE_RMDIR | SHCNE_DRIVEREMOVED);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::Modified))
+	{
+		WI_SetFlag(changeEvents, SHCNE_UPDATEITEM);
+	}
+
+	if (WI_IsFlagSet(filters, DirectoryWatcher::Filters::Attributes))
+	{
+		WI_SetFlag(changeEvents, SHCNE_ATTRIBUTES);
+	}
+
+	return changeEvents;
+}
+
+void ShellWatcherManager::EnsureWindow()
 {
 	if (m_hwnd)
 	{
@@ -99,10 +149,10 @@ void ShellChangeManager::EnsureWindow()
 	CHECK(m_hwnd);
 
 	m_subclass = std::make_unique<WindowSubclass>(m_hwnd.get(),
-		std::bind_front(&ShellChangeManager::WndProc, this));
+		std::bind_front(&ShellWatcherManager::WndProc, this));
 }
 
-ATOM ShellChangeManager::RegisterWindowClass()
+ATOM ShellWatcherManager::RegisterWindowClass()
 {
 	WNDCLASS windowClass = {};
 	windowClass.lpfnWndProc = DefWindowProc;
@@ -113,7 +163,7 @@ ATOM ShellChangeManager::RegisterWindowClass()
 	return RegisterClass(&windowClass);
 }
 
-LRESULT ShellChangeManager::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT ShellWatcherManager::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (msg >= MESSAGE_ID_MIN && msg <= MESSAGE_ID_MAX
 		&& m_messageIdToWatchDetailsMap.contains(msg))
@@ -134,7 +184,7 @@ LRESULT ShellChangeManager::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void ShellChangeManager::OnChangeNotify(UINT msg, WPARAM wParam, LPARAM lParam)
+void ShellWatcherManager::OnChangeNotify(UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PIDLIST_ABSOLUTE *pidls;
 	LONG event;
@@ -148,7 +198,7 @@ void ShellChangeManager::OnChangeNotify(UINT msg, WPARAM wParam, LPARAM lParam)
 	SetTimer(m_hwnd.get(), PROCESS_CHANGES_TIMER_ID, PROCESS_CHANGES_TIMEOUT, nullptr);
 }
 
-void ShellChangeManager::OnProcessChanges()
+void ShellWatcherManager::OnProcessChanges()
 {
 	KillTimer(m_hwnd.get(), PROCESS_CHANGES_TIMER_ID);
 
@@ -162,8 +212,36 @@ void ShellChangeManager::OnProcessChanges()
 		}
 
 		const auto &watchDetails = itr->second;
-		watchDetails.callback(change.event, change.pidl1, change.pidl2);
+		watchDetails.callback(ShellChangeEventToEvent(change.event), change.pidl1, change.pidl2);
 	}
 
 	m_changes.clear();
+}
+
+DirectoryWatcher::Event ShellWatcherManager::ShellChangeEventToEvent(LONG event)
+{
+	switch (event)
+	{
+	case SHCNE_DRIVEADD:
+	case SHCNE_MKDIR:
+	case SHCNE_CREATE:
+		return DirectoryWatcher::Event::Added;
+
+	case SHCNE_RENAMEFOLDER:
+	case SHCNE_RENAMEITEM:
+		return DirectoryWatcher::Event::Renamed;
+
+	case SHCNE_UPDATEITEM:
+		return DirectoryWatcher::Event::Modified;
+
+	case SHCNE_UPDATEDIR:
+		return DirectoryWatcher::Event::DirectoryContentsChanged;
+
+	case SHCNE_DRIVEREMOVED:
+	case SHCNE_RMDIR:
+	case SHCNE_DELETE:
+		return DirectoryWatcher::Event::Removed;
+	}
+
+	LOG(FATAL) << "Invalid change event type";
 }

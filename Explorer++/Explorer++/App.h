@@ -12,6 +12,7 @@
 #include "Config.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
+#include "DirectoryWatcher.h"
 #include "DriveModel.h"
 #include "DriveWatcherImpl.h"
 #include "EventWindow.h"
@@ -26,7 +27,7 @@
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
-#include "ShellChangeManager.h"
+#include "ShellWatcherManager.h"
 #include "TabEvents.h"
 #include "TabList.h"
 #include "TabRestorer.h"
@@ -59,7 +60,9 @@ public:
 	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
 	PlatformContext *GetPlatformContext();
 	Runtime *GetRuntime();
-	ShellChangeManager *GetShellChangeManager();
+	std::unique_ptr<DirectoryWatcher> MaybeCreateDirectoryWatcher(const PidlAbsolute &pidl,
+		DirectoryWatcher::Filters filters, DirectoryWatcher::Callback callback,
+		DirectoryWatcher::Behavior behavior = DirectoryWatcher::Behavior::NonRecursive);
 	ClipboardWatcher *GetClipboardWatcher();
 	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
@@ -115,7 +118,7 @@ private:
 	bool m_savePreferencesToXmlFile = false;
 	PlatformContextImpl m_platformContext;
 	Runtime m_runtime;
-	ShellChangeManager m_shellChangeManager;
+	ShellWatcherManager m_shellWatcherManager;
 	EventWindow m_eventWindow;
 	ClipboardWatcher m_clipboardWatcher;
 	FeatureList m_featureList;

@@ -6,7 +6,6 @@
 #include "ShellTreeView.h"
 #include "App.h"
 #include "FeatureList.h"
-#include "ShellChangeWatcher.h"
 #include "ShellTreeNode.h"
 #include "../Helper/ScopedRedrawDisabler.h"
 
@@ -15,30 +14,14 @@ void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 	// Note that both folders and files are monitored for changes. Although this class displays
 	// folders, certain types of container files (e.g. .7z, .cab, .rar, .zip) act like folders as
 	// well. Those items will be displayed and need to be updated when necessary.
-	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
-	{
-		node->SetShellChangeWatcher(ShellChangeWatcher::MaybeCreate(m_app->GetShellChangeManager(),
-			node->GetFullPidl().get(),
-			SHCNE_CREATE | SHCNE_MKDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_ATTRIBUTES
-				| SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_DELETE | SHCNE_RMDIR | SHCNE_DRIVEADD
-				| SHCNE_DRIVEREMOVED,
-			std::bind_front(&ShellTreeView::ProcessShellChangeNotification, this)));
-	}
-	else
-	{
-		node->SetFileSystemChangeWatcher(
-			FileSystemChangeWatcher::MaybeCreate(node->GetFullPidl().get(),
-				wil::FolderChangeEvents::FileName | wil::FolderChangeEvents::DirectoryName
-					| wil::FolderChangeEvents::Attributes | wil::FolderChangeEvents::LastWriteTime,
-				m_app->GetRuntime()->GetUiThreadExecutor(),
-				std::bind_front(&ShellTreeView::ProcessFileSystemChangeNotification, this)));
-	}
+	node->SetDirectoryWatcher(m_app->MaybeCreateDirectoryWatcher(node->GetFullPidl().get(),
+		DirectoryWatcher::Filters::All,
+		std::bind_front(&ShellTreeView::ProcessDirectoryChangeNotification, this)));
 }
 
 void ShellTreeView::StopDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	node->SetShellChangeWatcher(nullptr);
-	node->SetFileSystemChangeWatcher(nullptr);
+	node->SetDirectoryWatcher(nullptr);
 }
 
 void ShellTreeView::StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node)
@@ -67,9 +50,7 @@ void ShellTreeView::RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *
 
 void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if ((m_config->changeNotifyMode == ChangeNotifyMode::Shell && !node->GetShellChangeWatcher())
-		|| (m_config->changeNotifyMode == ChangeNotifyMode::Filesystem
-			&& !node->GetFileSystemChangeWatcher()))
+	if (!node->GetDirectoryWatcher())
 	{
 		// Directory monitoring should only be restarted if it's already in place. If it's not in
 		// place (e.g. because the node isn't expanded), there's no need to try to restart it.
@@ -80,61 +61,29 @@ void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 	StartDirectoryMonitoringForNode(node);
 }
 
-void ShellTreeView::ProcessShellChangeNotification(LONG event, const PidlAbsolute &simplePidl1,
-	const PidlAbsolute &simplePidl2)
-{
-	switch (event)
-	{
-	case SHCNE_DRIVEADD:
-	case SHCNE_MKDIR:
-	case SHCNE_CREATE:
-		OnItemAdded(simplePidl1.Raw());
-		break;
-
-	case SHCNE_RENAMEFOLDER:
-	case SHCNE_RENAMEITEM:
-		OnItemUpdated(simplePidl1.Raw(), simplePidl2.Raw());
-		break;
-
-	case SHCNE_UPDATEITEM:
-		OnItemUpdated(simplePidl1.Raw(), nullptr);
-		break;
-
-	case SHCNE_DRIVEREMOVED:
-	case SHCNE_RMDIR:
-	case SHCNE_DELETE:
-		OnItemRemoved(simplePidl1.Raw());
-		break;
-
-	case SHCNE_UPDATEDIR:
-		OnDirectoryUpdated(simplePidl1.Raw());
-		break;
-	}
-}
-
-void ShellTreeView::ProcessFileSystemChangeNotification(FileSystemChangeWatcher::Event event,
+void ShellTreeView::ProcessDirectoryChangeNotification(DirectoryWatcher::Event event,
 	const PidlAbsolute &simplePidl1, const PidlAbsolute &simplePidl2)
 {
 	switch (event)
 	{
-	case FileSystemChangeWatcher::Event::Added:
+	case DirectoryWatcher::Event::Added:
 		OnItemAdded(simplePidl1.Raw());
 		break;
 
-	case FileSystemChangeWatcher::Event::Modified:
-		OnItemUpdated(simplePidl1.Raw(), nullptr);
-		break;
-
-	case FileSystemChangeWatcher::Event::Renamed:
+	case DirectoryWatcher::Event::Renamed:
 		OnItemUpdated(simplePidl1.Raw(), simplePidl2.Raw());
 		break;
 
-	case FileSystemChangeWatcher::Event::Removed:
-		OnItemRemoved(simplePidl1.Raw());
+	case DirectoryWatcher::Event::Modified:
+		OnItemUpdated(simplePidl1.Raw(), nullptr);
 		break;
 
-	case FileSystemChangeWatcher::Event::ChangesLost:
+	case DirectoryWatcher::Event::DirectoryContentsChanged:
 		OnDirectoryUpdated(simplePidl1.Raw());
+		break;
+
+	case DirectoryWatcher::Event::Removed:
+		OnItemRemoved(simplePidl1.Raw());
 		break;
 	}
 }
