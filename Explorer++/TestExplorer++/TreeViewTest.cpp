@@ -31,6 +31,16 @@ public:
 
 	MOCK_METHOD(void, OnNodeExpanding, (TreeViewNode * node), (override));
 	MOCK_METHOD(void, OnNodeCollapsing, (TreeViewNode * node), (override));
+
+protected:
+	std::weak_ordering CompareItems(const TreeViewNode *first,
+		const TreeViewNode *second) const override
+	{
+		UNREFERENCED_PARAMETER(first);
+		UNREFERENCED_PARAMETER(second);
+
+		return std::weak_ordering::equivalent;
+	}
 };
 
 class TreeViewDelegateMock : public TreeViewDelegate
@@ -105,7 +115,7 @@ TEST_F(TreeViewTest, MoveNodeCollapsesParent)
 	m_treeView->ExpandNode(node1);
 
 	// Since node1 no longer has any children after the move, it should be collapsed.
-	m_adapter.MoveNode(childNode, node2, 0);
+	m_adapter.MoveNode(childNode, node2);
 	EXPECT_FALSE(m_treeView->IsNodeExpanded(node1));
 }
 
@@ -118,7 +128,7 @@ TEST_F(TreeViewTest, MoveNodeDoesntCollapseParent)
 	m_treeView->ExpandNode(node1);
 
 	// node1 still has a child, so it shouldn't be collapsed.
-	m_adapter.MoveNode(childNode1, node2, 0);
+	m_adapter.MoveNode(childNode1, node2);
 	EXPECT_TRUE(m_treeView->IsNodeExpanded(node1));
 }
 
@@ -131,7 +141,7 @@ TEST_F(TreeViewTest, MoveSelectedNode)
 	// The node being moved is selected, so it should still be selected after the move and no
 	// selection change notification should be generated.
 	EXPECT_CALL(m_delegate, OnSelectionChanged(_)).Times(0);
-	m_adapter.MoveNode(node2, node1, 0);
+	m_adapter.MoveNode(node2, node1);
 	EXPECT_EQ(m_treeView->GetSelectedNode(), node2);
 }
 
@@ -144,7 +154,7 @@ TEST_F(TreeViewTest, MoveNonSelectedNode)
 	// The node being moved isn't selected, so the selection shouldn't change and no selection
 	// change notification should be generated.
 	EXPECT_CALL(m_delegate, OnSelectionChanged(_)).Times(0);
-	m_adapter.MoveNode(node2, node1, 0);
+	m_adapter.MoveNode(node2, node1);
 	EXPECT_EQ(m_treeView->GetSelectedNode(), node1);
 }
 
@@ -404,6 +414,16 @@ public:
 	void SetShouldAddChildrenOnExpand(bool shouldAddChildrenOnExpand)
 	{
 		m_shouldAddChildrenOnExpand = shouldAddChildrenOnExpand;
+	}
+
+protected:
+	std::weak_ordering CompareItems(const TreeViewNode *first,
+		const TreeViewNode *second) const override
+	{
+		UNREFERENCED_PARAMETER(first);
+		UNREFERENCED_PARAMETER(second);
+
+		return std::weak_ordering::equivalent;
 	}
 
 private:

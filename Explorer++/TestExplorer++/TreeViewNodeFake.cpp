@@ -5,6 +5,10 @@
 #include "pch.h"
 #include "TreeViewNodeFake.h"
 
+TreeViewNodeFake::TreeViewNodeFake(const std::wstring &text) : m_text(text)
+{
+}
+
 std::wstring TreeViewNodeFake::GetText() const
 {
 	return m_text;

@@ -25,6 +25,10 @@ public:
 	BookmarkTreeViewNode *GetNodeForBookmark(const BookmarkItem *bookmarkFolder);
 	const BookmarkTreeViewNode *GetNodeForBookmark(const BookmarkItem *bookmarkFolder) const;
 
+protected:
+	std::weak_ordering CompareItems(const TreeViewNode *first,
+		const TreeViewNode *second) const override;
+
 private:
 	void AddFolderRecursive(BookmarkItem *bookmarkFolder);
 	void AddFolder(BookmarkItem *bookmarkFolder);
@@ -35,7 +39,6 @@ private:
 		size_t oldIndex, const BookmarkItem *newParent, size_t newIndex);
 	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
-	size_t GetFolderViewIndex(const BookmarkItem *bookmarkFolder) const;
 	TreeViewNode *GetParentNode(const BookmarkItem *bookmarkItem);
 
 	BookmarkTree *const m_bookmarkTree;

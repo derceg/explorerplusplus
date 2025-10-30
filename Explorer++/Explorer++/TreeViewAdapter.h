@@ -6,6 +6,7 @@
 
 #include "TreeViewNode.h"
 #include "../Helper/SignalWrapper.h"
+#include <compare>
 #include <memory>
 #include <unordered_map>
 
@@ -43,11 +44,12 @@ public:
 
 protected:
 	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node);
-	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node,
-		size_t index);
 	void NotifyNodeUpdated(TreeViewNode *node, TreeViewNode::Property property);
-	void MoveNode(TreeViewNode *node, TreeViewNode *newParent, size_t index);
+	void MoveNode(TreeViewNode *node, TreeViewNode *newParent);
 	void RemoveNode(TreeViewNode *node);
+
+	virtual std::weak_ordering CompareItems(const TreeViewNode *first,
+		const TreeViewNode *second) const = 0;
 
 private:
 	class RootTreeViewNode : public TreeViewNode
@@ -61,6 +63,10 @@ private:
 		bool IsGhosted() const override;
 		bool IsFile() const override;
 	};
+
+	size_t GetNodeSortedIndex(const TreeViewNode *node, const TreeViewNode *parentNode) const;
+	bool CompareItemsWrapper(const TreeViewNode *first, const TreeViewNode *second) const;
+	void MaybeRepositionNode(TreeViewNode *node);
 
 	bool IsInTree(const TreeViewNode *node) const;
 

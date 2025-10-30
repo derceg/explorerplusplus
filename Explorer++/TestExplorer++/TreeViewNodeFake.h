@@ -9,6 +9,8 @@
 class TreeViewNodeFake : public TreeViewNode
 {
 public:
+	TreeViewNodeFake(const std::wstring &text = L"");
+
 	std::wstring GetText() const override;
 	std::optional<std::wstring> MaybeGetEditingText() const override;
 	std::optional<int> GetIconIndex() const override;

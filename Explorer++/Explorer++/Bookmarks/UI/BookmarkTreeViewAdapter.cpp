@@ -53,8 +53,7 @@ void BookmarkTreeViewAdapter::AddFolder(BookmarkItem *bookmarkFolder)
 		m_bookmarkFolderIconIndex);
 	auto *rawNode = node.get();
 
-	AddNode(GetParentNode(bookmarkFolder->GetParent()), std::move(node),
-		GetFolderViewIndex(bookmarkFolder));
+	AddNode(GetParentNode(bookmarkFolder->GetParent()), std::move(node));
 
 	auto [itr, didInsert] = m_bookmarkToNodeMap.insert({ bookmarkFolder, rawNode });
 	CHECK(didInsert);
@@ -99,20 +98,7 @@ void BookmarkTreeViewAdapter::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,
 		return;
 	}
 
-	auto *node = GetNodeForBookmark(bookmarkItem);
-	auto currentNodeIndex = node->GetParent()->GetChildIndex(node);
-	auto newNodeIndex = GetFolderViewIndex(bookmarkItem);
-
-	// The index passed to the method below is based on the original items in the folder. So, if an
-	// item is moved to a later index in the same parent, the node index needs to be incremented by
-	// 1 (since the node would be shifted 1 position to the right if the item were still present at
-	// its original location).
-	if (oldParent == newParent && newNodeIndex > currentNodeIndex)
-	{
-		newNodeIndex++;
-	}
-
-	MoveNode(node, GetParentNode(newParent), newNodeIndex);
+	MoveNode(GetNodeForBookmark(bookmarkItem), GetParentNode(newParent));
 }
 
 void BookmarkTreeViewAdapter::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
@@ -139,24 +125,16 @@ void BookmarkTreeViewAdapter::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkIte
 	RemoveNode(node);
 }
 
-// As a bookmark folder can contain both bookmark folders as well as bookmarks, the index of a
-// bookmark folder won't necessarily match the index of the folder in the treeview. That's because
-// the treeview only contains bookmark folders.
-//
-// Therefore, this function returns the index of a folder, as it should appear in the treeview (i.e.
-// it only takes into account other bookmark folders).
-size_t BookmarkTreeViewAdapter::GetFolderViewIndex(const BookmarkItem *bookmarkFolder) const
+std::weak_ordering BookmarkTreeViewAdapter::CompareItems(const TreeViewNode *first,
+	const TreeViewNode *second) const
 {
-	DCHECK(bookmarkFolder->IsFolder());
+	auto *firstBookmark = GetBookmarkForNode(first);
+	auto *secondBookmark = GetBookmarkForNode(second);
 
-	size_t index = bookmarkFolder->GetParent()->GetChildIndex(bookmarkFolder);
-	const auto &children = bookmarkFolder->GetParent()->GetChildren();
-	const auto itr = children.begin() + index;
+	size_t firstIndex = firstBookmark->GetParent()->GetChildIndex(firstBookmark);
+	size_t secondIndex = secondBookmark->GetParent()->GetChildIndex(secondBookmark);
 
-	auto numPreviousFolders =
-		std::count_if(children.begin(), itr, [](auto &child) { return child->IsFolder(); });
-
-	return numPreviousFolders;
+	return firstIndex <=> secondIndex;
 }
 
 TreeViewNode *BookmarkTreeViewAdapter::GetParentNode(const BookmarkItem *bookmarkItem)

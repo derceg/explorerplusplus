@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TreeViewAdapter.h"
+#include <algorithm>
 
 TreeViewAdapter::TreeViewAdapter()
 {
@@ -39,12 +40,6 @@ TreeViewNode *TreeViewAdapter::MaybeGetNodeById(int id)
 
 TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node)
 {
-	return AddNode(parentNode, std::move(node), parentNode->GetChildren().size());
-}
-
-TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node,
-	size_t index)
-{
 	CHECK(IsInTree(parentNode));
 
 	for (auto *currentNode : node->GetNodesDepthFirst())
@@ -57,11 +52,7 @@ TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr
 			std::bind_front(&TreeViewAdapter::NotifyNodeUpdated, this, currentNode));
 	}
 
-	if (index > parentNode->GetChildren().size())
-	{
-		index = parentNode->GetChildren().size();
-	}
-
+	size_t index = GetNodeSortedIndex(node.get(), parentNode);
 	auto *newNode = parentNode->AddChild(std::move(node), index);
 	nodeAddedSignal.m_signal(newNode);
 	return newNode;
@@ -72,9 +63,11 @@ void TreeViewAdapter::NotifyNodeUpdated(TreeViewNode *node, TreeViewNode::Proper
 	CHECK(IsInTree(node));
 
 	nodeUpdatedSignal.m_signal(node, property);
+
+	MaybeRepositionNode(node);
 }
 
-void TreeViewAdapter::MoveNode(TreeViewNode *node, TreeViewNode *newParent, size_t index)
+void TreeViewAdapter::MoveNode(TreeViewNode *node, TreeViewNode *newParent)
 {
 	CHECK(IsInTree(node));
 	CHECK(IsInTree(newParent));
@@ -82,23 +75,14 @@ void TreeViewAdapter::MoveNode(TreeViewNode *node, TreeViewNode *newParent, size
 	auto *oldParent = node->GetParent();
 	size_t oldIndex = oldParent->GetChildIndex(node);
 
-	if (index > newParent->GetChildren().size())
-	{
-		index = newParent->GetChildren().size();
-	}
+	auto ownedNode = oldParent->RemoveChild(node);
+	size_t index = GetNodeSortedIndex(node, newParent);
+	newParent->AddChild(std::move(ownedNode), index);
 
-	if (oldParent == newParent && index > oldIndex)
-	{
-		index--;
-	}
-
-	if (oldParent == newParent && index == oldIndex)
+	if (oldParent == newParent && oldIndex == index)
 	{
 		return;
 	}
-
-	auto ownedNode = oldParent->RemoveChild(node);
-	newParent->AddChild(std::move(ownedNode), index);
 
 	nodeMovedSignal.m_signal(node, oldParent, oldIndex, newParent, index);
 }
@@ -118,6 +102,31 @@ void TreeViewAdapter::RemoveNode(TreeViewNode *node)
 
 	auto ownedNode = parentNode->RemoveChild(node);
 	nodeRemovedSignal.m_signal(node);
+}
+
+size_t TreeViewAdapter::GetNodeSortedIndex(const TreeViewNode *node,
+	const TreeViewNode *parentNode) const
+{
+	DCHECK(!node->GetParent());
+
+	auto itr = std::ranges::upper_bound(parentNode->GetChildren(), node,
+		std::bind_front(&TreeViewAdapter::CompareItemsWrapper, this),
+		[](const auto &currentNode) { return currentNode.get(); });
+	return std::distance(parentNode->GetChildren().begin(), itr);
+}
+
+bool TreeViewAdapter::CompareItemsWrapper(const TreeViewNode *first,
+	const TreeViewNode *second) const
+{
+	auto cmp = CompareItems(first, second);
+	return std::is_lt(cmp);
+}
+
+void TreeViewAdapter::MaybeRepositionNode(TreeViewNode *node)
+{
+	// MoveNode() determines the sorted position of the node when adding it to its new parent. So,
+	// this effectively updates the sorted position of the node, if necessary.
+	MoveNode(node, node->GetParent());
 }
 
 bool TreeViewAdapter::IsInTree(const TreeViewNode *node) const
