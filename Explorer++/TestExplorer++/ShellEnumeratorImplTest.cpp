@@ -14,12 +14,6 @@ using namespace testing;
 class ShellEnumeratorImplTest : public Test
 {
 protected:
-	ShellEnumeratorImplTest(ShellEnumeratorImpl::HiddenItemsPolicy hiddenItemsPolicy =
-								ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden) :
-		m_shellEnumerator(nullptr, hiddenItemsPolicy)
-	{
-	}
-
 	void SetUp() override
 	{
 		SetTestFileHidden(true);
@@ -34,15 +28,17 @@ protected:
 		SetTestFileHidden(false);
 	}
 
-	void CheckEnumeration(const std::vector<std::wstring> &expectedItems)
+	void CheckEnumeration(const ShellEnumeratorImpl &shellEnumerator,
+		const std::vector<std::wstring> &expectedItems)
 	{
 		std::vector<std::wstring> itemNames;
-		EnumerateTestDirectory(itemNames);
+		EnumerateTestDirectory(shellEnumerator, itemNames);
 
 		EXPECT_THAT(itemNames, UnorderedElementsAreArray(expectedItems));
 	}
 
-	void EnumerateTestDirectory(std::vector<std::wstring> &itemNames)
+	void EnumerateTestDirectory(const ShellEnumeratorImpl &shellEnumerator,
+		std::vector<std::wstring> &itemNames)
 	{
 		PidlAbsolute pidl;
 		std::wstring testDirectory = GetEnumerationTestDirectory();
@@ -51,7 +47,7 @@ protected:
 
 		std::vector<PidlChild> items;
 		ASSERT_HRESULT_SUCCEEDED(
-			m_shellEnumerator.EnumerateDirectory(pidl.Raw(), items, m_stopSource.get_token()));
+			shellEnumerator.EnumerateDirectory(pidl.Raw(), items, m_stopSource.get_token()));
 
 		wil::com_ptr_nothrow<IShellFolder> parent;
 		ASSERT_HRESULT_SUCCEEDED(
@@ -94,36 +90,44 @@ private:
 		auto res = SetFileAttributes(hiddenItemPath.c_str(), attributes);
 		ASSERT_NE(res, 0);
 	}
-
-	ShellEnumeratorImpl m_shellEnumerator;
 };
 
-TEST_F(ShellEnumeratorImplTest, EnumerateTestDirectory)
+TEST_F(ShellEnumeratorImplTest, FoldersAndFiles)
 {
-	CheckEnumeration({ L"item1.txt", L"item2.txt", L"item3.txt" });
+	ShellEnumeratorImpl shellEnumerator(nullptr,
+		ShellEnumeratorImpl::EnumerationScope::FoldersAndFiles,
+		ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden);
+	CheckEnumeration(shellEnumerator,
+		{ L"folder1", L"folder2", L"item1.txt", L"item2.txt", L"item3.txt" });
+}
+
+TEST_F(ShellEnumeratorImplTest, FoldersOnly)
+{
+	ShellEnumeratorImpl shellEnumerator(nullptr, ShellEnumeratorImpl::EnumerationScope::FoldersOnly,
+		ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden);
+	CheckEnumeration(shellEnumerator, { L"folder1", L"folder2" });
+}
+
+TEST_F(ShellEnumeratorImplTest, IncludeHidden)
+{
+	ShellEnumeratorImpl shellEnumerator(nullptr,
+		ShellEnumeratorImpl::EnumerationScope::FoldersAndFiles,
+		ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden);
+	CheckEnumeration(shellEnumerator,
+		{ L"folder1", L"folder2", L"item1.txt", L"item2.txt", L"item3.txt", L"hidden.txt" });
 }
 
 TEST_F(ShellEnumeratorImplTest, StopToken)
 {
+	ShellEnumeratorImpl shellEnumerator(nullptr,
+		ShellEnumeratorImpl::EnumerationScope::FoldersAndFiles,
+		ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden);
+
 	m_stopSource.request_stop();
 
 	// A stop was requested, so it's expected that the enumeration will stop early and that no items
 	// will be returned.
 	std::vector<std::wstring> itemNames;
-	EnumerateTestDirectory(itemNames);
+	EnumerateTestDirectory(shellEnumerator, itemNames);
 	EXPECT_TRUE(itemNames.empty());
-}
-
-class ShellEnumeratorImplIncludeHiddenTest : public ShellEnumeratorImplTest
-{
-protected:
-	ShellEnumeratorImplIncludeHiddenTest() :
-		ShellEnumeratorImplTest(ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden)
-	{
-	}
-};
-
-TEST_F(ShellEnumeratorImplIncludeHiddenTest, EnumerateTestDirectory)
-{
-	CheckEnumeration({ L"item1.txt", L"item2.txt", L"item3.txt", L"hidden.txt" });
 }

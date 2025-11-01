@@ -10,6 +10,12 @@
 class ShellEnumeratorImpl : public ShellEnumerator
 {
 public:
+	enum class EnumerationScope
+	{
+		FoldersOnly,
+		FoldersAndFiles
+	};
+
 	// The values here indicate whether hidden and hidden system items will be included in the
 	// enumeration, or excluded.
 	enum class HiddenItemsPolicy
@@ -18,7 +24,8 @@ public:
 		ExcludeHidden
 	};
 
-	ShellEnumeratorImpl(HWND embedder, HiddenItemsPolicy hiddenItemsPolicy);
+	ShellEnumeratorImpl(HWND embedder, EnumerationScope enumerationScope,
+		HiddenItemsPolicy hiddenItemsPolicy);
 
 	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory, std::vector<PidlChild> &outputItems,
 		std::stop_token stopToken) const override;
@@ -29,5 +36,6 @@ public:
 
 private:
 	const HWND m_embedder;
+	const EnumerationScope m_enumerationScope;
 	std::atomic<HiddenItemsPolicy> m_hiddenItemsPolicy = HiddenItemsPolicy::IncludeHidden;
 };

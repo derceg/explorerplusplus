@@ -7,8 +7,10 @@
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
 
-ShellEnumeratorImpl::ShellEnumeratorImpl(HWND embedder, HiddenItemsPolicy hiddenItemsPolicy) :
+ShellEnumeratorImpl::ShellEnumeratorImpl(HWND embedder, EnumerationScope enumerationScope,
+	HiddenItemsPolicy hiddenItemsPolicy) :
 	m_embedder(embedder),
+	m_enumerationScope(enumerationScope),
 	m_hiddenItemsPolicy(hiddenItemsPolicy)
 {
 }
@@ -19,7 +21,12 @@ HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	RETURN_IF_FAILED(SHBindToObject(nullptr, pidlDirectory, nullptr, IID_PPV_ARGS(&shellFolder)));
 
-	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+	SHCONTF enumFlags = SHCONTF_FOLDERS;
+
+	if (m_enumerationScope == EnumerationScope::FoldersAndFiles)
+	{
+		WI_SetFlag(enumFlags, SHCONTF_NONFOLDERS);
+	}
 
 	if (m_hiddenItemsPolicy == HiddenItemsPolicy::IncludeHidden)
 	{

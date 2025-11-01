@@ -72,6 +72,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	m_app(app),
 	m_browser(browser),
 	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(owner,
+		ShellEnumeratorImpl::EnumerationScope::FoldersAndFiles,
 		folderSettings.showHidden ? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
 								  : ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden)),
 	m_navigationManager(this, app->GetNavigationEvents(), m_shellEnumerator,
