@@ -100,3 +100,8 @@ boost::signals2::connection TreeViewNode::AddUpdatedObserver(
 {
 	return m_updatedSignal.connect(observer);
 }
+
+void TreeViewNode::NotifyUpdated()
+{
+	m_updatedSignal();
+}

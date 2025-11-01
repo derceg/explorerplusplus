@@ -34,8 +34,7 @@ public:
 
 	// Signals
 	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeAddedSignal;
-	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node, TreeViewNode::Property property)>
-		nodeUpdatedSignal;
+	SignalWrapper<TreeViewAdapter, void(TreeViewNode *node)> nodeUpdatedSignal;
 	SignalWrapper<TreeViewAdapter,
 		void(TreeViewNode *node, const TreeViewNode *oldParent, size_t oldIndex,
 			const TreeViewNode *newParent, size_t newIndex)>
@@ -44,7 +43,7 @@ public:
 
 protected:
 	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node);
-	void NotifyNodeUpdated(TreeViewNode *node, TreeViewNode::Property property);
+	void NotifyNodeUpdated(TreeViewNode *node);
 	void MoveNode(TreeViewNode *node, TreeViewNode *newParent);
 	void RemoveNode(TreeViewNode *node);
 

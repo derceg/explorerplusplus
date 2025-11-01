@@ -109,7 +109,7 @@ private:
 
 	void AddNodeRecursive(TreeViewNode *node);
 	void AddNode(TreeViewNode *node);
-	void UpdateNode(TreeViewNode *node, TreeViewNode::Property property);
+	void RefreshNode(TreeViewNode *node);
 	void MoveNode(TreeViewNode *node, const TreeViewNode *oldParent, size_t oldIndex,
 		const TreeViewNode *newParent, size_t newIndex);
 	void RemoveNode(TreeViewNode *node);

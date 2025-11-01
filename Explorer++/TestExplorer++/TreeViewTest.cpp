@@ -360,7 +360,7 @@ private:
 
 		m_mayLazyLoadChildren = mayLazyLoadChildren;
 
-		NotifyUpdated(TreeViewNode::Property::MayLazyLoadChildren);
+		NotifyUpdated();
 	}
 
 	bool ComputeMayLazyLoadChildren()

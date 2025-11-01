@@ -81,7 +81,7 @@ void BookmarkTreeViewAdapter::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 
 	if (propertyType == BookmarkItem::PropertyType::Name)
 	{
-		NotifyNodeUpdated(GetNodeForBookmark(&bookmarkItem), TreeViewNode::Property::Text);
+		NotifyNodeUpdated(GetNodeForBookmark(&bookmarkItem));
 	}
 }
 

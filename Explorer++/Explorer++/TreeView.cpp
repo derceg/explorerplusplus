@@ -39,7 +39,7 @@ void TreeView::SetAdapter(TreeViewAdapter *adapter)
 	m_connections.push_back(
 		m_adapter->nodeAddedSignal.AddObserver(std::bind_front(&TreeView::AddNode, this)));
 	m_connections.push_back(
-		m_adapter->nodeUpdatedSignal.AddObserver(std::bind_front(&TreeView::UpdateNode, this)));
+		m_adapter->nodeUpdatedSignal.AddObserver(std::bind_front(&TreeView::RefreshNode, this)));
 	m_connections.push_back(
 		m_adapter->nodeMovedSignal.AddObserver(std::bind_front(&TreeView::MoveNode, this)));
 	m_connections.push_back(
@@ -74,14 +74,6 @@ void TreeView::AddNode(TreeViewNode *node)
 		return;
 	}
 
-	std::wstring text = node->GetText();
-
-	TVITEMEX tvItem = {};
-	tvItem.mask = TVIF_TEXT | TVIF_STATE;
-	tvItem.pszText = text.data();
-	tvItem.stateMask = TVIS_CUT;
-	tvItem.state = node->IsGhosted() ? TVIS_CUT : 0;
-
 	auto *parentNode = node->GetParent();
 
 	HTREEITEM parentHandle = m_adapter->IsRoot(parentNode) ? nullptr : GetHandleForNode(parentNode);
@@ -101,35 +93,26 @@ void TreeView::AddNode(TreeViewNode *node)
 	TVINSERTSTRUCT tvInsertData = {};
 	tvInsertData.hParent = parentHandle;
 	tvInsertData.hInsertAfter = insertAfterHandle;
-	tvInsertData.itemex = tvItem;
 	auto handle = TreeView_InsertItem(m_hwnd, &tvInsertData);
 	CHECK(handle);
 
 	auto [itr, didInsert] = m_handleToNodeMap.insert({ handle, node });
 	CHECK(didInsert);
 
-	// TreeView_InsertItem() can result in a TVN_GETDISPINFO message being dispatched (to query the
-	// callback properties). That message can't be processed properly until the handle has been
-	// inserted into the map above. Therefore, the callback properties will only be set after the
-	// node has been inserted and the map has been updated.
+	// Note that the node is initially inserted with no properties set at all. The main reason for
+	// that is that TreeView_InsertItem() can result in a TVN_GETDISPINFO message being dispatched
+	// (to query the callback properties). That message can't be processed properly until the handle
+	// has been inserted into the map above. Therefore, the callback properties can only be set
+	// after the node has been inserted and the map has been updated.
 	//
 	// Alternatively, it would be possible to store a pointer to the node in TVITEM::lParam. But
 	// then there would still need to be some way to go from a node to a handle. It's easiest just
 	// to use a single structure to store both mappings.
-	TVITEM tvItemUpdate = {};
-	tvItemUpdate.mask = TVIF_CHILDREN;
-	tvItemUpdate.hItem = handle;
-	tvItemUpdate.cChildren = I_CHILDRENCALLBACK;
-
-	if (m_imageList)
-	{
-		WI_SetAllFlags(tvItemUpdate.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE);
-		tvItemUpdate.iImage = I_IMAGECALLBACK;
-		tvItemUpdate.iSelectedImage = I_IMAGECALLBACK;
-	}
-
-	auto res = TreeView_SetItem(m_hwnd, &tvItemUpdate);
-	CHECK(res);
+	//
+	// Setting all the properties in a separate method also allows that same method to be used to
+	// update a node. That helps to avoid a situation where a property is set here but not updated
+	// when a node changes.
+	RefreshNode(node);
 
 	if (parentHandle)
 	{
@@ -137,7 +120,7 @@ void TreeView::AddNode(TreeViewNode *node)
 		tvParentItem.mask = TVIF_CHILDREN;
 		tvParentItem.hItem = parentHandle;
 		tvParentItem.cChildren = 1;
-		res = TreeView_SetItem(m_hwnd, &tvParentItem);
+		auto res = TreeView_SetItem(m_hwnd, &tvParentItem);
 		CHECK(res);
 	}
 
@@ -149,56 +132,27 @@ void TreeView::AddNode(TreeViewNode *node)
 	}
 }
 
-void TreeView::UpdateNode(TreeViewNode *node, TreeViewNode::Property property)
+void TreeView::RefreshNode(TreeViewNode *node)
 {
-	std::wstring nodeText;
-
 	TVITEMEX tvItem = {};
 	tvItem.hItem = GetHandleForNode(node);
+	tvItem.mask = TVIF_TEXT | TVIF_STATE;
+	tvItem.pszText = LPSTR_TEXTCALLBACK;
+	tvItem.stateMask = TVIS_CUT;
+	tvItem.state = node->IsGhosted() ? TVIS_CUT : 0;
 
-	switch (property)
+	if (m_imageList)
 	{
-	case TreeViewNode::Property::Text:
-		WI_SetFlag(tvItem.mask, TVIF_TEXT);
-		nodeText = node->GetText();
-		tvItem.pszText = nodeText.data();
-		break;
-
-	case TreeViewNode::Property::Icon:
-	{
-		// The icon for a node should only be updated if images are being displayed.
-		CHECK(m_imageList);
-
-		// Additionally, an icon index should be returned here.
-		auto iconIndex = node->GetIconIndex();
-		CHECK(iconIndex);
-
 		WI_SetAllFlags(tvItem.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE);
-		tvItem.iImage = *iconIndex;
-		tvItem.iSelectedImage = *iconIndex;
+		tvItem.iImage = I_IMAGECALLBACK;
+		tvItem.iSelectedImage = I_IMAGECALLBACK;
 	}
-	break;
 
-	case TreeViewNode::Property::Ghosted:
-		WI_SetFlag(tvItem.mask, TVIF_STATE);
-		tvItem.stateMask = TVIS_CUT;
-		tvItem.state = node->IsGhosted() ? TVIS_CUT : 0;
-		break;
-
-	case TreeViewNode::Property::MayLazyLoadChildren:
-		if (!node->GetChildren().empty())
-		{
-			// This hint is only valid when the node has no children. If the node currently has
-			// children, the hint can be ignored.
-			return;
-		}
-
+	if (node->GetChildren().empty())
+	{
 		WI_SetFlag(tvItem.mask, TVIF_CHILDREN);
-		tvItem.cChildren = IsNodeExpandable(node) ? 1 : 0;
-		break;
+		tvItem.cChildren = I_CHILDRENCALLBACK;
 	}
-
-	CHECK(tvItem.mask != 0);
 
 	auto res = TreeView_SetItem(m_hwnd, &tvItem);
 	CHECK(res);
@@ -433,6 +387,11 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 void TreeView::OnGetDispInfo(NMTVDISPINFO *dispInfo)
 {
 	const auto *node = GetNodeForHandle(dispInfo->item.hItem);
+
+	if (WI_IsFlagSet(dispInfo->item.mask, TVIF_TEXT))
+	{
+		StringCchCopy(dispInfo->item.pszText, dispInfo->item.cchTextMax, node->GetText().c_str());
+	}
 
 	if (WI_IsAnyFlagSet(dispInfo->item.mask, TVIF_IMAGE | TVIF_SELECTEDIMAGE))
 	{

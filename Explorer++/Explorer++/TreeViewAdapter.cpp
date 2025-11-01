@@ -58,11 +58,11 @@ TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr
 	return newNode;
 }
 
-void TreeViewAdapter::NotifyNodeUpdated(TreeViewNode *node, TreeViewNode::Property property)
+void TreeViewAdapter::NotifyNodeUpdated(TreeViewNode *node)
 {
 	CHECK(IsInTree(node));
 
-	nodeUpdatedSignal.m_signal(node, property);
+	nodeUpdatedSignal.m_signal(node);
 
 	MaybeRepositionNode(node);
 }

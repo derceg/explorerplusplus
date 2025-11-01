@@ -47,7 +47,7 @@ bool TreeViewNodeFake::IsFile() const
 void TreeViewNodeFake::SetText(const std::wstring &text)
 {
 	m_text = text;
-	NotifyUpdated(TreeViewNode::Property::Text);
+	NotifyUpdated();
 }
 
 void TreeViewNodeFake::SetEditingText(const std::wstring &editingText)
@@ -63,5 +63,5 @@ void TreeViewNodeFake::ClearEditingText()
 void TreeViewNodeFake::SetIsGhosted(bool isGhosted)
 {
 	m_isGhosted = isGhosted;
-	NotifyUpdated(Property::Ghosted);
+	NotifyUpdated();
 }

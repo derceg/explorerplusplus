@@ -20,15 +20,7 @@ using TreeViewNodes = std::vector<std::unique_ptr<TreeViewNode>>;
 class TreeViewNode : private boost::noncopyable
 {
 public:
-	enum class Property
-	{
-		Text,
-		Icon,
-		Ghosted,
-		MayLazyLoadChildren
-	};
-
-	using UpdatedSignal = boost::signals2::signal<void(Property property)>;
+	using UpdatedSignal = boost::signals2::signal<void()>;
 
 	TreeViewNode();
 	virtual ~TreeViewNode() = default;
@@ -69,10 +61,7 @@ public:
 		const typename UpdatedSignal::slot_type &observer);
 
 protected:
-	void NotifyUpdated(Property property)
-	{
-		m_updatedSignal(property);
-	}
+	void NotifyUpdated();
 
 private:
 	static inline int m_idCounter = 1;
