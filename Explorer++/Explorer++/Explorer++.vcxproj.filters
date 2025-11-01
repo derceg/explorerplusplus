@@ -907,6 +907,9 @@
     <ClCompile Include="ShellWatcherManager.cpp">
       <Filter>Directory Watching</Filter>
     </ClCompile>
+    <ClCompile Include="DirectoryWatcherFactory.cpp">
+      <Filter>Directory Watching</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1930,6 +1933,9 @@
       <Filter>Directory Watching</Filter>
     </ClInclude>
     <ClInclude Include="DirectoryWatcher.h">
+      <Filter>Directory Watching</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryWatcherFactory.h">
       <Filter>Directory Watching</Filter>
     </ClInclude>
   </ItemGroup>

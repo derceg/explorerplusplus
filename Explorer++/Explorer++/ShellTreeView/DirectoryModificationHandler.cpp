@@ -14,8 +14,8 @@ void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 	// Note that both folders and files are monitored for changes. Although this class displays
 	// folders, certain types of container files (e.g. .7z, .cab, .rar, .zip) act like folders as
 	// well. Those items will be displayed and need to be updated when necessary.
-	node->SetDirectoryWatcher(m_app->MaybeCreateDirectoryWatcher(node->GetFullPidl().get(),
-		DirectoryWatcher::Filters::All,
+	node->SetDirectoryWatcher(m_app->GetDirectoryWatcherFactory()->MaybeCreate(
+		node->GetFullPidl().get(), DirectoryWatcher::Filters::All,
 		std::bind_front(&ShellTreeView::ProcessDirectoryChangeNotification, this)));
 }
 

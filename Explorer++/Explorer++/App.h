@@ -12,7 +12,7 @@
 #include "Config.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
-#include "DirectoryWatcher.h"
+#include "DirectoryWatcherFactory.h"
 #include "DriveModel.h"
 #include "DriveWatcherImpl.h"
 #include "EventWindow.h"
@@ -60,13 +60,11 @@ public:
 	void SetSavePreferencesToXmlFile(bool savePreferencesToXmlFile);
 	PlatformContext *GetPlatformContext();
 	Runtime *GetRuntime();
-	std::unique_ptr<DirectoryWatcher> MaybeCreateDirectoryWatcher(const PidlAbsolute &pidl,
-		DirectoryWatcher::Filters filters, DirectoryWatcher::Callback callback,
-		DirectoryWatcher::Behavior behavior = DirectoryWatcher::Behavior::NonRecursive);
 	ClipboardWatcher *GetClipboardWatcher();
 	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
 	Config *GetConfig();
+	DirectoryWatcherFactory *GetDirectoryWatcherFactory();
 	CachedIcons *GetCachedIcons();
 	std::shared_ptr<AsyncIconFetcher> GetIconFetcher();
 	BrowserList *GetBrowserList();
@@ -118,12 +116,13 @@ private:
 	bool m_savePreferencesToXmlFile = false;
 	PlatformContextImpl m_platformContext;
 	Runtime m_runtime;
-	ShellWatcherManager m_shellWatcherManager;
 	EventWindow m_eventWindow;
 	ClipboardWatcher m_clipboardWatcher;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
+	ShellWatcherManager m_shellWatcherManager;
+	DirectoryWatcherFactory m_directoryWatcherFactory;
 	DarkModeManager m_darkModeManager;
 	DarkModeColorProvider m_darkModeColorProvider;
 	ThemeManager m_themeManager;

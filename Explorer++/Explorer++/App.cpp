@@ -42,6 +42,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 			static_cast<int>(std::thread::hardware_concurrency()), MIN_COM_STA_THREADPOOL_SIZE))),
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
+	m_directoryWatcherFactory(&m_config, &m_shellWatcherManager, m_runtime.GetUiThreadExecutor()),
 	m_darkModeManager(&m_eventWindow, &m_config),
 	m_themeManager(&m_darkModeManager, &m_darkModeColorProvider),
 	m_cachedIcons(std::make_shared<CachedIcons>(MAX_CACHED_ICONS)),
@@ -369,21 +370,6 @@ Runtime *App::GetRuntime()
 	return &m_runtime;
 }
 
-std::unique_ptr<DirectoryWatcher> App::MaybeCreateDirectoryWatcher(const PidlAbsolute &pidl,
-	DirectoryWatcher::Filters filters, DirectoryWatcher::Callback callback,
-	DirectoryWatcher::Behavior behavior)
-{
-	if (m_config.changeNotifyMode == ChangeNotifyMode::Shell)
-	{
-		return ShellWatcher::MaybeCreate(&m_shellWatcherManager, pidl, filters, callback, behavior);
-	}
-	else
-	{
-		return FileSystemWatcher::MaybeCreate(pidl, filters, m_runtime.GetUiThreadExecutor(),
-			callback, behavior);
-	}
-}
-
 ClipboardWatcher *App::GetClipboardWatcher()
 {
 	return &m_clipboardWatcher;
@@ -402,6 +388,11 @@ AcceleratorManager *App::GetAcceleratorManager()
 Config *App::GetConfig()
 {
 	return &m_config;
+}
+
+DirectoryWatcherFactory *App::GetDirectoryWatcherFactory()
+{
+	return &m_directoryWatcherFactory;
 }
 
 CachedIcons *App::GetCachedIcons()
