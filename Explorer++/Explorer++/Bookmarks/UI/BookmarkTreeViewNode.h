@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include "Bookmarks/BookmarkItem.h"
 #include "TreeViewNode.h"
+#include <boost/signals2.hpp>
 
-class BookmarkItem;
 class BookmarkTree;
 
 class BookmarkTreeViewNode : public TreeViewNode
@@ -27,7 +28,11 @@ public:
 	const BookmarkItem *GetBookmarkFolder() const;
 
 private:
+	void OnBookmarkFolderUpdated(BookmarkItem &bookmarkFolder,
+		BookmarkItem::PropertyType propertyType);
+
 	BookmarkItem *const m_bookmarkFolder;
 	const BookmarkTree *const m_bookmarkTree;
 	const int m_bookmarkFolderIconIndex;
+	boost::signals2::scoped_connection m_updateConnection;
 };

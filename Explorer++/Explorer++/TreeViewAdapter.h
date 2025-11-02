@@ -43,7 +43,6 @@ public:
 
 protected:
 	TreeViewNode *AddNode(TreeViewNode *parentNode, std::unique_ptr<TreeViewNode> node);
-	void NotifyNodeUpdated(TreeViewNode *node);
 	void MoveNode(TreeViewNode *node, TreeViewNode *newParent);
 	void RemoveNode(TreeViewNode *node);
 
@@ -62,6 +61,8 @@ private:
 		bool IsGhosted() const override;
 		bool IsFile() const override;
 	};
+
+	void OnNodeUpdated(TreeViewNode *node);
 
 	size_t GetNodeSortedIndex(const TreeViewNode *node, const TreeViewNode *parentNode) const;
 	bool CompareItemsWrapper(const TreeViewNode *first, const TreeViewNode *second) const;

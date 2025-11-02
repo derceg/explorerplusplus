@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkTreeViewNode.h"
-#include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
 
 BookmarkTreeViewNode::BookmarkTreeViewNode(BookmarkItem *bookmarkFolder,
@@ -14,6 +13,20 @@ BookmarkTreeViewNode::BookmarkTreeViewNode(BookmarkItem *bookmarkFolder,
 	m_bookmarkFolderIconIndex(bookmarkFolderIconIndex)
 {
 	DCHECK(bookmarkFolder->IsFolder());
+
+	m_updateConnection = m_bookmarkFolder->updatedSignal.AddObserver(
+		std::bind_front(&BookmarkTreeViewNode::OnBookmarkFolderUpdated, this));
+}
+
+void BookmarkTreeViewNode::OnBookmarkFolderUpdated(BookmarkItem &bookmarkFolder,
+	BookmarkItem::PropertyType propertyType)
+{
+	UNREFERENCED_PARAMETER(bookmarkFolder);
+
+	if (propertyType == BookmarkItem::PropertyType::Name)
+	{
+		NotifyUpdated();
+	}
 }
 
 std::wstring BookmarkTreeViewNode::GetText() const

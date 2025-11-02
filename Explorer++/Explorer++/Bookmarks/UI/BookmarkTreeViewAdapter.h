@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "Bookmarks/BookmarkItem.h"
 #include "TreeViewAdapter.h"
 #include <boost/signals2.hpp>
 #include <unordered_map>
 #include <vector>
 
+class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreeViewNode;
 
@@ -34,7 +34,6 @@ private:
 	void AddFolder(BookmarkItem *bookmarkFolder);
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
-	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 	void OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent,
 		size_t oldIndex, const BookmarkItem *newParent, size_t newIndex);
 	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);

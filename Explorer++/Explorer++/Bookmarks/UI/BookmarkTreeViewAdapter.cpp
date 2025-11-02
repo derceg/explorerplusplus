@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkTreeViewAdapter.h"
+#include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeViewNode.h"
-#include <algorithm>
 #include <memory>
 
 BookmarkTreeViewAdapter::BookmarkTreeViewAdapter(BookmarkTree *bookmarkTree,
@@ -16,8 +16,6 @@ BookmarkTreeViewAdapter::BookmarkTreeViewAdapter(BookmarkTree *bookmarkTree,
 {
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind_front(&BookmarkTreeViewAdapter::OnBookmarkItemAdded, this)));
-	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
-		std::bind_front(&BookmarkTreeViewAdapter::OnBookmarkItemUpdated, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
 		std::bind_front(&BookmarkTreeViewAdapter::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
@@ -69,20 +67,6 @@ void BookmarkTreeViewAdapter::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, si
 	}
 
 	AddFolderRecursive(&bookmarkItem);
-}
-
-void BookmarkTreeViewAdapter::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
-	BookmarkItem::PropertyType propertyType)
-{
-	if (!bookmarkItem.IsFolder())
-	{
-		return;
-	}
-
-	if (propertyType == BookmarkItem::PropertyType::Name)
-	{
-		NotifyNodeUpdated(GetNodeForBookmark(&bookmarkItem));
-	}
 }
 
 void BookmarkTreeViewAdapter::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,

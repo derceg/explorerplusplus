@@ -49,22 +49,13 @@ TreeViewNode *TreeViewAdapter::AddNode(TreeViewNode *parentNode, std::unique_ptr
 
 		// The observer here doesn't need to be removed, since this class owns the node.
 		std::ignore = currentNode->AddUpdatedObserver(
-			std::bind_front(&TreeViewAdapter::NotifyNodeUpdated, this, currentNode));
+			std::bind_front(&TreeViewAdapter::OnNodeUpdated, this, currentNode));
 	}
 
 	size_t index = GetNodeSortedIndex(node.get(), parentNode);
 	auto *newNode = parentNode->AddChild(std::move(node), index);
 	nodeAddedSignal.m_signal(newNode);
 	return newNode;
-}
-
-void TreeViewAdapter::NotifyNodeUpdated(TreeViewNode *node)
-{
-	CHECK(IsInTree(node));
-
-	nodeUpdatedSignal.m_signal(node);
-
-	MaybeRepositionNode(node);
 }
 
 void TreeViewAdapter::MoveNode(TreeViewNode *node, TreeViewNode *newParent)
@@ -102,6 +93,13 @@ void TreeViewAdapter::RemoveNode(TreeViewNode *node)
 
 	auto ownedNode = parentNode->RemoveChild(node);
 	nodeRemovedSignal.m_signal(node);
+}
+
+void TreeViewAdapter::OnNodeUpdated(TreeViewNode *node)
+{
+	nodeUpdatedSignal.m_signal(node);
+
+	MaybeRepositionNode(node);
 }
 
 size_t TreeViewAdapter::GetNodeSortedIndex(const TreeViewNode *node,
