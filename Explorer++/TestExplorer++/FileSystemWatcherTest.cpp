@@ -56,8 +56,8 @@ private:
 	void CreateWatcher(std::unique_ptr<FileSystemWatcher> &watcher,
 		DirectoryWatcher::Event eventToObserve)
 	{
-		watcher = FileSystemWatcher::MaybeCreate(m_scopedTestDirPidl,
-			DirectoryWatcher::Filters::All, m_uiThreadExecutor.Get(),
+		watcher = FileSystemWatcher::MaybeCreate(
+			m_scopedTestDirPidl, DirectoryWatcher::Filters::All, m_uiThreadExecutor.Get(),
 			[this, eventToObserve](DirectoryWatcher::Event event, const PidlAbsolute &simplePidl1,
 				const PidlAbsolute &simplePidl2)
 			{
@@ -66,7 +66,8 @@ private:
 					m_callback.Call(event, simplePidl1, simplePidl2);
 					m_messageLoop.Stop();
 				}
-			});
+			},
+			DirectoryWatcher::Behavior::NonRecursive);
 		ASSERT_NE(watcher, nullptr);
 	}
 };

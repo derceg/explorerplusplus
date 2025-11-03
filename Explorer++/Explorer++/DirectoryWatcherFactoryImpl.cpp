@@ -3,13 +3,13 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DirectoryWatcherFactory.h"
+#include "DirectoryWatcherFactoryImpl.h"
 #include "ChangeNotifyMode.h"
 #include "Config.h"
 #include "FileSystemWatcher.h"
 #include "ShellWatcher.h"
 
-DirectoryWatcherFactory::DirectoryWatcherFactory(const Config *config,
+DirectoryWatcherFactoryImpl::DirectoryWatcherFactoryImpl(const Config *config,
 	ShellWatcherManager *shellWatcherManager,
 	std::shared_ptr<concurrencpp::executor> uiThreadExecutor) :
 	m_config(config),
@@ -18,7 +18,7 @@ DirectoryWatcherFactory::DirectoryWatcherFactory(const Config *config,
 {
 }
 
-std::unique_ptr<DirectoryWatcher> DirectoryWatcherFactory::MaybeCreate(const PidlAbsolute &pidl,
+std::unique_ptr<DirectoryWatcher> DirectoryWatcherFactoryImpl::MaybeCreate(const PidlAbsolute &pidl,
 	DirectoryWatcher::Filters filters, DirectoryWatcher::Callback callback,
 	DirectoryWatcher::Behavior behavior)
 {

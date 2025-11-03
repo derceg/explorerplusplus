@@ -18,8 +18,7 @@ private:
 
 public:
 	static std::unique_ptr<ShellWatcher> MaybeCreate(ShellWatcherManager *manager,
-		const PidlAbsolute &pidl, Filters filters, Callback callback,
-		Behavior behavior = Behavior::NonRecursive);
+		const PidlAbsolute &pidl, Filters filters, Callback callback, Behavior behavior);
 
 	ShellWatcher(ShellWatcherManager *manager, UINT id, PassKey);
 	~ShellWatcher();

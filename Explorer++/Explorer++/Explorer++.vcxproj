@@ -1216,7 +1216,7 @@
     <ClCompile Include="ConfigXmlStorage.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
-    <ClCompile Include="DirectoryWatcherFactory.cpp" />
+    <ClCompile Include="DirectoryWatcherFactoryImpl.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ListView.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
@@ -1563,6 +1563,7 @@
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DirectoryWatcher.h" />
     <ClInclude Include="DirectoryWatcherFactory.h" />
+    <ClInclude Include="DirectoryWatcherFactoryImpl.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="IconModel.h" />
     <ClInclude Include="IconUpdateCallback.h" />

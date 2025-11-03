@@ -22,7 +22,8 @@ void ShellBrowserImpl::StartDirectoryMonitoring()
 {
 	m_directoryState.directoryWatcher = m_app->GetDirectoryWatcherFactory()->MaybeCreate(
 		m_directoryState.pidlDirectory, DirectoryWatcher::Filters::All,
-		std::bind_front(&ShellBrowserImpl::ProcessDirectoryChangeNotification, this));
+		std::bind_front(&ShellBrowserImpl::ProcessDirectoryChangeNotification, this),
+		DirectoryWatcher::Behavior::NonRecursive);
 
 	if (m_config->changeNotifyMode == ChangeNotifyMode::Shell)
 	{

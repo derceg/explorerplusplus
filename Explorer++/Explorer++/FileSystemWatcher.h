@@ -23,7 +23,7 @@ private:
 public:
 	static std::unique_ptr<FileSystemWatcher> MaybeCreate(const PidlAbsolute &pidl, Filters filters,
 		std::shared_ptr<concurrencpp::executor> uiThreadExecutor, Callback callback,
-		Behavior behavior = Behavior::NonRecursive);
+		Behavior behavior);
 
 	FileSystemWatcher(const std::wstring &path, Callback callback, PassKey);
 

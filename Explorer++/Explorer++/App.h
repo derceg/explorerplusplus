@@ -12,7 +12,7 @@
 #include "Config.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
-#include "DirectoryWatcherFactory.h"
+#include "DirectoryWatcherFactoryImpl.h"
 #include "DriveModel.h"
 #include "DriveWatcherImpl.h"
 #include "EventWindow.h"
@@ -122,7 +122,7 @@ private:
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	ShellWatcherManager m_shellWatcherManager;
-	DirectoryWatcherFactory m_directoryWatcherFactory;
+	DirectoryWatcherFactoryImpl m_directoryWatcherFactory;
 	DarkModeManager m_darkModeManager;
 	DarkModeColorProvider m_darkModeColorProvider;
 	ThemeManager m_themeManager;

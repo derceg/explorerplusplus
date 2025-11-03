@@ -16,7 +16,8 @@ void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 	// well. Those items will be displayed and need to be updated when necessary.
 	node->SetDirectoryWatcher(m_app->GetDirectoryWatcherFactory()->MaybeCreate(
 		node->GetFullPidl().get(), DirectoryWatcher::Filters::All,
-		std::bind_front(&ShellTreeView::ProcessDirectoryChangeNotification, this)));
+		std::bind_front(&ShellTreeView::ProcessDirectoryChangeNotification, this),
+		DirectoryWatcher::Behavior::NonRecursive));
 }
 
 void ShellTreeView::StopDirectoryMonitoringForNode(ShellTreeNode *node)

@@ -907,7 +907,7 @@
     <ClCompile Include="ShellWatcherManager.cpp">
       <Filter>Directory Watching</Filter>
     </ClCompile>
-    <ClCompile Include="DirectoryWatcherFactory.cpp">
+    <ClCompile Include="DirectoryWatcherFactoryImpl.cpp">
       <Filter>Directory Watching</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1933,6 +1933,9 @@
       <Filter>Directory Watching</Filter>
     </ClInclude>
     <ClInclude Include="DirectoryWatcher.h">
+      <Filter>Directory Watching</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryWatcherFactoryImpl.h">
       <Filter>Directory Watching</Filter>
     </ClInclude>
     <ClInclude Include="DirectoryWatcherFactory.h">
