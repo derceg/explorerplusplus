@@ -524,5 +524,13 @@
     <Filter Include="Platform">
       <UniqueIdentifier>{52d49072-ff88-40cb-a3f6-adaf82a3dd53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Natvis">
+      <UniqueIdentifier>{59f1f5d0-c343-49a0-bb21-63fe55866928}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Pidl.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

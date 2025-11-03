@@ -50,58 +50,32 @@ private:
 		using Pointer = IDListType *;
 
 		PidlBase() = default;
+		PidlBase(const IDListType *pidl);
+		PidlBase(IDListType *pidl, Pidl::TakeOwnership);
+		PidlBase(const PidlBase &other);
+		PidlBase(PidlBase &&other);
 
-		PidlBase(const IDListType *pidl) : m_pidl(pidl ? CloneFunction(pidl) : nullptr)
-		{
-		}
+		PidlBase &operator=(const IDListType *pidl);
+		PidlBase &operator=(PidlBase other);
 
-		PidlBase(IDListType *pidl, Pidl::TakeOwnership) : m_pidl(pidl)
-		{
-		}
+		bool RemoveLastItem()
+			requires std::same_as<IDListType, ITEMIDLIST_ABSOLUTE>
+			|| std::same_as<IDListType, ITEMIDLIST_RELATIVE>;
 
-		PidlBase(const PidlBase &other) :
-			m_pidl(other.m_pidl ? CloneFunction(other.m_pidl.get()) : nullptr)
-		{
-		}
-
-		PidlBase(PidlBase &&other) : m_pidl(std::move(other.m_pidl))
-		{
-		}
-
-		PidlBase &operator=(const IDListType *pidl)
-		{
-			m_pidl.reset(pidl ? CloneFunction(pidl) : nullptr);
-			return *this;
-		}
-
-		PidlBase &operator=(PidlBase other)
-		{
-			std::swap(m_pidl, other.m_pidl);
-			return *this;
-		}
-
-		bool HasValue() const
-		{
-			return m_pidl != nullptr;
-		}
-
-		const IDListType *Raw() const
-		{
-			return m_pidl.get();
-		}
-
-		IDListType *Raw()
-		{
-			return m_pidl.get();
-		}
-
-		void Reset()
-		{
-			m_pidl.reset();
-		}
+		bool HasValue() const;
+		const IDListType *Raw() const;
+		void Reset();
 
 	private:
+		void UpdateDebugInfo();
+
 		wil::unique_cotaskmem_ptr<IDListType> m_pidl;
+
+#ifndef NDEBUG
+		// If the name of either of these fields is updated, Pidl.natvis should be updated as well.
+		std::wstring m_path;
+		bool m_isEmpty = true;
+#endif // !NDEBUG
 	};
 
 public:

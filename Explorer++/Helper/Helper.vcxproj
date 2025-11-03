@@ -974,6 +974,9 @@
     <ClInclude Include="WinUserBackwardsCompatibility.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Pidl.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

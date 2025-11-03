@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="PidlAccessor::PidlBase&lt;_ITEMIDLIST_ABSOLUTE,&amp;ILCloneFull&gt;">
+    <DisplayString Condition="m_isEmpty">empty</DisplayString>
+    <DisplayString>{m_path}</DisplayString>
+  </Type>
+  <Type Name="PidlAccessor::PidlBase&lt;_ITEMIDLIST_RELATIVE,&amp;ILClone&gt;">
+    <DisplayString Condition="m_isEmpty">empty</DisplayString>
+    <DisplayString>(Relative pidl)</DisplayString>
+  </Type>
+  <Type Name="PidlAccessor::PidlBase&lt;_ITEMID_CHILD,&amp;ILCloneChild&gt;">
+    <DisplayString Condition="m_isEmpty">empty</DisplayString>
+    <DisplayString>(Child pidl)</DisplayString>
+  </Type>
+</AutoVisualizer>

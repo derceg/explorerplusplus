@@ -1446,7 +1446,7 @@ PidlAbsolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl)
 		{
 			return currentPidl;
 		}
-	} while (ILRemoveLastID(currentPidl.Raw()));
+	} while (currentPidl.RemoveLastItem());
 
 	// This point shouldn't be reached, as there should always be a parent that exists (e.g. the
 	// root folder always exists), so the above loop should always find an existing item.

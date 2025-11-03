@@ -31,9 +31,9 @@ std::vector<PidlAbsolute> TabParentItemsMenu::GetParentPidlCollection(
 	// Shouldn't be attempting to show the list of parent items for the root folder.
 	DCHECK(!IsNamespaceRoot(currentPidl.Raw()));
 
-	while (ILRemoveLastID(currentPidl.Raw()))
+	while (currentPidl.RemoveLastItem())
 	{
-		pidls.emplace_back(currentPidl.Raw());
+		pidls.emplace_back(currentPidl);
 	}
 
 	// Items in the menu will be displayed in the same order they appear in the vector. Since the

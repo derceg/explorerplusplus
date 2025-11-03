@@ -9,6 +9,121 @@
 #include "ShellHelper.h"
 #include <boost/container_hash/hash.hpp>
 
+template <typename IDListType, auto CloneFunction>
+PidlAccessor::PidlBase<IDListType, CloneFunction>::PidlBase(const IDListType *pidl) :
+	m_pidl(pidl ? CloneFunction(pidl) : nullptr)
+{
+	UpdateDebugInfo();
+}
+
+template <typename IDListType, auto CloneFunction>
+PidlAccessor::PidlBase<IDListType, CloneFunction>::PidlBase(IDListType *pidl, Pidl::TakeOwnership) :
+	m_pidl(pidl)
+{
+	UpdateDebugInfo();
+}
+
+template <typename IDListType, auto CloneFunction>
+PidlAccessor::PidlBase<IDListType, CloneFunction>::PidlBase(const PidlBase &other) :
+	m_pidl(other.m_pidl ? CloneFunction(other.m_pidl.get()) : nullptr)
+{
+	UpdateDebugInfo();
+}
+
+template <typename IDListType, auto CloneFunction>
+PidlAccessor::PidlBase<IDListType, CloneFunction>::PidlBase(PidlBase &&other) :
+	m_pidl(std::move(other.m_pidl))
+{
+	UpdateDebugInfo();
+	other.UpdateDebugInfo();
+}
+
+template <typename IDListType, auto CloneFunction>
+PidlAccessor::PidlBase<IDListType, CloneFunction> &PidlAccessor::PidlBase<IDListType,
+	CloneFunction>::operator=(const IDListType *pidl)
+{
+	m_pidl.reset(pidl ? CloneFunction(pidl) : nullptr);
+	UpdateDebugInfo();
+	return *this;
+}
+
+template <typename IDListType, auto CloneFunction>
+PidlAccessor::PidlBase<IDListType, CloneFunction> &PidlAccessor::PidlBase<IDListType,
+	CloneFunction>::operator=(PidlBase other)
+{
+	std::swap(m_pidl, other.m_pidl);
+	UpdateDebugInfo();
+	return *this;
+}
+
+template <typename IDListType, auto CloneFunction>
+bool PidlAccessor::PidlBase<IDListType, CloneFunction>::RemoveLastItem()
+	requires std::same_as<IDListType, ITEMIDLIST_ABSOLUTE>
+	|| std::same_as<IDListType, ITEMIDLIST_RELATIVE>
+{
+	if (!m_pidl)
+	{
+		return false;
+	}
+
+	bool res = ILRemoveLastID(m_pidl.get());
+
+	if (res)
+	{
+		UpdateDebugInfo();
+	}
+
+	return res;
+}
+
+template <typename IDListType, auto CloneFunction>
+bool PidlAccessor::PidlBase<IDListType, CloneFunction>::HasValue() const
+{
+	return m_pidl != nullptr;
+}
+
+template <typename IDListType, auto CloneFunction>
+const IDListType *PidlAccessor::PidlBase<IDListType, CloneFunction>::Raw() const
+{
+	return m_pidl.get();
+}
+
+template <typename IDListType, auto CloneFunction>
+void PidlAccessor::PidlBase<IDListType, CloneFunction>::Reset()
+{
+	m_pidl.reset();
+	UpdateDebugInfo();
+}
+
+#ifndef NDEBUG
+template <typename IDListType, auto CloneFunction>
+void PidlAccessor::PidlBase<IDListType, CloneFunction>::UpdateDebugInfo()
+{
+	m_isEmpty = !m_pidl;
+
+	if constexpr (std::is_same_v<IDListType, ITEMIDLIST_ABSOLUTE>)
+	{
+		if (m_pidl)
+		{
+			m_path = GetDisplayNameWithFallback(m_pidl.get(), SHGDN_FORPARSING);
+		}
+		else
+		{
+			m_path.clear();
+		}
+	}
+}
+#else
+template <typename IDListType, auto CloneFunction>
+void PidlAccessor::PidlBase<IDListType, CloneFunction>::UpdateDebugInfo()
+{
+}
+#endif // !NDEBUG
+
+template class PidlAccessor::PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
+template class PidlAccessor::PidlBase<ITEMIDLIST_RELATIVE, ILClone>;
+template class PidlAccessor::PidlBase<ITEMID_CHILD, ILCloneChild>;
+
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2)
 {
 	if (!pidl1.HasValue() && !pidl2.HasValue())

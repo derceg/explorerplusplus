@@ -135,6 +135,13 @@ TEST(PidlAbsolute, TakeOwnership)
 	EXPECT_EQ(pidl.Raw(), rawPidl);
 }
 
+TEST(PidlAbsolute, RemoveLastItem)
+{
+	auto pidl = CreateSimplePidlForTest(L"c:\\users\\public");
+	EXPECT_TRUE(pidl.RemoveLastItem());
+	EXPECT_EQ(pidl, CreateSimplePidlForTest(L"c:\\users"));
+}
+
 TEST(PidlAbsolute, Reset)
 {
 	unique_pidl_absolute ownedPidl(SHSimpleIDListFromPath(L"C:\\"));
