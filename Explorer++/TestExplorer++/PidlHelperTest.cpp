@@ -135,6 +135,25 @@ TEST(PidlAbsolute, TakeOwnership)
 	EXPECT_EQ(pidl.Raw(), rawPidl);
 }
 
+TEST(PidlAbsolute, Combine)
+{
+	auto fullPidl = CreateSimplePidlForTest(L"c:\\users\\public");
+	PidlChild child(ILFindLastID(fullPidl.Raw()));
+
+	auto parentPidl = CreateSimplePidlForTest(L"c:\\users");
+	EXPECT_EQ(parentPidl + child.Raw(), fullPidl);
+	EXPECT_EQ(parentPidl + child, fullPidl);
+	EXPECT_EQ(parentPidl.Raw() + child, fullPidl);
+
+	auto parentPidl2 = parentPidl;
+	parentPidl2 += child.Raw();
+	EXPECT_EQ(parentPidl2, fullPidl);
+
+	auto parentPidl3 = parentPidl;
+	parentPidl3 += child;
+	EXPECT_EQ(parentPidl3, fullPidl);
+}
+
 TEST(PidlAbsolute, RemoveLastItem)
 {
 	auto pidl = CreateSimplePidlForTest(L"c:\\users\\public");

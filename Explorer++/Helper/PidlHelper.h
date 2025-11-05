@@ -76,16 +76,8 @@ private:
 	};
 
 public:
-	using PidlAbsolute = PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
 	using PidlChild = PidlBase<ITEMID_CHILD, ILCloneChild>;
-};
-
-class PidlAbsolute : public PidlAccessor::PidlAbsolute
-{
-public:
-	using PidlAccessor::PidlAbsolute::PidlBase;
-
-	bool RemoveLastItem();
+	using PidlAbsolute = PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
 };
 
 class PidlChild : public PidlAccessor::PidlChild
@@ -93,6 +85,20 @@ class PidlChild : public PidlAccessor::PidlChild
 public:
 	using PidlAccessor::PidlChild::PidlBase;
 };
+
+class PidlAbsolute : public PidlAccessor::PidlAbsolute
+{
+public:
+	using PidlAccessor::PidlAbsolute::PidlBase;
+
+	PidlAbsolute &operator+=(const PidlChild &child);
+	PidlAbsolute &operator+=(PCITEMID_CHILD child);
+
+	bool RemoveLastItem();
+};
+
+PidlAbsolute operator+(const PidlAbsolute &parent, const PidlChild &child);
+PidlAbsolute operator+(const PidlAbsolute &parent, PCITEMID_CHILD child);
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2);
 
@@ -140,8 +146,6 @@ PidlOutParamType<T> PidlOutParam(T &p)
 {
 	return PidlOutParamType<T>(p);
 }
-
-PidlAbsolute CombinePidls(PCIDLIST_ABSOLUTE parent, PCUIDLIST_RELATIVE child);
 
 std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl);
 PidlAbsolute DecodePidlFromBase64(const std::string &encodedPidl);

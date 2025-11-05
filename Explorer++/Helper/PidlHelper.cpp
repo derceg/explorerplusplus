@@ -103,6 +103,29 @@ void PidlAccessor::PidlBase<IDListType, CloneFunction>::UpdateDebugInfo()
 template class PidlAccessor::PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
 template class PidlAccessor::PidlBase<ITEMID_CHILD, ILCloneChild>;
 
+PidlAbsolute &PidlAbsolute::operator+=(const PidlChild &child)
+{
+	return *this += child.Raw();
+}
+
+PidlAbsolute &PidlAbsolute::operator+=(PCITEMID_CHILD child)
+{
+	// ILCombine() will return a clone of one of the parameters, if the other is null. That's
+	// unusual, since the function is documented as returning an absolute pidl. So, if the parent
+	// pidl were null, the returned pidl would be a copy of the child pidl. Which likely isn't going
+	// to be absolute.
+	//
+	// Within the application, there shouldn't be instances where two pidls are being combined and
+	// one (or both) of those pidls is empty. That is, the intent within the application is to
+	// consistently join two pidls, forming an absolute pidl, never to simply receive a copy of one
+	// of the pidls.
+	//
+	// So, if the existing absolute pidl is null or the child is null, this CHECK will be triggered.
+	CHECK(m_pidl && child);
+	m_pidl.reset(ILCombine(m_pidl.get(), child));
+	return *this;
+}
+
 bool PidlAbsolute::RemoveLastItem()
 {
 	if (!m_pidl)
@@ -118,6 +141,20 @@ bool PidlAbsolute::RemoveLastItem()
 	}
 
 	return res;
+}
+
+PidlAbsolute operator+(const PidlAbsolute &parent, const PidlChild &child)
+{
+	auto combined = parent;
+	combined += child;
+	return combined;
+}
+
+PidlAbsolute operator+(const PidlAbsolute &parent, PCITEMID_CHILD child)
+{
+	auto combined = parent;
+	combined += child;
+	return combined;
 }
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2)
@@ -170,23 +207,6 @@ std::size_t hash_value(const PidlAbsolute &pidl)
 	HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingPath);
 	DCHECK(SUCCEEDED(hr));
 	return hasher(parsingPath);
-}
-
-PidlAbsolute CombinePidls(PCIDLIST_ABSOLUTE parent, PCUIDLIST_RELATIVE child)
-{
-	// ILCombine() has the unusual behavior of returning a clone of one of the parameters, if the
-	// other is null. That's unusual, since the function is documented as returning an absolute
-	// pidl. So, of the parent pidl were null, the returned pidl would be a copy of the child pidl.
-	// Which likely isn't going to be absolute.
-	//
-	// Within the application, there shouldn't be instances where ILCombine() is being called with a
-	// null parameter. That is, the intent within the application is to consistently join two pidls,
-	// forming an absolute pidl, never to simply receive a copy of one of the pidls.
-	//
-	// So, if at least one the parameters is null, this CHECK will be triggered.
-	CHECK(parent && child);
-
-	return PidlAbsolute(ILCombine(parent, child), Pidl::takeOwnership);
 }
 
 std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl)

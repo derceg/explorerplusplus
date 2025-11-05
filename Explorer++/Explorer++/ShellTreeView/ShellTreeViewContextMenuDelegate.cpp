@@ -28,7 +28,7 @@ bool ShellTreeViewContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUT
 	// The context menu should only ever be shown for a single item in the treeview.
 	CHECK_EQ(items.size(), 1u);
 
-	PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
+	auto pidlComplete = directory + items[0];
 
 	if (verb == L"rename")
 	{

@@ -26,7 +26,7 @@ void OpenItemLocationContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE di
 		return;
 	}
 
-	PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
+	auto pidlComplete = directory + items[0];
 
 	std::wstring openLocationText;
 

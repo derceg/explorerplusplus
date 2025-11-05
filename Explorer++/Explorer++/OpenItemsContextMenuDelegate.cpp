@@ -34,7 +34,7 @@ void OpenItemsContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory
 		return;
 	}
 
-	PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
+	auto pidlComplete = directory + items[0];
 
 	if (!DoesItemHaveAttributes(pidlComplete.Raw(), SFGAO_FOLDER))
 	{
@@ -52,10 +52,9 @@ bool OpenItemsContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE di
 	{
 		auto *browser = GetTargetBrowser();
 
-		for (const auto &pidl : items)
+		for (const auto &item : items)
 		{
-			PidlAbsolute pidlComplete = CombinePidls(directory, pidl.Raw());
-
+			auto pidlComplete = directory + item;
 			browser->OpenItem(pidlComplete.Raw());
 		}
 
@@ -75,7 +74,7 @@ void OpenItemsContextMenuDelegate::HandleCustomMenuItem(PCIDLIST_ABSOLUTE direct
 		// This menu item should only be added when a single folder is selected.
 		CHECK_EQ(items.size(), 1u);
 
-		PidlAbsolute pidlComplete = CombinePidls(directory, items[0].Raw());
+		auto pidlComplete = directory + items[0];
 
 		auto *browser = GetTargetBrowser();
 		browser->OpenItem(pidlComplete.Raw(), OpenFolderDisposition::NewTabDefault);

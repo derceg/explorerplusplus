@@ -59,7 +59,7 @@ std::vector<PidlAbsolute> ShellBrowserContextMenuDelegate::BuildItemList(
 
 	for (const auto &child : pidlItems)
 	{
-		fullPidls.push_back(CombinePidls(pidlParent, child.Raw()));
+		fullPidls.push_back(pidlParent + child);
 	}
 
 	return fullPidls;
