@@ -57,26 +57,6 @@ PidlAccessor::PidlBase<IDListType, CloneFunction> &PidlAccessor::PidlBase<IDList
 }
 
 template <typename IDListType, auto CloneFunction>
-bool PidlAccessor::PidlBase<IDListType, CloneFunction>::RemoveLastItem()
-	requires std::same_as<IDListType, ITEMIDLIST_ABSOLUTE>
-	|| std::same_as<IDListType, ITEMIDLIST_RELATIVE>
-{
-	if (!m_pidl)
-	{
-		return false;
-	}
-
-	bool res = ILRemoveLastID(m_pidl.get());
-
-	if (res)
-	{
-		UpdateDebugInfo();
-	}
-
-	return res;
-}
-
-template <typename IDListType, auto CloneFunction>
 bool PidlAccessor::PidlBase<IDListType, CloneFunction>::HasValue() const
 {
 	return m_pidl != nullptr;
@@ -121,8 +101,24 @@ void PidlAccessor::PidlBase<IDListType, CloneFunction>::UpdateDebugInfo()
 #endif // !NDEBUG
 
 template class PidlAccessor::PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
-template class PidlAccessor::PidlBase<ITEMIDLIST_RELATIVE, ILClone>;
 template class PidlAccessor::PidlBase<ITEMID_CHILD, ILCloneChild>;
+
+bool PidlAbsolute::RemoveLastItem()
+{
+	if (!m_pidl)
+	{
+		return false;
+	}
+
+	bool res = ILRemoveLastID(m_pidl.get());
+
+	if (res)
+	{
+		UpdateDebugInfo();
+	}
+
+	return res;
+}
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2)
 {

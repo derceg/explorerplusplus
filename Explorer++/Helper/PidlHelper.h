@@ -58,19 +58,16 @@ private:
 		PidlBase &operator=(const IDListType *pidl);
 		PidlBase &operator=(PidlBase other);
 
-		bool RemoveLastItem()
-			requires std::same_as<IDListType, ITEMIDLIST_ABSOLUTE>
-			|| std::same_as<IDListType, ITEMIDLIST_RELATIVE>;
-
 		bool HasValue() const;
 		const IDListType *Raw() const;
 		void Reset();
 
-	private:
+	protected:
 		void UpdateDebugInfo();
 
 		wil::unique_cotaskmem_ptr<IDListType> m_pidl;
 
+	private:
 #ifndef NDEBUG
 		// If the name of either of these fields is updated, Pidl.natvis should be updated as well.
 		std::wstring m_path;
@@ -80,13 +77,22 @@ private:
 
 public:
 	using PidlAbsolute = PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
-	using PidlRelative = PidlBase<ITEMIDLIST_RELATIVE, ILClone>;
 	using PidlChild = PidlBase<ITEMID_CHILD, ILCloneChild>;
 };
 
-using PidlAbsolute = PidlAccessor::PidlAbsolute;
-using PidlRelative = PidlAccessor::PidlRelative;
-using PidlChild = PidlAccessor::PidlChild;
+class PidlAbsolute : public PidlAccessor::PidlAbsolute
+{
+public:
+	using PidlAccessor::PidlAbsolute::PidlBase;
+
+	bool RemoveLastItem();
+};
+
+class PidlChild : public PidlAccessor::PidlChild
+{
+public:
+	using PidlAccessor::PidlChild::PidlBase;
+};
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2);
 
@@ -96,8 +102,7 @@ bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2);
 std::size_t hash_value(const PidlAbsolute &pidl);
 
 template <typename T,
-	typename = std::enable_if_t<std::is_same_v<T, PidlAbsolute> || std::is_same_v<T, PidlRelative>
-		|| std::is_same_v<T, PidlChild>>>
+	typename = std::enable_if_t<std::is_same_v<T, PidlAbsolute> || std::is_same_v<T, PidlChild>>>
 class PidlOutParamType
 {
 public:
