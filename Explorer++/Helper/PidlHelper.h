@@ -94,6 +94,7 @@ public:
 	PidlAbsolute &operator+=(const PidlChild &child);
 	PidlAbsolute &operator+=(PCITEMID_CHILD child);
 
+	PidlChild GetLastItem() const;
 	bool RemoveLastItem();
 };
 

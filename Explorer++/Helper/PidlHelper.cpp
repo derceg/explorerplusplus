@@ -126,6 +126,16 @@ PidlAbsolute &PidlAbsolute::operator+=(PCITEMID_CHILD child)
 	return *this;
 }
 
+PidlChild PidlAbsolute::GetLastItem() const
+{
+	if (!m_pidl)
+	{
+		return {};
+	}
+
+	return ILFindLastID(m_pidl.get());
+}
+
 bool PidlAbsolute::RemoveLastItem()
 {
 	if (!m_pidl)

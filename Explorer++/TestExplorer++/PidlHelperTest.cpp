@@ -154,6 +154,17 @@ TEST(PidlAbsolute, Combine)
 	EXPECT_EQ(parentPidl3, fullPidl);
 }
 
+TEST(PidlAbsolute, GetLastItem)
+{
+	auto pidl = CreateSimplePidlForTest(L"c:\\users\\public");
+	auto originalPidl = pidl;
+
+	auto lastItem = pidl.GetLastItem();
+	ASSERT_TRUE(pidl.RemoveLastItem());
+
+	EXPECT_EQ(pidl + lastItem, originalPidl);
+}
+
 TEST(PidlAbsolute, RemoveLastItem)
 {
 	auto pidl = CreateSimplePidlForTest(L"c:\\users\\public");
