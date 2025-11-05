@@ -126,6 +126,26 @@ PidlAbsolute &PidlAbsolute::operator+=(PCITEMID_CHILD child)
 	return *this;
 }
 
+bool PidlAbsolute::IsParent(const PidlAbsolute &other) const
+{
+	if (!m_pidl || !other.HasValue())
+	{
+		return false;
+	}
+
+	return ILIsParent(m_pidl.get(), other.Raw(), true);
+}
+
+bool PidlAbsolute::IsAncestor(const PidlAbsolute &other) const
+{
+	if (!m_pidl || !other.HasValue())
+	{
+		return false;
+	}
+
+	return ILIsParent(m_pidl.get(), other.Raw(), false);
+}
+
 PidlChild PidlAbsolute::GetLastItem() const
 {
 	if (!m_pidl)

@@ -154,6 +154,22 @@ TEST(PidlAbsolute, Combine)
 	EXPECT_EQ(parentPidl3, fullPidl);
 }
 
+TEST(PidlAbsolute, IsParent)
+{
+	auto pidl = CreateSimplePidlForTest(L"c:\\users");
+	EXPECT_TRUE(pidl.IsParent(CreateSimplePidlForTest(L"c:\\users\\public")));
+	EXPECT_FALSE(pidl.IsParent(CreateSimplePidlForTest(L"c:\\users\\public\\documents")));
+	EXPECT_FALSE(pidl.IsParent(CreateSimplePidlForTest(L"c:\\windows")));
+}
+
+TEST(PidlAbsolute, IsAncestor)
+{
+	auto pidl = CreateSimplePidlForTest(L"c:\\users");
+	EXPECT_TRUE(pidl.IsAncestor(CreateSimplePidlForTest(L"c:\\users\\public")));
+	EXPECT_TRUE(pidl.IsAncestor(CreateSimplePidlForTest(L"c:\\users\\public\\documents")));
+	EXPECT_FALSE(pidl.IsAncestor(CreateSimplePidlForTest(L"c:\\windows")));
+}
+
 TEST(PidlAbsolute, GetLastItem)
 {
 	auto pidl = CreateSimplePidlForTest(L"c:\\users\\public");

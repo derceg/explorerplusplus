@@ -94,6 +94,12 @@ public:
 	PidlAbsolute &operator+=(const PidlChild &child);
 	PidlAbsolute &operator+=(PCITEMID_CHILD child);
 
+	// Returns true if this pidl is the direct parent of other.
+	bool IsParent(const PidlAbsolute &other) const;
+
+	// Returns true if this pidl is the direct parent or ancestor of other.
+	bool IsAncestor(const PidlAbsolute &other) const;
+
 	PidlChild GetLastItem() const;
 	bool RemoveLastItem();
 };
