@@ -10,17 +10,9 @@
 namespace
 {
 
-std::weak_ordering IntToWeakOrdering(int cmp)
-{
-	return (cmp < 0) ? std::weak_ordering::less
-		: (cmp > 0)  ? std::weak_ordering::greater
-					 : std::weak_ordering::equivalent;
-}
-
 std::weak_ordering CompareByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
-	return IntToWeakOrdering(
-		StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str()));
+	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str()) <=> 0;
 }
 
 std::weak_ordering CompareByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
@@ -39,7 +31,7 @@ std::weak_ordering CompareByDateAdded(const BookmarkItem *firstItem, const Bookm
 {
 	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
 	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
-	return IntToWeakOrdering(CompareFileTime(&firstItemDateCreated, &secondItemDateCreated));
+	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated) <=> 0;
 }
 
 std::weak_ordering CompareByDateModified(const BookmarkItem *firstItem,
@@ -47,7 +39,7 @@ std::weak_ordering CompareByDateModified(const BookmarkItem *firstItem,
 {
 	FILETIME firstItemDateModified = firstItem->GetDateModified();
 	FILETIME secondItemDateModified = secondItem->GetDateModified();
-	return IntToWeakOrdering(CompareFileTime(&firstItemDateModified, &secondItemDateModified));
+	return CompareFileTime(&firstItemDateModified, &secondItemDateModified) <=> 0;
 }
 
 }
