@@ -16,13 +16,13 @@
 // Which would defeat the entire purpose of something like this - a short literal that gives
 // information about the type.
 // Therefore, the literal is explicitly defined outside of a namespace.
-constexpr int operator"" _px(unsigned long long pixels)
+constexpr int operator""_px(unsigned long long pixels)
 {
 	return static_cast<int>(pixels);
 }
 
 // Specifies a point (unit for font size) value.
-constexpr int operator"" _pt(unsigned long long points)
+constexpr int operator""_pt(unsigned long long points)
 {
 	return static_cast<int>(points);
 }
