@@ -499,9 +499,6 @@
     <ClCompile Include="HistoryModel.cpp">
       <Filter>History</Filter>
     </ClCompile>
-    <ClCompile Include="ShellEnumeratorImpl.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainRebarRegistryStorage.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
@@ -909,6 +906,12 @@
     </ClCompile>
     <ClCompile Include="DirectoryWatcherFactoryImpl.cpp">
       <Filter>Directory Watching</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellEnumeratorImpl.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellEntry.cpp">
+      <Filter>Shell</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1425,9 +1428,6 @@
     <ClInclude Include="HistoryModel.h">
       <Filter>History</Filter>
     </ClInclude>
-    <ClInclude Include="ShellEnumeratorImpl.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="MainRebarRegistryStorage.h">
       <Filter>Main Rebar</Filter>
     </ClInclude>
@@ -1658,9 +1658,6 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\NavigationManager.h">
       <Filter>ShellBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellEnumerator.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\NavigationRequest.h">
       <Filter>ShellBrowser</Filter>
@@ -1940,6 +1937,21 @@
     </ClInclude>
     <ClInclude Include="DirectoryWatcherFactory.h">
       <Filter>Directory Watching</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellEntry.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellEnumerator.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellEnumeratorImpl.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContext.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="PidlUpdater.h">
+      <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1223,6 +1223,7 @@
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp" />
+    <ClCompile Include="ShellEntry.cpp" />
     <ClCompile Include="ShellWatcherManager.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
@@ -1573,6 +1574,7 @@
     <ClInclude Include="NoOpMenuHelpTextHost.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
     <ClInclude Include="OpenItemsContextMenuDelegate.h" />
+    <ClInclude Include="PidlUpdater.h" />
     <ClInclude Include="PlatformContext.h" />
     <ClInclude Include="PlatformContextImpl.h" />
     <ClInclude Include="ResourceIconModel.h" />
@@ -1580,6 +1582,8 @@
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserFactory.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h" />
+    <ClInclude Include="ShellContext.h" />
+    <ClInclude Include="ShellEntry.h" />
     <ClInclude Include="ShellWatcherManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />

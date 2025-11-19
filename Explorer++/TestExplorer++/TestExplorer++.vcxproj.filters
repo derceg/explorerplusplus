@@ -337,12 +337,6 @@
     <ClCompile Include="NavigationManagerTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellEnumeratorImplTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellEnumeratorFake.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="NavigationRequestTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -539,6 +533,36 @@
     <ClCompile Include="TreeViewNodeFake.cpp">
       <Filter>Views\TreeView</Filter>
     </ClCompile>
+    <ClCompile Include="ShellEntryTest.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellEnumeratorFake.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellEnumeratorImplTest.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulatedFileSystemItem.cpp">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulatedFileSystem.cpp">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextFake.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulatedFileSystemWatcherFactory.cpp">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulatedFileSystemWatcher.cpp">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulatedFileSystemPidlUpdater.cpp">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulatedFileSystemEnumerator.cpp">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -715,6 +739,12 @@
     <Filter Include="Directory Watching">
       <UniqueIdentifier>{8b1f57ff-8a2e-4dd6-a57c-e8cdbb41507c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shell">
+      <UniqueIdentifier>{6369db6c-44f8-4124-a5e2-6b258d941aeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SimulatedFileSystem">
+      <UniqueIdentifier>{a38d4a09-25d4-402f-a63d-efb4a6ff00e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -806,9 +836,6 @@
     <ClInclude Include="StartupFoldersStorageTestHelper.h">
       <Filter>Startup</Filter>
     </ClInclude>
-    <ClInclude Include="ShellEnumeratorFake.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="NavigationRequestTestHelper.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
@@ -883,6 +910,30 @@
     </ClInclude>
     <ClInclude Include="TreeViewNodeFake.h">
       <Filter>Views\TreeView</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellEnumeratorFake.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatedFileSystem.h">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatedFileSystemItem.h">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextFake.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatedFileSystemWatcherFactory.h">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatedFileSystemWatcher.h">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatedFileSystemPidlUpdater.h">
+      <Filter>SimulatedFileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulatedFileSystemEnumerator.h">
+      <Filter>SimulatedFileSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
