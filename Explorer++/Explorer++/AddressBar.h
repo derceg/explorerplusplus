@@ -7,7 +7,7 @@
 #include "AddressBarViewDelegate.h"
 #include "BrowserCommandTarget.h"
 #include "ScopedBrowserCommandTarget.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/ScopedStopSource.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"

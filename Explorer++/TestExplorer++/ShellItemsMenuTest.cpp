@@ -8,10 +8,10 @@
 #include "BrowserWindowFake.h"
 #include "MenuViewFake.h"
 #include "MenuViewFakeTestHelper.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellIconLoaderFake.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 class ShellItemsMenuTest : public BrowserTestBase

@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "WindowStorageTestHelper.h"
 #include "MainRebarStorage.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "TabStorage.h"
 #include "TabStorageTestHelper.h"
 #include "WindowStorage.h"

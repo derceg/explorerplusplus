@@ -5,7 +5,7 @@
 #pragma once
 
 #include "MenuBase.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 
 class BrowserWindow;
 class ShellIconLoader;

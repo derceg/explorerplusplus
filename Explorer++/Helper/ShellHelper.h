@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "PidlHelper.h"
+#include "Pidl.h"
 #include "WilExtraTypes.h"
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
@@ -40,12 +40,6 @@ enum class EnvVarsExpansion
 {
 	Expand,
 	DontExpand
-};
-
-enum class ShellItemType
-{
-	File,
-	Folder
 };
 
 enum class LaunchProcessFlags
@@ -119,8 +113,6 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	const std::vector<PCITEMID_CHILD> &items, HWND hwnd, const std::wstring &action, DWORD mask,
 	IUnknown *site);
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
-HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl,
-	IShellFolder *parent = nullptr, ShellItemType shellItemType = ShellItemType::File);
 HRESULT UpdatePidl(PCIDLIST_ABSOLUTE inputPidl, PidlAbsolute &outputPidl);
 
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(

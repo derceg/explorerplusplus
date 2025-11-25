@@ -5,7 +5,7 @@
 #pragma once
 
 #include "DataExchangeHelper.h"
-#include "PidlHelper.h"
+#include "Pidl.h"
 #include "UniqueVariableSizeStruct.h"
 #include <wil/result.h>
 #include <ShlObj.h>

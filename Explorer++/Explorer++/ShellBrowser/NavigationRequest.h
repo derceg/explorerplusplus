@@ -5,7 +5,7 @@
 #pragma once
 
 #include "NavigateParams.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/core/noncopyable.hpp>

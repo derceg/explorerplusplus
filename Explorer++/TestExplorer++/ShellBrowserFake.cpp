@@ -4,11 +4,11 @@
 
 #include "pch.h"
 #include "ShellBrowserFake.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/PreservedShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellEnumeratorFake.h"
-#include "ShellTestHelper.h"
 
 ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 	const PreservedShellBrowser &preservedShellBrowser) :

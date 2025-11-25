@@ -4,155 +4,26 @@
 
 #pragma once
 
-#include <wil/resource.h>
-#include <ShlObj.h>
+#include <ShObjIdl.h>
 #include <string>
-#include <type_traits>
 
-namespace Pidl
-{
+class PidlAbsolute;
 
-struct TakeOwnership
+enum class ShellItemType
 {
-	explicit TakeOwnership() = default;
+	File,
+	Folder
 };
 
-// When this token is provided when constructing one of the pidl classes below, it indicates that
-// the class will take ownership of the provided pidl.
-inline constexpr TakeOwnership takeOwnership{};
-
-}
-
-// The accessor class here simply stops PidlBase from being accessed directly (since PidlBase is
-// only designed for a few types of template parameters, passing an arbitrary template parameter is
-// wrong).
-class PidlAccessor
+enum class ShellItemExtraAttributes
 {
-private:
-	// PidlBase wraps a pidl. It's designed to be somewhat similar to how std::string wraps a
-	// character array. That is, std::string makes it simple to copy and move strings from one place
-	// to another, while doing that manually with char* is more cumbersome.
-	// The same principle applies here, with PidlBase being designed to make it easy to copy and
-	// move a pidl.
-	// Note that this class always copies a raw pidl that's passed in during
-	// construction/assignment. That means a call like:
-	//
-	// PidlAbsolute pidl(SHSimpleIDListFromPath(path));
-	//
-	// will leak memory, since a copy of the return value from SHSimpleIDListFromPath() will be made
-	// and stored. The original return value will be leaked. That's hard to prevent, since it's
-	// genuinely useful to copy a raw pidl.
-	// The TakeOwnership() function can be used to assume ownership of an existing pidl.
-	template <typename IDListType, auto CloneFunction>
-	class PidlBase
-	{
-	public:
-		using Pointer = IDListType *;
-
-		PidlBase() = default;
-		PidlBase(const IDListType *pidl);
-		PidlBase(IDListType *pidl, Pidl::TakeOwnership);
-		PidlBase(const PidlBase &other);
-		PidlBase(PidlBase &&other);
-
-		PidlBase &operator=(const IDListType *pidl);
-		PidlBase &operator=(PidlBase other);
-
-		bool HasValue() const;
-		const IDListType *Raw() const;
-		void Reset();
-
-	protected:
-		void UpdateDebugInfo();
-
-		wil::unique_cotaskmem_ptr<IDListType> m_pidl;
-
-	private:
-#ifndef NDEBUG
-		// If the name of either of these fields is updated, Pidl.natvis should be updated as well.
-		std::wstring m_path;
-		bool m_isEmpty = true;
-#endif // !NDEBUG
-	};
-
-public:
-	using PidlChild = PidlBase<ITEMID_CHILD, ILCloneChild>;
-	using PidlAbsolute = PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
+	None = 0,
+	Hidden = FILE_ATTRIBUTE_HIDDEN
 };
 
-class PidlChild : public PidlAccessor::PidlChild
-{
-public:
-	using PidlAccessor::PidlChild::PidlBase;
-};
-
-class PidlAbsolute : public PidlAccessor::PidlAbsolute
-{
-public:
-	using PidlAccessor::PidlAbsolute::PidlBase;
-
-	PidlAbsolute &operator+=(const PidlChild &child);
-	PidlAbsolute &operator+=(PCITEMID_CHILD child);
-
-	// Returns true if this pidl is the direct parent of other.
-	bool IsParent(const PidlAbsolute &other) const;
-
-	// Returns true if this pidl is the direct parent or ancestor of other.
-	bool IsAncestor(const PidlAbsolute &other) const;
-
-	PidlChild GetLastItem() const;
-	bool RemoveLastItem();
-};
-
-PidlAbsolute operator+(const PidlAbsolute &parent, const PidlChild &child);
-PidlAbsolute operator+(const PidlAbsolute &parent, PCITEMID_CHILD child);
-
-bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2);
-
-// This allows PidlAbsolute instances to be used with containers that require items to be hashed.
-// Boost containers will use this hash by default (via boost::hash), while it can be used with
-// standard containers by passing the appropriate template parameter.
-std::size_t hash_value(const PidlAbsolute &pidl);
-
-template <typename T,
-	typename = std::enable_if_t<std::is_same_v<T, PidlAbsolute> || std::is_same_v<T, PidlChild>>>
-class PidlOutParamType
-{
-public:
-	typedef typename T::Pointer Pointer;
-
-	PidlOutParamType(T &output) : wrapper(output)
-	{
-	}
-
-	operator Pointer *()
-	{
-		return &raw;
-	}
-
-	~PidlOutParamType()
-	{
-		wrapper = T(raw, Pidl::takeOwnership);
-	}
-
-private:
-	T &wrapper;
-	Pointer raw = nullptr;
-};
-
-// Functions like SHParseDisplayName() take a PIDLIST_ABSOLUTE* out parameter. Using this helper
-// allows one of the types above to be passed in as that parameter, without having to use an
-// intermediate type or add a operator&() method to PidlBase. For example:
-//
-// PidlAbsolute pidl;
-// SHParseDisplayName(L"C:\\", nullptr, PidlOutParam(pidl), 0, nullptr);
-//
-// Designed in a similar way to wil::out_param().
-template <typename T>
-PidlOutParamType<T> PidlOutParam(T &p)
-{
-	return PidlOutParamType<T>(p);
-}
-
-std::string EncodePidlToBase64(PCIDLIST_ABSOLUTE pidl);
+std::string EncodePidlToBase64(const PidlAbsolute &pidl);
 PidlAbsolute DecodePidlFromBase64(const std::string &encodedPidl);
+
+HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl,
+	IShellFolder *parent = nullptr, ShellItemType itemType = ShellItemType::File,
+	ShellItemExtraAttributes extraAttributes = ShellItemExtraAttributes::None);

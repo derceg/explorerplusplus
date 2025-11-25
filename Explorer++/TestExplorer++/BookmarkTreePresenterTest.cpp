@@ -12,8 +12,8 @@
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
 #include "LabelEditHandler.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellTestHelper.h"
 #include "TabContainer.h"
 #include "TreeView.h"
 #include <boost/range/adaptor/transformed.hpp>

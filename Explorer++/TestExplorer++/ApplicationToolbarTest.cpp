@@ -9,7 +9,7 @@
 #include "ApplicationToolbarView.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>

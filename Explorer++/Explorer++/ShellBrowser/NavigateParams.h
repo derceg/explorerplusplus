@@ -5,7 +5,7 @@
 #pragma once
 
 #include "HistoryEntry.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <optional>
 
 class NavigationRequest;

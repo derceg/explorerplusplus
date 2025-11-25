@@ -5,13 +5,14 @@
 #include "pch.h"
 #include "ShellEntry.h"
 #include "GeneratorTestHelper.h"
+#include "PidlTestHelper.h"
 #include "ShellContextFake.h"
-#include "ShellTestHelper.h"
 #include "SimulatedFileSystem.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+using namespace std::string_literals;
 using namespace testing;
 
 namespace
@@ -33,20 +34,10 @@ protected:
 	{
 	}
 
-	void VerifyFolderContents(const ShellEntry *shellEntry)
+	void VerifyFolderContents(const ShellEntry *shellEntry,
+		const std::vector<PidlAbsolute> &expectedPidls)
 	{
 		ASSERT_TRUE(shellEntry->AreChildrenLoaded());
-
-		std::vector<PidlAbsolute> expectedPidls;
-		ASSERT_HRESULT_SUCCEEDED(
-			m_fileSystem->EnumerateFolder(shellEntry->GetPidl(), expectedPidls));
-
-		if (shellEntry->GetChildType() == ShellEntry::ChildType::FoldersOnly)
-		{
-			std::erase_if(expectedPidls,
-				[](const auto &pidl) { return !DoesItemHaveAttributes(pidl.Raw(), SFGAO_FOLDER); });
-		}
-
 		EXPECT_THAT(GeneratorToVector(shellEntry->GetChildren()),
 			UnorderedPointwise(ShellEntryPidlMatcher(), expectedPidls));
 	}
@@ -58,31 +49,34 @@ protected:
 
 TEST_F(ShellEntryTest, LoadChildren)
 {
-	m_fileSystem->AddFolder(m_rootPidl, L"Folder 1");
-	m_fileSystem->AddFile(m_rootPidl, L"File 1");
-	m_fileSystem->AddFolder(m_rootPidl, L"Folder 2");
+	auto folder1Pidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder 1");
+	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
+	auto folder2Pidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder 2");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
-	VerifyFolderContents(&rootShellEntry);
+	VerifyFolderContents(&rootShellEntry, { folder1Pidl, filePidl, folder2Pidl });
 }
 
 TEST_F(ShellEntryTest, LoadChildrenFoldersOnly)
 {
-	m_fileSystem->AddFolder(m_rootPidl, L"Folder 1");
-	m_fileSystem->AddFile(m_rootPidl, L"File 1");
-	m_fileSystem->AddFolder(m_rootPidl, L"Folder 2");
+	auto folder1Pidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder 1");
+	m_fileSystem->AddFile(m_rootPidl, L"File");
+	auto folder2Pidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder 2");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersOnly);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellItemFilter::ItemType::FoldersOnly,
+		ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
-	VerifyFolderContents(&rootShellEntry);
+	VerifyFolderContents(&rootShellEntry, { folder1Pidl, folder2Pidl });
 }
 
 TEST_F(ShellEntryTest, UnloadChildren)
 {
 	m_fileSystem->AddFolder(m_rootPidl, L"Folder");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 	rootShellEntry.UnloadChildren();
 	EXPECT_THAT(GeneratorToVector(rootShellEntry.GetChildren()), IsEmpty());
@@ -90,7 +84,8 @@ TEST_F(ShellEntryTest, UnloadChildren)
 
 TEST_F(ShellEntryTest, AreChildrenLoaded)
 {
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	EXPECT_FALSE(rootShellEntry.AreChildrenLoaded());
 
 	rootShellEntry.LoadChildren();
@@ -105,7 +100,8 @@ TEST_F(ShellEntryTest, GetParent)
 	auto folder1Pidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder 1");
 	auto folder2Pidl = m_fileSystem->AddFolder(folder1Pidl, L"Folder 2");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	EXPECT_EQ(rootShellEntry.GetParent(), nullptr);
 
 	rootShellEntry.LoadChildren();
@@ -121,69 +117,88 @@ TEST_F(ShellEntryTest, GetParent)
 
 TEST_F(ShellEntryTest, AddItem)
 {
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
-	m_fileSystem->AddFile(m_rootPidl, L"File");
-	VerifyFolderContents(&rootShellEntry);
+	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
+	VerifyFolderContents(&rootShellEntry, { filePidl });
 }
 
 TEST_F(ShellEntryTest, AddItemFoldersOnly)
 {
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersOnly);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellItemFilter::ItemType::FoldersOnly,
+		ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
-	m_fileSystem->AddFolder(m_rootPidl, L"Folder");
+	auto folderPidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder");
 	m_fileSystem->AddFile(m_rootPidl, L"File");
-	VerifyFolderContents(&rootShellEntry);
+	VerifyFolderContents(&rootShellEntry, { folderPidl });
+}
+
+TEST_F(ShellEntryTest, AddHiddenItem)
+{
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Exclude);
+	rootShellEntry.LoadChildren();
+
+	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
+	m_fileSystem->AddFile(m_rootPidl, L"Hidden file", ShellItemExtraAttributes::Hidden);
+	VerifyFolderContents(&rootShellEntry, { filePidl });
 }
 
 TEST_F(ShellEntryTest, RenameItem)
 {
 	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
-	m_fileSystem->RenameItem(filePidl, L"Updated name");
-	VerifyFolderContents(&rootShellEntry);
+	auto updatedFilePidl = m_fileSystem->RenameItem(filePidl, L"Updated name");
+	VerifyFolderContents(&rootShellEntry, { updatedFilePidl });
 }
 
 TEST_F(ShellEntryTest, RenameTopLevelItem)
 {
 	auto folderPidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder");
-	auto filePidl = m_fileSystem->AddFile(folderPidl, L"File");
+	m_fileSystem->AddFile(folderPidl, L"File");
 
-	ShellEntry shellEntry(folderPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry shellEntry(folderPidl, &m_shellContext, ShellItemFilter::ItemType::FoldersAndFiles,
+		ShellItemFilter::HiddenItemPolicy::Include);
 	shellEntry.LoadChildren();
 
 	m_fileSystem->RenameItem(folderPidl, L"Updated name");
-	VerifyFolderContents(&shellEntry);
+	VerifyFolderContents(&shellEntry,
+		{ CreateSimplePidlForTest(
+			SimulatedFileSystem::ROOT_FOLDER_PATH + L"\\Updated name\\File"s) });
 }
 
 TEST_F(ShellEntryTest, RenameNonFolderToFolder)
 {
 	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File.zip.tmp");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersOnly);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellItemFilter::ItemType::FoldersOnly,
+		ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	// This mimics the behavior that can be seen when renaming a file. That is, the file might start
 	// as a regular file, but then change to a container file on rename (and thus function as a
 	// virtual folder).
-	m_fileSystem->RenameItem(filePidl, L"File.zip", ShellItemType::Folder);
-	VerifyFolderContents(&rootShellEntry);
+	auto updatedFilePidl = m_fileSystem->RenameItem(filePidl, L"File.zip", ShellItemType::Folder);
+	VerifyFolderContents(&rootShellEntry, { updatedFilePidl });
 }
 
 TEST_F(ShellEntryTest, RenameFolderToNonFolder)
 {
 	auto filePidl = m_fileSystem->AddFolder(m_rootPidl, L"File.zip");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersOnly);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellItemFilter::ItemType::FoldersOnly,
+		ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	m_fileSystem->RenameItem(filePidl, L"File.zip.tmp", ShellItemType::File);
-	VerifyFolderContents(&rootShellEntry);
+	VerifyFolderContents(&rootShellEntry, {});
 }
 
 TEST_F(ShellEntryTest, RenameItemUpdatesChildren)
@@ -192,7 +207,8 @@ TEST_F(ShellEntryTest, RenameItemUpdatesChildren)
 	auto nestedFolder1Pidl = m_fileSystem->AddFolder(folder1Pidl, L"Nested folder 1");
 	m_fileSystem->AddFolder(nestedFolder1Pidl, L"Nested folder 2");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	auto *folder1ShellEntry = rootShellEntry.MaybeGetChild(folder1Pidl);
@@ -206,25 +222,52 @@ TEST_F(ShellEntryTest, RenameItemUpdatesChildren)
 	auto folder1PidlUpdated = m_fileSystem->RenameItem(folder1Pidl, L"Updated name");
 	EXPECT_EQ(rootShellEntry.MaybeGetChild(folder1PidlUpdated), folder1ShellEntry);
 
-	std::wstring path;
-	ASSERT_HRESULT_SUCCEEDED(GetDisplayName(folder1PidlUpdated.Raw(), SHGDN_FORPARSING, path));
-	auto nestedFolder1PidlUpdated = CreateSimplePidlForTest(path + L"\\Nested folder 1");
+	auto nestedFolder1PidlUpdated = CreateSimplePidlForTest(
+		SimulatedFileSystem::ROOT_FOLDER_PATH + L"\\Updated name\\Nested folder 1"s);
 	EXPECT_EQ(folder1ShellEntry->MaybeGetChild(nestedFolder1PidlUpdated), nestedFolder1ShellEntry);
 
 	// Directory monitoring should still work after an item has been renamed. That is, once an item
 	// has been renamed, the updated path should be watched for changes.
-	m_fileSystem->AddFile(folder1PidlUpdated, L"New file");
-	VerifyFolderContents(folder1ShellEntry);
+	auto newFilePidl = m_fileSystem->AddFile(folder1PidlUpdated, L"New file");
+	VerifyFolderContents(folder1ShellEntry, { nestedFolder1PidlUpdated, newFilePidl });
 
-	m_fileSystem->AddFolder(nestedFolder1PidlUpdated, L"New folder");
-	VerifyFolderContents(nestedFolder1ShellEntry);
+	auto newFolderPidl = m_fileSystem->AddFolder(nestedFolder1PidlUpdated, L"New folder");
+	VerifyFolderContents(nestedFolder1ShellEntry,
+		{ CreateSimplePidlForTest(SimulatedFileSystem::ROOT_FOLDER_PATH
+			  + L"\\Updated name\\Nested folder 1\\Nested folder 2"s),
+			newFolderPidl });
+}
+
+TEST_F(ShellEntryTest, UpdateHiddenItemToNonHidden)
+{
+	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File", ShellItemExtraAttributes::Hidden);
+
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Exclude);
+	rootShellEntry.LoadChildren();
+
+	m_fileSystem->UpdateItem(filePidl, ShellItemExtraAttributes::None);
+	VerifyFolderContents(&rootShellEntry, { filePidl });
+}
+
+TEST_F(ShellEntryTest, UpdateNonHiddenItemToHidden)
+{
+	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
+
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Exclude);
+	rootShellEntry.LoadChildren();
+
+	m_fileSystem->UpdateItem(filePidl, ShellItemExtraAttributes::Hidden);
+	VerifyFolderContents(&rootShellEntry, {});
 }
 
 TEST_F(ShellEntryTest, RemoveItem)
 {
 	auto folderPidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	m_fileSystem->RemoveItem(folderPidl);
@@ -233,7 +276,8 @@ TEST_F(ShellEntryTest, RemoveItem)
 
 TEST_F(ShellEntryTest, ChildAddedSignal)
 {
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	MockFunction<void(ShellEntry * shellEntry)> callback;
@@ -251,7 +295,8 @@ TEST_F(ShellEntryTest, ChildRemovedSignal)
 {
 	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	MockFunction<void(ShellEntry * childEntry)> callback;
@@ -268,7 +313,8 @@ TEST_F(ShellEntryTest, RenamedSignal)
 {
 	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	auto *fileShellEntry = rootShellEntry.MaybeGetChild(filePidl);
@@ -285,7 +331,8 @@ TEST_F(ShellEntryTest, UpdatedSignal)
 {
 	auto filePidl = m_fileSystem->AddFile(m_rootPidl, L"File");
 
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	auto *fileShellEntry = rootShellEntry.MaybeGetChild(filePidl);
@@ -295,19 +342,22 @@ TEST_F(ShellEntryTest, UpdatedSignal)
 	fileShellEntry->updatedSignal.AddObserver(callback.AsStdFunction());
 
 	EXPECT_CALL(callback, Call());
-	m_fileSystem->NotifyItemUpdated(filePidl);
+	m_fileSystem->UpdateItem(filePidl, ShellItemExtraAttributes::None);
 }
 
 TEST_F(ShellEntryTest, TopLevelItemUpdatedSignal)
 {
-	ShellEntry rootShellEntry(m_rootPidl, &m_shellContext, ShellEntry::ChildType::FoldersAndFiles);
+	auto folderPidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder");
+
+	ShellEntry rootShellEntry(folderPidl, &m_shellContext,
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	rootShellEntry.LoadChildren();
 
 	MockFunction<void()> callback;
 	rootShellEntry.updatedSignal.AddObserver(callback.AsStdFunction());
 
 	EXPECT_CALL(callback, Call());
-	m_fileSystem->NotifyItemUpdated(m_rootPidl);
+	m_fileSystem->UpdateItem(folderPidl, ShellItemExtraAttributes::None);
 }
 
 TEST_F(ShellEntryTest, TopLevelEntryDeletedSignal)
@@ -315,7 +365,7 @@ TEST_F(ShellEntryTest, TopLevelEntryDeletedSignal)
 	auto folderPidl = m_fileSystem->AddFolder(m_rootPidl, L"Folder");
 
 	ShellEntry folderShellEntry(folderPidl, &m_shellContext,
-		ShellEntry::ChildType::FoldersAndFiles);
+		ShellItemFilter::ItemType::FoldersAndFiles, ShellItemFilter::HiddenItemPolicy::Include);
 	folderShellEntry.LoadChildren();
 
 	MockFunction<void()> callback;

@@ -5,8 +5,9 @@
 #include "pch.h"
 #include "FrequentLocationsModel.h"
 #include "FrequentLocationsStorageTestHelper.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "SystemClockFake.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include <gtest/gtest.h>
 

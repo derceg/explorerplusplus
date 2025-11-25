@@ -8,9 +8,9 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "IconFetcherFake.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
 

@@ -5,8 +5,8 @@
 #pragma once
 
 #include "SimulatedFileSystemItem.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/PidlHelper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/container_hash/hash.hpp>
 #include <optional>
@@ -16,15 +16,19 @@
 class SimulatedFileSystem
 {
 public:
+	static constexpr wchar_t ROOT_FOLDER_PATH[] = L"z:\\dummy";
+
 	SimulatedFileSystem();
 
 	PidlAbsolute GetRoot();
 
-	PidlAbsolute AddFolder(const PidlAbsolute &parent, const std::wstring &name);
-	PidlAbsolute AddFile(const PidlAbsolute &parent, const std::wstring &name);
+	PidlAbsolute AddFolder(const PidlAbsolute &parent, const std::wstring &name,
+		ShellItemExtraAttributes extraAttributes = ShellItemExtraAttributes::None);
+	PidlAbsolute AddFile(const PidlAbsolute &parent, const std::wstring &name,
+		ShellItemExtraAttributes extraAttributes = ShellItemExtraAttributes::None);
 	PidlAbsolute RenameItem(const PidlAbsolute &pidl, const std::wstring &name,
 		std::optional<ShellItemType> itemType = {});
-	void NotifyItemUpdated(const PidlAbsolute &pidl);
+	void UpdateItem(const PidlAbsolute &pidl, ShellItemExtraAttributes extraAttributes);
 	void NotifyDirectoryContentsChanged(const PidlAbsolute &pidl);
 	void RemoveItem(const PidlAbsolute &pidl);
 
@@ -42,10 +46,8 @@ public:
 	SignalWrapper<SimulatedFileSystem, void(const PidlAbsolute &pidl)> itemRemovedSignal;
 
 private:
-	static constexpr wchar_t ROOT_FOLDER_PATH[] = L"z:\\dummy";
-
 	PidlAbsolute AddItem(const PidlAbsolute &parent, const std::wstring &name,
-		ShellItemType itemType);
+		ShellItemType itemType, ShellItemExtraAttributes extraAttributes);
 
 	SimulatedFileSystemItem *GetFileSystemItemForPidl(const PidlAbsolute &pidl);
 	const SimulatedFileSystemItem *GetFileSystemItemForPidl(const PidlAbsolute &pidl) const;

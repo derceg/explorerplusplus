@@ -8,7 +8,7 @@
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/ShellContextMenuBuilder.h"
 #include "../Helper/ShellHelper.h"
 

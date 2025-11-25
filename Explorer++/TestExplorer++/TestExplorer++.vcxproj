@@ -240,6 +240,7 @@
     <ClCompile Include="BrowserWindowFake.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
+    <ClCompile Include="PidlHelperTest.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcherFactory.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcher.cpp" />
     <ClCompile Include="SimulatedFileSystem.cpp" />
@@ -367,7 +368,7 @@
     <ClCompile Include="PasteSymLinksServerClientTest.cpp" />
     <ClCompile Include="MenuViewTest.cpp" />
     <ClCompile Include="ShellIconLoaderFake.cpp" />
-    <ClCompile Include="ShellTestHelper.cpp" />
+    <ClCompile Include="PidlTestHelper.cpp" />
     <ClCompile Include="TabHistoryMenuTest.cpp" />
     <ClCompile Include="ImageHelperTest.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -412,7 +413,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release-Clang|x64'">false</MultiProcessorCompilation>
     </ClCompile>
-    <ClCompile Include="PidlHelperTest.cpp" />
+    <ClCompile Include="PidlTest.cpp" />
     <ClCompile Include="RegistrySettingsTest.cpp" />
     <ClCompile Include="RegistryStorageTestHelper.cpp" />
     <ClCompile Include="ResourceTestHelper.cpp" />
@@ -502,7 +503,7 @@
     <ClInclude Include="ShellContextMenuDelegateFake.h" />
     <ClInclude Include="ShellEnumeratorFake.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
-    <ClInclude Include="ShellTestHelper.h" />
+    <ClInclude Include="PidlTestHelper.h" />
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />

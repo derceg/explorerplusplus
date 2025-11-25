@@ -4,7 +4,10 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
+#include "../Helper/PidlHelper.h"
+
+class PidlAbsolute;
 
 PidlAbsolute CreateSimplePidlForTest(const std::wstring &path, IShellFolder *parent = nullptr,
-	ShellItemType shellItemType = ShellItemType::Folder);
+	ShellItemType shellItemType = ShellItemType::Folder,
+	ShellItemExtraAttributes extraAttributes = ShellItemExtraAttributes::None);

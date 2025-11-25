@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/ClipboardHelper.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "SimulatedClipboardStore.h"
 #include "../Helper/Clipboard.h"
 #include <gtest/gtest.h>

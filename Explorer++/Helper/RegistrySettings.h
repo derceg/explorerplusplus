@@ -5,7 +5,7 @@
 #pragma once
 
 #include "BetterEnumsWrapper.h"
-#include "PidlHelper.h"
+#include "Pidl.h"
 #include <wil/registry.h>
 #include <windows.h>
 #include <functional>

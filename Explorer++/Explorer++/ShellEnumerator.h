@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "../Helper/PidlHelper.h"
+#include "ShellItemFilter.h"
+#include "../Helper/Pidl.h"
 #include <stop_token>
 #include <vector>
 
@@ -14,5 +15,6 @@ public:
 	virtual ~ShellEnumerator() = default;
 
 	virtual HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
+		ShellItemFilter::ItemType itemType, ShellItemFilter::HiddenItemPolicy hiddenItemPolicy,
 		std::vector<PidlChild> &outputItems, std::stop_token stopToken) const = 0;
 };

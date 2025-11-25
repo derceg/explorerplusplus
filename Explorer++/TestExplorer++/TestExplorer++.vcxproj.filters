@@ -93,7 +93,7 @@
     <ClCompile Include="HelperTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="PidlHelperTest.cpp">
+    <ClCompile Include="PidlTest.cpp">
       <Filter>Helper\Shell</Filter>
     </ClCompile>
     <ClCompile Include="TabTest.cpp">
@@ -161,7 +161,6 @@
     <ClCompile Include="HistoryModelTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
-    <ClCompile Include="ShellTestHelper.cpp" />
     <ClCompile Include="FrequentLocationsModelTest.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
@@ -563,6 +562,12 @@
     <ClCompile Include="SimulatedFileSystemEnumerator.cpp">
       <Filter>SimulatedFileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="PidlHelperTest.cpp">
+      <Filter>Helper\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="PidlTestHelper.cpp">
+      <Filter>Helper\Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -791,7 +796,6 @@
     <ClInclude Include="TestResources.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShellTestHelper.h" />
     <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="AcceleratorTestHelper.h">
       <Filter>Core\Accelerators</Filter>
@@ -934,6 +938,9 @@
     </ClInclude>
     <ClInclude Include="SimulatedFileSystemEnumerator.h">
       <Filter>SimulatedFileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PidlTestHelper.h">
+      <Filter>Helper\Shell</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

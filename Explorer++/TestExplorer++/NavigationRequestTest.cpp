@@ -5,10 +5,10 @@
 #include "pch.h"
 #include "ShellBrowser/NavigationRequest.h"
 #include "NavigationRequestDelegateMock.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/NavigationRequestDelegate.h"
 #include "ShellEnumeratorFake.h"
-#include "ShellTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

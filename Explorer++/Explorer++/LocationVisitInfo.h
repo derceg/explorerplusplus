@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/SystemClock.h"
 
 // Holds information about visits to a particular location (identified by its pidl).

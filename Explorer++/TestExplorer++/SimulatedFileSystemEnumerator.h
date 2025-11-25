@@ -6,6 +6,7 @@
 
 #include "ShellEnumerator.h"
 
+class PidlAbsolute;
 class SimulatedFileSystem;
 
 class SimulatedFileSystemEnumerator : public ShellEnumerator
@@ -13,9 +14,13 @@ class SimulatedFileSystemEnumerator : public ShellEnumerator
 public:
 	SimulatedFileSystemEnumerator(SimulatedFileSystem *fileSystem);
 
-	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory, std::vector<PidlChild> &outputItems,
+	HRESULT EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory, ShellItemFilter::ItemType itemType,
+		ShellItemFilter::HiddenItemPolicy hiddenItemPolicy, std::vector<PidlChild> &outputItems,
 		std::stop_token stopToken) const override;
 
 private:
+	static bool ShouldIncludeItem(const PidlAbsolute &pidl, ShellItemFilter::ItemType itemType,
+		ShellItemFilter::HiddenItemPolicy hiddenItemPolicy);
+
 	SimulatedFileSystem *const m_fileSystem;
 };

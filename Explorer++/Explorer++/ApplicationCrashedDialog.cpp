@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ApplicationCrashedDialog.h"
 #include "App.h"
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <format>
 

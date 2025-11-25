@@ -10,9 +10,9 @@
 #include "CopiedBookmark.h"
 #include "MainResource.h"
 #include "MenuViewFake.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

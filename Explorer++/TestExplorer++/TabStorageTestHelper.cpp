@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "TabStorageTestHelper.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "TabStorage.h"
 
 TabStorageData CreateTabStorageFromDirectory(const std::wstring &directory,

@@ -6,8 +6,8 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "NavigationRequestDelegateMock.h"
+#include "PidlTestHelper.h"
 #include "ShellEnumeratorFake.h"
-#include "ShellTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

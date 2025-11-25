@@ -7,9 +7,9 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "MainTabView.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "FrequentLocationsStorageTestHelper.h"
 #include "FrequentLocationsModel.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 
 bool operator==(const FrequentLocationsModel &first, const FrequentLocationsModel &second)
 {

@@ -23,6 +23,7 @@
 #include "TabContainer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>

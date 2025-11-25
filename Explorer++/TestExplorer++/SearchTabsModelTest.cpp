@@ -7,9 +7,9 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "GeneratorTestHelper.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include "TabList.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

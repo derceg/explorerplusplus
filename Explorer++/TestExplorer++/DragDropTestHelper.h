@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>

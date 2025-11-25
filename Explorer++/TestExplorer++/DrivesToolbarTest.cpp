@@ -10,8 +10,8 @@
 #include "DriveModel.h"
 #include "DriveWatcherFake.h"
 #include "DrivesToolbarView.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellTestHelper.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
 

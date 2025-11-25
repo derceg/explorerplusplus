@@ -15,8 +15,8 @@
 #include "IconFetcherFake.h"
 #include "LabelEditHandler.h"
 #include "ListView.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 

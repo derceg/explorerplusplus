@@ -6,8 +6,8 @@
 #include "FileSystemWatcher.h"
 #include "ExecutorWrapper.h"
 #include "MessageLoop.h"
+#include "PidlTestHelper.h"
 #include "ScopedTestDir.h"
-#include "ShellTestHelper.h"
 #include "UIThreadExecutor.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

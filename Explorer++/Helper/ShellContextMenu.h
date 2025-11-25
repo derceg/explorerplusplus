@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "PidlHelper.h"
+#include "Pidl.h"
 #include "ShellContextMenuIdGenerator.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/com.h>

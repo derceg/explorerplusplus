@@ -142,7 +142,7 @@
     <ClCompile Include="ResourceHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="PidlHelper.cpp">
+    <ClCompile Include="Pidl.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
     <ClCompile Include="ScopedBitmapLock.cpp">
@@ -204,6 +204,9 @@
     </ClCompile>
     <ClCompile Include="KeyboardStateImpl.cpp">
       <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="PidlHelper.cpp">
+      <Filter>Shell</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -354,7 +357,7 @@
     <ClInclude Include="DisableUnaligned.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="PidlHelper.h">
+    <ClInclude Include="Pidl.h">
       <Filter>Shell</Filter>
     </ClInclude>
     <ClInclude Include="GdiplusHelper.h">
@@ -479,6 +482,9 @@
     </ClInclude>
     <ClInclude Include="PassKey.h">
       <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="PidlHelper.h">
+      <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

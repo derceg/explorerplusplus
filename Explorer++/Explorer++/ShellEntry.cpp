@@ -12,19 +12,23 @@
 #include <ranges>
 #include <utility>
 
-ShellEntry::ShellEntry(const PidlAbsolute &pidl, ShellContext *shellContext, ChildType childType) :
+ShellEntry::ShellEntry(const PidlAbsolute &pidl, ShellContext *shellContext,
+	ShellItemFilter::ItemType childItemType, ShellItemFilter::HiddenItemPolicy hiddenItemPolicy) :
 	m_pidl(pidl),
 	m_shellContext(shellContext),
-	m_childType(childType)
+	m_childItemType(childItemType),
+	m_hiddenItemPolicy(hiddenItemPolicy)
 {
 }
 
 ShellEntry::ShellEntry(const PidlAbsolute &pidl, ShellEntry *parent, ShellContext *shellContext,
-	ChildType childType, PassKey) :
+	ShellItemFilter::ItemType childItemType, ShellItemFilter::HiddenItemPolicy hiddenItemPolicy,
+	PassKey) :
 	m_pidl(pidl),
 	m_parent(parent),
 	m_shellContext(shellContext),
-	m_childType(childType)
+	m_childItemType(childItemType),
+	m_hiddenItemPolicy(hiddenItemPolicy)
 {
 }
 
@@ -36,11 +40,6 @@ const PidlAbsolute &ShellEntry::GetPidl() const
 const ShellEntry *ShellEntry::GetParent() const
 {
 	return m_parent;
-}
-
-ShellEntry::ChildType ShellEntry::GetChildType() const
-{
-	return m_childType;
 }
 
 void ShellEntry::LoadChildren()
@@ -71,8 +70,8 @@ void ShellEntry::LoadChildren()
 std::vector<PidlChild> ShellEntry::EnumerateChildren()
 {
 	std::vector<PidlChild> childPidls;
-	HRESULT hr = m_shellContext->GetShellEnumerator()->EnumerateDirectory(m_pidl.Raw(), childPidls,
-		std::stop_token());
+	HRESULT hr = m_shellContext->GetShellEnumerator()->EnumerateDirectory(m_pidl.Raw(),
+		m_childItemType, m_hiddenItemPolicy, childPidls, std::stop_token());
 
 	if (FAILED(hr))
 	{
@@ -300,6 +299,8 @@ void ShellEntry::OnChildUpdated(const PidlAbsolute &simplePidl)
 
 	if (!child)
 	{
+		// If hidden items are excluded, this path can be taken when a hidden item is unhidden.
+		OnChildAdded(simplePidl);
 		return;
 	}
 
@@ -309,6 +310,15 @@ void ShellEntry::OnChildUpdated(const PidlAbsolute &simplePidl)
 void ShellEntry::OnCurrentEntryUpdated()
 {
 	m_pidl = m_shellContext->GetPidlUpdater()->GetUpdatedPidl(m_pidl);
+
+	if (!ShouldIncludeItem(m_pidl))
+	{
+		// If hidden items are excluded, this path can be taken when an item transitions from
+		// non-hidden to hidden.
+		OnCurrentEntryRemoved();
+		return;
+	}
+
 	updatedSignal.m_signal();
 }
 
@@ -351,7 +361,8 @@ void ShellEntry::AddChild(const PidlAbsolute &pidl)
 		return;
 	}
 
-	auto entry = std::make_unique<ShellEntry>(pidl, this, m_shellContext, m_childType, PassKey());
+	auto entry = std::make_unique<ShellEntry>(pidl, this, m_shellContext, m_childItemType,
+		m_hiddenItemPolicy, PassKey());
 	auto *rawEntry = entry.get();
 
 	auto [itr, didInsert] = m_pidlToChildMap.insert({ pidl, std::move(entry) });
@@ -377,7 +388,14 @@ void ShellEntry::UpdateDirectoryWatcher()
 
 bool ShellEntry::ShouldIncludeItem(const PidlAbsolute &pidl) const
 {
-	if (m_childType == ChildType::FoldersOnly && !DoesItemHaveAttributes(pidl.Raw(), SFGAO_FOLDER))
+	if (m_childItemType == ShellItemFilter::ItemType::FoldersOnly
+		&& !DoesItemHaveAttributes(pidl.Raw(), SFGAO_FOLDER))
+	{
+		return false;
+	}
+
+	if (m_hiddenItemPolicy == ShellItemFilter::HiddenItemPolicy::Exclude
+		&& DoesItemHaveAttributes(pidl.Raw(), SFGAO_HIDDEN))
 	{
 		return false;
 	}

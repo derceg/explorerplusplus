@@ -7,15 +7,12 @@
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
 
-ShellEnumeratorImpl::ShellEnumeratorImpl(HWND embedder, EnumerationScope enumerationScope,
-	HiddenItemsPolicy hiddenItemsPolicy) :
-	m_embedder(embedder),
-	m_enumerationScope(enumerationScope),
-	m_hiddenItemsPolicy(hiddenItemsPolicy)
+ShellEnumeratorImpl::ShellEnumeratorImpl(HWND embedder) : m_embedder(embedder)
 {
 }
 
 HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
+	ShellItemFilter::ItemType itemType, ShellItemFilter::HiddenItemPolicy hiddenItemPolicy,
 	std::vector<PidlChild> &outputItems, std::stop_token stopToken) const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
@@ -23,12 +20,12 @@ HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
 
 	SHCONTF enumFlags = SHCONTF_FOLDERS;
 
-	if (m_enumerationScope == EnumerationScope::FoldersAndFiles)
+	if (itemType == ShellItemFilter::ItemType::FoldersAndFiles)
 	{
 		WI_SetFlag(enumFlags, SHCONTF_NONFOLDERS);
 	}
 
-	if (m_hiddenItemsPolicy == HiddenItemsPolicy::IncludeHidden)
+	if (hiddenItemPolicy == ShellItemFilter::HiddenItemPolicy::Include)
 	{
 		WI_SetAllFlags(enumFlags, SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN);
 	}
@@ -57,9 +54,4 @@ HRESULT ShellEnumeratorImpl::EnumerateDirectory(PCIDLIST_ABSOLUTE pidlDirectory,
 	}
 
 	return S_OK;
-}
-
-void ShellEnumeratorImpl::SetHiddenItemsPolicy(HiddenItemsPolicy hiddenItemsPolicy)
-{
-	m_hiddenItemsPolicy = hiddenItemsPolicy;
 }

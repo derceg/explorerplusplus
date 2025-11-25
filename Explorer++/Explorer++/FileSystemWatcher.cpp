@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FileSystemWatcher.h"
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 

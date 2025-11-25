@@ -5,7 +5,7 @@
 #pragma once
 
 #include "NavigationRequestDelegate.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <memory>

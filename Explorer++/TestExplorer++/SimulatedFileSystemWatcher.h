@@ -5,7 +5,7 @@
 #pragma once
 
 #include "DirectoryWatcher.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <boost/signals2.hpp>
 #include <vector>
 

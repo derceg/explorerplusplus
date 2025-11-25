@@ -6,7 +6,7 @@
 
 #include "ShellBrowser/FolderSettings.h"
 #include "TabContainer.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 
 struct TabStorageData
 {

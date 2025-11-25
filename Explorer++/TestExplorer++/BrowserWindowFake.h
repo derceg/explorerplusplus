@@ -7,7 +7,7 @@
 #include "BrowserWindow.h"
 #include "ShellBrowserFactoryFake.h"
 #include "TabContainer.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <wil/resource.h>
 
 class AcceleratorManager;

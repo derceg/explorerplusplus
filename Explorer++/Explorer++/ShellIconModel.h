@@ -6,7 +6,7 @@
 
 #include "IconModel.h"
 #include "ShellIconLoader.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 
 // Represents a shell icon (i.e. the icon for a shell item). Using this class, it's possible to
 // signify that a shell icon should be shown, without needing to know the exact details of how that

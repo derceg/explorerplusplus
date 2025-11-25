@@ -14,7 +14,7 @@
 #include "TabEvents.h"
 #include "Win32ResourceLoader.h"
 #include "../Helper/CachedIcons.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>

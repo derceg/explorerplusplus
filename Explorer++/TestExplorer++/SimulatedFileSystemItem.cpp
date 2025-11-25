@@ -4,13 +4,15 @@
 
 #include "pch.h"
 #include "SimulatedFileSystemItem.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <list>
 
-SimulatedFileSystemItem::SimulatedFileSystemItem(const std::wstring &name, ShellItemType itemType) :
+SimulatedFileSystemItem::SimulatedFileSystemItem(const std::wstring &name, ShellItemType itemType,
+	ShellItemExtraAttributes extraAttributes) :
 	m_name(name),
-	m_itemType(itemType)
+	m_itemType(itemType),
+	m_extraAttributes(extraAttributes)
 {
 }
 
@@ -27,7 +29,7 @@ PidlAbsolute SimulatedFileSystemItem::GetPidl() const
 	}
 
 	std::wstring path = boost::algorithm::join(pathSegments, L"\\");
-	return CreateSimplePidlForTest(path, nullptr, m_itemType);
+	return CreateSimplePidlForTest(path, nullptr, m_itemType, m_extraAttributes);
 }
 
 SimulatedFileSystemItem *SimulatedFileSystemItem::GetParent()
@@ -49,6 +51,11 @@ void SimulatedFileSystemItem::SetName(const std::wstring &name,
 			m_children.clear();
 		}
 	}
+}
+
+void SimulatedFileSystemItem::SetExtraAttributes(ShellItemExtraAttributes extraAttributes)
+{
+	m_extraAttributes = extraAttributes;
 }
 
 SimulatedFileSystemItem *SimulatedFileSystemItem::AddChild(

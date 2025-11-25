@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
@@ -16,12 +17,14 @@ class PidlAbsolute;
 class SimulatedFileSystemItem
 {
 public:
-	SimulatedFileSystemItem(const std::wstring &name, ShellItemType itemType);
+	SimulatedFileSystemItem(const std::wstring &name, ShellItemType itemType,
+		ShellItemExtraAttributes extraAttributes = ShellItemExtraAttributes::None);
 
 	PidlAbsolute GetPidl() const;
 	SimulatedFileSystemItem *GetParent();
 
 	void SetName(const std::wstring &name, std::optional<ShellItemType> itemType);
+	void SetExtraAttributes(ShellItemExtraAttributes extraAttributes);
 
 	SimulatedFileSystemItem *AddChild(std::unique_ptr<SimulatedFileSystemItem> item);
 	std::unique_ptr<SimulatedFileSystemItem> RemoveChild(SimulatedFileSystemItem *item);
@@ -32,6 +35,7 @@ public:
 private:
 	std::wstring m_name;
 	ShellItemType m_itemType;
+	ShellItemExtraAttributes m_extraAttributes;
 	SimulatedFileSystemItem *m_parent = nullptr;
 	std::vector<std::unique_ptr<SimulatedFileSystemItem>> m_children;
 };

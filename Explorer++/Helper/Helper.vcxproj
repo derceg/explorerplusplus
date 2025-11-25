@@ -796,6 +796,7 @@
     <ClCompile Include="FileDialogs.cpp" />
     <ClCompile Include="KeyboardStateImpl.cpp" />
     <ClCompile Include="MessageWindowHelper.cpp" />
+    <ClCompile Include="PidlHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
     <ClCompile Include="ScopedStopSource.cpp" />
@@ -821,7 +822,7 @@
     <ClCompile Include="ListViewHelper.cpp" />
     <ClCompile Include="MenuHelper.cpp" />
     <ClCompile Include="MessageForwarder.cpp" />
-    <ClCompile Include="PidlHelper.cpp" />
+    <ClCompile Include="Pidl.cpp" />
     <ClCompile Include="ProcessHelper.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
@@ -892,6 +893,7 @@
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
     <ClInclude Include="PassKey.h" />
+    <ClInclude Include="PidlHelper.h" />
     <ClInclude Include="RemoveMode.h" />
     <ClInclude Include="DetoursHelper.h" />
     <ClInclude Include="DialogSettings.h" />
@@ -939,7 +941,7 @@
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />
     <ClInclude Include="MovableModel.h" />
-    <ClInclude Include="PidlHelper.h" />
+    <ClInclude Include="Pidl.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />

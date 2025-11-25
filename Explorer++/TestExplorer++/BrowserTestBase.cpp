@@ -5,9 +5,9 @@
 #include "pch.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include <wil/common.h>
 
 BrowserTestBase::BrowserTestBase() :

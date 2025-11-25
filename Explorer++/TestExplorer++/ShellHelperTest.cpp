@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/ShellHelper.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/com.h>

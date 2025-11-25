@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "HistoryModel.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 

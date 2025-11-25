@@ -6,7 +6,7 @@
 #include "AsyncIconFetcher.h"
 #include "RuntimeHelper.h"
 #include "../Helper/CachedIcons.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/ShellHelper.h"
 
 AsyncIconFetcher::AsyncIconFetcher(const Runtime *runtime,

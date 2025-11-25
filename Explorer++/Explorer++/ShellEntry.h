@@ -5,8 +5,9 @@
 #pragma once
 
 #include "DirectoryWatcher.h"
+#include "ShellItemFilter.h"
 #include "../Helper/PassKey.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/container_hash/hash.hpp>
 #include <boost/core/noncopyable.hpp>
@@ -25,21 +26,15 @@ private:
 	using PassKey = PassKey<ShellEntry>;
 
 public:
-	// When loading children, this can be used to control whether only folders are loaded, or files
-	// as well.
-	enum class ChildType
-	{
-		FoldersOnly,
-		FoldersAndFiles
-	};
-
-	ShellEntry(const PidlAbsolute &pidl, ShellContext *shellContext, ChildType childType);
+	ShellEntry(const PidlAbsolute &pidl, ShellContext *shellContext,
+		ShellItemFilter::ItemType childItemType,
+		ShellItemFilter::HiddenItemPolicy hiddenItemPolicy);
 	ShellEntry(const PidlAbsolute &pidl, ShellEntry *parent, ShellContext *shellContext,
-		ChildType childType, PassKey);
+		ShellItemFilter::ItemType childItemType, ShellItemFilter::HiddenItemPolicy hiddenItemPolicy,
+		PassKey);
 
 	const PidlAbsolute &GetPidl() const;
 	const ShellEntry *GetParent() const;
-	ChildType GetChildType() const;
 
 	void LoadChildren();
 	void UnloadChildren();
@@ -87,7 +82,8 @@ private:
 	PidlAbsolute m_pidl;
 	ShellEntry *const m_parent = nullptr;
 	ShellContext *const m_shellContext;
-	const ChildType m_childType;
+	const ShellItemFilter::ItemType m_childItemType;
+	const ShellItemFilter::HiddenItemPolicy m_hiddenItemPolicy;
 	std::unordered_map<PidlAbsolute, std::unique_ptr<ShellEntry>, boost::hash<PidlAbsolute>>
 		m_pidlToChildMap;
 	bool m_childrenLoaded = false;

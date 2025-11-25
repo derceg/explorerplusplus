@@ -6,9 +6,9 @@
 #include "ShellBrowser/NavigationManager.h"
 #include "GeneratorTestHelper.h"
 #include "NavigationRequestTestHelper.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellEnumeratorFake.h"
-#include "ShellTestHelper.h"
 #include "../Helper/UniqueThreadId.h"
 #include <gtest/gtest.h>
 #include <future>

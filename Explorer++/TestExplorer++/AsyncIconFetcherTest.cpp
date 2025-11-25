@@ -5,10 +5,10 @@
 #include "pch.h"
 #include "AsyncIconFetcher.h"
 #include "MessageLoop.h"
+#include "PidlTestHelper.h"
 #include "Runtime.h"
 #include "RuntimeHelper.h"
 #include "RuntimeTestHelper.h"
-#include "ShellTestHelper.h"
 #include "../Helper/CachedIcons.h"
 #include <gtest/gtest.h>
 

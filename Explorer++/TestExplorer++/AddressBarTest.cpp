@@ -8,11 +8,11 @@
 #include "AsyncIconFetcher.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "PidlTestHelper.h"
 #include "Runtime.h"
 #include "RuntimeTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include "Tab.h"
 #include "../Helper/CachedIcons.h"
 #include <gtest/gtest.h>

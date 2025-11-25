@@ -8,7 +8,7 @@
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/NavigationManager.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
 

@@ -7,6 +7,7 @@
 #include "FrequentLocationsModel.h"
 #include "FrequentLocationsStorageHelper.h"
 #include "LocationVisitInfo.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -122,7 +123,7 @@ void LoadFromNode(IXMLDOMNode *frequentLocationsNode, FrequentLocationsModel *mo
 void SaveFrequentLocation(IXMLDOMDocument *xmlDocument, IXMLDOMElement *frequentLocationNode,
 	const LocationVisitInfo &frequentLocation)
 {
-	auto encodedPidl = EncodePidlToBase64(frequentLocation.GetLocation().Raw());
+	auto encodedPidl = EncodePidlToBase64(frequentLocation.GetLocation());
 	auto encodedPidlWide = StrToWstr(encodedPidl);
 
 	if (!encodedPidlWide)

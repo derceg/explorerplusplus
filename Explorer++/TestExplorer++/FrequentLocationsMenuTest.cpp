@@ -10,8 +10,8 @@
 #include "FrequentLocationsTracker.h"
 #include "MenuViewFake.h"
 #include "MenuViewFakeTestHelper.h"
+#include "PidlTestHelper.h"
 #include "ShellIconLoaderFake.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 class FrequentLocationsMenuTest : public BrowserTestBase

@@ -1953,6 +1953,9 @@
     <ClInclude Include="PidlUpdater.h">
       <Filter>Shell</Filter>
     </ClInclude>
+    <ClInclude Include="ShellItemFilter.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

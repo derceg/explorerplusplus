@@ -1584,6 +1584,7 @@
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h" />
     <ClInclude Include="ShellContext.h" />
     <ClInclude Include="ShellEntry.h" />
+    <ClInclude Include="ShellItemFilter.h" />
     <ClInclude Include="ShellWatcherManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />

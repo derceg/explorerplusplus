@@ -5,10 +5,10 @@
 #include "pch.h"
 #include "Tab.h"
 #include "BrowserWindowMock.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
-#include "ShellTestHelper.h"
 #include "TabEvents.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

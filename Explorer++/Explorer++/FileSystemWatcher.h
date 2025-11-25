@@ -6,7 +6,7 @@
 
 #include "DirectoryWatcher.h"
 #include "../Helper/PassKey.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <concurrencpp/concurrencpp.h>

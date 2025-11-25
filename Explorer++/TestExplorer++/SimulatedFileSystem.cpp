@@ -15,22 +15,25 @@ PidlAbsolute SimulatedFileSystem::GetRoot()
 	return m_root.GetPidl();
 }
 
-PidlAbsolute SimulatedFileSystem::AddFolder(const PidlAbsolute &parent, const std::wstring &name)
+PidlAbsolute SimulatedFileSystem::AddFolder(const PidlAbsolute &parent, const std::wstring &name,
+	ShellItemExtraAttributes extraAttributes)
 {
-	return AddItem(parent, name, ShellItemType::Folder);
+	return AddItem(parent, name, ShellItemType::Folder, extraAttributes);
 }
 
-PidlAbsolute SimulatedFileSystem::AddFile(const PidlAbsolute &parent, const std::wstring &name)
+PidlAbsolute SimulatedFileSystem::AddFile(const PidlAbsolute &parent, const std::wstring &name,
+	ShellItemExtraAttributes extraAttributes)
 {
-	return AddItem(parent, name, ShellItemType::File);
+	return AddItem(parent, name, ShellItemType::File, extraAttributes);
 }
 
 PidlAbsolute SimulatedFileSystem::AddItem(const PidlAbsolute &parent, const std::wstring &name,
-	ShellItemType itemType)
+	ShellItemType itemType, ShellItemExtraAttributes extraAttributes)
 {
 	auto *parentItem = GetFileSystemItemForPidl(parent);
 	CHECK(DoesItemHaveAttributes(parentItem->GetPidl().Raw(), SFGAO_FOLDER));
-	auto *item = parentItem->AddChild(std::make_unique<SimulatedFileSystemItem>(name, itemType));
+	auto *item = parentItem->AddChild(
+		std::make_unique<SimulatedFileSystemItem>(name, itemType, extraAttributes));
 
 	auto [itr, didInsert] = m_pidlToItemMap.insert({ item->GetPidl(), item });
 	CHECK(didInsert);
@@ -69,8 +72,14 @@ PidlAbsolute SimulatedFileSystem::RenameItem(const PidlAbsolute &pidl, const std
 	return pidlNew;
 }
 
-void SimulatedFileSystem::NotifyItemUpdated(const PidlAbsolute &pidl)
+void SimulatedFileSystem::UpdateItem(const PidlAbsolute &pidl,
+	ShellItemExtraAttributes extraAttributes)
 {
+	auto *item = GetFileSystemItemForPidl(pidl);
+	CHECK(item != &m_root);
+
+	item->SetExtraAttributes(extraAttributes);
+
 	itemUpdatedSignal.m_signal(pidl);
 }
 

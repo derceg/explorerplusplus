@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "DragDropTestHelper.h"
-#include "ShellTestHelper.h"
+#include "PidlTestHelper.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"

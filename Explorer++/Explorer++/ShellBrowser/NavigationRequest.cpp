@@ -4,8 +4,10 @@
 
 #include "stdafx.h"
 #include "NavigationRequest.h"
+#include "FolderSettings.h"
 #include "NavigationEvents.h"
 #include "NavigationRequestDelegate.h"
+#include "ShellBrowser.h"
 #include "ShellEnumerator.h"
 #include "../Helper/ShellHelper.h"
 
@@ -95,6 +97,11 @@ concurrencpp::null_result NavigationRequest::StartInternal(WeakPtr<NavigationReq
 	auto enumerationExecutor = weakSelf->m_enumerationExecutor;
 	auto originalExecutor = weakSelf->m_originalExecutor;
 	auto navigateParams = weakSelf->m_navigateParams;
+
+	// m_shellBrowser can be null in tests.
+	auto *shellBrowser = weakSelf->m_shellBrowser;
+	auto showHidden = shellBrowser ? shellBrowser->GetFolderSettings().showHidden : true;
+
 	auto stopToken = weakSelf->m_stopToken;
 
 	weakSelf->m_navigationEvents->NotifyStarted(weakSelf.Get());
@@ -123,7 +130,11 @@ concurrencpp::null_result NavigationRequest::StartInternal(WeakPtr<NavigationReq
 	}
 
 	std::vector<PidlChild> items;
-	hr = shellEnumerator->EnumerateDirectory(navigateParams.pidl.Raw(), items, stopToken);
+	hr = shellEnumerator->EnumerateDirectory(navigateParams.pidl.Raw(),
+		ShellItemFilter::ItemType::FoldersAndFiles,
+		showHidden ? ShellItemFilter::HiddenItemPolicy::Include
+				   : ShellItemFilter::HiddenItemPolicy::Exclude,
+		items, stopToken);
 
 	co_await concurrencpp::resume_on(originalExecutor);
 

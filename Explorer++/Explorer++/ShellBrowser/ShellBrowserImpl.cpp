@@ -71,10 +71,7 @@ ShellBrowserImpl::ShellBrowserImpl(HWND owner, App *app, BrowserWindow *browser,
 	m_owner(owner),
 	m_app(app),
 	m_browser(browser),
-	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(owner,
-		ShellEnumeratorImpl::EnumerationScope::FoldersAndFiles,
-		folderSettings.showHidden ? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
-								  : ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden)),
+	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(owner)),
 	m_navigationManager(this, app->GetNavigationEvents(), m_shellEnumerator,
 		app->GetFeatureList()->IsEnabled(Feature::BackgroundThreadEnumeration)
 			? app->GetRuntime()->GetComStaExecutor()
@@ -882,10 +879,6 @@ bool ShellBrowserImpl::GetShowHidden() const
 void ShellBrowserImpl::SetShowHidden(bool showHidden)
 {
 	m_folderSettings.showHidden = showHidden;
-
-	m_shellEnumerator->SetHiddenItemsPolicy(showHidden
-			? ShellEnumeratorImpl::HiddenItemsPolicy::IncludeHidden
-			: ShellEnumeratorImpl::HiddenItemsPolicy::ExcludeHidden);
 }
 
 std::vector<SortMode> ShellBrowserImpl::GetAvailableSortModes() const

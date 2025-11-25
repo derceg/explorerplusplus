@@ -6,8 +6,8 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 class ShellBrowserTest : public BrowserTestBase

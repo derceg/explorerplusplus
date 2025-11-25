@@ -5,9 +5,9 @@
 #include "pch.h"
 #include "GTestHelper.h"
 #include "MenuViewFake.h"
+#include "PidlTestHelper.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellIconModel.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

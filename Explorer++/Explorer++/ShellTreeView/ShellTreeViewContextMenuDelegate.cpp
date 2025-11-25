@@ -7,7 +7,7 @@
 #include "ShellTreeViewContextMenuDelegate.h"
 // clang-format on
 #include "ShellTreeView.h"
-#include "../Helper/PidlHelper.h"
+#include "../Helper/Pidl.h"
 
 ShellTreeViewContextMenuDelegate::ShellTreeViewContextMenuDelegate(ShellTreeView *shellTreeView) :
 	m_shellTreeView(shellTreeView)

@@ -8,9 +8,9 @@
 #include "BrowserWindowFake.h"
 #include "MainResource.h"
 #include "MenuViewFake.h"
+#include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
