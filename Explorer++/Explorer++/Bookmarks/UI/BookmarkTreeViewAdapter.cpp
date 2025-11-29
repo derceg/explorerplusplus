@@ -109,7 +109,7 @@ void BookmarkTreeViewAdapter::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkIte
 	RemoveNode(node);
 }
 
-std::weak_ordering BookmarkTreeViewAdapter::CompareItems(const TreeViewNode *first,
+std::weak_ordering BookmarkTreeViewAdapter::CompareNodes(const TreeViewNode *first,
 	const TreeViewNode *second) const
 {
 	auto *firstBookmark = GetBookmarkForNode(first);

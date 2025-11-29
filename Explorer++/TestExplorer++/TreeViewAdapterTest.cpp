@@ -26,7 +26,7 @@ public:
 	using TreeViewAdapter::RemoveNode;
 
 protected:
-	std::weak_ordering CompareItems(const TreeViewNode *first,
+	std::weak_ordering CompareNodes(const TreeViewNode *first,
 		const TreeViewNode *second) const override
 	{
 		const auto *firstFake = GetFakeFromNode(first);

@@ -108,15 +108,15 @@ size_t TreeViewAdapter::GetNodeSortedIndex(const TreeViewNode *node,
 	DCHECK(!node->GetParent());
 
 	auto itr = std::ranges::upper_bound(parentNode->GetChildren(), node,
-		std::bind_front(&TreeViewAdapter::CompareItemsWrapper, this),
+		std::bind_front(&TreeViewAdapter::CompareNodesWrapper, this),
 		[](const auto &currentNode) { return currentNode.get(); });
 	return std::distance(parentNode->GetChildren().begin(), itr);
 }
 
-bool TreeViewAdapter::CompareItemsWrapper(const TreeViewNode *first,
+bool TreeViewAdapter::CompareNodesWrapper(const TreeViewNode *first,
 	const TreeViewNode *second) const
 {
-	auto cmp = CompareItems(first, second);
+	auto cmp = CompareNodes(first, second);
 	return std::is_lt(cmp);
 }
 

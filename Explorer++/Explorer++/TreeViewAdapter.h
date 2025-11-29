@@ -46,7 +46,7 @@ protected:
 	void MoveNode(TreeViewNode *node, TreeViewNode *newParent);
 	void RemoveNode(TreeViewNode *node);
 
-	virtual std::weak_ordering CompareItems(const TreeViewNode *first,
+	virtual std::weak_ordering CompareNodes(const TreeViewNode *first,
 		const TreeViewNode *second) const = 0;
 
 private:
@@ -65,7 +65,7 @@ private:
 	void OnNodeUpdated(TreeViewNode *node);
 
 	size_t GetNodeSortedIndex(const TreeViewNode *node, const TreeViewNode *parentNode) const;
-	bool CompareItemsWrapper(const TreeViewNode *first, const TreeViewNode *second) const;
+	bool CompareNodesWrapper(const TreeViewNode *first, const TreeViewNode *second) const;
 	void MaybeRepositionNode(TreeViewNode *node);
 
 	bool IsInTree(const TreeViewNode *node) const;

@@ -33,7 +33,7 @@ public:
 	MOCK_METHOD(void, OnNodeCollapsing, (TreeViewNode * node), (override));
 
 protected:
-	std::weak_ordering CompareItems(const TreeViewNode *first,
+	std::weak_ordering CompareNodes(const TreeViewNode *first,
 		const TreeViewNode *second) const override
 	{
 		UNREFERENCED_PARAMETER(first);
@@ -417,7 +417,7 @@ public:
 	}
 
 protected:
-	std::weak_ordering CompareItems(const TreeViewNode *first,
+	std::weak_ordering CompareNodes(const TreeViewNode *first,
 		const TreeViewNode *second) const override
 	{
 		UNREFERENCED_PARAMETER(first);
