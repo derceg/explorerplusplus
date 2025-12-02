@@ -39,6 +39,7 @@ public:
 	void LoadChildren();
 	void UnloadChildren();
 	bool AreChildrenLoaded() const;
+	concurrencpp::generator<ShellEntry *> GetChildren();
 	concurrencpp::generator<const ShellEntry *> GetChildren() const;
 	ShellEntry *MaybeGetChild(const PidlAbsolute &pidl);
 

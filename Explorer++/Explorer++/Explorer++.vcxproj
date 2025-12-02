@@ -1224,6 +1224,7 @@
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp" />
     <ClCompile Include="ShellEntry.cpp" />
+    <ClCompile Include="ShellEntryCollection.cpp" />
     <ClCompile Include="ShellWatcherManager.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
@@ -1585,6 +1586,7 @@
     <ClInclude Include="ShellContext.h" />
     <ClInclude Include="ShellEntry.h" />
     <ClInclude Include="ShellItemFilter.h" />
+    <ClInclude Include="ShellEntryCollection.h" />
     <ClInclude Include="ShellWatcherManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />

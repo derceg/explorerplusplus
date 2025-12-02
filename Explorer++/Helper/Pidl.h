@@ -102,6 +102,9 @@ public:
 
 	PidlChild GetLastItem() const;
 	bool RemoveLastItem();
+
+	// Formats an absolute pidl for Google Test.
+	friend void PrintTo(const PidlAbsolute &pidl, std::ostream *os);
 };
 
 PidlAbsolute operator+(const PidlAbsolute &parent, const PidlChild &child);

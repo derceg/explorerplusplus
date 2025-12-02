@@ -568,6 +568,9 @@
     <ClCompile Include="PidlTestHelper.cpp">
       <Filter>Helper\Shell</Filter>
     </ClCompile>
+    <ClCompile Include="ShellEntryCollectionTest.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

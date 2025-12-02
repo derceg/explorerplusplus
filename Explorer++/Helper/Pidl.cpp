@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Pidl.h"
 #include "ShellHelper.h"
+#include "StringHelper.h"
 #include <boost/container_hash/hash.hpp>
 
 template <typename IDListType, auto CloneFunction>
@@ -169,6 +170,19 @@ bool PidlAbsolute::RemoveLastItem()
 	}
 
 	return res;
+}
+
+void PrintTo(const PidlAbsolute &pidl, std::ostream *os)
+{
+	if (!pidl.HasValue())
+	{
+		*os << "(empty)";
+		return;
+	}
+
+	auto narrowPath = WstrToStr(GetDisplayNameWithFallback(pidl.Raw(), SHGDN_FORPARSING));
+	CHECK(narrowPath);
+	*os << *narrowPath;
 }
 
 PidlAbsolute operator+(const PidlAbsolute &parent, const PidlChild &child)

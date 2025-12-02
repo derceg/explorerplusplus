@@ -114,6 +114,16 @@ bool ShellEntry::AreChildrenLoaded() const
 	return m_childrenLoaded;
 }
 
+concurrencpp::generator<ShellEntry *> ShellEntry::GetChildren()
+{
+	DCHECK(HasAttributes(SFGAO_FOLDER));
+
+	for (const auto &child : m_pidlToChildMap | std::views::values)
+	{
+		co_yield child.get();
+	}
+}
+
 concurrencpp::generator<const ShellEntry *> ShellEntry::GetChildren() const
 {
 	DCHECK(HasAttributes(SFGAO_FOLDER));

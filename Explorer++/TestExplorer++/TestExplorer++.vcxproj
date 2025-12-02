@@ -241,6 +241,7 @@
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />
+    <ClCompile Include="ShellEntryCollectionTest.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcherFactory.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcher.cpp" />
     <ClCompile Include="SimulatedFileSystem.cpp" />

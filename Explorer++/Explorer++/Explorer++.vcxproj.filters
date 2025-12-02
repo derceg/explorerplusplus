@@ -913,6 +913,9 @@
     <ClCompile Include="ShellEntry.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="ShellEntryCollection.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1954,6 +1957,9 @@
       <Filter>Shell</Filter>
     </ClInclude>
     <ClInclude Include="ShellItemFilter.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellEntryCollection.h">
       <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>
