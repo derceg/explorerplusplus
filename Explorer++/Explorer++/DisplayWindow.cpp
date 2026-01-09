@@ -8,8 +8,10 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
+#include "PreviewPane.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
+#include <glog/logging.h>
 #include "../Helper/FolderSize.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
@@ -389,4 +391,43 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 	}
 
 	DisplayWindow_BufferText(m_displayWindow->GetHWND(), szTotalSize);
+}
+
+void Explorerplusplus::UpdatePreviewPane(const Tab &tab)
+{
+	OutputDebugString(L"[PreviewPane] UpdatePreviewPane called\n");
+
+	if (!m_config->showPreviewPane.get() || !m_previewPane)
+	{
+		OutputDebugString(L"[PreviewPane] Preview pane disabled or null\n");
+		return;
+	}
+
+	int nSelected = tab.GetShellBrowserImpl()->GetNumSelected();
+	wchar_t msg[256];
+	swprintf_s(msg, L"[PreviewPane] nSelected=%d\n", nSelected);
+	OutputDebugString(msg);
+
+	if (nSelected == 1)
+	{
+		int iSelected = ListView_GetNextItem(tab.GetShellBrowserImpl()->GetListView(), -1, LVNI_SELECTED);
+		swprintf_s(msg, L"[PreviewPane] iSelected=%d\n", iSelected);
+		OutputDebugString(msg);
+
+		if (iSelected != -1)
+		{
+			auto pidl = tab.GetShellBrowserImpl()->GetItemCompleteIdl(iSelected);
+			OutputDebugString(pidl.get() ? L"[PreviewPane] Got pidl, calling SetPreviewFile\n" 
+			                              : L"[PreviewPane] pidl is null\n");
+			m_previewPane->SetPreviewFile(pidl.get());
+		}
+		else
+		{
+			m_previewPane->ClearPreview();
+		}
+	}
+	else
+	{
+		m_previewPane->ClearPreview();
+	}
 }
