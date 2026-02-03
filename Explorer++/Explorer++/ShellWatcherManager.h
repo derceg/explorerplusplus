@@ -89,7 +89,7 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnChangeNotify(UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnProcessChanges();
-	static DirectoryWatcher::Event ShellChangeEventToEvent(LONG event);
+	static std::optional<DirectoryWatcher::Event> TryConvertShellChangeEvent(LONG event);
 
 	wil::unique_hwnd m_hwnd;
 	std::unique_ptr<WindowSubclass> m_subclass;

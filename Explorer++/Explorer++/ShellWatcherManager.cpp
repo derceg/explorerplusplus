@@ -211,14 +211,21 @@ void ShellWatcherManager::OnProcessChanges()
 			continue;
 		}
 
+		auto directoryWatcherEvent = TryConvertShellChangeEvent(change.event);
+
+		if (!directoryWatcherEvent)
+		{
+			continue;
+		}
+
 		const auto &watchDetails = itr->second;
-		watchDetails.callback(ShellChangeEventToEvent(change.event), change.pidl1, change.pidl2);
+		watchDetails.callback(*directoryWatcherEvent, change.pidl1, change.pidl2);
 	}
 
 	m_changes.clear();
 }
 
-DirectoryWatcher::Event ShellWatcherManager::ShellChangeEventToEvent(LONG event)
+std::optional<DirectoryWatcher::Event> ShellWatcherManager::TryConvertShellChangeEvent(LONG event)
 {
 	switch (event)
 	{
@@ -243,5 +250,7 @@ DirectoryWatcher::Event ShellWatcherManager::ShellChangeEventToEvent(LONG event)
 		return DirectoryWatcher::Event::Removed;
 	}
 
-	LOG(FATAL) << "Invalid change event type";
+	LOG(WARNING) << "Unhandled shell change event type: " << event;
+
+	return std::nullopt;
 }
