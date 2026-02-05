@@ -96,7 +96,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		{
 			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
-			UpdateDisplayWindow(selectedTab);
+			UpdateWindowStates(selectedTab);
 			m_mainToolbar->UpdateToolbarButtonStates();
 
 			KillTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID);
@@ -429,6 +429,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case IDM_VIEW_DISPLAYWINDOW:
 		m_commandController.ExecuteCommand(id);
+		break;
+
+	case IDM_VIEW_PREVIEWPANE:
+		m_config->showPreviewPane = !m_config->showPreviewPane.get();
 		break;
 
 	case IDM_DISPLAYWINDOW_VERTICAL:

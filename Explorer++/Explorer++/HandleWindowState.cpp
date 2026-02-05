@@ -19,6 +19,7 @@
 void Explorerplusplus::UpdateWindowStates(const Tab &tab)
 {
 	UpdateDisplayWindow(tab);
+	UpdatePreviewPane(tab);
 }
 
 /*
@@ -89,6 +90,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_STATUSBAR, m_config->showStatusBar.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_FOLDERS, m_config->showFolders.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_DISPLAYWINDOW, m_config->showDisplayWindow.get());
+	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_PREVIEWPANE, m_config->showPreviewPane.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_TOOLBARS_ADDRESS_BAR,
 		m_config->showAddressBar.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_TOOLBARS_MAIN_TOOLBAR,

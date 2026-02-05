@@ -1406,6 +1406,7 @@
     <ClCompile Include="DialogStorageHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
     <ClCompile Include="DisplayWindow.cpp" />
+    <ClCompile Include="PreviewPane.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="Plugins\Event.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
@@ -1780,6 +1781,7 @@
     <ClInclude Include="DialogConstants.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
     <ClInclude Include="DisplayWindow\DisplayWindow.h" />
+    <ClInclude Include="PreviewPane.h" />
     <ClInclude Include="DrivesToolbar.h" />
     <ClInclude Include="Plugins\Event.h" />
     <ClInclude Include="Explorer++.h" />
