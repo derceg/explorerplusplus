@@ -169,6 +169,10 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.globalFolderSettings.hideLinkExtension);
 	RegistrySettings::ReadBetterEnumValue(settingsKey, L"ViewModeGlobal",
 		config.defaultFolderSettings.viewMode);
+	RegistrySettings::ReadBetterEnumValue(settingsKey, L"SortModeGlobal",
+		config.defaultFolderSettings.sortMode);
+	RegistrySettings::ReadBetterEnumValue(settingsKey, L"GroupModeGlobal",
+		config.defaultFolderSettings.groupMode);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DisplayWindowVertical",
 		config.displayWindowVertical);
 
@@ -307,6 +311,10 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		config.defaultFolderSettings.showHidden);
 	RegistrySettings::SaveDword(settingsKey, L"ViewModeGlobal",
 		config.defaultFolderSettings.viewMode);
+	RegistrySettings::SaveDword(settingsKey, L"SortModeGlobal",
+		config.defaultFolderSettings.sortMode);
+	RegistrySettings::SaveDword(settingsKey, L"GroupModeGlobal",
+		config.defaultFolderSettings.groupMode);
 	RegistrySettings::SaveDword(settingsKey, L"ShowGridlinesGlobal",
 		config.globalFolderSettings.showGridlines.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowInGroupsGlobal",

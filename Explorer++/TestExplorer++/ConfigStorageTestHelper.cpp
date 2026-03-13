@@ -23,6 +23,8 @@ Config BuildReference()
 	config.globalFolderSettings.oneClickActivate = true;
 	config.globalFolderSettings.oneClickActivateHoverTime = 40;
 	config.defaultFolderSettings.viewMode = ViewMode::Details;
+	config.defaultFolderSettings.sortMode = SortMode::Size;
+	config.defaultFolderSettings.groupMode = SortMode::DateModified;
 	config.defaultFolderSettings.showInGroups = true;
 	return config;
 }

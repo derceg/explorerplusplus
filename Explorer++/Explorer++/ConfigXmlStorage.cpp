@@ -219,6 +219,8 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"UseFullRowSelect", config.useFullRowSelect);
 	GetBoolSetting(settingsNode, L"TreeViewDelayEnabled", config.treeViewDelayEnabled);
 	GetBetterEnumSetting(settingsNode, L"ViewModeGlobal", config.defaultFolderSettings.viewMode);
+	GetBetterEnumSetting(settingsNode, L"SortModeGlobal", config.defaultFolderSettings.sortMode);
+	GetBetterEnumSetting(settingsNode, L"GroupModeGlobal", config.defaultFolderSettings.groupMode);
 	GetTextSetting(settingsNode, L"NewTabDirectory", config.defaultTabDirectory);
 	GetBetterEnumSetting(settingsNode, L"InfoTipType", config.infoTipType);
 	GetBetterEnumSetting(settingsNode, L"IconTheme", config.iconSet);
@@ -455,6 +457,10 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"TreeViewDelayEnabled", XMLSettings::EncodeBoolValue(config.treeViewDelayEnabled));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"ViewModeGlobal", XMLSettings::EncodeIntValue(config.defaultFolderSettings.viewMode));
+	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
+		L"SortModeGlobal", XMLSettings::EncodeIntValue(config.defaultFolderSettings.sortMode));
+	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
+		L"GroupModeGlobal", XMLSettings::EncodeIntValue(config.defaultFolderSettings.groupMode));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"CheckPinnedToNamespaceTreeProperty",
 		XMLSettings::EncodeBoolValue(config.checkPinnedToNamespaceTreeProperty));
