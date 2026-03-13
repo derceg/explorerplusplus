@@ -1,0 +1,149 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [master, main]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }} (${{ matrix.configuration }})
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [Win32, x64, ARM64]
+        configuration: [Release]
+        include:
+          - platform: Win32
+            arch: x86
+          - platform: x64
+            arch: x64
+          - platform: ARM64
+            arch: arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Bootstrap vcpkg
+        run: .\Explorer++\ThirdParty\vcpkg\bootstrap-vcpkg.bat
+        shell: cmd
+
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            vcpkg_installed
+            ${{ env.LOCALAPPDATA }}\vcpkg\archives
+          key: vcpkg-${{ matrix.platform }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ matrix.platform }}-
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build solution
+        run: msbuild Explorer++\Explorer++.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /m /verbosity:minimal
+
+      - name: Run tests
+        if: matrix.platform != 'ARM64'
+        run: |
+          $testExe = "Explorer++\TestExplorer++\${{ matrix.platform }}\${{ matrix.configuration }}\TestExplorer++.exe"
+          & $testExe --gtest_output=xml:TestResults.xml
+          if ($LASTEXITCODE -ne 0) { throw "Tests failed" }
+        shell: pwsh
+
+      - name: Upload test results
+        if: matrix.platform != 'ARM64' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.arch }}
+          path: TestResults.xml
+
+      - name: Package binaries
+        shell: pwsh
+        run: |
+          $arch = "${{ matrix.arch }}"
+          $platform = "${{ matrix.platform }}"
+          $config = "${{ matrix.configuration }}"
+
+          # Main binary zip
+          $archiveName = "explorerpp_${arch}.zip"
+          7z a $archiveName "Explorer++\Explorer++\${platform}\${config}\Explorer++.exe"
+          7z a $archiveName "Documentation\User\History.txt"
+          7z a $archiveName "Documentation\User\License.txt"
+          7z a $archiveName "Documentation\User\Readme.txt"
+
+          # Symbols zip
+          7z a "explorerpp_${arch}_symbols.zip" "Explorer++\Explorer++\${platform}\${config}\Explorer++.pdb"
+
+          # Translation DLLs (only from first platform to avoid duplication)
+          if ($platform -eq "x64") {
+            7z a "explorerpp_translations.zip" "Explorer++\Win32\${config}\Explorer++*.dll"
+          }
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: explorerpp-${{ matrix.arch }}
+          path: |
+            explorerpp_${{ matrix.arch }}.zip
+            explorerpp_${{ matrix.arch }}_symbols.zip
+
+      - name: Upload translations
+        if: matrix.platform == 'x64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: explorerpp-translations
+          path: explorerpp_translations.zip
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: false
+
+      - name: Prepare release files
+        run: |
+          mkdir -p release
+          find artifacts -name '*.zip' -exec cp {} release/ \;
+          ls -la release/
+
+      - name: Determine release info
+        id: release_info
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          if [[ "$TAG" == *"-beta"* ]]; then
+            echo "title=Explorer++ ${VERSION} beta" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "title=Explorer++ ${VERSION}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.release_info.outputs.title }}
+          prerelease: ${{ steps.release_info.outputs.prerelease }}
+          draft: true
+          files: release/*.zip
+          generate_release_notes: true
