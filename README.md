@@ -44,7 +44,7 @@ For a full list of builds, see https://explorerplusplus.com/builds.
 
 ## Building Explorer++
 
-For instructions on how to build Explorer++, see [BUILDING.md](BUILDING.md).
+For instructions on how to build Explorer++, see [docs/Building.md](docs/Building.md).
 
 ## Documentation
 
