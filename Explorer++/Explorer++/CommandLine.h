@@ -25,6 +25,7 @@ struct Settings
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =
 		DefaultFileManager::ReplaceExplorerMode::None;
 	bool jumplistNewTab = false;
+	bool openNewWindow = false;
 	std::optional<CrashedData> crashedData;
 	std::optional<std::wstring> pasteSymLinksDestination;
 	std::vector<std::wstring> filesToSelect;

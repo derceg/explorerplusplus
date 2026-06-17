@@ -1,0 +1,7 @@
+{
+  "name": "Event Logger",
+  "description": "Logs tab events to the console (if attached).",
+  "file": "event_logger.lua",
+  "version": "1.0",
+  "author": "Explorer++ Team"
+}

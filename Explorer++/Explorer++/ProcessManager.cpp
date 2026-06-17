@@ -58,7 +58,7 @@ bool ProcessManager::InitializeCurrentProcess(const CommandLine::Settings *comma
 			return false;
 		}
 
-		if (!config->allowMultipleInstances)
+		if (!config->allowMultipleInstances && !commandLineSettings->openNewWindow)
 		{
 			AttemptToNotifyExistingProcess(existingWindow, commandLineSettings->directories);
 			return false;

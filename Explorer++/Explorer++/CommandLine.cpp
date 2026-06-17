@@ -7,8 +7,10 @@
 #include "CommandLineSplitter.h"
 #include "ExitCode.h"
 #include "../Helper/StringHelper.h"
+#include "../Helper/ShellHelper.h"
 #include <CLI/CLI.hpp>
 #include <boost/pfr.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 // Allows std::wstring to be used as a custom type for add_option.
@@ -46,14 +48,14 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 
 	Settings settings;
 
-	app.add_flag("--clear-registry-settings", settings.clearRegistrySettings,
+	app.add_flag("-c,--clear-settings", settings.clearRegistrySettings,
 		"Clear existing registry settings");
 
-	auto removeAsDefaultOption = app.add_flag("--remove-as-default", settings.removeAsDefault,
+	auto removeAsDefaultOption = app.add_flag("-r,--remove-default", settings.removeAsDefault,
 		"Remove Explorer++ as the default file manager");
 
 	auto setAsDefaultOption =
-		app.add_option("--set-as-default", settings.replaceExplorerMode,
+		app.add_option("-d,--set-default", settings.replaceExplorerMode,
 			   "Set Explorer++ as the default file manager for the current user")
 			->transform(CLI::CheckedTransformer(
 				CLI::TransformPairs<DefaultFileManager::ReplaceExplorerMode>{
@@ -85,7 +87,7 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 	privateCommands->add_option(wstrToUtf8Str(PASTE_SYMLINKS_ARGUMENT),
 		settings.pasteSymLinksDestination);
 
-	app.add_flag("--enable-logging", settings.enableLogging, "Enable logging");
+	app.add_flag("-l,--log", settings.enableLogging, "Enable logging");
 
 	std::map<std::string, Feature> featureMap;
 
@@ -94,17 +96,17 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 		featureMap.insert({ item._to_string(), item });
 	}
 
-	app.add_option("--enable-features", settings.featuresToEnable,
+	app.add_option("-f,--features", settings.featuresToEnable,
 		   "Allows incomplete features that are disabled by default to be enabled")
 		->transform(CLI::CheckedTransformer(featureMap));
 
-	app.add_option("--change-notify-mode", settings.changeNotifyMode,
+	app.add_option("-n,--notify", settings.changeNotifyMode,
 		   "Allows the directory change implementation to be selected")
 		->transform(CLI::CheckedTransformer(
 			CLI::TransformPairs<ChangeNotifyMode>{ { "shell", ChangeNotifyMode::Shell },
 				{ "filesystem", ChangeNotifyMode::Filesystem } }));
 
-	app.add_option("--language", settings.language,
+	app.add_option("-L,--lang", settings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
 		"FR, RU, etc).");
 
@@ -116,7 +118,7 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 	//
 	// That could mean: select two items (c:\windows and c:\users\public) or select one item
 	// (c:\windows) and open a directory (c:\users\public).
-	app.add_option("--select", settings.filesToSelect,
+	app.add_option("-s,--select", settings.filesToSelect,
 		   R"(When supplied a path like "C:\path\to\file", will open "C:\path\to" in a tab and )"
 		   R"(select "file". This option can be supplied multiple times, in which case each path )"
 		   "will be opened in a separate tab.")
@@ -142,16 +144,127 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 	CHECK(!splitResult.arguments.empty());
 	splitResult.arguments.erase(splitResult.arguments.begin());
 
+	// Process Windows Explorer style arguments and resolve relative paths.
+	auto currentDirectory = GetCurrentDirectoryWrapper();
+	std::vector<std::string> finalArguments;
+
+	for (size_t i = 0; i < splitResult.arguments.size(); ++i)
+	{
+		const std::string &arg = splitResult.arguments[i];
+		std::wstring wArg = utf8StrToWstr(arg);
+		std::wstring wArgLower = wArg;
+		boost::algorithm::to_lower(wArgLower);
+
+		if (wArgLower == L"/n")
+		{
+			settings.openNewWindow = true;
+			continue;
+		}
+		else if (wArgLower == L"/e")
+		{
+			// /e is default behavior for Explorer++ (explorer view)
+			continue;
+		}
+		else if (wArgLower.length() >= 8 && wArgLower.substr(0, 8) == L"/select,")
+		{
+			std::wstring path = wArg.substr(8);
+			if (currentDirectory)
+			{
+				auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(path,
+					currentDirectory.value(), EnvVarsExpansion::DontExpand);
+				if (absolutePath)
+				{
+					settings.filesToSelect.push_back(absolutePath.value());
+				}
+				else
+				{
+					settings.filesToSelect.push_back(path);
+				}
+			}
+			else
+			{
+				settings.filesToSelect.push_back(path);
+			}
+			continue;
+		}
+		else if (wArgLower == L"/select")
+		{
+			if (i + 1 < splitResult.arguments.size())
+			{
+				std::wstring path = utf8StrToWstr(splitResult.arguments[++i]);
+				if (currentDirectory)
+				{
+					auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(path,
+						currentDirectory.value(), EnvVarsExpansion::DontExpand);
+					if (absolutePath)
+					{
+						settings.filesToSelect.push_back(absolutePath.value());
+					}
+					else
+					{
+						settings.filesToSelect.push_back(path);
+					}
+				}
+				else
+				{
+					settings.filesToSelect.push_back(path);
+				}
+			}
+			continue;
+		}
+
+		// If it's not a special / argument, it might be a directory or a standard flag.
+		// If it doesn't start with - or /, try to resolve it as a relative path if it's likely a directory.
+		if (!arg.empty() && arg[0] != '-' && arg[0] != '/')
+		{
+			// Check if previous argument was a flag that expects a non-path value
+			bool isFlagValue = false;
+			if (i > 0)
+			{
+				const std::string &prevArg = splitResult.arguments[i - 1];
+				if (prevArg == "-L" || prevArg == "--lang" || prevArg == "--language" ||
+					prevArg == "-f" || prevArg == "--features" || prevArg == "--enable-features" ||
+					prevArg == "-n" || prevArg == "--notify" || prevArg == "--change-notify-mode" ||
+					prevArg == "-d" || prevArg == "--set-default" || prevArg == "--set-as-default")
+				{
+					isFlagValue = true;
+				}
+			}
+
+			if (!isFlagValue && currentDirectory)
+			{
+				auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(wArg,
+					currentDirectory.value(), EnvVarsExpansion::DontExpand);
+				if (absolutePath)
+				{
+					finalArguments.push_back(wstrToUtf8Str(absolutePath.value()));
+					continue;
+				}
+			}
+		}
+
+		finalArguments.push_back(arg);
+	}
+
 	// CLI11 requires arguments be provided in reverse order.
-	std::reverse(splitResult.arguments.begin(), splitResult.arguments.end());
+	std::reverse(finalArguments.begin(), finalArguments.end());
 
 	try
 	{
-		app.parse(splitResult.arguments);
+		app.parse(finalArguments);
 	}
 	catch (const CLI::ParseError &e)
 	{
-		return ExitInfo{ app.exit(e) };
+		auto exitCode = app.exit(e);
+
+		// If we are in a console, we want to return the cursor.
+		// Sending a VK_RETURN to the console window can help.
+		if (GetConsoleWindow() != nullptr)
+		{
+			PostMessage(GetConsoleWindow(), WM_KEYDOWN, VK_RETURN, 0);
+		}
+
+		return ExitInfo{ exitCode };
 	}
 
 	return settings;

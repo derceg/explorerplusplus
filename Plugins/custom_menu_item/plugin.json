@@ -1,0 +1,7 @@
+{
+  "name": "Custom Menu Item",
+  "description": "Demonstrates how to add a custom menu item to the Explorer++ menu.",
+  "file": "custom_menu_item.lua",
+  "version": "1.0",
+  "author": "Explorer++ Team"
+}

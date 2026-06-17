@@ -1,0 +1,7 @@
+{
+  "name": "Session Manager",
+  "description": "Quickly opens a predefined set of directories.",
+  "file": "session_manager.lua",
+  "version": "1.0",
+  "author": "Explorer++ Team"
+}
