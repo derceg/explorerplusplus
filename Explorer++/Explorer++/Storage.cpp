@@ -28,4 +28,12 @@ std::wstring GetConfigFilePath()
 	return configFilePath.c_str();
 }
 
+std::wstring GetFrequentLocationsFilePath()
+{
+	std::filesystem::path frequentLocationsFilePath(GetConfigFilePath());
+	frequentLocationsFilePath.replace_filename(FREQUENT_LOCATIONS_FILE_FILENAME);
+
+	return frequentLocationsFilePath.c_str();
+}
+
 }

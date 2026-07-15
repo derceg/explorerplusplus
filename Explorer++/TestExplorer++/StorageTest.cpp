@@ -25,3 +25,21 @@ TEST(StorageTest, ConfigEnvVar)
 	path = Storage::GetConfigFilePath();
 	ASSERT_TRUE(path.ends_with(L"config.xml"));
 }
+
+TEST(StorageTest, FrequentLocationsFilePath)
+{
+	auto set = SetEnvironmentVariable(Storage::CONFIG_FILE_ENV_VAR_NAME, NULL);
+	ASSERT_TRUE(set);
+	auto path = Storage::GetFrequentLocationsFilePath();
+	ASSERT_TRUE(path.ends_with(L"frequent_locations.xml"));
+
+	set = SetEnvironmentVariable(L"FOO", L"BAR");
+	ASSERT_TRUE(set);
+	set = SetEnvironmentVariable(Storage::CONFIG_FILE_ENV_VAR_NAME, L"%FOO%\\explorerpp.xml");
+	ASSERT_TRUE(set);
+	path = Storage::GetFrequentLocationsFilePath();
+	ASSERT_EQ(path, L"BAR\\frequent_locations.xml");
+
+	set = SetEnvironmentVariable(Storage::CONFIG_FILE_ENV_VAR_NAME, NULL);
+	ASSERT_TRUE(set);
+}
