@@ -179,7 +179,8 @@ TEST_F(BookmarksToolbarFontTest, UsesConfiguredFontOnStartup)
 	ASSERT_NE(toolbarFont, nullptr);
 
 	LOGFONT toolbarLogFont;
-	ASSERT_EQ(GetObject(toolbarFont, sizeof(toolbarLogFont), &toolbarLogFont), sizeof(toolbarLogFont));
+	ASSERT_EQ(GetObject(toolbarFont, sizeof(toolbarLogFont), &toolbarLogFont),
+		static_cast<int>(sizeof(toolbarLogFont)));
 
 	auto expectedFont = CreateFontFromNameAndSize(L"Segoe UI", 15,
 		m_bookmarksToolbarView->GetHWND());
@@ -187,7 +188,7 @@ TEST_F(BookmarksToolbarFontTest, UsesConfiguredFontOnStartup)
 
 	LOGFONT expectedLogFont;
 	ASSERT_EQ(GetObject(expectedFont.get(), sizeof(expectedLogFont), &expectedLogFont),
-		sizeof(expectedLogFont));
+		static_cast<int>(sizeof(expectedLogFont)));
 
 	EXPECT_EQ(toolbarLogFont, expectedLogFont);
 }
