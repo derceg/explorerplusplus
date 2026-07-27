@@ -22,26 +22,31 @@ jobs:
             platform: x64
             runner: windows-2022
             msbuild-architecture: x64
+            publish: false
 
           - configuration: Release-Clang
             platform: x64
             runner: windows-2022
             msbuild-architecture: x64
+            publish: false
 
           - configuration: Release
             platform: Win32
             runner: windows-2022
             msbuild-architecture: x64
+            publish: true
 
           - configuration: Release
             platform: x64
             runner: windows-2022
             msbuild-architecture: x64
+            publish: true
 
           - configuration: Release
             platform: ARM64
             runner: windows-11-arm
             msbuild-architecture: arm64
+            publish: true
 
     runs-on: ${{ matrix.runner }}
 
@@ -70,3 +75,16 @@ jobs:
 
       - name: Run tests
         run: ./.github/run_tests.ps1 -Configuration '${{ matrix.configuration }}' -Platform '${{ matrix.platform }}'
+
+      - name: Package artifacts
+        if: matrix.publish
+        run: ./.github/package.ps1 -Configuration '${{ matrix.configuration }}' -Platform '${{ matrix.platform }}'
+
+      - name: Upload artifacts
+        if: matrix.publish
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: Explorer++.${{ matrix.configuration }}.${{ matrix.platform }}
+          path: artifacts
+          if-no-files-found: error
+          compression-level: 0
