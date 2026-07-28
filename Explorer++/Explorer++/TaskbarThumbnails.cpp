@@ -319,7 +319,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 		return 0;
 
 	case WM_SETFOCUS:
-		SetFocus(tab->GetShellBrowserImpl()->GetListView());
+		tab->FocusContent();
 		break;
 
 	case WM_SYSCOMMAND:
@@ -329,7 +329,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 			break;
 
 		default:
-			SendMessage(tab->GetShellBrowserImpl()->GetListView(), WM_SYSCOMMAND, wParam, lParam);
+			SendMessage(tab->GetContentWindow(), WM_SYSCOMMAND, wParam, lParam);
 			break;
 		}
 		break;
@@ -359,8 +359,8 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM 
 			wil::unique_hbitmap bitmap = GetTabLivePreviewBitmap(*tab);
 
 			RECT rcTab;
-			GetClientRect(tab->GetShellBrowserImpl()->GetListView(), &rcTab);
-			MapWindowPoints(tab->GetShellBrowserImpl()->GetListView(), m_browser->GetHWND(),
+			GetClientRect(tab->GetContentWindow(), &rcTab);
+			MapWindowPoints(tab->GetContentWindow(), m_browser->GetHWND(),
 				reinterpret_cast<LPPOINT>(&rcTab), 2);
 
 			MENUBARINFO mbi;
@@ -491,31 +491,31 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 
 	/* Now draw the tab onto the main window. */
 	RECT rcTab;
-	GetClientRect(tab.GetShellBrowserImpl()->GetListView(), &rcTab);
+	GetClientRect(tab.GetContentWindow(), &rcTab);
 
-	wil::unique_hdc_window hdcTab = wil::GetDC(tab.GetShellBrowserImpl()->GetListView());
+	wil::unique_hdc_window hdcTab = wil::GetDC(tab.GetContentWindow());
 	wil::unique_hdc hdcTabSrc(CreateCompatibleDC(hdcTab.get()));
 	wil::unique_hbitmap hbmTab(
 		CreateCompatibleBitmap(hdcTab.get(), GetRectWidth(&rcTab), GetRectHeight(&rcTab)));
 
 	auto tabPreviousBitmap = wil::SelectObject(hdcTabSrc.get(), hbmTab.get());
 
-	BOOL bVisible = IsWindowVisible(tab.GetShellBrowserImpl()->GetListView());
+	BOOL bVisible = IsWindowVisible(tab.GetContentWindow());
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.GetShellBrowserImpl()->GetListView(), SW_SHOW);
+		ShowWindow(tab.GetContentWindow(), SW_SHOW);
 	}
 
-	PrintWindow(tab.GetShellBrowserImpl()->GetListView(), hdcTabSrc.get(), PW_CLIENTONLY);
+	PrintWindow(tab.GetContentWindow(), hdcTabSrc.get(), PW_CLIENTONLY);
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.GetShellBrowserImpl()->GetListView(), SW_HIDE);
+		ShowWindow(tab.GetContentWindow(), SW_HIDE);
 	}
 
-	MapWindowPoints(tab.GetShellBrowserImpl()->GetListView(), m_browser->GetHWND(),
-		reinterpret_cast<LPPOINT>(&rcTab), 2);
+	MapWindowPoints(tab.GetContentWindow(), m_browser->GetHWND(), reinterpret_cast<LPPOINT>(&rcTab),
+		2);
 	BitBlt(hdcSrc.get(), rcTab.left, rcTab.top, GetRectWidth(&rcTab), GetRectHeight(&rcTab),
 		hdcTabSrc.get(), 0, 0, SRCCOPY);
 
@@ -544,11 +544,11 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 
 wil::unique_hbitmap TaskbarThumbnails::GetTabLivePreviewBitmap(const Tab &tab)
 {
-	wil::unique_hdc_window hdcTab = wil::GetDC(tab.GetShellBrowserImpl()->GetListView());
+	wil::unique_hdc_window hdcTab = wil::GetDC(tab.GetContentWindow());
 	wil::unique_hdc hdcTabSrc(CreateCompatibleDC(hdcTab.get()));
 
 	RECT rcTab;
-	GetClientRect(tab.GetShellBrowserImpl()->GetListView(), &rcTab);
+	GetClientRect(tab.GetContentWindow(), &rcTab);
 
 	wil::unique_hbitmap hbmTab;
 	Gdiplus::Color color(0, 0, 0);
@@ -557,18 +557,18 @@ wil::unique_hbitmap TaskbarThumbnails::GetTabLivePreviewBitmap(const Tab &tab)
 
 	auto tabPreviousBitmap = wil::SelectObject(hdcTabSrc.get(), hbmTab.get());
 
-	BOOL bVisible = IsWindowVisible(tab.GetShellBrowserImpl()->GetListView());
+	BOOL bVisible = IsWindowVisible(tab.GetContentWindow());
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.GetShellBrowserImpl()->GetListView(), SW_SHOW);
+		ShowWindow(tab.GetContentWindow(), SW_SHOW);
 	}
 
-	PrintWindow(tab.GetShellBrowserImpl()->GetListView(), hdcTabSrc.get(), PW_CLIENTONLY);
+	PrintWindow(tab.GetContentWindow(), hdcTabSrc.get(), PW_CLIENTONLY);
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.GetShellBrowserImpl()->GetListView(), SW_HIDE);
+		ShowWindow(tab.GetContentWindow(), SW_HIDE);
 	}
 
 	SetStretchBltMode(hdcTabSrc.get(), HALFTONE);

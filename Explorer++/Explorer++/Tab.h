@@ -6,12 +6,14 @@
 
 #include <boost/core/noncopyable.hpp>
 #include <memory>
+#include <optional>
 
 class BrowserWindow;
 class ShellBrowser;
 class ShellBrowserImpl;
 class TabContainer;
 class TabEvents;
+class TerminalHost;
 struct TabStorageData;
 
 class Tab : private boost::noncopyable
@@ -47,11 +49,20 @@ public:
 		TabContainer *tabContainer, TabEvents *tabEvents);
 	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 		TabContainer *tabContainer, TabEvents *tabEvents, const InitialData &initialData);
+	~Tab();
 
 	int GetId() const;
 
 	ShellBrowser *GetShellBrowser() const;
 	ShellBrowserImpl *GetShellBrowserImpl() const;
+
+	bool IsTerminal() const;
+	void SetTerminalHost(std::unique_ptr<TerminalHost> terminalHost);
+	void SetTerminalFontSize(int fontSize);
+	HWND GetContentWindow() const;
+	void SetContentBounds(int x, int y, int width, int height, bool visible);
+	void FocusContent() const;
+	std::optional<std::wstring> GetTerminalDirectory() const;
 
 	BrowserWindow *GetBrowser() const;
 	TabContainer *GetTabContainer() const;
@@ -84,12 +95,15 @@ private:
 	};
 
 	void ApplyLockState(LockState lockState, NotificationMode notificationMode);
+	void OnTerminalDirectoryChanged(const std::wstring &directory);
 
 	static inline int idCounter = 1;
 	const int m_id;
 
 	const std::unique_ptr<ShellBrowser> m_shellBrowser;
 	ShellBrowserImpl *const m_shellBrowserImpl;
+	std::unique_ptr<TerminalHost> m_terminalHost;
+	std::optional<std::wstring> m_terminalDirectory;
 
 	BrowserWindow *const m_browser;
 	TabContainer *const m_tabContainer;

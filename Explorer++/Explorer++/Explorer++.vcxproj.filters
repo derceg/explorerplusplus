@@ -169,6 +169,9 @@
     <ClCompile Include="Tab.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="TerminalHost.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
     <ClCompile Include="Plugins\Event.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -1018,6 +1021,9 @@
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="Tab.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TerminalHost.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="Plugins\MenuApi.h">

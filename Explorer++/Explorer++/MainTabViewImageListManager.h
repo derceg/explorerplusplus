@@ -30,6 +30,7 @@ public:
 	bool IsDefaultIcon(int iconIndex) const;
 	int GetLockIconIndex() const;
 	int GetDefaultFolderIconIndex() const;
+	int GetCommandLineIconIndex() const;
 
 private:
 	static constexpr int ICON_SIZE_96DPI = 16;
@@ -40,4 +41,5 @@ private:
 	wil::unique_himagelist m_imageList;
 	int m_defaultFolderIconIndex;
 	int m_lockIconIndex;
+	int m_commandLineIconIndex;
 };

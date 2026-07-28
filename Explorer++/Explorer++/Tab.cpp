@@ -10,6 +10,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
+#include "TerminalHost.h"
 
 Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	TabContainer *tabContainer, TabEvents *tabEvents) :
@@ -50,6 +51,8 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	ApplyLockState(initialData.lockState, NotificationMode::DontNotify);
 }
 
+Tab::~Tab() = default;
+
 int Tab::GetId() const
 {
 	return m_id;
@@ -63,6 +66,77 @@ ShellBrowser *Tab::GetShellBrowser() const
 ShellBrowserImpl *Tab::GetShellBrowserImpl() const
 {
 	return m_shellBrowserImpl;
+}
+
+bool Tab::IsTerminal() const
+{
+	return m_terminalHost != nullptr;
+}
+
+void Tab::SetTerminalHost(std::unique_ptr<TerminalHost> terminalHost)
+{
+	CHECK(!m_terminalHost);
+	CHECK(terminalHost);
+
+	HWND listView = m_shellBrowserImpl->GetListView();
+	RECT bounds{};
+	GetWindowRect(listView, &bounds);
+	MapWindowPoints(nullptr, GetParent(terminalHost->GetHWND()), reinterpret_cast<POINT *>(&bounds),
+		2);
+
+	terminalHost->SetBounds(bounds.left, bounds.top, bounds.right - bounds.left,
+		bounds.bottom - bounds.top, false);
+	terminalHost->SetDirectoryChangedCallback(
+		std::bind_front(&Tab::OnTerminalDirectoryChanged, this));
+	ShowWindow(listView, SW_HIDE);
+	m_terminalHost = std::move(terminalHost);
+	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
+}
+
+void Tab::SetTerminalFontSize(int fontSize)
+{
+	if (m_terminalHost)
+	{
+		m_terminalHost->SetFontSize(fontSize);
+	}
+}
+
+HWND Tab::GetContentWindow() const
+{
+	if (m_terminalHost)
+	{
+		return m_terminalHost->GetHWND();
+	}
+
+	return m_shellBrowserImpl->GetListView();
+}
+
+void Tab::SetContentBounds(int x, int y, int width, int height, bool visible)
+{
+	if (m_terminalHost)
+	{
+		m_terminalHost->SetBounds(x, y, width, height, visible);
+		return;
+	}
+
+	UINT flags = SWP_NOZORDER | (visible ? SWP_SHOWWINDOW : SWP_HIDEWINDOW);
+	SetWindowPos(m_shellBrowserImpl->GetListView(), nullptr, x, y, width, height, flags);
+}
+
+void Tab::FocusContent() const
+{
+	if (m_terminalHost)
+	{
+		m_terminalHost->Focus();
+		return;
+	}
+
+	SetFocus(m_shellBrowserImpl->GetListView());
+}
+
+std::optional<std::wstring> Tab::GetTerminalDirectory() const
+{
+	return m_terminalDirectory;
 }
 
 BrowserWindow *Tab::GetBrowser() const
@@ -79,6 +153,19 @@ TabContainer *Tab::GetTabContainer() const
 // display name of the current directory will be returned.
 std::wstring Tab::GetName() const
 {
+	if (m_terminalDirectory)
+	{
+		auto path = std::filesystem::path(*m_terminalDirectory);
+
+		while (!path.has_filename() && path != path.root_path())
+		{
+			path = path.parent_path();
+		}
+
+		auto name = path.filename().wstring();
+		return name.empty() ? path.root_path().wstring() : name;
+	}
+
 	if (m_useCustomName)
 	{
 		return m_customName;
@@ -86,6 +173,17 @@ std::wstring Tab::GetName() const
 
 	auto *entry = m_shellBrowser->GetNavigationController()->GetCurrentEntry();
 	return GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER);
+}
+
+void Tab::OnTerminalDirectoryChanged(const std::wstring &directory)
+{
+	if (directory.empty() || m_terminalDirectory == directory)
+	{
+		return;
+	}
+
+	m_terminalDirectory = directory;
+	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
 }
 
 bool Tab::GetUseCustomName() const

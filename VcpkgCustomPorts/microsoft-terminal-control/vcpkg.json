@@ -1,0 +1,7 @@
+{
+  "name": "microsoft-terminal-control",
+  "version": "1.22.250204002",
+  "description": "Native Windows Terminal control used by the embedded terminal tab.",
+  "homepage": "https://github.com/microsoft/terminal",
+  "license": "MIT"
+}

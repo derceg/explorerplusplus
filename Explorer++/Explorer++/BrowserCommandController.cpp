@@ -507,8 +507,27 @@ void BrowserCommandController::OnCloseTab()
 
 void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 {
+	const auto *shellBrowser = GetActiveShellBrowser();
+
+	wil::unique_cotaskmem_string directoryPath;
+	HRESULT hr =
+		SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(), SIGDN_FILESYSPATH, &directoryPath);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	if (!WI_IsFlagSet(flags, LaunchProcessFlags::Elevated)
+		&& m_browser->GetActiveTabContainer()->CreateNewTerminalTab(directoryPath.get()))
+	{
+		return;
+	}
+
+	// Elevated terminal processes can't be hosted safely inside this unelevated window. Also retain
+	// this path as a fallback when Windows Terminal Control or ConPTY isn't available.
 	wil::unique_cotaskmem_string systemPath;
-	HRESULT hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
+	hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
 
 	if (FAILED(hr))
 	{
@@ -517,16 +536,6 @@ void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 
 	std::filesystem::path fullPath(systemPath.get());
 	fullPath /= L"cmd.exe";
-
-	const auto *shellBrowser = GetActiveShellBrowser();
-
-	wil::unique_cotaskmem_string directoryPath;
-	hr = SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(), SIGDN_FILESYSPATH, &directoryPath);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
 
 	std::wstring parameters;
 

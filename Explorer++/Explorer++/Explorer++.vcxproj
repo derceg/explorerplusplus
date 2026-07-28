@@ -1496,6 +1496,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release-Clang|ARM64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="Tab.cpp" />
+    <ClCompile Include="TerminalHost.cpp" />
     <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
     <ClCompile Include="TabHandler.cpp" />
@@ -1843,6 +1844,7 @@
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />
+    <ClInclude Include="TerminalHost.h" />
     <ClInclude Include="TabBacking.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />
@@ -1945,6 +1947,12 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CopyMicrosoftTerminalControl" AfterTargets="Build">
+    <Copy
+      SourceFiles="$(ProjectDir)..\..\vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\microsoft-terminal-control\Microsoft.Terminal.Control.dll"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true" />
+  </Target>
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>

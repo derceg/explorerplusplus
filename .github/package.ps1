@@ -38,6 +38,7 @@ $repositoryRoot = $PWD.Path
 
 $applicationFiles = @(
     "$repositoryRoot\Explorer++\Explorer++\$Platform\$Configuration\Explorer++.exe"
+    "$repositoryRoot\Explorer++\Explorer++\$Platform\$Configuration\Microsoft.Terminal.Control.dll"
     "$repositoryRoot\Documentation\User\History.txt"
     "$repositoryRoot\Documentation\User\License.txt"
     "$repositoryRoot\Documentation\User\Readme.txt"

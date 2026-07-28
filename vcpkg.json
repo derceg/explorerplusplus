@@ -29,6 +29,7 @@
     "glog",
     "gtest",
     "lua",
+    "microsoft-terminal-control",
     "nlohmann-json",
     "pegtl",
     "sol2",
