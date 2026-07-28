@@ -16,6 +16,7 @@ environment:
     secure: vl0ntw9DjQdAno9nYVe0osg2tBmXD7gW75NLfxIvxMDW3GiVlJlFcESf7v6f7qKe
   PFX_PASS:
     secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
+  EXPLORERPLUSPLUS_BUILD_NUMBER: $(APPVEYOR_BUILD_NUMBER)
 
 cache:
   - vcpkg_installed -> vcpkg.json

@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  EXPLORERPLUSPLUS_BUILD_NUMBER: ${{ github.run_number }}
+
 jobs:
   build:
     name: ${{ matrix.configuration }} / ${{ matrix.platform }}

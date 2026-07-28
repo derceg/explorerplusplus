@@ -5,10 +5,10 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(EXPLORERPLUSPLUS_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(EXPLORERPLUSPLUS_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(EXPLORERPLUSPLUS_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(EXPLORERPLUSPLUS_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
