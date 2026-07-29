@@ -68,7 +68,8 @@ public:
 	MainTabView *GetView();
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
-	bool CreateNewTerminalTab(const std::wstring &directory);
+	bool CreateNewTerminalTab(const std::wstring &directory,
+		const std::wstring &initialCommand = L"");
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
 		const FolderColumns *initialColumns = nullptr);

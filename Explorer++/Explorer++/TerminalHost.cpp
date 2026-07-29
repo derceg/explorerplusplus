@@ -236,7 +236,8 @@ std::wstring QuoteArgument(const std::wstring &argument)
 class TerminalHost::Impl
 {
 public:
-	static std::unique_ptr<Impl> Create(HWND parent, const std::wstring &directory)
+	static std::unique_ptr<Impl> Create(HWND parent, const std::wstring &directory,
+		const std::wstring &initialCommand)
 	{
 		auto &terminalApi = TerminalControlApi::GetInstance();
 		auto &pseudoConsoleApi = PseudoConsoleApi::GetInstance();
@@ -272,7 +273,7 @@ public:
 			terminalApi.dpiChanged(impl->m_terminal, impl->m_dpi);
 		}
 
-		if (!impl->StartPseudoConsole(directory))
+		if (!impl->StartPseudoConsole(directory, initialCommand))
 		{
 			return nullptr;
 		}
@@ -426,7 +427,7 @@ private:
 		Impl *m_previousHost;
 	};
 
-	bool StartPseudoConsole(const std::wstring &directory)
+	bool StartPseudoConsole(const std::wstring &directory, const std::wstring &initialCommand)
 	{
 		SECURITY_ATTRIBUTES securityAttributes{ sizeof(securityAttributes), nullptr, TRUE };
 		HANDLE pseudoConsoleInputRead = nullptr;
@@ -508,6 +509,11 @@ private:
 		// OSC 9;9 is the Windows Terminal working-directory sequence. Emitting it as part of every
 		// prompt lets the tab title follow cd commands without polling or inspecting the process.
 		commandLine += L"prompt $E]9;9;$P$E\\$P$G";
+
+		if (!initialCommand.empty())
+		{
+			commandLine += L" & " + initialCommand;
+		}
 
 		STARTUPINFOEX startupInfo{};
 		startupInfo.StartupInfo.cb = sizeof(startupInfo);
@@ -991,9 +997,10 @@ private:
 	int m_accumulatedWheelDelta = 0;
 };
 
-std::unique_ptr<TerminalHost> TerminalHost::Create(HWND parent, const std::wstring &directory)
+std::unique_ptr<TerminalHost> TerminalHost::Create(HWND parent, const std::wstring &directory,
+	const std::wstring &initialCommand)
 {
-	auto impl = Impl::Create(parent, directory);
+	auto impl = Impl::Create(parent, directory, initialCommand);
 
 	if (!impl)
 	{

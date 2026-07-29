@@ -339,10 +339,11 @@ void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings
 	CreateNewTab(m_config->defaultTabDirectory, tabSettings);
 }
 
-bool TabContainer::CreateNewTerminalTab(const std::wstring &directory)
+bool TabContainer::CreateNewTerminalTab(const std::wstring &directory,
+	const std::wstring &initialCommand)
 {
 	auto &tab = CreateNewTab(directory);
-	auto terminalHost = TerminalHost::Create(m_browser->GetHWND(), directory);
+	auto terminalHost = TerminalHost::Create(m_browser->GetHWND(), directory, initialCommand);
 
 	if (!terminalHost)
 	{

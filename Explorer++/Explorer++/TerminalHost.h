@@ -12,7 +12,8 @@
 class TerminalHost : private boost::noncopyable
 {
 public:
-	static std::unique_ptr<TerminalHost> Create(HWND parent, const std::wstring &directory);
+	static std::unique_ptr<TerminalHost> Create(HWND parent, const std::wstring &directory,
+		const std::wstring &initialCommand);
 
 	~TerminalHost();
 

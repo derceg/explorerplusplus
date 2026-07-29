@@ -47,6 +47,50 @@
 #include <wil/resource.h>
 #include <algorithm>
 
+namespace
+{
+
+bool IsBatchFile(const std::filesystem::path &path)
+{
+	auto extension = path.extension().wstring();
+	return _wcsicmp(extension.c_str(), L".bat") == 0 || _wcsicmp(extension.c_str(), L".cmd") == 0;
+}
+
+bool TryOpenBatchFileInTerminal(TabContainer *tabContainer, const std::wstring &itemPath,
+	const std::wstring &parameters, const std::wstring &workingDirectory)
+{
+	std::filesystem::path batchPath(itemPath);
+
+	if (!IsBatchFile(batchPath))
+	{
+		return false;
+	}
+
+	if (batchPath.is_relative() && !workingDirectory.empty())
+	{
+		batchPath = std::filesystem::path(workingDirectory) / batchPath;
+	}
+
+	batchPath = batchPath.lexically_normal();
+	auto batchDirectory = batchPath.parent_path();
+
+	if (batchDirectory.empty())
+	{
+		return false;
+	}
+
+	std::wstring initialCommand = L"call \"" + batchPath.wstring() + L"\"";
+
+	if (!parameters.empty())
+	{
+		initialCommand += L" " + parameters;
+	}
+
+	return tabContainer->CreateNewTerminalTab(batchDirectory.wstring(), initialCommand);
+}
+
+}
+
 void Explorerplusplus::OpenDefaultItem(OpenFolderDisposition openFolderDisposition)
 {
 	OpenItem(m_config->defaultTabDirectory, openFolderDisposition);
@@ -236,15 +280,33 @@ void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
-	ExecuteFileAction(m_hContainer, itemPath, L"", parameters,
-		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
+	std::wstring workingDirectory =
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath();
+
+	if (TryOpenBatchFileInTerminal(GetActivePane()->GetTabContainer(), itemPath, parameters,
+			workingDirectory))
+	{
+		return;
+	}
+
+	ExecuteFileAction(m_hContainer, itemPath, L"", parameters, workingDirectory);
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters)
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
-	ExecuteFileAction(m_hContainer, pidlItem, L"", parameters,
-		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
+	std::wstring workingDirectory =
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath();
+	wil::unique_cotaskmem_string itemPath;
+
+	if (SUCCEEDED(SHGetNameFromIDList(pidlItem, SIGDN_FILESYSPATH, &itemPath)) && itemPath
+		&& TryOpenBatchFileInTerminal(GetActivePane()->GetTabContainer(), itemPath.get(),
+			parameters, workingDirectory))
+	{
+		return;
+	}
+
+	ExecuteFileAction(m_hContainer, pidlItem, L"", parameters, workingDirectory);
 }
 
 void Explorerplusplus::OnSize(UINT state)
