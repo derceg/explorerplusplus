@@ -34,14 +34,25 @@ struct TerminalTheme
 	COLORREF colorTable[16];
 };
 
+struct TerminalScrollState
+{
+	int viewTop;
+	int viewHeight;
+	int bufferSize;
+};
+
 class TerminalControlApi
 {
 public:
+	using ScrollCallback = void(__stdcall *)(int viewTop, int viewHeight, int bufferSize);
 	using WriteCallback = void(__stdcall *)(wchar_t *data);
 	using CreateTerminalFunction = HRESULT(__stdcall *)(HWND parent, HWND *window, void **terminal);
 	using DestroyTerminalFunction = void(__stdcall *)(void *terminal);
 	using SendOutputFunction = void(__stdcall *)(void *terminal, const wchar_t *data);
+	using RegisterScrollCallbackFunction = void(
+		__stdcall *)(void *terminal, ScrollCallback callback);
 	using RegisterWriteCallbackFunction = void(__stdcall *)(void *terminal, WriteCallback callback);
+	using UserScrollFunction = void(__stdcall *)(void *terminal, int viewTop);
 	using TriggerResizeFunction = HRESULT(
 		__stdcall *)(void *terminal, int width, int height, TerminalSize *dimensions);
 	using DpiChangedFunction = void(__stdcall *)(void *terminal, int dpi);
@@ -67,7 +78,9 @@ public:
 	CreateTerminalFunction createTerminal = nullptr;
 	DestroyTerminalFunction destroyTerminal = nullptr;
 	SendOutputFunction sendOutput = nullptr;
+	RegisterScrollCallbackFunction registerScrollCallback = nullptr;
 	RegisterWriteCallbackFunction registerWriteCallback = nullptr;
+	UserScrollFunction userScroll = nullptr;
 	TriggerResizeFunction triggerResize = nullptr;
 	DpiChangedFunction dpiChanged = nullptr;
 	SendKeyEventFunction sendKeyEvent = nullptr;
@@ -118,7 +131,9 @@ private:
 		bool resolved = Resolve(createTerminal, "CreateTerminal")
 			&& Resolve(destroyTerminal, "DestroyTerminal")
 			&& Resolve(sendOutput, "TerminalSendOutput")
+			&& Resolve(registerScrollCallback, "TerminalRegisterScrollCallback")
 			&& Resolve(registerWriteCallback, "TerminalRegisterWriteCallback")
+			&& Resolve(userScroll, "TerminalUserScroll")
 			&& Resolve(triggerResize, "TerminalTriggerResize")
 			&& Resolve(dpiChanged, "TerminalDpiChanged")
 			&& Resolve(sendKeyEvent, "TerminalSendKeyEvent")
@@ -187,6 +202,8 @@ constexpr std::wstring_view TERMINAL_FONT_FAMILY = L"Cascadia Mono";
 constexpr std::wstring_view CURRENT_DIRECTORY_SEQUENCE_PREFIX = L"\x1b]9;9;";
 const UINT TERMINAL_DIRECTORY_CHANGED_MESSAGE =
 	RegisterWindowMessage(L"Explorer++TerminalDirectoryChanged");
+const UINT TERMINAL_SCROLL_CHANGED_MESSAGE =
+	RegisterWindowMessage(L"Explorer++TerminalScrollChanged");
 
 std::string ToUtf8(std::wstring_view input)
 {
@@ -240,9 +257,20 @@ public:
 
 		impl->m_windowSubclass = std::make_unique<WindowSubclass>(impl->m_window,
 			std::bind_front(&Impl::WindowProcedure, impl.get()));
-		terminalApi.registerWriteCallback(impl->m_terminal, &Impl::OnTerminalWrite);
+
+		LONG_PTR windowStyle = GetWindowLongPtr(impl->m_window, GWL_STYLE);
+		SetWindowLongPtr(impl->m_window, GWL_STYLE, windowStyle | WS_VSCROLL);
+		SetWindowPos(impl->m_window, nullptr, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+
 		impl->m_dpi = DpiCompatibility::GetInstance().GetDpiForWindow(parent);
-		terminalApi.dpiChanged(impl->m_terminal, impl->m_dpi);
+		terminalApi.registerScrollCallback(impl->m_terminal, &Impl::OnTerminalScroll);
+		terminalApi.registerWriteCallback(impl->m_terminal, &Impl::OnTerminalWrite);
+
+		{
+			ScrollCallbackContext callbackContext(impl.get());
+			terminalApi.dpiChanged(impl->m_terminal, impl->m_dpi);
+		}
 
 		if (!impl->StartPseudoConsole(directory))
 		{
@@ -292,7 +320,9 @@ public:
 
 		if (m_terminal)
 		{
-			TerminalControlApi::GetInstance().destroyTerminal(m_terminal);
+			auto &terminalApi = TerminalControlApi::GetInstance();
+			terminalApi.registerScrollCallback(m_terminal, nullptr);
+			terminalApi.destroyTerminal(m_terminal);
 		}
 	}
 
@@ -306,10 +336,14 @@ public:
 		UINT flags = SWP_NOZORDER | SWP_NOACTIVATE | (visible ? SWP_SHOWWINDOW : SWP_HIDEWINDOW);
 		width = std::max(width, 1);
 		height = std::max(height, 1);
+		int scrollBarWidth =
+			DpiCompatibility::GetInstance().GetSystemMetricsForDpi(SM_CXVSCROLL, m_dpi);
+		int rendererWidth = std::max(width - scrollBarWidth, 1);
 
 		TerminalSize dimensions{};
 		auto &terminalApi = TerminalControlApi::GetInstance();
-		HRESULT result = terminalApi.triggerResize(m_terminal, width, height, &dimensions);
+		ScrollCallbackContext callbackContext(this);
+		HRESULT result = terminalApi.triggerResize(m_terminal, rendererWidth, height, &dimensions);
 
 		// TerminalTriggerResize sizes the renderer and also moves the terminal HWND to (0, 0).
 		// Position it within the Explorer++ client area after that internal resize.
@@ -342,6 +376,7 @@ public:
 		}
 
 		m_fontSize = terminalFontSize;
+		ScrollCallbackContext callbackContext(this);
 		TerminalControlApi::GetInstance().setTheme(m_terminal, DEFAULT_TERMINAL_THEME,
 			TERMINAL_FONT_FAMILY.data(), terminalFontSize, m_dpi);
 
@@ -371,6 +406,25 @@ public:
 
 private:
 	Impl() = default;
+
+	// The native scroll callback doesn't include the originating terminal. Terminal Core invokes it
+	// synchronously from API calls, so retain the host for the duration of each such call.
+	class ScrollCallbackContext
+	{
+	public:
+		explicit ScrollCallbackContext(Impl *host) : m_previousHost(s_scrollCallbackHost)
+		{
+			s_scrollCallbackHost = host;
+		}
+
+		~ScrollCallbackContext()
+		{
+			s_scrollCallbackHost = m_previousHost;
+		}
+
+	private:
+		Impl *m_previousHost;
+	};
 
 	bool StartPseudoConsole(const std::wstring &directory)
 	{
@@ -527,6 +581,7 @@ private:
 			MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, pending.data(),
 				static_cast<int>(prefixSize), output.data(), requiredSize);
 			InspectOutput(output);
+			ScrollCallbackContext callbackContext(this);
 			TerminalControlApi::GetInstance().sendOutput(m_terminal, output.c_str());
 			pending.erase(0, prefixSize);
 			return;
@@ -543,6 +598,7 @@ private:
 			MultiByteToWideChar(CP_UTF8, 0, pending.data(), static_cast<int>(pending.size()),
 				output.data(), requiredSize);
 			InspectOutput(output);
+			ScrollCallbackContext callbackContext(this);
 			TerminalControlApi::GetInstance().sendOutput(m_terminal, output.c_str());
 		}
 
@@ -634,6 +690,177 @@ private:
 		}
 	}
 
+	static void __stdcall OnTerminalScroll(int viewTop, int viewHeight, int bufferSize)
+	{
+		if (s_scrollCallbackHost)
+		{
+			s_scrollCallbackHost->QueueScrollChanged({ viewTop, viewHeight, bufferSize });
+		}
+	}
+
+	void QueueScrollChanged(const TerminalScrollState &scrollState)
+	{
+		// TerminalSendOutput runs on the pipe reader thread. Marshal scrollbar updates back to the
+		// window thread and coalesce them when output arrives rapidly.
+		bool shouldPostMessage = false;
+
+		{
+			std::scoped_lock lock(m_scrollMutex);
+			m_pendingScrollState = scrollState;
+
+			if (!m_scrollNotificationPending)
+			{
+				m_scrollNotificationPending = true;
+				shouldPostMessage = true;
+			}
+		}
+
+		if (shouldPostMessage && !PostMessage(m_window, TERMINAL_SCROLL_CHANGED_MESSAGE, 0, 0))
+		{
+			std::scoped_lock lock(m_scrollMutex);
+			m_scrollNotificationPending = false;
+		}
+	}
+
+	void NotifyScrollChanged()
+	{
+		std::optional<TerminalScrollState> scrollState;
+
+		{
+			std::scoped_lock lock(m_scrollMutex);
+			scrollState = std::move(m_pendingScrollState);
+			m_pendingScrollState.reset();
+			m_scrollNotificationPending = false;
+		}
+
+		if (!scrollState)
+		{
+			return;
+		}
+
+		SCROLLINFO scrollInfo{ sizeof(scrollInfo) };
+		scrollInfo.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_DISABLENOSCROLL;
+		scrollInfo.nMin = 0;
+		scrollInfo.nMax = std::max(scrollState->bufferSize - 1, 0);
+		scrollInfo.nPage = static_cast<UINT>(std::max(scrollState->viewHeight, 0));
+		scrollInfo.nPos = std::max(scrollState->viewTop, 0);
+		SetScrollInfo(m_window, SB_VERT, &scrollInfo, TRUE);
+	}
+
+	void ScrollTo(int position)
+	{
+		SCROLLINFO scrollInfo{ sizeof(scrollInfo) };
+		scrollInfo.fMask = SIF_ALL;
+
+		if (!GetScrollInfo(m_window, SB_VERT, &scrollInfo))
+		{
+			return;
+		}
+
+		int maximumPosition =
+			std::max(scrollInfo.nMin, scrollInfo.nMax - static_cast<int>(scrollInfo.nPage) + 1);
+		int newPosition = std::clamp(position, scrollInfo.nMin, maximumPosition);
+
+		if (newPosition == scrollInfo.nPos)
+		{
+			return;
+		}
+
+		scrollInfo.fMask = SIF_POS;
+		scrollInfo.nPos = newPosition;
+		SetScrollInfo(m_window, SB_VERT, &scrollInfo, TRUE);
+
+		ScrollCallbackContext callbackContext(this);
+		TerminalControlApi::GetInstance().userScroll(m_terminal, newPosition);
+	}
+
+	void OnVerticalScroll(WORD request)
+	{
+		SCROLLINFO scrollInfo{ sizeof(scrollInfo) };
+		scrollInfo.fMask = SIF_ALL;
+
+		if (!GetScrollInfo(m_window, SB_VERT, &scrollInfo))
+		{
+			return;
+		}
+
+		int position = scrollInfo.nPos;
+
+		switch (request)
+		{
+		case SB_TOP:
+			position = scrollInfo.nMin;
+			break;
+
+		case SB_BOTTOM:
+			position = scrollInfo.nMax;
+			break;
+
+		case SB_LINEUP:
+			--position;
+			break;
+
+		case SB_LINEDOWN:
+			++position;
+			break;
+
+		case SB_PAGEUP:
+			position -= std::max(static_cast<int>(scrollInfo.nPage), 1);
+			break;
+
+		case SB_PAGEDOWN:
+			position += std::max(static_cast<int>(scrollInfo.nPage), 1);
+			break;
+
+		case SB_THUMBPOSITION:
+		case SB_THUMBTRACK:
+			position = scrollInfo.nTrackPos;
+			break;
+
+		default:
+			return;
+		}
+
+		ScrollTo(position);
+	}
+
+	void OnMouseWheel(WPARAM wParam)
+	{
+		UINT scrollLines = 0;
+
+		if (!SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &scrollLines, 0) || scrollLines == 0)
+		{
+			return;
+		}
+
+		m_accumulatedWheelDelta += GET_WHEEL_DELTA_WPARAM(wParam);
+
+		SCROLLINFO scrollInfo{ sizeof(scrollInfo) };
+		scrollInfo.fMask = SIF_PAGE | SIF_POS;
+
+		if (!GetScrollInfo(m_window, SB_VERT, &scrollInfo))
+		{
+			return;
+		}
+
+		int positionDelta;
+
+		if (scrollLines == WHEEL_PAGESCROLL)
+		{
+			int pageCount = m_accumulatedWheelDelta / WHEEL_DELTA;
+			m_accumulatedWheelDelta %= WHEEL_DELTA;
+			positionDelta = -pageCount * std::max(static_cast<int>(scrollInfo.nPage), 1);
+		}
+		else
+		{
+			int deltaPerLine = std::max(WHEEL_DELTA / static_cast<int>(scrollLines), 1);
+			positionDelta = -m_accumulatedWheelDelta / deltaPerLine;
+			m_accumulatedWheelDelta %= deltaPerLine;
+		}
+
+		ScrollTo(scrollInfo.nPos + positionDelta);
+	}
+
 	static void __stdcall OnTerminalWrite(wchar_t *data)
 	{
 		std::wstring input;
@@ -680,6 +907,12 @@ private:
 			return 0;
 		}
 
+		if (message == TERMINAL_SCROLL_CHANGED_MESSAGE)
+		{
+			NotifyScrollChanged();
+			return 0;
+		}
+
 		auto &terminalApi = TerminalControlApi::GetInstance();
 		unsigned short scanCode = static_cast<unsigned short>((lParam >> 16) & 0xff);
 		unsigned short flags = static_cast<unsigned short>((lParam >> 16) & 0xff00);
@@ -690,6 +923,17 @@ private:
 			SetActive();
 			SetFocus(hwnd);
 			break;
+
+		case WM_MOUSEWHEEL:
+		{
+			LRESULT result = DefSubclassProc(hwnd, message, wParam, lParam);
+			OnMouseWheel(wParam);
+			return result;
+		}
+
+		case WM_VSCROLL:
+			OnVerticalScroll(LOWORD(wParam));
+			return 0;
 
 		case WM_SETFOCUS:
 			SetActive();
@@ -723,6 +967,7 @@ private:
 
 	static inline std::mutex s_activeHostMutex;
 	static inline Impl *s_activeHost = nullptr;
+	static inline thread_local Impl *s_scrollCallbackHost = nullptr;
 
 	HWND m_window = nullptr;
 	void *m_terminal = nullptr;
@@ -740,6 +985,10 @@ private:
 	std::optional<std::wstring> m_pendingDirectory;
 	bool m_directoryNotificationPending = false;
 	std::function<void(const std::wstring &)> m_directoryChangedCallback;
+	std::mutex m_scrollMutex;
+	std::optional<TerminalScrollState> m_pendingScrollState;
+	bool m_scrollNotificationPending = false;
+	int m_accumulatedWheelDelta = 0;
 };
 
 std::unique_ptr<TerminalHost> TerminalHost::Create(HWND parent, const std::wstring &directory)
