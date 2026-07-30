@@ -8,18 +8,24 @@ on:
 
 permissions: {}
 
-env:
-  EXPLORERPLUSPLUS_BUILD_NUMBER: ${{ github.run_number }}
-
 jobs:
-  classify:
-    name: Classify
+  before-build:
+    name: Before build
     runs-on: ubuntu-slim
 
     outputs:
+      build-number: ${{ steps.build-number.outputs.build-number }}
       deployment-environment: ${{ steps.classify.outputs.environment }}
 
     steps:
+      # Note that the offset below brings the build number in line with the previous AppVeyor build number.
+      - name: Calculate build number
+        id: build-number
+        shell: pwsh
+        run: |
+          $buildNumber = [int] '${{ github.run_number }}' + 2809
+          "build-number=$buildNumber" >> $env:GITHUB_OUTPUT
+
       # This classifies the build type for deployment. When set, it indicates that a deployment will take place. This
       # won't be set for unofficial builds (e.g. pull request builds).
       - name: Classify build type
@@ -41,7 +47,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.configuration }} / ${{ matrix.platform }}
-    needs: classify
+    needs: before-build
 
     permissions:
       attestations: write
@@ -106,7 +112,13 @@ jobs:
         run: Explorer++/ThirdParty/vcpkg/bootstrap-vcpkg.bat
 
       - name: Build
-        run: msbuild Explorer++/Explorer++.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /v:minimal
+        run: |
+          msbuild `
+            Explorer++/Explorer++.sln `
+            /p:Configuration=${{ matrix.configuration }} `
+            /p:Platform=${{ matrix.platform }} `
+            /p:ExplorerPlusPlusBuildVersion=${{ needs.before-build.outputs.build-number }} `
+            /v:minimal
 
       - name: Run tests
         run: ./.github/run_tests.ps1 -Configuration '${{ matrix.configuration }}' -Platform '${{ matrix.platform }}'
@@ -116,7 +128,7 @@ jobs:
         run: ./.github/package.ps1 -Configuration '${{ matrix.configuration }}' -Platform '${{ matrix.platform }}'
 
       - name: Attest artifacts
-        if: matrix.publish && needs.classify.outputs.deployment-environment != ''
+        if: matrix.publish && needs.before-build.outputs.deployment-environment != ''
         uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6 # v4.2.0
         with:
           subject-path: 'artifacts/*'
@@ -133,13 +145,13 @@ jobs:
   deploy:
     name: Deploy
     needs:
-      - classify
+      - before-build
       - build
-    if: needs.classify.outputs.deployment-environment != ''
+    if: needs.before-build.outputs.deployment-environment != ''
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ needs.classify.outputs.deployment-environment }}
+      name: ${{ needs.before-build.outputs.deployment-environment }}
 
     permissions:
       contents: read
@@ -162,4 +174,8 @@ jobs:
 
       - name: Deploy
         shell: pwsh
-        run: ./.github/deploy.ps1 -DeploymentDirectory deployment -BucketPathPrefix '${{ vars.S3_PREFIX }}' -BuildNumber '${{ env.EXPLORERPLUSPLUS_BUILD_NUMBER }}'
+        run: |
+          ./.github/deploy.ps1 `
+            -DeploymentDirectory deployment `
+            -BucketPathPrefix '${{ vars.S3_PREFIX }}' `
+            -BuildNumber '${{ needs.before-build.outputs.build-number }}'
