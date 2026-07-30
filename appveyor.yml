@@ -12,10 +12,6 @@ platform:
 - ARM64
 
 environment:
-  PFX_ENC_PASS:
-    secure: vl0ntw9DjQdAno9nYVe0osg2tBmXD7gW75NLfxIvxMDW3GiVlJlFcESf7v6f7qKe
-  PFX_PASS:
-    secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
   EXPLORERPLUSPLUS_BUILD_NUMBER: $(APPVEYOR_BUILD_NUMBER)
 
 cache:
@@ -71,7 +67,6 @@ init:
       Exit-AppveyorBuild
     }
 
-# Decrypt the code signing certificate.
 install:
 - cmd: >-
     git submodule init
@@ -79,10 +74,6 @@ install:
     git submodule update
 
     .\Explorer++\ThirdParty\vcpkg\bootstrap-vcpkg.bat
-
-    nuget install secure-file -ExcludeVersion
-
-    IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
 before_build:
 - pwsh: >-
