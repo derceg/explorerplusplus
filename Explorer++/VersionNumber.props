@@ -2,13 +2,26 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup>
+    <!-- Storing the version information here allows it to be accessed both by the source code as well as by the build itself. -->
+    <ExplorerPlusPlusMajorVersion>1</ExplorerPlusPlusMajorVersion>
+    <ExplorerPlusPlusMinorVersion>5</ExplorerPlusPlusMinorVersion>
+    <ExplorerPlusPlusMicroVersion>0</ExplorerPlusPlusMicroVersion>
+    <ExplorerPlusPlusBuildVersion>0</ExplorerPlusPlusBuildVersion>
+
+    <ExplorerPlusPlusEffectiveBuildVersion>$(ExplorerPlusPlusBuildVersion)</ExplorerPlusPlusEffectiveBuildVersion>
+
+    <!-- This allows the CI environment to dynamically set the build version. -->
+    <ExplorerPlusPlusEffectiveBuildVersion Condition="'$(EXPLORERPLUSPLUS_BUILD_NUMBER)'!=''">$(EXPLORERPLUSPLUS_BUILD_NUMBER)</ExplorerPlusPlusEffectiveBuildVersion>
+
+    <ExplorerPlusPlusVersionPreprocessorDefinitions>MAJOR_VERSION=$(ExplorerPlusPlusMajorVersion);MINOR_VERSION=$(ExplorerPlusPlusMinorVersion);MICRO_VERSION=$(ExplorerPlusPlusMicroVersion);BUILD_VERSION=$(ExplorerPlusPlusEffectiveBuildVersion)</ExplorerPlusPlusVersionPreprocessorDefinitions>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions Condition="'$(EXPLORERPLUSPLUS_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(EXPLORERPLUSPLUS_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(ExplorerPlusPlusVersionPreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions Condition="'$(EXPLORERPLUSPLUS_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(EXPLORERPLUSPLUS_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(ExplorerPlusPlusVersionPreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

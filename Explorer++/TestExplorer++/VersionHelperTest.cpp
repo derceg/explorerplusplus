@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "VersionHelper.h"
 #include "Version.h"
-#include "VersionConstants.h"
 #include <gtest/gtest.h>
 
 TEST(VersionHelperTest, GetVersion)
