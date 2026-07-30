@@ -13,6 +13,7 @@ env:
 
 jobs:
   classify:
+    name: Classify
     runs-on: ubuntu-slim
 
     outputs:
@@ -39,7 +40,7 @@ jobs:
           "environment=$environment" >> $env:GITHUB_OUTPUT
 
   build:
-    name: ${{ matrix.configuration }} / ${{ matrix.platform }}
+    name: Build ${{ matrix.configuration }} / ${{ matrix.platform }}
     needs: classify
 
     permissions:
