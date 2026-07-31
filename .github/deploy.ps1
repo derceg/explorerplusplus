@@ -67,6 +67,11 @@ function Copy-ToS3 {
     }
 }
 
+if ($BuildNumber -eq 0) {
+    # Only official builds are deployed and all official builds should be assigned non-0 build numbers.
+    throw "Invalid build number"
+}
+
 $fullVersion = Get-FullVersionNumber -BuildNumber $BuildNumber
 
 $artifactsToDeploy = @(
