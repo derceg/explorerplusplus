@@ -67,7 +67,13 @@ int MainTabViewImageListManager::GetDefaultFolderIconIndex() const
 	return m_defaultFolderIconIndex;
 }
 
-int MainTabViewImageListManager::GetCommandLineIconIndex() const
+int MainTabViewImageListManager::GetContentIconIndex(TabContent::Icon icon) const
 {
-	return m_commandLineIconIndex;
+	switch (icon)
+	{
+	case TabContent::Icon::CommandLine:
+		return m_commandLineIconIndex;
+	}
+
+	LOG(FATAL) << "Unknown tab content icon";
 }

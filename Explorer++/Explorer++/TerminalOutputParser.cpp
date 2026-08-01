@@ -11,6 +11,21 @@ namespace
 constexpr std::wstring_view CURRENT_DIRECTORY_SEQUENCE_PREFIX = L"\x1b]9;9;";
 constexpr size_t MAXIMUM_PENDING_OUTPUT_SIZE = 32768;
 
+size_t GetPotentialPrefixLength(std::wstring_view output)
+{
+	size_t maximumLength = std::min(output.size(), CURRENT_DIRECTORY_SEQUENCE_PREFIX.size() - 1);
+
+	for (size_t length = maximumLength; length > 0; length--)
+	{
+		if (output.ends_with(CURRENT_DIRECTORY_SEQUENCE_PREFIX.substr(0, length)))
+		{
+			return length;
+		}
+	}
+
+	return 0;
+}
+
 }
 
 TerminalOutputParser::TerminalOutputParser(
@@ -19,9 +34,10 @@ TerminalOutputParser::TerminalOutputParser(
 {
 }
 
-void TerminalOutputParser::Process(std::wstring_view output)
+std::wstring TerminalOutputParser::Process(std::wstring_view output)
 {
 	m_pendingOutput.append(output);
+	std::wstring filteredOutput;
 
 	while (true)
 	{
@@ -29,14 +45,15 @@ void TerminalOutputParser::Process(std::wstring_view output)
 
 		if (sequenceStart == std::wstring::npos)
 		{
-			size_t retainedLength =
-				std::min(m_pendingOutput.size(), CURRENT_DIRECTORY_SEQUENCE_PREFIX.size() - 1);
+			size_t retainedLength = GetPotentialPrefixLength(m_pendingOutput);
+			filteredOutput.append(m_pendingOutput, 0, m_pendingOutput.size() - retainedLength);
 			m_pendingOutput.erase(0, m_pendingOutput.size() - retainedLength);
-			return;
+			return filteredOutput;
 		}
 
 		if (sequenceStart > 0)
 		{
+			filteredOutput.append(m_pendingOutput, 0, sequenceStart);
 			m_pendingOutput.erase(0, sequenceStart);
 		}
 
@@ -49,10 +66,11 @@ void TerminalOutputParser::Process(std::wstring_view output)
 		{
 			if (m_pendingOutput.size() > MAXIMUM_PENDING_OUTPUT_SIZE)
 			{
+				filteredOutput.append(m_pendingOutput);
 				m_pendingOutput.clear();
 			}
 
-			return;
+			return filteredOutput;
 		}
 
 		m_directoryChangedCallback(m_pendingOutput.substr(valueStart, sequenceEnd - valueStart));

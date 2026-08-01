@@ -22,9 +22,8 @@
 #include "RegistryAppStorageFactory.h"
 #include "ResourceHelper.h"
 #include "ShellWatcher.h"
-#include "Tab.h"
-#include "TabContainer.h"
 #include "TabStorage.h"
+#include "TerminalMessageRouter.h"
 #include "UIThreadExecutor.h"
 #include "Win32ResourceLoader.h"
 #include "WindowStorage.h"
@@ -36,17 +35,6 @@
 #include <fmt/xchar.h>
 
 using namespace std::chrono_literals;
-
-namespace
-{
-
-bool ShouldBypassAcceleratorForSelectedTab(const MSG *msg, BrowserWindow *browser)
-{
-	const auto &selectedTab = browser->GetActiveTabContainer()->GetSelectedTab();
-	return selectedTab.ShouldBypassAccelerator(msg);
-}
-
-}
 
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
@@ -350,7 +338,14 @@ bool App::MaybeTranslateAccelerator(MSG *msg)
 	{
 		if (IsChild(browser->GetHWND(), msg->hwnd))
 		{
-			if (ShouldBypassAcceleratorForSelectedTab(msg, browser))
+			auto terminalMessageResult = TerminalMessageRouter::Process(msg, browser);
+
+			if (terminalMessageResult == TerminalMessageRouter::Result::Handled)
+			{
+				return true;
+			}
+
+			if (terminalMessageResult == TerminalMessageRouter::Result::BypassAccelerator)
 			{
 				return false;
 			}

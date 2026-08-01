@@ -12,7 +12,6 @@
 #include "Tab.h"
 #include "TabView.h"
 #include "TabViewDelegate.h"
-#include "TerminalLaunchRequest.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclass.h"
 #include <functional>
@@ -34,6 +33,7 @@ class ResourceLoader;
 class ShellBrowserEvents;
 class ShellBrowserFactory;
 class TabRestorer;
+struct TerminalLaunchRequest;
 
 // Used when creating a tab.
 struct TabSettings

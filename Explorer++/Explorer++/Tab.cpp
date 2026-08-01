@@ -10,7 +10,6 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
-#include "TerminalTabContent.h"
 
 Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	TabContainer *tabContainer, TabEvents *tabEvents) :
@@ -39,6 +38,8 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	m_id(idCounter++),
 	m_shellBrowser(std::move(shellBrowser)),
 	m_shellBrowserImpl(dynamic_cast<ShellBrowserImpl *>(m_shellBrowser.get())),
+	m_content(std::make_unique<TabContent>(
+		m_shellBrowserImpl ? m_shellBrowserImpl->GetListView() : nullptr)),
 	m_browser(browser),
 	m_tabContainer(tabContainer),
 	m_tabEvents(tabEvents),
@@ -68,69 +69,45 @@ ShellBrowserImpl *Tab::GetShellBrowserImpl() const
 	return m_shellBrowserImpl;
 }
 
-bool Tab::IsTerminal() const
+void Tab::SetContent(std::unique_ptr<TabContent> content)
 {
-	return m_terminalTabContent != nullptr;
-}
+	CHECK(content);
 
-void Tab::SetTerminalTabContent(std::unique_ptr<TerminalTabContent> terminalTabContent)
-{
-	CHECK(!m_terminalTabContent);
-	CHECK(terminalTabContent);
-
-	terminalTabContent->AttachToTab(m_shellBrowserImpl->GetListView());
-	m_terminalTabContent = std::move(terminalTabContent);
-	m_terminalTabContent->SetUpdatedCallback(
+	content->AttachToTab(m_content->GetHWND());
+	m_content = std::move(content);
+	m_content->SetUpdatedCallback(
 		[this] { m_tabEvents->NotifyUpdated(*this, PropertyType::Name); });
 	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
 }
 
 HWND Tab::GetContentWindow() const
 {
-	if (m_terminalTabContent)
-	{
-		return m_terminalTabContent->GetHWND();
-	}
-
-	return m_shellBrowserImpl->GetListView();
+	return m_content->GetHWND();
 }
 
 void Tab::SetContentBounds(int x, int y, int width, int height, bool visible)
 {
-	if (m_terminalTabContent)
-	{
-		m_terminalTabContent->SetBounds(x, y, width, height, visible);
-		return;
-	}
-
-	UINT flags = SWP_NOZORDER | (visible ? SWP_SHOWWINDOW : SWP_HIDEWINDOW);
-	SetWindowPos(m_shellBrowserImpl->GetListView(), nullptr, x, y, width, height, flags);
+	m_content->SetBounds(x, y, width, height, visible);
 }
 
 void Tab::FocusContent() const
 {
-	if (m_terminalTabContent)
-	{
-		m_terminalTabContent->Focus();
-		return;
-	}
-
-	SetFocus(m_shellBrowserImpl->GetListView());
+	m_content->Focus();
 }
 
-std::optional<std::wstring> Tab::GetTerminalDirectory() const
+std::optional<std::wstring> Tab::GetContentTooltipText() const
 {
-	if (!m_terminalTabContent)
-	{
-		return std::nullopt;
-	}
-
-	return m_terminalTabContent->GetDirectory();
+	return m_content->GetTooltipText();
 }
 
-bool Tab::ShouldBypassAccelerator(const MSG *msg) const
+std::optional<TabContent::Icon> Tab::GetContentIcon() const
 {
-	return m_terminalTabContent && m_terminalTabContent->ShouldBypassAccelerator(msg);
+	return m_content->GetIcon();
+}
+
+TabContent::MessageResult Tab::ProcessContentMessage(const MSG *msg)
+{
+	return m_content->ProcessMessage(msg);
 }
 
 BrowserWindow *Tab::GetBrowser() const
@@ -147,14 +124,11 @@ TabContainer *Tab::GetTabContainer() const
 // display name of the current directory will be returned.
 std::wstring Tab::GetName() const
 {
-	if (m_terminalTabContent)
-	{
-		auto name = m_terminalTabContent->GetName();
+	auto contentName = m_content->GetName();
 
-		if (!name.empty())
-		{
-			return name;
-		}
+	if (contentName)
+	{
+		return *contentName;
 	}
 
 	if (m_useCustomName)

@@ -63,8 +63,11 @@ TerminalControlApi::TerminalControlApi()
 		&& Resolve(triggerResize, "TerminalTriggerResize")
 		&& Resolve(dpiChanged, "TerminalDpiChanged")
 		&& Resolve(sendKeyEvent, "TerminalSendKeyEvent")
-		&& Resolve(sendCharEvent, "TerminalSendCharEvent") && Resolve(setFocus, "TerminalSetFocus")
-		&& Resolve(killFocus, "TerminalKillFocus") && Resolve(setTheme, "TerminalSetTheme");
+		&& Resolve(sendCharEvent, "TerminalSendCharEvent")
+		&& Resolve(getSelection, "TerminalGetSelection")
+		&& Resolve(isSelectionActive, "TerminalIsSelectionActive")
+		&& Resolve(setFocus, "TerminalSetFocus") && Resolve(killFocus, "TerminalKillFocus")
+		&& Resolve(setTheme, "TerminalSetTheme");
 
 	if (!resolved)
 	{

@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "CustomFont.h"
 #include "SystemFontHelper.h"
+#include "TerminalClipboard.h"
 #include "TerminalHost.h"
 #include "../Helper/DpiCompatibility.h"
 
@@ -25,10 +26,22 @@ int GetMainFontSize(const Config *config)
 		DpiCompatibility::GetInstance().PixelsToPointsForDefaultDpi(systemLogFont.lfHeight));
 }
 
+bool IsMessageForWindow(const MSG *msg, HWND window)
+{
+	return msg->hwnd == window || IsChild(window, msg->hwnd);
+}
+
+bool IsPlainControlKeyDown(const MSG *msg, WPARAM key)
+{
+	return (msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN) && msg->wParam == key
+		&& GetKeyState(VK_CONTROL) < 0 && GetKeyState(VK_SHIFT) >= 0 && GetKeyState(VK_MENU) >= 0;
+}
+
 }
 
 std::unique_ptr<TerminalTabContent> TerminalTabContent::Create(HWND parent,
-	const TerminalLaunchRequest &launchRequest, const Config *config)
+	const TerminalLaunchRequest &launchRequest, const Config *config,
+	ClipboardStore *clipboardStore)
 {
 	auto terminalHost = TerminalHost::Create(parent, launchRequest.process);
 
@@ -39,12 +52,15 @@ std::unique_ptr<TerminalTabContent> TerminalTabContent::Create(HWND parent,
 
 	ShowWindow(terminalHost->GetHWND(), SW_HIDE);
 	return std::unique_ptr<TerminalTabContent>(
-		new TerminalTabContent(std::move(terminalHost), launchRequest, config));
+		new TerminalTabContent(std::move(terminalHost), launchRequest, config, clipboardStore));
 }
 
 TerminalTabContent::TerminalTabContent(std::unique_ptr<TerminalHost> terminalHost,
-	const TerminalLaunchRequest &launchRequest, const Config *config) :
+	const TerminalLaunchRequest &launchRequest, const Config *config,
+	ClipboardStore *clipboardStore) :
+	TabContent(terminalHost->GetHWND()),
 	m_terminalHost(std::move(terminalHost)),
+	m_terminalClipboard(std::make_unique<TerminalClipboard>(clipboardStore)),
 	m_config(config)
 {
 	if (!launchRequest.initialDirectory.empty())
@@ -55,11 +71,8 @@ TerminalTabContent::TerminalTabContent(std::unique_ptr<TerminalHost> terminalHos
 	m_terminalHost->SetDirectoryChangedCallback(
 		std::bind_front(&TerminalTabContent::OnDirectoryChanged, this));
 
-	if (launchRequest.exitBehavior == TerminalExitBehavior::CloseTab)
-	{
-		m_terminalHost->SetProcessExitedCallback(
-			std::bind_front(&TerminalTabContent::OnProcessExited, this));
-	}
+	m_terminalHost->SetProcessExitedCallback(
+		std::bind_front(&TerminalTabContent::OnProcessExited, this));
 
 	UpdateFontSize();
 	m_mainFontConnection =
@@ -68,23 +81,6 @@ TerminalTabContent::TerminalTabContent(std::unique_ptr<TerminalHost> terminalHos
 
 TerminalTabContent::~TerminalTabContent() = default;
 
-void TerminalTabContent::AttachToTab(HWND replacedWindow)
-{
-	RECT bounds{};
-	GetWindowRect(replacedWindow, &bounds);
-	MapWindowPoints(nullptr, GetParent(m_terminalHost->GetHWND()),
-		reinterpret_cast<POINT *>(&bounds), 2);
-
-	m_terminalHost->SetBounds(bounds.left, bounds.top, bounds.right - bounds.left,
-		bounds.bottom - bounds.top, false);
-	ShowWindow(replacedWindow, SW_HIDE);
-}
-
-HWND TerminalTabContent::GetHWND() const
-{
-	return m_terminalHost->GetHWND();
-}
-
 void TerminalTabContent::SetBounds(int x, int y, int width, int height, bool visible)
 {
 	m_terminalHost->SetBounds(x, y, width, height, visible);
@@ -92,14 +88,25 @@ void TerminalTabContent::SetBounds(int x, int y, int width, int height, bool vis
 
 void TerminalTabContent::Focus()
 {
+	if (!m_startAttempted)
+	{
+		m_startAttempted = true;
+
+		if (!m_terminalHost->Start())
+		{
+			OnProcessExited();
+			return;
+		}
+	}
+
 	m_terminalHost->Focus();
 }
 
-std::wstring TerminalTabContent::GetName() const
+std::optional<std::wstring> TerminalTabContent::GetName() const
 {
 	if (!m_directory)
 	{
-		return {};
+		return std::nullopt;
 	}
 
 	auto path = std::filesystem::path(*m_directory);
@@ -113,26 +120,57 @@ std::wstring TerminalTabContent::GetName() const
 	return name.empty() ? path.root_path().wstring() : name;
 }
 
-std::optional<std::wstring> TerminalTabContent::GetDirectory() const
+std::optional<std::wstring> TerminalTabContent::GetTooltipText() const
 {
 	return m_directory;
 }
 
-bool TerminalTabContent::ShouldBypassAccelerator(const MSG *msg) const
+std::optional<TabContent::Icon> TerminalTabContent::GetIcon() const
 {
-	if ((msg->message != WM_KEYDOWN && msg->message != WM_SYSKEYDOWN) || msg->wParam != VK_TAB
-		|| GetKeyState(VK_CONTROL) < 0 || GetKeyState(VK_MENU) < 0)
-	{
-		return false;
-	}
-
-	HWND terminalWindow = m_terminalHost->GetHWND();
-	return msg->hwnd == terminalWindow || IsChild(terminalWindow, msg->hwnd);
+	return Icon::CommandLine;
 }
 
-void TerminalTabContent::SetUpdatedCallback(std::function<void()> updatedCallback)
+TabContent::MessageResult TerminalTabContent::ProcessMessage(const MSG *msg)
 {
-	m_updatedCallback = std::move(updatedCallback);
+	if (!IsMessageForWindow(msg, m_terminalHost->GetHWND()))
+	{
+		return MessageResult::NotHandled;
+	}
+
+	if (IsPlainControlKeyDown(msg, 'C') && m_terminalHost->IsSelectionActive())
+	{
+		auto selection = m_terminalHost->GetSelection();
+
+		if (selection)
+		{
+			m_terminalClipboard->WriteSelection(*selection);
+		}
+
+		return MessageResult::Handled;
+	}
+
+	if (IsPlainControlKeyDown(msg, 'V'))
+	{
+		auto text = m_terminalClipboard->ReadText();
+
+		if (text)
+		{
+			m_terminalHost->WriteInput(*text);
+		}
+
+		return MessageResult::Handled;
+	}
+
+	bool isTab = (msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN)
+		&& msg->wParam == VK_TAB && GetKeyState(VK_CONTROL) >= 0 && GetKeyState(VK_MENU) >= 0;
+
+	// With no active selection, Ctrl+C must reach the shell so it retains its interrupt behavior.
+	if (isTab || IsPlainControlKeyDown(msg, 'C'))
+	{
+		return MessageResult::BypassAccelerator;
+	}
+
+	return MessageResult::NotHandled;
 }
 
 void TerminalTabContent::SetCloseRequestedCallback(std::function<void()> closeRequestedCallback)
@@ -160,10 +198,7 @@ void TerminalTabContent::OnDirectoryChanged(const std::wstring &directory)
 
 	m_directory = directory;
 
-	if (m_updatedCallback)
-	{
-		m_updatedCallback();
-	}
+	NotifyUpdated();
 }
 
 void TerminalTabContent::OnProcessExited()

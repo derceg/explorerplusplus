@@ -14,7 +14,7 @@ public:
 	explicit TerminalOutputParser(
 		std::function<void(const std::wstring &)> directoryChangedCallback);
 
-	void Process(std::wstring_view output);
+	std::wstring Process(std::wstring_view output);
 
 private:
 	std::wstring m_pendingOutput;

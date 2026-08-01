@@ -8,6 +8,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainTabView.h"
+#include "PlatformContext.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/NavigateParams.h"
@@ -72,11 +73,11 @@ public:
 
 	std::wstring GetTooltipText() const override
 	{
-		auto terminalDirectory = m_tab->GetTerminalDirectory();
+		auto contentTooltipText = m_tab->GetContentTooltipText();
 
-		if (terminalDirectory)
+		if (contentTooltipText)
 		{
-			return *terminalDirectory;
+			return *contentTooltipText;
 		}
 
 		const auto &pidlDirectory = m_tab->GetShellBrowser()->GetDirectory();
@@ -125,9 +126,11 @@ private:
 
 	int DetermineIconIndex() const
 	{
-		if (m_tab->IsTerminal())
+		auto contentIcon = m_tab->GetContentIcon();
+
+		if (contentIcon)
 		{
-			return m_imageListManager->GetCommandLineIconIndex();
+			return m_imageListManager->GetContentIconIndex(*contentIcon);
 		}
 
 		FetchUpdatedIcon();
@@ -299,7 +302,7 @@ LRESULT TabContainer::TabViewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		auto *tab = MaybeGetTab(static_cast<int>(wParam));
 
-		if (tab && tab->IsTerminal())
+		if (tab)
 		{
 			CloseTab(*tab, CloseMode::Force);
 		}
@@ -345,8 +348,8 @@ void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings
 
 bool TabContainer::CreateNewTerminalTab(const TerminalLaunchRequest &launchRequest)
 {
-	auto terminalTabContent =
-		TerminalTabContent::Create(m_browser->GetHWND(), launchRequest, m_config);
+	auto terminalTabContent = TerminalTabContent::Create(m_browser->GetHWND(), launchRequest,
+		m_config, m_platformContext->GetClipboardStore());
 
 	if (!terminalTabContent)
 	{
@@ -357,7 +360,7 @@ bool TabContainer::CreateNewTerminalTab(const TerminalLaunchRequest &launchReque
 	int tabId = tab.GetId();
 	terminalTabContent->SetCloseRequestedCallback(
 		[this, tabId] { ScheduleTerminalTabClose(tabId); });
-	tab.SetTerminalTabContent(std::move(terminalTabContent));
+	tab.SetContent(std::move(terminalTabContent));
 	SelectTab(tab);
 	return true;
 }

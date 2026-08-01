@@ -41,6 +41,8 @@ public:
 		unsigned short scanCode, unsigned short flags, bool keyDown);
 	using SendCharEventFunction = void(__stdcall *)(void *terminal, wchar_t character,
 		unsigned short scanCode, unsigned short flags);
+	using GetSelectionFunction = const wchar_t *(__stdcall *) (void *terminal);
+	using IsSelectionActiveFunction = bool(__stdcall *)(void *terminal);
 	using FocusFunction = void(__stdcall *)(void *terminal);
 	using SetThemeFunction = void(__stdcall *)(void *terminal, TerminalTheme theme,
 		const wchar_t *fontFamily, short fontSize, int dpi);
@@ -59,6 +61,8 @@ public:
 	DpiChangedFunction dpiChanged = nullptr;
 	SendKeyEventFunction sendKeyEvent = nullptr;
 	SendCharEventFunction sendCharEvent = nullptr;
+	GetSelectionFunction getSelection = nullptr;
+	IsSelectionActiveFunction isSelectionActive = nullptr;
 	FocusFunction setFocus = nullptr;
 	FocusFunction killFocus = nullptr;
 	SetThemeFunction setTheme = nullptr;

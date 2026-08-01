@@ -7,7 +7,9 @@
 #include <boost/core/noncopyable.hpp>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
 
 struct TerminalProcessLaunchInfo;
 
@@ -20,9 +22,13 @@ public:
 	~TerminalHost();
 
 	HWND GetHWND() const;
+	bool Start();
 	void SetBounds(int x, int y, int width, int height, bool visible);
 	void SetFontSize(int fontSize);
 	void Focus();
+	bool IsSelectionActive() const;
+	std::optional<std::wstring> GetSelection();
+	void WriteInput(std::wstring_view text);
 	void SetDirectoryChangedCallback(
 		std::function<void(const std::wstring &)> directoryChangedCallback);
 	void SetProcessExitedCallback(std::function<void()> processExitedCallback);

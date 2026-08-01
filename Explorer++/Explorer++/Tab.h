@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "TabContent.h"
 #include <boost/core/noncopyable.hpp>
 #include <memory>
 #include <optional>
@@ -13,7 +14,6 @@ class ShellBrowser;
 class ShellBrowserImpl;
 class TabContainer;
 class TabEvents;
-class TerminalTabContent;
 struct TabStorageData;
 
 class Tab : private boost::noncopyable
@@ -56,13 +56,13 @@ public:
 	ShellBrowser *GetShellBrowser() const;
 	ShellBrowserImpl *GetShellBrowserImpl() const;
 
-	bool IsTerminal() const;
-	void SetTerminalTabContent(std::unique_ptr<TerminalTabContent> terminalTabContent);
+	void SetContent(std::unique_ptr<TabContent> content);
 	HWND GetContentWindow() const;
 	void SetContentBounds(int x, int y, int width, int height, bool visible);
 	void FocusContent() const;
-	std::optional<std::wstring> GetTerminalDirectory() const;
-	bool ShouldBypassAccelerator(const MSG *msg) const;
+	std::optional<std::wstring> GetContentTooltipText() const;
+	std::optional<TabContent::Icon> GetContentIcon() const;
+	TabContent::MessageResult ProcessContentMessage(const MSG *msg);
 
 	BrowserWindow *GetBrowser() const;
 	TabContainer *GetTabContainer() const;
@@ -100,7 +100,7 @@ private:
 
 	const std::unique_ptr<ShellBrowser> m_shellBrowser;
 	ShellBrowserImpl *const m_shellBrowserImpl;
-	std::unique_ptr<TerminalTabContent> m_terminalTabContent;
+	std::unique_ptr<TabContent> m_content;
 
 	BrowserWindow *const m_browser;
 	TabContainer *const m_tabContainer;

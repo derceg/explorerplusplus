@@ -7,7 +7,6 @@
 #include "AddressBar.h"
 #include "App.h"
 #include "ColorRule.h"
-#include "CommandPromptProfile.h"
 #include "Config.h"
 #include "DarkModeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -31,6 +30,7 @@
 #include "TabBacking.h"
 #include "TabContainer.h"
 #include "TaskbarThumbnails.h"
+#include "TerminalLauncher.h"
 #include "ToolbarHelper.h"
 #include "WindowStorage.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -47,19 +47,6 @@
 #include <glog/logging.h>
 #include <wil/resource.h>
 #include <algorithm>
-
-namespace
-{
-
-bool TryOpenBatchFileInTerminal(TabContainer *tabContainer, const std::wstring &itemPath,
-	const std::wstring &parameters, const std::wstring &workingDirectory)
-{
-	auto launchRequest =
-		CommandPromptProfile::CreateBatchFile(itemPath, parameters, workingDirectory);
-	return launchRequest && tabContainer->CreateNewTerminalTab(*launchRequest);
-}
-
-}
 
 void Explorerplusplus::OpenDefaultItem(OpenFolderDisposition openFolderDisposition)
 {
@@ -253,7 +240,7 @@ void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wst
 	std::wstring workingDirectory =
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath();
 
-	if (TryOpenBatchFileInTerminal(GetActivePane()->GetTabContainer(), itemPath, parameters,
+	if (TerminalLauncher::TryOpenBatchFile(GetActivePane()->GetTabContainer(), itemPath, parameters,
 			workingDirectory))
 	{
 		return;
@@ -267,11 +254,9 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstri
 	auto shellBrowser = GetActiveShellBrowserImpl();
 	std::wstring workingDirectory =
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath();
-	wil::unique_cotaskmem_string itemPath;
 
-	if (SUCCEEDED(SHGetNameFromIDList(pidlItem, SIGDN_FILESYSPATH, &itemPath)) && itemPath
-		&& TryOpenBatchFileInTerminal(GetActivePane()->GetTabContainer(), itemPath.get(),
-			parameters, workingDirectory))
+	if (TerminalLauncher::TryOpenBatchFile(GetActivePane()->GetTabContainer(), pidlItem, parameters,
+			workingDirectory))
 	{
 		return;
 	}

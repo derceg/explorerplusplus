@@ -6,7 +6,6 @@
 #include "BrowserCommandController.h"
 #include "AboutDialog.h"
 #include "BrowserWindow.h"
-#include "CommandPromptProfile.h"
 #include "Config.h"
 #include "DisplayColoursDialog.h"
 #include "MainResource.h"
@@ -15,6 +14,7 @@
 #include "SortModeMenuMappings.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
+#include "TerminalLauncher.h"
 #include "UpdateCheckDialog.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -519,38 +519,8 @@ void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 		return;
 	}
 
-	if (!WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
-	{
-		auto terminalLaunchRequest = CommandPromptProfile::CreateInteractive(directoryPath.get());
-
-		if (terminalLaunchRequest
-			&& m_browser->GetActiveTabContainer()->CreateNewTerminalTab(*terminalLaunchRequest))
-		{
-			return;
-		}
-	}
-
-	// Elevated terminal processes can't be hosted safely inside this unelevated window. Also retain
-	// this path as a fallback when Windows Terminal Control or ConPTY isn't available.
-	wil::unique_cotaskmem_string systemPath;
-	hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	std::filesystem::path fullPath(systemPath.get());
-	fullPath /= L"cmd.exe";
-
-	std::wstring parameters;
-
-	if (WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
-	{
-		parameters = L"/K cd /d "s + directoryPath.get();
-	}
-
-	LaunchProcess(nullptr, fullPath.c_str(), parameters, directoryPath.get(), flags);
+	TerminalLauncher::OpenCommandPrompt(m_browser->GetActiveTabContainer(), directoryPath.get(),
+		flags);
 }
 
 void BrowserCommandController::CopyFolderPath() const

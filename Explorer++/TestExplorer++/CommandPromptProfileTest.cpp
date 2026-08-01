@@ -17,7 +17,6 @@ TEST(CommandPromptProfileTest, InteractiveRequest)
 	ASSERT_TRUE(request);
 	EXPECT_EQ(request->initialDirectory, directory);
 	EXPECT_EQ(request->process.workingDirectory, directory);
-	EXPECT_EQ(request->exitBehavior, TerminalExitBehavior::KeepTabOpen);
 	EXPECT_THAT(request->process.commandLine, HasSubstr(L" /K "));
 	EXPECT_THAT(request->process.commandLine, HasSubstr(L"prompt $E]9;9;$P$E\\$P$G"));
 }
@@ -31,7 +30,6 @@ TEST(CommandPromptProfileTest, BatchFileRequest)
 	ASSERT_TRUE(request);
 	EXPECT_EQ(request->initialDirectory, workingDirectory);
 	EXPECT_EQ(request->process.workingDirectory, workingDirectory);
-	EXPECT_EQ(request->exitBehavior, TerminalExitBehavior::CloseTab);
 	EXPECT_THAT(request->process.commandLine, HasSubstr(L" /C "));
 	EXPECT_THAT(request->process.commandLine,
 		HasSubstr(LR"(call "C:\Working Directory\script.cmd" first second)"));

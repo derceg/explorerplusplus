@@ -7,12 +7,6 @@
 #include <filesystem>
 #include <string>
 
-enum class TerminalExitBehavior
-{
-	KeepTabOpen,
-	CloseTab
-};
-
 struct TerminalProcessLaunchInfo
 {
 	std::filesystem::path application;
@@ -24,5 +18,4 @@ struct TerminalLaunchRequest
 {
 	std::filesystem::path initialDirectory;
 	TerminalProcessLaunchInfo process;
-	TerminalExitBehavior exitBehavior = TerminalExitBehavior::KeepTabOpen;
 };

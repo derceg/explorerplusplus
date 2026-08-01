@@ -8,19 +8,6 @@
 namespace
 {
 
-std::optional<std::filesystem::path> GetCommandPromptPath()
-{
-	wchar_t systemDirectory[MAX_PATH];
-	UINT systemDirectoryLength = GetSystemDirectory(systemDirectory, std::size(systemDirectory));
-
-	if (systemDirectoryLength == 0 || systemDirectoryLength >= std::size(systemDirectory))
-	{
-		return std::nullopt;
-	}
-
-	return std::filesystem::path(systemDirectory) / L"cmd.exe";
-}
-
 std::wstring QuoteArgument(const std::filesystem::path &argument)
 {
 	return L"\"" + argument.wstring() + L"\"";
@@ -55,10 +42,23 @@ TerminalProcessLaunchInfo BuildProcessLaunchInfo(const std::filesystem::path &cm
 
 }
 
+std::optional<std::filesystem::path> CommandPromptProfile::GetExecutablePath()
+{
+	wchar_t systemDirectory[MAX_PATH];
+	UINT systemDirectoryLength = GetSystemDirectory(systemDirectory, std::size(systemDirectory));
+
+	if (systemDirectoryLength == 0 || systemDirectoryLength >= std::size(systemDirectory))
+	{
+		return std::nullopt;
+	}
+
+	return std::filesystem::path(systemDirectory) / L"cmd.exe";
+}
+
 std::optional<TerminalLaunchRequest> CommandPromptProfile::CreateInteractive(
 	const std::filesystem::path &directory)
 {
-	auto cmdPath = GetCommandPromptPath();
+	auto cmdPath = GetExecutablePath();
 
 	if (!cmdPath)
 	{
@@ -69,7 +69,6 @@ std::optional<TerminalLaunchRequest> CommandPromptProfile::CreateInteractive(
 	request.initialDirectory = directory;
 	request.process = BuildProcessLaunchInfo(*cmdPath, directory, L"/K");
 	request.process.commandLine += L"prompt $E]9;9;$P$E\\$P$G";
-	request.exitBehavior = TerminalExitBehavior::KeepTabOpen;
 	return request;
 }
 
@@ -97,7 +96,7 @@ std::optional<TerminalLaunchRequest> CommandPromptProfile::CreateBatchFile(
 		return std::nullopt;
 	}
 
-	auto cmdPath = GetCommandPromptPath();
+	auto cmdPath = GetExecutablePath();
 
 	if (!cmdPath)
 	{
@@ -114,6 +113,5 @@ std::optional<TerminalLaunchRequest> CommandPromptProfile::CreateBatchFile(
 		request.process.commandLine += L" " + parameters;
 	}
 
-	request.exitBehavior = TerminalExitBehavior::CloseTab;
 	return request;
 }

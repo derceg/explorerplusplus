@@ -10,6 +10,7 @@
 class CommandPromptProfile
 {
 public:
+	static std::optional<std::filesystem::path> GetExecutablePath();
 	static std::optional<TerminalLaunchRequest> CreateInteractive(
 		const std::filesystem::path &directory);
 	static std::optional<TerminalLaunchRequest> CreateBatchFile(

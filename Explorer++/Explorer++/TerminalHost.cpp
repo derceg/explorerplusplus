@@ -33,6 +33,8 @@ constexpr TerminalTheme DEFAULT_TERMINAL_THEME{ 0x0c0c0c, 0xcccccc, 0xcccccc, 5,
 constexpr std::wstring_view TERMINAL_FONT_FAMILY = L"Cascadia Mono";
 const UINT TERMINAL_DIRECTORY_CHANGED_MESSAGE =
 	RegisterWindowMessage(L"Explorer++TerminalDirectoryChanged");
+const UINT TERMINAL_OUTPUT_AVAILABLE_MESSAGE =
+	RegisterWindowMessage(L"Explorer++TerminalOutputAvailable");
 const UINT TERMINAL_SCROLL_CHANGED_MESSAGE =
 	RegisterWindowMessage(L"Explorer++TerminalScrollChanged");
 const UINT TERMINAL_PROCESS_EXITED_MESSAGE =
@@ -52,7 +54,7 @@ public:
 			return nullptr;
 		}
 
-		auto impl = std::unique_ptr<Impl>(new Impl());
+		auto impl = std::unique_ptr<Impl>(new Impl(launchInfo));
 		HRESULT result = terminalApi.createTerminal(parent, &impl->m_window, &impl->m_terminal);
 
 		if (FAILED(result) || !impl->m_window || !impl->m_terminal)
@@ -78,14 +80,6 @@ public:
 			terminalApi.dpiChanged(impl->m_terminal, impl->m_dpi);
 		}
 
-		impl->m_session = PseudoConsoleSession::Create(launchInfo,
-			[host = impl.get()](const std::wstring &output) { host->OnOutput(output); });
-
-		if (!impl->m_session)
-		{
-			return nullptr;
-		}
-
 		return impl;
 	}
 
@@ -109,6 +103,7 @@ public:
 		{
 			auto &terminalApi = TerminalControlApi::GetInstance();
 			terminalApi.registerScrollCallback(m_terminal, nullptr);
+			terminalApi.registerWriteCallback(m_terminal, nullptr);
 			terminalApi.destroyTerminal(m_terminal);
 		}
 	}
@@ -116,6 +111,30 @@ public:
 	HWND GetHWND() const
 	{
 		return m_window;
+	}
+
+	bool Start()
+	{
+		if (m_session)
+		{
+			return true;
+		}
+
+		m_session = PseudoConsoleSession::Create(m_launchInfo,
+			[host = this](const std::wstring &output) { host->OnOutput(output); });
+
+		if (!m_session)
+		{
+			return false;
+		}
+
+		if (m_pseudoConsoleSize)
+		{
+			m_session->Resize(*m_pseudoConsoleSize);
+		}
+
+		RegisterProcessExitedCallback();
+		return true;
 	}
 
 	void SetBounds(int x, int y, int width, int height, bool visible)
@@ -127,8 +146,8 @@ public:
 			DpiCompatibility::GetInstance().GetSystemMetricsForDpi(SM_CXVSCROLL, m_dpi);
 		int rendererWidth = std::max(width - scrollBarWidth, 1);
 
-		TerminalSize dimensions{};
 		auto &terminalApi = TerminalControlApi::GetInstance();
+		TerminalSize dimensions{};
 		ScrollCallbackContext callbackContext(this);
 		HRESULT result = terminalApi.triggerResize(m_terminal, rendererWidth, height, &dimensions);
 
@@ -138,9 +157,13 @@ public:
 
 		if (SUCCEEDED(result) && dimensions.x > 0 && dimensions.y > 0)
 		{
-			COORD pseudoConsoleSize{ static_cast<SHORT>(std::min(dimensions.x, SHRT_MAX)),
+			m_pseudoConsoleSize = COORD{ static_cast<SHORT>(std::min(dimensions.x, SHRT_MAX)),
 				static_cast<SHORT>(std::min(dimensions.y, SHRT_MAX)) };
-			m_session->Resize(pseudoConsoleSize);
+
+			if (m_session)
+			{
+				m_session->Resize(*m_pseudoConsoleSize);
+			}
 		}
 
 		UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_window);
@@ -185,6 +208,33 @@ public:
 		SetFocus(m_window);
 	}
 
+	bool IsSelectionActive() const
+	{
+		return TerminalControlApi::GetInstance().isSelectionActive(m_terminal);
+	}
+
+	std::optional<std::wstring> GetSelection()
+	{
+		const wchar_t *selectionData = TerminalControlApi::GetInstance().getSelection(m_terminal);
+		// The control declares the returned buffer const, but transfers its CoTaskMem ownership.
+		wil::unique_cotaskmem_string selection(const_cast<wchar_t *>(selectionData));
+
+		if (!selection)
+		{
+			return std::nullopt;
+		}
+
+		return std::wstring(selection.get());
+	}
+
+	void WriteInput(std::wstring_view text)
+	{
+		if (m_session)
+		{
+			m_session->WriteInput(std::wstring(text));
+		}
+	}
+
 	void SetDirectoryChangedCallback(
 		std::function<void(const std::wstring &)> directoryChangedCallback)
 	{
@@ -195,6 +245,17 @@ public:
 	{
 		CHECK(!m_processExitedCallback);
 		m_processExitedCallback = std::move(processExitedCallback);
+		RegisterProcessExitedCallback();
+	}
+
+private:
+	void RegisterProcessExitedCallback()
+	{
+		if (!m_session || !m_processExitedCallback)
+		{
+			return;
+		}
+
 		m_session->SetProcessExitedCallback(
 			[this]
 			{
@@ -204,9 +265,8 @@ public:
 				}
 			});
 	}
-
-private:
-	Impl() :
+	explicit Impl(TerminalProcessLaunchInfo launchInfo) :
+		m_launchInfo(std::move(launchInfo)),
 		m_outputParser([this](const std::wstring &directory) { QueueDirectoryChanged(directory); })
 	{
 	}
@@ -237,9 +297,54 @@ private:
 			return;
 		}
 
-		m_outputParser.Process(output);
-		ScrollCallbackContext callbackContext(this);
-		TerminalControlApi::GetInstance().sendOutput(m_terminal, output.c_str());
+		auto filteredOutput = m_outputParser.Process(output);
+
+		if (filteredOutput.empty())
+		{
+			return;
+		}
+
+		QueueOutput(std::move(filteredOutput));
+	}
+
+	void QueueOutput(std::wstring output)
+	{
+		bool shouldPostMessage = false;
+
+		{
+			std::scoped_lock lock(m_outputMutex);
+			m_pendingOutput.append(output);
+
+			if (!m_outputNotificationPending)
+			{
+				m_outputNotificationPending = true;
+				shouldPostMessage = true;
+			}
+		}
+
+		if (shouldPostMessage && !PostMessage(m_window, TERMINAL_OUTPUT_AVAILABLE_MESSAGE, 0, 0))
+		{
+			std::scoped_lock lock(m_outputMutex);
+			m_outputNotificationPending = false;
+		}
+	}
+
+	void NotifyOutputAvailable()
+	{
+		std::wstring output;
+
+		{
+			std::scoped_lock lock(m_outputMutex);
+			output = std::move(m_pendingOutput);
+			m_pendingOutput.clear();
+			m_outputNotificationPending = false;
+		}
+
+		if (!output.empty())
+		{
+			ScrollCallbackContext callbackContext(this);
+			TerminalControlApi::GetInstance().sendOutput(m_terminal, output.c_str());
+		}
 	}
 
 	void QueueDirectoryChanged(const std::wstring &directory)
@@ -299,8 +404,7 @@ private:
 
 	void QueueScrollChanged(const TerminalScrollState &scrollState)
 	{
-		// TerminalSendOutput runs on the pipe reader thread. Marshal scrollbar updates back to the
-		// window thread and coalesce them when output arrives rapidly.
+		// Coalesce scrollbar updates generated by consecutive Terminal Core calls.
 		bool shouldPostMessage = false;
 
 		{
@@ -486,6 +590,12 @@ private:
 
 	LRESULT WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
+		if (message == TERMINAL_OUTPUT_AVAILABLE_MESSAGE)
+		{
+			NotifyOutputAvailable();
+			return 0;
+		}
+
 		if (message == TERMINAL_DIRECTORY_CHANGED_MESSAGE)
 		{
 			NotifyDirectoryChanged();
@@ -562,11 +672,16 @@ private:
 
 	HWND m_window = nullptr;
 	void *m_terminal = nullptr;
+	const TerminalProcessLaunchInfo m_launchInfo;
 	std::unique_ptr<PseudoConsoleSession> m_session;
+	std::optional<COORD> m_pseudoConsoleSize;
 	std::unique_ptr<WindowSubclass> m_windowSubclass;
 	std::atomic_bool m_stopping = false;
 	UINT m_dpi = 0;
 	short m_fontSize = 0;
+	std::mutex m_outputMutex;
+	std::wstring m_pendingOutput;
+	bool m_outputNotificationPending = false;
 	TerminalOutputParser m_outputParser;
 	std::mutex m_directoryMutex;
 	std::optional<std::wstring> m_pendingDirectory;
@@ -603,6 +718,11 @@ HWND TerminalHost::GetHWND() const
 	return m_impl->GetHWND();
 }
 
+bool TerminalHost::Start()
+{
+	return m_impl->Start();
+}
+
 void TerminalHost::SetBounds(int x, int y, int width, int height, bool visible)
 {
 	m_impl->SetBounds(x, y, width, height, visible);
@@ -616,6 +736,21 @@ void TerminalHost::SetFontSize(int fontSize)
 void TerminalHost::Focus()
 {
 	m_impl->Focus();
+}
+
+bool TerminalHost::IsSelectionActive() const
+{
+	return m_impl->IsSelectionActive();
+}
+
+std::optional<std::wstring> TerminalHost::GetSelection()
+{
+	return m_impl->GetSelection();
+}
+
+void TerminalHost::WriteInput(std::wstring_view text)
+{
+	m_impl->WriteInput(text);
 }
 
 void TerminalHost::SetDirectoryChangedCallback(
