@@ -12,9 +12,9 @@
 #include "Tab.h"
 #include "TabView.h"
 #include "TabViewDelegate.h"
+#include "TerminalLaunchRequest.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclass.h"
-#include <boost/signals2/connection.hpp>
 #include <functional>
 #include <optional>
 #include <unordered_map>
@@ -68,8 +68,7 @@ public:
 	MainTabView *GetView();
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
-	bool CreateNewTerminalTab(const std::wstring &directory,
-		const std::wstring &initialCommand = L"");
+	bool CreateNewTerminalTab(const TerminalLaunchRequest &launchRequest);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
 		const FolderColumns *initialColumns = nullptr);
@@ -138,6 +137,7 @@ private:
 		const ResourceLoader *resourceLoader, PlatformContext *platformContext);
 
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT TabViewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
 
@@ -173,7 +173,7 @@ private:
 	void OnDropScrollTimer();
 
 	void OnWindowDestroyed();
-	void UpdateTerminalFontSizes();
+	void ScheduleTerminalTabClose(int tabId);
 
 	MainTabView *const m_view;
 	BrowserWindow *const m_browser;
@@ -192,8 +192,6 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	PlatformContext *const m_platformContext;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-	boost::signals2::scoped_connection m_mainFontConnection;
-
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;
 

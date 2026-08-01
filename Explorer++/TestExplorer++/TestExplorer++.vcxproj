@@ -280,6 +280,7 @@
     <ClCompile Include="ColumnXmlStorageTest.cpp" />
     <ClCompile Include="CommandLineSplitterTest.cpp" />
     <ClCompile Include="CommandLineTest.cpp" />
+    <ClCompile Include="CommandPromptProfileTest.cpp" />
     <ClCompile Include="BrowserCommandTargetManagerTest.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutorTest.cpp" />
     <ClCompile Include="ConfigRegistryStorageTest.cpp" />
@@ -427,6 +428,7 @@
     <ClCompile Include="TabStorageTestHelper.cpp" />
     <ClCompile Include="TabTest.cpp" />
     <ClCompile Include="TabXmlStorageTest.cpp" />
+    <ClCompile Include="TerminalOutputParserTest.cpp" />
     <ClCompile Include="VersionHelperTest.cpp" />
     <ClCompile Include="VersionTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />

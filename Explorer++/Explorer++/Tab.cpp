@@ -10,7 +10,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
-#include "TerminalHost.h"
+#include "TerminalTabContent.h"
 
 Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	TabContainer *tabContainer, TabEvents *tabEvents) :
@@ -70,42 +70,26 @@ ShellBrowserImpl *Tab::GetShellBrowserImpl() const
 
 bool Tab::IsTerminal() const
 {
-	return m_terminalHost != nullptr;
+	return m_terminalTabContent != nullptr;
 }
 
-void Tab::SetTerminalHost(std::unique_ptr<TerminalHost> terminalHost)
+void Tab::SetTerminalTabContent(std::unique_ptr<TerminalTabContent> terminalTabContent)
 {
-	CHECK(!m_terminalHost);
-	CHECK(terminalHost);
+	CHECK(!m_terminalTabContent);
+	CHECK(terminalTabContent);
 
-	HWND listView = m_shellBrowserImpl->GetListView();
-	RECT bounds{};
-	GetWindowRect(listView, &bounds);
-	MapWindowPoints(nullptr, GetParent(terminalHost->GetHWND()), reinterpret_cast<POINT *>(&bounds),
-		2);
-
-	terminalHost->SetBounds(bounds.left, bounds.top, bounds.right - bounds.left,
-		bounds.bottom - bounds.top, false);
-	terminalHost->SetDirectoryChangedCallback(
-		std::bind_front(&Tab::OnTerminalDirectoryChanged, this));
-	ShowWindow(listView, SW_HIDE);
-	m_terminalHost = std::move(terminalHost);
+	terminalTabContent->AttachToTab(m_shellBrowserImpl->GetListView());
+	m_terminalTabContent = std::move(terminalTabContent);
+	m_terminalTabContent->SetUpdatedCallback(
+		[this] { m_tabEvents->NotifyUpdated(*this, PropertyType::Name); });
 	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
-}
-
-void Tab::SetTerminalFontSize(int fontSize)
-{
-	if (m_terminalHost)
-	{
-		m_terminalHost->SetFontSize(fontSize);
-	}
 }
 
 HWND Tab::GetContentWindow() const
 {
-	if (m_terminalHost)
+	if (m_terminalTabContent)
 	{
-		return m_terminalHost->GetHWND();
+		return m_terminalTabContent->GetHWND();
 	}
 
 	return m_shellBrowserImpl->GetListView();
@@ -113,9 +97,9 @@ HWND Tab::GetContentWindow() const
 
 void Tab::SetContentBounds(int x, int y, int width, int height, bool visible)
 {
-	if (m_terminalHost)
+	if (m_terminalTabContent)
 	{
-		m_terminalHost->SetBounds(x, y, width, height, visible);
+		m_terminalTabContent->SetBounds(x, y, width, height, visible);
 		return;
 	}
 
@@ -125,9 +109,9 @@ void Tab::SetContentBounds(int x, int y, int width, int height, bool visible)
 
 void Tab::FocusContent() const
 {
-	if (m_terminalHost)
+	if (m_terminalTabContent)
 	{
-		m_terminalHost->Focus();
+		m_terminalTabContent->Focus();
 		return;
 	}
 
@@ -136,7 +120,17 @@ void Tab::FocusContent() const
 
 std::optional<std::wstring> Tab::GetTerminalDirectory() const
 {
-	return m_terminalDirectory;
+	if (!m_terminalTabContent)
+	{
+		return std::nullopt;
+	}
+
+	return m_terminalTabContent->GetDirectory();
+}
+
+bool Tab::ShouldBypassAccelerator(const MSG *msg) const
+{
+	return m_terminalTabContent && m_terminalTabContent->ShouldBypassAccelerator(msg);
 }
 
 BrowserWindow *Tab::GetBrowser() const
@@ -153,17 +147,14 @@ TabContainer *Tab::GetTabContainer() const
 // display name of the current directory will be returned.
 std::wstring Tab::GetName() const
 {
-	if (m_terminalDirectory)
+	if (m_terminalTabContent)
 	{
-		auto path = std::filesystem::path(*m_terminalDirectory);
+		auto name = m_terminalTabContent->GetName();
 
-		while (!path.has_filename() && path != path.root_path())
+		if (!name.empty())
 		{
-			path = path.parent_path();
+			return name;
 		}
-
-		auto name = path.filename().wstring();
-		return name.empty() ? path.root_path().wstring() : name;
 	}
 
 	if (m_useCustomName)
@@ -173,17 +164,6 @@ std::wstring Tab::GetName() const
 
 	auto *entry = m_shellBrowser->GetNavigationController()->GetCurrentEntry();
 	return GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER);
-}
-
-void Tab::OnTerminalDirectoryChanged(const std::wstring &directory)
-{
-	if (directory.empty() || m_terminalDirectory == directory)
-	{
-		return;
-	}
-
-	m_terminalDirectory = directory;
-	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
 }
 
 bool Tab::GetUseCustomName() const

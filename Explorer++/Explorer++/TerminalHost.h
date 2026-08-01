@@ -9,11 +9,13 @@
 #include <memory>
 #include <string>
 
+struct TerminalProcessLaunchInfo;
+
 class TerminalHost : private boost::noncopyable
 {
 public:
-	static std::unique_ptr<TerminalHost> Create(HWND parent, const std::wstring &directory,
-		const std::wstring &initialCommand);
+	static std::unique_ptr<TerminalHost> Create(HWND parent,
+		const TerminalProcessLaunchInfo &launchInfo);
 
 	~TerminalHost();
 
@@ -23,6 +25,7 @@ public:
 	void Focus();
 	void SetDirectoryChangedCallback(
 		std::function<void(const std::wstring &)> directoryChangedCallback);
+	void SetProcessExitedCallback(std::function<void()> processExitedCallback);
 
 private:
 	class Impl;

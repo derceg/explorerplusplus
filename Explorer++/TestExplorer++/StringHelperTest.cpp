@@ -6,6 +6,7 @@
 #include "../Helper/StringHelper.h"
 #include <gtest/gtest.h>
 #include <tchar.h>
+#include <locale>
 
 TEST(CheckWildcardMatch, SimpleMatches)
 {
@@ -37,17 +38,20 @@ http://connect.microsoft.com/VisualStudio/feedback/details/431433/unicode-string
 
 TEST(FormatSizeString, Simple)
 {
+	const std::wstring decimalSeparator(1,
+		std::use_facet<std::numpunct<wchar_t>>(std::locale("")).decimal_point());
+
 	auto formattedSize = FormatSizeString(1);
 	EXPECT_EQ(formattedSize, L"1 bytes");
 
 	formattedSize = FormatSizeString(1024);
-	EXPECT_EQ(formattedSize, L"1.00 KB");
+	EXPECT_EQ(formattedSize, L"1" + decimalSeparator + L"00 KB");
 
 	formattedSize = FormatSizeString(1024 * 1024 * 2);
-	EXPECT_EQ(formattedSize, L"2.00 MB");
+	EXPECT_EQ(formattedSize, L"2" + decimalSeparator + L"00 MB");
 
 	formattedSize = FormatSizeString(48169402368);
-	EXPECT_EQ(formattedSize, L"44.8 GB");
+	EXPECT_EQ(formattedSize, L"44" + decimalSeparator + L"8 GB");
 
 	formattedSize = FormatSizeString(517637815320);
 	EXPECT_EQ(formattedSize, L"482 GB");

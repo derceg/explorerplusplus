@@ -7,6 +7,7 @@
 #include "AddressBar.h"
 #include "App.h"
 #include "ColorRule.h"
+#include "CommandPromptProfile.h"
 #include "Config.h"
 #include "DarkModeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -50,43 +51,12 @@
 namespace
 {
 
-bool IsBatchFile(const std::filesystem::path &path)
-{
-	auto extension = path.extension().wstring();
-	return _wcsicmp(extension.c_str(), L".bat") == 0 || _wcsicmp(extension.c_str(), L".cmd") == 0;
-}
-
 bool TryOpenBatchFileInTerminal(TabContainer *tabContainer, const std::wstring &itemPath,
 	const std::wstring &parameters, const std::wstring &workingDirectory)
 {
-	std::filesystem::path batchPath(itemPath);
-
-	if (!IsBatchFile(batchPath))
-	{
-		return false;
-	}
-
-	if (batchPath.is_relative() && !workingDirectory.empty())
-	{
-		batchPath = std::filesystem::path(workingDirectory) / batchPath;
-	}
-
-	batchPath = batchPath.lexically_normal();
-	auto batchDirectory = batchPath.parent_path();
-
-	if (batchDirectory.empty())
-	{
-		return false;
-	}
-
-	std::wstring initialCommand = L"call \"" + batchPath.wstring() + L"\"";
-
-	if (!parameters.empty())
-	{
-		initialCommand += L" " + parameters;
-	}
-
-	return tabContainer->CreateNewTerminalTab(batchDirectory.wstring(), initialCommand);
+	auto launchRequest =
+		CommandPromptProfile::CreateBatchFile(itemPath, parameters, workingDirectory);
+	return launchRequest && tabContainer->CreateNewTerminalTab(*launchRequest);
 }
 
 }

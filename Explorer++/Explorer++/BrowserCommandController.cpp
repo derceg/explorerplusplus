@@ -6,6 +6,7 @@
 #include "BrowserCommandController.h"
 #include "AboutDialog.h"
 #include "BrowserWindow.h"
+#include "CommandPromptProfile.h"
 #include "Config.h"
 #include "DisplayColoursDialog.h"
 #include "MainResource.h"
@@ -518,10 +519,15 @@ void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 		return;
 	}
 
-	if (!WI_IsFlagSet(flags, LaunchProcessFlags::Elevated)
-		&& m_browser->GetActiveTabContainer()->CreateNewTerminalTab(directoryPath.get()))
+	if (!WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
 	{
-		return;
+		auto terminalLaunchRequest = CommandPromptProfile::CreateInteractive(directoryPath.get());
+
+		if (terminalLaunchRequest
+			&& m_browser->GetActiveTabContainer()->CreateNewTerminalTab(*terminalLaunchRequest))
+		{
+			return;
+		}
 	}
 
 	// Elevated terminal processes can't be hosted safely inside this unelevated window. Also retain

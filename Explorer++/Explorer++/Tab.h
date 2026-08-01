@@ -13,7 +13,7 @@ class ShellBrowser;
 class ShellBrowserImpl;
 class TabContainer;
 class TabEvents;
-class TerminalHost;
+class TerminalTabContent;
 struct TabStorageData;
 
 class Tab : private boost::noncopyable
@@ -57,12 +57,12 @@ public:
 	ShellBrowserImpl *GetShellBrowserImpl() const;
 
 	bool IsTerminal() const;
-	void SetTerminalHost(std::unique_ptr<TerminalHost> terminalHost);
-	void SetTerminalFontSize(int fontSize);
+	void SetTerminalTabContent(std::unique_ptr<TerminalTabContent> terminalTabContent);
 	HWND GetContentWindow() const;
 	void SetContentBounds(int x, int y, int width, int height, bool visible);
 	void FocusContent() const;
 	std::optional<std::wstring> GetTerminalDirectory() const;
+	bool ShouldBypassAccelerator(const MSG *msg) const;
 
 	BrowserWindow *GetBrowser() const;
 	TabContainer *GetTabContainer() const;
@@ -95,15 +95,12 @@ private:
 	};
 
 	void ApplyLockState(LockState lockState, NotificationMode notificationMode);
-	void OnTerminalDirectoryChanged(const std::wstring &directory);
-
 	static inline int idCounter = 1;
 	const int m_id;
 
 	const std::unique_ptr<ShellBrowser> m_shellBrowser;
 	ShellBrowserImpl *const m_shellBrowserImpl;
-	std::unique_ptr<TerminalHost> m_terminalHost;
-	std::optional<std::wstring> m_terminalDirectory;
+	std::unique_ptr<TerminalTabContent> m_terminalTabContent;
 
 	BrowserWindow *const m_browser;
 	TabContainer *const m_tabContainer;

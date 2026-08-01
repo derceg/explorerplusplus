@@ -172,6 +172,21 @@
     <ClCompile Include="TerminalHost.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="CommandPromptProfile.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="PseudoConsoleSession.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="TerminalControlApi.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="TerminalOutputParser.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="TerminalTabContent.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
     <ClCompile Include="Plugins\Event.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -1024,6 +1039,24 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="TerminalHost.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandPromptProfile.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="PseudoConsoleSession.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TerminalControlApi.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TerminalLaunchRequest.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TerminalOutputParser.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TerminalTabContent.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="Plugins\MenuApi.h">

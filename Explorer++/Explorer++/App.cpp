@@ -40,23 +40,10 @@ using namespace std::chrono_literals;
 namespace
 {
 
-bool ShouldSendTabToTerminal(const MSG *msg, BrowserWindow *browser)
+bool ShouldBypassAcceleratorForSelectedTab(const MSG *msg, BrowserWindow *browser)
 {
-	if ((msg->message != WM_KEYDOWN && msg->message != WM_SYSKEYDOWN) || msg->wParam != VK_TAB
-		|| GetKeyState(VK_CONTROL) < 0 || GetKeyState(VK_MENU) < 0)
-	{
-		return false;
-	}
-
 	const auto &selectedTab = browser->GetActiveTabContainer()->GetSelectedTab();
-
-	if (!selectedTab.IsTerminal())
-	{
-		return false;
-	}
-
-	HWND terminalWindow = selectedTab.GetContentWindow();
-	return msg->hwnd == terminalWindow || IsChild(terminalWindow, msg->hwnd);
+	return selectedTab.ShouldBypassAccelerator(msg);
 }
 
 }
@@ -363,7 +350,7 @@ bool App::MaybeTranslateAccelerator(MSG *msg)
 	{
 		if (IsChild(browser->GetHWND(), msg->hwnd))
 		{
-			if (ShouldSendTabToTerminal(msg, browser))
+			if (ShouldBypassAcceleratorForSelectedTab(msg, browser))
 			{
 				return false;
 			}

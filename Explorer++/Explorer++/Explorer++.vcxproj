@@ -1496,7 +1496,12 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release-Clang|ARM64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="Tab.cpp" />
+    <ClCompile Include="CommandPromptProfile.cpp" />
+    <ClCompile Include="PseudoConsoleSession.cpp" />
+    <ClCompile Include="TerminalControlApi.cpp" />
     <ClCompile Include="TerminalHost.cpp" />
+    <ClCompile Include="TerminalOutputParser.cpp" />
+    <ClCompile Include="TerminalTabContent.cpp" />
     <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
     <ClCompile Include="TabHandler.cpp" />
@@ -1844,7 +1849,13 @@
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />
+    <ClInclude Include="CommandPromptProfile.h" />
+    <ClInclude Include="PseudoConsoleSession.h" />
+    <ClInclude Include="TerminalControlApi.h" />
     <ClInclude Include="TerminalHost.h" />
+    <ClInclude Include="TerminalLaunchRequest.h" />
+    <ClInclude Include="TerminalOutputParser.h" />
+    <ClInclude Include="TerminalTabContent.h" />
     <ClInclude Include="TabBacking.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />

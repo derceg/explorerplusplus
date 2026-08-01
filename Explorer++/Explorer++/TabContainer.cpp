@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CustomFont.h"
 #include "MainTabView.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
@@ -18,12 +17,11 @@
 #include "ShellBrowser/ShellBrowserFactory.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "SystemFontHelper.h"
 #include "TabContainerBackgroundContextMenu.h"
 #include "TabContextMenu.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
-#include "TerminalHost.h"
+#include "TerminalTabContent.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -39,17 +37,7 @@ using namespace std::chrono_literals;
 namespace
 {
 
-int GetMainFontSize(const Config *config)
-{
-	if (config->mainFont.get())
-	{
-		return config->mainFont.get()->GetSize();
-	}
-
-	auto systemLogFont = GetDefaultSystemFontForDefaultDpi();
-	return std::abs(
-		DpiCompatibility::GetInstance().PixelsToPointsForDefaultDpi(systemLogFont.lfHeight));
-}
+const UINT TERMINAL_TAB_CLOSE_MESSAGE = RegisterWindowMessage(L"Explorer++TerminalTabClose");
 
 class MainTabViewItem : public TabViewItem
 {
@@ -251,11 +239,10 @@ void TabContainer::Initialize(HWND parent)
 	m_view->windowDestroyedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnWindowDestroyed, this));
 
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_view->GetHWND(),
+		std::bind_front(&TabContainer::TabViewWndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
-
-	m_mainFontConnection =
-		m_config->mainFont.addObserver([this](const auto &) { UpdateTerminalFontSizes(); });
 }
 
 void TabContainer::OnTabDoubleClicked(Tab *tab, const MouseEvent &event)
@@ -306,6 +293,23 @@ LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
+LRESULT TabContainer::TabViewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (uMsg == TERMINAL_TAB_CLOSE_MESSAGE)
+	{
+		auto *tab = MaybeGetTab(static_cast<int>(wParam));
+
+		if (tab && tab->IsTerminal())
+		{
+			CloseTab(*tab, CloseMode::Force);
+		}
+
+		return 0;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
 void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 {
 	POINT ptScreen = ptClient;
@@ -339,34 +343,28 @@ void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings
 	CreateNewTab(m_config->defaultTabDirectory, tabSettings);
 }
 
-bool TabContainer::CreateNewTerminalTab(const std::wstring &directory,
-	const std::wstring &initialCommand)
+bool TabContainer::CreateNewTerminalTab(const TerminalLaunchRequest &launchRequest)
 {
-	auto &tab = CreateNewTab(directory);
-	auto terminalHost = TerminalHost::Create(m_browser->GetHWND(), directory, initialCommand);
+	auto terminalTabContent =
+		TerminalTabContent::Create(m_browser->GetHWND(), launchRequest, m_config);
 
-	if (!terminalHost)
+	if (!terminalTabContent)
 	{
-		CloseTab(tab);
 		return false;
 	}
 
-	ShowWindow(terminalHost->GetHWND(), SW_HIDE);
-	tab.SetTerminalHost(std::move(terminalHost));
-	tab.SetTerminalFontSize(GetMainFontSize(m_config));
+	auto &tab = CreateNewTab(launchRequest.initialDirectory.wstring());
+	int tabId = tab.GetId();
+	terminalTabContent->SetCloseRequestedCallback(
+		[this, tabId] { ScheduleTerminalTabClose(tabId); });
+	tab.SetTerminalTabContent(std::move(terminalTabContent));
 	SelectTab(tab);
 	return true;
 }
 
-void TabContainer::UpdateTerminalFontSizes()
+void TabContainer::ScheduleTerminalTabClose(int tabId)
 {
-	int fontSize = GetMainFontSize(m_config);
-
-	for (const auto &[tabId, tab] : m_tabs)
-	{
-		UNREFERENCED_PARAMETER(tabId);
-		tab->SetTerminalFontSize(fontSize);
-	}
+	PostMessage(m_view->GetHWND(), TERMINAL_TAB_CLOSE_MESSAGE, static_cast<WPARAM>(tabId), 0);
 }
 
 // Note that although it's guaranteed that the tab will be created, it's not guaranteed that it will

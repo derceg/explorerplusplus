@@ -173,6 +173,9 @@
     <ClCompile Include="CommandLineSplitterTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="CommandPromptProfileTest.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
     <ClCompile Include="DataExchangeHelperTest.cpp">
       <Filter>Helper\Data Exchange</Filter>
     </ClCompile>
@@ -468,6 +471,9 @@
     </ClCompile>
     <ClCompile Include="TabContainerTest.cpp">
       <Filter>Tabs\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TerminalOutputParserTest.cpp">
+      <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="TabContextMenuTest.cpp">
       <Filter>Tabs\UI</Filter>
