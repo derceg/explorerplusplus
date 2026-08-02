@@ -41,6 +41,7 @@ $applicationFiles = @(
     "$repositoryRoot\Explorer++\Explorer++\$Platform\$Configuration\Microsoft.Terminal.Control.dll"
     "$repositoryRoot\Documentation\User\History.txt"
     "$repositoryRoot\Documentation\User\License.txt"
+    "$repositoryRoot\Documentation\User\Microsoft.Terminal.Control.LICENSE.txt"
     "$repositoryRoot\Documentation\User\Readme.txt"
 )
 
