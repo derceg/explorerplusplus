@@ -8,6 +8,9 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.ref == 'refs/heads/master' && format('{0}-{1}', github.workflow, github.ref) || github.run_id }}
+
 jobs:
   before-build:
     name: Before build
