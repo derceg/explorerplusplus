@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
 if ($Configuration -eq "Debug-Asan") {
     # See https://github.com/microsoft/vswhere/wiki/Start-Developer-Command-Prompt#using-powershell.
@@ -32,10 +33,6 @@ if ($Configuration -eq "Debug-Asan") {
 
     $developerEnvironment = & $env:COMSPEC /s /c "`"$vsDevCmd`" -no_logo -arch=$architecture -host_arch=amd64 && set"
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "VsDevCmd.bat failed with exit code $LASTEXITCODE"
-    }
-
     # To be able to run the test executable when ASAN is enabled, the appropriate ASAN DLL needs to be on the path.
     # This is accomplished here by effectively setting up a developer environment.
     foreach ($line in $developerEnvironment) {
@@ -45,7 +42,3 @@ if ($Configuration -eq "Debug-Asan") {
 }
 
 & ".\Explorer++\TestExplorer++\${Platform}\${Configuration}\TestExplorer++.exe"
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Tests failed with exit code $LASTEXITCODE"
-}

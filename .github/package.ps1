@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$PSNativeCommandUseErrorActionPreference = $true
 
 $artifactsDirectory = 'artifacts'
 
@@ -21,10 +22,6 @@ function New-Artifact {
     
     $artifactPath = Join-Path $artifactsDirectory $Name
     & 7z a $artifactPath @Files
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "7z failed with exit code $LASTEXITCODE"
-    }
 }
 
 $architecture = switch ($Platform) {

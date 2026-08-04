@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$PSNativeCommandUseErrorActionPreference = $true
 
 function Get-FullVersionNumber {
     param(
@@ -61,10 +62,6 @@ function Copy-ToS3 {
     }
 
     & aws s3 cp $Source "s3://explorerplusplus-builds/$DestinationPrefix/" @additionalArguments
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "AWS CLI failed while copying '$Source'"
-    }
 }
 
 if ($BuildNumber -eq 0) {
