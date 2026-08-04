@@ -1,0 +1,60 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  coverage:
+    name: Generate coverage report
+    runs-on: windows-2022
+
+    strategy:
+      matrix:
+        include:
+          - configuration: Release-Clang
+            platform: x64
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~\AppData\Local\vcpkg\archives
+          key: vcpkg-${{ matrix.configuration }}-${{ matrix.platform }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+
+      - name: Bootstrap vcpkg
+        run: Explorer++/ThirdParty/vcpkg/bootstrap-vcpkg.bat
+
+      - name: Build
+        run: |
+          msbuild `
+            Explorer++/Explorer++.sln `
+            /p:Configuration=${{ matrix.configuration }} `
+            /p:Platform=${{ matrix.platform }} `
+            /p:EnableClangCoverage=true `
+            /v:minimal
+
+      - name: Run tests and generate coverage report
+        run: ./.github/run_tests_with_coverage.ps1 -Configuration '${{ matrix.configuration }}' -Platform '${{ matrix.platform }}'
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: coverage.lcov
+          disable_search: true
+          fail_ci_if_error: true
+          use_oidc: true

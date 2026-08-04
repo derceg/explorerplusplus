@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions Condition="'$(PlatformToolset)' == 'ClangCL'">-Wno-missing-designated-field-initializers -Wno-missing-field-initializers %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(PlatformToolset)' == 'ClangCL' AND '$(EnableClangCoverage)' == 'true'">-fprofile-instr-generate -fcoverage-mapping %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
