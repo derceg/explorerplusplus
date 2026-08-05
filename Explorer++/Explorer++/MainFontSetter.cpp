@@ -15,8 +15,7 @@ MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
 	m_config(config),
 	m_defaultFontAt96Dpi(defaultFontAt96Dpi)
 {
-	SubclassWindowForDpiChanges();
-	MaybeSubclassSpecificWindowClasses();
+	InstallWindowSubclass();
 	UpdateFont();
 
 	m_connections.push_back(
@@ -25,7 +24,7 @@ MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
 
 MainFontSetter::~MainFontSetter() = default;
 
-void MainFontSetter::SubclassWindowForDpiChanges()
+void MainFontSetter::InstallWindowSubclass()
 {
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainFontSetter::WndProc, this)));
@@ -38,6 +37,21 @@ LRESULT MainFontSetter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	case WM_DPICHANGED_AFTERPARENT:
 		OnDpiChanged();
 		break;
+
+	case WM_THEMECHANGED:
+	{
+		auto res = DefSubclassProc(hwnd, msg, wParam, lParam);
+
+		// Some controls, including toolbars and tooltips, reset their font when the theme is
+		// changed. Restore the active custom font after the control has processed the message.
+		if (m_font)
+		{
+			SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_font.get()), true);
+			fontUpdatedSignal.m_signal();
+		}
+
+		return res;
+	}
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -53,49 +67,6 @@ void MainFontSetter::OnDpiChanged()
 	}
 
 	UpdateFont();
-}
-
-void MainFontSetter::MaybeSubclassSpecificWindowClasses()
-{
-	WCHAR className[256];
-	auto res = GetClassName(m_hwnd, className, static_cast<int>(std::size(className)));
-
-	if (res == 0)
-	{
-		DCHECK(false);
-		return;
-	}
-
-	if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
-	{
-		m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
-			std::bind_front(&MainFontSetter::TooltipWndProc, this)));
-	}
-}
-
-LRESULT MainFontSetter::TooltipWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_THEMECHANGED:
-	{
-		auto res = DefSubclassProc(hwnd, msg, wParam, lParam);
-
-		// The tooltip control will internally reset its font when it receives a WM_THEMECHANGED
-		// message. Therefore, if a custom font is currently active within the application, that
-		// font will need to be restored. If a custom font isn't active, the control can use the
-		// default font it sets.
-		if (m_font)
-		{
-			SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_font.get()), true);
-		}
-
-		return res;
-	}
-	break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 void MainFontSetter::UpdateFont()
