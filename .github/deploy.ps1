@@ -53,9 +53,7 @@ function Copy-ToS3 {
         [switch] $AllowOverwrite
     )
 
-    $additionalArguments = @(
-        '--dryrun'
-    )
+    $additionalArguments = @()
 
     if (!$AllowOverwrite) {
         $additionalArguments += '--no-overwrite'
