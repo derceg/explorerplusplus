@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "TabContent.h"
 #include <boost/core/noncopyable.hpp>
 #include <memory>
+#include <optional>
 
 class BrowserWindow;
 class ShellBrowser;
@@ -47,11 +49,20 @@ public:
 		TabContainer *tabContainer, TabEvents *tabEvents);
 	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 		TabContainer *tabContainer, TabEvents *tabEvents, const InitialData &initialData);
+	~Tab();
 
 	int GetId() const;
 
 	ShellBrowser *GetShellBrowser() const;
 	ShellBrowserImpl *GetShellBrowserImpl() const;
+
+	void SetContent(std::unique_ptr<TabContent> content);
+	HWND GetContentWindow() const;
+	void SetContentBounds(int x, int y, int width, int height, bool visible);
+	void FocusContent() const;
+	std::optional<std::wstring> GetContentTooltipText() const;
+	std::optional<TabContent::Icon> GetContentIcon() const;
+	TabContent::MessageResult ProcessContentMessage(const MSG *msg);
 
 	BrowserWindow *GetBrowser() const;
 	TabContainer *GetTabContainer() const;
@@ -84,12 +95,12 @@ private:
 	};
 
 	void ApplyLockState(LockState lockState, NotificationMode notificationMode);
-
 	static inline int idCounter = 1;
 	const int m_id;
 
 	const std::unique_ptr<ShellBrowser> m_shellBrowser;
 	ShellBrowserImpl *const m_shellBrowserImpl;
+	std::unique_ptr<TabContent> m_content;
 
 	BrowserWindow *const m_browser;
 	TabContainer *const m_tabContainer;

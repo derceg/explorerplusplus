@@ -416,6 +416,7 @@ private:
 	Plugins::PluginCommandManager m_pluginCommandManager;
 
 	HWND m_hActiveListView;
+	HWND m_hActiveTabContent;
 	ShellBrowserImpl *m_pActiveShellBrowser;
 	ShellBrowserFactoryImpl m_shellBrowserFactory;
 

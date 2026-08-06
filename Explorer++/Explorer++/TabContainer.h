@@ -33,6 +33,7 @@ class ResourceLoader;
 class ShellBrowserEvents;
 class ShellBrowserFactory;
 class TabRestorer;
+struct TerminalLaunchRequest;
 
 // Used when creating a tab.
 struct TabSettings
@@ -67,6 +68,7 @@ public:
 	MainTabView *GetView();
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
+	bool CreateNewTerminalTab(const TerminalLaunchRequest &launchRequest);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
 		const FolderColumns *initialColumns = nullptr);
@@ -135,6 +137,7 @@ private:
 		const ResourceLoader *resourceLoader, PlatformContext *platformContext);
 
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT TabViewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
 
@@ -170,6 +173,7 @@ private:
 	void OnDropScrollTimer();
 
 	void OnWindowDestroyed();
+	void ScheduleTerminalTabClose(int tabId);
 
 	MainTabView *const m_view;
 	BrowserWindow *const m_browser;
@@ -188,7 +192,6 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	PlatformContext *const m_platformContext;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;
 

@@ -14,6 +14,7 @@ enum class Icon
 	CloseTab,
 	CommandLine,
 	CommandLineAdmin,
+	CommandLineTab,
 	Copy,
 	CopyTo,
 	CustomizeColors,

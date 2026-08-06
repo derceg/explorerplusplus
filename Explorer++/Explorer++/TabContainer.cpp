@@ -8,6 +8,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainTabView.h"
+#include "PlatformContext.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/NavigateParams.h"
@@ -21,6 +22,7 @@
 #include "TabContextMenu.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
+#include "TerminalTabContent.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -35,6 +37,8 @@ using namespace std::chrono_literals;
 
 namespace
 {
+
+const UINT TERMINAL_TAB_CLOSE_MESSAGE = RegisterWindowMessage(L"Explorer++TerminalTabClose");
 
 class MainTabViewItem : public TabViewItem
 {
@@ -69,6 +73,13 @@ public:
 
 	std::wstring GetTooltipText() const override
 	{
+		auto contentTooltipText = m_tab->GetContentTooltipText();
+
+		if (contentTooltipText)
+		{
+			return *contentTooltipText;
+		}
+
 		const auto &pidlDirectory = m_tab->GetShellBrowser()->GetDirectory();
 		return GetFolderPathForDisplayWithFallback(pidlDirectory.Raw());
 	}
@@ -115,6 +126,13 @@ private:
 
 	int DetermineIconIndex() const
 	{
+		auto contentIcon = m_tab->GetContentIcon();
+
+		if (contentIcon)
+		{
+			return m_imageListManager->GetContentIconIndex(*contentIcon);
+		}
+
 		FetchUpdatedIcon();
 
 		auto cachedIconIndex = MaybeGetCachedIconIndex();
@@ -224,6 +242,8 @@ void TabContainer::Initialize(HWND parent)
 	m_view->windowDestroyedSignal.AddObserver(
 		std::bind_front(&TabContainer::OnWindowDestroyed, this));
 
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_view->GetHWND(),
+		std::bind_front(&TabContainer::TabViewWndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
 }
@@ -276,6 +296,23 @@ LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
+LRESULT TabContainer::TabViewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (uMsg == TERMINAL_TAB_CLOSE_MESSAGE)
+	{
+		auto *tab = MaybeGetTab(static_cast<int>(wParam));
+
+		if (tab)
+		{
+			CloseTab(*tab, CloseMode::Force);
+		}
+
+		return 0;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
 void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 {
 	POINT ptScreen = ptClient;
@@ -307,6 +344,30 @@ MainTabView *TabContainer::GetView()
 void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
 {
 	CreateNewTab(m_config->defaultTabDirectory, tabSettings);
+}
+
+bool TabContainer::CreateNewTerminalTab(const TerminalLaunchRequest &launchRequest)
+{
+	auto terminalTabContent = TerminalTabContent::Create(m_browser->GetHWND(), launchRequest,
+		m_config, m_platformContext->GetClipboardStore());
+
+	if (!terminalTabContent)
+	{
+		return false;
+	}
+
+	auto &tab = CreateNewTab(launchRequest.initialDirectory.wstring());
+	int tabId = tab.GetId();
+	terminalTabContent->SetCloseRequestedCallback(
+		[this, tabId] { ScheduleTerminalTabClose(tabId); });
+	tab.SetContent(std::move(terminalTabContent));
+	SelectTab(tab);
+	return true;
+}
+
+void TabContainer::ScheduleTerminalTabClose(int tabId)
+{
+	PostMessage(m_view->GetHWND(), TERMINAL_TAB_CLOSE_MESSAGE, static_cast<WPARAM>(tabId), 0);
 }
 
 // Note that although it's guaranteed that the tab will be created, it's not guaranteed that it will

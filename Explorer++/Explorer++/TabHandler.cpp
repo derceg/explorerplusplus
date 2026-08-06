@@ -263,17 +263,19 @@ void Explorerplusplus::CreateCommandLineTabs()
 
 void Explorerplusplus::OnTabSelected(const Tab &tab)
 {
-	/* Hide the old listview. */
-	ShowWindow(m_hActiveListView, SW_HIDE);
+	if (m_hActiveTabContent)
+	{
+		ShowWindow(m_hActiveTabContent, SW_HIDE);
+	}
 
 	m_hActiveListView = tab.GetShellBrowserImpl()->GetListView();
+	m_hActiveTabContent = tab.GetContentWindow();
 	m_pActiveShellBrowser = tab.GetShellBrowserImpl();
 
 	UpdateWindowStates(tab);
 
-	/* Show the new listview. */
-	ShowWindow(m_hActiveListView, SW_SHOW);
-	SetFocus(m_hActiveListView);
+	ShowWindow(m_hActiveTabContent, SW_SHOW);
+	tab.FocusContent();
 }
 
 void Explorerplusplus::OnTabPreRemoval(const Tab &tab, int index)

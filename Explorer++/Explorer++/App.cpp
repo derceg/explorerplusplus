@@ -23,6 +23,7 @@
 #include "ResourceHelper.h"
 #include "ShellWatcher.h"
 #include "TabStorage.h"
+#include "TerminalMessageRouter.h"
 #include "UIThreadExecutor.h"
 #include "Win32ResourceLoader.h"
 #include "WindowStorage.h"
@@ -337,6 +338,18 @@ bool App::MaybeTranslateAccelerator(MSG *msg)
 	{
 		if (IsChild(browser->GetHWND(), msg->hwnd))
 		{
+			auto terminalMessageResult = TerminalMessageRouter::Process(msg, browser);
+
+			if (terminalMessageResult == TerminalMessageRouter::Result::Handled)
+			{
+				return true;
+			}
+
+			if (terminalMessageResult == TerminalMessageRouter::Result::BypassAccelerator)
+			{
+				return false;
+			}
+
 			return TranslateAccelerator(browser->GetHWND(),
 				m_acceleratorManager.GetAcceleratorTable(), msg);
 		}

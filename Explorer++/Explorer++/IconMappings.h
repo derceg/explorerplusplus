@@ -29,6 +29,7 @@ using IconMapping = std::unordered_map<Icon, std::map<int, UINT>>;
 	{ Icon::CloseTab, { ICON_SIZE_MAPPINGS(IDB_CLOSE_TAB##SetSuffix) } }, \
 	{ Icon::CommandLine, { ICON_SIZE_MAPPINGS(IDB_COMMAND_LINE##SetSuffix) } }, \
 	{ Icon::CommandLineAdmin, { ICON_SIZE_MAPPINGS(IDB_COMMAND_LINE_ADMIN##SetSuffix) } }, \
+	{ Icon::CommandLineTab, { ICON_SIZE_MAPPINGS(IDB_COMMAND_LINE_TAB##SetSuffix) } }, \
 	{ Icon::Copy, { ICON_SIZE_MAPPINGS(IDB_COPY##SetSuffix) } }, \
 	{ Icon::CopyTo, { ICON_SIZE_MAPPINGS(IDB_COPY_TO##SetSuffix) } }, \
 	{ Icon::CustomizeColors, { ICON_SIZE_MAPPINGS(IDB_CUSTOMIZE_COLORS##SetSuffix) } }, \

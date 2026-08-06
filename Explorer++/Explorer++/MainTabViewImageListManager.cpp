@@ -25,6 +25,11 @@ MainTabViewImageListManager::MainTabViewImageListManager(const ResourceLoader *r
 	m_lockIconIndex = ImageList_Add(m_imageList.get(), bitmap.get(), nullptr);
 	CHECK_NE(m_lockIconIndex, -1);
 
+	bitmap = resourceLoader->LoadBitmapFromPNGForDpi(Icon::CommandLineTab, ICON_SIZE_96DPI,
+		ICON_SIZE_96DPI, dpi);
+	m_commandLineIconIndex = ImageList_Add(m_imageList.get(), bitmap.get(), nullptr);
+	CHECK_NE(m_commandLineIconIndex, -1);
+
 	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
 		m_defaultFolderIconSystemImageListIndex);
@@ -48,7 +53,8 @@ int MainTabViewImageListManager::AddIconFromSystemImageList(int systemIconIndex)
 
 bool MainTabViewImageListManager::IsDefaultIcon(int iconIndex) const
 {
-	return iconIndex == m_lockIconIndex || iconIndex == m_defaultFolderIconIndex;
+	return iconIndex == m_lockIconIndex || iconIndex == m_defaultFolderIconIndex
+		|| iconIndex == m_commandLineIconIndex;
 }
 
 int MainTabViewImageListManager::GetLockIconIndex() const
@@ -59,4 +65,15 @@ int MainTabViewImageListManager::GetLockIconIndex() const
 int MainTabViewImageListManager::GetDefaultFolderIconIndex() const
 {
 	return m_defaultFolderIconIndex;
+}
+
+int MainTabViewImageListManager::GetContentIconIndex(TabContent::Icon icon) const
+{
+	switch (icon)
+	{
+	case TabContent::Icon::CommandLine:
+		return m_commandLineIconIndex;
+	}
+
+	LOG(FATAL) << "Unknown tab content icon";
 }

@@ -961,6 +961,30 @@ IDB_CLOSE_BUTTON_FLUENT_UI_32 PNG                     "res\\icons\\fluent-ui\\32
 
 IDB_CLOSE_BUTTON_FLUENT_UI_48 PNG                     "res\\icons\\fluent-ui\\48x48\\close-button.png"
 
+IDB_COMMAND_LINE_TAB_16 PNG                     "res\\icons\\color\\16x16\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_24 PNG                     "res\\icons\\color\\24x24\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_32 PNG                     "res\\icons\\color\\32x32\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_48 PNG                     "res\\icons\\color\\48x48\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_FLUENT_UI_16 PNG                     "res\\icons\\fluent-ui\\16x16\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_FLUENT_UI_24 PNG                     "res\\icons\\fluent-ui\\24x24\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_FLUENT_UI_32 PNG                     "res\\icons\\fluent-ui\\32x32\\command-line-tab.png"
+
+IDB_COMMAND_LINE_TAB_FLUENT_UI_48 PNG                     "res\\icons\\fluent-ui\\48x48\\command-line-tab.png"
+
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 

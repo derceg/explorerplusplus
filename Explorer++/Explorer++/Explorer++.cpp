@@ -63,6 +63,7 @@ Explorerplusplus::Explorerplusplus(App *app, const WindowStorageData *storageDat
 	m_pActiveShellBrowser = nullptr;
 	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
+	m_hActiveTabContent = nullptr;
 
 	m_iDWFolderSizeUniqueId = 0;
 
@@ -189,7 +190,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	CreateInitialTabs(storageData);
 
-	SetFocus(m_hActiveListView);
+	FocusActiveTab();
 
 	InitializePlugins();
 

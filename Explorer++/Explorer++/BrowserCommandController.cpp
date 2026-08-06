@@ -14,6 +14,7 @@
 #include "SortModeMenuMappings.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
+#include "TerminalLauncher.h"
 #include "UpdateCheckDialog.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -507,35 +508,19 @@ void BrowserCommandController::OnCloseTab()
 
 void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
 {
-	wil::unique_cotaskmem_string systemPath;
-	HRESULT hr = SHGetKnownFolderPath(FOLDERID_System, KF_FLAG_DEFAULT, nullptr, &systemPath);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	std::filesystem::path fullPath(systemPath.get());
-	fullPath /= L"cmd.exe";
-
 	const auto *shellBrowser = GetActiveShellBrowser();
 
 	wil::unique_cotaskmem_string directoryPath;
-	hr = SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(), SIGDN_FILESYSPATH, &directoryPath);
+	HRESULT hr =
+		SHGetNameFromIDList(shellBrowser->GetDirectory().Raw(), SIGDN_FILESYSPATH, &directoryPath);
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	std::wstring parameters;
-
-	if (WI_IsFlagSet(flags, LaunchProcessFlags::Elevated))
-	{
-		parameters = L"/K cd /d "s + directoryPath.get();
-	}
-
-	LaunchProcess(nullptr, fullPath.c_str(), parameters, directoryPath.get(), flags);
+	TerminalLauncher::OpenCommandPrompt(m_browser->GetActiveTabContainer(), directoryPath.get(),
+		flags);
 }
 
 void BrowserCommandController::CopyFolderPath() const

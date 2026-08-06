@@ -4,15 +4,17 @@
 
 #pragma once
 
+#include "TabContent.h"
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <CommCtrl.h>
 
 class ResourceLoader;
 
-// The main tab view displays two types of icons:
+// The main tab view displays three types of icons:
 //
 // - The lock icon (when a tab is locked)
+// - The command-line icon (for terminal content)
 // - The system icon for the associated folder (when a tab isn't locked)
 //
 // Since at least one custom icon is used, it's not feasible to assign the system image list itself
@@ -30,6 +32,7 @@ public:
 	bool IsDefaultIcon(int iconIndex) const;
 	int GetLockIconIndex() const;
 	int GetDefaultFolderIconIndex() const;
+	int GetContentIconIndex(TabContent::Icon icon) const;
 
 private:
 	static constexpr int ICON_SIZE_96DPI = 16;
@@ -40,4 +43,5 @@ private:
 	wil::unique_himagelist m_imageList;
 	int m_defaultFolderIconIndex;
 	int m_lockIconIndex;
+	int m_commandLineIconIndex;
 };

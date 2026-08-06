@@ -10,6 +10,7 @@ Set-Location $env:APPVEYOR_BUILD_FOLDER
 
 $archiveName = "explorerpp_$env:arch.zip"
 7z a $archiveName $env:APPVEYOR_BUILD_FOLDER\Explorer++\Explorer++\$env:platform\$env:configuration\Explorer++.exe
+7z a $archiveName $env:APPVEYOR_BUILD_FOLDER\Explorer++\Explorer++\$env:platform\$env:configuration\Microsoft.Terminal.Control.dll
 7z a $archiveName $env:APPVEYOR_BUILD_FOLDER\Documentation\User\History.txt
 7z a $archiveName $env:APPVEYOR_BUILD_FOLDER\Documentation\User\License.txt
 7z a $archiveName $env:APPVEYOR_BUILD_FOLDER\Documentation\User\Readme.txt

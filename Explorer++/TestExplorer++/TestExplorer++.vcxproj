@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug-Asan|ARM64">
@@ -280,6 +280,7 @@
     <ClCompile Include="ColumnXmlStorageTest.cpp" />
     <ClCompile Include="CommandLineSplitterTest.cpp" />
     <ClCompile Include="CommandLineTest.cpp" />
+    <ClCompile Include="CommandPromptProfileTest.cpp" />
     <ClCompile Include="BrowserCommandTargetManagerTest.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutorTest.cpp" />
     <ClCompile Include="ConfigRegistryStorageTest.cpp" />
@@ -427,6 +428,8 @@
     <ClCompile Include="TabStorageTestHelper.cpp" />
     <ClCompile Include="TabTest.cpp" />
     <ClCompile Include="TabXmlStorageTest.cpp" />
+    <ClCompile Include="TerminalClipboardTest.cpp" />
+    <ClCompile Include="TerminalOutputParserTest.cpp" />
     <ClCompile Include="VersionHelperTest.cpp" />
     <ClCompile Include="VersionTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />

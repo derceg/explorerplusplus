@@ -38,6 +38,8 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	m_id(idCounter++),
 	m_shellBrowser(std::move(shellBrowser)),
 	m_shellBrowserImpl(dynamic_cast<ShellBrowserImpl *>(m_shellBrowser.get())),
+	m_content(std::make_unique<TabContent>(
+		m_shellBrowserImpl ? m_shellBrowserImpl->GetListView() : nullptr)),
 	m_browser(browser),
 	m_tabContainer(tabContainer),
 	m_tabEvents(tabEvents),
@@ -49,6 +51,8 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 
 	ApplyLockState(initialData.lockState, NotificationMode::DontNotify);
 }
+
+Tab::~Tab() = default;
 
 int Tab::GetId() const
 {
@@ -65,6 +69,47 @@ ShellBrowserImpl *Tab::GetShellBrowserImpl() const
 	return m_shellBrowserImpl;
 }
 
+void Tab::SetContent(std::unique_ptr<TabContent> content)
+{
+	CHECK(content);
+
+	content->AttachToTab(m_content->GetHWND());
+	m_content = std::move(content);
+	m_content->SetUpdatedCallback(
+		[this] { m_tabEvents->NotifyUpdated(*this, PropertyType::Name); });
+	m_tabEvents->NotifyUpdated(*this, PropertyType::Name);
+}
+
+HWND Tab::GetContentWindow() const
+{
+	return m_content->GetHWND();
+}
+
+void Tab::SetContentBounds(int x, int y, int width, int height, bool visible)
+{
+	m_content->SetBounds(x, y, width, height, visible);
+}
+
+void Tab::FocusContent() const
+{
+	m_content->Focus();
+}
+
+std::optional<std::wstring> Tab::GetContentTooltipText() const
+{
+	return m_content->GetTooltipText();
+}
+
+std::optional<TabContent::Icon> Tab::GetContentIcon() const
+{
+	return m_content->GetIcon();
+}
+
+TabContent::MessageResult Tab::ProcessContentMessage(const MSG *msg)
+{
+	return m_content->ProcessMessage(msg);
+}
+
 BrowserWindow *Tab::GetBrowser() const
 {
 	return m_browser;
@@ -79,6 +124,13 @@ TabContainer *Tab::GetTabContainer() const
 // display name of the current directory will be returned.
 std::wstring Tab::GetName() const
 {
+	auto contentName = m_content->GetName();
+
+	if (contentName)
+	{
+		return *contentName;
+	}
+
 	if (m_useCustomName)
 	{
 		return m_customName;

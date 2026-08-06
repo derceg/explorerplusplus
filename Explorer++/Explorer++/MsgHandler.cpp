@@ -30,6 +30,7 @@
 #include "TabBacking.h"
 #include "TabContainer.h"
 #include "TaskbarThumbnails.h"
+#include "TerminalLauncher.h"
 #include "ToolbarHelper.h"
 #include "WindowStorage.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -236,15 +237,31 @@ void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
-	ExecuteFileAction(m_hContainer, itemPath, L"", parameters,
-		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
+	std::wstring workingDirectory =
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath();
+
+	if (TerminalLauncher::TryOpenBatchFile(GetActivePane()->GetTabContainer(), itemPath, parameters,
+			workingDirectory))
+	{
+		return;
+	}
+
+	ExecuteFileAction(m_hContainer, itemPath, L"", parameters, workingDirectory);
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstring &parameters)
 {
 	auto shellBrowser = GetActiveShellBrowserImpl();
-	ExecuteFileAction(m_hContainer, pidlItem, L"", parameters,
-		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
+	std::wstring workingDirectory =
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath();
+
+	if (TerminalLauncher::TryOpenBatchFile(GetActivePane()->GetTabContainer(), pidlItem, parameters,
+			workingDirectory))
+	{
+		return;
+	}
+
+	ExecuteFileAction(m_hContainer, pidlItem, L"", parameters, workingDirectory);
 }
 
 void Explorerplusplus::OnSize(UINT state)
@@ -439,17 +456,10 @@ void Explorerplusplus::UpdateLayout()
 			mainWindowWidth, m_displayWindowHeight, displayWindowShowFlags);
 	}
 
-	/* <---- ALL listview windows ----> */
+	/* <---- ALL tab content windows ----> */
 
 	for (auto &tab : GetActivePane()->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
-		showFlags = SWP_NOZORDER;
-
-		if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
-		{
-			showFlags |= SWP_SHOWWINDOW;
-		}
-
 		int width = mainWindowWidth - indentLeft - indentRight;
 		int height = mainWindowHeight - indentBottom - indentTop;
 
@@ -458,8 +468,8 @@ void Explorerplusplus::UpdateLayout()
 			height -= tabWindowHeight;
 		}
 
-		SetWindowPos(tab->GetShellBrowserImpl()->GetListView(), NULL, indentLeft, indentTop, width,
-			height, showFlags);
+		tab->SetContentBounds(indentLeft, indentTop, width, height,
+			GetActivePane()->GetTabContainer()->IsTabSelected(*tab));
 	}
 
 	/* <---- Status bar ----> */
@@ -810,7 +820,7 @@ void Explorerplusplus::OnShowHiddenFiles()
 void Explorerplusplus::FocusActiveTab()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	SetFocus(selectedTab.GetShellBrowserImpl()->GetListView());
+	selectedTab.FocusContent();
 }
 
 bool Explorerplusplus::OnActivate(int activationState, bool minimized)
