@@ -173,7 +173,27 @@ void App::LoadSettings(std::vector<WindowStorageData> &windows)
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
 	appStorage->LoadDefaultColumns(m_config.globalFolderSettings.folderColumns);
-	appStorage->LoadFrequentLocations(&m_frequentLocationsModel);
+
+	if (m_savePreferencesToXmlFile)
+	{
+		auto frequentLocationsStorage = XmlAppStorageFactory::MaybeCreate(
+			Storage::GetFrequentLocationsFilePath(), Storage::OperationType::Load);
+
+		if (frequentLocationsStorage)
+		{
+			frequentLocationsStorage->LoadFrequentLocations(&m_frequentLocationsModel);
+		}
+		else
+		{
+			// Older versions stored frequent locations in config.xml. Fall back to that data so
+			// that it can be migrated to the separate file the next time settings are saved.
+			appStorage->LoadFrequentLocations(&m_frequentLocationsModel);
+		}
+	}
+	else
+	{
+		appStorage->LoadFrequentLocations(&m_frequentLocationsModel);
+	}
 
 	ValidateColumns(m_config.globalFolderSettings.folderColumns);
 }
@@ -219,7 +239,22 @@ void App::SaveSettings()
 	appStorage->SaveApplications(&m_applicationModel);
 	appStorage->SaveDialogStates();
 	appStorage->SaveDefaultColumns(m_config.globalFolderSettings.folderColumns);
-	appStorage->SaveFrequentLocations(&m_frequentLocationsModel);
+
+	if (m_savePreferencesToXmlFile)
+	{
+		auto frequentLocationsStorage = XmlAppStorageFactory::MaybeCreate(
+			Storage::GetFrequentLocationsFilePath(), Storage::OperationType::Save);
+
+		if (frequentLocationsStorage)
+		{
+			frequentLocationsStorage->SaveFrequentLocations(&m_frequentLocationsModel);
+			frequentLocationsStorage->Commit();
+		}
+	}
+	else
+	{
+		appStorage->SaveFrequentLocations(&m_frequentLocationsModel);
+	}
 
 	appStorage->Commit();
 }
