@@ -63,6 +63,7 @@ class TabBacking;
 class TabContainer;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
+class PreviewPane;
 class WindowSubclass;
 
 namespace Applications
@@ -350,6 +351,8 @@ private:
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
+	void InitializePreviewPane();
+	void UpdatePreviewPane(const Tab &tab);
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
 		LPVOID pData);
@@ -385,6 +388,10 @@ private:
 	DisplayWindow *m_displayWindow = nullptr;
 	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	int m_displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+
+	// Preview pane
+	PreviewPane *m_previewPane = nullptr;
+	int m_previewPaneWidth = LayoutDefaults::DEFAULT_PREVIEW_PANE_WIDTH;
 
 	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
 	std::vector<wil::unique_hbitmap> m_mainMenuImages;

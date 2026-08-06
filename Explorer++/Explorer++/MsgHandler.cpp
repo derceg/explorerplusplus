@@ -11,6 +11,7 @@
 #include "DarkModeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "HolderWindow.h"
+#include "PreviewPane.h"
 #include "MainRebarStorage.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
@@ -337,6 +338,11 @@ void Explorerplusplus::UpdateLayout()
 		}
 	}
 
+	if (m_config->showPreviewPane.get() && m_previewPane)
+	{
+		indentRight += m_previewPaneWidth;
+	}
+
 	if (m_config->showFolders.get())
 	{
 		indentLeft = m_treeViewWidth;
@@ -429,7 +435,12 @@ void Explorerplusplus::UpdateLayout()
 
 	if (m_config->displayWindowVertical)
 	{
-		SetWindowPos(m_displayWindow->GetHWND(), nullptr, mainWindowWidth - indentRight,
+		int displayWindowLeft = mainWindowWidth - indentRight;
+		if (m_config->showPreviewPane.get())
+		{
+			displayWindowLeft += m_previewPaneWidth;
+		}
+		SetWindowPos(m_displayWindow->GetHWND(), nullptr, displayWindowLeft,
 			indentRebar, m_displayWindowWidth, mainWindowHeight - indentRebar - indentBottom,
 			displayWindowShowFlags);
 	}
@@ -437,6 +448,23 @@ void Explorerplusplus::UpdateLayout()
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, 0, mainWindowHeight - indentBottom,
 			mainWindowWidth, m_displayWindowHeight, displayWindowShowFlags);
+	}
+
+	/* <---- Preview pane ----> */
+
+	if (m_previewPane)
+	{
+		UINT previewPaneShowFlags =
+			(m_config->showPreviewPane.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
+
+		int previewPaneLeft = mainWindowWidth - m_previewPaneWidth;
+		if (m_config->showDisplayWindow.get() && m_config->displayWindowVertical)
+		{
+			previewPaneLeft -= m_displayWindowWidth;
+		}
+
+		SetWindowPos(m_previewPane->GetHWND(), nullptr, previewPaneLeft, indentRebar,
+			m_previewPaneWidth, mainWindowHeight - indentRebar - indentBottom, previewPaneShowFlags);
 	}
 
 	/* <---- ALL listview windows ----> */
@@ -688,7 +716,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 void Explorerplusplus::OnDirectoryContentsChanged(const ShellBrowser *shellBrowser)
 {
 	const auto *tab = shellBrowser->GetTab();
-	UpdateDisplayWindow(*tab);
+	UpdateWindowStates(*tab);
 }
 
 void Explorerplusplus::CreateNewWindow(const std::vector<TabStorageData> &tabs)

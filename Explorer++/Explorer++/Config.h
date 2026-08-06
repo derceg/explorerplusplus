@@ -113,6 +113,9 @@ struct Config
 	ValueWrapper<COLORREF> displayWindowTextColor = DisplayWindowDefaults::TEXT_COLOR;
 	ValueWrapper<LOGFONT> displayWindowFont = DisplayWindowDefaults::FONT;
 
+	// Preview pane - shows document previews on the right side
+	ValueWrapper<bool> showPreviewPane = true;
+
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.
 	GlobalFolderSettings globalFolderSettings;

@@ -10,6 +10,7 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
+#include "PreviewPane.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
 #include "HolderWindow.h"
@@ -153,6 +154,8 @@ void Explorerplusplus::SetUpControlVisibilityConfigListeners()
 		m_config->showFolders.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
 	m_connections.push_back(
 		m_config->showDisplayWindow.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
+	m_connections.push_back(
+		m_config->showPreviewPane.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
 }
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
@@ -171,6 +174,7 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 	CreateMainRebarAndChildren(storageData);
 	InitializeDisplayWindow();
+	InitializePreviewPane();
 	InitializeTabs();
 	CreateFolderControls();
 
@@ -204,6 +208,11 @@ void Explorerplusplus::InitializeDisplayWindow()
 	m_displayWindow = DisplayWindow::Create(m_hContainer, m_config);
 
 	ApplyDisplayWindowPosition();
+}
+
+void Explorerplusplus::InitializePreviewPane()
+{
+	m_previewPane = PreviewPane::Create(m_hContainer, m_config);
 }
 
 void Explorerplusplus::CreateFolderControls()
