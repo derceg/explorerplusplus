@@ -12,9 +12,13 @@
 /*
 Notes:
 
-- To replace Explorer for filesystem folders only, add a key at:
+- To replace Explorer for filesystem folders and drives only, add keys at:
 
   HKEY_CURRENT_USER\Software\Classes\Directory
+
+  (Default value is 'none')
+
+  HKEY_CURRENT_USER\Software\Classes\Drive
 
   (Default value is 'none')
 
@@ -34,12 +38,18 @@ Notes:
 namespace DefaultFileManagerInternal
 {
 const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
+const TCHAR KEY_DRIVE_SHELL[] = _T("Software\\Classes\\Drive\\shell");
 const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
 const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
 
 LSTATUS SetAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
 	const std::wstring &applicationKeyName, const std::wstring &menuText);
 LSTATUS RemoveAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName);
+
+LSTATUS SetRegKeys(const TCHAR *shellKeyPath, const std::wstring &applicationKeyName,
+	const std::wstring &menuText);
+LSTATUS RemoveRegKeys(const TCHAR *shellKeyPath, const TCHAR *defaultValue,
 	const std::wstring &applicationKeyName);
 }
 
@@ -61,20 +71,25 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	DefaultFileManager::ReplaceExplorerMode replacementType, const std::wstring &applicationKeyName,
 	const std::wstring &menuText)
 {
-	const TCHAR *shellKeyPath = nullptr;
-
 	switch (replacementType)
 	{
 	case DefaultFileManager::ReplaceExplorerMode::All:
-		shellKeyPath = KEY_FOLDER_SHELL;
+		return DefaultFileManagerInternal::SetRegKeys(KEY_FOLDER_SHELL, applicationKeyName, menuText);
 		break;
 
 	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
 	default:
-		shellKeyPath = KEY_DIRECTORY_SHELL;
+		LSTATUS res = DefaultFileManagerInternal::SetRegKeys(KEY_DIRECTORY_SHELL,
+			applicationKeyName, menuText);
+		if (res != ERROR_SUCCESS) return res;
+		return DefaultFileManagerInternal::SetRegKeys(KEY_DRIVE_SHELL, applicationKeyName, menuText);
 		break;
 	}
+}
 
+LSTATUS DefaultFileManagerInternal::SetRegKeys(
+	const TCHAR *shellKeyPath, const std::wstring &applicationKeyName, const std::wstring &menuText)
+{
 	wil::unique_hkey shellKey;
 	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, shellKeyPath, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &shellKey, nullptr);
@@ -147,26 +162,29 @@ LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &ap
 LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 	DefaultFileManager::ReplaceExplorerMode replacementType, const std::wstring &applicationKeyName)
 {
-	std::wstring shellKeyPath;
-	std::wstring defaultValue;
-
 	switch (replacementType)
 	{
 	case DefaultFileManager::ReplaceExplorerMode::All:
-		shellKeyPath = KEY_FOLDER_SHELL;
-		defaultValue = L"";
+		return DefaultFileManagerInternal::RemoveRegKeys(KEY_FOLDER_SHELL, L"", applicationKeyName);
 		break;
 
 	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
 	default:
-		shellKeyPath = KEY_DIRECTORY_SHELL;
-		defaultValue = SHELL_DEFAULT_VALUE;
+		LSTATUS res = DefaultFileManagerInternal::RemoveRegKeys(KEY_DIRECTORY_SHELL,
+			SHELL_DEFAULT_VALUE, applicationKeyName);
+		if (res != ERROR_SUCCESS) return res;
+		return DefaultFileManagerInternal::RemoveRegKeys(KEY_DRIVE_SHELL, SHELL_DEFAULT_VALUE,
+			applicationKeyName);
 		break;
 	}
+}
 
+LSTATUS DefaultFileManagerInternal::RemoveRegKeys(const TCHAR *shellKeyPath,
+	const TCHAR *defaultValue, const std::wstring &applicationKeyName)
+{
 	// Remove the shell default value.
 	wil::unique_hkey shellKey;
-	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, shellKeyPath.c_str(), 0, KEY_WRITE, &shellKey);
+	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, shellKeyPath, 0, KEY_WRITE, &shellKey);
 
 	if (res != ERROR_SUCCESS)
 	{
