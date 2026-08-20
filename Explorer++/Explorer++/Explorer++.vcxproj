@@ -1386,7 +1386,6 @@
     <ClCompile Include="Bookmarks\BookmarkTree.cpp" />
     <ClCompile Include="Bookmarks\BookmarkXmlStorage.cpp" />
     <ClCompile Include="DisplayWindow\DisplayWindow.cpp" />
-    <ClCompile Include="DisplayWindow\MsgHandler.cpp" />
     <ClCompile Include="PreservedTab.cpp" />
     <ClCompile Include="ShellBrowser\DocumentServiceProvider.cpp" />
     <ClCompile Include="ShellBrowser\Filtering.cpp" />

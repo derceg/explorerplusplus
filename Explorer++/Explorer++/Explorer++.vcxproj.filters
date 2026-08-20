@@ -916,9 +916,6 @@
     <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp">
       <Filter>DisplayWindow\UI</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayWindow\MsgHandler.cpp">
-      <Filter>DisplayWindow\UI</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
