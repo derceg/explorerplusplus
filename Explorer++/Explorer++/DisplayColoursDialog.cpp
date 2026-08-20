@@ -11,15 +11,18 @@
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
 DisplayColoursDialog *DisplayColoursDialog::Create(const ResourceLoader *resourceLoader,
-	HWND hParent, Config *config)
+	HWND parent, BrowserWindow *browser, Config *config,
+	const AcceleratorManager *acceleratorManager)
 {
-	return new DisplayColoursDialog(resourceLoader, hParent, config);
+	return new DisplayColoursDialog(resourceLoader, parent, browser, config, acceleratorManager);
 }
 
-DisplayColoursDialog::DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	Config *config) :
-	BaseDialog(resourceLoader, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),
-	m_config(config)
+DisplayColoursDialog::DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND parent,
+	BrowserWindow *browser, Config *config, const AcceleratorManager *acceleratorManager) :
+	BaseDialog(resourceLoader, IDD_DISPLAYCOLOURS, parent, DialogSizingType::None),
+	m_browser(browser),
+	m_config(config),
+	m_acceleratorManager(acceleratorManager)
 {
 	m_pdcdps = &DisplayColoursDialogPersistentSettings::GetInstance();
 }
@@ -110,7 +113,8 @@ void DisplayColoursDialog::InitializePreviewWindow()
 	CopyDisplayConfigFields(*m_config, m_previewConfig);
 
 	HWND hStatic = GetDlgItem(m_hDlg, IDC_STATIC_PREVIEWDISPLAY);
-	m_previewDisplayWindow = DisplayWindow::Create(hStatic, &m_previewConfig);
+	m_previewDisplayWindow = DisplayWindow::Create(hStatic, DisplayWindow::Mode::Preview, m_browser,
+		&m_previewConfig, m_acceleratorManager, m_resourceLoader);
 
 	DisplayWindow_ClearTextBuffer(m_previewDisplayWindow->GetHWND());
 

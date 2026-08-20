@@ -345,7 +345,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		XMLSettings::EncodeIntValue(GetBValue(config.displayWindowTextColor.get())));
 
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"DisplayWindowVertical", XMLSettings::EncodeBoolValue(config.displayWindowVertical));
+		L"DisplayWindowVertical", XMLSettings::EncodeBoolValue(config.displayWindowVertical.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"DoubleClickTabClose", XMLSettings::EncodeBoolValue(config.doubleClickTabClose));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,

@@ -60,7 +60,7 @@ struct Config
 	ValueWrapper<bool> checkBoxSelection = false;
 	bool confirmCloseTabs = false;
 	ValueWrapper<bool> synchronizeTreeview = true;
-	bool displayWindowVertical = false;
+	ValueWrapper<bool> displayWindowVertical = false;
 	bool goUpOnDoubleClick = true;
 
 	// Indicates whether container files (e.g. .7z, .cab, .rar, .zip) will be opened in Explorer++,

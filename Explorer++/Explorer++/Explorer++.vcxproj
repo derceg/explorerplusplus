@@ -1214,6 +1214,7 @@
     <ClCompile Include="DarkModeManager.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="DirectoryWatcherFactoryImpl.cpp" />
+    <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ListView.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
@@ -1567,6 +1568,7 @@
     <ClInclude Include="DirectoryWatcher.h" />
     <ClInclude Include="DirectoryWatcherFactory.h" />
     <ClInclude Include="DirectoryWatcherFactoryImpl.h" />
+    <ClInclude Include="DisplayWindow\DisplayWindowContextMenu.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="IconModel.h" />
     <ClInclude Include="IconUpdateCallback.h" />

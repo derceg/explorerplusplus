@@ -28,13 +28,12 @@
 #define DisplayWindow_SetLine(hDisplay, iLine, szText)                                             \
 	SendMessage(hDisplay, DWM_SETLINE, iLine, (LPARAM) szText)
 
-#define WM_USER_DISPLAYWINDOWMOVED (WM_APP + 99)
 #define WM_USER_DISPLAYWINDOWRESIZED (WM_APP + 100)
 
-#define WM_NDW_ICONRCLICK (WM_APP + 101)
-#define WM_NDW_RCLICK (WM_APP + 102)
-
+class AcceleratorManager;
+class BrowserWindow;
 struct Config;
+class ResourceLoader;
 class WindowSubclass;
 
 typedef struct
@@ -51,7 +50,15 @@ typedef struct
 class DisplayWindow
 {
 public:
-	static DisplayWindow *Create(HWND parent, const Config *config);
+	// In preview mode, context menus won't be shown.
+	enum class Mode
+	{
+		Normal,
+		Preview
+	};
+
+	static DisplayWindow *Create(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	HWND GetHWND() const;
 
@@ -63,7 +70,8 @@ private:
 	static inline const wchar_t CLASS_NAME[] = L"DisplayWindow";
 	static inline const wchar_t WINDOW_NAME[] = L"DisplayWindow";
 
-	DisplayWindow(HWND parent, const Config *config);
+	DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 	~DisplayWindow();
 
 	static HWND CreateDisplayWindow(HWND parent);
@@ -73,7 +81,7 @@ private:
 
 	LONG OnMouseMove(LPARAM lParam);
 	void OnLButtonDown(LPARAM lParam);
-	void OnRButtonUp(WPARAM wParam, LPARAM lParam);
+	void OnShowContextMenu(const POINT &ptScreen);
 	void PaintText(HDC, unsigned int);
 	void TransparentTextOut(HDC hdc, TCHAR *text, RECT *prcText);
 	void DrawThumbnail(HDC hdcMem);
@@ -89,9 +97,14 @@ private:
 	void OnFontConfigChanged();
 
 	const HWND m_hwnd;
+	const Mode m_mode;
+	BrowserWindow *const m_browser;
+	Config *const m_config;
+	const AcceleratorManager *const m_acceleratorManager;
+	const ResourceLoader *const m_resourceLoader;
+
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-	const Config *const m_config;
 
 	wil::unique_hicon m_mainIcon;
 	wil::unique_hfont m_font;
@@ -107,7 +120,6 @@ private:
 
 	int m_iImageWidth;
 	int m_iImageHeight;
-	BOOL m_bVertical;
 
 	/* Thumbnails. */
 	CRITICAL_SECTION m_csDWThumbnails;

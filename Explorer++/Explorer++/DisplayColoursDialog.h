@@ -8,6 +8,8 @@
 #include "Config.h"
 #include "../Helper/DialogSettings.h"
 
+class AcceleratorManager;
+class BrowserWindow;
 class DisplayColoursDialog;
 class DisplayWindow;
 
@@ -31,8 +33,8 @@ private:
 class DisplayColoursDialog : public BaseDialog
 {
 public:
-	static DisplayColoursDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
-		Config *config);
+	static DisplayColoursDialog *Create(const ResourceLoader *resourceLoader, HWND parent,
+		BrowserWindow *browser, Config *config, const AcceleratorManager *acceleratorManager);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -60,7 +62,8 @@ private:
 	static const int NUM_COLORS = 3;
 	static const int TICK_REQUENCY = 10;
 
-	DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND hParent, Config *config);
+	DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND parent, BrowserWindow *browser,
+		Config *config, const AcceleratorManager *acceleratorManager);
 	~DisplayColoursDialog() = default;
 
 	void OnRestoreDefaults();
@@ -79,7 +82,9 @@ private:
 	void UpdateEditControlsFromSlider(ColorGroup colorGroup[NUM_COLORS]);
 	COLORREF GetColorFromSliderGroup(ColorGroup colorGroup[NUM_COLORS]);
 
+	BrowserWindow *const m_browser;
 	Config *const m_config;
+	const AcceleratorManager *const m_acceleratorManager;
 	Config m_previewConfig;
 	DisplayWindow *m_previewDisplayWindow = nullptr;
 

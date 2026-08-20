@@ -3,8 +3,11 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "DisplayWindow.h"
+#include "DisplayWindowContextMenu.h"
+#include "PopupMenuView.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <windowsx.h>
@@ -87,7 +90,7 @@ void DisplayWindow::DrawBackground(HDC hdcMem, RECT *rc)
 	so that it is visually separated from other windows. */
 	Gdiplus::Pen newPen(BORDER_COLOUR, 1);
 
-	if (m_bVertical)
+	if (m_config->displayWindowVertical.get())
 	{
 		graphics.DrawLine(&newPen, 0, 0, 0, rc->bottom);
 	}
@@ -353,10 +356,11 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 			0);
 	}
 
-	if ((m_bVertical && cursorPos.x <= (rc.left + 5))
-		|| (!m_bVertical && cursorPos.y <= (rc.top + 5)))
+	if ((m_config->displayWindowVertical.get() && cursorPos.x <= (rc.left + 5))
+		|| (!m_config->displayWindowVertical.get() && cursorPos.y <= (rc.top + 5)))
 	{
-		SetCursor(LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS));
+		SetCursor(
+			LoadCursor(NULL, m_config->displayWindowVertical.get() ? IDC_SIZEWE : IDC_SIZENS));
 	}
 
 	/* If there is a thumbnail preview
@@ -389,10 +393,11 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 
 	GetClientRect(m_hwnd, &rc);
 
-	if ((m_bVertical && cursorPos.x <= (rc.left + 5))
-		|| (!m_bVertical && cursorPos.y <= (rc.top + 5)))
+	if ((m_config->displayWindowVertical.get() && cursorPos.x <= (rc.left + 5))
+		|| (!m_config->displayWindowVertical.get() && cursorPos.y <= (rc.top + 5)))
 	{
-		SetCursor(LoadCursor(NULL, m_bVertical ? IDC_SIZEWE : IDC_SIZENS));
+		SetCursor(
+			LoadCursor(NULL, m_config->displayWindowVertical.get() ? IDC_SIZEWE : IDC_SIZENS));
 		m_bSizing = TRUE;
 		SetFocus(m_hwnd);
 		SetCapture(m_hwnd);
@@ -417,26 +422,32 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 	}
 }
 
-void DisplayWindow::OnRButtonUp(WPARAM wParam, LPARAM lParam)
+void DisplayWindow::OnShowContextMenu(const POINT &ptScreen)
 {
-	POINT pt;
-	RECT rc;
-
-	pt.x = GET_X_LPARAM(lParam);
-	pt.y = GET_Y_LPARAM(lParam);
-
-	rc.left = MAIN_ICON_LEFT;
-	rc.top = MAIN_ICON_TOP;
-	rc.right = MAIN_ICON_LEFT + MAIN_ICON_WIDTH;
-	rc.bottom = MAIN_ICON_TOP + MAIN_ICON_HEIGHT;
-
-	if (PtInRect(&rc, pt))
+	if (m_mode == Mode::Preview)
 	{
-		SendMessage(GetParent(m_hwnd), WM_NDW_ICONRCLICK, wParam, lParam);
+		// If the display window is being previewed (e.g. to show what a color change would look
+		// like), no context menus will be shown.
+		return;
+	}
+
+	POINT ptClient = ptScreen;
+	auto res = ScreenToClient(m_hwnd, &ptClient);
+	CHECK(res);
+
+	RECT rc = { MAIN_ICON_LEFT, MAIN_ICON_TOP, MAIN_ICON_LEFT + MAIN_ICON_WIDTH,
+		MAIN_ICON_TOP + MAIN_ICON_HEIGHT };
+
+	if (PtInRect(&rc, ptClient))
+	{
+		// TODO: Show file context menu.
 	}
 	else
 	{
-		SendMessage(GetParent(m_hwnd), WM_NDW_RCLICK, wParam, lParam);
+		PopupMenuView popupMenu(m_browser);
+		DisplayWindowContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_browser, m_config,
+			m_resourceLoader);
+		popupMenu.Show(m_hwnd, ptScreen);
 	}
 }
 

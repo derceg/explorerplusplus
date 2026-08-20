@@ -174,7 +174,7 @@ private:
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	void SetUpControlVisibilityConfigListeners();
+	void SetUpLayoutConfigListeners();
 
 	/* Main window message handlers. */
 	LRESULT CommandHandler(HWND hwnd, HWND control, UINT id, UINT notificationCode);
@@ -259,9 +259,6 @@ private:
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
 	bool OnToolbarRightClick(const NMMOUSE *mouseInfo);
 
-	/* Settings. */
-	void ApplyDisplayWindowPosition();
-
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
 	void OnTreeViewHolderResized(int newWidth);
@@ -280,7 +277,6 @@ private:
 
 	/* Display window. */
 	void OnDisplayWindowResized(WPARAM wParam);
-	void OnDisplayWindowRClick(POINT *ptClient);
 	void UpdateDisplayWindow(const Tab &tab);
 	void UpdateDisplayWindowForZeroFiles(const Tab &tab);
 	void UpdateDisplayWindowForOneFile(const Tab &tab);

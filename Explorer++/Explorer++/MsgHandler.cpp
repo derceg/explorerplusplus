@@ -334,7 +334,7 @@ void Explorerplusplus::UpdateLayout()
 
 	if (m_config->showDisplayWindow.get())
 	{
-		if (m_config->displayWindowVertical)
+		if (m_config->displayWindowVertical.get())
 		{
 			indentRight += m_displayWindowWidth;
 		}
@@ -434,7 +434,7 @@ void Explorerplusplus::UpdateLayout()
 	UINT displayWindowShowFlags =
 		(m_config->showDisplayWindow.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER;
 
-	if (m_config->displayWindowVertical)
+	if (m_config->displayWindowVertical.get())
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, mainWindowWidth - indentRight,
 			indentRebar, m_displayWindowWidth, mainWindowHeight - indentRebar - indentBottom,
@@ -516,7 +516,7 @@ int Explorerplusplus::OnDestroy()
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
-	if (m_config->displayWindowVertical)
+	if (m_config->displayWindowVertical.get())
 	{
 		m_displayWindowWidth = LOWORD(wParam);
 	}
@@ -660,32 +660,6 @@ void Explorerplusplus::OnCloneWindow()
 		currentDirectory.c_str());
 
 	LaunchCurrentProcess(m_hwnd, szQuotedCurrentDirectory);
-}
-
-void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
-{
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)));
-
-	if (!parentMenu)
-	{
-		return;
-	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	MenuHelper::CheckItem(menu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
-
-	POINT ptScreen = *ptClient;
-	BOOL res = ClientToScreen(m_displayWindow->GetHWND(), &ptScreen);
-
-	if (!res)
-	{
-		return;
-	}
-
-	TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL, ptScreen.x, ptScreen.y, 0,
-		m_hwnd, nullptr);
 }
 
 void Explorerplusplus::OnGroupBy(SortMode groupMode)

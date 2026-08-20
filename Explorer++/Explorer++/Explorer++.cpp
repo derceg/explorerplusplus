@@ -74,7 +74,7 @@ Explorerplusplus::Explorerplusplus(AppServices *appServices, HINSTANCE resourceI
 		m_displayWindowHeight = storageData->displayWindowHeight;
 	}
 
-	SetUpControlVisibilityConfigListeners();
+	SetUpLayoutConfigListeners();
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
 		std::bind_front(&Explorerplusplus::WindowProcedure, this)));
@@ -147,7 +147,7 @@ ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
 	return RegisterClassEx(&windowClass);
 }
 
-void Explorerplusplus::SetUpControlVisibilityConfigListeners()
+void Explorerplusplus::SetUpLayoutConfigListeners()
 {
 	m_connections.push_back(
 		m_config->showStatusBar.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
@@ -155,6 +155,8 @@ void Explorerplusplus::SetUpControlVisibilityConfigListeners()
 		m_config->showFolders.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
 	m_connections.push_back(
 		m_config->showDisplayWindow.addObserver(std::bind(&Explorerplusplus::UpdateLayout, this)));
+	m_connections.push_back(m_config->displayWindowVertical.addObserver(
+		std::bind(&Explorerplusplus::UpdateLayout, this)));
 }
 
 void Explorerplusplus::Initialize(const WindowStorageData *storageData)
@@ -202,9 +204,8 @@ void Explorerplusplus::Initialize(const WindowStorageData *storageData)
 
 void Explorerplusplus::InitializeDisplayWindow()
 {
-	m_displayWindow = DisplayWindow::Create(m_hwnd, m_config);
-
-	ApplyDisplayWindowPosition();
+	m_displayWindow = DisplayWindow::Create(m_hwnd, DisplayWindow::Mode::Normal, this, m_config,
+		m_acceleratorManager, m_resourceLoader);
 }
 
 void Explorerplusplus::CreateFolderControls()

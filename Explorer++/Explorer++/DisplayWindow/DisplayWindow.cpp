@@ -24,18 +24,23 @@
 #include "MainResource.h"
 #include "../Helper/WindowSubclass.h"
 
-DisplayWindow *DisplayWindow::Create(HWND parent, const Config *config)
+DisplayWindow *DisplayWindow::Create(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
 {
-	return new DisplayWindow(parent, config);
+	return new DisplayWindow(parent, mode, browser, config, acceleratorManager, resourceLoader);
 }
 
-DisplayWindow::DisplayWindow(HWND parent, const Config *config) :
+DisplayWindow::DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	m_hwnd(CreateDisplayWindow(parent)),
+	m_mode(mode),
+	m_browser(browser),
 	m_config(config),
+	m_acceleratorManager(acceleratorManager),
+	m_resourceLoader(resourceLoader),
 	m_mainIcon(static_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION))),
-	m_font(CreateFontIndirect(&config->displayWindowFont.get())),
-	m_bVertical(FALSE)
+	m_font(CreateFontIndirect(&config->displayWindowFont.get()))
 {
 	m_LineSpacing = 20;
 	m_LeftIndent = 80;
@@ -58,6 +63,8 @@ DisplayWindow::DisplayWindow(HWND parent, const Config *config) :
 	m_connections.push_back(m_config->displayWindowFont.addObserver(
 		std::bind(&DisplayWindow::OnFontConfigChanged, this)));
 	m_connections.push_back(m_config->displayWindowTextColor.addObserver(
+		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+	m_connections.push_back(m_config->displayWindowVertical.addObserver(
 		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
 }
 
@@ -117,9 +124,12 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		OnLButtonDown(lParam);
 		break;
 
-	case WM_RBUTTONUP:
-		OnRButtonUp(wParam, lParam);
+	case WM_CONTEXTMENU:
+		OnShowContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 		break;
+
+	case WM_ERASEBKGND:
+		return 1;
 
 	case WM_PAINT:
 	{
@@ -196,11 +206,6 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	case DWM_SETTHUMBNAILFILE:
 		OnSetThumbnailFile(wParam, lParam);
 		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
-		break;
-
-	case WM_USER_DISPLAYWINDOWMOVED:
-		m_bVertical = (BOOL) wParam;
-		InvalidateRect(m_hwnd, nullptr, TRUE);
 		break;
 
 	case WM_NCDESTROY:

@@ -329,7 +329,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		config.treeViewAutoExpandSelected);
 
 	RegistrySettings::SaveDword(settingsKey, L"DisplayWindowVertical",
-		config.displayWindowVertical);
+		config.displayWindowVertical.get());
 
 	RegistrySettings::SaveBinaryValue(settingsKey, L"DisplayCentreColor",
 		reinterpret_cast<const BYTE *>(&config.displayWindowCentreColor.get()),

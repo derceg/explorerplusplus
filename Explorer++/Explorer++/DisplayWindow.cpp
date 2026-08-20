@@ -387,12 +387,6 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 	DisplayWindow_BufferText(m_displayWindow->GetHWND(), szTotalSize);
 }
 
-void Explorerplusplus::ApplyDisplayWindowPosition()
-{
-	SendMessage(m_displayWindow->GetHWND(), WM_USER_DISPLAYWINDOWMOVED,
-		m_config->displayWindowVertical, NULL);
-}
-
 void Explorerplusplus::FolderSizeCallbackStub(int nFolders, int nFiles,
 	PULARGE_INTEGER lTotalFolderSize, LPVOID pData)
 {

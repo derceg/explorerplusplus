@@ -256,12 +256,6 @@
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayWindow\DisplayWindow.cpp">
-      <Filter>DisplayWindow</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayWindow\MsgHandler.cpp">
-      <Filter>DisplayWindow</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\PreservedShellBrowser.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -916,6 +910,15 @@
     <ClCompile Include="BrowserCommands.cpp">
       <Filter>Browser\Command Handling</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayWindow\DisplayWindow.cpp">
+      <Filter>DisplayWindow\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp">
+      <Filter>DisplayWindow\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayWindow\MsgHandler.cpp">
+      <Filter>DisplayWindow\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1172,9 +1175,6 @@
     </ClInclude>
     <ClInclude Include="ShellTreeView\ShellTreeView.h">
       <Filter>ShellTreeView</Filter>
-    </ClInclude>
-    <ClInclude Include="DisplayWindow\DisplayWindow.h">
-      <Filter>DisplayWindow</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellNavigationController.h">
       <Filter>ShellBrowser</Filter>
@@ -1587,9 +1587,6 @@
     <ClInclude Include="WindowXmlStorage.h">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayWindowDefaults.h">
-      <Filter>DisplayWindow</Filter>
-    </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Config</Filter>
     </ClInclude>
@@ -1986,6 +1983,15 @@
     <ClInclude Include="BrowserCommands.h">
       <Filter>Browser\Command Handling</Filter>
     </ClInclude>
+    <ClInclude Include="DisplayWindow\DisplayWindow.h">
+      <Filter>DisplayWindow\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayWindow\DisplayWindowContextMenu.h">
+      <Filter>DisplayWindow\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayWindowDefaults.h">
+      <Filter>DisplayWindow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2240,6 +2246,9 @@
     </Filter>
     <Filter Include="Browser\UI\Views">
       <UniqueIdentifier>{0beed1ab-8c7c-4099-971c-c8ba2eb8406c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DisplayWindow\UI">
+      <UniqueIdentifier>{cb609dee-cc66-45cf-a82b-1cf7143e6201}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

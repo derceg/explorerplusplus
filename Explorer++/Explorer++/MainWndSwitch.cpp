@@ -162,14 +162,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	}
 	break;
 
-	case WM_NDW_RCLICK:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnDisplayWindowRClick(&pt);
-	}
-	break;
-
 	case WM_APPCOMMAND:
 		OnAppCommand(GET_APPCOMMAND_LPARAM(lParam));
 		break;
@@ -432,12 +424,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case IDM_VIEW_DISPLAYWINDOW:
 		m_commandController.ExecuteCommand(id);
-		break;
-
-	case IDM_DISPLAYWINDOW_VERTICAL:
-		m_config->displayWindowVertical = !m_config->displayWindowVertical;
-		ApplyDisplayWindowPosition();
-		UpdateLayout();
 		break;
 
 	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
@@ -951,11 +937,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case MainToolbarButton::Views:
 		OnToolbarViews();
-		break;
-
-		/* Display window menus. */
-	case IDM_DW_HIDEDISPLAYWINDOW:
-		m_config->showDisplayWindow = false;
 		break;
 	}
 
