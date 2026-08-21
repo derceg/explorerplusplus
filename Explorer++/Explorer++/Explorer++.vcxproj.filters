@@ -22,9 +22,6 @@
     <ClCompile Include="FilterDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="MassRenameDialog.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="MergeFilesDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
@@ -916,6 +913,15 @@
     <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp">
       <Filter>DisplayWindow\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MassRenameDialog.cpp">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClCompile>
+    <ClCompile Include="MassRenameHelper.cpp">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClCompile>
+    <ClCompile Include="MassRenameTokensMenu.cpp">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -941,9 +947,6 @@
     </ClInclude>
     <ClInclude Include="IDropFilesCallback.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="MassRenameDialog.h">
-      <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="MergeFilesDialog.h">
       <Filter>Dialogs</Filter>
@@ -1989,6 +1992,15 @@
     <ClInclude Include="DisplayWindowDefaults.h">
       <Filter>DisplayWindow</Filter>
     </ClInclude>
+    <ClInclude Include="MassRenameDialog.h">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClInclude>
+    <ClInclude Include="MassRenameHelper.h">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClInclude>
+    <ClInclude Include="MassRenameTokensMenu.h">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2246,6 +2258,9 @@
     </Filter>
     <Filter Include="DisplayWindow\UI">
       <UniqueIdentifier>{cb609dee-cc66-45cf-a82b-1cf7143e6201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Mass Rename">
+      <UniqueIdentifier>{d8ed6144-b5d4-44fc-ac20-826ee07fae10}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ResizableDialogHelper.h"
 
+class AcceleratorManager;
 class MassRenameDialog;
 
 class MassRenameDialogPersistentSettings : public DialogSettings
@@ -44,9 +45,9 @@ private:
 class MassRenameDialog : public BaseDialog
 {
 public:
-	static MassRenameDialog *Create(const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, HWND hParent, const std::list<std::wstring> &FullFilenameList,
-		FileActionHandler *pFileActionHandler);
+	static MassRenameDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler,
+		const AcceleratorManager *acceleratorManager);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -56,23 +57,22 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
-	MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance, HWND hParent,
-		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
+	MassRenameDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler,
+		const AcceleratorManager *acceleratorManager);
 	~MassRenameDialog() = default;
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
+	void OnShowTokensMenu();
 	void OnOk();
 	void OnCancel();
 
-	void ProcessFileName(const std::wstring &strTarget, const std::wstring &strFilename,
-		int iFileIndex, std::wstring &strOutput);
-
-	const HINSTANCE m_resourceInstance;
 	std::list<std::wstring> m_FullFilenameList;
 	wil::unique_hicon m_moreIcon;
-	FileActionHandler *m_pFileActionHandler;
+	FileActionHandler *const m_pFileActionHandler;
+	const AcceleratorManager *const m_acceleratorManager;
 
 	MassRenameDialogPersistentSettings *m_persistentSettings;
 };

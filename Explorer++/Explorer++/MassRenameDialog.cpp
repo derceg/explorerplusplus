@@ -2,50 +2,42 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-/*
- * Provides support for the mass renaming of files.
- * The following special characters are supported:
- * /N	- Counter
- * /F	- Filename
- * /B	- Basename (filename without extension)
- * /E	- Extension
- * /L	- Lowercase filename
- * /U	- Uppercase filename
- */
-
 #include "stdafx.h"
 #include "MassRenameDialog.h"
 #include "MainResource.h"
+#include "MassRenameTokensMenu.h"
+#include "NoOpMenuHelpTextHost.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include <boost/locale.hpp>
 #include <Shlwapi.h>
-#include <iomanip>
 #include <list>
-#include <regex>
+#include <string>
+
+using namespace std::string_literals;
 
 const TCHAR MassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");
 
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
-MassRenameDialog *MassRenameDialog::Create(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, const std::list<std::wstring> &FullFilenameList,
-	FileActionHandler *pFileActionHandler)
+MassRenameDialog *MassRenameDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
+	const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler,
+	const AcceleratorManager *acceleratorManager)
 {
-	return new MassRenameDialog(resourceLoader, resourceInstance, hParent, FullFilenameList,
-		pFileActionHandler);
+	return new MassRenameDialog(resourceLoader, hParent, FullFilenameList, pFileActionHandler,
+		acceleratorManager);
 }
 
-MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-	HWND hParent, const std::list<std::wstring> &FullFilenameList,
-	FileActionHandler *pFileActionHandler) :
+MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler,
+	const AcceleratorManager *acceleratorManager) :
 	BaseDialog(resourceLoader, IDD_MASSRENAME, hParent, DialogSizingType::Both),
-	m_resourceInstance(resourceInstance),
 	m_FullFilenameList(FullFilenameList),
-	m_pFileActionHandler(pFileActionHandler)
+	m_pFileActionHandler(pFileActionHandler),
+	m_acceleratorManager(acceleratorManager)
 {
 	m_persistentSettings = &MassRenameDialogPersistentSettings::GetInstance();
 }
@@ -110,7 +102,8 @@ INT_PTR MassRenameDialog::OnInitDialog()
 		iItem++;
 	}
 
-	SetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, _T("/F"));
+	SetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT,
+		GetMassRenameTokenText(MassRenameToken::Filename).c_str());
 	SendMessage(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT), EM_SETSEL, 0, -1);
 	SetFocus(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT));
 
@@ -152,29 +145,24 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, szNamePattern, std::size(szNamePattern));
 
 			HWND hListView = GetDlgItem(m_hDlg, IDC_MASSRENAME_FILELISTVIEW);
+			int index = 0;
 
-			LVITEM lvItem;
-			std::wstring strNewFilename;
-			TCHAR szFilename[MAX_PATH];
-			TCHAR szNewFilename[MAX_PATH];
-			int iItem = 0;
-
-			for (const auto &strFilename : m_FullFilenameList)
+			for (const auto &path : m_FullFilenameList)
 			{
-				StringCchCopy(szFilename, std::size(szFilename), strFilename.c_str());
-				PathStripPath(szFilename);
+				TCHAR filename[MAX_PATH];
+				StringCchCopy(filename, std::size(filename), path.c_str());
+				PathStripPath(filename);
 
-				ProcessFileName(szNamePattern, szFilename, iItem, strNewFilename);
+				auto updatedFilename = ExpandMassRenamePattern(szNamePattern, filename, index);
 
-				StringCchCopy(szNewFilename, std::size(szNewFilename), strNewFilename.c_str());
-
+				LVITEM lvItem = {};
 				lvItem.mask = LVIF_TEXT;
-				lvItem.iItem = iItem;
+				lvItem.iItem = index;
 				lvItem.iSubItem = 1;
-				lvItem.pszText = szNewFilename;
+				lvItem.pszText = const_cast<wchar_t *>(updatedFilename.c_str());
 				ListView_SetItem(hListView, &lvItem);
 
-				iItem++;
+				index++;
 			}
 		}
 		break;
@@ -185,50 +173,8 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDC_MASSRENAME_MORE:
-		{
-			HMENU hMenu =
-				GetSubMenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MASSRENAME_MENU)), 0);
-
-			RECT rc;
-			GetWindowRect(GetDlgItem(m_hDlg, IDC_MASSRENAME_MORE), &rc);
-
-			UINT uCmd = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_VERTICAL | TPM_RETURNCMD,
-				rc.right, rc.top, 0, m_hDlg, nullptr);
-
-			switch (uCmd)
-			{
-			case IDM_MASSRENAME_FILENAME:
-				SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, TRUE,
-					reinterpret_cast<LPARAM>(_T("/F")));
-				break;
-
-			case IDM_MASSRENAME_BASENAME:
-				SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, TRUE,
-					reinterpret_cast<LPARAM>(_T("/B")));
-				break;
-
-			case IDM_MASSRENAME_EXTENSION:
-				SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, TRUE,
-					reinterpret_cast<LPARAM>(_T("/E")));
-				break;
-
-			case IDM_MASSRENAME_COUNTER:
-				SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, TRUE,
-					reinterpret_cast<LPARAM>(_T("/N")));
-				break;
-
-			case IDM_MASSRENAME_LCASE:
-				SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, TRUE,
-					reinterpret_cast<LPARAM>(_T("/L")));
-				break;
-
-			case IDM_MASSRENAME_UCASE:
-				SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, TRUE,
-					reinterpret_cast<LPARAM>(_T("/U")));
-				break;
-			}
-		}
-		break;
+			OnShowTokensMenu();
+			break;
 
 		case IDOK:
 			OnOk();
@@ -249,6 +195,24 @@ INT_PTR MassRenameDialog::OnClose()
 	return 0;
 }
 
+void MassRenameDialog::OnShowTokensMenu()
+{
+	RECT rc;
+	auto res = GetWindowRect(GetDlgItem(m_hDlg, IDC_MASSRENAME_MORE), &rc);
+	CHECK(res);
+
+	auto tokenSelectedCallback = [this](MassRenameToken token)
+	{
+		SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_EDIT, EM_REPLACESEL, true,
+			reinterpret_cast<LPARAM>(GetMassRenameTokenText(token).c_str()));
+	};
+
+	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
+	MassRenameTokensMenu menu(&popupMenu, m_acceleratorManager, tokenSelectedCallback,
+		m_resourceLoader);
+	popupMenu.Show(m_hDlg, { rc.left, rc.top });
+}
+
 void MassRenameDialog::OnOk()
 {
 	TCHAR szNamePattern[MAX_PATH];
@@ -262,27 +226,26 @@ void MassRenameDialog::OnOk()
 	}
 
 	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
-	int iItem = 0;
+	int index = 0;
 
 	for (const auto &strOldFilename : m_FullFilenameList)
 	{
-		TCHAR szFilename[MAX_PATH];
-		StringCchCopy(szFilename, std::size(szFilename), strOldFilename.c_str());
-		PathStripPath(szFilename);
+		TCHAR filename[MAX_PATH];
+		StringCchCopy(filename, std::size(filename), strOldFilename.c_str());
+		PathStripPath(filename);
 
-		std::wstring strNewFilename;
-		ProcessFileName(szNamePattern, szFilename, iItem, strNewFilename);
+		auto updatedFilename = ExpandMassRenamePattern(szNamePattern, filename, index);
 
-		StringCchCopy(szFilename, std::size(szFilename), strOldFilename.c_str());
-		PathRemoveFileSpec(szFilename);
-		strNewFilename = szFilename + std::wstring(_T("\\")) + strNewFilename;
+		StringCchCopy(filename, std::size(filename), strOldFilename.c_str());
+		PathRemoveFileSpec(filename);
+		auto updatedPath = filename + L"\\"s + updatedFilename;
 
 		FileActionHandler::RenamedItem_t renamedItem;
 		renamedItem.strOldFilename = strOldFilename;
-		renamedItem.strNewFilename = strNewFilename;
+		renamedItem.strNewFilename = updatedPath;
 		renamedItemList.push_back(renamedItem);
 
-		iItem++;
+		index++;
 	}
 
 	m_pFileActionHandler->RenameFiles(renamedItemList);
@@ -304,73 +267,6 @@ void MassRenameDialog::SaveState()
 	m_persistentSettings->m_iColumnWidth2 = ListView_GetColumnWidth(hListView, 1);
 
 	m_persistentSettings->m_bStateSaved = TRUE;
-}
-
-void MassRenameDialog::ProcessFileName(const std::wstring &strTarget,
-	const std::wstring &strFilename, int iFileIndex, std::wstring &strOutput)
-{
-	TCHAR szBaseName[MAX_PATH];
-	StringCchCopy(szBaseName, std::size(szBaseName), strFilename.c_str());
-	PathRemoveExtension(szBaseName);
-
-	TCHAR *pExt = PathFindExtension(strFilename.c_str());
-
-	size_t iPos;
-
-	strOutput = strTarget;
-
-	std::wregex rxPattern;
-	rxPattern.assign(_T("/[0]*N"));
-
-	bool bStop = false;
-
-	while (!bStop)
-	{
-		std::match_results<std::wstring::const_iterator> mr;
-		std::wstring::const_iterator itrStart = strOutput.begin();
-		std::wstring::const_iterator itrEnd = strOutput.end();
-
-		if (std::regex_search(itrStart, itrEnd, mr, rxPattern))
-		{
-			std::wstringstream ss;
-
-			/* The minimum length is the number of zeros present plus one. */
-			ss << std::setfill(_T('0')) << std::setw((mr.length() - 2) + 1) << iFileIndex;
-
-			strOutput.replace(mr.position(), mr.length(), ss.str());
-		}
-		else
-		{
-			bStop = true;
-		}
-	}
-
-	while ((iPos = strOutput.find(_T("/F"))) != std::wstring::npos)
-	{
-		strOutput.replace(iPos, 2, strFilename);
-	}
-
-	while ((iPos = strOutput.find(_T("/B"))) != std::wstring::npos)
-	{
-		strOutput.replace(iPos, 2, szBaseName);
-	}
-
-	while ((iPos = strOutput.find(_T("/E"))) != std::wstring::npos)
-	{
-		strOutput.replace(iPos, 2, pExt);
-	}
-
-	while ((iPos = strOutput.find(_T("/L"))) != std::wstring::npos)
-	{
-		strOutput.replace(iPos, 2, strFilename);
-		strOutput = boost::locale::to_lower(strOutput);
-	}
-
-	while ((iPos = strOutput.find(_T("/U"))) != std::wstring::npos)
-	{
-		strOutput.replace(iPos, 2, strFilename);
-		strOutput = boost::locale::to_upper(strOutput);
-	}
 }
 
 MassRenameDialogPersistentSettings::MassRenameDialogPersistentSettings() :

@@ -1031,8 +1031,8 @@ void ShellBrowserImpl::StartRenamingMultipleItems(const std::vector<PidlAbsolute
 		return;
 	}
 
-	auto *massRenameDialog = MassRenameDialog::Create(m_resourceLoader, m_resourceInstance,
-		m_listView, fullFilenameList, m_fileActionHandler);
+	auto *massRenameDialog = MassRenameDialog::Create(m_resourceLoader, m_listView,
+		fullFilenameList, m_fileActionHandler, m_acceleratorManager);
 	massRenameDialog->ShowModalDialog();
 }
 

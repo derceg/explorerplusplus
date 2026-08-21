@@ -13,8 +13,13 @@
 #include <cstdlib>
 #include <format>
 
+namespace
+{
+
 [[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
+
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -64,6 +69,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App app(&commandLineSettings);
 	return app.Run();
 }
+
+namespace
+{
 
 unique_glog_shutdown_call InitializeLogging()
 {
@@ -138,4 +146,6 @@ void InitializeLocale()
 	// Use the system default locale.
 	boost::locale::generator gen;
 	std::locale::global(gen(""));
+}
+
 }

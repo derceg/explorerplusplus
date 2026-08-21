@@ -595,6 +595,12 @@
     <ClCompile Include="BookmarkHelperTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="MassRenameHelperTest.cpp">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClCompile>
+    <ClCompile Include="MassRenameTokensMenuTest.cpp">
+      <Filter>Dialogs\Mass Rename</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -782,6 +788,9 @@
     </Filter>
     <Filter Include="Dark Mode Support">
       <UniqueIdentifier>{ade3c027-284b-4310-9aea-c84fc0a190fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Mass Rename">
+      <UniqueIdentifier>{1cde3251-e30e-44ec-a1ea-f35f4bf8f1cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

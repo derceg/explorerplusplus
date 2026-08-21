@@ -5,11 +5,15 @@
 #include "pch.h"
 #include "TestHelper.h"
 #include "../Helper/UniqueResources.h"
+#include <boost/locale.hpp>
 #include <gtest/gtest.h>
 #include <commctrl.h>
 #include <gdiplus.h>
 
 using namespace testing;
+
+namespace
+{
 
 class ComEnvironment : public Environment
 {
@@ -76,9 +80,23 @@ public:
 	}
 };
 
+void InitializeLocale()
+{
+	auto backendManager = boost::locale::localization_backend_manager::global();
+	backendManager.select("winapi");
+	boost::locale::localization_backend_manager::global(backendManager);
+
+	boost::locale::generator gen;
+	std::locale::global(gen("en_US.UTF-8"));
+}
+
+}
+
 int wmain(int argc, wchar_t *argv[])
 {
 	SetIsInTest();
+
+	InitializeLocale();
 
 	AddGlobalTestEnvironment(new ComEnvironment);
 	AddGlobalTestEnvironment(new GdiplusEnvironment);

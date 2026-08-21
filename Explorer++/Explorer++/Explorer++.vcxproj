@@ -1221,6 +1221,8 @@
     <ClCompile Include="ListViewModel.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
+    <ClCompile Include="MassRenameHelper.cpp" />
+    <ClCompile Include="MassRenameTokensMenu.cpp" />
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
@@ -1581,6 +1583,8 @@
     <ClInclude Include="ListViewModel.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
+    <ClInclude Include="MassRenameHelper.h" />
+    <ClInclude Include="MassRenameTokensMenu.h" />
     <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="NoOpMenuHelpTextHost.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />

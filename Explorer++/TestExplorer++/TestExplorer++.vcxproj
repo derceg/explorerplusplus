@@ -246,6 +246,8 @@
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
     <ClCompile Include="DarkModeManagerFake.cpp" />
+    <ClCompile Include="MassRenameHelperTest.cpp" />
+    <ClCompile Include="MassRenameTokensMenuTest.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />
     <ClCompile Include="SessionRestorerTest.cpp" />
