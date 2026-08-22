@@ -7,7 +7,7 @@
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "SearchTabsModel.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/ListViewHelper.h"
@@ -268,7 +268,7 @@ std::wstring SearchTabsDialog::GetTabColumnText(const Tab *tab, ColumnType colum
 		return tab->GetName();
 
 	case SearchTabsDialog::ColumnType::Path:
-		return tab->GetShellBrowserImpl()->GetDirectoryPath();
+		return tab->GetShellBrowser()->GetDirectoryPath();
 
 	default:
 		LOG(FATAL) << "Search tabs column type not found";

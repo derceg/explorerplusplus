@@ -37,7 +37,6 @@ public:
 private:
 	void OnTabsChanged();
 	bool TabFilter(const Tab *tab) const;
-	static std::wstring GetTabDirectory(const Tab *tab);
 
 	const TabList *const m_tabList;
 	std::wstring m_searchTerm;

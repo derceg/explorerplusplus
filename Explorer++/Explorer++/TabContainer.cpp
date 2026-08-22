@@ -130,17 +130,7 @@ private:
 
 	std::optional<int> MaybeGetCachedIconIndex() const
 	{
-		const auto &pidl = m_tab->GetShellBrowser()->GetDirectory();
-
-		std::wstring parsingPath;
-		HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingPath);
-
-		if (FAILED(hr))
-		{
-			return std::nullopt;
-		}
-
-		return m_cachedIcons->MaybeGetIconIndex(parsingPath);
+		return m_cachedIcons->MaybeGetIconIndex(m_tab->GetShellBrowser()->GetDirectoryPath());
 	}
 
 	void FetchUpdatedIcon() const

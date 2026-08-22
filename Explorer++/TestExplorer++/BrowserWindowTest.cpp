@@ -7,7 +7,6 @@
 #include "BrowserWindowFake.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "../Helper/ShellHelper.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
 
@@ -83,10 +82,7 @@ TEST_F(BrowserWindowTest, GetStorageData)
 	for (const auto &[storageTab, tab] : boost::combine(storageData.tabs, tabs))
 	{
 		EXPECT_EQ(storageTab.pidl, tab->GetShellBrowser()->GetDirectory());
-
-		std::wstring path;
-		ASSERT_HRESULT_SUCCEEDED(GetDisplayName(storageTab.pidl.Raw(), SHGDN_FORPARSING, path));
-		EXPECT_EQ(storageTab.directory, path);
+		EXPECT_EQ(storageTab.directory, tab->GetShellBrowser()->GetDirectoryPath());
 
 		EXPECT_EQ(storageTab.tabSettings.lockState, tab->GetLockState());
 		EXPECT_EQ(storageTab.tabSettings.name,

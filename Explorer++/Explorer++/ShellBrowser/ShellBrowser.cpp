@@ -6,6 +6,7 @@
 #include "ShellBrowser.h"
 #include "NavigationManager.h"
 #include "ShellNavigationController.h"
+#include "../Helper/ShellHelper.h"
 
 ShellBrowser::ShellBrowser() : m_id(idCounter++)
 {
@@ -32,6 +33,14 @@ const PidlAbsolute &ShellBrowser::GetDirectory() const
 {
 	const auto *currentEntry = GetNavigationController()->GetCurrentEntry();
 	return currentEntry->GetPidl();
+}
+
+std::wstring ShellBrowser::GetDirectoryPath() const
+{
+	std::wstring path;
+	HRESULT hr = GetDisplayName(GetDirectory().Raw(), SHGDN_FORPARSING, path);
+	CHECK(SUCCEEDED(hr));
+	return path;
 }
 
 const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const

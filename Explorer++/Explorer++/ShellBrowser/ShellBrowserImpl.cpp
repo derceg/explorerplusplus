@@ -601,11 +601,6 @@ std::wstring ShellBrowserImpl::GetItemFullName(int index) const
 	return GetItemByIndex(index).parsingName;
 }
 
-std::wstring ShellBrowserImpl::GetDirectoryPath() const
-{
-	return m_directoryState.directory;
-}
-
 void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 {
 	ListViewHelper::SelectAllItems(m_listView, false);

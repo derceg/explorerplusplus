@@ -32,6 +32,7 @@ public:
 	void SetTab(const Tab *tab);
 
 	const PidlAbsolute &GetDirectory() const;
+	std::wstring GetDirectoryPath() const;
 	const NavigationRequest *MaybeGetLatestActiveNavigation() const;
 
 	virtual const FolderSettings &GetFolderSettings() const = 0;

@@ -7,11 +7,9 @@
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
-#include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabEvents.h"
 #include "TabList.h"
-#include "../Helper/ShellHelper.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <ranges>
 
@@ -82,16 +80,10 @@ bool SearchTabsModel::TabFilter(const Tab *tab) const
 		return true;
 	}
 
-	if (boost::icontains(GetTabDirectory(tab), m_searchTerm))
+	if (boost::icontains(tab->GetShellBrowser()->GetDirectoryPath(), m_searchTerm))
 	{
 		return true;
 	}
 
 	return false;
-}
-
-std::wstring SearchTabsModel::GetTabDirectory(const Tab *tab)
-{
-	const auto *currentEntry = tab->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-	return GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING);
 }

@@ -123,7 +123,6 @@ public:
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
 	/* Get/Set current state. */
-	std::wstring GetDirectoryPath() const;
 	int GetUniqueFolderId() const;
 	void CycleViewMode(bool cycleForward);
 	SortMode GetGroupMode() const;

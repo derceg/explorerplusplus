@@ -8,12 +8,10 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
-#include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
@@ -213,9 +211,7 @@ void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	}
 
 	const auto *shellBrowser = browser->GetActiveShellBrowser();
-	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
-	std::wstring currentDirectory =
-		GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_FORPARSING);
+	std::wstring currentDirectory = shellBrowser->GetDirectoryPath();
 
 	if (bookmarkItem->IsFolder())
 	{

@@ -153,8 +153,7 @@ TabStorageData Tab::GetStorageData() const
 {
 	TabStorageData storageData;
 	storageData.pidl = m_shellBrowser->GetDirectory();
-	CHECK(SUCCEEDED(GetDisplayName(m_shellBrowser->GetDirectory().Raw(), SHGDN_FORPARSING,
-		storageData.directory)));
+	storageData.directory = m_shellBrowser->GetDirectoryPath();
 	storageData.folderSettings = m_shellBrowser->GetFolderSettings();
 	storageData.columns = m_shellBrowser->GetAllColumnSets();
 

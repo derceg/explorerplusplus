@@ -41,7 +41,7 @@ void Explorerplusplus::OnSearch()
 		[this]
 		{
 			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-			std::wstring currentDirectory = selectedTab.GetShellBrowserImpl()->GetDirectoryPath();
+			std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectoryPath();
 
 			return SearchDialog::Create(m_resourceLoader, m_hwnd, currentDirectory, m_browserList);
 		});
@@ -83,7 +83,7 @@ void Explorerplusplus::OnResolveLink()
 			Tab &newTab =
 				GetActivePane()->GetTabContainer()->CreateNewTab(szPath, { .selected = true });
 
-			if (newTab.GetShellBrowserImpl()->GetDirectoryPath() == szPath)
+			if (newTab.GetShellBrowser()->GetDirectoryPath() == szPath)
 			{
 				wil::com_ptr_nothrow<IShellFolder> parent;
 				hr = SHBindToObject(nullptr, newTab.GetShellBrowser()->GetDirectory().Raw(),

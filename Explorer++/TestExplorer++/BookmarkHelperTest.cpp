@@ -40,9 +40,6 @@ TEST_F(BookmarkHelperTest, AddBrowserTabsToBookmarkFolder)
 			SHGDN_INFOLDER, expectedName));
 		EXPECT_EQ(bookmark->GetName(), expectedName);
 
-		std::wstring expectedPath;
-		ASSERT_HRESULT_SUCCEEDED(GetDisplayName(tab->GetShellBrowser()->GetDirectory().Raw(),
-			SHGDN_FORPARSING, expectedPath));
-		EXPECT_EQ(bookmark->GetLocation(), expectedPath);
+		EXPECT_EQ(bookmark->GetLocation(), tab->GetShellBrowser()->GetDirectoryPath());
 	}
 }

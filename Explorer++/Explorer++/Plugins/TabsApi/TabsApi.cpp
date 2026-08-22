@@ -47,7 +47,7 @@ Plugins::TabsApi::Tab::Tab(const ::Tab &tabInternal) :
 	folderSettings(*tabInternal.GetShellBrowserImpl())
 {
 	id = tabInternal.GetId();
-	location = tabInternal.GetShellBrowserImpl()->GetDirectoryPath();
+	location = tabInternal.GetShellBrowser()->GetDirectoryPath();
 	name = tabInternal.GetName();
 	locked = (tabInternal.GetLockState() == ::Tab::LockState::Locked);
 	addressLocked = (tabInternal.GetLockState() == ::Tab::LockState::AddressLocked);

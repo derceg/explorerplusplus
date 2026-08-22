@@ -85,8 +85,7 @@ void AddressBar::OnEnterPressed()
 	std::wstring path = m_view->GetText();
 
 	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
-	std::wstring currentDirectory =
-		GetDisplayNameWithFallback(shellBrowser->GetDirectory().Raw(), SHGDN_FORPARSING);
+	std::wstring currentDirectory = shellBrowser->GetDirectoryPath();
 
 	// When entering a path in the address bar in Windows Explorer, environment variables will be
 	// expanded. The behavior here is designed to match that.
