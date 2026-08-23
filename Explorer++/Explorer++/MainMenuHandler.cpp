@@ -9,7 +9,6 @@
 #include "DestroyFilesDialog.h"
 #include "ModelessDialogHelper.h"
 #include "OptionsDialog.h"
-#include "SearchDialog.h"
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -33,18 +32,6 @@ void Explorerplusplus::OnDestroyFiles()
 	auto *destroyFilesDialog = DestroyFilesDialog::Create(m_resourceLoader, m_hwnd,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog->ShowModalDialog();
-}
-
-void Explorerplusplus::OnSearch()
-{
-	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"SearchDialog",
-		[this]
-		{
-			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-			std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectoryPath();
-
-			return SearchDialog::Create(m_resourceLoader, m_hwnd, currentDirectory, m_browserList);
-		});
 }
 
 void Explorerplusplus::OnShowOptions()

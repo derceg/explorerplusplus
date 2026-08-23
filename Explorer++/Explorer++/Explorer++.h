@@ -205,7 +205,6 @@ private:
 	void OnShowHiddenFiles();
 	void OnSelectColumns();
 	void OnDestroyFiles();
-	void OnSearch();
 	void OnShowOptions();
 
 	void OnGoToOffset(int offset);

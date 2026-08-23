@@ -564,7 +564,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_BROWSER_SEARCH:
-		OnSearch();
+		m_commandController.ExecuteCommand(IDM_TOOLS_SEARCH);
 		break;
 
 	case APPCOMMAND_CLOSE:

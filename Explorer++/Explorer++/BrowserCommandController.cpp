@@ -18,6 +18,7 @@
 #include "ModelessDialogHelper.h"
 #include "PlatformContext.h"
 #include "ScriptingDialog.h"
+#include "SearchDialog.h"
 #include "SearchTabsDialog.h"
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -436,6 +437,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 			m_appServices->GetResourceLoader());
 		break;
 
+	case IDM_TOOLS_SEARCH:
+		OnSearch();
+		break;
+
 	case IDM_TOOLS_CUSTOMIZECOLORS:
 		OnCustomizeColors();
 		break;
@@ -734,6 +739,16 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	}
 
 	m_browser->OpenItem(pidl.get(), disposition);
+}
+
+void BrowserCommandController::OnSearch()
+{
+	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"SearchDialog",
+		[this]
+		{
+			return SearchDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetHWND(),
+				GetActiveShellBrowser()->GetDirectoryPath(), m_appServices->GetBrowserList());
+		});
 }
 
 void BrowserCommandController::OnCustomizeColors()

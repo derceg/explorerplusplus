@@ -882,7 +882,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case MainToolbarButton::Search:
 	case IDM_TOOLS_SEARCH:
-		OnSearch();
+		m_commandController.ExecuteCommand(IDM_TOOLS_SEARCH);
 		break;
 
 	case IDM_TOOLS_CUSTOMIZECOLORS:
