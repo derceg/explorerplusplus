@@ -78,7 +78,8 @@ protected:
 		OrganizeBookmarksContextMenuDelegate *delegate, BookmarkItem *targetFolder = nullptr)
 	{
 		return std::make_unique<OrganizeBookmarksContextMenu>(menuView, &m_acceleratorManager,
-			nullptr, &m_bookmarkTree, targetFolder ? targetFolder : m_targetFolder, delegate,
+			nullptr, &m_bookmarkTree,
+			targetFolder ? targetFolder->GetWeakPtr() : m_targetFolder->GetWeakPtr(), delegate,
 			&m_resourceLoader, &m_platformContext);
 	}
 

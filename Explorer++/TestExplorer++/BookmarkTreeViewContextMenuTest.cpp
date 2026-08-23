@@ -26,30 +26,47 @@ public:
 
 }
 
-TEST(BookmarkTreeViewContextMenuTest, Selection)
+class BookmarkTreeViewContextMenuTest : public Test
 {
-	AcceleratorManager acceleratorManager;
-	BookmarkTreeViewContextMenuDelegateMock delegate;
+protected:
+	BookmarkTreeViewContextMenuTest() :
+		m_targetFolder(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
+			std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt), 0)),
+		m_contextMenu(&m_menuView, &m_acceleratorManager, &m_delegate, &m_bookmarkTree,
+			m_targetFolder->GetWeakPtr(), &m_resourceLoader)
+	{
+	}
 
-	BookmarkTree bookmarkTree;
-	auto *targetFolder = bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt), 0);
+	BookmarkTree m_bookmarkTree;
+	BookmarkItem *m_targetFolder = nullptr;
+	AcceleratorManager m_acceleratorManager;
+	ResourceLoaderFake m_resourceLoader;
 
-	ResourceLoaderFake resourceLoader;
+	BookmarkTreeViewContextMenuDelegateMock m_delegate;
 
-	MenuViewFake menuView;
-	BookmarkTreeViewContextMenu contextMenu(&menuView, &acceleratorManager, &delegate,
-		&bookmarkTree, targetFolder, &resourceLoader);
+	MenuViewFake m_menuView;
+	BookmarkTreeViewContextMenu m_contextMenu;
+};
 
-	EXPECT_CALL(delegate, StartRenamingFolder(targetFolder));
-	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
+TEST_F(BookmarkTreeViewContextMenuTest, Selection)
+{
+	EXPECT_CALL(m_delegate, StartRenamingFolder(m_targetFolder));
+	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
 
-	EXPECT_CALL(delegate, CreateFolder(targetFolder, targetFolder->GetChildren().size()));
-	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
+	EXPECT_CALL(m_delegate, CreateFolder(m_targetFolder, m_targetFolder->GetChildren().size()));
+	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
 
 	MockFunction<void(const std::wstring &guid)> removedCallback;
-	bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
+	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
 
-	EXPECT_CALL(removedCallback, Call(targetFolder->GetGUID()));
-	menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE, false, false);
+	EXPECT_CALL(removedCallback, Call(m_targetFolder->GetGUID()));
+	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE, false, false);
+}
+
+TEST_F(BookmarkTreeViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
+{
+	m_bookmarkTree.RemoveBookmarkItem(m_targetFolder);
+
+	EXPECT_CALL(m_delegate, StartRenamingFolder(_)).Times(0);
+	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
 }

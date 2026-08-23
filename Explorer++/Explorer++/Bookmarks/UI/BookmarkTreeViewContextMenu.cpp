@@ -11,7 +11,8 @@
 
 BookmarkTreeViewContextMenu::BookmarkTreeViewContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, BookmarkTreeViewContextMenuDelegate *delegate,
-	BookmarkTree *bookmarkTree, BookmarkItem *targetFolder, const ResourceLoader *resourceLoader) :
+	BookmarkTree *bookmarkTree, WeakPtr<BookmarkItem> targetFolder,
+	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_delegate(delegate),
 	m_bookmarkTree(bookmarkTree),
@@ -38,17 +39,22 @@ void BookmarkTreeViewContextMenu::BuildMenu()
 		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER));
 
 	m_menuView->EnableItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME,
-		!m_bookmarkTree->IsPermanentNode(m_targetFolder));
+		!m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()));
 	m_menuView->EnableItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE,
-		!m_bookmarkTree->IsPermanentNode(m_targetFolder));
+		!m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()));
 }
 
 void BookmarkTreeViewContextMenu::OnMenuItemSelected(UINT menuItemId)
 {
+	if (!m_targetFolder)
+	{
+		return;
+	}
+
 	switch (menuItemId)
 	{
 	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME:
-		m_delegate->StartRenamingFolder(m_targetFolder);
+		m_delegate->StartRenamingFolder(m_targetFolder.Get());
 		break;
 
 	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE:
@@ -56,7 +62,7 @@ void BookmarkTreeViewContextMenu::OnMenuItemSelected(UINT menuItemId)
 		break;
 
 	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER:
-		m_delegate->CreateFolder(m_targetFolder, m_targetFolder->GetChildren().size());
+		m_delegate->CreateFolder(m_targetFolder.Get(), m_targetFolder->GetChildren().size());
 		break;
 
 	default:
@@ -67,5 +73,5 @@ void BookmarkTreeViewContextMenu::OnMenuItemSelected(UINT menuItemId)
 
 void BookmarkTreeViewContextMenu::DeleteItem()
 {
-	m_bookmarkTree->RemoveBookmarkItem(m_targetFolder);
+	m_bookmarkTree->RemoveBookmarkItem(m_targetFolder.Get());
 }

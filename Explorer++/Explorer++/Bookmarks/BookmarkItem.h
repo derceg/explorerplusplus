@@ -6,6 +6,7 @@
 
 #include "../Helper/Helper.h"
 #include "../Helper/SignalWrapper.h"
+#include "../Helper/WeakPtrFactory.h"
 #include <boost/core/noncopyable.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
@@ -104,6 +105,8 @@ public:
 
 	void VisitRecursively(std::function<void(BookmarkItem *currentItem)> callback);
 
+	WeakPtr<BookmarkItem> GetWeakPtr();
+
 	// Signals
 	SignalWrapper<BookmarkItem, void(BookmarkItem &bookmarkItem, PropertyType propertyType)>
 		updatedSignal;
@@ -141,4 +144,6 @@ private:
 	FILETIME m_dateModified = m_dateCreated;
 
 	BookmarkItems m_children;
+
+	WeakPtrFactory<BookmarkItem> m_weakPtrFactory{ this };
 };

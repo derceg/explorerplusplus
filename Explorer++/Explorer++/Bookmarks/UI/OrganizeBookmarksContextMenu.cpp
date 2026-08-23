@@ -18,7 +18,7 @@
 
 OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, HWND parentWindow, BookmarkTree *bookmarkTree,
-	BookmarkItem *targetFolder, OrganizeBookmarksContextMenuDelegate *delegate,
+	WeakPtr<BookmarkItem> targetFolder, OrganizeBookmarksContextMenuDelegate *delegate,
 	const ResourceLoader *resourceLoader, PlatformContext *platformContext) :
 	MenuBase(menuView, acceleratorManager),
 	m_parentWindow(parentWindow),
@@ -32,8 +32,6 @@ OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(
 		std::bind(&OrganizeBookmarksContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
-	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
-		std::bind_front(&OrganizeBookmarksContextMenu::OnBookmarkItemPreRemoval, this)));
 }
 
 void OrganizeBookmarksContextMenu::BuildMenu()
@@ -122,10 +120,10 @@ void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
 void OrganizeBookmarksContextMenu::OnNewBookmark()
 {
 	auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_targetFolder, GetTargetIndex(), m_parentWindow, nullptr, m_acceleratorManager,
+		m_targetFolder.Get(), GetTargetIndex(), m_parentWindow, nullptr, m_acceleratorManager,
 		m_resourceLoader, m_platformContext);
 
-	if (!bookmark || bookmark->GetParent() != m_targetFolder)
+	if (!bookmark || bookmark->GetParent() != m_targetFolder.Get())
 	{
 		return;
 	}
@@ -154,7 +152,7 @@ void OrganizeBookmarksContextMenu::OnCopy(ClipboardAction action)
 void OrganizeBookmarksContextMenu::OnPaste()
 {
 	BookmarkHelper::PasteBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
-		m_targetFolder, GetTargetIndex());
+		m_targetFolder.Get(), GetTargetIndex());
 }
 
 void OrganizeBookmarksContextMenu::OnDelete()
@@ -169,7 +167,7 @@ void OrganizeBookmarksContextMenu::OnSelectAll()
 
 size_t OrganizeBookmarksContextMenu::GetTargetIndex() const
 {
-	auto selectedChildren = m_delegate->GetSelectedChildItems(m_targetFolder);
+	auto selectedChildren = m_delegate->GetSelectedChildItems(m_targetFolder.Get());
 
 	if (selectedChildren.empty())
 	{
@@ -180,12 +178,4 @@ size_t OrganizeBookmarksContextMenu::GetTargetIndex() const
 			   | std::views::transform([this](const auto *bookmarkItem)
 				   { return m_targetFolder->GetChildIndex(bookmarkItem); }))
 		+ 1;
-}
-
-void OrganizeBookmarksContextMenu::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
-{
-	if (BookmarkHelper::IsAncestor(m_targetFolder, &bookmarkItem))
-	{
-		m_targetFolder = nullptr;
-	}
 }

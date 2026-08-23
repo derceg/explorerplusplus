@@ -534,7 +534,7 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_hDlg, m_bookmarkTree,
-		m_currentBookmarkFolder, delegate, m_resourceLoader, m_platformContext);
+		m_currentBookmarkFolder->GetWeakPtr(), delegate, m_resourceLoader, m_platformContext);
 	popupMenu.Show(m_hDlg, pt);
 
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));

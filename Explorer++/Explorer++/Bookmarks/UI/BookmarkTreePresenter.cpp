@@ -171,7 +171,7 @@ void BookmarkTreePresenter::OnShowContextMenu(TreeViewNode *targetNode, const PO
 {
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
 	BookmarkTreeViewContextMenu contextMenu(&popupMenu, m_acceleratorManager, this, m_bookmarkTree,
-		m_adapter->GetBookmarkForNode(targetNode), m_resourceLoader);
+		m_adapter->GetBookmarkForNode(targetNode)->GetWeakPtr(), m_resourceLoader);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 

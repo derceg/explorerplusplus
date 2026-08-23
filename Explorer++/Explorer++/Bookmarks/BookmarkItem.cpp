@@ -254,3 +254,8 @@ void BookmarkItem::VisitRecursively(std::function<void(BookmarkItem *currentItem
 		child->VisitRecursively(callback);
 	}
 }
+
+WeakPtr<BookmarkItem> BookmarkItem::GetWeakPtr()
+{
+	return m_weakPtrFactory.GetWeakPtr();
+}

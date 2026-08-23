@@ -6,6 +6,7 @@
 
 #include "MenuBase.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/WeakPtr.h"
 #include <boost/signals2.hpp>
 #include <vector>
 
@@ -19,7 +20,7 @@ class OrganizeBookmarksContextMenu : public MenuBase
 {
 public:
 	OrganizeBookmarksContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		HWND parentWindow, BookmarkTree *bookmarkTree, BookmarkItem *targetFolder,
+		HWND parentWindow, BookmarkTree *bookmarkTree, WeakPtr<BookmarkItem> targetFolder,
 		OrganizeBookmarksContextMenuDelegate *delegate, const ResourceLoader *resourceLoader,
 		PlatformContext *platformContext);
 
@@ -35,11 +36,9 @@ private:
 	void OnSelectAll();
 	size_t GetTargetIndex() const;
 
-	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
-
 	const HWND m_parentWindow;
 	BookmarkTree *const m_bookmarkTree;
-	BookmarkItem *m_targetFolder = nullptr;
+	WeakPtr<BookmarkItem> m_targetFolder;
 	OrganizeBookmarksContextMenuDelegate *const m_delegate;
 	const ResourceLoader *const m_resourceLoader;
 	PlatformContext *const m_platformContext;

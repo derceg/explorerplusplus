@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MenuBase.h"
+#include "../Helper/WeakPtr.h"
 #include <boost/signals2.hpp>
 #include <vector>
 
@@ -26,7 +27,7 @@ class BookmarkTreeViewContextMenu : public MenuBase
 public:
 	BookmarkTreeViewContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTreeViewContextMenuDelegate *delegate, BookmarkTree *bookmarkTree,
-		BookmarkItem *targetItem, const ResourceLoader *resourceLoader);
+		WeakPtr<BookmarkItem> targetFolder, const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu();
@@ -36,7 +37,7 @@ private:
 
 	BookmarkTreeViewContextMenuDelegate *const m_delegate;
 	BookmarkTree *const m_bookmarkTree;
-	BookmarkItem *const m_targetFolder;
+	WeakPtr<BookmarkItem> m_targetFolder;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };
