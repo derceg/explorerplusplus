@@ -52,9 +52,8 @@ protected:
 		return std::make_unique<BookmarkTreePresenter>(std::make_unique<TreeView>(treeViewWindow,
 														   m_platformContext.GetKeyboardState(),
 														   LabelEditHandler::CreateForTest),
-			&m_bookmarkTree, &m_browserList, m_platformContext.GetClipboardStore(),
-			&m_acceleratorManager, &m_resourceLoader, initiallyExpandedBookmarkIds,
-			initiallySelectedBookmarkId);
+			&m_bookmarkTree, &m_browserList, &m_platformContext, &m_acceleratorManager,
+			&m_resourceLoader, initiallyExpandedBookmarkIds, initiallySelectedBookmarkId);
 	}
 
 	void VerifyViewItems(const BookmarkTreePresenter *presenter)
@@ -158,29 +157,14 @@ TEST_F(BookmarkTreePresenterTest, SelectedFolder)
 
 	auto presenter = BuildPresenter();
 
-	presenter->SelectOnly(m_bookmarkTree.GetBookmarksMenuFolder());
+	presenter->SelectFolder(m_bookmarkTree.GetBookmarksMenuFolder());
 	EXPECT_EQ(presenter->GetSelectedFolder(), m_bookmarkTree.GetBookmarksMenuFolder());
 	EXPECT_THAT(presenter->GetSelectedItems(),
 		ElementsAre(m_bookmarkTree.GetBookmarksMenuFolder()));
 
-	presenter->SelectOnly(folder);
+	presenter->SelectFolder(folder);
 	EXPECT_EQ(presenter->GetSelectedFolder(), folder);
 	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(folder));
-}
-
-TEST_F(BookmarkTreePresenterTest, SelectBookmark)
-{
-	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
-	auto *bookmark = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\"));
-
-	auto presenter = BuildPresenter();
-	presenter->SelectOnly(folder);
-
-	// Attempting to select a bookmark should have no effect (since the view only displays folders).
-	presenter->SelectOnly(bookmark);
-	EXPECT_EQ(presenter->GetSelectedFolder(), folder);
 }
 
 TEST_F(BookmarkTreePresenterTest, CreateFolder)
@@ -200,13 +184,21 @@ TEST_F(BookmarkTreePresenterTest, CreateFolder)
 
 	InSequence seq;
 
-	presenter->SelectOnly(folder1);
-	EXPECT_CALL(callback, Call(CreateFolderMatcher(folder1), 0));
-	presenter->CreateFolder(0);
+	BookmarkItem *createdBookmarkItem = nullptr;
+	ON_CALL(callback, Call)
+		.WillByDefault([&createdBookmarkItem](BookmarkItem &bookmarkItem, size_t)
+			{ createdBookmarkItem = &bookmarkItem; });
 
-	presenter->SelectOnly(folder2);
+	presenter->SelectFolder(folder1);
+	EXPECT_CALL(callback, Call(CreateFolderMatcher(folder1), 0));
+	presenter->CreateFolder();
+	EXPECT_EQ(presenter->GetSelectedFolder(), createdBookmarkItem);
+	createdBookmarkItem = nullptr;
+
+	presenter->SelectFolder(folder2);
 	EXPECT_CALL(callback, Call(CreateFolderMatcher(folder2), 1));
-	presenter->CreateFolder(1);
+	presenter->CreateFolder();
+	EXPECT_EQ(presenter->GetSelectedFolder(), createdBookmarkItem);
 }
 
 TEST_F(BookmarkTreePresenterTest, AddFolder)

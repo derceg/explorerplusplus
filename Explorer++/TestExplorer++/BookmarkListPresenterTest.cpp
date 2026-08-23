@@ -26,7 +26,6 @@ class BookmarkListPresenterTest : public BrowserTestBase
 {
 protected:
 	BookmarkListPresenterTest() :
-		m_resourceInstance(GetModuleHandle(nullptr)),
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab(L"c:\\initial\\folder"))
 	{
@@ -46,9 +45,9 @@ protected:
 		return std::make_unique<BookmarkListPresenter>(
 			std::make_unique<ListView>(listViewWindow, m_platformContext.GetKeyboardState(),
 				LabelEditHandler::CreateForTest, &m_resourceLoader),
-			m_resourceInstance, &m_bookmarkTree, columnModel, std::nullopt,
-			SortDirection::Ascending, &m_browserList, &m_config, &m_acceleratorManager,
-			&m_resourceLoader, &m_iconFetcher, &m_platformContext);
+			&m_bookmarkTree, columnModel, std::nullopt, SortDirection::Ascending, &m_browserList,
+			&m_config, &m_acceleratorManager, &m_resourceLoader, &m_iconFetcher,
+			&m_platformContext);
 	}
 
 	void VerifyViewItems(const BookmarkListPresenter *presenter)
@@ -73,7 +72,6 @@ protected:
 		}
 	}
 
-	HINSTANCE m_resourceInstance;
 	IconFetcherFake m_iconFetcher;
 
 	BrowserWindowFake *const m_browser;
@@ -139,27 +137,6 @@ TEST_F(BookmarkListPresenterTest, SelectAllItems)
 	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(bookmark1, folder, bookmark2));
 }
 
-TEST_F(BookmarkListPresenterTest, SelectOnly)
-{
-	auto *targetFolder = m_bookmarkTree.GetBookmarksToolbarFolder();
-	auto *bookmark1 = m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\"));
-	m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
-	auto *bookmark2 = m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\"));
-
-	auto presenter = BuildPresenter();
-	presenter->NavigateToBookmarkFolder(targetFolder);
-	EXPECT_THAT(presenter->GetSelectedItems(), IsEmpty());
-
-	presenter->SelectOnly(bookmark1);
-	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(bookmark1));
-
-	presenter->SelectOnly(bookmark2);
-	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(bookmark2));
-}
-
 TEST_F(BookmarkListPresenterTest, CreateFolder)
 {
 	auto *targetFolder = m_bookmarkTree.GetBookmarksToolbarFolder();
@@ -174,11 +151,19 @@ TEST_F(BookmarkListPresenterTest, CreateFolder)
 	MockFunction<void(BookmarkItem & bookmarkItem, size_t index)> callback;
 	m_bookmarkTree.bookmarkItemAddedSignal.AddObserver(callback.AsStdFunction());
 
+	BookmarkItem *createdBookmarkItem = nullptr;
+	ON_CALL(callback, Call)
+		.WillByDefault([&createdBookmarkItem](BookmarkItem &bookmarkItem, size_t)
+			{ createdBookmarkItem = &bookmarkItem; });
+
 	EXPECT_CALL(callback, Call(CreateFolderMatcher(targetFolder), 0));
-	presenter->CreateFolder(0);
+	presenter->CreateFolder(targetFolder, 0);
+	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(createdBookmarkItem));
+	createdBookmarkItem = nullptr;
 
 	EXPECT_CALL(callback, Call(CreateFolderMatcher(targetFolder), 3));
-	presenter->CreateFolder(3);
+	presenter->CreateFolder(targetFolder, 3);
+	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(createdBookmarkItem));
 }
 
 TEST_F(BookmarkListPresenterTest, ToggleColumn)
@@ -306,7 +291,9 @@ TEST_F(BookmarkListPresenterTest, UpdateItemWithPositionChange)
 	presenter->SetSortDetails(BookmarkColumn::Location, SortDirection::Ascending);
 	presenter->NavigateToBookmarkFolder(targetFolder);
 
-	presenter->SelectOnly(bookmark2);
+	auto *view = presenter->GetView();
+	auto *model = presenter->GetModelForTesting();
+	view->SelectItem(model->GetItemForBookmark(bookmark2));
 
 	bookmark2->SetLocation(L"a:\\");
 	VerifyViewItems(presenter.get());

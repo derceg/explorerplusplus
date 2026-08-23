@@ -13,6 +13,7 @@
 #include "MainResource.h"
 #include "MouseEvent.h"
 #include "NoOpMenuHelpTextHost.h"
+#include "PlatformContext.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
@@ -25,7 +26,7 @@
 #include <wil/resource.h>
 
 BookmarkTreePresenter::BookmarkTreePresenter(std::unique_ptr<TreeView> view,
-	BookmarkTree *bookmarkTree, const BrowserList *browserListOpt, ClipboardStore *clipboardStore,
+	BookmarkTree *bookmarkTree, const BrowserList *browserListOpt, PlatformContext *platformContext,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	const std::unordered_set<std::wstring> &initiallyExpandedBookmarkIds,
 	const std::optional<std::wstring> &initiallySelectedBookmarkId,
@@ -34,7 +35,7 @@ BookmarkTreePresenter::BookmarkTreePresenter(std::unique_ptr<TreeView> view,
 	m_view(std::move(view)),
 	m_bookmarkTree(bookmarkTree),
 	m_browserListOpt(browserListOpt),
-	m_clipboardStore(clipboardStore),
+	m_platformContext(platformContext),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_middleClickOpenPolicy(middleClickOpenPolicy)
@@ -138,7 +139,7 @@ void BookmarkTreePresenter::OnNodeRemoved(TreeViewNode *targetNode, RemoveMode r
 
 void BookmarkTreePresenter::OnNodeCopied(TreeViewNode *targetNode)
 {
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree,
+	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
 		{ m_adapter->GetBookmarkForNode(targetNode) }, ClipboardAction::Copy);
 }
 
@@ -151,15 +152,15 @@ void BookmarkTreePresenter::OnNodeCut(TreeViewNode *targetNode)
 		return;
 	}
 
-	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, { bookmark },
-		ClipboardAction::Cut);
+	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		{ bookmark }, ClipboardAction::Cut);
 }
 
 void BookmarkTreePresenter::OnPaste(TreeViewNode *targetNode)
 {
 	auto *bookmark = m_adapter->GetBookmarkForNode(targetNode);
-	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, bookmark,
-		bookmark->GetChildren().size());
+	BookmarkHelper::PasteBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
+		bookmark, bookmark->GetChildren().size());
 }
 
 void BookmarkTreePresenter::OnSelectionChanged(TreeViewNode *selectedNode)
@@ -212,17 +213,25 @@ void BookmarkTreePresenter::StartRenamingFolder(BookmarkItem *folder)
 	m_view->StartRenamingNode(m_adapter->GetNodeForBookmark(folder));
 }
 
-void BookmarkTreePresenter::CreateFolder(size_t index)
+void BookmarkTreePresenter::CreateBookmark(BookmarkItem *parentFolder, size_t index)
 {
-	CreateFolder(GetSelectedFolder(), index);
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark, parentFolder,
+		index, m_view->GetHWND(), nullptr, m_acceleratorManager, m_resourceLoader,
+		m_platformContext);
+}
+
+void BookmarkTreePresenter::CreateFolder()
+{
+	auto *parentFolder = GetSelectedFolder();
+	CreateFolder(parentFolder, parentFolder->GetChildren().size());
 }
 
 void BookmarkTreePresenter::CreateFolder(BookmarkItem *parentFolder, size_t index)
 {
-	std::wstring newBookmarkFolderName =
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
 	auto *addedFolder = m_bookmarkTree->AddBookmarkItem(parentFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt), index);
+		std::make_unique<BookmarkItem>(std::nullopt,
+			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt),
+		index);
 
 	auto *node = m_adapter->GetNodeForBookmark(addedFolder);
 	m_view->SelectNode(node);
@@ -251,13 +260,9 @@ RawBookmarkItems BookmarkTreePresenter::GetSelectedChildItems(
 	return {};
 }
 
-void BookmarkTreePresenter::SelectOnly(const BookmarkItem *bookmarkItem)
+void BookmarkTreePresenter::SelectFolder(const BookmarkItem *bookmarkItem)
 {
-	if (!bookmarkItem->IsFolder())
-	{
-		return;
-	}
-
+	CHECK(bookmarkItem->IsFolder());
 	m_view->SelectNode(m_adapter->GetNodeForBookmark(bookmarkItem));
 }
 

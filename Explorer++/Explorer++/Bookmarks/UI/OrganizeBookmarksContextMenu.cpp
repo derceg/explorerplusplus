@@ -10,23 +10,21 @@
 #include "MainResource.h"
 #include "MenuView.h"
 #include "OrganizeBookmarksContextMenuDelegate.h"
-#include "PlatformContext.h"
 #include "ResourceLoader.h"
 #include "../Helper/ClipboardStore.h"
 #include <algorithm>
 #include <ranges>
 
 OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, HWND parentWindow, BookmarkTree *bookmarkTree,
+	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
 	WeakPtr<BookmarkItem> targetFolder, OrganizeBookmarksContextMenuDelegate *delegate,
-	const ResourceLoader *resourceLoader, PlatformContext *platformContext) :
+	ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
-	m_parentWindow(parentWindow),
 	m_bookmarkTree(bookmarkTree),
 	m_targetFolder(targetFolder),
 	m_delegate(delegate),
-	m_resourceLoader(resourceLoader),
-	m_platformContext(platformContext)
+	m_clipboardStore(clipboardStore),
+	m_resourceLoader(resourceLoader)
 {
 	BuildMenu();
 
@@ -65,8 +63,7 @@ void OrganizeBookmarksContextMenu::BuildMenu()
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, !selectedBookmarkItems.empty());
 
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
-		m_platformContext->GetClipboardStore()->IsDataAvailable(
-			BookmarkClipboard::GetClipboardFormat()));
+		m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()));
 
 	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, canDelete);
 
@@ -84,11 +81,11 @@ void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
 	switch (menuItemId)
 	{
 	case IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK:
-		OnNewBookmark();
+		m_delegate->CreateBookmark(m_targetFolder.Get(), GetTargetIndex());
 		break;
 
 	case IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER:
-		OnNewFolder();
+		m_delegate->CreateFolder(m_targetFolder.Get(), GetTargetIndex());
 		break;
 
 	case IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT:
@@ -117,25 +114,6 @@ void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
 	}
 }
 
-void OrganizeBookmarksContextMenu::OnNewBookmark()
-{
-	auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_targetFolder.Get(), GetTargetIndex(), m_parentWindow, nullptr, m_acceleratorManager,
-		m_resourceLoader, m_platformContext);
-
-	if (!bookmark || bookmark->GetParent() != m_targetFolder.Get())
-	{
-		return;
-	}
-
-	m_delegate->SelectOnly(bookmark);
-}
-
-void OrganizeBookmarksContextMenu::OnNewFolder()
-{
-	m_delegate->CreateFolder(GetTargetIndex());
-}
-
 void OrganizeBookmarksContextMenu::OnCopy(ClipboardAction action)
 {
 	auto selectedItems = m_delegate->GetSelectedItems();
@@ -145,14 +123,13 @@ void OrganizeBookmarksContextMenu::OnCopy(ClipboardAction action)
 		return;
 	}
 
-	BookmarkHelper::CopyBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
-		selectedItems, action);
+	BookmarkHelper::CopyBookmarkItems(m_clipboardStore, m_bookmarkTree, selectedItems, action);
 }
 
 void OrganizeBookmarksContextMenu::OnPaste()
 {
-	BookmarkHelper::PasteBookmarkItems(m_platformContext->GetClipboardStore(), m_bookmarkTree,
-		m_targetFolder.Get(), GetTargetIndex());
+	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, m_targetFolder.Get(),
+		GetTargetIndex());
 }
 
 void OrganizeBookmarksContextMenu::OnDelete()

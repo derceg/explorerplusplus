@@ -21,7 +21,7 @@ class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreeViewAdapter;
 class BrowserList;
-class ClipboardStore;
+class PlatformContext;
 class ResourceLoader;
 class TreeView;
 
@@ -43,7 +43,7 @@ public:
 	};
 
 	BookmarkTreePresenter(std::unique_ptr<TreeView> view, BookmarkTree *bookmarkTree,
-		const BrowserList *browserListOpt, ClipboardStore *clipboardStore,
+		const BrowserList *browserListOpt, PlatformContext *platformContext,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 		const std::unordered_set<std::wstring> &initiallyExpandedBookmarkIds,
 		const std::optional<std::wstring> &initiallySelectedBookmarkId = std::nullopt,
@@ -56,11 +56,15 @@ public:
 	// OrganizeBookmarksContextMenuDelegate
 	bool CanSelectAllItems() const override;
 	void SelectAllItems() override;
-	void CreateFolder(size_t index) override;
 	RawBookmarkItems GetSelectedItems() const override;
 	RawBookmarkItems GetSelectedChildItems(const BookmarkItem *targetFolder) const override;
-	void SelectOnly(const BookmarkItem *bookmarkItem) override;
 
+	// BookmarkItemCreationDelegate
+	void CreateBookmark(BookmarkItem *parentFolder, size_t index) override;
+	void CreateFolder(BookmarkItem *parentFolder, size_t index) override;
+
+	void CreateFolder();
+	void SelectFolder(const BookmarkItem *bookmarkItem);
 	BookmarkItem *GetSelectedFolder() const;
 	RawBookmarkItems GetExpandedBookmarks() const;
 
@@ -91,7 +95,6 @@ private:
 
 	// BookmarkTreeViewContextMenuDelegate
 	void StartRenamingFolder(BookmarkItem *folder) override;
-	void CreateFolder(BookmarkItem *parentFolder, size_t index) override;
 
 	// BookmarkDropTargetWindow
 	DropLocation GetDropLocation(const POINT &pt) override;
@@ -102,7 +105,7 @@ private:
 	const std::unique_ptr<TreeView> m_view;
 	BookmarkTree *const m_bookmarkTree;
 	const BrowserList *const m_browserListOpt;
-	ClipboardStore *const m_clipboardStore;
+	PlatformContext *const m_platformContext;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	const MiddleClickOpenPolicy m_middleClickOpenPolicy;

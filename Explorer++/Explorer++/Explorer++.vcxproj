@@ -1196,6 +1196,7 @@
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkColumnHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkColumnModel.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkListViewContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListViewItem.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListViewModel.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewAdapter.cpp" />
@@ -1545,6 +1546,8 @@
     <ClInclude Include="Bookmarks\UI\BookmarkColumn.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumnHelper.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumnModel.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkItemCreationDelegate.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkListViewContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkListViewItem.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkListViewModel.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewAdapter.h" />

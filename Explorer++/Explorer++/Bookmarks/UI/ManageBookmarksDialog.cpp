@@ -189,8 +189,8 @@ void ManageBookmarksDialog::SetupTreeView()
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
 		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW),
 			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog),
-		m_bookmarkTree, m_browserList, m_platformContext->GetClipboardStore(), m_acceleratorManager,
-		m_resourceLoader, m_persistentSettings->m_expandedBookmarkIds);
+		m_bookmarkTree, m_browserList, m_platformContext, m_acceleratorManager, m_resourceLoader,
+		m_persistentSettings->m_expandedBookmarkIds);
 
 	m_connections.push_back(m_bookmarkTreePresenter->selectionChangedSignal.AddObserver(
 		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
@@ -202,9 +202,9 @@ void ManageBookmarksDialog::SetupListView()
 		std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
 			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog,
 			m_resourceLoader),
-		m_resourceInstance, m_bookmarkTree, m_persistentSettings->m_listViewColumnModel,
-		std::nullopt, SortDirection::Ascending, m_browserList, m_config, m_acceleratorManager,
-		m_resourceLoader, m_iconFetcher, m_platformContext);
+		m_bookmarkTree, m_persistentSettings->m_listViewColumnModel, std::nullopt,
+		SortDirection::Ascending, m_browserList, m_config, m_acceleratorManager, m_resourceLoader,
+		m_iconFetcher, m_platformContext);
 
 	m_connections.push_back(m_bookmarkListPresenter->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
@@ -533,8 +533,9 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 	DCHECK(res);
 
 	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
-	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_hDlg, m_bookmarkTree,
-		m_currentBookmarkFolder->GetWeakPtr(), delegate, m_resourceLoader, m_platformContext);
+	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+		m_currentBookmarkFolder->GetWeakPtr(), delegate, m_platformContext->GetClipboardStore(),
+		m_resourceLoader);
 	popupMenu.Show(m_hDlg, pt);
 
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));
@@ -557,7 +558,7 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder,
 	UNREFERENCED_PARAMETER(entry);
 
 	m_currentBookmarkFolder = bookmarkFolder;
-	m_bookmarkTreePresenter->SelectOnly(bookmarkFolder);
+	m_bookmarkTreePresenter->SelectFolder(bookmarkFolder);
 
 	UpdateToolbarState();
 }

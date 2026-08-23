@@ -10,6 +10,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkColumnHelper.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
+#include "Bookmarks/UI/BookmarkListViewContextMenu.h"
 #include "Bookmarks/UI/BookmarkListViewModel.h"
 #include "BrowserList.h"
 #include "ListView.h"
@@ -27,14 +28,13 @@
 #include <boost/range/iterator_range.hpp>
 
 BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
-	HINSTANCE resourceInstance, BookmarkTree *bookmarkTree, const BookmarkColumnModel &columnModel,
+	BookmarkTree *bookmarkTree, const BookmarkColumnModel &columnModel,
 	std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
 	const BrowserList *browserList, const Config *config,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, PlatformContext *platformContext) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(std::move(view)),
-	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
 	m_browserList(browserList),
 	m_config(config),
@@ -151,12 +151,6 @@ void BookmarkListPresenter::SelectAllItems()
 	m_view->SelectAllItems();
 }
 
-void BookmarkListPresenter::SelectOnly(const BookmarkItem *bookmarkItem)
-{
-	m_view->DeselectAllItems();
-	m_view->SelectItem(m_model->GetItemForBookmark(bookmarkItem));
-}
-
 RawBookmarkItems BookmarkListPresenter::GetSelectedItems() const
 {
 	return GetSelectedChildItems(m_currentBookmarkFolder);
@@ -173,14 +167,38 @@ RawBookmarkItems BookmarkListPresenter::GetSelectedChildItems(
 	return GetBookmarksForItems(m_view->GetSelectedItems());
 }
 
-void BookmarkListPresenter::CreateFolder(size_t index)
+void BookmarkListPresenter::CreateBookmark(BookmarkItem *parentFolder, size_t index)
 {
-	const auto *bookmarkFolder = m_bookmarkTree->AddBookmarkItem(m_currentBookmarkFolder,
+	const auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree,
+		BookmarkItem::Type::Bookmark, parentFolder, index, m_view->GetHWND(), nullptr,
+		m_acceleratorManager, m_resourceLoader, m_platformContext);
+
+	if (!bookmark)
+	{
+		return;
+	}
+
+	if (bookmark->GetParent() != m_currentBookmarkFolder)
+	{
+		return;
+	}
+
+	m_view->SelectOnly(m_model->GetItemForBookmark(bookmark));
+}
+
+void BookmarkListPresenter::CreateFolder(BookmarkItem *parentFolder, size_t index)
+{
+	const auto *bookmarkFolder = m_bookmarkTree->AddBookmarkItem(parentFolder,
 		std::make_unique<BookmarkItem>(std::nullopt,
 			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt),
 		index);
 
-	SelectOnly(bookmarkFolder);
+	if (parentFolder != m_currentBookmarkFolder)
+	{
+		return;
+	}
+
+	m_view->SelectOnly(m_model->GetItemForBookmark(bookmarkFolder));
 	m_view->StartRenamingItem(m_model->GetItemForBookmark(bookmarkFolder));
 }
 
@@ -256,72 +274,10 @@ void BookmarkListPresenter::OnPaste(ListViewItem *lastSelectedItemOpt)
 
 void BookmarkListPresenter::OnShowBackgroundContextMenu(const POINT &ptScreen)
 {
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_BOOKMARK_LISTVIEW_CONTEXT_MENU)));
-
-	if (!parentMenu)
-	{
-		return;
-	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
-		m_view->GetHWND(), nullptr);
-
-	if (menuItemId != 0)
-	{
-		OnBackgroundContextMenuItemSelected(menuItemId);
-	}
-}
-
-void BookmarkListPresenter::OnBackgroundContextMenuItemSelected(int menuItemId)
-{
-	switch (menuItemId)
-	{
-	case IDM_BOOKMARKS_NEW_BOOKMARK:
-		OnNewBookmark();
-		break;
-
-	case IDM_BOOKMARKS_NEW_FOLDER:
-		CreateFolder(m_currentBookmarkFolder->GetChildren().size());
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
-}
-
-void BookmarkListPresenter::OnNewBookmark()
-{
-	size_t targetIndex;
-	auto selectedItems = m_view->GetSelectedItems();
-
-	if (!selectedItems.empty())
-	{
-		targetIndex = m_model->GetItemIndex(*selectedItems.rbegin()) + 1;
-	}
-	else
-	{
-		targetIndex = m_currentBookmarkFolder->GetChildren().size();
-	}
-
-	const auto *bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree,
-		BookmarkItem::Type::Bookmark, m_currentBookmarkFolder, targetIndex, m_view->GetHWND(),
-		nullptr, m_acceleratorManager, m_resourceLoader, m_platformContext);
-
-	if (!bookmark)
-	{
-		return;
-	}
-
-	if (bookmark->GetParent() != m_currentBookmarkFolder)
-	{
-		return;
-	}
-
-	SelectOnly(bookmark);
+	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
+	BookmarkListViewContextMenu contextMenu(&popupMenu, m_acceleratorManager, this,
+		m_currentBookmarkFolder->GetWeakPtr(), m_resourceLoader);
+	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 
 void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem *> &items,

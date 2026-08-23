@@ -12,8 +12,8 @@
 #include "CopiedBookmark.h"
 #include "MainResource.h"
 #include "MenuViewFake.h"
-#include "PlatformContextFake.h"
 #include "ResourceLoaderFake.h"
+#include "SimulatedClipboardStore.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -36,11 +36,11 @@ public:
 
 	MOCK_METHOD(bool, CanSelectAllItems, (), (const, override));
 	MOCK_METHOD(void, SelectAllItems, (), (override));
-	MOCK_METHOD(void, CreateFolder, (size_t index), (override));
 	MOCK_METHOD(RawBookmarkItems, GetSelectedItems, (), (const, override));
 	MOCK_METHOD(RawBookmarkItems, GetSelectedChildItems, (const BookmarkItem *targetFolder),
 		(const, override));
-	MOCK_METHOD(void, SelectOnly, (const BookmarkItem *bookmarkItem), (override));
+	MOCK_METHOD(void, CreateBookmark, (BookmarkItem * parentFolder, size_t index), (override));
+	MOCK_METHOD(void, CreateFolder, (BookmarkItem * parentFolder, size_t index), (override));
 
 	void SetCanSelectAllItems(bool canSelectAllItems)
 	{
@@ -78,12 +78,12 @@ protected:
 		OrganizeBookmarksContextMenuDelegate *delegate, BookmarkItem *targetFolder = nullptr)
 	{
 		return std::make_unique<OrganizeBookmarksContextMenu>(menuView, &m_acceleratorManager,
-			nullptr, &m_bookmarkTree,
+			&m_bookmarkTree,
 			targetFolder ? targetFolder->GetWeakPtr() : m_targetFolder->GetWeakPtr(), delegate,
-			&m_resourceLoader, &m_platformContext);
+			&m_clipboardStore, &m_resourceLoader);
 	}
 
-	PlatformContextFake m_platformContext;
+	SimulatedClipboardStore m_clipboardStore;
 	AcceleratorManager m_acceleratorManager;
 	ResourceLoaderFake m_resourceLoader;
 
@@ -126,8 +126,8 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithEmptyClipboard)
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithNonEmptyClipboard)
 {
-	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
-		{ m_bookmarkToCopy }, ClipboardAction::Copy);
+	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { m_bookmarkToCopy },
+		ClipboardAction::Copy);
 
 	MenuViewFake menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
@@ -180,7 +180,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, NewFolderWithNoSelection)
 
 	// There are no selected items, so the new folder should be added to the last position in the
 	// target folder.
-	EXPECT_CALL(delegate, CreateFolder(2));
+	EXPECT_CALL(delegate, CreateFolder(m_targetFolder, 2));
 	menuView.SelectItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER, false, false);
 }
 
@@ -192,7 +192,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, NewFolderWithSelection)
 
 	// In this case, the first item in the target folder is selected. So, the new folder should be
 	// added after that item.
-	EXPECT_CALL(delegate, CreateFolder(1));
+	EXPECT_CALL(delegate, CreateFolder(m_targetFolder, 1));
 	menuView.SelectItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER, false, false);
 }
 
@@ -209,7 +209,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, Cut)
 	menuView.SelectItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT, false, false);
 	EXPECT_EQ(m_targetFolder->GetChildren().size(), 1u);
 
-	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
+	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -226,7 +226,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, Copy)
 
 	menuView.SelectItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, false, false);
 
-	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
+	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
 	EXPECT_THAT(clipboardItems, ElementsAre(Pointee(copiedBookmark)));
 }
@@ -234,8 +234,8 @@ TEST_F(OrganizeBookmarksContextMenuTest, Copy)
 TEST_F(OrganizeBookmarksContextMenuTest, PasteWithNoSelection)
 {
 	CopiedBookmark copiedBookmark(*m_bookmarkToCopy);
-	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
-		{ m_bookmarkToCopy }, ClipboardAction::Copy);
+	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { m_bookmarkToCopy },
+		ClipboardAction::Copy);
 
 	MenuViewFake menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
@@ -249,8 +249,8 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteWithNoSelection)
 TEST_F(OrganizeBookmarksContextMenuTest, PasteWithSelection)
 {
 	CopiedBookmark copiedBookmark(*m_bookmarkToCopy);
-	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
-		{ m_bookmarkToCopy }, ClipboardAction::Copy);
+	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { m_bookmarkToCopy },
+		ClipboardAction::Copy);
 
 	MenuViewFake menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate({ m_targetFolder->GetChildren()[0].get() });

@@ -285,6 +285,19 @@ TEST_F(ListViewTest, IsItemSelected)
 	EXPECT_TRUE(listView->IsItemSelected(item3));
 }
 
+TEST_F(ListViewTest, SelectOnly)
+{
+	const auto *item1 = m_model.AddItem();
+	const auto *item2 = m_model.AddItem();
+
+	auto listView = BuildListView();
+	listView->SelectOnly(item1);
+	EXPECT_THAT(listView->GetSelectedItems(), ElementsAre(item1));
+
+	listView->SelectOnly(item2);
+	EXPECT_THAT(listView->GetSelectedItems(), ElementsAre(item2));
+}
+
 TEST_F(ListViewTest, SelectAllItems)
 {
 	const auto *item1 = m_model.AddItem();

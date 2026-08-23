@@ -601,6 +601,9 @@
     <ClCompile Include="MassRenameTokensMenuTest.cpp">
       <Filter>Dialogs\Mass Rename</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkListViewContextMenuTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

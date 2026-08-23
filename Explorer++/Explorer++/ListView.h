@@ -57,6 +57,7 @@ public:
 	std::vector<ListViewItem *> GetSelectedItems();
 	bool IsItemSelected(const ListViewItem *item) const;
 	void SelectItem(const ListViewItem *item);
+	void SelectOnly(const ListViewItem *item);
 	void SelectAllItems();
 	void DeselectAllItems();
 	void StartRenamingItem(const ListViewItem *item);

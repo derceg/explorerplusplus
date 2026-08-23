@@ -12,35 +12,32 @@
 
 class BookmarkItem;
 class BookmarkTree;
+class ClipboardStore;
 class OrganizeBookmarksContextMenuDelegate;
-class PlatformContext;
 class ResourceLoader;
 
 class OrganizeBookmarksContextMenu : public MenuBase
 {
 public:
 	OrganizeBookmarksContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		HWND parentWindow, BookmarkTree *bookmarkTree, WeakPtr<BookmarkItem> targetFolder,
-		OrganizeBookmarksContextMenuDelegate *delegate, const ResourceLoader *resourceLoader,
-		PlatformContext *platformContext);
+		BookmarkTree *bookmarkTree, WeakPtr<BookmarkItem> targetFolder,
+		OrganizeBookmarksContextMenuDelegate *delegate, ClipboardStore *clipboardStore,
+		const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu();
 
 	void OnMenuItemSelected(UINT menuItemId);
-	void OnNewBookmark();
-	void OnNewFolder();
 	void OnCopy(ClipboardAction action);
 	void OnPaste();
 	void OnDelete();
 	void OnSelectAll();
 	size_t GetTargetIndex() const;
 
-	const HWND m_parentWindow;
 	BookmarkTree *const m_bookmarkTree;
 	WeakPtr<BookmarkItem> m_targetFolder;
 	OrganizeBookmarksContextMenuDelegate *const m_delegate;
+	ClipboardStore *const m_clipboardStore;
 	const ResourceLoader *const m_resourceLoader;
-	PlatformContext *const m_platformContext;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

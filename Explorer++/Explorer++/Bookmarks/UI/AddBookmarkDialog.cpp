@@ -89,9 +89,8 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
 		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW),
 			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog),
-		m_bookmarkTree, nullptr, m_platformContext->GetClipboardStore(), m_acceleratorManager,
-		m_resourceLoader, m_persistentSettings->m_expandedBookmarkIds,
-		m_persistentSettings->m_selectedBookmarkId,
+		m_bookmarkTree, nullptr, m_platformContext, m_acceleratorManager, m_resourceLoader,
+		m_persistentSettings->m_expandedBookmarkIds, m_persistentSettings->m_selectedBookmarkId,
 		BookmarkTreePresenter::MiddleClickOpenPolicy::Disabled);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
@@ -243,8 +242,7 @@ INT_PTR AddBookmarkDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDC_BOOKMARK_NEWFOLDER:
-			m_bookmarkTreePresenter->CreateFolder(
-				m_bookmarkTreePresenter->GetSelectedFolder()->GetChildren().size());
+			m_bookmarkTreePresenter->CreateFolder();
 			break;
 
 		case IDOK:

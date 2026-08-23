@@ -11,6 +11,7 @@
 #include "TestHelper.h"
 #include "../Helper/KeyboardState.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
 #include <windowsx.h>
@@ -262,6 +263,12 @@ void ListView::SelectItem(const ListViewItem *item)
 	UpdateItemState(item, LVIS_SELECTED, ItemStateOp::Set);
 }
 
+void ListView::SelectOnly(const ListViewItem *item)
+{
+	DeselectAllItems();
+	SelectItem(item);
+}
+
 void ListView::SelectAllItems()
 {
 	UpdateAllItemStates(LVIS_SELECTED, ItemStateOp::Set);
@@ -321,6 +328,7 @@ void ListView::UpdateItemState(const ListViewItem *item, UINT state, ItemStateOp
 
 void ListView::UpdateAllItemStates(UINT state, ItemStateOp stateOp)
 {
+	ScopedRedrawDisabler redrawDisabler(m_hwnd);
 	ApplyItemStateUpdates(StateUpdateTarget::AllItems(), state, stateOp);
 }
 

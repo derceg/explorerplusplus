@@ -35,10 +35,9 @@ class BookmarkListPresenter :
 	private ListViewDelegate
 {
 public:
-	BookmarkListPresenter(std::unique_ptr<ListView> view, HINSTANCE resourceInstance,
-		BookmarkTree *bookmarkTree, const BookmarkColumnModel &columnModel,
-		std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
-		const BrowserList *browserList, const Config *config,
+	BookmarkListPresenter(std::unique_ptr<ListView> view, BookmarkTree *bookmarkTree,
+		const BookmarkColumnModel &columnModel, std::optional<BookmarkColumn> sortColumn,
+		SortDirection sortDirection, const BrowserList *browserList, const Config *config,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 		IconFetcher *iconFetcher, PlatformContext *platformContext);
 	~BookmarkListPresenter();
@@ -59,10 +58,12 @@ public:
 	// OrganizeBookmarksContextMenuDelegate
 	bool CanSelectAllItems() const override;
 	void SelectAllItems() override;
-	void SelectOnly(const BookmarkItem *bookmarkItem) override;
 	RawBookmarkItems GetSelectedItems() const override;
 	RawBookmarkItems GetSelectedChildItems(const BookmarkItem *targetFolder) const override;
-	void CreateFolder(size_t index) override;
+
+	// BookmarkItemCreationDelegate
+	void CreateBookmark(BookmarkItem *parentFolder, size_t index) override;
+	void CreateFolder(BookmarkItem *parentFolder, size_t index) override;
 
 	const BookmarkColumnModel *GetColumnModel() const;
 	void ToggleColumn(BookmarkColumn column);
@@ -91,9 +92,6 @@ private:
 	void OnShowHeaderContextMenu(const POINT &ptScreen) override;
 	void OnBeginDrag(const std::vector<ListViewItem *> &items) override;
 
-	void OnBackgroundContextMenuItemSelected(int menuItemId);
-	void OnNewBookmark();
-
 	void OnHeaderContextMenuItemSelected(int menuItemId);
 
 	// BookmarkDropTargetWindow
@@ -109,7 +107,6 @@ private:
 
 	std::unique_ptr<BookmarkListViewModel> m_model;
 	const std::unique_ptr<ListView> m_view;
-	HINSTANCE m_resourceInstance;
 	BookmarkTree *const m_bookmarkTree;
 	const BrowserList *const m_browserList;
 	const Config *const m_config;

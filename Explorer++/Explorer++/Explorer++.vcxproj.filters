@@ -922,6 +922,9 @@
     <ClCompile Include="MassRenameTokensMenu.cpp">
       <Filter>Dialogs\Mass Rename</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkListViewContextMenu.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2000,6 +2003,12 @@
     </ClInclude>
     <ClInclude Include="MassRenameTokensMenu.h">
       <Filter>Dialogs\Mass Rename</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkItemCreationDelegate.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkListViewContextMenu.h">
+      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
