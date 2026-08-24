@@ -5,8 +5,10 @@
 #include "stdafx.h"
 #include "ListView.h"
 #include "ListViewColumnModel.h"
+#include "ListViewColumnsMenu.h"
 #include "ListViewItem.h"
 #include "ListViewModel.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
 #include "../Helper/KeyboardState.h"
@@ -17,10 +19,13 @@
 #include <windowsx.h>
 
 ListView::ListView(HWND hwnd, const KeyboardState *keyboardState,
-	LabelEditHandlerFactory labelEditHandlerFactory, const ResourceLoader *resourceLoader) :
+	LabelEditHandlerFactory labelEditHandlerFactory, MenuHelpTextHost *menuHelpTextHost,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	m_hwnd(hwnd),
 	m_keyboardState(keyboardState),
 	m_labelEditHandlerFactory(labelEditHandlerFactory),
+	m_menuHelpTextHost(menuHelpTextHost),
+	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader)
 {
 	m_windowSubclasses.push_back(
@@ -528,7 +533,7 @@ LRESULT ListView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		else if (reinterpret_cast<HWND>(wParam) == GetHeader())
 		{
-			m_delegate->OnShowHeaderContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+			OnShowHeaderContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 			return 0;
 		}
 		break;
@@ -546,8 +551,11 @@ LRESULT ListView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				OnHeaderItemClick(reinterpret_cast<NMHEADER *>(lParam));
 				break;
 
+			// When returning false, the header control will automatically manage the drag-and-drop
+			// operation. When returning true, a manual drag-and-drop operation can be initiated. By
+			// not doing that, column rearrangement via drag-and-drop is effectively blocked.
 			case HDN_BEGINDRAG:
-				return false;
+				return m_model->GetColumnModel()->CanChangeColumnLayout() ? false : true;
 
 			case HDN_ENDDRAG:
 				OnHeaderEndDrag(reinterpret_cast<NMHEADER *>(lParam));
@@ -597,6 +605,20 @@ void ListView::OnShowContextMenu(const POINT &ptScreen)
 
 		m_delegate->OnShowItemContextMenu(selectedItems, finalPoint);
 	}
+}
+
+void ListView::OnShowHeaderContextMenu(const POINT &ptScreen)
+{
+	auto *columnModel = m_model->GetColumnModel();
+
+	if (!columnModel->CanChangeColumnLayout())
+	{
+		return;
+	}
+
+	PopupMenuView popupMenu(m_menuHelpTextHost);
+	ListViewColumnsMenu menu(&popupMenu, m_acceleratorManager, columnModel, m_resourceLoader);
+	popupMenu.Show(m_hwnd, ptScreen);
 }
 
 LRESULT ListView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -799,8 +821,7 @@ void ListView::OnHeaderItemChanged(const NMHEADER *changeInfo)
 	}
 
 	auto columnId = GetColumnIdAtIndex(changeInfo->iItem);
-	auto &column = m_model->GetColumnModel()->GetColumnById(columnId);
-	column.width = changeInfo->pitem->cxy;
+	m_model->GetColumnModel()->OnColumnWidthChanged(columnId, changeInfo->pitem->cxy);
 }
 
 void ListView::OnHeaderItemClick(const NMHEADER *header)
@@ -885,7 +906,7 @@ ListView::ViewType ListView::GetViewType() const
 		break;
 
 	default:
-		LOG(FATAL) << "Invalid view type";
+		LOG(FATAL) << "Invalid ViewType value";
 	}
 
 	return viewType;
@@ -1073,11 +1094,6 @@ void ListView::NoOpDelegate::OnShowItemContextMenu(const std::vector<ListViewIte
 	const POINT &ptScreen)
 {
 	UNREFERENCED_PARAMETER(items);
-	UNREFERENCED_PARAMETER(ptScreen);
-}
-
-void ListView::NoOpDelegate::OnShowHeaderContextMenu(const POINT &ptScreen)
-{
 	UNREFERENCED_PARAMETER(ptScreen);
 }
 

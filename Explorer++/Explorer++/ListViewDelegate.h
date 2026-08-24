@@ -27,7 +27,6 @@ public:
 	virtual void OnShowBackgroundContextMenu(const POINT &ptScreen) = 0;
 	virtual void OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
 		const POINT &ptScreen) = 0;
-	virtual void OnShowHeaderContextMenu(const POINT &ptScreen) = 0;
 
 	virtual void OnBeginDrag(const std::vector<ListViewItem *> &items) = 0;
 };

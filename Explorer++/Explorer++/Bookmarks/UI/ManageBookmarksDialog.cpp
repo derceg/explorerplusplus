@@ -201,7 +201,7 @@ void ManageBookmarksDialog::SetupListView()
 	m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(
 		std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
 			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog,
-			m_resourceLoader),
+			NoOpMenuHelpTextHost::GetInstance(), m_acceleratorManager, m_resourceLoader),
 		m_bookmarkTree, m_persistentSettings->m_listViewColumnModel, std::nullopt,
 		SortDirection::Ascending, m_browserList, m_config, m_acceleratorManager, m_resourceLoader,
 		m_iconFetcher, m_platformContext);
@@ -329,7 +329,7 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	auto columnsMenu = m_bookmarkListPresenter->BuildColumnsMenu();
+	auto columnsMenu = BuildColumnsMenu();
 
 	if (!columnsMenu)
 	{
@@ -380,6 +380,28 @@ void ManageBookmarksDialog::ShowViewMenu()
 	}
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(FALSE, 0));
+}
+
+wil::unique_hmenu ManageBookmarksDialog::BuildColumnsMenu()
+{
+	wil::unique_hmenu menu(CreatePopupMenu());
+
+	if (!menu)
+	{
+		return nullptr;
+	}
+
+	const auto *columnModel = m_bookmarkListPresenter->GetColumnModel();
+
+	for (auto columnId : columnModel->GetAllColumnIds())
+	{
+		const auto &column = columnModel->GetColumnById(columnId);
+		MenuHelper::AddStringItem(menu.get(), columnId.value,
+			m_resourceLoader->LoadString(column.nameStringId));
+		MenuHelper::CheckItem(menu.get(), columnId.value, column.visible);
+	}
+
+	return menu;
 }
 
 void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)

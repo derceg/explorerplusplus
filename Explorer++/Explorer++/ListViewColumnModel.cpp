@@ -8,9 +8,10 @@
 #include <algorithm>
 
 ListViewColumnModel::ListViewColumnModel(const std::vector<ListViewColumn> &columns,
-	ListViewColumnId primaryColumnId) :
+	ListViewColumnId primaryColumnId, LayoutChanges layoutChanges) :
 	m_columns(columns),
-	m_primaryColumnId(primaryColumnId)
+	m_primaryColumnId(primaryColumnId),
+	m_layoutChanges(layoutChanges)
 {
 	// At the very least, there needs to be one column (the primary column) and that column should
 	// be visible.
@@ -22,7 +23,8 @@ ListViewColumnModel::ListViewColumnModel(const std::vector<ListViewColumn> &colu
 
 ListViewColumnModel::ListViewColumnModel(const ListViewColumnModel &other) :
 	m_columns(other.m_columns),
-	m_primaryColumnId(other.m_primaryColumnId)
+	m_primaryColumnId(other.m_primaryColumnId),
+	m_layoutChanges(other.m_layoutChanges)
 {
 }
 
@@ -30,7 +32,13 @@ ListViewColumnModel &ListViewColumnModel::operator=(const ListViewColumnModel &o
 {
 	m_columns = other.m_columns;
 	m_primaryColumnId = other.m_primaryColumnId;
+	m_layoutChanges = other.m_layoutChanges;
 	return *this;
+}
+
+bool ListViewColumnModel::CanChangeColumnLayout() const
+{
+	return m_layoutChanges == LayoutChanges::Allowed;
 }
 
 concurrencpp::generator<const ListViewColumnId> ListViewColumnModel::GetAllColumnIds() const
@@ -85,13 +93,18 @@ bool ListViewColumnModel::IsColumnVisible(ListViewColumnId columnId) const
 
 void ListViewColumnModel::SetColumnVisible(ListViewColumnId columnId, bool visible)
 {
+	if (m_layoutChanges == LayoutChanges::Disallowed)
+	{
+		return;
+	}
+
 	if (columnId == m_primaryColumnId)
 	{
 		// The primary column is always visible.
 		return;
 	}
 
-	auto &column = GetColumnById(columnId);
+	auto &column = GetMutableColumnById(columnId);
 
 	if (column.visible == visible)
 	{
@@ -103,12 +116,23 @@ void ListViewColumnModel::SetColumnVisible(ListViewColumnId columnId, bool visib
 	columnVisibilityChangedSignal.m_signal(column.id, visible);
 }
 
-ListViewColumnId ListViewColumnModel::GetPrimaryColumnId()
+void ListViewColumnModel::OnColumnWidthChanged(ListViewColumnId columnId, int width)
+{
+	auto &column = GetMutableColumnById(columnId);
+	column.width = width;
+}
+
+ListViewColumnId ListViewColumnModel::GetPrimaryColumnId() const
 {
 	return m_primaryColumnId;
 }
 
-ListViewColumn &ListViewColumnModel::GetColumnById(ListViewColumnId columnId)
+bool ListViewColumnModel::IsPrimaryColumnId(ListViewColumnId columnId) const
+{
+	return columnId == m_primaryColumnId;
+}
+
+ListViewColumn &ListViewColumnModel::GetMutableColumnById(ListViewColumnId columnId)
 {
 	return const_cast<ListViewColumn &>(std::as_const(*this).GetColumnById(columnId));
 }
@@ -123,6 +147,11 @@ const ListViewColumn &ListViewColumnModel::GetColumnById(ListViewColumnId column
 
 void ListViewColumnModel::MoveColumn(ListViewColumnId columnId, int newVisibleIndex)
 {
+	if (m_layoutChanges == LayoutChanges::Disallowed)
+	{
+		return;
+	}
+
 	auto itr = std::ranges::find_if(m_columns,
 		[columnId](const auto &column) { return column.id == columnId; });
 	CHECK(itr != m_columns.end());

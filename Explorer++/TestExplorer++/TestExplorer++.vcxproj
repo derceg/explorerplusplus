@@ -225,7 +225,6 @@
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
     <ClCompile Include="AsyncIconFetcherFake.cpp" />
     <ClCompile Include="AutoResetTest.cpp" />
-    <ClCompile Include="BookmarkColumnHelperTest.cpp" />
     <ClCompile Include="BookmarkContextMenuTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />
     <ClCompile Include="BookmarkHelperTest.cpp" />
@@ -247,6 +246,7 @@
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
     <ClCompile Include="DarkModeManagerFake.cpp" />
+    <ClCompile Include="ListViewColumnsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />

@@ -116,6 +116,15 @@ TEST_F(ListViewColumnModelTest, PrimaryColumnVisibility)
 	EXPECT_TRUE(m_model.IsColumnVisible(COLUMN_A));
 }
 
+TEST_F(ListViewColumnModelTest, OnColumnWidthChanged)
+{
+	m_model.OnColumnWidthChanged(COLUMN_A, 32);
+	EXPECT_EQ(m_model.GetColumnById(COLUMN_A).width, 32);
+
+	m_model.OnColumnWidthChanged(COLUMN_C, 298);
+	EXPECT_EQ(m_model.GetColumnById(COLUMN_C).width, 298);
+}
+
 TEST_F(ListViewColumnModelTest, GetPrimaryColumnId)
 {
 	EXPECT_EQ(m_model.GetPrimaryColumnId(), COLUMN_A);

@@ -16,10 +16,12 @@
 #include <string>
 #include <vector>
 
+class AcceleratorManager;
 class KeyboardState;
 class LabelEditHandler;
 class ListViewItem;
 class ListViewModel;
+class MenuHelpTextHost;
 class ResourceLoader;
 class WindowSubclass;
 
@@ -43,7 +45,8 @@ public:
 	};
 
 	ListView(HWND hwnd, const KeyboardState *keyboardState,
-		LabelEditHandlerFactory labelEditHandlerFactory, const ResourceLoader *resourceLoader);
+		LabelEditHandlerFactory labelEditHandlerFactory, MenuHelpTextHost *menuHelpTextHost,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 	~ListView();
 
 	HWND GetHWND() const;
@@ -98,7 +101,6 @@ private:
 		void OnShowBackgroundContextMenu(const POINT &ptScreen) override;
 		void OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
 			const POINT &ptScreen) override;
-		void OnShowHeaderContextMenu(const POINT &ptScreen) override;
 		void OnBeginDrag(const std::vector<ListViewItem *> &items) override;
 	};
 
@@ -151,6 +153,7 @@ private:
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnShowContextMenu(const POINT &ptScreen);
+	void OnShowHeaderContextMenu(const POINT &ptScreen);
 
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
@@ -184,6 +187,8 @@ private:
 	ListViewDelegate *m_delegate = &m_noOpDelegate;
 	const KeyboardState *const m_keyboardState;
 	LabelEditHandlerFactory m_labelEditHandlerFactory;
+	MenuHelpTextHost *const m_menuHelpTextHost;
+	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	std::optional<ListViewColumnId> m_previousSortColumnId;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

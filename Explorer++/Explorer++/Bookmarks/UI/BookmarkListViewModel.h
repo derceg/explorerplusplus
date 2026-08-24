@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Bookmarks/UI/BookmarkColumn.h"
 #include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "ListViewModel.h"
 #include <boost/signals2.hpp>
@@ -31,10 +32,6 @@ public:
 	ListViewItem *GetItemForBookmark(const BookmarkItem *bookmarkItem);
 	const ListViewItem *GetItemForBookmark(const BookmarkItem *bookmarkItem) const;
 
-protected:
-	std::weak_ordering CompareItems(const ListViewItem *first,
-		const ListViewItem *second) const override;
-
 private:
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent,
@@ -45,6 +42,19 @@ private:
 	void RemoveBookmarkItem(BookmarkItem *bookmarkItem);
 
 	void RemoveAllBookmarkItems();
+
+	std::weak_ordering CompareItems(const ListViewItem *first,
+		const ListViewItem *second) const override;
+	static std::weak_ordering CompareBookmarksByColumn(BookmarkColumn column,
+		const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+	static std::weak_ordering CompareByName(const BookmarkItem *firstItem,
+		const BookmarkItem *secondItem);
+	static std::weak_ordering CompareByLocation(const BookmarkItem *firstItem,
+		const BookmarkItem *secondItem);
+	static std::weak_ordering CompareByDateAdded(const BookmarkItem *firstItem,
+		const BookmarkItem *secondItem);
+	static std::weak_ordering CompareByDateModified(const BookmarkItem *firstItem,
+		const BookmarkItem *secondItem);
 
 	BookmarkTree *const m_bookmarkTree;
 	BookmarkIconManager *const m_bookmarkIconManager;

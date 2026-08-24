@@ -15,8 +15,14 @@
 class ListViewColumnModel
 {
 public:
+	enum class LayoutChanges
+	{
+		Allowed,
+		Disallowed
+	};
+
 	ListViewColumnModel(const std::vector<ListViewColumn> &columns,
-		ListViewColumnId primaryColumnId);
+		ListViewColumnId primaryColumnId, LayoutChanges layoutChanges = LayoutChanges::Allowed);
 
 	// This copies only the column state. Any observers aren't copied.
 	ListViewColumnModel(const ListViewColumnModel &other);
@@ -26,6 +32,9 @@ public:
 
 	virtual ~ListViewColumnModel() = default;
 
+	// Indicates whether columns can be toggled or reordered. Column widths can always be changed.
+	bool CanChangeColumnLayout() const;
+
 	concurrencpp::generator<const ListViewColumnId> GetAllColumnIds() const;
 	concurrencpp::generator<const ListViewColumnId> GetVisibleColumnIds() const;
 	int GetNumVisibleColumns() const;
@@ -33,9 +42,10 @@ public:
 	ListViewColumnId GetColumnIdAtVisibleIndex(int visibleIndex) const;
 	bool IsColumnVisible(ListViewColumnId columnId) const;
 	void SetColumnVisible(ListViewColumnId columnId, bool visible);
+	void OnColumnWidthChanged(ListViewColumnId columnId, int width);
 
-	ListViewColumnId GetPrimaryColumnId();
-	ListViewColumn &GetColumnById(ListViewColumnId columnId);
+	ListViewColumnId GetPrimaryColumnId() const;
+	bool IsPrimaryColumnId(ListViewColumnId columnId) const;
 	const ListViewColumn &GetColumnById(ListViewColumnId columnId) const;
 
 	void MoveColumn(ListViewColumnId columnId, int newVisibleIndex);
@@ -52,8 +62,10 @@ private:
 		return m_columns | std::views::filter(std::mem_fn(&ListViewColumn::visible));
 	}
 
+	ListViewColumn &GetMutableColumnById(ListViewColumnId columnId);
 	int VisibleIndexToPhysicalIndex(int visibleIndex) const;
 
 	std::vector<ListViewColumn> m_columns;
 	ListViewColumnId m_primaryColumnId;
+	LayoutChanges m_layoutChanges;
 };

@@ -4,12 +4,14 @@
 
 #include "pch.h"
 #include "ListView.h"
+#include "AcceleratorManager.h"
 #include "GeneratorTestHelper.h"
 #include "KeyboardStateFake.h"
 #include "LabelEditHandler.h"
 #include "ListViewColumnModelFake.h"
 #include "ListViewItemFake.h"
 #include "ListViewModelFake.h"
+#include "NoOpMenuHelpTextHost.h"
 #include "ResourceLoaderFake.h"
 #include "../Helper/Helper.h"
 #include "../Helper/WindowHelper.h"
@@ -35,7 +37,6 @@ public:
 	MOCK_METHOD(void, OnShowBackgroundContextMenu, (const POINT &ptScreen), (override));
 	MOCK_METHOD(void, OnShowItemContextMenu,
 		(const std::vector<ListViewItem *> &items, const POINT &ptScreen), (override));
-	MOCK_METHOD(void, OnShowHeaderContextMenu, (const POINT &ptScreen), (override));
 	MOCK_METHOD(void, OnBeginDrag, (const std::vector<ListViewItem *> &items), (override));
 };
 
@@ -60,7 +61,8 @@ protected:
 	std::unique_ptr<ListView> BuildListView(ListViewModel *model = nullptr)
 	{
 		auto listView = std::make_unique<ListView>(m_listViewWindow, &m_keyboardState,
-			LabelEditHandler::CreateForTest, &m_resourceLoader);
+			LabelEditHandler::CreateForTest, NoOpMenuHelpTextHost::GetInstance(),
+			&m_acceleratorManager, &m_resourceLoader);
 		listView->SetModel(model ? model : &m_model);
 		return listView;
 	}
@@ -87,6 +89,7 @@ protected:
 		SendMessage(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(ptClient.x, ptClient.y));
 	}
 
+	AcceleratorManager m_acceleratorManager;
 	KeyboardStateFake m_keyboardState;
 	ResourceLoaderFake m_resourceLoader;
 

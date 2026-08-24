@@ -6,7 +6,6 @@
 #include "Bookmarks/UI/BookmarkListViewModel.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "Bookmarks/UI/BookmarkColumnHelper.h"
 #include "Bookmarks/UI/BookmarkListViewItem.h"
 
 BookmarkListViewModel::BookmarkListViewModel(BookmarkTree *bookmarkTree,
@@ -134,6 +133,73 @@ std::weak_ordering BookmarkListViewModel::CompareItems(const ListViewItem *first
 			: (firstIndex > secondIndex)  ? std::weak_ordering::greater
 										  : std::weak_ordering::equivalent;
 	}
+}
+
+std::weak_ordering BookmarkListViewModel::CompareBookmarksByColumn(BookmarkColumn column,
+	const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+{
+	if (firstItem->IsFolder() && secondItem->IsBookmark())
+	{
+		return std::weak_ordering::less;
+	}
+	else if (firstItem->IsBookmark() && secondItem->IsFolder())
+	{
+		return std::weak_ordering::greater;
+	}
+	else
+	{
+		switch (column)
+		{
+		case BookmarkColumn::Name:
+			return CompareByName(firstItem, secondItem);
+
+		case BookmarkColumn::Location:
+			return CompareByLocation(firstItem, secondItem);
+
+		case BookmarkColumn::DateCreated:
+			return CompareByDateAdded(firstItem, secondItem);
+
+		case BookmarkColumn::DateModified:
+			return CompareByDateModified(firstItem, secondItem);
+		}
+
+		LOG(FATAL) << "Invalid BookmarkColumn value";
+	}
+}
+
+std::weak_ordering BookmarkListViewModel::CompareByName(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
+{
+	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str()) <=> 0;
+}
+
+std::weak_ordering BookmarkListViewModel::CompareByLocation(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
+{
+	if (firstItem->IsFolder() && secondItem->IsFolder())
+	{
+		return CompareByName(firstItem, secondItem);
+	}
+	else
+	{
+		return firstItem->GetLocation() <=> secondItem->GetLocation();
+	}
+}
+
+std::weak_ordering BookmarkListViewModel::CompareByDateAdded(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
+{
+	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
+	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
+	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated) <=> 0;
+}
+
+std::weak_ordering BookmarkListViewModel::CompareByDateModified(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
+{
+	FILETIME firstItemDateModified = firstItem->GetDateModified();
+	FILETIME secondItemDateModified = secondItem->GetDateModified();
+	return CompareFileTime(&firstItemDateModified, &secondItemDateModified) <=> 0;
 }
 
 BookmarkColumnModel *BookmarkListViewModel::GetColumnModel()

@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkColumnModel.h"
-#include "Bookmarks/UI/BookmarkColumnHelper.h"
+#include "MainResource.h"
 
 BookmarkColumnModel::BookmarkColumnModel() :
 	ListViewColumnModel(BuildColumnSet(), BookmarkColumnToColumnId(BookmarkColumn::Name))
@@ -27,6 +27,26 @@ std::vector<ListViewColumn> BookmarkColumnModel::BuildColumnSet()
 	addColumn(BookmarkColumn::DateModified, false);
 
 	return columns;
+}
+
+UINT BookmarkColumnModel::GetBookmarkColumnStringId(BookmarkColumn column)
+{
+	switch (column)
+	{
+	case BookmarkColumn::Name:
+		return IDS_BOOKMARKS_COLUMN_NAME;
+
+	case BookmarkColumn::Location:
+		return IDS_BOOKMARKS_COLUMN_LOCATION;
+
+	case BookmarkColumn::DateCreated:
+		return IDS_BOOKMARKS_COLUMN_DATE_CREATED;
+
+	case BookmarkColumn::DateModified:
+		return IDS_BOOKMARKS_COLUMN_DATE_MODIFIED;
+	}
+
+	LOG(FATAL) << "Invalid BookmarkColumn value";
 }
 
 ListViewColumnId BookmarkColumnModel::BookmarkColumnToColumnId(BookmarkColumn column)

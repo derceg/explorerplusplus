@@ -8,7 +8,6 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "Bookmarks/UI/BookmarkColumnHelper.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkListViewContextMenu.h"
 #include "Bookmarks/UI/BookmarkListViewModel.h"
@@ -22,7 +21,6 @@
 #include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
-#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -295,59 +293,6 @@ void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem
 		GetBookmarksForItems(items), m_resourceLoader, browser, m_view->GetHWND(),
 		m_platformContext);
 	popupMenu.Show(m_view->GetHWND(), ptScreen);
-}
-
-void BookmarkListPresenter::OnShowHeaderContextMenu(const POINT &ptScreen)
-{
-	auto menu = BuildColumnsMenu();
-
-	if (!menu)
-	{
-		return;
-	}
-
-	// The name column can't be removed.
-	MenuHelper::EnableItem(menu.get(), BookmarkColumn::Name, FALSE);
-
-	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
-		m_view->GetHWND(), nullptr);
-
-	if (cmd != 0)
-	{
-		OnHeaderContextMenuItemSelected(cmd);
-	}
-}
-
-wil::unique_hmenu BookmarkListPresenter::BuildColumnsMenu()
-{
-	wil::unique_hmenu menu(CreatePopupMenu());
-
-	if (!menu)
-	{
-		return nullptr;
-	}
-
-	const auto *columnModel = m_model->GetColumnModel();
-
-	for (auto columnId : columnModel->GetAllColumnIds())
-	{
-		const auto &column = columnModel->GetColumnById(columnId);
-		auto bookmarkColumn = BookmarkColumnModel::ColumnIdToBookmarkColumn(columnId);
-		std::wstring columnText =
-			m_resourceLoader->LoadString(GetBookmarkColumnStringId(bookmarkColumn));
-
-		MenuHelper::AddStringItem(menu.get(), bookmarkColumn, columnText);
-		MenuHelper::CheckItem(menu.get(), bookmarkColumn, column.visible);
-	}
-
-	return menu;
-}
-
-void BookmarkListPresenter::OnHeaderContextMenuItemSelected(int menuItemId)
-{
-	auto columnType = BookmarkColumn::_from_integral_nothrow(menuItemId);
-	CHECK(columnType);
-	ToggleColumn(*columnType);
 }
 
 RawBookmarkItems BookmarkListPresenter::GetBookmarksForItems(

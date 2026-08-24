@@ -12,9 +12,11 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
+#include "GeneratorTestHelper.h"
 #include "IconFetcherFake.h"
 #include "LabelEditHandler.h"
 #include "ListView.h"
+#include "NoOpMenuHelpTextHost.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include <gtest/gtest.h>
@@ -44,7 +46,8 @@ protected:
 
 		return std::make_unique<BookmarkListPresenter>(
 			std::make_unique<ListView>(listViewWindow, m_platformContext.GetKeyboardState(),
-				LabelEditHandler::CreateForTest, &m_resourceLoader),
+				LabelEditHandler::CreateForTest, NoOpMenuHelpTextHost::GetInstance(),
+				&m_acceleratorManager, &m_resourceLoader),
 			&m_bookmarkTree, columnModel, std::nullopt, SortDirection::Ascending, &m_browserList,
 			&m_config, &m_acceleratorManager, &m_resourceLoader, &m_iconFetcher,
 			&m_platformContext);
@@ -546,4 +549,97 @@ TEST_F(BookmarkListPresenterTest, NavigationCompletedSignal)
 	auto *targetFolder = m_bookmarkTree.GetOtherBookmarksFolder();
 	EXPECT_CALL(callback, Call(targetFolder, nullptr));
 	presenter->NavigateToBookmarkFolder(targetFolder);
+}
+
+class BookmarkListPresenterSortTest : public BookmarkListPresenterTest
+{
+protected:
+	void SetUp() override
+	{
+		auto *targetFolder = m_bookmarkTree.GetOtherBookmarksFolder();
+		m_bookmarkY = m_bookmarkTree.AddBookmarkItem(targetFolder,
+			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark Y", L"e:\\"));
+		m_folderB = m_bookmarkTree.AddBookmarkItem(targetFolder,
+			std::make_unique<BookmarkItem>(std::nullopt, L"Folder B", std::nullopt));
+		m_bookmarkZ = m_bookmarkTree.AddBookmarkItem(targetFolder,
+			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark Z", L"c:\\"));
+		m_bookmarkX = m_bookmarkTree.AddBookmarkItem(targetFolder,
+			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark X", L"d:\\"));
+		m_folderA = m_bookmarkTree.AddBookmarkItem(targetFolder,
+			std::make_unique<BookmarkItem>(std::nullopt, L"Folder A", std::nullopt));
+
+		m_presenter = BuildPresenter();
+		m_presenter->NavigateToBookmarkFolder(targetFolder);
+	}
+
+	void VerifyBookmarkOrdering(const std::vector<const BookmarkItem *> &bookmarks)
+	{
+		auto *model = m_presenter->GetModelForTesting();
+		std::vector<ListViewItem *> items;
+
+		for (const auto *bookmark : bookmarks)
+		{
+			items.push_back(model->GetItemForBookmark(bookmark));
+		}
+
+		EXPECT_EQ(GeneratorToVector(model->GetItems()), items);
+	}
+
+	static FILETIME BuildFileTime(WORD year, WORD month, WORD day)
+	{
+		SYSTEMTIME systemTime = {};
+		systemTime.wYear = year;
+		systemTime.wMonth = month;
+		systemTime.wDay = day;
+
+		FILETIME fileTime;
+		auto res = SystemTimeToFileTime(&systemTime, &fileTime);
+		CHECK(res);
+
+		return fileTime;
+	}
+
+	BookmarkItem *m_folderA = nullptr;
+	BookmarkItem *m_folderB = nullptr;
+	BookmarkItem *m_bookmarkX = nullptr;
+	BookmarkItem *m_bookmarkY = nullptr;
+	BookmarkItem *m_bookmarkZ = nullptr;
+
+	std::unique_ptr<BookmarkListPresenter> m_presenter;
+};
+
+TEST_F(BookmarkListPresenterSortTest, SortByName)
+{
+	m_presenter->SetSortDetails(BookmarkColumn::Name, SortDirection::Ascending);
+	VerifyBookmarkOrdering({ m_folderA, m_folderB, m_bookmarkX, m_bookmarkY, m_bookmarkZ });
+}
+
+TEST_F(BookmarkListPresenterSortTest, SortByLocation)
+{
+	m_presenter->SetSortDetails(BookmarkColumn::Location, SortDirection::Ascending);
+	VerifyBookmarkOrdering({ m_folderA, m_folderB, m_bookmarkZ, m_bookmarkX, m_bookmarkY });
+}
+
+TEST_F(BookmarkListPresenterSortTest, SortByDateCreated)
+{
+	m_bookmarkZ->SetDateCreated(BuildFileTime(2025, 10, 1));
+	m_folderA->SetDateCreated(BuildFileTime(2025, 10, 2));
+	m_bookmarkY->SetDateCreated(BuildFileTime(2025, 10, 3));
+	m_bookmarkX->SetDateCreated(BuildFileTime(2025, 10, 4));
+	m_folderB->SetDateCreated(BuildFileTime(2025, 10, 5));
+
+	m_presenter->SetSortDetails(BookmarkColumn::DateCreated, SortDirection::Ascending);
+	VerifyBookmarkOrdering({ m_folderA, m_folderB, m_bookmarkZ, m_bookmarkY, m_bookmarkX });
+}
+
+TEST_F(BookmarkListPresenterSortTest, SortByDateModified)
+{
+	m_folderB->SetDateModified(BuildFileTime(2025, 10, 1));
+	m_bookmarkY->SetDateModified(BuildFileTime(2025, 10, 2));
+	m_bookmarkX->SetDateModified(BuildFileTime(2025, 10, 3));
+	m_folderA->SetDateModified(BuildFileTime(2025, 10, 4));
+	m_bookmarkZ->SetDateModified(BuildFileTime(2025, 10, 5));
+
+	m_presenter->SetSortDetails(BookmarkColumn::DateModified, SortDirection::Ascending);
+	VerifyBookmarkOrdering({ m_folderB, m_folderA, m_bookmarkY, m_bookmarkX, m_bookmarkZ });
 }

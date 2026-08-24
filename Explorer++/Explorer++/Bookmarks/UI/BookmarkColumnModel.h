@@ -20,4 +20,5 @@ private:
 	static constexpr int DEFAULT_COLUMN_WIDTH = 180;
 
 	static std::vector<ListViewColumn> BuildColumnSet();
+	static UINT GetBookmarkColumnStringId(BookmarkColumn column);
 };

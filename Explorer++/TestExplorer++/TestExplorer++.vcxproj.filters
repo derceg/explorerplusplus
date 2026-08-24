@@ -517,9 +517,6 @@
     <ClCompile Include="ListViewModelFake.cpp">
       <Filter>Views\ListView</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkColumnHelperTest.cpp">
-      <Filter>Bookmarks\UI</Filter>
-    </ClCompile>
     <ClCompile Include="AutoResetTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
@@ -603,6 +600,9 @@
     </ClCompile>
     <ClCompile Include="BookmarkListViewContextMenuTest.cpp">
       <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewColumnsMenuTest.cpp">
+      <Filter>Views\ListView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

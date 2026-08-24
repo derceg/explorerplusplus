@@ -1194,7 +1194,6 @@
     <ClCompile Include="AppServices.cpp" />
     <ClCompile Include="BackgroundContextMenuDelegate.cpp" />
     <ClCompile Include="BaseDialog.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarkColumnHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkColumnModel.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListViewContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListViewItem.cpp" />
@@ -1218,6 +1217,7 @@
     <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ListView.cpp" />
+    <ClCompile Include="ListViewColumnsMenu.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
     <ClCompile Include="ListViewModel.cpp" />
     <ClCompile Include="MainTabView.cpp" />
@@ -1544,7 +1544,6 @@
     <ClInclude Include="BackgroundContextMenuDelegate.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumn.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarkColumnHelper.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumnModel.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkItemCreationDelegate.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkListViewContextMenu.h" />
@@ -1580,6 +1579,7 @@
     <ClInclude Include="ItemStateOp.h" />
     <ClInclude Include="ListView.h" />
     <ClInclude Include="ListViewColumn.h" />
+    <ClInclude Include="ListViewColumnsMenu.h" />
     <ClInclude Include="ListViewColumnModel.h" />
     <ClInclude Include="ListViewDelegate.h" />
     <ClInclude Include="ListViewItem.h" />

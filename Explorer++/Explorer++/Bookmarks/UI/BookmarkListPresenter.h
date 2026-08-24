@@ -11,7 +11,6 @@
 #include "Bookmarks/UI/OrganizeBookmarksContextMenuDelegate.h"
 #include "ListViewDelegate.h"
 #include "../Helper/SortDirection.h"
-#include <wil/resource.h>
 #include <memory>
 #include <optional>
 
@@ -67,7 +66,6 @@ public:
 
 	const BookmarkColumnModel *GetColumnModel() const;
 	void ToggleColumn(BookmarkColumn column);
-	wil::unique_hmenu BuildColumnsMenu();
 	std::optional<BookmarkColumn> GetSortColumn() const;
 	SortDirection GetSortDirection() const;
 	void SetSortDetails(std::optional<BookmarkColumn> sortColumn, SortDirection direction);
@@ -89,10 +87,7 @@ private:
 	void OnShowBackgroundContextMenu(const POINT &ptScreen) override;
 	void OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
 		const POINT &ptScreen) override;
-	void OnShowHeaderContextMenu(const POINT &ptScreen) override;
 	void OnBeginDrag(const std::vector<ListViewItem *> &items) override;
-
-	void OnHeaderContextMenuItemSelected(int menuItemId);
 
 	// BookmarkDropTargetWindow
 	DropLocation GetDropLocation(const POINT &pt) override;

@@ -10,6 +10,7 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
+#include <wil/resource.h>
 #include <memory>
 #include <unordered_set>
 #include <vector>
@@ -102,6 +103,7 @@ private:
 
 	// View menu
 	void ShowViewMenu();
+	wil::unique_hmenu BuildColumnsMenu();
 	void SetViewMenuItemStates(HMENU menu);
 	void OnViewMenuItemSelected(int menuItemId);
 	void UpdateSortColumn(BookmarkColumn sortColumn);
