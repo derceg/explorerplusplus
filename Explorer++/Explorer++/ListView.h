@@ -88,22 +88,6 @@ private:
 		Tiles
 	};
 
-	class NoOpDelegate : public ListViewDelegate
-	{
-	public:
-		bool OnItemRenamed(ListViewItem *item, const std::wstring &name) override;
-		void OnItemsActivated(const std::vector<ListViewItem *> &items) override;
-		void OnItemsRemoved(const std::vector<ListViewItem *> &items,
-			RemoveMode removeMode) override;
-		void OnItemsCopied(const std::vector<ListViewItem *> &items) override;
-		void OnItemsCut(const std::vector<ListViewItem *> &items) override;
-		void OnPaste(ListViewItem *lastSelectedItemOpt) override;
-		void OnShowBackgroundContextMenu(const POINT &ptScreen) override;
-		void OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
-			const POINT &ptScreen) override;
-		void OnBeginDrag(const std::vector<ListViewItem *> &items) override;
-	};
-
 	class StateUpdateTarget
 	{
 	public:
@@ -183,7 +167,7 @@ private:
 
 	const HWND m_hwnd;
 	ListViewModel *m_model = nullptr;
-	NoOpDelegate m_noOpDelegate;
+	ListViewDelegate m_noOpDelegate;
 	ListViewDelegate *m_delegate = &m_noOpDelegate;
 	const KeyboardState *const m_keyboardState;
 	LabelEditHandlerFactory m_labelEditHandlerFactory;

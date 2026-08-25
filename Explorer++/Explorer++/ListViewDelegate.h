@@ -16,17 +16,54 @@ class ListViewDelegate
 public:
 	virtual ~ListViewDelegate() = default;
 
-	virtual void OnItemsActivated(const std::vector<ListViewItem *> &items) = 0;
-	virtual bool OnItemRenamed(ListViewItem *item, const std::wstring &name) = 0;
-	virtual void OnItemsRemoved(const std::vector<ListViewItem *> &items,
-		RemoveMode removeMode) = 0;
-	virtual void OnItemsCopied(const std::vector<ListViewItem *> &items) = 0;
-	virtual void OnItemsCut(const std::vector<ListViewItem *> &items) = 0;
-	virtual void OnPaste(ListViewItem *lastSelectedItemOpt) = 0;
+	virtual void OnItemsActivated(const std::vector<ListViewItem *> &items)
+	{
+		UNREFERENCED_PARAMETER(items);
+	}
 
-	virtual void OnShowBackgroundContextMenu(const POINT &ptScreen) = 0;
+	virtual bool OnItemRenamed(ListViewItem *item, const std::wstring &name)
+	{
+		UNREFERENCED_PARAMETER(item);
+		UNREFERENCED_PARAMETER(name);
+
+		return false;
+	}
+
+	virtual void OnItemsRemoved(const std::vector<ListViewItem *> &items, RemoveMode removeMode)
+	{
+		UNREFERENCED_PARAMETER(items);
+		UNREFERENCED_PARAMETER(removeMode);
+	}
+
+	virtual void OnItemsCopied(const std::vector<ListViewItem *> &items)
+	{
+		UNREFERENCED_PARAMETER(items);
+	}
+
+	virtual void OnItemsCut(const std::vector<ListViewItem *> &items)
+	{
+		UNREFERENCED_PARAMETER(items);
+	}
+
+	virtual void OnPaste(ListViewItem *lastSelectedItemOpt)
+	{
+		UNREFERENCED_PARAMETER(lastSelectedItemOpt);
+	}
+
+	virtual void OnShowBackgroundContextMenu(const POINT &ptScreen)
+	{
+		UNREFERENCED_PARAMETER(ptScreen);
+	}
+
 	virtual void OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
-		const POINT &ptScreen) = 0;
+		const POINT &ptScreen)
+	{
+		UNREFERENCED_PARAMETER(items);
+		UNREFERENCED_PARAMETER(ptScreen);
+	}
 
-	virtual void OnBeginDrag(const std::vector<ListViewItem *> &items) = 0;
+	virtual void OnBeginDrag(const std::vector<ListViewItem *> &items)
+	{
+		UNREFERENCED_PARAMETER(items);
+	}
 };

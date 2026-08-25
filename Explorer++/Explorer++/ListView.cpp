@@ -1051,57 +1051,6 @@ int ListView::GetItemCountForTesting() const
 	return ListView_GetItemCount(m_hwnd);
 }
 
-bool ListView::NoOpDelegate::OnItemRenamed(ListViewItem *item, const std::wstring &name)
-{
-	UNREFERENCED_PARAMETER(item);
-	UNREFERENCED_PARAMETER(name);
-	return false;
-}
-
-void ListView::NoOpDelegate::OnItemsActivated(const std::vector<ListViewItem *> &items)
-{
-	UNREFERENCED_PARAMETER(items);
-}
-
-void ListView::NoOpDelegate::OnItemsRemoved(const std::vector<ListViewItem *> &items,
-	RemoveMode removeMode)
-{
-	UNREFERENCED_PARAMETER(items);
-	UNREFERENCED_PARAMETER(removeMode);
-}
-
-void ListView::NoOpDelegate::OnItemsCopied(const std::vector<ListViewItem *> &items)
-{
-	UNREFERENCED_PARAMETER(items);
-}
-
-void ListView::NoOpDelegate::OnItemsCut(const std::vector<ListViewItem *> &items)
-{
-	UNREFERENCED_PARAMETER(items);
-}
-
-void ListView::NoOpDelegate::OnPaste(ListViewItem *lastSelectedItemOpt)
-{
-	UNREFERENCED_PARAMETER(lastSelectedItemOpt);
-}
-
-void ListView::NoOpDelegate::OnShowBackgroundContextMenu(const POINT &ptScreen)
-{
-	UNREFERENCED_PARAMETER(ptScreen);
-}
-
-void ListView::NoOpDelegate::OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
-	const POINT &ptScreen)
-{
-	UNREFERENCED_PARAMETER(items);
-	UNREFERENCED_PARAMETER(ptScreen);
-}
-
-void ListView::NoOpDelegate::OnBeginDrag(const std::vector<ListViewItem *> &items)
-{
-	UNREFERENCED_PARAMETER(items);
-}
-
 ListView::StateUpdateTarget ListView::StateUpdateTarget::AllItems()
 {
 	return StateUpdateTarget(AllItemsTag{});
