@@ -4,28 +4,37 @@
 
 #include "stdafx.h"
 #include "SearchTabsDialog.h"
+#include "LabelEditHandler.h"
+#include "ListView.h"
 #include "MainResource.h"
+#include "NoOpMenuHelpTextHost.h"
 #include "ResourceLoader.h"
+#include "SearchTabsListViewModel.h"
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
 #include "TabContainer.h"
-#include "../Helper/ListViewHelper.h"
-#include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
 
 SearchTabsDialog *SearchTabsDialog::Create(HWND parent, std::unique_ptr<SearchTabsModel> model,
-	const ResourceLoader *resourceLoader)
+	const TabList *tabList, AsyncIconFetcher *iconFetcher, const KeyboardState *keyboardState,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
 {
-	return new SearchTabsDialog(parent, std::move(model), resourceLoader);
+	return new SearchTabsDialog(parent, std::move(model), tabList, iconFetcher, keyboardState,
+		acceleratorManager, resourceLoader);
 }
 
 SearchTabsDialog::SearchTabsDialog(HWND parent, std::unique_ptr<SearchTabsModel> model,
-	const ResourceLoader *resourceLoader) :
+	const TabList *tabList, AsyncIconFetcher *iconFetcher, const KeyboardState *keyboardState,
+	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	BaseDialog(resourceLoader, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both),
 	m_model(std::move(model)),
+	m_tabList(tabList),
+	m_iconFetcher(iconFetcher),
+	m_keyboardState(keyboardState),
+	m_acceleratorManager(acceleratorManager),
 	m_persistentSettings(&SearchTabsDialogPersistentSettings::GetInstance())
 {
 	m_model->SetSearchTerm(m_persistentSettings->m_searchTerm);
@@ -36,12 +45,12 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	SetupListView();
 	SetupEditControl();
 
-	m_model->updatedSignal.AddObserver(std::bind_front(&SearchTabsDialog::RefreshTabList, this));
-
 	SendMessage(m_hDlg, WM_NEXTDLGCTL,
 		reinterpret_cast<WPARAM>(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_SEARCH_TERM)), true);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
+
+	m_listView->SizeLastColumnToFill();
 
 	return FALSE;
 }
@@ -68,103 +77,36 @@ std::vector<ResizableDialogControl> SearchTabsDialog::GetResizableControls()
 
 void SearchTabsDialog::SetupListView()
 {
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	ListView_SetExtendedListViewStyle(listView,
-		LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+	m_listView = std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST),
+		m_keyboardState, LabelEditHandler::CreateForDialog, NoOpMenuHelpTextHost::GetInstance(),
+		m_acceleratorManager, m_resourceLoader);
+	m_listView->AddExtendedStyles(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP);
+	m_listView->SetupSmallShellImageList();
 
-	InsertColumns();
-	RefreshTabList();
-}
+	m_listViewModel =
+		std::make_unique<SearchTabsListViewModel>(m_model.get(), m_tabList, m_iconFetcher);
 
-void SearchTabsDialog::InsertColumns()
-{
-	int index = 0;
+	m_connections.push_back(m_listViewModel->itemsRefreshedSignal.AddObserver(
+		std::bind_front(&SearchTabsDialog::SelectFirstItem, this)));
 
-	for (auto column : COLUMNS)
+	if (m_persistentSettings->m_sortColumn && m_persistentSettings->m_sortDirection)
 	{
-		InsertColumn(column, index);
-		index++;
-	}
-}
-
-void SearchTabsDialog::InsertColumn(const Column &column, int index)
-{
-	std::wstring columnText = GetColumnText(column.type);
-
-	RECT listViewRect;
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	auto res = GetClientRect(listView, &listViewRect);
-	CHECK(res);
-
-	LVCOLUMN lvColumn = {};
-	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
-	lvColumn.pszText = columnText.data();
-	lvColumn.cx = static_cast<int>(column.percentageWidth * GetRectWidth(&listViewRect));
-	int insertedIndex = ListView_InsertColumn(listView, index, &lvColumn);
-	CHECK(insertedIndex == index);
-}
-
-std::wstring SearchTabsDialog::GetColumnText(ColumnType columnType)
-{
-	UINT stringId;
-
-	switch (columnType)
-	{
-	case SearchTabsDialog::ColumnType::TabName:
-		stringId = IDS_SEARCH_TABS_COLUMN_TAB_NAME;
-		break;
-
-	case SearchTabsDialog::ColumnType::Path:
-		stringId = IDS_SEARCH_TABS_COLUMN_PATH;
-		break;
-
-	default:
-		LOG(FATAL) << "Search tabs column type not found";
-		__assume(0);
+		m_listViewModel->SetSortDetails(*m_persistentSettings->m_sortColumn,
+			*m_persistentSettings->m_sortDirection);
 	}
 
-	return m_resourceLoader->LoadString(stringId);
+	m_listView->SetModel(m_listViewModel.get());
+	m_listView->SetDelegate(this);
+
+	SelectFirstItem();
 }
 
-void SearchTabsDialog::RefreshTabList()
+void SearchTabsDialog::SelectFirstItem()
 {
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-
-	ScopedRedrawDisabler redrawDisabler(listView);
-	ListView_DeleteAllItems(listView);
-	AddTabs();
-}
-
-void SearchTabsDialog::AddTabs()
-{
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	int index = 0;
-
-	for (auto *tab : m_model->GetResults())
+	if (m_listViewModel->GetNumItems() > 0)
 	{
-		AddTab(tab, index);
-
-		if (index == 0)
-		{
-			ListViewHelper::SelectItem(listView, index, true);
-		}
-
-		index++;
+		m_listView->SelectItem(m_listViewModel->GetItemAtIndex(0));
 	}
-}
-
-void SearchTabsDialog::AddTab(const Tab *tab, int index)
-{
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-
-	LVITEM item = {};
-	item.mask = LVIF_TEXT | LVIF_PARAM;
-	item.iItem = index;
-	item.iSubItem = 0;
-	item.pszText = LPSTR_TEXTCALLBACK;
-	item.lParam = reinterpret_cast<LPARAM>(tab);
-	int finalIndex = ListView_InsertItem(listView, &item);
-	CHECK(finalIndex == index);
 }
 
 void SearchTabsDialog::SetupEditControl()
@@ -212,69 +154,6 @@ INT_PTR SearchTabsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-INT_PTR SearchTabsDialog::OnNotify(NMHDR *nmhdr)
-{
-	if (nmhdr->idFrom == IDC_SEARCH_TABS_TAB_LIST)
-	{
-		switch (nmhdr->code)
-		{
-		case NM_DBLCLK:
-			OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(nmhdr));
-			break;
-
-		case LVN_GETDISPINFO:
-			OnGetDispInfo(reinterpret_cast<NMLVDISPINFO *>(nmhdr));
-			break;
-		}
-	}
-
-	return 0;
-}
-
-void SearchTabsDialog::OnListViewDoubleClick(const NMITEMACTIVATE *itemActivate)
-{
-	if (itemActivate->iItem == -1)
-	{
-		return;
-	}
-
-	const Tab *tab = GetTabFromListView(itemActivate->iItem);
-	tab->GetTabContainer()->SelectTab(*tab);
-
-	DestroyWindow(m_hDlg);
-}
-
-void SearchTabsDialog::OnGetDispInfo(NMLVDISPINFO *dispInfo)
-{
-	if (WI_IsFlagSet(dispInfo->item.mask, LVIF_TEXT))
-	{
-		const Tab *tab = GetTabFromListView(dispInfo->item.iItem);
-
-		CHECK(dispInfo->item.iSubItem >= 0 && dispInfo->item.iSubItem < std::ssize(COLUMNS));
-		auto columnType = COLUMNS[dispInfo->item.iSubItem].type;
-
-		auto text = GetTabColumnText(tab, columnType);
-		StringCchCopy(dispInfo->item.pszText, dispInfo->item.cchTextMax, text.c_str());
-
-		WI_SetFlag(dispInfo->item.mask, LVIF_DI_SETITEM);
-	}
-}
-
-std::wstring SearchTabsDialog::GetTabColumnText(const Tab *tab, ColumnType columnType)
-{
-	switch (columnType)
-	{
-	case SearchTabsDialog::ColumnType::TabName:
-		return tab->GetName();
-
-	case SearchTabsDialog::ColumnType::Path:
-		return tab->GetShellBrowser()->GetDirectoryPath();
-
-	default:
-		LOG(FATAL) << "Search tabs column type not found";
-	}
-}
-
 LRESULT SearchTabsDialog::EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -298,62 +177,70 @@ LRESULT SearchTabsDialog::EditWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 
 void SearchTabsDialog::OnMoveListViewSelection(MoveDirection direction)
 {
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	int currentItemIndex = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+	auto selectedItems = m_listView->GetSelectedItems();
+	ListViewItem *currentItem = nullptr;
 
-	if (currentItemIndex == -1)
+	if (selectedItems.size() == 1)
 	{
-		currentItemIndex = ListView_GetNextItem(listView, -1, LVNI_FOCUSED);
+		currentItem = selectedItems[0];
+	}
 
-		if (currentItemIndex == -1)
+	if (!currentItem)
+	{
+		currentItem = m_listView->MaybeGetFocusedItem();
+	}
+
+	if (!currentItem)
+	{
+		if (m_listViewModel->GetNumItems() > 0)
 		{
-			currentItemIndex = 0;
+			currentItem = m_listViewModel->GetItemAtIndex(0);
 		}
 	}
 
-	int newIndex;
-
-	if (direction == MoveDirection::Up)
-	{
-		newIndex = currentItemIndex - 1;
-	}
-	else
-	{
-		newIndex = currentItemIndex + 1;
-	}
-
-	if (newIndex < 0 || newIndex >= ListView_GetItemCount(listView))
+	if (!currentItem)
 	{
 		return;
 	}
 
-	ListViewHelper::SelectItem(listView, newIndex, true);
+	int currentItemIndex = m_listViewModel->GetItemIndex(currentItem);
+	int newIndex = currentItemIndex + (direction == MoveDirection::Up ? -1 : 1);
+
+	if (newIndex < 0 || newIndex >= m_listViewModel->GetNumItems())
+	{
+		return;
+	}
+
+	auto *itemToSelect = m_listViewModel->GetItemAtIndex(newIndex);
+	m_listView->SelectItem(itemToSelect);
+	m_listView->EnsureItemVisible(itemToSelect);
+}
+
+void SearchTabsDialog::OnItemsActivated(const std::vector<ListViewItem *> &items)
+{
+	// Single selection is enabled for the listview. So, whenever a set of items are activated, that
+	// set should only contain a single item.
+	CHECK(items.size() == 1);
+	SelectTabForItem(items[0]);
+	DestroyWindow(m_hDlg);
 }
 
 void SearchTabsDialog::OnOk()
 {
-	HWND listView = GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST);
-	int selectedItemIndex = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+	auto selectedItems = m_listView->GetSelectedItems();
 
-	if (selectedItemIndex != -1)
+	if (selectedItems.size() == 1)
 	{
-		const Tab *tab = GetTabFromListView(selectedItemIndex);
-		tab->GetTabContainer()->SelectTab(*tab);
+		SelectTabForItem(selectedItems[0]);
 	}
 
 	DestroyWindow(m_hDlg);
 }
 
-const Tab *SearchTabsDialog::GetTabFromListView(int index)
+void SearchTabsDialog::SelectTabForItem(ListViewItem *item)
 {
-	LVITEM lvItem;
-	lvItem.mask = LVIF_PARAM;
-	lvItem.iItem = index;
-	lvItem.iSubItem = 0;
-	BOOL res = ListView_GetItem(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST), &lvItem);
-	CHECK(res);
-
-	return reinterpret_cast<const Tab *>(lvItem.lParam);
+	const auto *tab = m_listViewModel->GetTabForItem(item);
+	tab->GetTabContainer()->SelectTab(*tab);
 }
 
 void SearchTabsDialog::OnCancel()
@@ -371,6 +258,8 @@ void SearchTabsDialog::SaveState()
 {
 	m_persistentSettings->SaveDialogPosition(m_hDlg);
 
+	m_persistentSettings->m_sortColumn = m_listViewModel->GetSortColumnId();
+	m_persistentSettings->m_sortDirection = m_listViewModel->GetSortDirection();
 	m_persistentSettings->m_searchTerm = m_model->GetSearchTerm();
 
 	m_persistentSettings->m_bStateSaved = TRUE;

@@ -23,6 +23,7 @@ class ListViewItem;
 class ListViewModel;
 class MenuHelpTextHost;
 class ResourceLoader;
+class ScopedRedrawDisabler;
 class WindowSubclass;
 
 class ListView
@@ -55,14 +56,19 @@ public:
 	void SetDelegate(ListViewDelegate *delegate);
 
 	void AddExtendedStyles(DWORD styles);
+	void SetupSmallShellImageList();
 	void SetImageList(HIMAGELIST imageList, ImageListType imageListType);
 
+	void SizeLastColumnToFill();
 	std::vector<ListViewItem *> GetSelectedItems();
 	bool IsItemSelected(const ListViewItem *item) const;
 	void SelectItem(const ListViewItem *item);
 	void SelectOnly(const ListViewItem *item);
 	void SelectAllItems();
 	void DeselectAllItems();
+	ListViewItem *MaybeGetFocusedItem();
+	void FocusItem(const ListViewItem *item);
+	void EnsureItemVisible(const ListViewItem *item);
 	void StartRenamingItem(const ListViewItem *item);
 	RECT GetItemRect(const ListViewItem *item) const;
 	ListViewItem *MaybeGetItemAtPoint(const POINT &pt);
@@ -121,6 +127,8 @@ private:
 	void ResetItemColumns(const ListViewItem *item);
 	void RemoveItem(const ListViewItem *item);
 	void RemoveAllItems();
+	void OnBatchUpdatesBegan();
+	void OnBatchUpdatesCompleted();
 
 	void OnColumnVisibilityChanged(ListViewColumnId columnId, bool visible);
 	void OnColumnMoved(ListViewColumnId columnId, int newVisibleIndex);
@@ -174,6 +182,7 @@ private:
 	MenuHelpTextHost *const m_menuHelpTextHost;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
+	std::unique_ptr<ScopedRedrawDisabler> m_scopedRedrawDisabler;
 	std::optional<ListViewColumnId> m_previousSortColumnId;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

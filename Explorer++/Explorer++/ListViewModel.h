@@ -53,9 +53,21 @@ public:
 	SignalWrapper<ListViewModel, void(ListViewItem *item, int newIndex)> itemMovedSignal;
 	SignalWrapper<ListViewModel, void(const ListViewItem *item)> itemRemovedSignal;
 	SignalWrapper<ListViewModel, void()> allItemsRemovedSignal;
+	SignalWrapper<ListViewModel, void()> batchUpdatesBeganSignal;
+	SignalWrapper<ListViewModel, void()> batchUpdatesCompletedSignal;
 	SignalWrapper<ListViewModel, void()> sortOrderChangedSignal;
 
 protected:
+	class ScopedBatchUpdate
+	{
+	public:
+		ScopedBatchUpdate(ListViewModel *model);
+		~ScopedBatchUpdate();
+
+	private:
+		ListViewModel *const m_model;
+	};
+
 	ListViewModel(SortPolicy sortPolicy);
 
 	void AddItem(std::unique_ptr<ListViewItem> item);
@@ -66,11 +78,16 @@ protected:
 	void RemoveItem(ListViewItem *item);
 	void RemoveAllItems();
 
+	std::unique_ptr<ScopedBatchUpdate> BeginBatchUpdates();
+
 	virtual std::weak_ordering CompareItems(const ListViewItem *first,
 		const ListViewItem *second) const = 0;
 
 private:
 	void OnItemUpdated(ListViewItem *item);
+
+	void NotifyBatchUpdatesBegan();
+	void NotifyBatchUpdatesCompleted();
 
 	void SortItems();
 	int GetItemSortedIndex(const ListViewItem *item) const;

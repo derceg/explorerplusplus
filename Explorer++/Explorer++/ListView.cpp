@@ -14,6 +14,7 @@
 #include "../Helper/KeyboardState.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ScopedRedrawDisabler.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
 #include <windowsx.h>
@@ -58,6 +59,10 @@ void ListView::SetModel(ListViewModel *model)
 		m_model->itemRemovedSignal.AddObserver(std::bind_front(&ListView::RemoveItem, this)));
 	m_connections.push_back(m_model->allItemsRemovedSignal.AddObserver(
 		std::bind_front(&ListView::RemoveAllItems, this)));
+	m_connections.push_back(m_model->batchUpdatesBeganSignal.AddObserver(
+		std::bind_front(&ListView::OnBatchUpdatesBegan, this)));
+	m_connections.push_back(m_model->batchUpdatesCompletedSignal.AddObserver(
+		std::bind_front(&ListView::OnBatchUpdatesCompleted, this)));
 	m_connections.push_back(m_model->sortOrderChangedSignal.AddObserver(
 		std::bind_front(&ListView::OnSortOrderChanged, this)));
 
@@ -80,6 +85,19 @@ void ListView::AddExtendedStyles(DWORD styles)
 	ListView_SetExtendedListViewStyleEx(m_hwnd, styles, styles);
 }
 
+void ListView::SetupSmallShellImageList()
+{
+	// If the system image list is being used, LVS_SHAREIMAGELISTS should be set (otherwise the
+	// control will incorrectly free the image list on destruction).
+	CHECK(HasWindowStyles(m_hwnd, LVS_SHAREIMAGELISTS));
+
+	HIMAGELIST smallShellImageList;
+	auto res = Shell_GetImageLists(nullptr, &smallShellImageList);
+	CHECK(res);
+
+	SetImageList(smallShellImageList, ListView::ImageListType::SmallIcons);
+}
+
 void ListView::SetImageList(HIMAGELIST imageList, ImageListType imageListType)
 {
 	int type = (imageListType == ImageListType::NormalIcons) ? LVSIL_NORMAL : LVSIL_SMALL;
@@ -92,6 +110,8 @@ void ListView::AddColumns()
 	{
 		AddColumn(columnId);
 	}
+
+	UpdateHeaderSortArrow();
 }
 
 void ListView::AddColumn(ListViewColumnId columnId)
@@ -126,13 +146,6 @@ void ListView::AddColumn(ListViewColumnId columnId)
 	CHECK(res);
 
 	UpdateColumnOrdering();
-
-	auto sortColumnId = m_model->GetSortColumnId();
-
-	if (sortColumnId == column.id)
-	{
-		SetHeaderSortArrow();
-	}
 }
 
 void ListView::UpdateColumnOrdering()
@@ -244,6 +257,29 @@ void ListView::RemoveAllItems()
 	CHECK(res);
 }
 
+void ListView::OnBatchUpdatesBegan()
+{
+	m_scopedRedrawDisabler = std::make_unique<ScopedRedrawDisabler>(m_hwnd);
+}
+
+void ListView::OnBatchUpdatesCompleted()
+{
+	m_scopedRedrawDisabler.reset();
+}
+
+void ListView::SizeLastColumnToFill()
+{
+	if (!HasWindowStyles(m_hwnd, LVS_REPORT))
+	{
+		return;
+	}
+
+	int numColumns = m_model->GetColumnModel()->GetNumVisibleColumns();
+	CHECK(numColumns > 0);
+	auto res = ListView_SetColumnWidth(m_hwnd, numColumns - 1, LVSCW_AUTOSIZE_USEHEADER);
+	CHECK(res);
+}
+
 std::vector<ListViewItem *> ListView::GetSelectedItems()
 {
 	std::vector<ListViewItem *> items;
@@ -276,12 +312,40 @@ void ListView::SelectOnly(const ListViewItem *item)
 
 void ListView::SelectAllItems()
 {
+	if (HasWindowStyles(m_hwnd, LVS_SINGLESEL))
+	{
+		return;
+	}
+
 	UpdateAllItemStates(LVIS_SELECTED, ItemStateOp::Set);
 }
 
 void ListView::DeselectAllItems()
 {
 	UpdateAllItemStates(LVIS_SELECTED, ItemStateOp::Clear);
+}
+
+ListViewItem *ListView::MaybeGetFocusedItem()
+{
+	int index = ListView_GetNextItem(m_hwnd, -1, LVNI_FOCUSED);
+
+	if (index == -1)
+	{
+		return nullptr;
+	}
+
+	return GetItemAtIndex(index);
+}
+
+void ListView::FocusItem(const ListViewItem *item)
+{
+	UpdateItemState(item, LVIS_FOCUSED, ItemStateOp::Set);
+}
+
+void ListView::EnsureItemVisible(const ListViewItem *item)
+{
+	auto res = ListView_EnsureVisible(m_hwnd, GetItemIndex(item), false);
+	CHECK(res);
 }
 
 void ListView::StartRenamingItem(const ListViewItem *item)
@@ -401,6 +465,8 @@ void ListView::OnColumnVisibilityChanged(ListViewColumnId columnId, bool visible
 	{
 		RemoveColumn(columnId);
 	}
+
+	UpdateHeaderSortArrow();
 }
 
 void ListView::OnColumnMoved(ListViewColumnId columnId, int newVisibleIndex)
@@ -421,8 +487,6 @@ void ListView::OnSortOrderChanged()
 {
 	SortItems();
 	UpdateHeaderSortArrow();
-
-	m_previousSortColumnId = m_model->GetSortColumnId();
 }
 
 void ListView::SortItems()
@@ -481,6 +545,8 @@ void ListView::SetHeaderSortArrow()
 	}
 
 	UpdateHeaderItemFormat(*sortColumnId, sortOption, ItemStateOp::Set);
+
+	m_previousSortColumnId = *sortColumnId;
 }
 
 void ListView::UpdateHeaderItemFormat(ListViewColumnId columnId, int format, ItemStateOp stateOp)

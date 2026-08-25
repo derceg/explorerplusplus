@@ -61,6 +61,21 @@ void ListViewModel::RemoveAllItems()
 	allItemsRemovedSignal.m_signal();
 }
 
+std::unique_ptr<ListViewModel::ScopedBatchUpdate> ListViewModel::BeginBatchUpdates()
+{
+	return std::make_unique<ScopedBatchUpdate>(this);
+}
+
+void ListViewModel::NotifyBatchUpdatesBegan()
+{
+	batchUpdatesBeganSignal.m_signal();
+}
+
+void ListViewModel::NotifyBatchUpdatesCompleted()
+{
+	batchUpdatesCompletedSignal.m_signal();
+}
+
 void ListViewModel::OnItemUpdated(ListViewItem *item)
 {
 	itemUpdatedSignal.m_signal(item);
@@ -159,4 +174,14 @@ bool ListViewModel::CompareItemsWrapper(const ListViewItem *first, const ListVie
 {
 	auto cmp = CompareItems(first, second);
 	return (GetSortDirection() == +SortDirection::Ascending) ? std::is_lt(cmp) : std::is_gt(cmp);
+}
+
+ListViewModel::ScopedBatchUpdate::ScopedBatchUpdate(ListViewModel *model) : m_model(model)
+{
+	m_model->NotifyBatchUpdatesBegan();
+}
+
+ListViewModel::ScopedBatchUpdate::~ScopedBatchUpdate()
+{
+	m_model->NotifyBatchUpdatesCompleted();
 }

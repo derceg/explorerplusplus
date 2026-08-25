@@ -773,11 +773,14 @@ void BrowserCommandController::OnSearchTabs()
 	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"SearchTabsDialog",
 		[this]
 		{
-			return SearchTabsDialog::Create(m_browser->GetHWND(),
-				std::make_unique<SearchTabsModel>(m_appServices->GetTabList(),
-					m_appServices->GetTabEvents(), m_appServices->GetShellBrowserEvents(),
-					m_appServices->GetNavigationEvents()),
-				m_appServices->GetResourceLoader());
+			auto searchTabsModel = std::make_unique<SearchTabsModel>(m_appServices->GetTabList(),
+				m_appServices->GetTabEvents(), m_appServices->GetShellBrowserEvents(),
+				m_appServices->GetNavigationEvents());
+
+			return SearchTabsDialog::Create(m_browser->GetHWND(), std::move(searchTabsModel),
+				m_appServices->GetTabList(), m_appServices->GetAsyncIconFetcher(),
+				m_appServices->GetPlatformContext()->GetKeyboardState(),
+				m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader());
 		});
 }
 

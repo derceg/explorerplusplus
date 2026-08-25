@@ -925,6 +925,9 @@
     <ClCompile Include="ListViewColumnsMenu.cpp">
       <Filter>Views\ListView</Filter>
     </ClCompile>
+    <ClCompile Include="SearchTabsListViewModel.cpp">
+      <Filter>Dialogs\Search Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2009,6 +2012,9 @@
     </ClInclude>
     <ClInclude Include="ListViewColumnsMenu.h">
       <Filter>Views\ListView</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchTabsListViewModel.h">
+      <Filter>Dialogs\Search Tabs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -55,7 +55,7 @@ const std::wstring &SearchTabsModel::GetSearchTerm() const
 // TODO: This should use std::generator once C++23 support is available.
 concurrencpp::generator<Tab *> SearchTabsModel::GetResults() const
 {
-	auto tabs = m_tabList->GetAllByLastActiveTime();
+	auto tabs = m_tabList->GetAll();
 
 	for (auto *tab : tabs | std::views::filter(std::bind_front(&SearchTabsModel::TabFilter, this)))
 	{

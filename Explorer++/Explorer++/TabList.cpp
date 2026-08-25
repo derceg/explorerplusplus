@@ -41,6 +41,14 @@ Tab *TabList::MaybeGetById(int id) const
 	return itr->GetMutableTab();
 }
 
+TabActivationPoint TabList::GetTabLastActivationPoint(const Tab *tab) const
+{
+	auto &tabIndex = m_tabs.get<ByTab>();
+	auto itr = tabIndex.find(tab);
+	CHECK(itr != tabIndex.end());
+	return itr->GetLastActivationPoint();
+}
+
 // TODO: This should use std::generator once C++23 support is available.
 concurrencpp::generator<Tab *> TabList::GetAll() const
 {
@@ -51,9 +59,9 @@ concurrencpp::generator<Tab *> TabList::GetAll() const
 }
 
 // TODO: This should use std::generator once C++23 support is available.
-concurrencpp::generator<Tab *> TabList::GetAllByLastActiveTime() const
+concurrencpp::generator<Tab *> TabList::GetAllByLastActivation() const
 {
-	for (Tab *tab : m_tabs.get<ByActiveTime>() | std::views::transform(&TabList::ExtractTab))
+	for (Tab *tab : m_tabs.get<ByActivationPoint>() | std::views::transform(&TabList::ExtractTab))
 	{
 		co_yield tab;
 	}
@@ -90,7 +98,9 @@ void TabList::OnTabSelected(const Tab &tab)
 		return;
 	}
 
-	m_tabs.modify(itr, [](auto &tabData) { tabData.UpdateLastActiveTime(); });
+	int activationPoint = m_nextActivationPoint++;
+	m_tabs.modify(itr, [activationPoint](auto &tabData)
+		{ tabData.SetLastActivationPoint(TabActivationPoint{ activationPoint }); });
 }
 
 void TabList::OnTabRemoved(const Tab &tab)
@@ -125,12 +135,12 @@ Tab *TabList::TabData::GetMutableTab() const
 	return m_tab;
 }
 
-TabList::TabData::Clock::time_point TabList::TabData::GetLastActiveTime() const
+TabActivationPoint TabList::TabData::GetLastActivationPoint() const
 {
-	return m_lastActiveTime;
+	return m_lastActivationPoint;
 }
 
-void TabList::TabData::UpdateLastActiveTime()
+void TabList::TabData::SetLastActivationPoint(TabActivationPoint activationPoint)
 {
-	m_lastActiveTime = Clock::now();
+	m_lastActivationPoint = activationPoint;
 }

@@ -46,8 +46,8 @@ TEST_F(SearchTabsModelTest, GetResults)
 	auto *browser2 = AddBrowser();
 	auto *tab2 = browser2->AddTab(L"j:\\documents");
 
-	// There is no search term, so all tabs should be returned, ordered by last active time.
-	EXPECT_THAT(GeneratorToVector(m_model.GetResults()), ElementsAre(tab2, tab1));
+	// There is no search term, so all tabs should be returned, in an unspecified order.
+	EXPECT_THAT(GeneratorToVector(m_model.GetResults()), UnorderedElementsAre(tab2, tab1));
 
 	m_model.SetSearchTerm(L"c:\\windows");
 	EXPECT_THAT(GeneratorToVector(m_model.GetResults()), ElementsAre(tab1));

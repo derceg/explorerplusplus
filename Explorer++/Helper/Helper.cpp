@@ -795,3 +795,8 @@ std::optional<std::wstring> GetExpandedEnvironmentVariable(const std::wstring &n
 	}
 	return std::wstring(expandedValue.get());
 }
+
+std::weak_ordering ReverseOrdering(std::weak_ordering ordering)
+{
+	return 0 <=> ordering;
+}

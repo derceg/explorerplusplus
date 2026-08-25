@@ -61,6 +61,25 @@ TEST(ListViewModelTest, GetItemAtIndex)
 	EXPECT_EQ(model.GetItemAtIndex(2), item3);
 }
 
+TEST(ListViewModelTest, BatchUpdates)
+{
+	ListViewModelFake model;
+
+	MockFunction<void()> batchUpdatesBeganCallback;
+	model.batchUpdatesBeganSignal.AddObserver(batchUpdatesBeganCallback.AsStdFunction());
+
+	MockFunction<void()> batchUpdatesCompletedCallback;
+	model.batchUpdatesCompletedSignal.AddObserver(batchUpdatesCompletedCallback.AsStdFunction());
+
+	InSequence seq;
+
+	EXPECT_CALL(batchUpdatesBeganCallback, Call());
+	EXPECT_CALL(batchUpdatesCompletedCallback, Call());
+
+	auto batchUpdates = model.BeginBatchUpdates();
+	batchUpdates.reset();
+}
+
 TEST(ListViewModelTest, HasDefaultSortOrder)
 {
 	auto model =

@@ -20,9 +20,6 @@ class TabList;
 class SearchTabsModel
 {
 public:
-	// Signals
-	SignalWrapper<SearchTabsModel, void()> updatedSignal;
-
 	SearchTabsModel(const TabList *tabList, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents);
 
@@ -33,6 +30,9 @@ public:
 	const std::wstring &GetSearchTerm() const;
 
 	concurrencpp::generator<Tab *> GetResults() const;
+
+	// Signals
+	SignalWrapper<SearchTabsModel, void()> updatedSignal;
 
 private:
 	void OnTabsChanged();

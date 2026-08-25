@@ -1230,6 +1230,7 @@
     <ClCompile Include="PlatformContextImpl.cpp" />
     <ClCompile Include="ResourceIconModel.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
+    <ClCompile Include="SearchTabsListViewModel.cpp" />
     <ClCompile Include="SessionRestorer.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp" />
@@ -1596,6 +1597,7 @@
     <ClInclude Include="PlatformContext.h" />
     <ClInclude Include="PlatformContextImpl.h" />
     <ClInclude Include="ResourceIconModel.h" />
+    <ClInclude Include="SearchTabsListViewModel.h" />
     <ClInclude Include="SelectionType.h" />
     <ClInclude Include="SessionRestorer.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h" />

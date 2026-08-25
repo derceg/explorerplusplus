@@ -31,14 +31,20 @@ TEST_F(WindowHelperTest, GetWindowString)
 	EXPECT_EQ(GetWindowString(m_window.get()), text);
 }
 
-TEST_F(WindowHelperTest, AddWindowStyles)
+TEST_F(WindowHelperTest, HasWindowStyles)
+{
+	EXPECT_TRUE(HasWindowStyles(m_window.get(), WS_POPUP));
+	EXPECT_FALSE(HasWindowStyles(m_window.get(), WS_VISIBLE));
+}
+
+TEST_F(WindowHelperTest, SetWindowStyles)
 {
 	LONG_PTR originalStyle = GetWindowLongPtr(m_window.get(), GWL_STYLE);
 	ASSERT_NE(originalStyle, 0);
 
-	AddWindowStyles(m_window.get(), WS_BORDER | WS_TABSTOP, true);
+	SetWindowStyles(m_window.get(), WS_BORDER | WS_TABSTOP, true);
 	EXPECT_EQ(GetWindowLongPtr(m_window.get(), GWL_STYLE), originalStyle | WS_BORDER | WS_TABSTOP);
 
-	AddWindowStyles(m_window.get(), WS_TABSTOP, false);
+	SetWindowStyles(m_window.get(), WS_TABSTOP, false);
 	EXPECT_EQ(GetWindowLongPtr(m_window.get(), GWL_STYLE), originalStyle | WS_BORDER);
 }

@@ -100,28 +100,30 @@ BOOL lShowWindow(HWND hwnd, BOOL bShowWindow)
 	return ShowWindow(hwnd, windowShowState);
 }
 
-void AddWindowStyles(HWND hwnd, LONG_PTR styles, bool add)
+bool HasWindowStyles(HWND hwnd, LONG_PTR styles)
 {
-	LONG_PTR currentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
+	auto currentStyles = GetWindowLongPtr(hwnd, GWL_STYLE);
+	CHECK(currentStyles != 0);
+	return WI_AreAllFlagsSet(currentStyles, styles);
+}
 
-	if (currentStyle == 0)
-	{
-		DCHECK(false);
-		return;
-	}
+void SetWindowStyles(HWND hwnd, LONG_PTR styles, bool add)
+{
+	LONG_PTR currentStyles = GetWindowLongPtr(hwnd, GWL_STYLE);
+	CHECK(currentStyles != 0);
 
 	if (add)
 	{
-		WI_SetAllFlags(currentStyle, styles);
+		WI_SetAllFlags(currentStyles, styles);
 	}
 	else
 	{
-		WI_ClearAllFlags(currentStyle, styles);
+		WI_ClearAllFlags(currentStyles, styles);
 	}
 
 	SetLastError(0);
-	LONG_PTR res = SetWindowLongPtr(hwnd, GWL_STYLE, currentStyle);
-	DCHECK(!(res == 0 && GetLastError() != 0));
+	LONG_PTR res = SetWindowLongPtr(hwnd, GWL_STYLE, currentStyles);
+	CHECK(!(res == 0 && GetLastError() != 0));
 }
 
 int GetRectHeight(const RECT *rc)

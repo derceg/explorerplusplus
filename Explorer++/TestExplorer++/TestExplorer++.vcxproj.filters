@@ -604,6 +604,9 @@
     <ClCompile Include="ListViewColumnsMenuTest.cpp">
       <Filter>Views\ListView</Filter>
     </ClCompile>
+    <ClCompile Include="SearchTabsListViewModelTest.cpp">
+      <Filter>Dialogs\Search Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

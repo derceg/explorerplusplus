@@ -251,6 +251,7 @@
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />
+    <ClCompile Include="SearchTabsListViewModelTest.cpp" />
     <ClCompile Include="SessionRestorerTest.cpp" />
     <ClCompile Include="ShellEntryCollectionTest.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcherFactory.cpp" />

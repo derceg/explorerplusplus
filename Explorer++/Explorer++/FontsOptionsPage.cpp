@@ -180,7 +180,7 @@ void FontsOptionsPage::InitializeSizeControl()
 void FontsOptionsPage::InitializeSampleControl()
 {
 	HWND sampleControl = GetDlgItem(GetDialog(), IDC_OPTIONS_FONT_SAMPLE);
-	AddWindowStyles(sampleControl, WS_BORDER, true);
+	SetWindowStyles(sampleControl, WS_BORDER, true);
 
 	// This will cause the border to be drawn.
 	SetWindowPos(sampleControl, nullptr, 0, 0, 0, 0,

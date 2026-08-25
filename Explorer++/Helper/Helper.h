@@ -8,6 +8,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <wil/resource.h>
 #include <windows.h>
+#include <compare>
 #include <optional>
 #include <string>
 
@@ -64,6 +65,8 @@ bool IsProcessRTL();
 wil::unique_hmodule LoadSystemLibrary(const std::wstring &libraryName);
 
 std::optional<std::wstring> GetExpandedEnvironmentVariable(const std::wstring &name);
+
+std::weak_ordering ReverseOrdering(std::weak_ordering ordering);
 
 template <typename L, typename R>
 boost::bimap<L, R> MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)

@@ -198,7 +198,13 @@ TEST_F(ListViewTest, ColumnResized)
 
 TEST_F(ListViewTest, SortArrow)
 {
+	// If sort details are set when ListView is constructed, it should set up the sort arrow
+	// appropriately.
+	m_model.SetSortDetails(ListViewColumnModelFake::COLUMN_NAME, SortDirection::Ascending);
 	auto listView = BuildListView();
+	EXPECT_EQ(listView->GetColumnSortArrowDetailsForTesting(),
+		ListView::ColumnSortArrowDetails(ListViewColumnModelFake::COLUMN_NAME,
+			SortDirection::Ascending));
 
 	m_model.SetSortDetails(ListViewColumnModelFake::COLUMN_DATA_1, SortDirection::Ascending);
 	EXPECT_EQ(listView->GetColumnSortArrowDetailsForTesting(),
@@ -310,6 +316,15 @@ TEST_F(ListViewTest, SelectAllItems)
 	auto listView = BuildListView();
 	listView->SelectAllItems();
 	EXPECT_THAT(listView->GetSelectedItems(), ElementsAre(item1, item2, item3));
+
+	listView->DeselectAllItems();
+
+	SetWindowStyles(m_listViewWindow, LVS_SINGLESEL, true);
+
+	// When single selection is enabled, it's not possible to select all items, so this call should
+	// have no effect.
+	listView->SelectAllItems();
+	EXPECT_THAT(listView->GetSelectedItems(), IsEmpty());
 }
 
 TEST_F(ListViewTest, DeselectAllItems)
@@ -323,6 +338,22 @@ TEST_F(ListViewTest, DeselectAllItems)
 
 	listView->DeselectAllItems();
 	EXPECT_THAT(listView->GetSelectedItems(), IsEmpty());
+}
+
+TEST_F(ListViewTest, FocusedItem)
+{
+	m_model.AddItem();
+	const auto *item2 = m_model.AddItem();
+	const auto *item3 = m_model.AddItem();
+
+	auto listView = BuildListView();
+	EXPECT_EQ(listView->MaybeGetFocusedItem(), nullptr);
+
+	listView->FocusItem(item2);
+	EXPECT_EQ(listView->MaybeGetFocusedItem(), item2);
+
+	listView->FocusItem(item3);
+	EXPECT_EQ(listView->MaybeGetFocusedItem(), item3);
 }
 
 TEST_F(ListViewTest, ItemPosition)

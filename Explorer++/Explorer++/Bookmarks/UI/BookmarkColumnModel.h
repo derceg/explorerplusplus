@@ -6,6 +6,7 @@
 
 #include "Bookmarks/UI/BookmarkColumn.h"
 #include "ListViewColumnModel.h"
+#include "Literals.h"
 #include <vector>
 
 class BookmarkColumnModel : public ListViewColumnModel
@@ -17,7 +18,7 @@ public:
 	static BookmarkColumn ColumnIdToBookmarkColumn(ListViewColumnId columnId);
 
 private:
-	static constexpr int DEFAULT_COLUMN_WIDTH = 180;
+	static constexpr int DEFAULT_COLUMN_WIDTH = 180_px;
 
 	static std::vector<ListViewColumn> BuildColumnSet();
 	static UINT GetBookmarkColumnStringId(BookmarkColumn column);

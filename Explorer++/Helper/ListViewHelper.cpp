@@ -124,7 +124,7 @@ void FocusItem(HWND listView, int item, bool focus)
 
 void SetAutoArrange(HWND listView, bool autoArrange)
 {
-	AddWindowStyles(listView, LVS_AUTOARRANGE, autoArrange);
+	SetWindowStyles(listView, LVS_AUTOARRANGE, autoArrange);
 }
 
 void ActivateOneClickSelect(HWND listView, bool activate, UINT hoverTime)

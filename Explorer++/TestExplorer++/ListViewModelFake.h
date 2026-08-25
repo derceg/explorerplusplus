@@ -19,6 +19,7 @@ public:
 
 	ListViewItemFake *AddItem(const std::wstring &name = L"");
 
+	using ListViewModel::BeginBatchUpdates;
 	using ListViewModel::RemoveAllItems;
 	using ListViewModel::RemoveItem;
 

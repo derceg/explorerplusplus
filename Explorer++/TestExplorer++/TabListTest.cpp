@@ -23,6 +23,17 @@ protected:
 	{
 	}
 
+	// Takes a set of tabs, ordered by descending activation point (i.e. more recently activated
+	// first).
+	void VerifyActivationPointOrdering(const std::vector<const Tab *> &orderedTabs)
+	{
+		for (size_t i = 1; i < orderedTabs.size(); i++)
+		{
+			EXPECT_GT(m_tabList.GetTabLastActivationPoint(orderedTabs[i - 1]),
+				m_tabList.GetTabLastActivationPoint(orderedTabs[i]));
+		}
+	}
+
 	BrowserWindowFake *const m_browser1;
 	Tab *const m_tab1;
 	Tab *const m_tab2;
@@ -58,17 +69,28 @@ TEST_F(TabListTest, MaybeGetById)
 	EXPECT_EQ(m_tabList.MaybeGetById(1000), nullptr);
 }
 
-TEST_F(TabListTest, GetAllByLastActiveTime)
+TEST_F(TabListTest, GetTabLastActivationPoint)
 {
-	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActiveTime()),
+	VerifyActivationPointOrdering({ m_tab3, m_tab1, m_tab2 });
+
+	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab2);
+	VerifyActivationPointOrdering({ m_tab2, m_tab3, m_tab1 });
+
+	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab1);
+	VerifyActivationPointOrdering({ m_tab1, m_tab2, m_tab3 });
+}
+
+TEST_F(TabListTest, GetAllByLastActivation)
+{
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActivation()),
 		ElementsAre(m_tab3, m_tab1, m_tab2));
 
-	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
-	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActiveTime()),
+	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab2);
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActivation()),
 		ElementsAre(m_tab2, m_tab3, m_tab1));
 
-	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(0);
-	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActiveTime()),
+	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab1);
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActivation()),
 		ElementsAre(m_tab1, m_tab2, m_tab3));
 }
 
