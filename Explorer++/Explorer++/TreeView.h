@@ -92,21 +92,6 @@ private:
 		}
 	};
 
-	class NoOpDelegate : public TreeViewDelegate
-	{
-	public:
-		void OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event) override;
-		bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) override;
-		void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) override;
-		void OnNodeCopied(TreeViewNode *targetNode) override;
-		void OnNodeCut(TreeViewNode *targetNode) override;
-		void OnPaste(TreeViewNode *targetNode) override;
-		void OnSelectionChanged(TreeViewNode *selectedNode) override;
-		void OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen) override;
-		void OnBeginDrag(TreeViewNode *targetNode) override;
-		void OnBeginRightButtonDrag(TreeViewNode *targetNode) override;
-	};
-
 	void AddNodeRecursive(TreeViewNode *node);
 	void AddNode(TreeViewNode *node);
 	void RefreshNode(TreeViewNode *node);
@@ -146,7 +131,7 @@ private:
 
 	const HWND m_hwnd;
 	TreeViewAdapter *m_adapter = nullptr;
-	NoOpDelegate m_noOpDelegate;
+	TreeViewDelegate m_noOpDelegate;
 	TreeViewDelegate *m_delegate = &m_noOpDelegate;
 	const KeyboardState *const m_keyboardState;
 	LabelEditHandlerFactory m_labelEditHandlerFactory;

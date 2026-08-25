@@ -16,14 +16,59 @@ class TreeViewDelegate
 public:
 	virtual ~TreeViewDelegate() = default;
 
-	virtual void OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event) = 0;
-	virtual bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name) = 0;
-	virtual void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode) = 0;
-	virtual void OnNodeCopied(TreeViewNode *targetNode) = 0;
-	virtual void OnNodeCut(TreeViewNode *targetNode) = 0;
-	virtual void OnPaste(TreeViewNode *targetNode) = 0;
-	virtual void OnSelectionChanged(TreeViewNode *selectedNode) = 0;
-	virtual void OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen) = 0;
-	virtual void OnBeginDrag(TreeViewNode *targetNode) = 0;
-	virtual void OnBeginRightButtonDrag(TreeViewNode *targetNode) = 0;
+	virtual void OnNodeMiddleClicked(TreeViewNode *targetNode, const MouseEvent &event)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+		UNREFERENCED_PARAMETER(event);
+	}
+
+	virtual bool OnNodeRenamed(TreeViewNode *targetNode, const std::wstring &name)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+		UNREFERENCED_PARAMETER(name);
+
+		return false;
+	}
+
+	virtual void OnNodeRemoved(TreeViewNode *targetNode, RemoveMode removeMode)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+		UNREFERENCED_PARAMETER(removeMode);
+	}
+
+	virtual void OnNodeCopied(TreeViewNode *targetNode)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+	}
+
+	virtual void OnNodeCut(TreeViewNode *targetNode)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+	}
+
+	virtual void OnPaste(TreeViewNode *targetNode)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+	}
+
+	virtual void OnSelectionChanged(TreeViewNode *selectedNode)
+	{
+		UNREFERENCED_PARAMETER(selectedNode);
+	}
+
+	virtual void OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+		UNREFERENCED_PARAMETER(ptScreen);
+	}
+
+	virtual void OnBeginDrag(TreeViewNode *targetNode)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+	}
+
+	virtual void OnBeginRightButtonDrag(TreeViewNode *targetNode)
+	{
+		UNREFERENCED_PARAMETER(targetNode);
+	}
 };
