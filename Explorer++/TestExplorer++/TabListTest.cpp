@@ -42,16 +42,33 @@ protected:
 	Tab *const m_tab3;
 };
 
+TEST_F(TabListTest, GetAll)
+{
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()),
+		UnorderedElementsAre(m_tab1, m_tab2, m_tab3));
+}
+
 TEST_F(TabListTest, Add)
 {
-	auto *browser3 = AddBrowser();
-	auto *tab4 = browser3->AddTab(L"c:\\");
+	auto *tab4 = m_browser2->AddTab(L"c:\\");
 
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()),
 		UnorderedElementsAre(m_tab1, m_tab2, m_tab3, tab4));
 
-	// TODO: Removing a browser should also be tested, but at the moment, no tab removal events are
-	// broadcast when a window is closed.
+	auto *browser3 = AddBrowser();
+	auto *tab5 = browser3->AddTab(L"c:\\");
+
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()),
+		UnorderedElementsAre(m_tab1, m_tab2, m_tab3, tab4, tab5));
+}
+
+TEST_F(TabListTest, Remove)
+{
+	m_browser1->GetActiveTabContainer()->CloseTab(*m_tab1);
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()), UnorderedElementsAre(m_tab2, m_tab3));
+
+	RemoveBrowser(m_browser2);
+	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()), UnorderedElementsAre(m_tab2));
 }
 
 TEST_F(TabListTest, GetById)
