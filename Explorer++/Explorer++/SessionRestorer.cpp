@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "SessionRestorer.h"
-#include "BrowserList.h"
 #include "BrowserWindowFactory.h"
+#include "CommandLine.h"
 #include "Config.h"
 #include "FeatureList.h"
 #include "MainRebarStorage.h"
@@ -13,85 +13,141 @@
 #include "WindowStorage.h"
 #include <ranges>
 
-SessionRestorer::SessionRestorer(const Config *config, const FeatureList *featureList,
-	const BrowserList *browserList, BrowserWindowFactory *browserWindowFactory) :
+SessionRestorer::SessionRestorer(const CommandLine::Settings *commandLineSettings,
+	const Config *config, const FeatureList *featureList,
+	BrowserWindowFactory *browserWindowFactory) :
+	m_commandLineSettings(commandLineSettings),
 	m_config(config),
 	m_featureList(featureList),
-	m_browserList(browserList),
 	m_browserWindowFactory(browserWindowFactory)
 {
 }
 
 void SessionRestorer::Restore(const std::vector<WindowStorageData> &sessionWindows)
 {
-	WindowStorageData startupWindowData;
+	auto windowsToRestore = GetWindowsToRestore(sessionWindows);
+	CHECK(!windowsToRestore.empty());
+
+	auto &targetWindow = windowsToRestore.back();
+	AddStartupModeTabs(targetWindow);
+
+	// This is explicitly done last, since the command-line tabs can overwrite existing tabs.
+	AddCommandLineTabs(targetWindow);
+
+	// If this feature isn't enabled, only a single window is supported.
+	size_t maxWindowsToRestore =
+		m_featureList->IsEnabled(Feature::MultipleWindowsPerSession) ? windowsToRestore.size() : 1;
+
+	for (const auto &windowToRestore : windowsToRestore | std::views::take(maxWindowsToRestore))
+	{
+		m_browserWindowFactory->CreateBrowserWindow(&windowToRestore);
+	}
+}
+
+std::vector<WindowStorageData> SessionRestorer::GetWindowsToRestore(
+	const std::vector<WindowStorageData> &sessionWindows) const
+{
+	std::vector<WindowStorageData> windowsToRestore;
+
+	WindowStorageData newWindowData;
 
 	if (!sessionWindows.empty())
 	{
 		// The details here will be used if a new window needs to be created (as opposed to
 		// restoring the previous set of windows).
-		startupWindowData = sessionWindows[0];
-		startupWindowData.tabs = {};
-		startupWindowData.selectedTab = 0;
+		newWindowData = sessionWindows[0];
+		newWindowData.tabs.clear();
+		newWindowData.selectedTab = 0;
 	}
 
+	if (m_config->startupMode == +StartupMode::PreviousTabs)
+	{
+		windowsToRestore = sessionWindows;
+	}
+
+	if (windowsToRestore.empty())
+	{
+		windowsToRestore = { newWindowData };
+	}
+
+	return windowsToRestore;
+}
+
+void SessionRestorer::AddStartupModeTabs(WindowStorageData &targetWindow) const
+{
 	switch (m_config->startupMode)
 	{
 	case StartupMode::PreviousTabs:
-		RestorePreviousWindows(sessionWindows);
+		// Nothing needs to be done here. The tabs from the previous session are already available
+		// above.
 		break;
 
 	case StartupMode::CustomFolders:
-		CreateStartupFolders(startupWindowData);
+		for (const auto &startupFolder : m_config->startupFolders)
+		{
+			targetWindow.tabs.push_back({ .directory = startupFolder });
+		}
 		break;
 
 	case StartupMode::DefaultFolder:
-		// This case is handled below.
+		// Nothing needs to be done here. An empty set of tabs will result in a default tab being
+		// created.
 		break;
 	}
-
-	if (m_browserList->IsEmpty())
-	{
-		// This path can be taken in a few different situations:
-		//
-		// - If m_config.startupMode is StartupMode::PreviousTabs and the list of windows is empty.
-		// - If m_config.startupMode is StartupMode::CustomFolders and the list of startup folders
-		//   is empty.
-		// - If m_config.startupMode is StartupMode::DefaultFolder.
-		//
-		// In each case, a default window should be created.
-		m_browserWindowFactory->CreateBrowserWindow(&startupWindowData);
-	}
 }
 
-void SessionRestorer::RestorePreviousWindows(const std::vector<WindowStorageData> &sessionWindows)
+void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 {
-	// If this feature isn't enabled, only a single window is supported.
-	size_t maxWindowsToRestore =
-		m_featureList->IsEnabled(Feature::MultipleWindowsPerSession) ? sessionWindows.size() : 1;
+	auto currentDirectory = GetCurrentDirectoryWrapper();
+	CHECK(currentDirectory);
 
-	for (const auto &sessionWindow : sessionWindows | std::views::take(maxWindowsToRestore))
+	std::vector<std::wstring> processedPaths;
+
+	for (const auto &directory : m_commandLineSettings->directories)
 	{
-		m_browserWindowFactory->CreateBrowserWindow(&sessionWindow);
-	}
-}
+		// Windows Explorer doesn't expand environment variables passed in on the command line. The
+		// command-line interpreter that's being used can expand variables - for example, running:
+		//
+		// explorer.exe %windir%
+		//
+		// from cmd.exe will result in %windir% being expanded before being passed to explorer.exe.
+		//
+		// But if explorer.exe is launched with the string %windir% passed as a parameter, no
+		// expansion will occur.
+		//
+		// Therefore, no expansion is performed here either.
+		//
+		// One difference from Explorer is that paths here are trimmed, which means that passing a
+		// path like "  C:\Windows  " will result in "C:\Windows" being opened.
+		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(directory,
+			currentDirectory.value(), EnvVarsExpansion::DontExpand);
 
-void SessionRestorer::CreateStartupFolders(const WindowStorageData &startupWindowData)
-{
-	if (m_config->startupFolders.empty())
+		if (!absolutePath)
+		{
+			continue;
+		}
+
+		processedPaths.push_back(*absolutePath);
+	}
+
+	if (processedPaths.empty())
 	{
 		return;
 	}
 
-	std::vector<TabStorageData> tabs;
-
-	for (const auto &startupFolder : m_config->startupFolders)
+	// When a set of command-line directories is supplied:
+	//
+	// - The directories will be added to the set of tabs, if the startup mode was set to
+	//   StartupMode::PreviousTabs.
+	// - The directories will replace the set of tabs otherwise.
+	if (m_config->startupMode != +StartupMode::PreviousTabs)
 	{
-		tabs.push_back({ .directory = startupFolder });
+		targetWindow.tabs.clear();
+		targetWindow.selectedTab = 0;
 	}
 
-	WindowStorageData initialData = startupWindowData;
-	initialData.tabs = tabs;
-	initialData.selectedTab = 0;
-	m_browserWindowFactory->CreateBrowserWindow(&initialData);
+	for (const auto &processedPath : processedPaths)
+	{
+		targetWindow.tabs.push_back({ .directory = processedPath });
+	}
 }

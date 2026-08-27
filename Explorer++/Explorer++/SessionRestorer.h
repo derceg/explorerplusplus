@@ -6,26 +6,34 @@
 
 #include <vector>
 
-class BrowserList;
 class BrowserWindowFactory;
 struct Config;
 class FeatureList;
 struct WindowStorageData;
 
+namespace CommandLine
+{
+
+struct Settings;
+
+}
+
 class SessionRestorer
 {
 public:
-	SessionRestorer(const Config *config, const FeatureList *featureList,
-		const BrowserList *browserList, BrowserWindowFactory *browserWindowFactory);
+	SessionRestorer(const CommandLine::Settings *commandLineSettings, const Config *config,
+		const FeatureList *featureList, BrowserWindowFactory *browserWindowFactory);
 
 	void Restore(const std::vector<WindowStorageData> &sessionWindows);
 
 private:
-	void RestorePreviousWindows(const std::vector<WindowStorageData> &sessionWindows);
-	void CreateStartupFolders(const WindowStorageData &startupWindowData);
+	std::vector<WindowStorageData> GetWindowsToRestore(
+		const std::vector<WindowStorageData> &sessionWindows) const;
+	void AddStartupModeTabs(WindowStorageData &targetWindow) const;
+	void AddCommandLineTabs(WindowStorageData &targetWindow) const;
 
+	const CommandLine::Settings *const m_commandLineSettings;
 	const Config *const m_config;
 	const FeatureList *const m_featureList;
-	const BrowserList *const m_browserList;
 	BrowserWindowFactory *const m_browserWindowFactory;
 };

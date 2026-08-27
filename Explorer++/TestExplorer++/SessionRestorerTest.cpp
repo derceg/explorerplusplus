@@ -19,7 +19,8 @@ class SessionRestorerTest : public BrowserTestBase
 {
 protected:
 	SessionRestorerTest() :
-		m_sessionRestorer(&m_config, &m_featureList, &m_browserList, &m_browserWindowFactory)
+		m_sessionRestorer(&m_commandLineSettings, &m_config, &m_featureList,
+			&m_browserWindowFactory)
 	{
 	}
 
@@ -146,4 +147,60 @@ TEST_F(SessionRestorerTest, RestoreDefaultFolder)
 
 	m_sessionRestorer.Restore({});
 	EXPECT_EQ(m_browserList.GetSize(), 1u);
+}
+
+TEST_F(SessionRestorerTest, CommandLineDirectoriesWithPreviousTabs)
+{
+	m_config.startupMode = StartupMode::PreviousTabs;
+
+	m_commandLineSettings.directories = { L"c:\\", L"d:\\", L"e:\\" };
+
+	WindowStorageData sessionWindow;
+	sessionWindow.tabs = { { .directory = L"h:\\previous\\folder" } };
+
+	m_sessionRestorer.Restore({ sessionWindow });
+	ASSERT_EQ(m_browserList.GetSize(), 1u);
+
+	auto *restoredBrowser = m_browserList.GetLastActive();
+	ASSERT_NE(restoredBrowser, nullptr);
+
+	// When loading a set of previous tabs, command line directories (if present) should be loaded
+	// in addition to the previous tabs.
+	VerifyTabs(restoredBrowser, { L"h:\\previous\\folder", L"c:\\", L"d:\\", L"e:\\" });
+}
+
+TEST_F(SessionRestorerTest, CommandLineDirectoriesWithCustomFolders)
+{
+	m_config.startupMode = StartupMode::CustomFolders;
+	m_config.startupFolders = { L"c:\\startup-folder" };
+
+	m_commandLineSettings.directories = { L"g:\\", L"h:\\documents" };
+
+	m_sessionRestorer.Restore({});
+	ASSERT_EQ(m_browserList.GetSize(), 1u);
+
+	auto *restoredBrowser = m_browserList.GetLastActive();
+	ASSERT_NE(restoredBrowser, nullptr);
+
+	// When loading a set of custom folders, command line directories (if present) should replace
+	// the custom folders. That is, the only tabs that should exist at this point should be the tabs
+	// for the command line directories.
+	VerifyTabs(restoredBrowser, m_commandLineSettings.directories);
+}
+
+TEST_F(SessionRestorerTest, CommandLineDirectoriesWithDefaultFolder)
+{
+	m_config.startupMode = StartupMode::DefaultFolder;
+
+	m_commandLineSettings.directories = { L"d:\\", L"d:\\folder" };
+
+	m_sessionRestorer.Restore({});
+	ASSERT_EQ(m_browserList.GetSize(), 1u);
+
+	auto *restoredBrowser = m_browserList.GetLastActive();
+	ASSERT_NE(restoredBrowser, nullptr);
+
+	// As with the above case, the only tabs that should exist at this point should be the tabs for
+	// the command line directories.
+	VerifyTabs(restoredBrowser, m_commandLineSettings.directories);
 }

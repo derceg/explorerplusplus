@@ -63,7 +63,7 @@ protected:
 
 	static void NavigateTab(Tab *tab, const std::wstring &path, PidlAbsolute *outputPidl = nullptr);
 
-	const CommandLine::Settings m_commandLineSettings;
+	CommandLine::Settings m_commandLineSettings;
 	AppServices m_appServices;
 	AppControllerFake m_appController;
 	PlatformContextFake m_platformContext;

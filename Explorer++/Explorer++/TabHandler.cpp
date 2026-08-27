@@ -237,30 +237,6 @@ void Explorerplusplus::CreateCommandLineTabs()
 			newTab.GetShellBrowserImpl()->SelectItems({ fullPidl.get() });
 		}
 	}
-
-	for (const auto &directory : commandLineSettings->directories)
-	{
-		// Windows Explorer doesn't expand environment variables passed in on the command line. The
-		// command-line interpreter that's being used can expand variables - for example, running:
-		//
-		// explorer.exe %windir%
-		//
-		// from cmd.exe will result in %windir% being expanded before being passed to explorer.exe.
-		// But if explorer.exe is launched with the string %windir% passed as a parameter, no
-		// expansion will occur.
-		// Therefore, no expansion is performed here either.
-		// One difference from Explorer is that paths here are trimmed, which means that passing
-		// "  C:\Windows  " will result in "C:\Windows" being opened.
-		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(directory,
-			currentDirectory.value(), EnvVarsExpansion::DontExpand);
-
-		if (!absolutePath)
-		{
-			continue;
-		}
-
-		GetActivePane()->GetTabContainer()->CreateNewTab(*absolutePath, { .selected = true });
-	}
 }
 
 void Explorerplusplus::OnTabSelected(const Tab &tab)
