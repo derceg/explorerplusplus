@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "AppServices.h"
 #include "ColumnStorage.h"
-#include "CommandLine.h"
 #include "Config.h"
 #include "MainTabView.h"
 #include "Runtime.h"
@@ -140,8 +139,6 @@ void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
 		CreateTabsFromStorageData(*storageData);
 	}
 
-	CreateCommandLineTabs();
-
 	if (GetActivePane()->GetTabContainer()->GetNumTabs() == 0)
 	{
 		GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory({});
@@ -170,17 +167,27 @@ void Explorerplusplus::CreateTabsFromStorageData(const WindowStorageData &storag
 		auto validatedColumns = loadedTab.columns;
 		ValidateColumns(validatedColumns);
 
+		PidlAbsolute directory;
+
 		if (loadedTab.pidl.HasValue())
 		{
-			auto navigateParams = NavigateParams::Normal(loadedTab.pidl.Raw());
-			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, tabSettings,
-				&loadedTab.folderSettings, &validatedColumns);
+			directory = loadedTab.pidl;
 		}
 		else
 		{
-			GetActivePane()->GetTabContainer()->CreateNewTab(loadedTab.directory, tabSettings,
-				&loadedTab.folderSettings, &validatedColumns);
+			HRESULT hr = SHParseDisplayName(loadedTab.directory.c_str(), nullptr,
+				PidlOutParam(directory), 0, nullptr);
+
+			if (FAILED(hr))
+			{
+				continue;
+			}
 		}
+
+		auto navigateParams = NavigateParams::Normal(directory.Raw());
+		navigateParams.itemsToSelect = loadedTab.itemsToSelect;
+		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, tabSettings,
+			&loadedTab.folderSettings, &validatedColumns);
 
 		index++;
 	}
@@ -189,53 +196,6 @@ void Explorerplusplus::CreateTabsFromStorageData(const WindowStorageData &storag
 		&& storageData.selectedTab < GetActivePane()->GetTabContainer()->GetNumTabs())
 	{
 		GetActivePane()->GetTabContainer()->SelectTabAtIndex(storageData.selectedTab);
-	}
-}
-
-void Explorerplusplus::CreateCommandLineTabs()
-{
-	// It's implicitly assumed that this will succeed. Although the documentation states that
-	// GetCurrentDirectory() can fail, I'm not sure under what circumstances it ever would.
-	auto currentDirectory = GetCurrentDirectoryWrapper();
-	CHECK(currentDirectory);
-
-	const CommandLine::Settings *commandLineSettings = m_appServices->GetCommandLineSettings();
-
-	for (const auto &fileToSelect : commandLineSettings->filesToSelect)
-	{
-		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(fileToSelect,
-			currentDirectory.value(), EnvVarsExpansion::DontExpand);
-
-		if (!absolutePath)
-		{
-			continue;
-		}
-
-		unique_pidl_absolute fullPidl;
-		HRESULT hr = ParseDisplayNameForNavigation(absolutePath->c_str(), fullPidl);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		unique_pidl_absolute parentPidl(ILCloneFull(fullPidl.get()));
-
-		BOOL res = ILRemoveLastID(parentPidl.get());
-
-		if (!res)
-		{
-			continue;
-		}
-
-		auto navigateParams = NavigateParams::Normal(parentPidl.get());
-		Tab &newTab =
-			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, { .selected = true });
-
-		if (ArePidlsEquivalent(newTab.GetShellBrowser()->GetDirectory().Raw(), parentPidl.get()))
-		{
-			newTab.GetShellBrowserImpl()->SelectItems({ fullPidl.get() });
-		}
 	}
 }
 

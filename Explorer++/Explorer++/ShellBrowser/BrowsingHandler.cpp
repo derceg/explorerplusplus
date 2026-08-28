@@ -462,6 +462,7 @@ void ShellBrowserImpl::OnNavigationComitted(const NavigationRequest *request)
 	StartDirectoryMonitoring();
 
 	AddNavigationItems(request, request->GetItems());
+	SelectItems(GetItemsToSelectAfterNavigation(request));
 
 	SetNavigationState(NavigationState::Committed);
 }
@@ -485,18 +486,6 @@ void ShellBrowserImpl::AddNavigationItems(const NavigationRequest *request,
 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-
-	// A history entry should be created when the navigation is committed, so the current entry
-	// should always be for the current navigation.
-	auto *currentEntry = m_navigationController->GetCurrentEntry();
-	DCHECK(currentEntry->GetPidl() == request->GetNavigateParams().pidl);
-
-	SelectItems(currentEntry->GetSelectedItems());
-
-	if (request->GetNavigateParams().navigationType == NavigationType::Up)
-	{
-		SelectItems({ request->GetNavigateParams().originalPidl });
-	}
 }
 
 std::vector<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformationFromPidls(
@@ -699,6 +688,32 @@ BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	}
 
 	return bFilenameFiltered || bHideSystemFile;
+}
+
+std::vector<PidlAbsolute> ShellBrowserImpl::GetItemsToSelectAfterNavigation(
+	const NavigationRequest *request)
+{
+	if (!request->GetNavigateParams().itemsToSelect.empty())
+	{
+		return request->GetNavigateParams().itemsToSelect;
+	}
+
+	// A history entry should be created when the navigation is committed, so the current entry
+	// should always be for the current navigation.
+	auto *currentEntry = m_navigationController->GetCurrentEntry();
+	DCHECK(currentEntry->GetPidl() == request->GetNavigateParams().pidl);
+
+	if (!currentEntry->GetSelectedItems().empty())
+	{
+		return currentEntry->GetSelectedItems();
+	}
+
+	if (request->GetNavigateParams().navigationType == NavigationType::Up)
+	{
+		return { request->GetNavigateParams().originalPidl };
+	}
+
+	return {};
 }
 
 void ShellBrowserImpl::RemoveItem(int iItemInternal)

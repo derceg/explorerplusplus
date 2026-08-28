@@ -928,6 +928,9 @@
     <ClCompile Include="SearchTabsListViewModel.cpp">
       <Filter>Dialogs\Search Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="ShellNameParserImpl.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2015,6 +2018,12 @@
     </ClInclude>
     <ClInclude Include="SearchTabsListViewModel.h">
       <Filter>Dialogs\Search Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellNameParser.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellNameParserImpl.h">
+      <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

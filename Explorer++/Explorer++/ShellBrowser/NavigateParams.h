@@ -7,6 +7,7 @@
 #include "HistoryEntry.h"
 #include "../Helper/Pidl.h"
 #include <optional>
+#include <vector>
 
 class NavigationRequest;
 
@@ -59,6 +60,9 @@ public:
 
 	// When navigating up, this will store the pidl of the previous item.
 	PidlAbsolute originalPidl;
+
+	// A set of items to select once the navigation completes.
+	std::vector<PidlAbsolute> itemsToSelect;
 
 	static NavigateParams Normal(PCIDLIST_ABSOLUTE pidl,
 		HistoryEntryType historyEntryType = HistoryEntryType::AddEntry)

@@ -9,6 +9,7 @@
 class BrowserWindowFactory;
 struct Config;
 class FeatureList;
+class ShellNameParser;
 struct WindowStorageData;
 
 namespace CommandLine
@@ -22,7 +23,8 @@ class SessionRestorer
 {
 public:
 	SessionRestorer(const CommandLine::Settings *commandLineSettings, const Config *config,
-		const FeatureList *featureList, BrowserWindowFactory *browserWindowFactory);
+		const FeatureList *featureList, BrowserWindowFactory *browserWindowFactory,
+		ShellNameParser *shellNameParser);
 
 	void Restore(const std::vector<WindowStorageData> &sessionWindows);
 
@@ -36,4 +38,5 @@ private:
 	const Config *const m_config;
 	const FeatureList *const m_featureList;
 	BrowserWindowFactory *const m_browserWindowFactory;
+	ShellNameParser *const m_shellNameParser;
 };

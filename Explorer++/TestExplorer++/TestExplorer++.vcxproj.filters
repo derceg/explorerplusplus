@@ -607,6 +607,9 @@
     <ClCompile Include="SearchTabsListViewModelTest.cpp">
       <Filter>Dialogs\Search Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="ShellNameParserFake.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -1007,6 +1010,9 @@
     </ClInclude>
     <ClInclude Include="NoOpThemeManager.h">
       <Filter>Dark Mode Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellNameParserFake.h">
+      <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

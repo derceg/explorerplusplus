@@ -392,6 +392,7 @@ private:
 	int AddItemInternal(int itemIndex, const ItemInfo_t &itemInfo, BOOL setPosition);
 	static HRESULT ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
 		PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
+	std::vector<PidlAbsolute> GetItemsToSelectAfterNavigation(const NavigationRequest *request);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();

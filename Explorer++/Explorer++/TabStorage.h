@@ -7,6 +7,7 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "TabContainer.h"
 #include "../Helper/Pidl.h"
+#include <vector>
 
 struct TabStorageData
 {
@@ -18,6 +19,9 @@ struct TabStorageData
 	TabSettings tabSettings;
 	FolderSettings folderSettings;
 	FolderColumns columns;
+
+	// Contains a set of items to select once navigation to the target directory has occurred.
+	std::vector<PidlAbsolute> itemsToSelect;
 
 	// This is only used in tests.
 	bool operator==(const TabStorageData &) const = default;

@@ -34,6 +34,7 @@
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
+#include "ShellNameParserImpl.h"
 #include "ShellWatcherManager.h"
 #include "TabEvents.h"
 #include "TabList.h"
@@ -100,6 +101,7 @@ private:
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	ShellWatcherManager m_shellWatcherManager;
+	ShellNameParserImpl m_shellNameParser;
 	DirectoryWatcherFactoryImpl m_directoryWatcherFactory;
 	DarkModeManagerImpl m_darkModeManager;
 	DarkModeColorProvider m_darkModeColorProvider;

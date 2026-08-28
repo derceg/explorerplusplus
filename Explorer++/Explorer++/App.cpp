@@ -150,7 +150,7 @@ void App::SetUpSession()
 	InitializePlugins();
 
 	SessionRestorer sessionRestorer(m_commandLineSettings, &m_config, &m_featureList,
-		m_browserWindowFactory.get());
+		m_browserWindowFactory.get(), &m_shellNameParser);
 	sessionRestorer.Restore(windows);
 }
 

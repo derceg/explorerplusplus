@@ -9,6 +9,7 @@
 #include "MainRebarStorage.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellNameParserFake.h"
 #include "WindowStorage.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/combine.hpp>
@@ -20,7 +21,7 @@ class SessionRestorerTest : public BrowserTestBase
 protected:
 	SessionRestorerTest() :
 		m_sessionRestorer(&m_commandLineSettings, &m_config, &m_featureList,
-			&m_browserWindowFactory)
+			&m_browserWindowFactory, &m_shellNameParser)
 	{
 	}
 
@@ -38,6 +39,7 @@ protected:
 		}
 	}
 
+	ShellNameParserFake m_shellNameParser;
 	SessionRestorer m_sessionRestorer;
 };
 
@@ -203,4 +205,20 @@ TEST_F(SessionRestorerTest, CommandLineDirectoriesWithDefaultFolder)
 	// As with the above case, the only tabs that should exist at this point should be the tabs for
 	// the command line directories.
 	VerifyTabs(restoredBrowser, m_commandLineSettings.directories);
+}
+
+TEST_F(SessionRestorerTest, CommandLineFilesToSelect)
+{
+	m_commandLineSettings.filesToSelect = { L"c:\\users", L"h:\\project\\documents" };
+
+	m_sessionRestorer.Restore({});
+	ASSERT_EQ(m_browserList.GetSize(), 1u);
+
+	auto *restoredBrowser = m_browserList.GetLastActive();
+	ASSERT_NE(restoredBrowser, nullptr);
+
+	VerifyTabs(restoredBrowser, { L"c:\\", L"h:\\project" });
+
+	// TODO: At the moment, there's no way to check that the requested files have been selected, but
+	// it should be tested if possible.
 }

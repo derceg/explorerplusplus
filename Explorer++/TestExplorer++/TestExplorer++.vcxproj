@@ -254,6 +254,7 @@
     <ClCompile Include="SearchTabsListViewModelTest.cpp" />
     <ClCompile Include="SessionRestorerTest.cpp" />
     <ClCompile Include="ShellEntryCollectionTest.cpp" />
+    <ClCompile Include="ShellNameParserFake.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcherFactory.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcher.cpp" />
     <ClCompile Include="SimulatedFileSystem.cpp" />
@@ -477,6 +478,7 @@
     <ClInclude Include="CopiedBookmark.h" />
     <ClInclude Include="DarkModeManagerFake.h" />
     <ClInclude Include="NoOpThemeManager.h" />
+    <ClInclude Include="ShellNameParserFake.h" />
     <ClInclude Include="SimulatedFileSystemWatcherFactory.h" />
     <ClInclude Include="SimulatedFileSystemWatcher.h" />
     <ClInclude Include="SimulatedFileSystem.h" />

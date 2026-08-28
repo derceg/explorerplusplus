@@ -231,7 +231,6 @@ private:
 	void HideTabBar();
 	void CreateInitialTabs(const WindowStorageData *storageData);
 	void CreateTabsFromStorageData(const WindowStorageData &storageData);
-	void CreateCommandLineTabs();
 	void OnTabListViewSelectionChanged(const ShellBrowser *shellBrowser);
 
 	void OnNavigationCommitted(const NavigationRequest *request);

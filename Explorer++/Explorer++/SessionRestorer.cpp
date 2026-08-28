@@ -9,17 +9,20 @@
 #include "Config.h"
 #include "FeatureList.h"
 #include "MainRebarStorage.h"
+#include "ShellNameParser.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
+#include "../Helper/ShellHelper.h"
 #include <ranges>
 
 SessionRestorer::SessionRestorer(const CommandLine::Settings *commandLineSettings,
 	const Config *config, const FeatureList *featureList,
-	BrowserWindowFactory *browserWindowFactory) :
+	BrowserWindowFactory *browserWindowFactory, ShellNameParser *shellNameParser) :
 	m_commandLineSettings(commandLineSettings),
 	m_config(config),
 	m_featureList(featureList),
-	m_browserWindowFactory(browserWindowFactory)
+	m_browserWindowFactory(browserWindowFactory),
+	m_shellNameParser(shellNameParser)
 {
 }
 
@@ -98,10 +101,12 @@ void SessionRestorer::AddStartupModeTabs(WindowStorageData &targetWindow) const
 
 void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 {
+	// It's implicitly assumed that this will succeed. Although the documentation states that
+	// GetCurrentDirectory() can fail, I'm not sure under what circumstances it ever would.
 	auto currentDirectory = GetCurrentDirectoryWrapper();
 	CHECK(currentDirectory);
 
-	std::vector<std::wstring> processedPaths;
+	std::vector<TabStorageData> commandLineTabs;
 
 	for (const auto &directory : m_commandLineSettings->directories)
 	{
@@ -127,27 +132,48 @@ void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 			continue;
 		}
 
-		processedPaths.push_back(*absolutePath);
+		commandLineTabs.push_back({ .directory = *absolutePath });
 	}
 
-	if (processedPaths.empty())
+	for (const auto &fileToSelect : m_commandLineSettings->filesToSelect)
+	{
+		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(fileToSelect,
+			currentDirectory.value(), EnvVarsExpansion::DontExpand);
+
+		if (!absolutePath)
+		{
+			continue;
+		}
+
+		auto parseResult = m_shellNameParser->ParseDisplayName(*absolutePath);
+
+		if (!parseResult)
+		{
+			continue;
+		}
+
+		auto parentPidl = parseResult.value();
+		parentPidl.RemoveLastItem();
+
+		commandLineTabs.push_back({ .pidl = parentPidl, .itemsToSelect = { parseResult.value() } });
+	}
+
+	if (commandLineTabs.empty())
 	{
 		return;
 	}
 
-	// When a set of command-line directories is supplied:
+	// When one or more tabs are specified on the command line:
 	//
-	// - The directories will be added to the set of tabs, if the startup mode was set to
-	//   StartupMode::PreviousTabs.
-	// - The directories will replace the set of tabs otherwise.
+	// - The tabs are added to the restored tabs when using StartupMode::PreviousTabs.
+	// - The tabs replace the startup tabs otherwise.
 	if (m_config->startupMode != +StartupMode::PreviousTabs)
 	{
 		targetWindow.tabs.clear();
 		targetWindow.selectedTab = 0;
 	}
 
-	for (const auto &processedPath : processedPaths)
-	{
-		targetWindow.tabs.push_back({ .directory = processedPath });
-	}
+	targetWindow.tabs.insert(targetWindow.tabs.end(),
+		std::make_move_iterator(commandLineTabs.begin()),
+		std::make_move_iterator(commandLineTabs.end()));
 }
