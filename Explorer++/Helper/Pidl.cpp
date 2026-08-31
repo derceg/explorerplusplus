@@ -122,6 +122,7 @@ PidlAbsolute &PidlAbsolute::operator+=(PCITEMID_CHILD child)
 	// So, if the existing absolute pidl is null or the child is null, this CHECK will be triggered.
 	CHECK(m_pidl && child);
 	m_pidl.reset(ILCombine(m_pidl.get(), child));
+	UpdateDebugInfo();
 	return *this;
 }
 
