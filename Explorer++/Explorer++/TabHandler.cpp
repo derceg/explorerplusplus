@@ -132,12 +132,9 @@ void Explorerplusplus::OnNewTab()
 	GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory({ .selected = true });
 }
 
-void Explorerplusplus::CreateInitialTabs(const WindowStorageData *storageData)
+void Explorerplusplus::CreateInitialTabs(const WindowStorageData &storageData)
 {
-	if (storageData)
-	{
-		CreateTabsFromStorageData(*storageData);
-	}
+	CreateTabsFromStorageData(storageData);
 
 	if (GetActivePane()->GetTabContainer()->GetNumTabs() == 0)
 	{

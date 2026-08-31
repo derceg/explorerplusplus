@@ -10,12 +10,12 @@
 class BrowserWindowFactoryFake : public BrowserWindowFactory
 {
 public:
-	using CreationCallback = std::function<BrowserWindow *(const WindowStorageData *storageData)>;
+	using CreationCallback = std::function<BrowserWindow *(const WindowStorageData &storageData)>;
 
 	BrowserWindowFactoryFake(CreationCallback creationCallback);
 
 	// BrowserWindowFactory
-	BrowserWindow *CreateBrowserWindow(const WindowStorageData *storageData) override;
+	BrowserWindow *CreateBrowserWindow(const WindowStorageData &storageData) override;
 
 private:
 	CreationCallback m_creationCallback;

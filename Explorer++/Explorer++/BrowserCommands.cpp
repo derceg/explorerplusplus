@@ -22,7 +22,7 @@ void NewWindow(BrowserWindow *browser, BrowserWindowFactory *browserFactory,
 	constexpr int windowOffsetInPixels = 10;
 	OffsetRect(&initialData.bounds, windowOffsetInPixels, windowOffsetInPixels);
 
-	browserFactory->CreateBrowserWindow(&initialData);
+	browserFactory->CreateBrowserWindow(initialData);
 }
 
 }

@@ -24,10 +24,9 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 #include "ToolbarContextMenu.h"
-#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
-void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData *storageData)
+void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &storageData)
 {
 	m_mainRebarView = MainRebarView::Create(m_hwnd);
 
@@ -43,11 +42,11 @@ void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData *stora
 }
 
 std::vector<RebarView::Band> Explorerplusplus::InitializeMainRebarBands(
-	const WindowStorageData *storageData)
+	const WindowStorageData &storageData)
 {
 	std::vector<RebarView::Band> mainRebarBands;
 
-	CreateMainToolbar(storageData ? storageData->mainToolbarButtons : std::nullopt);
+	CreateMainToolbar(storageData.mainToolbarButtons);
 	auto band = InitializeToolbarBand(REBAR_BAND_ID_MAIN_TOOLBAR, m_mainToolbar->GetHWND(),
 		m_config->showMainToolbar.get());
 	mainRebarBands.push_back(band);
@@ -87,10 +86,7 @@ std::vector<RebarView::Band> Explorerplusplus::InitializeMainRebarBands(
 	m_rebarConnections.push_back(m_config->showApplicationToolbar.addObserver(std::bind_front(
 		&RebarView::ShowBand, m_mainRebarView, m_applicationToolbar->GetView()->GetHWND())));
 
-	if (storageData)
-	{
-		UpdateMainRebarBandsFromLoadedInfo(mainRebarBands, storageData->mainRebarInfo);
-	}
+	UpdateMainRebarBandsFromLoadedInfo(mainRebarBands, storageData.mainRebarInfo);
 
 	return mainRebarBands;
 }

@@ -43,7 +43,7 @@ void SessionRestorer::Restore(const std::vector<WindowStorageData> &sessionWindo
 
 	for (const auto &windowToRestore : windowsToRestore | std::views::take(maxWindowsToRestore))
 	{
-		m_browserWindowFactory->CreateBrowserWindow(&windowToRestore);
+		m_browserWindowFactory->CreateBrowserWindow(windowToRestore);
 	}
 }
 

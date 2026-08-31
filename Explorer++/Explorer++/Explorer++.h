@@ -76,8 +76,8 @@ class Explorerplusplus : public BrowserWindow, public CoreInterface
 public:
 	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
 
-	static Explorerplusplus *Create(AppServices *appServices, HINSTANCE resourceInstance,
-		const WindowStorageData *storageData = nullptr);
+	static Explorerplusplus *Create(const WindowStorageData &storageData, AppServices *appServices,
+		HINSTANCE resourceInstance);
 
 	// BrowserWindow
 	HWND GetHWND() const override;
@@ -165,11 +165,11 @@ private:
 		std::unique_ptr<MenuBase> menu;
 	};
 
-	Explorerplusplus(AppServices *appServices, HINSTANCE resourceInstance,
-		const WindowStorageData *storageData);
+	Explorerplusplus(const WindowStorageData &storageData, AppServices *appServices,
+		HINSTANCE resourceInstance);
 	~Explorerplusplus();
 
-	static HWND CreateMainWindow(const WindowStorageData *storageData);
+	static HWND CreateMainWindow(const WindowStorageData &storageData);
 	static ATOM RegisterMainWindowClass(HINSTANCE instance);
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -181,7 +181,7 @@ private:
 	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void Initialize(const WindowStorageData *storageData);
+	void Initialize(const WindowStorageData &storageData);
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
@@ -229,15 +229,15 @@ private:
 		Runtime *runtime);
 	void ShowTabBar();
 	void HideTabBar();
-	void CreateInitialTabs(const WindowStorageData *storageData);
+	void CreateInitialTabs(const WindowStorageData &storageData);
 	void CreateTabsFromStorageData(const WindowStorageData &storageData);
 	void OnTabListViewSelectionChanged(const ShellBrowser *shellBrowser);
 
 	void OnNavigationCommitted(const NavigationRequest *request);
 
 	// Main rebar
-	void CreateMainRebarAndChildren(const WindowStorageData *storageData);
-	std::vector<RebarView::Band> InitializeMainRebarBands(const WindowStorageData *storageData);
+	void CreateMainRebarAndChildren(const WindowStorageData &storageData);
+	std::vector<RebarView::Band> InitializeMainRebarBands(const WindowStorageData &storageData);
 	RebarView::Band InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
 	RebarView::Band InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
 	void UpdateMainRebarBandsFromLoadedInfo(std::vector<RebarView::Band> &mainRebarBands,

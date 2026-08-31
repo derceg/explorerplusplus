@@ -10,7 +10,7 @@ BrowserWindowFactoryFake::BrowserWindowFactoryFake(CreationCallback creationCall
 {
 }
 
-BrowserWindow *BrowserWindowFactoryFake::CreateBrowserWindow(const WindowStorageData *storageData)
+BrowserWindow *BrowserWindowFactoryFake::CreateBrowserWindow(const WindowStorageData &storageData)
 {
 	return m_creationCallback(storageData);
 }

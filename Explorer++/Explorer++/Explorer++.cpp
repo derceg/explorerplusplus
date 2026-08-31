@@ -33,14 +33,14 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
-Explorerplusplus *Explorerplusplus::Create(AppServices *appServices, HINSTANCE resourceInstance,
-	const WindowStorageData *storageData)
+Explorerplusplus *Explorerplusplus::Create(const WindowStorageData &storageData,
+	AppServices *appServices, HINSTANCE resourceInstance)
 {
-	return new Explorerplusplus(appServices, resourceInstance, storageData);
+	return new Explorerplusplus(storageData, appServices, resourceInstance);
 }
 
-Explorerplusplus::Explorerplusplus(AppServices *appServices, HINSTANCE resourceInstance,
-	const WindowStorageData *storageData) :
+Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServices *appServices,
+	HINSTANCE resourceInstance) :
 	m_appServices(appServices),
 	m_resourceInstance(resourceInstance),
 	m_platformContext(appServices->GetPlatformContext()),
@@ -67,12 +67,9 @@ Explorerplusplus::Explorerplusplus(AppServices *appServices, HINSTANCE resourceI
 
 	m_iDWFolderSizeUniqueId = 0;
 
-	if (storageData)
-	{
-		m_treeViewWidth = storageData->treeViewWidth;
-		m_displayWindowWidth = storageData->displayWindowWidth;
-		m_displayWindowHeight = storageData->displayWindowHeight;
-	}
+	m_treeViewWidth = storageData.treeViewWidth;
+	m_displayWindowWidth = storageData.displayWindowWidth;
+	m_displayWindowHeight = storageData.displayWindowHeight;
 
 	SetUpLayoutConfigListeners();
 
@@ -81,7 +78,7 @@ Explorerplusplus::Explorerplusplus(AppServices *appServices, HINSTANCE resourceI
 
 	Initialize(storageData);
 
-	WindowShowState showState = storageData ? storageData->showState : +WindowShowState::Normal;
+	WindowShowState showState = storageData.showState;
 
 	if (showState == +WindowShowState::Minimized)
 	{
@@ -96,7 +93,7 @@ Explorerplusplus::Explorerplusplus(AppServices *appServices, HINSTANCE resourceI
 
 Explorerplusplus::~Explorerplusplus() = default;
 
-HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
+HWND Explorerplusplus::CreateMainWindow(const WindowStorageData &storageData)
 {
 	static bool mainWindowClassRegistered = false;
 
@@ -119,8 +116,7 @@ HWND Explorerplusplus::CreateMainWindow(const WindowStorageData *storageData)
 	CHECK(res);
 
 	placement.showCmd = SW_HIDE;
-	placement.rcNormalPosition =
-		storageData ? storageData->bounds : LayoutDefaults::GetDefaultMainWindowBounds();
+	placement.rcNormalPosition = storageData.bounds;
 	res = SetWindowPlacement(hwnd, &placement);
 	CHECK(res);
 
@@ -159,7 +155,7 @@ void Explorerplusplus::SetUpLayoutConfigListeners()
 		std::bind(&Explorerplusplus::UpdateLayout, this)));
 }
 
-void Explorerplusplus::Initialize(const WindowStorageData *storageData)
+void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 {
 	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this,
 		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID },

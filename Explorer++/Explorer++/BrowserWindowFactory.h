@@ -12,5 +12,5 @@ class BrowserWindowFactory
 public:
 	virtual ~BrowserWindowFactory() = default;
 
-	virtual BrowserWindow *CreateBrowserWindow(const WindowStorageData *storageData) = 0;
+	virtual BrowserWindow *CreateBrowserWindow(const WindowStorageData &storageData) = 0;
 };

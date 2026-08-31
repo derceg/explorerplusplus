@@ -13,7 +13,7 @@ class BrowserWindowFactoryImpl : public BrowserWindowFactory
 public:
 	BrowserWindowFactoryImpl(AppServices *appServices, HINSTANCE resourceInstance);
 
-	BrowserWindow *CreateBrowserWindow(const WindowStorageData *storageData) override;
+	BrowserWindow *CreateBrowserWindow(const WindowStorageData &storageData) override;
 
 private:
 	AppServices *const m_appServices;

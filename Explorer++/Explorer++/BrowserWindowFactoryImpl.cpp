@@ -13,7 +13,7 @@ BrowserWindowFactoryImpl::BrowserWindowFactoryImpl(AppServices *appServices,
 {
 }
 
-BrowserWindow *BrowserWindowFactoryImpl::CreateBrowserWindow(const WindowStorageData *storageData)
+BrowserWindow *BrowserWindowFactoryImpl::CreateBrowserWindow(const WindowStorageData &storageData)
 {
-	return Explorerplusplus::Create(m_appServices, m_resourceInstance, storageData);
+	return Explorerplusplus::Create(storageData, m_appServices, m_resourceInstance);
 }

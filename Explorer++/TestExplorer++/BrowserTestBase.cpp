@@ -22,8 +22,8 @@ BrowserTestBase::BrowserTestBase() :
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(m_platformContext.GetSystemClock()),
 	m_frequentLocationsTracker(&m_frequentLocationsModel, &m_navigationEvents),
-	m_browserWindowFactory([this](const WindowStorageData *storageData)
-		{ return AddBrowser(storageData ? *storageData : WindowStorageData{}); }),
+	m_browserWindowFactory(
+		[this](const WindowStorageData &storageData) { return AddBrowser(storageData); }),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
 	m_driveModel(std::make_unique<DriveEnumeratorFake>(), &m_driveWatcher),
 	m_pluginMenuManager(&m_browserList, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
