@@ -5,7 +5,8 @@
 #pragma once
 
 #include <windows.h>
+#include <string>
 
-DWORD GetProcessImageName(DWORD dwProcessId, TCHAR *szImageName, DWORD nSize);
+std::wstring GetCurrentProcessPath();
 BOOL GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax);
 bool IsProcessElevated();

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SetDefaultFileManager.h"
-#include "Helper.h"
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
 #include <wil/resource.h>
@@ -113,11 +112,10 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 		return res;
 	}
 
-	TCHAR command[512];
-	TCHAR executable[MAX_PATH];
+	auto processPath = GetCurrentProcessPath();
 
-	GetProcessImageName(GetCurrentProcessId(), executable, std::size(executable));
-	StringCchPrintf(command, std::size(command), _T("\"%s\" \"%%1\""), executable);
+	TCHAR command[512];
+	StringCchPrintf(command, std::size(command), _T("\"%s\" \"%%1\""), processPath.c_str());
 
 	res = RegistrySettings::SaveString(commandKey.get(), L"", command);
 

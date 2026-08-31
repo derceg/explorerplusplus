@@ -14,6 +14,7 @@
 #include "DriveEnumeratorImpl.h"
 #include "ExitCode.h"
 #include "FileSystemWatcher.h"
+#include "JumpListHelper.h"
 #include "LanguageHelper.h"
 #include "MainRebarStorage.h"
 #include "MainResource.h"
@@ -147,6 +148,7 @@ void App::SetUpSession()
 
 	SetUpLanguageResourceInstance();
 	SetUpAppServices();
+	SetupJumpListTasks(m_resourceLoader.get());
 	InitializePlugins();
 
 	SessionRestorer sessionRestorer(m_commandLineSettings, &m_config, &m_featureList,
@@ -314,14 +316,11 @@ void App::InitializePlugins()
 		return;
 	}
 
-	TCHAR processImageName[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), processImageName, std::size(processImageName));
+	std::filesystem::path pluginsPath(GetCurrentProcessPath());
+	pluginsPath.remove_filename();
+	pluginsPath.append(PLUGIN_FOLDER_NAME);
 
-	std::filesystem::path processDirectoryPath(processImageName);
-	processDirectoryPath.remove_filename();
-	processDirectoryPath.append(PLUGIN_FOLDER_NAME);
-
-	m_pluginManager.LoadAllPlugins(processDirectoryPath);
+	m_pluginManager.LoadAllPlugins(pluginsPath);
 }
 
 bool App::IsModelessDialogMessage(MSG *msg)

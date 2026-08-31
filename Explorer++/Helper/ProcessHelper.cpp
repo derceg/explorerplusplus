@@ -6,21 +6,14 @@
 #include "ProcessHelper.h"
 #include "Helper.h"
 #include <wil/resource.h>
-#include <Psapi.h>
+#include <wil/win32_helpers.h>
 
-DWORD GetProcessImageName(DWORD dwProcessId, TCHAR *szImageName, DWORD nSize)
+std::wstring GetCurrentProcessPath()
 {
-	DWORD dwRet = 0;
-
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
-
-	if (hProcess != nullptr)
-	{
-		dwRet = GetModuleFileNameEx(hProcess, nullptr, szImageName, nSize);
-		CloseHandle(hProcess);
-	}
-
-	return dwRet;
+	wil::unique_cotaskmem_string processPath;
+	HRESULT hr = wil::GetModuleFileNameW(nullptr, processPath);
+	CHECK(SUCCEEDED(hr));
+	return processPath.get();
 }
 
 BOOL GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax)

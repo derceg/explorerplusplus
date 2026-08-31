@@ -41,7 +41,6 @@ private:
 	void Initialize();
 	void OnTaskbarButtonCreated();
 	void SetUpObservers();
-	void SetupJumplistTasks();
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
 	void CreateTabProxy(const Tab &tab);
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName);

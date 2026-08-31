@@ -17,10 +17,7 @@ constexpr wchar_t RESOURCES_DIRECTORY_NAME[] = L"Resources";
 
 std::filesystem::path GetResourcesDirectoryPath()
 {
-	wchar_t processImageName[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), processImageName, std::size(processImageName));
-
-	std::filesystem::path path(processImageName);
+	std::filesystem::path path(GetCurrentProcessPath());
 	return path.parent_path() / RESOURCES_DIRECTORY_NAME;
 }
 

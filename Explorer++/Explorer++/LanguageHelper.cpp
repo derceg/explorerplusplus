@@ -222,12 +222,11 @@ std::optional<std::wstring> GetCodeForLanguage(LANGID language)
 
 bool VerifyLanguageVersion(const std::wstring &languageDllPath)
 {
-	wchar_t currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
+	auto processPath = GetCurrentProcessPath();
 
 	DWORD processVersionLs;
 	DWORD processVersionMs;
-	auto res = GetFileProductVersion(currentProcessPath, &processVersionLs, &processVersionMs);
+	auto res = GetFileProductVersion(processPath.c_str(), &processVersionLs, &processVersionMs);
 
 	if (!res)
 	{
@@ -275,10 +274,7 @@ std::variant<LanguageInfo, LoadError> MaybeLoadTranslationDll(
 		return LoadError::LanguageCodeNotFound;
 	}
 
-	wchar_t currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
-
-	std::filesystem::path languageDllPath(currentProcessPath);
+	std::filesystem::path languageDllPath(GetCurrentProcessPath());
 	languageDllPath.replace_filename(std::format(L"Explorer++{}.dll", *languageCode));
 
 	WORD loadedLanguage;

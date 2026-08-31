@@ -108,8 +108,6 @@ void TaskbarThumbnails::OnTaskbarButtonCreated()
 		return;
 	}
 
-	SetupJumplistTasks();
-
 	for (const auto *tab : m_tabContainer->GetAllTabsInOrder())
 	{
 		CreateTabProxy(*tab);
@@ -143,27 +141,6 @@ void TaskbarThumbnails::SetUpObservers()
 	m_connections.push_back(m_appServices->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this),
 		NavigationEventScope::ForBrowser(*m_browser)));
-}
-
-void TaskbarThumbnails::SetupJumplistTasks()
-{
-	TCHAR szCurrentProcess[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, std::size(szCurrentProcess));
-
-	std::wstring name = m_appServices->GetResourceLoader()->LoadString(IDS_TASKS_NEWTAB);
-
-	/* New tab task. */
-	JumpListTaskInformation jlti;
-	jlti.pszName = name.c_str();
-	jlti.pszPath = szCurrentProcess;
-	jlti.pszArguments = CommandLine::JUMPLIST_TASK_NEWTAB_ARGUMENT;
-	jlti.pszIconPath = szCurrentProcess;
-	jlti.iIcon = 1;
-
-	std::list<JumpListTaskInformation> taskList;
-	taskList.push_back(jlti);
-
-	AddJumpListTasks(taskList);
 }
 
 ATOM TaskbarThumbnails::RegisterTabProxyClass(const TCHAR *szClassName)

@@ -51,8 +51,7 @@ void InitializeCrashHandler()
 
 LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 {
-	TCHAR currentProcess[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcess, std::size(currentProcess));
+	auto processPath = GetCurrentProcessPath();
 
 	// Event names are global in the system. Therefore, the event name used for signaling should be
 	// unique.
@@ -71,13 +70,13 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 	crashedData.exceptionPointersAddress = std::bit_cast<intptr_t>(exception);
 	crashedData.eventName = eventName;
 
-	std::wstring arguments = std::format(L"\"{}\" {} {}", currentProcess,
+	std::wstring arguments = std::format(L"\"{}\" {} {}", processPath,
 		CommandLine::APPLICATION_CRASHED_ARGUMENT, FormatCrashedDataForCommandLine(crashedData));
 
 	STARTUPINFO startupInfo = {};
 	startupInfo.cb = sizeof(startupInfo);
 	wil::unique_process_information processInformation;
-	res = CreateProcess(currentProcess, arguments.data(), nullptr, nullptr, false,
+	res = CreateProcess(processPath.c_str(), arguments.data(), nullptr, nullptr, false,
 		NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInformation);
 
 	if (!res)

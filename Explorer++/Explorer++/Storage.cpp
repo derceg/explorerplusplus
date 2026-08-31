@@ -14,18 +14,16 @@ namespace Storage
 std::wstring GetConfigFilePath()
 {
 	auto configPath = GetExpandedEnvironmentVariable(CONFIG_FILE_ENV_VAR_NAME);
+
 	if (configPath)
 	{
-		return configPath->c_str();
+		return *configPath;
 	}
 
-	wchar_t currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
-
-	std::filesystem::path configFilePath(currentProcessPath);
+	std::filesystem::path configFilePath(GetCurrentProcessPath());
 	configFilePath.replace_filename(CONFIG_FILE_FILENAME);
 
-	return configFilePath.c_str();
+	return configFilePath.wstring();
 }
 
 }

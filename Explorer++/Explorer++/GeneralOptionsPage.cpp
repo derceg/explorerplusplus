@@ -128,7 +128,6 @@ void GeneralOptionsPage::AddLanguages()
 	HWND hLanguageComboBox;
 	WIN32_FIND_DATA wfd;
 	HANDLE hFindFile;
-	TCHAR szImageDirectory[MAX_PATH];
 	TCHAR szNamePattern[MAX_PATH];
 	WORD wLanguage;
 	int iIndex = 1;
@@ -140,7 +139,10 @@ void GeneralOptionsPage::AddLanguages()
 	always be the first item. */
 	SendMessage(hLanguageComboBox, CB_ADDSTRING, 0, (LPARAM) _T("English"));
 
-	GetProcessImageName(GetCurrentProcessId(), szImageDirectory, std::size(szImageDirectory));
+	auto processPath = GetCurrentProcessPath();
+
+	TCHAR szImageDirectory[MAX_PATH];
+	StringCchCopy(szImageDirectory, std::size(szImageDirectory), processPath.c_str());
 	PathRemoveFileSpec(szImageDirectory);
 	StringCchCopy(szNamePattern, std::size(szNamePattern), szImageDirectory);
 	PathAppend(szNamePattern, L"Explorer++*.dll");

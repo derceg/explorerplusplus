@@ -1216,6 +1216,7 @@
     <ClCompile Include="DirectoryWatcherFactoryImpl.cpp" />
     <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="JumpListHelper.cpp" />
     <ClCompile Include="ListView.cpp" />
     <ClCompile Include="ListViewColumnsMenu.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
@@ -1579,6 +1580,7 @@
     <ClInclude Include="IconUpdateCallback.h" />
     <ClInclude Include="InsertMarkPosition.h" />
     <ClInclude Include="ItemStateOp.h" />
+    <ClInclude Include="JumpListHelper.h" />
     <ClInclude Include="ListView.h" />
     <ClInclude Include="ListViewColumn.h" />
     <ClInclude Include="ListViewColumnsMenu.h" />

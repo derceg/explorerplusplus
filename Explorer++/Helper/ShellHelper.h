@@ -9,7 +9,6 @@
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
 #include <shellapi.h>
-#include <list>
 #include <optional>
 #include <string>
 #include <vector>
@@ -50,15 +49,6 @@ enum class LaunchProcessFlags
 
 DEFINE_ENUM_FLAG_OPERATORS(LaunchProcessFlags);
 
-struct JumpListTaskInformation
-{
-	const TCHAR *pszName;
-	const TCHAR *pszPath;
-	const TCHAR *pszArguments;
-	const TCHAR *pszIconPath;
-	int iIcon;
-};
-
 struct ContextMenuHandler
 {
 	HMODULE hDLL;
@@ -94,7 +84,6 @@ std::wstring GetFolderPathForDisplayWithFallback(PCIDLIST_ABSOLUTE pidl);
 std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 bool IsPathGUID(const std::wstring &path);
 BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
-HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList);
 bool DoesItemHaveAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF attributes);
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes);

@@ -6,19 +6,15 @@
 #include "ShellHelper.h"
 #include "Helper.h"
 #include "ProcessHelper.h"
-#include "RegistrySettings.h"
 #include "StringHelper.h"
 #include "WinRTBaseWrapper.h"
 #include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <glog/logging.h>
 #include <wil/com.h>
-#include <propkey.h>
 #include <propvarutil.h>
 #include <wininet.h>
-#include <filesystem>
 
 namespace
 {
@@ -43,11 +39,6 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
 	EnvVarsExpansion envVarsExpansionType);
 bool ShouldNormalizePath(const std::wstring &path);
-
-bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
-	const std::list<JumpListTaskInformation> &taskList);
-HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
-	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex);
 
 HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrievalType retrievalType,
 	unique_pidl_absolute &targetPidl);
@@ -185,9 +176,7 @@ HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes)
 
 BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters, LaunchProcessFlags flags)
 {
-	TCHAR currentProcessPath[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcessPath, std::size(currentProcessPath));
-	return LaunchProcess(hwnd, currentProcessPath, parameters, L"", flags);
+	return LaunchProcess(hwnd, GetCurrentProcessPath(), parameters, L"", flags);
 }
 
 BOOL LaunchProcess(HWND hwnd, const std::wstring &path, const std::wstring &parameters,
@@ -1001,127 +990,6 @@ BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 	}
 
 	return ret;
-}
-
-HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
-{
-	wil::com_ptr_nothrow<ICustomDestinationList> customDestinationList;
-	HRESULT hr = CoCreateInstance(CLSID_DestinationList, nullptr, CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&customDestinationList));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	wil::com_ptr_nothrow<IObjectArray> removedItems;
-	UINT minSlots;
-	hr = customDestinationList->BeginList(&minSlots, IID_PPV_ARGS(&removedItems));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	wil::com_ptr_nothrow<IObjectCollection> objectCollection;
-	hr = CoCreateInstance(CLSID_EnumerableObjectCollection, nullptr, CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&objectCollection));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	AddJumpListTasksInternal(objectCollection.get(), taskList);
-
-	wil::com_ptr_nothrow<IObjectArray> items;
-	hr = objectCollection->QueryInterface(IID_PPV_ARGS(&items));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	hr = customDestinationList->AddUserTasks(items.get());
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	hr = customDestinationList->CommitList();
-
-	return hr;
-}
-
-bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
-	const std::list<JumpListTaskInformation> &taskList)
-{
-	bool allSucceeded = true;
-
-	for (const auto &jtli : taskList)
-	{
-		HRESULT hr = AddJumpListTaskInternal(objectCollection, jtli.pszName, jtli.pszPath,
-			jtli.pszArguments, jtli.pszIconPath, jtli.iIcon);
-
-		if (FAILED(hr))
-		{
-			allSucceeded = false;
-		}
-	}
-
-	return allSucceeded;
-}
-
-HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
-	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex)
-{
-	wil::com_ptr_nothrow<IShellLink> shellLink;
-	HRESULT hr =
-		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	shellLink->SetPath(path);
-	shellLink->SetArguments(arguments);
-	shellLink->SetIconLocation(iconPath, iconIndex);
-
-	wil::com_ptr_nothrow<IPropertyStore> propertyStore;
-	hr = shellLink->QueryInterface(IID_PPV_ARGS(&propertyStore));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	wil::unique_prop_variant titleProperty;
-	hr = InitPropVariantFromString(name, &titleProperty);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	hr = propertyStore->SetValue(PKEY_Title, titleProperty);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	hr = propertyStore->Commit();
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	hr = objectCollection->AddObject(shellLink.get());
-
-	return hr;
 }
 
 HRESULT GetItemInfoTip(const std::wstring &itemPath, std::wstring &outputInfoTip)

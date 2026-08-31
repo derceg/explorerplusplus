@@ -931,6 +931,9 @@
     <ClCompile Include="ShellNameParserImpl.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="JumpListHelper.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2023,6 +2026,9 @@
       <Filter>Shell</Filter>
     </ClInclude>
     <ClInclude Include="ShellNameParserImpl.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="JumpListHelper.h">
       <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>
