@@ -15,13 +15,12 @@ class AppServices;
 class BrowserWindow;
 class NavigationRequest;
 class ShellBrowser;
-class TabContainer;
 class WindowSubclass;
 
 class TaskbarThumbnails : private boost::noncopyable
 {
 public:
-	TaskbarThumbnails(BrowserWindow *browser, TabContainer *tabContainer, AppServices *appServices);
+	TaskbarThumbnails(BrowserWindow *browser, AppServices *appServices);
 	~TaskbarThumbnails();
 
 private:
@@ -40,6 +39,8 @@ private:
 
 	void Initialize();
 	void OnTaskbarButtonCreated();
+	void OnShowThumbnailsChanged(bool showTaskbarThumbnails);
+	void SetUpThumbnails();
 	void SetUpObservers();
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
 	void CreateTabProxy(const Tab &tab);
@@ -55,15 +56,17 @@ private:
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
 	void UpdateTaskbarThumbnailTitle(const Tab &tab);
+	void TearDownThumbnails();
 
 	BrowserWindow *const m_browser;
-	TabContainer *const m_tabContainer;
 	AppServices *const m_appServices;
+	std::vector<boost::signals2::scoped_connection> m_eventConnections;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::unique_ptr<WindowSubclass> m_mainWindowSubclass;
 
 	wil::com_ptr_nothrow<ITaskbarList4> m_taskbarList;
-	std::list<TabProxyInfo> m_TabProxyList;
-	UINT m_uTaskbarButtonCreatedMessage;
-	BOOL m_enabled;
+	std::list<TabProxyInfo> m_tabProxyList;
+	UINT m_taskbarButtonCreatedMessage;
+	bool m_taskbarButtonCreated = false;
+	bool m_thumbnailsSetUp = false;
 };

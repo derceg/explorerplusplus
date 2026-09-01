@@ -33,7 +33,7 @@ std::unique_ptr<ResizableDialogHelper> TabsOptionsPage::InitializeResizeDialogHe
 
 void TabsOptionsPage::InitializeControls()
 {
-	if (m_config->showTaskbarThumbnails)
+	if (m_config->showTaskbarThumbnails.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_TABS_TASKBARTHUMBNAILS, BST_CHECKED);
 	}

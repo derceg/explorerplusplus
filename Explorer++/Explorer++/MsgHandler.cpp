@@ -505,15 +505,6 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 	return std::nullopt;
 }
 
-int Explorerplusplus::OnDestroy()
-{
-	// This class depends on the TabContainer instance and needs to be destroyed before the
-	// TabContainer instance is destroyed.
-	m_taskbarThumbnails.reset();
-
-	return 0;
-}
-
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical.get())

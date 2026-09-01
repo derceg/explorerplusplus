@@ -213,9 +213,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		return 0;
 
-	case WM_DESTROY:
-		return OnDestroy();
-
 	case WM_NCDESTROY:
 		delete this;
 		return 0;

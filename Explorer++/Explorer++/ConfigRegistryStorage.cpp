@@ -322,7 +322,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"HideLinkExtensionGlobal",
 		config.globalFolderSettings.hideLinkExtension);
 	RegistrySettings::SaveDword(settingsKey, L"ShowTaskbarThumbnails",
-		config.showTaskbarThumbnails);
+		config.showTaskbarThumbnails.get());
 	RegistrySettings::SaveDword(settingsKey, L"SynchronizeTreeview",
 		config.synchronizeTreeview.get());
 	RegistrySettings::SaveDword(settingsKey, L"TVAutoExpandSelected",

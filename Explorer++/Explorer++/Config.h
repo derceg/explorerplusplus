@@ -50,7 +50,7 @@ struct Config
 	bool openNewTabNextToCurrent = false;
 	bool treeViewDelayEnabled = false;
 	bool treeViewAutoExpandSelected = false;
-	bool showTaskbarThumbnails = false;
+	ValueWrapper<bool> showTaskbarThumbnails = false;
 	ValueWrapper<bool> useFullRowSelect = false;
 	bool showFilePreviews = true;
 	bool allowMultipleInstances = true;

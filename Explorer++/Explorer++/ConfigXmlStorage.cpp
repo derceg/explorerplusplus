@@ -429,7 +429,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"ShowTabBarAtBottom", XMLSettings::EncodeBoolValue(config.showTabBarAtBottom.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"ShowTaskbarThumbnails", XMLSettings::EncodeBoolValue(config.showTaskbarThumbnails));
+		L"ShowTaskbarThumbnails", XMLSettings::EncodeBoolValue(config.showTaskbarThumbnails.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"ShowToolbar",
 		XMLSettings::EncodeBoolValue(config.showMainToolbar.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
