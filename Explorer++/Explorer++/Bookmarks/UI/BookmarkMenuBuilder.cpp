@@ -210,7 +210,7 @@ void BookmarkMenuBuilder::AddIconToMenuItem(HMENU menu, int position,
 	}
 
 	wil::unique_hbitmap bitmap;
-	ImageHelper::ImageListIconToPBGRABitmap(imageList.get(), iconIndex, bitmap);
+	ImageHelper::CreateHBITMAPFromImageListIcon(imageList.get(), iconIndex, bitmap);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);

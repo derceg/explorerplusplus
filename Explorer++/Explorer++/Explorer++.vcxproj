@@ -1513,7 +1513,7 @@
     <ClCompile Include="TabRestorerMenu.cpp" />
     <ClCompile Include="Plugins\TabsApi\TabsApi.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
-    <ClCompile Include="TaskbarThumbnails.cpp" />
+    <ClCompile Include="TaskbarTabManager.cpp" />
     <ClCompile Include="ThirdPartyCreditsDialog.cpp" />
     <ClCompile Include="UpdateCheckDialog.cpp" />
     <ClCompile Include="ApplicationToolbar.cpp" />
@@ -1877,7 +1877,7 @@
     <ClInclude Include="TabRestorerMenu.h" />
     <ClInclude Include="Plugins\TabsApi\TabsApi.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
-    <ClInclude Include="TaskbarThumbnails.h" />
+    <ClInclude Include="TaskbarTabManager.h" />
     <ClInclude Include="ThirdPartyCreditsDialog.h" />
     <ClInclude Include="MainToolbarButtons.h" />
     <ClInclude Include="UpdateCheckDialog.h" />

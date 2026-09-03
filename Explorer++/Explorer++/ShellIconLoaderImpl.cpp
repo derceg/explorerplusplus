@@ -37,8 +37,8 @@ void ShellIconLoaderImpl::QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl,
 			UNREFERENCED_PARAMETER(overlayIndex);
 
 			wil::unique_hbitmap bitmap;
-			HRESULT hr =
-				ImageHelper::ImageListIconToPBGRABitmap(systemImageList.get(), iconIndex, bitmap);
+			HRESULT hr = ImageHelper::CreateHBITMAPFromImageListIcon(systemImageList.get(),
+				iconIndex, bitmap);
 
 			if (FAILED(hr))
 			{
@@ -81,7 +81,7 @@ wil::unique_hbitmap ShellIconLoaderImpl::GetDefaultIcon(PCIDLIST_ABSOLUTE pidl)
 	int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(itemPath, defaultIconType);
 
 	wil::unique_hbitmap bitmap;
-	hr = ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), iconIndex, bitmap);
+	hr = ImageHelper::CreateHBITMAPFromImageListIcon(m_systemImageList.get(), iconIndex, bitmap);
 
 	if (FAILED(hr))
 	{

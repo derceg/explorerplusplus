@@ -8,21 +8,15 @@
 #include <CommCtrl.h>
 #include <commoncontrols.h>
 #include <gdiplus.h>
-#include <wincodec.h>
 #include <memory>
 
 namespace ImageHelper
 {
 
-HRESULT ImageListIconToPBGRABitmap(IImageList *imageList, int iconIndex,
-	wil::unique_hbitmap &outputBitmap);
-HRESULT ConvertIconToBitmap(HICON icon, WICPixelFormatGUID destPixelFormat,
-	wil::unique_hbitmap &outputBitmap);
-HRESULT WicBitmapToBitmap(IWICImagingFactory *imagingFactory, IWICBitmapSource *wicBitmapSource,
-	wil::unique_hbitmap &outputBitmap);
-
 std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
 	UINT resourceId);
+HRESULT CreateHBITMAPFromImageListIcon(IImageList *imageList, int iconIndex,
+	wil::unique_hbitmap &outputBitmap);
 int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex);
 
 wil::unique_hbitmap GdiplusBitmapToBitmap(Gdiplus::Bitmap *gdiplusBitmap);

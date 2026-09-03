@@ -25,7 +25,6 @@
 #include "StatusBarView.h"
 #include "TabRestorer.h"
 #include "TabStorage.h"
-#include "TaskbarThumbnails.h"
 #include "ThemeWindowTracker.h"
 #include "WindowStorage.h"
 #include "../Helper/WindowHelper.h"
@@ -43,6 +42,7 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 	HINSTANCE resourceInstance) :
 	m_appServices(appServices),
 	m_resourceInstance(resourceInstance),
+	m_config(appServices->GetConfig()),
 	m_platformContext(appServices->GetPlatformContext()),
 	m_acceleratorManager(appServices->GetAcceleratorManager()),
 	m_featureList(appServices->GetFeatureList()),
@@ -55,7 +55,8 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 	m_commandController(this, appServices),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_shellBrowserFactory(this, appServices, resourceInstance, &m_fileActionHandler),
-	m_config(appServices->GetConfig()),
+	m_taskbarTabManager(this, m_appServices,
+		[]() { return wil::CoCreateInstanceNoThrow<ITaskbarList4>(CLSID_TaskbarList); }),
 	m_iconFetcher(m_hwnd, appServices->GetCachedIcons()),
 	m_shellIconLoader(&m_iconFetcher),
 	m_applicationExecutor(this)
@@ -184,8 +185,6 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 	Therefore, the listview MUST be set to the correct
 	size initially. */
 	UpdateLayout();
-
-	m_taskbarThumbnails = std::make_unique<TaskbarThumbnails>(this, m_appServices);
 
 	CreateInitialTabs(storageData);
 

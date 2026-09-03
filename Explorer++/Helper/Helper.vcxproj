@@ -345,7 +345,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Lib>
@@ -377,7 +377,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Lib>
@@ -405,7 +405,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <TargetMachine>MachineX86</TargetMachine>
@@ -442,7 +442,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Lib>
@@ -478,7 +478,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Lib>
@@ -512,7 +512,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Lib>
@@ -546,7 +546,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Lib>
@@ -578,7 +578,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <TargetMachine>MachineX64</TargetMachine>
@@ -609,7 +609,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalOptions>/IGNORE:4006 /IGNORE:4221 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <TargetMachine>MachineARM64</TargetMachine>
@@ -637,7 +637,7 @@
       <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|Win32'">
@@ -662,7 +662,7 @@
       <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -690,7 +690,7 @@
       <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|x64'">
@@ -718,7 +718,7 @@
       <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -744,7 +744,7 @@
       <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Clang|ARM64'">
@@ -770,7 +770,7 @@
       <AdditionalOptions>/w44464 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;iphlpapi.lib;userenv.lib;wmvcore.lib;rpcrt4.lib;gdiplus.lib;shlwapi.lib;comctl32.lib;uxtheme.lib;d2d1.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -785,6 +785,7 @@
     <ClCompile Include="ComboBoxHelper.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Controls.cpp" />
+    <ClCompile Include="D2DHelper.cpp" />
     <ClCompile Include="DataExchangeHelper.cpp" />
     <ClCompile Include="DataObjectWrapper.cpp" />
     <ClCompile Include="DetoursHelper.cpp" />
@@ -796,6 +797,9 @@
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileDialogs.cpp" />
+    <ClCompile Include="GraphicsFactories.cpp" />
+    <ClCompile Include="ImageInterop.cpp" />
+    <ClCompile Include="ImageOperations.cpp" />
     <ClCompile Include="KeyboardStateImpl.cpp" />
     <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="PidlHelper.cpp" />
@@ -893,8 +897,12 @@
     <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Controls.h" />
+    <ClInclude Include="D2DHelper.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
+    <ClInclude Include="GraphicsFactories.h" />
+    <ClInclude Include="ImageInterop.h" />
+    <ClInclude Include="ImageOperations.h" />
     <ClInclude Include="PassKey.h" />
     <ClInclude Include="PidlHelper.h" />
     <ClInclude Include="RemoveMode.h" />

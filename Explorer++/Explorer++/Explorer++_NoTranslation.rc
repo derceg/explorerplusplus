@@ -20,7 +20,6 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 #pragma code_page(1252)
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -31,14 +30,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 IDI_MAIN                ICON                    "res\\Explorer++.ico"
 
 IDI_DISPLAYWINDOW       ICON                    "res\\Display Window.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_NOPREVIEWAVAILABLE  BITMAP                  "res\\No Preview Available.bmp"
 
 
 #ifdef APSTUDIO_INVOKED

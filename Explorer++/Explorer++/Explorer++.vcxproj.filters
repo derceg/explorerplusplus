@@ -67,9 +67,6 @@
     <ClCompile Include="IDropFilesCallback.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="TaskbarThumbnails.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -931,8 +928,11 @@
     <ClCompile Include="ShellNameParserImpl.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="TaskbarTabManager.cpp">
+      <Filter>Taskbar</Filter>
+    </ClCompile>
     <ClCompile Include="JumpListHelper.cpp">
-      <Filter>Shell</Filter>
+      <Filter>Taskbar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1085,9 +1085,6 @@
     </ClInclude>
     <ClInclude Include="Plugins\TabsApi\TabProperties.h">
       <Filter>Plugins\TabsApi</Filter>
-    </ClInclude>
-    <ClInclude Include="TaskbarThumbnails.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeHelper.h">
       <Filter>Core</Filter>
@@ -2028,8 +2025,11 @@
     <ClInclude Include="ShellNameParserImpl.h">
       <Filter>Shell</Filter>
     </ClInclude>
+    <ClInclude Include="TaskbarTabManager.h">
+      <Filter>Taskbar</Filter>
+    </ClInclude>
     <ClInclude Include="JumpListHelper.h">
-      <Filter>Shell</Filter>
+      <Filter>Taskbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2291,6 +2291,9 @@
     </Filter>
     <Filter Include="Dialogs\Mass Rename">
       <UniqueIdentifier>{d8ed6144-b5d4-44fc-ac20-826ee07fae10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Taskbar">
+      <UniqueIdentifier>{04aec467-d301-4e33-b027-bfa83b182edb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

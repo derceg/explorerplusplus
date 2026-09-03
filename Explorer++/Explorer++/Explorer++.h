@@ -18,6 +18,7 @@
 #include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
+#include "TaskbarTabManager.h"
 #include "WindowStorage.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/FileActionHandler.h"
@@ -62,7 +63,6 @@ class StatusBar;
 class TabBacking;
 class TabContainer;
 class TabEvents;
-class TaskbarThumbnails;
 class ThemeWindowTracker;
 class WindowSubclass;
 
@@ -326,6 +326,7 @@ private:
 
 	AppServices *const m_appServices;
 	const HINSTANCE m_resourceInstance;
+	Config *const m_config;
 	PlatformContext *const m_platformContext;
 	AcceleratorManager *const m_acceleratorManager;
 	FeatureList *const m_featureList;
@@ -385,10 +386,7 @@ private:
 	ShellBrowserImpl *m_pActiveShellBrowser;
 	ShellBrowserFactoryImpl m_shellBrowserFactory;
 
-	/* User options variables. */
-	Config *const m_config;
-
-	std::unique_ptr<TaskbarThumbnails> m_taskbarThumbnails;
+	TaskbarTabManager m_taskbarTabManager;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

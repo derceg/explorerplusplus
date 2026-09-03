@@ -76,8 +76,7 @@ public:
 
 	std::optional<int> GetIconIndex() const override
 	{
-		if (m_tab->GetLockState() == Tab::LockState::Locked
-			|| m_tab->GetLockState() == Tab::LockState::AddressLocked)
+		if (m_tab->IsLocked())
 		{
 			return m_imageListManager->GetLockIconIndex();
 		}
@@ -464,9 +463,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 bool TabContainer::CloseTab(const Tab &tab, CloseMode closeMode)
 {
-	if ((tab.GetLockState() == Tab::LockState::Locked
-			|| tab.GetLockState() == Tab::LockState::AddressLocked)
-		&& closeMode == CloseMode::Normal)
+	if (tab.IsLocked() && closeMode == CloseMode::Normal)
 	{
 		return false;
 	}

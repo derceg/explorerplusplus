@@ -182,8 +182,8 @@ void Explorerplusplus::SetPasteSymLinkElevationIcon()
 	}
 
 	wil::unique_hbitmap bitmap;
-	ImageHelper::ImageListIconToPBGRABitmap(m_mainMenuSystemImageList.get(), info.iSysImageIndex,
-		bitmap);
+	ImageHelper::CreateHBITMAPFromImageListIcon(m_mainMenuSystemImageList.get(),
+		info.iSysImageIndex, bitmap);
 
 	HMENU mainMenu = GetMenu(m_hwnd);
 	MenuHelper::SetBitmapForItem(mainMenu, IDM_EDIT_PASTE_SYMBOLIC_LINK, bitmap.get());
@@ -278,7 +278,7 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pi
 			// active. So, once destruction of the Explorerplusplus instance has started, there's no
 			// way for this callback to run.
 			wil::unique_hbitmap bitmap;
-			ImageHelper::ImageListIconToPBGRABitmap(m_mainMenuSystemImageList.get(), iconIndex,
+			ImageHelper::CreateHBITMAPFromImageListIcon(m_mainMenuSystemImageList.get(), iconIndex,
 				bitmap);
 
 			MenuHelper::SetBitmapForItem(goMenu, id, bitmap.get());

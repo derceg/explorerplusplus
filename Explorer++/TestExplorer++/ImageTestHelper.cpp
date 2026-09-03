@@ -4,9 +4,20 @@
 
 #include "pch.h"
 #include "ImageTestHelper.h"
+#include "../Helper/GraphicsFactories.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ScopedBitmapLock.h"
 #include <gtest/gtest.h>
+
+wil::com_ptr_nothrow<IWICBitmapSource> BuildTestWICBitmap(UINT width, UINT height)
+{
+	wil::com_ptr_nothrow<IWICBitmap> bitmap;
+	auto *imagingFactory = GraphicsFactories::GetWICFactory();
+	HRESULT hr = imagingFactory->CreateBitmap(width, height, GUID_WICPixelFormat32bppPBGRA,
+		WICBitmapCacheOnLoad, &bitmap);
+	CHECK(SUCCEEDED(hr));
+	return bitmap;
+}
 
 void BuildTestBitmap(int width, int height, wil::unique_hbitmap &bitmap)
 {

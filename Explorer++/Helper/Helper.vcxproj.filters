@@ -91,9 +91,6 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="ImageHelper.cpp">
-      <Filter>Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="DpiCompatibility.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
@@ -211,6 +208,21 @@
     <ClCompile Include="ClipboardWatcher.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="ImageHelper.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="D2DHelper.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageOperations.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageInterop.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsFactories.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -304,9 +316,6 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="..\targetver.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="ImageHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="DpiCompatibility.h">
@@ -492,6 +501,21 @@
     <ClInclude Include="ClipboardWatcher.h">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
+    <ClInclude Include="ImageHelper.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="D2DHelper.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageOperations.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageInterop.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsFactories.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
@@ -538,6 +562,9 @@
     </Filter>
     <Filter Include="Natvis">
       <UniqueIdentifier>{59f1f5d0-c343-49a0-bb21-63fe55866928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{a3cb9dcf-bc1a-4279-9642-59e40b105385}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

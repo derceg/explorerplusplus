@@ -245,7 +245,10 @@
     <ClCompile Include="BrowserWindowTest.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
+    <ClCompile Include="D2DHelperTest.cpp" />
     <ClCompile Include="DarkModeManagerFake.cpp" />
+    <ClCompile Include="ImageInteropTest.cpp" />
+    <ClCompile Include="ImageOperationsTest.cpp" />
     <ClCompile Include="ListViewColumnsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
@@ -308,6 +311,7 @@
     <ClCompile Include="TabContainerTest.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
+    <ClCompile Include="TaskbarTabManagerTest.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />

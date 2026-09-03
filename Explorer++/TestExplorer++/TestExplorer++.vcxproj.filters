@@ -143,9 +143,6 @@
     <ClCompile Include="MainToolbarStorageTest.cpp">
       <Filter>Main Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="ImageHelperTest.cpp">
-      <Filter>Helper\Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceHelperTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
@@ -610,6 +607,21 @@
     <ClCompile Include="ShellNameParserFake.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="TaskbarTabManagerTest.cpp">
+      <Filter>Taskbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageHelperTest.cpp">
+      <Filter>Helper\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageOperationsTest.cpp">
+      <Filter>Helper\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageInteropTest.cpp">
+      <Filter>Helper\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="D2DHelperTest.cpp">
+      <Filter>Helper\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -800,6 +812,12 @@
     </Filter>
     <Filter Include="Dialogs\Mass Rename">
       <UniqueIdentifier>{1cde3251-e30e-44ec-a1ea-f35f4bf8f1cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Taskbar">
+      <UniqueIdentifier>{37540854-d73a-4ed0-b22d-42780ae7b0aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Graphics">
+      <UniqueIdentifier>{0f3763ed-5a29-4838-aa28-7cb0c4f32942}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
