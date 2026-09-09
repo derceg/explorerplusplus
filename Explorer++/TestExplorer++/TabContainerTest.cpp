@@ -92,6 +92,17 @@ TEST_F(TabContainerTest, TabText)
 	EXPECT_EQ(tabViewItem->GetText(), customName);
 }
 
+TEST_F(TabContainerTest, TabIconReturnedAfterDestruction)
+{
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId1));
+
+	// When the tab is added to the control, its icon will be requested. That will cause the tab to
+	// initiate an asynchronous request. This verifies that completing the request after the tab has
+	// been closed is safe.
+	m_iconFetcher.CompletePendingRequests();
+}
+
 TEST_F(TabContainerTest, TabTooltip)
 {
 	std::wstring path = L"c:\\path\\to\\folder";

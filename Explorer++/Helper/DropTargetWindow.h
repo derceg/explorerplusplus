@@ -6,6 +6,7 @@
 
 #include "WinRTBaseWrapper.h"
 #include "WindowSubclass.h"
+#include <ShObjIdl.h>
 
 class DropTargetInternal
 {

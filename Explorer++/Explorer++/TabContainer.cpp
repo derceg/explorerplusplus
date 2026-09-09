@@ -5,31 +5,31 @@
 #include "stdafx.h"
 #include "TabContainer.h"
 #include "AppServices.h"
-#include "Bookmarks/BookmarkHelper.h"
+#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainTabView.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
+#include "RuntimeHelper.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserFactory.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainerBackgroundContextMenu.h"
 #include "TabContextMenu.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
-#include "../Helper/CachedIcons.h"
-#include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WeakPtrFactory.h"
-#include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 #include <glog/logging.h>
+#include <memory>
 #include <ranges>
 
 using namespace std::chrono_literals;
@@ -41,11 +41,11 @@ class MainTabViewItem : public TabViewItem
 {
 public:
 	MainTabViewItem(Tab *tab, TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-		NavigationEvents *navigationEvents, IconFetcher *iconFetcher, CachedIcons *cachedIcons,
+		NavigationEvents *navigationEvents, const Runtime *runtime, AsyncIconFetcher *iconFetcher,
 		MainTabViewImageListManager *imageListManager) :
 		m_tab(tab),
+		m_runtime(runtime),
 		m_iconFetcher(iconFetcher),
-		m_cachedIcons(cachedIcons),
 		m_imageListManager(imageListManager)
 	{
 		m_connections.push_back(
@@ -83,7 +83,26 @@ public:
 
 		if (!m_iconIndex)
 		{
-			m_iconIndex = DetermineIconIndex();
+			const auto &pidl = m_tab->GetShellBrowser()->GetDirectory();
+			auto cachedSystemIconIndex = m_iconFetcher->MaybeGetCachedIconIndex(pidl.Raw());
+			int iconIndex;
+
+			if (cachedSystemIconIndex)
+			{
+				iconIndex = m_imageListManager->AddIconFromSystemImageList(*cachedSystemIconIndex);
+			}
+			else
+			{
+				iconIndex = m_imageListManager->GetDefaultFolderIconIndex();
+			}
+
+			if (!cachedSystemIconIndex)
+			{
+				m_scopedStopSource = std::make_unique<ScopedStopSource>();
+				RetrieveUpdatedIcon(m_weakPtrFactory.GetMutableWeakPtr(), pidl);
+			}
+
+			m_iconIndex = iconIndex;
 		}
 
 		return *m_iconIndex;
@@ -107,50 +126,37 @@ private:
 
 	void OnDisplayPropertiesUpdated()
 	{
-		m_weakPtrFactory.InvalidateWeakPtrs();
+		m_scopedStopSource = std::make_unique<ScopedStopSource>();
 		m_iconIndex.reset();
 
 		NotifyParentOfUpdate();
 	}
 
-	int DetermineIconIndex() const
+	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<MainTabViewItem> weakSelf,
+		PidlAbsolute pidl)
 	{
-		FetchUpdatedIcon();
+		auto *runtime = weakSelf->m_runtime;
+		auto iconFetcher = weakSelf->m_iconFetcher;
+		auto stopToken = weakSelf->m_scopedStopSource->GetToken();
 
-		auto cachedIconIndex = MaybeGetCachedIconIndex();
+		auto iconInfo = co_await iconFetcher->GetIconIndexAsync(pidl.Raw(), stopToken);
 
-		if (cachedIconIndex)
+		if (!iconInfo)
 		{
-			return m_imageListManager->AddIconFromSystemImageList(*cachedIconIndex);
+			co_return;
 		}
 
-		return m_imageListManager->GetDefaultFolderIconIndex();
+		co_await ResumeOnUiThread(runtime);
+
+		if (stopToken.stop_requested() || !weakSelf)
+		{
+			co_return;
+		}
+
+		weakSelf->OnIconLoaded(iconInfo->iconIndex);
 	}
 
-	std::optional<int> MaybeGetCachedIconIndex() const
-	{
-		return m_cachedIcons->MaybeGetIconIndex(m_tab->GetShellBrowser()->GetDirectoryPath());
-	}
-
-	void FetchUpdatedIcon() const
-	{
-		const auto &pidlDirectory = m_tab->GetShellBrowser()->GetDirectory();
-
-		m_iconFetcher->QueueIconTask(pidlDirectory.Raw(),
-			[weakSelf = m_weakPtrFactory.GetWeakPtr()](int iconIndex, int overlayIndex)
-			{
-				UNREFERENCED_PARAMETER(overlayIndex);
-
-				if (!weakSelf)
-				{
-					return;
-				}
-
-				weakSelf->OnIconLoaded(iconIndex);
-			});
-	}
-
-	void OnIconLoaded(int iconIndex) const
+	void OnIconLoaded(int iconIndex)
 	{
 		m_iconIndex = m_imageListManager->AddIconFromSystemImageList(iconIndex);
 
@@ -158,10 +164,11 @@ private:
 	}
 
 	Tab *const m_tab;
-	IconFetcher *const m_iconFetcher;
-	CachedIcons *const m_cachedIcons;
+	const Runtime *const m_runtime;
+	AsyncIconFetcher *const m_iconFetcher;
 	MainTabViewImageListManager *const m_imageListManager;
 	mutable std::optional<int> m_iconIndex;
+	mutable std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	WeakPtrFactory<MainTabViewItem> m_weakPtrFactory{ this };
@@ -184,7 +191,6 @@ TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 	m_appServices(appServices),
 	m_tabEvents(appServices->GetTabEvents()),
 	m_timerManager(m_hwnd),
-	m_iconFetcher(m_hwnd, appServices->GetCachedIcons()),
 	m_config(appServices->GetConfig()),
 	m_iPreviousTabSelectionId(-1)
 {
@@ -404,9 +410,10 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		}
 	}
 
-	auto tabItem = std::make_unique<MainTabViewItem>(&tab, m_tabEvents,
-		m_appServices->GetShellBrowserEvents(), m_appServices->GetNavigationEvents(),
-		&m_iconFetcher, m_appServices->GetCachedIcons(), m_view->GetImageListManager());
+	auto tabItem =
+		std::make_unique<MainTabViewItem>(&tab, m_tabEvents, m_appServices->GetShellBrowserEvents(),
+			m_appServices->GetNavigationEvents(), m_appServices->GetRuntime(),
+			m_appServices->GetAsyncIconFetcher(), m_view->GetImageListManager());
 	tabItem->SetDoubleClickedCallback(
 		std::bind_front(&TabContainer::OnTabDoubleClicked, this, &tab));
 	tabItem->SetMiddleClickedCallback(

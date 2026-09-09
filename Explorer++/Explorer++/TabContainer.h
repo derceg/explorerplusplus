@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "IconFetcherImpl.h"
 #include "MouseEvent.h"
 #include "OneShotTimer.h"
 #include "OneShotTimerManager.h"
@@ -163,7 +162,6 @@ private:
 	TabEvents *const m_tabEvents;
 	OneShotTimerManager m_timerManager;
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
-	IconFetcherImpl m_iconFetcher;
 	const Config *const m_config;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
