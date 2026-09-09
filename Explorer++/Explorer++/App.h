@@ -90,6 +90,8 @@ private:
 	void Exit();
 	void OnExitStarted();
 
+	wil::unique_oleuninitialize_call m_oleCleanup;
+
 	const CommandLine::Settings *const m_commandLineSettings;
 	SaveLocation m_saveLocation = SaveLocation::Registry;
 	AppServices m_appServices;
@@ -140,7 +142,6 @@ private:
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;
-	wil::unique_oleuninitialize_call m_oleCleanup;
 
 	bool m_exitStarted = false;
 };

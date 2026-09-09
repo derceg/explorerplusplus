@@ -40,6 +40,7 @@
 using namespace std::chrono_literals;
 
 App::App(const CommandLine::Settings *commandLineSettings) :
+	m_oleCleanup(wil::OleInitialize_failfast()),
 	m_commandLineSettings(commandLineSettings),
 	m_runtime(std::make_unique<UIThreadExecutor>(),
 		std::make_unique<ComStaThreadPoolExecutor>(std::max(
@@ -66,8 +67,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_pluginManager(&m_appServices),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
-		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
-	m_oleCleanup(wil::OleInitialize_failfast())
+		L"Msftedit.dll")) // This is needed for version 5 of the Rich Edit control.
 {
 	CHECK(m_richEditLib);
 
