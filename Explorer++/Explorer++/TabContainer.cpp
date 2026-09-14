@@ -231,8 +231,8 @@ void TabContainer::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 	CHECK(res);
 
 	PopupMenuView popupMenu(m_browser);
-	TabContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), tab, this, m_tabEvents,
-		m_appServices->GetResourceLoader());
+	TabContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), tab->GetWeakPtr(), this,
+		m_tabEvents, m_appServices->GetResourceLoader());
 	popupMenu.Show(m_hwnd, ptScreen);
 }
 

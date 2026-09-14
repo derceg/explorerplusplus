@@ -6,8 +6,7 @@
 
 #include "MenuBase.h"
 #include "MenuDelegate.h"
-#include <boost/signals2.hpp>
-#include <vector>
+#include "../Helper/WeakPtr.h"
 
 class ResourceLoader;
 class Tab;
@@ -17,8 +16,9 @@ class TabEvents;
 class TabContextMenu : public MenuBase, private MenuDelegate
 {
 public:
-	TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager, Tab *tab,
-		TabContainer *tabContainer, TabEvents *tabEvents, const ResourceLoader *resourceLoader);
+	TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		WeakPtr<Tab> tab, TabContainer *tabContainer, TabEvents *tabEvents,
+		const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);
@@ -34,11 +34,8 @@ private:
 	void OnCloseOtherTabs();
 	void OnCloseTabsToRight();
 
-	void OnTabClosed(const Tab &tab);
-
-	Tab *m_tab = nullptr;
+	WeakPtr<Tab> m_tab;
 	TabContainer *const m_tabContainer;
 	TabEvents *const m_tabEvents;
 	const ResourceLoader *const m_resourceLoader;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

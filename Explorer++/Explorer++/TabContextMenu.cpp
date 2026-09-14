@@ -20,7 +20,7 @@
 #include <ranges>
 
 TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	Tab *tab, TabContainer *tabContainer, TabEvents *tabEvents,
+	WeakPtr<Tab> tab, TabContainer *tabContainer, TabEvents *tabEvents,
 	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_tab(tab),
@@ -31,10 +31,6 @@ TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acc
 	m_menuView->SetDelegate(this);
 
 	BuildMenu(resourceLoader);
-
-	m_connections.push_back(
-		tabEvents->AddRemovedObserver(std::bind_front(&TabContextMenu::OnTabClosed, this),
-			TabEventScope::ForBrowser(*m_tab->GetBrowser())));
 }
 
 void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
@@ -193,7 +189,7 @@ void TabContextMenu::OnRefreshAllTabs()
 
 void TabContextMenu::OnRenameTab()
 {
-	auto *renameTabDialog = RenameTabDialog::Create(m_tab->GetBrowser()->GetHWND(), m_tab,
+	auto *renameTabDialog = RenameTabDialog::Create(m_tab->GetBrowser()->GetHWND(), m_tab.Get(),
 		m_tabEvents, m_resourceLoader);
 	renameTabDialog->ShowModalDialog();
 }
@@ -246,13 +242,5 @@ void TabContextMenu::OnCloseTabsToRight()
 	{
 		const Tab &currentTab = m_tabContainer->GetTabByIndex(i);
 		m_tabContainer->CloseTab(currentTab);
-	}
-}
-
-void TabContextMenu::OnTabClosed(const Tab &tab)
-{
-	if (m_tab == &tab)
-	{
-		m_tab = nullptr;
 	}
 }

@@ -55,8 +55,8 @@ TEST_F(TabContextMenuTest, DuplicateTab)
 	auto *tab1 = m_browser->AddTab(L"c:\\users", {}, &pidl);
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1, m_tabContainer, &m_tabEvents,
-		&m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB, false, false);
 	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
@@ -70,8 +70,8 @@ TEST_F(TabContextMenuTest, OpenParentInNewTab)
 	auto *tab1 = m_browser->AddTab(L"c:\\windows\\system32");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1, m_tabContainer, &m_tabEvents,
-		&m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB, false, false);
 	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
@@ -86,8 +86,8 @@ TEST_F(TabContextMenuTest, Refresh)
 	auto snapshot = TakeHistoryEntrySnapshot(tab);
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, tab, m_tabContainer, &m_tabEvents,
-		&m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_REFRESH, false, false);
 	VerifyTabRefreshed(snapshot);
@@ -103,8 +103,8 @@ TEST_F(TabContextMenuTest, RefreshAll)
 		TakeHistoryEntrySnapshot(tab2), TakeHistoryEntrySnapshot(tab3) };
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1, m_tabContainer, &m_tabEvents,
-		&m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_REFRESH_ALL, false, false);
 
@@ -119,8 +119,8 @@ TEST_F(TabContextMenuTest, LockTab)
 	auto *tab = m_browser->AddTab(L"c:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, tab, m_tabContainer, &m_tabEvents,
-		&m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::Locked);
@@ -135,8 +135,8 @@ TEST_F(TabContextMenuTest, LockTabAndAddress)
 	auto *tab = m_browser->AddTab(L"c:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, tab, m_tabContainer, &m_tabEvents,
-		&m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::AddressLocked);
@@ -152,8 +152,9 @@ TEST_F(TabContextMenuTest, CloseTab)
 	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
+		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
+		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_TAB, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
@@ -168,8 +169,9 @@ TEST_F(TabContextMenuTest, CloseOtherTabs)
 	m_browser->AddTab(L"f:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
+		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
+		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(Property(&Tab::GetId, tabId2)));
@@ -183,8 +185,9 @@ TEST_F(TabContextMenuTest, CloseTabsToRight)
 	m_browser->AddTab(L"f:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
+		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
+		&m_resourceLoader);
 
 	menuView.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
@@ -199,8 +202,9 @@ TEST_F(TabContextMenuTest, SelectionAfterTabClosed)
 	int tabId4 = m_browser->AddTabAndReturnId(L"f:\\");
 
 	MenuViewFake menuView;
-	TabContextMenu menu(&menuView, &m_acceleratorManager, &m_tabContainer->GetTab(tabId2),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
+		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
+		&m_resourceLoader);
 
 	EXPECT_TRUE(m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId2)));
 

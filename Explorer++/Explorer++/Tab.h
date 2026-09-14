@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/WeakPtrFactory.h"
 #include <boost/core/noncopyable.hpp>
 #include <memory>
 
@@ -69,6 +70,8 @@ public:
 
 	TabStorageData GetStorageData() const;
 
+	WeakPtr<Tab> GetWeakPtr();
+
 	/* Although each tab manages its
 	own columns, it does not know
 	about any column defaults.
@@ -98,4 +101,6 @@ private:
 	bool m_useCustomName;
 	std::wstring m_customName;
 	LockState m_lockState;
+
+	WeakPtrFactory<Tab> m_weakPtrFactory{ this };
 };

@@ -170,3 +170,8 @@ TabStorageData Tab::GetStorageData() const
 
 	return storageData;
 }
+
+WeakPtr<Tab> Tab::GetWeakPtr()
+{
+	return m_weakPtrFactory.GetWeakPtr();
+}
