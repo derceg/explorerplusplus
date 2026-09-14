@@ -23,14 +23,12 @@ TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *a
 	m_shellIconLoader(shellIconLoader),
 	m_resourceLoader(resourceLoader)
 {
-	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
-		std::bind_front(&TabRestorerMenu::OnRestoreItemsChanged, this)));
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind_front(&TabRestorerMenu::OnMenuItemSelected, this)));
-	m_connections.push_back(m_menuView->AddItemMiddleClickedObserver(
-		std::bind_front(&TabRestorerMenu::OnMenuItemMiddleClicked, this)));
+	m_menuView->SetDelegate(this);
 
 	RebuildMenu();
+
+	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
+		std::bind_front(&TabRestorerMenu::OnRestoreItemsChanged, this)));
 }
 
 void TabRestorerMenu::RebuildMenu()
@@ -92,27 +90,25 @@ void TabRestorerMenu::OnRestoreItemsChanged()
 	RebuildMenu();
 }
 
-void TabRestorerMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void TabRestorerMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	UNREFERENCED_PARAMETER(isCtrlKeyDown);
 	UNREFERENCED_PARAMETER(isShiftKeyDown);
 
-	RestoreTabForMenuItem(menuItemId);
+	RestoreTabForMenuItem(id);
 }
 
-void TabRestorerMenu::OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
+void TabRestorerMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	UNREFERENCED_PARAMETER(isCtrlKeyDown);
 	UNREFERENCED_PARAMETER(isShiftKeyDown);
 
-	RestoreTabForMenuItem(menuItemId);
+	RestoreTabForMenuItem(id);
 }
 
-void TabRestorerMenu::RestoreTabForMenuItem(UINT menuItemId)
+void TabRestorerMenu::RestoreTabForMenuItem(UINT id)
 {
-	auto itr = m_menuItemMappings.find(menuItemId);
+	auto itr = m_menuItemMappings.find(id);
 	CHECK(itr != m_menuItemMappings.end());
-
 	m_tabRestorer->RestoreTabById(itr->second);
 }

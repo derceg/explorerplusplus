@@ -1250,7 +1250,6 @@
     <ClCompile Include="AppearanceOptionsPage.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ApplicationContextMenu.cpp" />
-    <ClCompile Include="ApplicationContextMenuController.cpp" />
     <ClCompile Include="ApplicationCrashedDialog.cpp" />
     <ClCompile Include="ApplicationDropper.cpp" />
     <ClCompile Include="ApplicationExecutorImpl.cpp" />
@@ -1592,6 +1591,7 @@
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MassRenameHelper.h" />
     <ClInclude Include="MassRenameTokensMenu.h" />
+    <ClInclude Include="MenuDelegate.h" />
     <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="NoOpMenuHelpTextHost.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
@@ -1624,7 +1624,6 @@
     <ClInclude Include="AppearanceOptionsPage.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationContextMenu.h" />
-    <ClInclude Include="ApplicationContextMenuController.h" />
     <ClInclude Include="ApplicationCrashedDialog.h" />
     <ClInclude Include="ApplicationDropper.h" />
     <ClInclude Include="ApplicationExecutor.h" />

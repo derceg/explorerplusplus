@@ -18,10 +18,9 @@ BookmarkListViewContextMenu::BookmarkListViewContextMenu(MenuView *menuView,
 	m_targetFolder(targetFolder),
 	m_resourceLoader(resourceLoader)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&BookmarkListViewContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void BookmarkListViewContextMenu::BuildMenu()
@@ -32,8 +31,11 @@ void BookmarkListViewContextMenu::BuildMenu()
 		m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER));
 }
 
-void BookmarkListViewContextMenu::OnMenuItemSelected(UINT menuItemId)
+void BookmarkListViewContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
 	if (!m_targetFolder)
 	{
 		return;
@@ -41,7 +43,7 @@ void BookmarkListViewContextMenu::OnMenuItemSelected(UINT menuItemId)
 
 	auto index = m_targetFolder->GetChildren().size();
 
-	switch (menuItemId)
+	switch (id)
 	{
 	case IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK:
 		m_delegate->CreateBookmark(m_targetFolder.Get(), index);

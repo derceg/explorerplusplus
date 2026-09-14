@@ -26,10 +26,9 @@ OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 	m_clipboardStore(clipboardStore),
 	m_resourceLoader(resourceLoader)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&OrganizeBookmarksContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void OrganizeBookmarksContextMenu::BuildMenu()
@@ -71,14 +70,17 @@ void OrganizeBookmarksContextMenu::BuildMenu()
 		!m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems());
 }
 
-void OrganizeBookmarksContextMenu::OnMenuItemSelected(UINT menuItemId)
+void OrganizeBookmarksContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
 	if (!m_targetFolder)
 	{
 		return;
 	}
 
-	switch (menuItemId)
+	switch (id)
 	{
 	case IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK:
 		m_delegate->CreateBookmark(m_targetFolder.Get(), GetTargetIndex());

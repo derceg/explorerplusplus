@@ -5,8 +5,7 @@
 #pragma once
 
 #include "MenuBase.h"
-#include <boost/signals2.hpp>
-#include <vector>
+#include "MenuDelegate.h"
 
 class BookmarkTree;
 class BrowserWindow;
@@ -16,7 +15,7 @@ class ResourceLoader;
 class TabContainer;
 class TabRestorer;
 
-class TabContainerBackgroundContextMenu : public MenuBase
+class TabContainerBackgroundContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	TabContainerBackgroundContextMenu(MenuView *menuView,
@@ -26,7 +25,9 @@ public:
 
 private:
 	void BuildMenu();
-	void OnMenuItemSelected(UINT menuItemId);
+
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	TabContainer *const m_tabContainer;
 	TabRestorer *const m_tabRestorer;
@@ -34,5 +35,4 @@ private:
 	BrowserWindow *const m_browser;
 	const ResourceLoader *const m_resourceLoader;
 	PlatformContext *const m_platformContext;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

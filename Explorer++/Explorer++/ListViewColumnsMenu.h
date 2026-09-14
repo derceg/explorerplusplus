@@ -5,9 +5,8 @@
 #pragma once
 
 #include "MenuBase.h"
-#include <boost/signals2.hpp>
+#include "MenuDelegate.h"
 #include <unordered_map>
-#include <vector>
 
 struct ListViewColumnId;
 class ListViewColumnModel;
@@ -15,7 +14,7 @@ class ResourceLoader;
 
 // Shows a menu containing the columns provided by the ListViewColumnModel instance. Each column can
 // be toggled on/off.
-class ListViewColumnsMenu : public MenuBase
+class ListViewColumnsMenu : public MenuBase, private MenuDelegate
 {
 public:
 	ListViewColumnsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -23,11 +22,12 @@ public:
 
 private:
 	void BuildMenu();
-	void OnMenuItemSelected(UINT menuItemId);
+
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	ListViewColumnModel *const m_columnModel;
 	const ResourceLoader *const m_resourceLoader;
 	UINT m_idCounter = 1;
 	std::unordered_map<UINT, ListViewColumnId> m_idToColumnMap;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

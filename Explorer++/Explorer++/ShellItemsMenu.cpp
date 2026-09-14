@@ -8,7 +8,6 @@
 #include "MenuView.h"
 #include "NavigationHelper.h"
 #include "ShellIconModel.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 
@@ -19,10 +18,7 @@ ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acc
 	m_browserWindow(browserWindow),
 	m_shellIconLoader(shellIconLoader)
 {
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind_front(&ShellItemsMenu::OnMenuItemSelected, this)));
-	m_connections.push_back(m_menuView->AddItemMiddleClickedObserver(
-		std::bind_front(&ShellItemsMenu::OnMenuItemMiddleClicked, this)));
+	m_menuView->SetDelegate(this);
 
 	RebuildMenu(pidls);
 }
@@ -56,21 +52,21 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 	DCHECK(didInsert);
 }
 
-void ShellItemsMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void ShellItemsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	OpenSelectedItem(menuItemId, false, isCtrlKeyDown, isShiftKeyDown);
+	OpenSelectedItem(id, false, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void ShellItemsMenu::OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
+void ShellItemsMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	OpenSelectedItem(menuItemId, true, isCtrlKeyDown, isShiftKeyDown);
+	OpenSelectedItem(id, true, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void ShellItemsMenu::OpenSelectedItem(UINT menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
+void ShellItemsMenu::OpenSelectedItem(UINT id, bool isMiddleButtonDown, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
-	auto &pidl = m_idPidlMap.at(menuItemId);
-	m_browserWindow->OpenItem(pidl.Raw(),
+	auto itr = m_idPidlMap.find(id);
+	CHECK(itr != m_idPidlMap.end());
+	m_browserWindow->OpenItem(itr->second.Raw(),
 		DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
 }

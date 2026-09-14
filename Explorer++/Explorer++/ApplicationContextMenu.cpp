@@ -4,6 +4,11 @@
 
 #include "stdafx.h"
 #include "ApplicationContextMenu.h"
+#include "AppInfo.h"
+#include "ApplicationEditorDialog.h"
+#include "ApplicationExecutor.h"
+#include "ApplicationModel.h"
+#include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
@@ -16,35 +21,99 @@ ApplicationContextMenu::ApplicationContextMenu(MenuView *menuView,
 	ApplicationExecutor *applicationExecutor, const BrowserWindow *browser,
 	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
-	m_controller(model, application, applicationExecutor, browser, resourceLoader)
+	m_model(model),
+	m_application(application),
+	m_applicationExecutor(applicationExecutor),
+	m_browser(browser),
+	m_resourceLoader(resourceLoader)
 {
-	BuildMenu(resourceLoader);
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&ApplicationContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
-void ApplicationContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
+void ApplicationContextMenu::BuildMenu()
 {
 	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_OPEN,
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN), {},
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN_HELP_TEXT));
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN), {},
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN_HELP_TEXT));
 	m_menuView->AppendSeparator();
 	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_NEW,
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW), {},
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW_HELP_TEXT));
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW), {},
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW_HELP_TEXT));
 	m_menuView->AppendSeparator();
 	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_DELETE,
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE), {},
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE_HELP_TEXT));
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE), {},
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE_HELP_TEXT));
 	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_PROPERTIES,
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES), {},
-		resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES), {},
+		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
 }
 
-void ApplicationContextMenu::OnMenuItemSelected(UINT menuItemId)
+void ApplicationContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	m_controller.OnMenuItemSelected(menuItemId);
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
+	switch (id)
+	{
+	case IDM_APPLICATION_CONTEXT_MENU_OPEN:
+		OnOpen();
+		break;
+
+	case IDM_APPLICATION_CONTEXT_MENU_NEW:
+		OnNew();
+		break;
+
+	case IDM_APPLICATION_CONTEXT_MENU_DELETE:
+		OnDelete();
+		break;
+
+	case IDM_APPLICATION_CONTEXT_MENU_PROPERTIES:
+		OnShowProperties();
+		break;
+
+	default:
+		DCHECK(false);
+		break;
+	}
+}
+
+void ApplicationContextMenu::OnOpen()
+{
+	m_applicationExecutor->Execute(m_application);
+}
+
+void ApplicationContextMenu::OnNew()
+{
+	auto index = m_model->GetItemIndex(m_application);
+
+	auto *editorDialog =
+		ApplicationEditorDialog::Create(m_browser->GetHWND(), m_resourceLoader, m_model,
+			ApplicationEditorDialog::EditDetails::AddNewApplication(
+				std::make_unique<Application>(L"", L""), index));
+	editorDialog->ShowModalDialog();
+}
+
+void ApplicationContextMenu::OnDelete()
+{
+	std::wstring message = m_resourceLoader->LoadString(IDS_APPLICATIONBUTTON_DELETE);
+	int messageBoxReturn = MessageBox(m_browser->GetHWND(), message.c_str(), AppInfo::NAME,
+		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
+
+	if (messageBoxReturn != IDYES)
+	{
+		return;
+	}
+
+	m_model->RemoveItem(m_application);
+}
+
+void ApplicationContextMenu::OnShowProperties()
+{
+	auto *editorDialog = ApplicationEditorDialog::Create(m_browser->GetHWND(), m_resourceLoader,
+		m_model, ApplicationEditorDialog::EditDetails::EditApplication(m_application));
+	editorDialog->ShowModalDialog();
 }
 
 }

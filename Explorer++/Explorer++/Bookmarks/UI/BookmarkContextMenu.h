@@ -7,9 +7,8 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
+#include "MenuDelegate.h"
 #include "../Helper/FileOperations.h"
-#include <boost/signals2.hpp>
-#include <vector>
 
 class BookmarkTree;
 class BrowserWindow;
@@ -18,7 +17,7 @@ class ResourceLoader;
 
 // Displays a context menu for one or more bookmarks. If multiple bookmarks are provided, they
 // should all reside in the same parent folder.
-class BookmarkContextMenu : public MenuBase
+class BookmarkContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	BookmarkContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -31,7 +30,9 @@ private:
 	bool AreBookmarkItemsValid();
 	size_t GetTotalBookmarks();
 
-	void OnMenuItemSelected(UINT menuItemId);
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
 	void OnOpen();
 	void OnOpenInNewTab();
 	void OnOpenAll();
@@ -48,5 +49,4 @@ private:
 	BrowserWindow *const m_browser;
 	const HWND m_parentWindow;
 	PlatformContext *const m_platformContext;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

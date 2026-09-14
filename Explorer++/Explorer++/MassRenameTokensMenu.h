@@ -6,15 +6,14 @@
 
 #include "MassRenameHelper.h"
 #include "MenuBase.h"
-#include <boost/signals2.hpp>
+#include "MenuDelegate.h"
 #include <functional>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 class ResourceLoader;
 
-class MassRenameTokensMenu : public MenuBase
+class MassRenameTokensMenu : public MenuBase, private MenuDelegate
 {
 public:
 	using TokenSelectedCallback = std::function<void(MassRenameToken token)>;
@@ -25,10 +24,11 @@ public:
 private:
 	void BuildMenu();
 	std::wstring BuildTokenMenuText(MassRenameToken token);
-	void OnMenuItemSelected(UINT menuItemId);
+
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	std::unordered_map<UINT, MassRenameToken> m_idToTokenMap;
 	const TokenSelectedCallback m_tokenSelectedCallback;
 	const ResourceLoader *const m_resourceLoader;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

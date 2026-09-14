@@ -24,10 +24,9 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 	m_resourceLoader(resourceLoader),
 	m_platformContext(platformContext)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(std::bind(
-		&TabContainerBackgroundContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void TabContainerBackgroundContextMenu::BuildMenu()
@@ -48,9 +47,13 @@ void TabContainerBackgroundContextMenu::BuildMenu()
 	}
 }
 
-void TabContainerBackgroundContextMenu::OnMenuItemSelected(UINT menuItemId)
+void TabContainerBackgroundContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown,
+	bool isShiftKeyDown)
 {
-	switch (menuItemId)
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
+	switch (id)
 	{
 	case IDM_TAB_CONTAINER_NEW_TAB:
 		m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true });

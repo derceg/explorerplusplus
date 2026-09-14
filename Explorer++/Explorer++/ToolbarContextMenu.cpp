@@ -24,10 +24,9 @@ ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, Browse
 	m_browser(browser),
 	m_appServices(appServices)
 {
-	BuildMenu(source, appServices->GetResourceLoader());
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&ToolbarContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu(source, appServices->GetResourceLoader());
 }
 
 void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resourceLoader)
@@ -97,11 +96,14 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 	m_menuView->RemoveTrailingSeparators();
 }
 
-void ToolbarContextMenu::OnMenuItemSelected(UINT menuItemId)
+void ToolbarContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
 	auto *commandController = m_browser->GetCommandController();
 
-	switch (menuItemId)
+	switch (id)
 	{
 	case IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR:
 		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_ADDRESS_BAR);

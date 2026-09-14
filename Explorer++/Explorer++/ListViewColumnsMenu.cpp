@@ -16,10 +16,9 @@ ListViewColumnsMenu::ListViewColumnsMenu(MenuView *menuView,
 	m_columnModel(columnModel),
 	m_resourceLoader(resourceLoader)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&ListViewColumnsMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void ListViewColumnsMenu::BuildMenu()
@@ -39,9 +38,12 @@ void ListViewColumnsMenu::BuildMenu()
 	}
 }
 
-void ListViewColumnsMenu::OnMenuItemSelected(UINT menuItemId)
+void ListViewColumnsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto itr = m_idToColumnMap.find(menuItemId);
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
+	auto itr = m_idToColumnMap.find(id);
 	CHECK(itr != m_idToColumnMap.end());
 	m_columnModel->SetColumnVisible(itr->second, !m_columnModel->IsColumnVisible(itr->second));
 }

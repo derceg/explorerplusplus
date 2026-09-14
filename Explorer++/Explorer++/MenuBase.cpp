@@ -15,8 +15,6 @@ MenuBase::MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorMana
 	m_acceleratorManager(acceleratorManager),
 	m_idRange(std::max(startId, 1u), std::max({ endId, startId, 1u }))
 {
-	m_connections.push_back(
-		menuView->AddViewDestroyedObserver(std::bind_front(&MenuBase::OnViewDestroyed, this)));
 }
 
 const MenuBase::IdRange &MenuBase::GetIdRange() const
@@ -43,11 +41,4 @@ std::optional<std::wstring> MenuBase::GetAcceleratorTextForId(UINT id) const
 	}
 
 	return BuildAcceleratorString(*accelerator);
-}
-
-void MenuBase::OnViewDestroyed()
-{
-	// The view should always outlive the associated menu controller, so this method should never be
-	// triggered.
-	CHECK(false);
 }

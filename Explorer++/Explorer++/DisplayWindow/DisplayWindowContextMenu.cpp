@@ -19,10 +19,9 @@ DisplayWindowContextMenu::DisplayWindowContextMenu(MenuView *menuView,
 	m_config(config),
 	m_resourceLoader(resourceLoader)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&DisplayWindowContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void DisplayWindowContextMenu::BuildMenu()
@@ -44,9 +43,12 @@ void DisplayWindowContextMenu::BuildMenu()
 		m_config->displayWindowVertical.get());
 }
 
-void DisplayWindowContextMenu::OnMenuItemSelected(UINT menuItemId)
+void DisplayWindowContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	switch (menuItemId)
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
+	switch (id)
 	{
 	case IDM_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS:
 		m_browser->GetCommandController()->ExecuteCommand(IDM_VIEW_CHANGEDISPLAYCOLOURS);

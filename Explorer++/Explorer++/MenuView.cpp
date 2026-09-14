@@ -14,9 +14,9 @@ MenuView::MenuView(MenuHelpTextHost *menuHelpTextHost) : m_menuHelpTextHost(menu
 {
 }
 
-MenuView::~MenuView()
+void MenuView::SetDelegate(MenuDelegate *delegate)
 {
-	m_viewDestroyedSignal();
+	m_delegate = delegate;
 }
 
 void MenuView::AppendItem(UINT id, const std::wstring &text,
@@ -210,38 +210,20 @@ const MenuView::Item *MenuView::GetItem(int id) const
 
 void MenuView::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	if (!MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
+	if (!m_delegate || !MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
 	{
 		return;
 	}
 
-	m_itemSelectedSignal(id, isCtrlKeyDown, isShiftKeyDown);
+	m_delegate->OnItemSelected(id, isCtrlKeyDown, isShiftKeyDown);
 }
 
 void MenuView::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	if (!MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
+	if (!m_delegate || !MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
 	{
 		return;
 	}
 
-	m_itemMiddleClickedSignal(id, isCtrlKeyDown, isShiftKeyDown);
-}
-
-boost::signals2::connection MenuView::AddItemSelectedObserver(
-	const ItemSelectedSignal::slot_type &observer)
-{
-	return m_itemSelectedSignal.connect(observer);
-}
-
-boost::signals2::connection MenuView::AddItemMiddleClickedObserver(
-	const ItemMiddleClickedSignal::slot_type &observer)
-{
-	return m_itemMiddleClickedSignal.connect(observer);
-}
-
-boost::signals2::connection MenuView::AddViewDestroyedObserver(
-	const ViewDestroyedSignal::slot_type &observer)
-{
-	return m_viewDestroyedSignal.connect(observer);
+	m_delegate->OnItemMiddleClicked(id, isCtrlKeyDown, isShiftKeyDown);
 }

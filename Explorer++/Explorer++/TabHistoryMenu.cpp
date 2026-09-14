@@ -19,17 +19,9 @@ TabHistoryMenu::TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acc
 	m_shellIconLoader(shellIconLoader),
 	m_type(type)
 {
-	Initialize();
-}
+	m_menuView->SetDelegate(this);
 
-void TabHistoryMenu::Initialize()
-{
 	BuildMenu();
-
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind_front(&TabHistoryMenu::OnMenuItemSelected, this)));
-	m_connections.push_back(m_menuView->AddItemMiddleClickedObserver(
-		std::bind_front(&TabHistoryMenu::OnMenuItemMiddleClicked, this)));
 }
 
 void TabHistoryMenu::BuildMenu()
@@ -63,21 +55,20 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 		std::make_unique<ShellIconModel>(m_shellIconLoader, entry->GetPidl().Raw()));
 }
 
-void TabHistoryMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void TabHistoryMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	NavigateToHistoryEntry(menuItemId, false, isCtrlKeyDown, isShiftKeyDown);
+	NavigateToHistoryEntry(id, false, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void TabHistoryMenu::OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown,
+void TabHistoryMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	NavigateToHistoryEntry(id, true, isCtrlKeyDown, isShiftKeyDown);
+}
+
+void TabHistoryMenu::NavigateToHistoryEntry(UINT id, bool isMiddleButtonDown, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
-	NavigateToHistoryEntry(menuItemId, true, isCtrlKeyDown, isShiftKeyDown);
-}
-
-void TabHistoryMenu::NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButtonDown,
-	bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	int offset = menuItemId;
+	int offset = id;
 
 	if (m_type == MenuType::Back)
 	{

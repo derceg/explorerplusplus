@@ -4,10 +4,8 @@
 
 #pragma once
 
-#include "ApplicationContextMenuController.h"
 #include "MenuBase.h"
-#include <boost/signals2.hpp>
-#include <vector>
+#include "MenuDelegate.h"
 
 class BrowserWindow;
 class MenuView;
@@ -20,7 +18,7 @@ class Application;
 class ApplicationExecutor;
 class ApplicationModel;
 
-class ApplicationContextMenu : public MenuBase
+class ApplicationContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	ApplicationContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -28,11 +26,21 @@ public:
 		const BrowserWindow *browser, const ResourceLoader *resourceLoader);
 
 private:
-	void BuildMenu(const ResourceLoader *resourceLoader);
-	void OnMenuItemSelected(UINT menuItemId);
+	void BuildMenu();
 
-	ApplicationContextMenuController m_controller;
-	std::vector<boost::signals2::scoped_connection> m_connections;
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
+	void OnOpen();
+	void OnNew();
+	void OnDelete();
+	void OnShowProperties();
+
+	ApplicationModel *const m_model;
+	Application *const m_application;
+	ApplicationExecutor *const m_applicationExecutor;
+	const BrowserWindow *const m_browser;
+	const ResourceLoader *const m_resourceLoader;
 };
 
 }

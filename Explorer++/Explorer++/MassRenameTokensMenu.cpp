@@ -16,10 +16,9 @@ MassRenameTokensMenu::MassRenameTokensMenu(MenuView *menuView,
 	m_tokenSelectedCallback(tokenSelectedCallback),
 	m_resourceLoader(resourceLoader)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&MassRenameTokensMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void MassRenameTokensMenu::BuildMenu()
@@ -71,9 +70,12 @@ std::wstring MassRenameTokensMenu::BuildTokenMenuText(MassRenameToken token)
 		m_resourceLoader->LoadString(*stringId));
 }
 
-void MassRenameTokensMenu::OnMenuItemSelected(UINT menuItemId)
+void MassRenameTokensMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto itr = m_idToTokenMap.find(menuItemId);
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
+	auto itr = m_idToTokenMap.find(id);
 	CHECK(itr != m_idToTokenMap.end());
 	m_tokenSelectedCallback(itr->second);
 }

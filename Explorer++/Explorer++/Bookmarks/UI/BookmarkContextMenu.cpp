@@ -26,10 +26,9 @@ BookmarkContextMenu::BookmarkContextMenu(MenuView *menuView,
 	m_parentWindow(parentWindow),
 	m_platformContext(platformContext)
 {
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&BookmarkContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void BookmarkContextMenu::BuildMenu()
@@ -149,8 +148,11 @@ size_t BookmarkContextMenu::GetTotalBookmarks()
 	return totalBookmarks;
 }
 
-void BookmarkContextMenu::OnMenuItemSelected(UINT menuItemId)
+void BookmarkContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
 	BookmarkItem *targetParentFolder;
 	size_t targetIndex;
 
@@ -168,7 +170,7 @@ void BookmarkContextMenu::OnMenuItemSelected(UINT menuItemId)
 			+ 1;
 	}
 
-	switch (menuItemId)
+	switch (id)
 	{
 	case IDM_BOOKMARK_CONTEXT_MENU_OPEN:
 		OnOpen();

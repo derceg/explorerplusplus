@@ -28,10 +28,10 @@ TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acc
 	m_tabEvents(tabEvents),
 	m_resourceLoader(resourceLoader)
 {
+	m_menuView->SetDelegate(this);
+
 	BuildMenu(resourceLoader);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&TabContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
 	m_connections.push_back(
 		tabEvents->AddRemovedObserver(std::bind_front(&TabContextMenu::OnTabClosed, this),
 			TabEventScope::ForBrowser(*m_tab->GetBrowser())));
@@ -106,15 +106,18 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 		m_tab->GetLockState() == Tab::LockState::NotLocked);
 }
 
-void TabContextMenu::OnMenuItemSelected(UINT menuItemId)
+void TabContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
 	if (!m_tab)
 	{
 		// The tab has been closed, so there's nothing that needs to be done.
 		return;
 	}
 
-	switch (menuItemId)
+	switch (id)
 	{
 	case IDM_TAB_CONTEXT_MENU_NEW_TAB:
 		m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true });

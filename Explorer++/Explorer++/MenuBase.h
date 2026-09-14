@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <boost/signals2.hpp>
-#include <vector>
-
 class AcceleratorManager;
 class MenuView;
 
@@ -45,8 +42,5 @@ protected:
 	const AcceleratorManager *const m_acceleratorManager;
 
 private:
-	void OnViewDestroyed();
-
 	const IdRange m_idRange;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

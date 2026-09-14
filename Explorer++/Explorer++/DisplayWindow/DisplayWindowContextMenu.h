@@ -5,14 +5,13 @@
 #pragma once
 
 #include "MenuBase.h"
-#include <boost/signals2.hpp>
-#include <vector>
+#include "MenuDelegate.h"
 
 class BrowserWindow;
 struct Config;
 class ResourceLoader;
 
-class DisplayWindowContextMenu : public MenuBase
+class DisplayWindowContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	DisplayWindowContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -20,10 +19,11 @@ public:
 
 private:
 	void BuildMenu();
-	void OnMenuItemSelected(UINT menuItemId);
+
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	BrowserWindow *const m_browser;
 	Config *const m_config;
 	const ResourceLoader *const m_resourceLoader;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

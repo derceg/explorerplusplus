@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MenuBase.h"
+#include "MenuDelegate.h"
 #include <boost/core/noncopyable.hpp>
 #include <unordered_map>
 
@@ -13,7 +14,7 @@ class ResourceLoader;
 class ShellIconLoader;
 class TabRestorer;
 
-class TabRestorerMenu : public MenuBase, private boost::noncopyable
+class TabRestorerMenu : public MenuBase, private MenuDelegate, private boost::noncopyable
 {
 public:
 	TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -29,9 +30,11 @@ private:
 
 	void OnRestoreItemsChanged();
 
-	void OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
-	void OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
-	void RestoreTabForMenuItem(UINT menuItemId);
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
+	void RestoreTabForMenuItem(UINT id);
 
 	TabRestorer *const m_tabRestorer;
 	ShellIconLoader *const m_shellIconLoader;

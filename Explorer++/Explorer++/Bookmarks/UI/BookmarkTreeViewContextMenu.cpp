@@ -23,10 +23,9 @@ BookmarkTreeViewContextMenu::BookmarkTreeViewContextMenu(MenuView *menuView,
 	// that the target item will be a folder.
 	DCHECK(targetFolder->IsFolder());
 
-	BuildMenu();
+	m_menuView->SetDelegate(this);
 
-	m_connections.push_back(m_menuView->AddItemSelectedObserver(
-		std::bind(&BookmarkTreeViewContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
+	BuildMenu();
 }
 
 void BookmarkTreeViewContextMenu::BuildMenu()
@@ -44,14 +43,17 @@ void BookmarkTreeViewContextMenu::BuildMenu()
 		!m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()));
 }
 
-void BookmarkTreeViewContextMenu::OnMenuItemSelected(UINT menuItemId)
+void BookmarkTreeViewContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
+	UNREFERENCED_PARAMETER(isCtrlKeyDown);
+	UNREFERENCED_PARAMETER(isShiftKeyDown);
+
 	if (!m_targetFolder)
 	{
 		return;
 	}
 
-	switch (menuItemId)
+	switch (id)
 	{
 	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME:
 		m_delegate->StartRenamingFolder(m_targetFolder.Get());

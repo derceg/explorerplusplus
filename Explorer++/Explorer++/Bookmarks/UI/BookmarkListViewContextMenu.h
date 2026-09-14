@@ -5,15 +5,14 @@
 #pragma once
 
 #include "MenuBase.h"
+#include "MenuDelegate.h"
 #include "../Helper/WeakPtr.h"
-#include <boost/signals2.hpp>
-#include <vector>
 
 class BookmarkItem;
 class BookmarkItemCreationDelegate;
 class ResourceLoader;
 
-class BookmarkListViewContextMenu : public MenuBase
+class BookmarkListViewContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	BookmarkListViewContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -22,10 +21,11 @@ public:
 
 private:
 	void BuildMenu();
-	void OnMenuItemSelected(UINT menuItemId);
+
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	BookmarkItemCreationDelegate *const m_delegate;
 	WeakPtr<BookmarkItem> m_targetFolder;
 	const ResourceLoader *const m_resourceLoader;
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

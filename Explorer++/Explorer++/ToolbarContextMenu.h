@@ -6,14 +6,13 @@
 
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
-#include <boost/signals2.hpp>
-#include <vector>
+#include "MenuDelegate.h"
 
 class AppServices;
 class BrowserWindow;
 class ResourceLoader;
 
-class ToolbarContextMenu : public MenuBase
+class ToolbarContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	enum class Source
@@ -31,13 +30,13 @@ public:
 private:
 	void BuildMenu(Source source, const ResourceLoader *resourceLoader);
 
-	void OnMenuItemSelected(UINT menuItemId);
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
 	void OnNewBookmarkItem(BookmarkItem::Type type);
 	void OnPasteBookmark();
 	void OnNewApplication();
 
 	BrowserWindow *const m_browser;
 	AppServices *const m_appServices;
-
-	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -331,9 +331,6 @@
     <ClCompile Include="Application.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationContextMenuController.cpp">
-      <Filter>Application Toolbar\UI</Filter>
-    </ClCompile>
     <ClCompile Include="ApplicationToolbar.cpp">
       <Filter>Application Toolbar\UI</Filter>
     </ClCompile>
@@ -1275,9 +1272,6 @@
     <ClInclude Include="Application.h">
       <Filter>Application Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="ApplicationContextMenuController.h">
-      <Filter>Application Toolbar\UI</Filter>
-    </ClInclude>
     <ClInclude Include="ApplicationToolbar.h">
       <Filter>Application Toolbar\UI</Filter>
     </ClInclude>
@@ -2030,6 +2024,9 @@
     </ClInclude>
     <ClInclude Include="JumpListHelper.h">
       <Filter>Taskbar</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuDelegate.h">
+      <Filter>Menus\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

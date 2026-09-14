@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MenuBase.h"
+#include "MenuDelegate.h"
 #include <boost/signals2.hpp>
 #include <vector>
 
@@ -13,7 +14,7 @@ class Tab;
 class TabContainer;
 class TabEvents;
 
-class TabContextMenu : public MenuBase
+class TabContextMenu : public MenuBase, private MenuDelegate
 {
 public:
 	TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager, Tab *tab,
@@ -22,7 +23,9 @@ public:
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);
 
-	void OnMenuItemSelected(UINT menuItemId);
+	// MenuDelegate
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
 	void OnOpenParentInNewTab();
 	void OnRefreshAllTabs();
 	void OnRenameTab();
