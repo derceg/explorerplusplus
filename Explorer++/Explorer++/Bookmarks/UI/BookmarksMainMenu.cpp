@@ -71,7 +71,7 @@ void BookmarksMainMenu::OnMainMenuPreShow(HMENU mainMenu)
 wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo)
 {
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_browserWindow->GetHWND());
 
@@ -132,7 +132,7 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu,
 	MenuHelper::AddSeparator(menu, position++, TRUE);
 
 	// Note that as DestroyMenu is recursive, this menu will be destroyed when its parent menu is.
-	wil::unique_hmenu subMenu(CreatePopupMenu());
+	auto subMenu = MenuHelper::CheckedCreatePopupMenu();
 	m_menuBuilder.BuildMenu(m_browserWindow->GetHWND(), subMenu.get(), otherBookmarksFolder,
 		menuIdRange, 0, menuImages, menuInfo);
 

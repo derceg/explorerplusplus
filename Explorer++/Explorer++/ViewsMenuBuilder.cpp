@@ -17,7 +17,7 @@ ViewsMenuBuilder::ViewsMenuBuilder(const ResourceLoader *resourceLoader) :
 
 wil::unique_hmenu ViewsMenuBuilder::BuildMenu(const BrowserWindow *browser)
 {
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	AddViewModesToMenu(menu.get(), 0, true);
 
 	ViewMode currentViewMode = browser->GetActiveShellBrowser()->GetViewMode();

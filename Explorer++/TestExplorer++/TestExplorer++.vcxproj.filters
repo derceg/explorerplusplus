@@ -297,7 +297,7 @@
     <ClCompile Include="TabRestorerMenuTest.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
-    <ClCompile Include="MenuViewFakeTestHelper.cpp">
+    <ClCompile Include="MenuViewTestHelper.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="XMLSettingsTest.cpp">
@@ -460,9 +460,6 @@
     <ClCompile Include="TabHistoryMenuTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
-    <ClCompile Include="MenuViewFake.cpp">
-      <Filter>Menus\UI\Views</Filter>
-    </ClCompile>
     <ClCompile Include="TabContainerTest.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
@@ -621,6 +618,12 @@
     </ClCompile>
     <ClCompile Include="D2DHelperTest.cpp">
       <Filter>Helper\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuControllerTest.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuTestHost.cpp">
+      <Filter>Menus\UI\Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -902,7 +905,7 @@
     <ClInclude Include="FrequentLocationsStorageTestHelper.h">
       <Filter>Frequent Locations</Filter>
     </ClInclude>
-    <ClInclude Include="MenuViewFakeTestHelper.h">
+    <ClInclude Include="MenuViewTestHelper.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="GTestHelper.h" />
@@ -948,9 +951,6 @@
     </ClInclude>
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="SimulatedClipboardDataObject.h" />
-    <ClInclude Include="MenuViewFake.h">
-      <Filter>Menus\UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowserFactoryFake.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
@@ -1031,6 +1031,9 @@
     </ClInclude>
     <ClInclude Include="ShellNameParserFake.h">
       <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuTestHost.h">
+      <Filter>Menus\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "../targetver.h"
+
 #define STRICT
 
 #define STRICT_TYPED_ITEMIDS

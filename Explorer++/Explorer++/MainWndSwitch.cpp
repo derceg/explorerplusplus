@@ -8,8 +8,6 @@
 #include "AddressBarView.h"
 #include "AppController.h"
 #include "AppServices.h"
-#include "Application.h"
-#include "ApplicationEditorDialog.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
 #include "Bookmarks/BookmarkHelper.h"
@@ -18,14 +16,11 @@
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserView.h"
-#include "ClipboardOperations.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
-#include "HolderWindow.h"
-#include "MainMenuSubMenuView.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
@@ -37,17 +32,11 @@
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/SortModes.h"
-#include "ShellBrowser/ViewModes.h"
 #include "SortModeMenuMappings.h"
-#include "StatusBar.h"
 #include "TabContainer.h"
-#include "TabRestorer.h"
-#include "TabRestorerMenu.h"
 #include "ViewsMenuBuilder.h"
 #include "../Helper/Controls.h"
-#include "../Helper/ListViewHelper.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/MenuHelper.h"
 #include <windowsx.h>
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;
@@ -67,16 +56,16 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		OnInitMenu(reinterpret_cast<HMENU>(wParam));
 		break;
 
+	case WM_ENTERMENULOOP:
+		OnEnterMenuLoop(wParam);
+		break;
+
 	case WM_EXITMENULOOP:
 		OnExitMenuLoop(wParam);
 		break;
 
 	case WM_INITMENUPOPUP:
 		OnInitMenuPopup(reinterpret_cast<HMENU>(wParam));
-		break;
-
-	case WM_UNINITMENUPOPUP:
-		OnUninitMenuPopup(reinterpret_cast<HMENU>(wParam));
 		break;
 
 	case WM_MENUSELECT:
@@ -985,7 +974,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	{
 		NMREBARCHEVRON *pnmrc = nullptr;
 		HWND hToolbar = nullptr;
-		HMENU hMenu;
 		MENUITEMINFO mii;
 		TCHAR szText[512];
 		TBBUTTON tbButton;
@@ -1011,7 +999,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			return 0;
 		}
 
-		hMenu = CreatePopupMenu();
+		auto menu = MenuHelper::CheckedCreatePopupMenu();
 
 		switch (pnmrc->wID)
 		{
@@ -1049,7 +1037,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						mii.cbSize = sizeof(mii);
 						mii.fMask = MIIM_FTYPE;
 						mii.fType = MFT_SEPARATOR;
-						InsertMenuItem(hMenu, i, TRUE, &mii);
+						InsertMenuItem(menu.get(), i, TRUE, &mii);
 					}
 					else
 					{
@@ -1107,7 +1095,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						mii.wID = tbButton.idCommand;
 						mii.hSubMenu = hSubMenu;
 						mii.dwTypeData = szText;
-						InsertMenuItem(hMenu, iMenu, TRUE, &mii);
+						InsertMenuItem(menu.get(), iMenu, TRUE, &mii);
 
 						/* TODO: Update the image
 						for this menu item. */
@@ -1120,7 +1108,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		UINT uFlags = TPM_LEFTALIGN | TPM_RETURNCMD;
 		int iCmd;
 
-		iCmd = TrackPopupMenu(hMenu, uFlags, ptMenu.x, ptMenu.y, 0, m_mainRebarView->GetHWND(),
+		iCmd = TrackPopupMenu(menu.get(), uFlags, ptMenu.x, ptMenu.y, 0, m_mainRebarView->GetHWND(),
 			nullptr);
 
 		if (iCmd != 0)
@@ -1147,8 +1135,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 				SendMessage(m_hwnd, WM_COMMAND, MAKEWPARAM(iCmd, 0), 0);
 			}
 		}
-
-		DestroyMenu(hMenu);
 	}
 	break;
 	}

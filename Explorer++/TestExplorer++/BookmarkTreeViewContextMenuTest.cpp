@@ -7,7 +7,7 @@
 #include "AcceleratorManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
-#include "MenuViewFake.h"
+#include "MenuTestHost.h"
 #include "ResourceLoaderFake.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -32,7 +32,7 @@ protected:
 	BookmarkTreeViewContextMenuTest() :
 		m_targetFolder(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt), 0)),
-		m_contextMenu(&m_menuView, &m_acceleratorManager, &m_delegate, &m_bookmarkTree,
+		m_contextMenu(m_menuHost.GetView(), &m_acceleratorManager, &m_delegate, &m_bookmarkTree,
 			m_targetFolder->GetWeakPtr(), &m_resourceLoader)
 	{
 	}
@@ -44,23 +44,23 @@ protected:
 
 	BookmarkTreeViewContextMenuDelegateMock m_delegate;
 
-	MenuViewFake m_menuView;
+	MenuTestHost m_menuHost;
 	BookmarkTreeViewContextMenu m_contextMenu;
 };
 
 TEST_F(BookmarkTreeViewContextMenuTest, Selection)
 {
 	EXPECT_CALL(m_delegate, StartRenamingFolder(m_targetFolder));
-	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
+	m_menuHost.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
 
 	EXPECT_CALL(m_delegate, CreateFolder(m_targetFolder, m_targetFolder->GetChildren().size()));
-	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
+	m_menuHost.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
 
 	MockFunction<void(const std::wstring &guid)> removedCallback;
 	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
 
 	EXPECT_CALL(removedCallback, Call(m_targetFolder->GetGUID()));
-	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE, false, false);
+	m_menuHost.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE, false, false);
 }
 
 TEST_F(BookmarkTreeViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
@@ -68,5 +68,5 @@ TEST_F(BookmarkTreeViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
 	m_bookmarkTree.RemoveBookmarkItem(m_targetFolder);
 
 	EXPECT_CALL(m_delegate, StartRenamingFolder(_)).Times(0);
-	m_menuView.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
+	m_menuHost.SelectItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME, false, false);
 }

@@ -16,7 +16,7 @@
 #include "NoOpMenuHelpTextHost.h"
 #include "OrganizeBookmarksContextMenu.h"
 #include "PlatformContext.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "TreeView.h"
@@ -384,12 +384,7 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 wil::unique_hmenu ManageBookmarksDialog::BuildColumnsMenu()
 {
-	wil::unique_hmenu menu(CreatePopupMenu());
-
-	if (!menu)
-	{
-		return nullptr;
-	}
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 
 	const auto *columnModel = m_bookmarkListPresenter->GetColumnModel();
 
@@ -554,11 +549,11 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(TRUE, 0));
 	DCHECK(res);
 
-	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
-	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	OrganizeBookmarksContextMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		m_currentBookmarkFolder->GetWeakPtr(), delegate, m_platformContext->GetClipboardStore(),
 		m_resourceLoader);
-	popupMenu.Show(m_hDlg, pt);
+	popupRunner.Show(m_hDlg, pt);
 
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));
 	DCHECK(res);

@@ -11,7 +11,7 @@
 #include "Icon.h"
 #include "MainResource.h"
 #include "NavigationHelper.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -713,18 +713,18 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 		button = MainToolbarButton::Forward;
 	}
 
-	PopupMenuView popupMenu(m_browser);
-	TabHistoryMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), m_browser,
+	PopupMenuRunner popupRunner(m_browser);
+	TabHistoryMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(), m_browser,
 		m_shellIconLoader, historyType);
-	popupMenu.Show(m_hwnd, GetMenuPositionForButton(button));
+	popupRunner.Show(m_hwnd, GetMenuPositionForButton(button));
 }
 
 void MainToolbar::ShowUpNavigationMenu()
 {
-	PopupMenuView popupMenu(m_browser);
-	TabParentItemsMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), m_browser,
-		m_shellIconLoader);
-	popupMenu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
+	PopupMenuRunner popupRunner(m_browser);
+	TabParentItemsMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(),
+		m_browser, m_shellIconLoader);
+	popupRunner.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
 }
 
 void MainToolbar::ShowToolbarViewsMenu()

@@ -7,45 +7,46 @@
 #include "IconModel.h"
 #include "MenuDelegate.h"
 #include "../Helper/WeakPtrFactory.h"
-#include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <memory>
 #include <optional>
 #include <unordered_map>
-
-class MenuHelpTextHost;
+#include <vector>
 
 class MenuView
 {
 public:
-	MenuView(MenuHelpTextHost *menuHelpTextHost);
-	virtual ~MenuView() = default;
+	MenuView(HMENU menu);
 
+	bool IsRoot() const;
 	void SetDelegate(MenuDelegate *delegate);
 
 	void AppendItem(UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
+	MenuView *AppendSubMenu(UINT id, const std::wstring &text,
+		std::unique_ptr<const IconModel> iconModel = {});
 	void AppendSeparator();
 	void EnableItem(UINT id, bool enable);
 	void CheckItem(UINT id, bool check);
 	void RemoveTrailingSeparators();
 	void ClearMenu();
+
+	bool IsItemEnabled(UINT id) const;
+	int GetNumItems() const;
+
 	std::wstring GetItemHelpText(UINT id) const;
 
-	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
-	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
-
-protected:
-	virtual HMENU GetMenu() const = 0;
-
-	void OnMenuWillShow(HWND ownerWindow);
-	void OnMenuWillShowForDpi(UINT dpi);
-	void OnMenuClosed();
-
-	MenuHelpTextHost *const m_menuHelpTextHost;
+	HMENU GetNativeMenuForTesting() const;
+	UINT GetItemIdForTesting(int index) const;
+	std::wstring GetItemTextForTesting(UINT id) const;
+	HBITMAP GetItemBitmapForTesting(UINT id) const;
+	void OnPopupWillShowForTesting(UINT dpi);
+	void OnPopupClosedForTesting();
 
 private:
+	friend class MenuController;
+
 	struct Item
 	{
 		Item(std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText) :
@@ -59,17 +60,26 @@ private:
 		const std::wstring helpText;
 	};
 
+	MenuDelegate *MaybeGetDelegate();
+
+	void OnPopupWillShowForDpi(UINT dpi);
+	void OnPopupClosed();
+	MenuView *MaybeGetMenuViewForNativeMenu(HMENU menu);
+	MenuView *MaybeGetMenuViewForItem(UINT id);
+
 	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
-	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, int id);
 	void MaybeAddImagesToMenu();
-	UINT GetCurrentDpi();
+	UINT GetCurrentDpi() const;
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
 
-	MenuDelegate *m_delegate = nullptr;
+	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
-	boost::signals2::scoped_connection m_helpTextConnection;
+	const HMENU m_menu;
+	MenuDelegate *m_delegate = nullptr;
+	MenuView *m_parent = nullptr;
+	std::vector<std::unique_ptr<MenuView>> m_subMenus;
 
 	std::unordered_map<UINT, Item> m_idToItemMap;
 

@@ -35,7 +35,7 @@ void ShellContextMenu::AddDelegate(ShellContextMenuDelegate *delegate)
 
 void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT flags)
 {
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 
 	m_contextMenu = MaybeGetShellContextMenu(hwnd);
 	wil::unique_set_site_null_call resetSite;
@@ -63,6 +63,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT
 	auto subclass = std::make_unique<WindowSubclass>(hwnd,
 		std::bind_front(&ShellContextMenu::ParentWindowSubclass, this));
 
+	m_menuHelpTextHost->NotifyTopLevelMenuShown();
 	auto helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
 		std::bind_front(&ShellContextMenu::MaybeGetMenuHelpText, this, menu.get()));
 
@@ -70,6 +71,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT
 		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, hwnd, nullptr);
 
 	helpTextConnection.disconnect();
+	m_menuHelpTextHost->NotifyTopLevelMenuClosed();
 
 	// When the selected command is invoked below, it could potentially do anything, including show
 	// another menu. It doesn't make sense for the subclass to be called in that situation and

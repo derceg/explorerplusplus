@@ -3,36 +3,51 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
+#include "MenuView.h"
 #include "GTestHelper.h"
-#include "MenuViewFake.h"
 #include "PidlTestHelper.h"
 #include "ShellIconLoaderFake.h"
 #include "ShellIconModel.h"
+#include "../Helper/MenuHelper.h"
 #include <gtest/gtest.h>
+#include <wil/resource.h>
 
 using namespace testing;
 
 class MenuViewTest : public Test
 {
 protected:
+	MenuViewTest() : m_menu(MenuHelper::CheckedCreatePopupMenu()), m_menuView(m_menu.get())
+	{
+	}
+
 	void CheckAppendItem(UINT itemId, const std::wstring &text, const std::wstring &helpText,
 		const std::optional<std::wstring> &acceleratorText = std::nullopt)
 	{
 		m_menuView.AppendItem(itemId, text, {}, helpText, acceleratorText);
 		m_appendItemCount++;
 
-		EXPECT_EQ(m_menuView.GetItemCount(), m_appendItemCount);
-		EXPECT_EQ(m_menuView.GetItemId(m_appendItemCount - 1), itemId);
-		EXPECT_EQ(m_menuView.GetItemText(itemId),
+		EXPECT_EQ(m_menuView.GetNumItems(), m_appendItemCount);
+		EXPECT_EQ(m_menuView.GetItemIdForTesting(m_appendItemCount - 1), itemId);
+		EXPECT_EQ(m_menuView.GetItemTextForTesting(itemId),
 			acceleratorText ? text + L"\t" + *acceleratorText : text);
 		EXPECT_EQ(m_menuView.GetItemHelpText(itemId), helpText);
 	}
 
-	MenuViewFake m_menuView;
+	wil::unique_hmenu m_menu;
+	MenuView m_menuView;
 
 private:
 	int m_appendItemCount = 0;
 };
+
+TEST_F(MenuViewTest, IsRoot)
+{
+	EXPECT_TRUE(m_menuView.IsRoot());
+
+	auto *subMenu = m_menuView.AppendSubMenu(1, L"SubMenu");
+	EXPECT_FALSE(subMenu->IsRoot());
+}
 
 TEST_F(MenuViewTest, AppendItem)
 {
@@ -47,6 +62,15 @@ TEST_F(MenuViewTest, AppendItem)
 	CheckAppendItem(idCounter++, L"Item 3", L"Help text for item 3");
 }
 
+TEST_F(MenuViewTest, AppendSubMenu)
+{
+	UINT subMenuItemId = 1;
+	m_menuView.AppendSubMenu(subMenuItemId, L"SubMenu");
+	ASSERT_EQ(m_menuView.GetNumItems(), 1);
+	EXPECT_EQ(m_menuView.GetItemIdForTesting(0), subMenuItemId);
+	EXPECT_EQ(m_menuView.GetItemTextForTesting(subMenuItemId), L"SubMenu");
+}
+
 TEST_F(MenuViewTest, ClearEmptyMenu)
 {
 	// Clearing an empty menu should have no effect, but also shouldn't cause any issues.
@@ -58,7 +82,7 @@ TEST_F(MenuViewTest, ClearMenu)
 	m_menuView.AppendItem(1, L"Item");
 
 	m_menuView.ClearMenu();
-	EXPECT_EQ(m_menuView.GetItemCount(), 0);
+	EXPECT_EQ(m_menuView.GetNumItems(), 0);
 }
 
 using MenuViewDeathTest = MenuViewTest;
@@ -84,6 +108,10 @@ protected:
 		Exclude
 	};
 
+	MenuViewIconTest() : m_menu(MenuHelper::CheckedCreatePopupMenu())
+	{
+	}
+
 	void AddItemsToMenu(MenuView *menuView, int numItems,
 		ImageOption imageOption = ImageOption::Include)
 	{
@@ -102,6 +130,7 @@ protected:
 	}
 
 	ShellIconLoaderFake m_shellIconLoader;
+	wil::unique_hmenu m_menu;
 
 private:
 	UINT m_idCounter = 100;
@@ -109,18 +138,18 @@ private:
 
 TEST_F(MenuViewIconTest, InitialState)
 {
-	MenuViewFake menuView;
+	MenuView menuView(m_menu.get());
 	AddItemsToMenu(&menuView, 1);
 
 	// Even though an image was assigned to the item, no image should be added to the menu until the
 	// menu is shown (so that DPI scaling can be applied).
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, OnShow)
 {
-	MenuViewFake menuView;
+	MenuView menuView(m_menu.get());
 	AddItemsToMenu(&menuView, 1);
 
 	HBITMAP generatedBitmap = nullptr;
@@ -128,30 +157,30 @@ TEST_F(MenuViewIconTest, OnShow)
 		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
 
 	// The item image should be set once the menu is shown.
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
 TEST_F(MenuViewIconTest, OnShowWithNoImage)
 {
-	MenuViewFake menuView;
+	MenuView menuView(m_menu.get());
 	AddItemsToMenu(&menuView, 1, ImageOption::Exclude);
 
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
 	// The item didn't have any image set, so showing the menu shouldn't result in any image being
 	// assigned.
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, MenuBeingShown)
 {
-	MenuViewFake menuView;
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	MenuView menuView(m_menu.get());
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
 	HBITMAP generatedBitmap = nullptr;
 	m_shellIconLoader.SetBitmapGeneratedCallback(
@@ -161,54 +190,54 @@ TEST_F(MenuViewIconTest, MenuBeingShown)
 	AddItemsToMenu(&menuView, 1);
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
 TEST_F(MenuViewIconTest, ShowAfterDpiChange)
 {
-	MenuViewFake menuView;
+	MenuView menuView(m_menu.get());
 
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 	AddItemsToMenu(&menuView, 1);
-	menuView.OnMenuClosed();
+	menuView.OnPopupClosedForTesting();
 
 	HBITMAP generatedBitmap = nullptr;
 	m_shellIconLoader.SetBitmapGeneratedCallback(
 		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
 
 	// The menu is being shown again, but at a different DPI level, so the image should be updated.
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI * 2);
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI * 2);
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
 TEST_F(MenuViewIconTest, ShowAtSameDpi)
 {
-	MenuViewFake menuView;
+	MenuView menuView(m_menu.get());
 
 	HBITMAP generatedBitmap = nullptr;
 	m_shellIconLoader.SetBitmapGeneratedCallback(
 		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
 
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 	AddItemsToMenu(&menuView, 1);
-	menuView.OnMenuClosed();
+	menuView.OnPopupClosedForTesting();
 	EXPECT_NE(generatedBitmap, nullptr);
 
 	// The menu is being shown again, at the same DPI level, so the image shouldn't be updated.
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
 TEST_F(MenuViewIconTest, IconUpdate)
 {
-	MenuViewFake menuView;
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
+	MenuView menuView(m_menu.get());
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
 	AddItemsToMenu(&menuView, 1);
 
@@ -219,25 +248,25 @@ TEST_F(MenuViewIconTest, IconUpdate)
 	m_shellIconLoader.TriggerPendingUpdateCallbacks();
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
 TEST_F(MenuViewIconTest, AddItemAfterClose)
 {
-	MenuViewFake menuView;
-	menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
-	menuView.OnMenuClosed();
+	MenuView menuView(m_menu.get());
+	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+	menuView.OnPopupClosedForTesting();
 
 	AddItemsToMenu(&menuView, 1);
 
-	auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(0));
+	auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(0));
 	EXPECT_EQ(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, IconRetrievalAfterMenuRebuilt)
 {
-	MenuViewFake menuView;
+	MenuView menuView(m_menu.get());
 	AddItemsToMenu(&menuView, 3);
 
 	// When the menu is rebuilt, the view will provide update callbacks to the icon loader.
@@ -251,9 +280,9 @@ TEST_F(MenuViewIconTest, IconRetrievalAfterMenuRebuilt)
 
 	std::vector<HBITMAP> originalBitmaps;
 
-	for (int i = 0; i < menuView.GetItemCount(); i++)
+	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(i));
+		auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(i));
 		originalBitmaps.push_back(bitmap);
 	}
 
@@ -264,16 +293,16 @@ TEST_F(MenuViewIconTest, IconRetrievalAfterMenuRebuilt)
 
 	// As the callbacks that were triggered were for the original items on the menu, the images for
 	// the new items shouldn't have changed.
-	for (int i = 0; i < menuView.GetItemCount(); i++)
+	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		auto bitmap = menuView.GetItemBitmap(menuView.GetItemId(i));
+		auto bitmap = menuView.GetItemBitmapForTesting(menuView.GetItemIdForTesting(i));
 		EXPECT_EQ(bitmap, originalBitmaps[i]);
 	}
 }
 
 TEST_F(MenuViewIconTest, IconRetrievalAfterMenuDestroyed)
 {
-	auto menuView = std::make_unique<MenuViewFake>();
+	auto menuView = std::make_unique<MenuView>(m_menu.get());
 	AddItemsToMenu(menuView.get(), 3);
 
 	menuView.reset();
@@ -281,69 +310,4 @@ TEST_F(MenuViewIconTest, IconRetrievalAfterMenuDestroyed)
 	// If one or more icons are retrieved after the menu has been closed and destroyed, the menu
 	// can't be updated, but that should still be a safe operation.
 	m_shellIconLoader.TriggerPendingUpdateCallbacks();
-}
-
-namespace
-{
-
-class MenuHelpTextHostFake : public MenuHelpTextHost
-{
-public:
-	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override
-	{
-		UNREFERENCED_PARAMETER(menu);
-		UNREFERENCED_PARAMETER(itemId);
-		UNREFERENCED_PARAMETER(flags);
-	}
-
-	boost::signals2::connection AddMenuHelpTextRequestObserver(
-		const MenuHelpTextRequestSignal::slot_type &observer) override
-	{
-		return m_menuHelpTextRequestSignal.connect(observer);
-	}
-
-	std::optional<std::wstring> TriggerHelpTextRequest(HMENU menu, UINT id)
-	{
-		return m_menuHelpTextRequestSignal(menu, id);
-	}
-
-private:
-	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
-};
-
-}
-
-class MenuViewHelpTextRequestTest : public Test
-{
-protected:
-	MenuViewHelpTextRequestTest() : m_menuView(&m_menuHelpTextHost)
-	{
-	}
-
-	MenuHelpTextHostFake m_menuHelpTextHost;
-	MenuViewFake m_menuView;
-};
-
-TEST_F(MenuViewHelpTextRequestTest, HelpTextRequest)
-{
-	UINT itemId = 1;
-	std::wstring helpText = L"Help text";
-	m_menuView.AppendItem(itemId, L"Item", {}, helpText);
-
-	// The menu isn't being shown, so no help text should be returned.
-	auto retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(m_menuView.GetMenu(), itemId);
-	EXPECT_EQ(retrievedHelpText, std::nullopt);
-
-	m_menuView.OnMenuWillShowForDpi(USER_DEFAULT_SCREEN_DPI);
-
-	// The menu is now being shown, so help text should be returned.
-	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(m_menuView.GetMenu(), itemId);
-	EXPECT_EQ(retrievedHelpText, helpText);
-
-	m_menuView.OnMenuClosed();
-
-	// The menu has been closed, so, again, no help text should be returned.
-	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(m_menuView.GetMenu(), itemId);
-	EXPECT_EQ(retrievedHelpText, std::nullopt);
 }

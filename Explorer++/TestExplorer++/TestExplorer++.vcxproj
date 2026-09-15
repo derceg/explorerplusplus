@@ -252,6 +252,8 @@
     <ClCompile Include="ListViewColumnsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
+    <ClCompile Include="MenuControllerTest.cpp" />
+    <ClCompile Include="MenuTestHost.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />
     <ClCompile Include="SearchTabsListViewModelTest.cpp" />
@@ -270,7 +272,6 @@
     <ClCompile Include="ListViewModelFake.cpp" />
     <ClCompile Include="ListViewModelTest.cpp" />
     <ClCompile Include="ListViewTest.cpp" />
-    <ClCompile Include="MenuViewFake.cpp" />
     <ClCompile Include="OrganizeBookmarksContextMenuTest.cpp" />
     <ClCompile Include="SimulatedFileSystemPidlUpdater.cpp" />
     <ClCompile Include="PlatformContextFake.cpp" />
@@ -362,7 +363,7 @@
     <ClCompile Include="ModelessDialogListTest.cpp" />
     <ClCompile Include="NavigationManagerTest.cpp" />
     <ClCompile Include="NavigationRequestTest.cpp" />
-    <ClCompile Include="MenuViewFakeTestHelper.cpp" />
+    <ClCompile Include="MenuViewTestHelper.cpp" />
     <ClCompile Include="ProcessManagerTest.cpp" />
     <ClCompile Include="RuntimeHelperTest.cpp" />
     <ClCompile Include="RuntimeTest.cpp" />
@@ -478,6 +479,7 @@
     <ClInclude Include="BrowserWindowFactoryFake.h" />
     <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowMock.h" />
+    <ClInclude Include="MenuTestHost.h" />
     <ClInclude Include="NoOpClipboardWatcher.h" />
     <ClInclude Include="CopiedBookmark.h" />
     <ClInclude Include="DarkModeManagerFake.h" />
@@ -492,7 +494,6 @@
     <ClInclude Include="ListViewColumnModelFake.h" />
     <ClInclude Include="ListViewItemFake.h" />
     <ClInclude Include="ListViewModelFake.h" />
-    <ClInclude Include="MenuViewFake.h" />
     <ClInclude Include="SimulatedFileSystemPidlUpdater.h" />
     <ClInclude Include="PlatformContextFake.h" />
     <ClInclude Include="ShellBrowserFactoryFake.h" />
@@ -520,7 +521,7 @@
     <ClInclude Include="NavigationRequestDelegateMock.h" />
     <ClInclude Include="NavigationRequestTestHelper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="MenuViewFakeTestHelper.h" />
+    <ClInclude Include="MenuViewTestHelper.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
     <ClInclude Include="ResourceLoaderFake.h" />
     <ClInclude Include="RuntimeTestHelper.h" />

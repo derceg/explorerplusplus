@@ -19,6 +19,9 @@ class MenuHelpTextHost
 public:
 	virtual ~MenuHelpTextHost() = default;
 
+	virtual void NotifyTopLevelMenuShown() = 0;
+	virtual void NotifyTopLevelMenuClosed() = 0;
+
 	// Notifies the host that a menu item has been selected.
 	virtual void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) = 0;
 

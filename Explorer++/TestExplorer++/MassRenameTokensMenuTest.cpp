@@ -6,7 +6,7 @@
 #include "MassRenameTokensMenu.h"
 #include "AcceleratorManager.h"
 #include "MassRenameHelper.h"
-#include "MenuViewFake.h"
+#include "MenuTestHost.h"
 #include "ResourceLoaderFake.h"
 #include <gtest/gtest.h>
 
@@ -17,9 +17,10 @@ TEST(MassRenameTokensMenuTest, Selection)
 	AcceleratorManager acceleratorManager;
 	ResourceLoaderFake resourceLoader;
 
-	MenuViewFake menuView;
+	MenuTestHost menuHost;
+	auto *menuView = menuHost.GetView();
 	MockFunction<void(MassRenameToken token)> selectionCallback;
-	MassRenameTokensMenu menu(&menuView, &acceleratorManager, selectionCallback.AsStdFunction(),
+	MassRenameTokensMenu menu(menuView, &acceleratorManager, selectionCallback.AsStdFunction(),
 		&resourceLoader);
 
 	InSequence seq;
@@ -29,8 +30,8 @@ TEST(MassRenameTokensMenuTest, Selection)
 		EXPECT_CALL(selectionCallback, Call(token));
 	}
 
-	for (int i = 0; i < menuView.GetItemCount(); i++)
+	for (int i = 0; i < menuView->GetNumItems(); i++)
 	{
-		menuView.SelectItem(menuView.GetItemId(i), false, false);
+		menuHost.SelectItemAtIndex(i, false, false);
 	}
 }

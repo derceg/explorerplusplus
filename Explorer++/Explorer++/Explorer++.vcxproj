@@ -1225,6 +1225,7 @@
     <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="MassRenameHelper.cpp" />
     <ClCompile Include="MassRenameTokensMenu.cpp" />
+    <ClCompile Include="MenuController.cpp" />
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
@@ -1301,7 +1302,7 @@
     <ClCompile Include="LanguageHelper.cpp" />
     <ClCompile Include="LayoutDefaults.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
-    <ClCompile Include="MainMenuSubMenuView.cpp" />
+    <ClCompile Include="MainMenuSubMenuHost.cpp" />
     <ClCompile Include="BrowserList.cpp" />
     <ClCompile Include="MainRebarView.cpp" />
     <ClCompile Include="ModelessDialogHelper.cpp" />
@@ -1345,7 +1346,7 @@
     <ClCompile Include="NavigationHelper.cpp" />
     <ClCompile Include="OneShotTimer.cpp" />
     <ClCompile Include="OneShotTimerManager.cpp" />
-    <ClCompile Include="PopupMenuView.cpp" />
+    <ClCompile Include="PopupMenuRunner.cpp" />
     <ClCompile Include="MainRebarRegistryStorage.cpp" />
     <ClCompile Include="ShellEnumeratorImpl.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
@@ -1591,6 +1592,7 @@
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MassRenameHelper.h" />
     <ClInclude Include="MassRenameTokensMenu.h" />
+    <ClInclude Include="MenuController.h" />
     <ClInclude Include="MenuDelegate.h" />
     <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="NoOpMenuHelpTextHost.h" />
@@ -1684,7 +1686,7 @@
     <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />
     <ClInclude Include="LocationVisitInfo.h" />
-    <ClInclude Include="MainMenuSubMenuView.h" />
+    <ClInclude Include="MainMenuSubMenuHost.h" />
     <ClInclude Include="BrowserList.h" />
     <ClInclude Include="MainRebarView.h" />
     <ClInclude Include="ModelessDialogHelper.h" />
@@ -1737,7 +1739,7 @@
     <ClInclude Include="NavigationHelper.h" />
     <ClInclude Include="OneShotTimer.h" />
     <ClInclude Include="OneShotTimerManager.h" />
-    <ClInclude Include="PopupMenuView.h" />
+    <ClInclude Include="PopupMenuRunner.h" />
     <ClInclude Include="MainRebarRegistryStorage.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellEnumeratorImpl.h" />

@@ -242,12 +242,7 @@ LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 	BookmarkMenuBuilder::IncludePredicate includePredicate)
 {
-	wil::unique_hmenu menu(CreatePopupMenu());
-
-	if (!menu)
-	{
-		return FALSE;
-	}
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 
 	MenuHelper::SetMenuStyle(menu.get(), MNS_DRAGDROP);
 

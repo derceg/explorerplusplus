@@ -55,21 +55,33 @@ void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_h
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING | MIIM_SUBMENU;
 	menuItemInfo.wID = id;
 	menuItemInfo.dwTypeData = const_cast<LPWSTR>(text.c_str());
-	menuItemInfo.hSubMenu = subMenu.release();
+	menuItemInfo.hSubMenu = subMenu.get();
 	auto res = InsertMenuItem(menu, item, byPosition, &menuItemInfo);
 	CHECK(res);
+
+	// As the sub menu is now part of the parent menu, it will be destroyed when the parent menu is
+	// destroyed.
+	subMenu.release();
+}
+
+HMENU AttachNewSubMenu(HMENU parentMenu, UINT item, BOOL byPosition)
+{
+	auto ownedSubMenu = CheckedCreatePopupMenu();
+	auto subMenu = ownedSubMenu.get();
+	AttachSubMenu(parentMenu, std::move(ownedSubMenu), item, byPosition);
+	return subMenu;
 }
 
 void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
 {
-	// As the sub menu is now part of the parent menu, it will be destroyed when the parent menu is
-	// destroyed.
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_SUBMENU;
-	menuItemInfo.hSubMenu = subMenu.release();
+	menuItemInfo.hSubMenu = subMenu.get();
 	auto res = SetMenuItemInfo(parentMenu, item, byPosition, &menuItemInfo);
 	CHECK(res);
+
+	subMenu.release();
 }
 
 void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
@@ -317,6 +329,13 @@ std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 	}
 
 	return std::nullopt;
+}
+
+wil::unique_hmenu CheckedCreatePopupMenu()
+{
+	wil::unique_hmenu menu(CreatePopupMenu());
+	CHECK(menu);
+	return menu;
 }
 
 }

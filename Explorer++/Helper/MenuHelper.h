@@ -16,6 +16,7 @@ void AddSeparator(HMENU menu, UINT item, BOOL byPosition);
 void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu);
 void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
 	UINT item, BOOL byPosition);
+HMENU AttachNewSubMenu(HMENU parentMenu, UINT item, BOOL byPosition);
 void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition);
 
 void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck);
@@ -36,5 +37,7 @@ bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu);
 bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition);
 
 std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen);
+
+wil::unique_hmenu CheckedCreatePopupMenu();
 
 }

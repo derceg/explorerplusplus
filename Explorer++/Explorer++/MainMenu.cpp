@@ -12,7 +12,7 @@
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
 #include "Icon.h"
-#include "MainMenuSubMenuView.h"
+#include "MainMenuSubMenuHost.h"
 #include "MainResource.h"
 #include "MenuRanges.h"
 #include "ResourceHelper.h"
@@ -138,9 +138,9 @@ void Explorerplusplus::InitializeMainMenu()
 void Explorerplusplus::AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
 	std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator)
 {
-	auto view = std::make_unique<MainMenuSubMenuView>(this, mainMenu, subMenuItemId);
-	auto menu = menuCreator(view.get());
-	m_mainMenuSubMenus.emplace_back(std::move(view), std::move(menu));
+	auto menuHost = std::make_unique<MainMenuSubMenuHost>(this, mainMenu, subMenuItemId);
+	auto menu = menuCreator(menuHost->GetView());
+	m_mainMenuSubMenus.emplace_back(std::move(menuHost), std::move(menu));
 }
 
 void Explorerplusplus::SetMainMenuImages()
@@ -313,10 +313,20 @@ void Explorerplusplus::OnInitMenu(HMENU menu)
 	}
 }
 
+void Explorerplusplus::OnEnterMenuLoop(bool shortcutMenu)
+{
+	if (!shortcutMenu)
+	{
+		NotifyTopLevelMenuShown();
+	}
+}
+
 void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
 {
 	if (!shortcutMenu)
 	{
+		NotifyTopLevelMenuClosed();
+
 		m_mainMenuShowing = false;
 	}
 }
@@ -324,27 +334,14 @@ void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
 void Explorerplusplus::OnInitMenuPopup(HMENU menu)
 {
 	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
-		[menu](const auto &currentSubMenu) { return currentSubMenu.view->GetMenu() == menu; });
+		[menu](const auto &currentSubMenu) { return currentSubMenu.menuHost->GetMenu() == menu; });
 
 	if (subMenu == m_mainMenuSubMenus.end())
 	{
 		return;
 	}
 
-	subMenu->view->OnSubMenuWillShow();
-}
-
-void Explorerplusplus::OnUninitMenuPopup(HMENU menu)
-{
-	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
-		[menu](const auto &currentSubMenu) { return currentSubMenu.view->GetMenu() == menu; });
-
-	if (subMenu == m_mainMenuSubMenus.end())
-	{
-		return;
-	}
-
-	subMenu->view->OnSubMenuClosed();
+	subMenu->menuHost->OnSubMenuWillShow();
 }
 
 bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)
@@ -356,7 +353,7 @@ bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)
 		return false;
 	}
 
-	subMenu->view->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+	subMenu->menuHost->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 
 	return true;
 }
@@ -373,17 +370,6 @@ void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
 	if (!m_mainMenuShowing)
 	{
 		return;
-	}
-
-	auto menuItemId = MenuHelper::MaybeGetMenuItemAtPoint(GetMenu(m_hwnd), pt);
-
-	if (menuItemId)
-	{
-		if (auto *subMenu = MaybeGetMainMenuSubMenuFromId(*menuItemId))
-		{
-			subMenu->view->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
-			return;
-		}
 	}
 
 	m_mainMenuItemMiddleClickedSignal(pt, isCtrlKeyDown, isShiftKeyDown);

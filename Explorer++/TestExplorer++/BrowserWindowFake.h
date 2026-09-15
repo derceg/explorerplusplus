@@ -48,6 +48,8 @@ public:
 	using BrowserWindow::SetLifecycleState;
 
 	// MenuHelpTextHost
+	void NotifyTopLevelMenuShown() override;
+	void NotifyTopLevelMenuClosed() override;
 	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override;
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;

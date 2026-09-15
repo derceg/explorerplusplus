@@ -24,7 +24,7 @@
 #include "Config.h"
 #include "DisplayWindowContextMenu.h"
 #include "MainResource.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
@@ -668,10 +668,10 @@ void DisplayWindow::OnShowContextMenu(const POINT &ptScreen)
 	}
 	else
 	{
-		PopupMenuView popupMenu(m_browser);
-		DisplayWindowContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_browser, m_config,
-			m_resourceLoader);
-		popupMenu.Show(m_hwnd, ptScreen);
+		PopupMenuRunner popupRunner(m_browser);
+		DisplayWindowContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_browser,
+			m_config, m_resourceLoader);
+		popupRunner.Show(m_hwnd, ptScreen);
 	}
 }
 

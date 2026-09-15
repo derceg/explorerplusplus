@@ -9,7 +9,7 @@
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
 #include "MainResource.h"
-#include "MenuViewFake.h"
+#include "MenuTestHost.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -53,10 +53,10 @@ protected:
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 {
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN, false, false);
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
 
@@ -66,10 +66,10 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, OpenInNewTab)
 {
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB, false, false);
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
@@ -81,13 +81,13 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, OpenInNewTab)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 {
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
 	CopiedBookmark copiedBookmark(*m_bookmark);
 	const auto *parentFolder = m_bookmark->GetParent();
 
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, false, false);
 
 	// Cutting the bookmark should have removed it from the tree.
 	ASSERT_TRUE(parentFolder->GetChildren().empty());
@@ -99,12 +99,12 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 {
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
 	CopiedBookmark copiedBookmark(*m_bookmark);
 
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
 
 	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
@@ -123,10 +123,10 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 	ASSERT_TRUE(BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(),
 		&m_bookmarkTree, { bookmark }, ClipboardAction::Copy));
 
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE, false, false);
 
 	const auto *parentFolder = m_bookmark->GetParent();
 	ASSERT_EQ(parentFolder->GetChildren().size(), 2u);
@@ -135,14 +135,14 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 
 TEST_F(BookmarkContextMenuSingleBookmarkTest, Delete)
 {
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
 	MockFunction<void(const std::wstring &guid)> removedCallback;
 	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
 
 	EXPECT_CALL(removedCallback, Call(m_bookmark->GetGUID()));
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, false, false);
 }
 
 class BookmarkContextMenuMultipleBookmarksTest : public BookmarkContextMenuTestBase
@@ -174,10 +174,10 @@ protected:
 
 TEST_F(BookmarkContextMenuMultipleBookmarksTest, OpenAll)
 {
-	MenuViewFake menuView;
-	auto contextMenu = BuildContextMenu(&menuView);
+	MenuTestHost menuHost;
+	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuView.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL, false, false);
+	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL, false, false);
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	int numBookmarks = static_cast<int>(m_bookmarkItems.size());

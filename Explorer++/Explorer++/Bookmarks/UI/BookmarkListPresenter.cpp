@@ -16,7 +16,7 @@
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
 #include "PlatformContext.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -272,10 +272,10 @@ void BookmarkListPresenter::OnPaste(ListViewItem *lastSelectedItemOpt)
 
 void BookmarkListPresenter::OnShowBackgroundContextMenu(const POINT &ptScreen)
 {
-	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
-	BookmarkListViewContextMenu contextMenu(&popupMenu, m_acceleratorManager, this,
+	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	BookmarkListViewContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, this,
 		m_currentBookmarkFolder->GetWeakPtr(), m_resourceLoader);
-	popupMenu.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(m_view->GetHWND(), ptScreen);
 }
 
 void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
@@ -288,11 +288,11 @@ void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem
 		return;
 	}
 
-	PopupMenuView popupMenu(NoOpMenuHelpTextHost::GetInstance());
-	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		GetBookmarksForItems(items), m_resourceLoader, browser, m_view->GetHWND(),
 		m_platformContext);
-	popupMenu.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(m_view->GetHWND(), ptScreen);
 }
 
 RawBookmarkItems BookmarkListPresenter::GetBookmarksForItems(

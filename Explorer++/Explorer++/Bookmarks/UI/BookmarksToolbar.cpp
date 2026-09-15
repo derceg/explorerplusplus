@@ -13,7 +13,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "NavigationHelper.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/WeakPtr.h"
@@ -301,10 +301,10 @@ void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	PopupMenuView popupMenu(m_browser);
-	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+	PopupMenuRunner popupRunner(m_browser);
+	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_platformContext);
-	popupMenu.Show(m_browser->GetHWND(), ptScreen);
+	popupRunner.Show(m_browser->GetHWND(), ptScreen);
 }
 
 BookmarksToolbarView *BookmarksToolbar::GetView() const

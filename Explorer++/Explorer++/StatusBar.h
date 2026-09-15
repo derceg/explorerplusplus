@@ -27,6 +27,9 @@ public:
 		NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader);
 
 	StatusBarView *GetView();
+
+	void NotifyMenuLoopStarted();
+	void NotifyMenuLoopEnded();
 	void OnMenuSelect(HMENU menu, UINT itemId, UINT flags);
 
 private:
@@ -41,9 +44,6 @@ private:
 	void OnListViewSelectionChanged(const ShellBrowser *shellBrowser);
 	void UpdateTextForNavigation(const NavigationRequest *request);
 	void OnNavigationsStopped(const ShellBrowser *shellBrowser);
-
-	void OnMenuClose();
-	void OnMenuItemSelected(HMENU menu, UINT itemId, UINT flags);
 
 	void UpdateText(const Tab &tab);
 	void SetLoadingText(PCIDLIST_ABSOLUTE pidl);

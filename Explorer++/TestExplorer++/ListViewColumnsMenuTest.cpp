@@ -7,7 +7,7 @@
 #include "AcceleratorManager.h"
 #include "GeneratorTestHelper.h"
 #include "ListViewColumnModel.h"
-#include "MenuViewFake.h"
+#include "MenuTestHost.h"
 #include "ResourceLoaderFake.h"
 #include <gtest/gtest.h>
 
@@ -24,7 +24,7 @@ protected:
 		m_model(
 			{ { COLUMN_A, 1, 100, true }, { COLUMN_B, 1, 100, true }, { COLUMN_C, 1, 100, true } },
 			COLUMN_A),
-		m_menu(&m_menuView, &m_acceleratorManager, &m_model, &m_resourceLoader)
+		m_menu(m_menuHost.GetView(), &m_acceleratorManager, &m_model, &m_resourceLoader)
 	{
 	}
 
@@ -33,42 +33,46 @@ protected:
 
 	ListViewColumnModel m_model;
 
-	MenuViewFake m_menuView;
+	MenuTestHost m_menuHost;
 	ListViewColumnsMenu m_menu;
 };
 
 TEST_F(ListViewColumnsMenuTest, MenuItemStates)
 {
-	auto columnIds = GeneratorToVector(m_model.GetAllColumnIds());
-	ASSERT_EQ(static_cast<size_t>(m_menuView.GetItemCount()), columnIds.size());
+	auto *menuView = m_menuHost.GetView();
 
-	for (int i = 0; i < m_menuView.GetItemCount(); i++)
+	auto columnIds = GeneratorToVector(m_model.GetAllColumnIds());
+	ASSERT_EQ(static_cast<size_t>(menuView->GetNumItems()), columnIds.size());
+
+	for (int i = 0; i < menuView->GetNumItems(); i++)
 	{
 		// The primary column can't be removed, so its menu item should be disabled. All other items
 		// should be enabled.
 		auto columnId = columnIds[i];
-		EXPECT_EQ(m_menuView.IsItemEnabled(m_menuView.GetItemId(i)),
+		EXPECT_EQ(menuView->IsItemEnabled(menuView->GetItemIdForTesting(i)),
 			!m_model.IsPrimaryColumnId(columnId));
 	}
 }
 
 TEST_F(ListViewColumnsMenuTest, Selection)
 {
-	auto columnIds = GeneratorToVector(m_model.GetAllColumnIds());
-	ASSERT_EQ(static_cast<size_t>(m_menuView.GetItemCount()), columnIds.size());
+	auto *menuView = m_menuHost.GetView();
 
-	for (int i = 0; i < m_menuView.GetItemCount(); i++)
+	auto columnIds = GeneratorToVector(m_model.GetAllColumnIds());
+	ASSERT_EQ(static_cast<size_t>(menuView->GetNumItems()), columnIds.size());
+
+	for (int i = 0; i < menuView->GetNumItems(); i++)
 	{
-		m_menuView.SelectItem(m_menuView.GetItemId(i), false, false);
+		m_menuHost.SelectItemAtIndex(i, false, false);
 
 		// All of the columns should be toggled off, except for the primary column.
 		auto columnId = columnIds[i];
 		EXPECT_EQ(m_model.IsColumnVisible(columnId), m_model.IsPrimaryColumnId(columnId));
 	}
 
-	for (int i = 0; i < m_menuView.GetItemCount(); i++)
+	for (int i = 0; i < menuView->GetNumItems(); i++)
 	{
-		m_menuView.SelectItem(m_menuView.GetItemId(i), false, false);
+		m_menuHost.SelectItemAtIndex(i, false, false);
 
 		// The above call should have toggled the columns back on.
 		auto columnId = columnIds[i];

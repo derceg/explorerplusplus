@@ -55,7 +55,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 wil::unique_hmenu SortMenuBuilder::CreateDefaultMenu(UINT ascendingMenuItemId,
 	UINT descendingMenuItemId)
 {
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 
 	MenuHelper::AddSeparator(menu.get());
 

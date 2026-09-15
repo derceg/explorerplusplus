@@ -105,19 +105,14 @@ StatusBarView *StatusBar::GetView()
 	return m_view;
 }
 
-void StatusBar::OnMenuSelect(HMENU menu, UINT itemId, UINT flags)
+void StatusBar::NotifyMenuLoopStarted()
 {
-	if (flags == 0xFFFF && menu == nullptr)
-	{
-		OnMenuClose();
-	}
-	else
-	{
-		OnMenuItemSelected(menu, itemId, flags);
-	}
+	m_showingMenuHelpText = true;
+
+	m_view->SetParts({ 100 });
 }
 
-void StatusBar::OnMenuClose()
+void StatusBar::NotifyMenuLoopEnded()
 {
 	m_showingMenuHelpText = false;
 
@@ -126,11 +121,12 @@ void StatusBar::OnMenuClose()
 	UpdateText(*tab);
 }
 
-void StatusBar::OnMenuItemSelected(HMENU menu, UINT itemId, UINT flags)
+void StatusBar::OnMenuSelect(HMENU menu, UINT itemId, UINT flags)
 {
-	m_showingMenuHelpText = true;
-
-	m_view->SetParts({ 100 });
+	if (!menu)
+	{
+		return;
+	}
 
 	std::optional<std::wstring> helpText;
 
@@ -139,14 +135,7 @@ void StatusBar::OnMenuItemSelected(HMENU menu, UINT itemId, UINT flags)
 		helpText = m_browser->RequestMenuHelpText(menu, itemId);
 	}
 
-	if (helpText)
-	{
-		m_view->SetPartText(0, *helpText);
-	}
-	else
-	{
-		m_view->SetPartText(0, L"");
-	}
+	m_view->SetPartText(0, helpText.value_or(L""));
 }
 
 void StatusBar::UpdateText(const Tab &tab)

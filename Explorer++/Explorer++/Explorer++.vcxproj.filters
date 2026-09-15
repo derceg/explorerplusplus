@@ -772,13 +772,13 @@
     <ClCompile Include="TabBacking.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenuSubMenuView.cpp">
+    <ClCompile Include="MainMenuSubMenuHost.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="MenuView.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="PopupMenuView.cpp">
+    <ClCompile Include="PopupMenuRunner.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="MenuBase.cpp">
@@ -930,6 +930,9 @@
     </ClCompile>
     <ClCompile Include="JumpListHelper.cpp">
       <Filter>Taskbar</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuController.cpp">
+      <Filter>Menus\UI\Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1788,13 +1791,13 @@
     <ClInclude Include="TabBacking.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
-    <ClInclude Include="MainMenuSubMenuView.h">
+    <ClInclude Include="MainMenuSubMenuHost.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MenuView.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="PopupMenuView.h">
+    <ClInclude Include="PopupMenuRunner.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MenuBase.h">
@@ -2026,6 +2029,9 @@
       <Filter>Taskbar</Filter>
     </ClInclude>
     <ClInclude Include="MenuDelegate.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuController.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,7 +19,7 @@
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
@@ -234,9 +234,9 @@ bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 	POINT ptScreen = mouseInfo->pt;
 	ClientToScreen(mouseInfo->hdr.hwndFrom, &ptScreen);
 
-	PopupMenuView popupMenu(this);
-	ToolbarContextMenu toolbarContextMenu(&popupMenu, source, this, m_appServices);
-	popupMenu.Show(m_hwnd, ptScreen);
+	PopupMenuRunner popupRunner(this);
+	ToolbarContextMenu toolbarContextMenu(popupRunner.GetView(), source, this, m_appServices);
+	popupRunner.Show(m_hwnd, ptScreen);
 
 	return true;
 }

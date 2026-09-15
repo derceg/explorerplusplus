@@ -10,6 +10,7 @@
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
+#include "../Helper/MenuHelper.h"
 #include <glog/logging.h>
 #include <wil/common.h>
 #include <format>
@@ -132,27 +133,11 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 		return FALSE;
 	}
 
-	HMENU subMenu = CreatePopupMenu();
+	auto ownedSubMenu = MenuHelper::CheckedCreatePopupMenu();
+	auto subMenu = ownedSubMenu.get();
 
-	if (subMenu == nullptr)
-	{
-		return FALSE;
-	}
-
-	std::wstring bookmarkFolderName = bookmarkItem->GetName();
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_ID | MIIM_STRING | MIIM_SUBMENU;
-	mii.wID = id;
-	mii.hSubMenu = subMenu;
-	mii.dwTypeData = bookmarkFolderName.data();
-	BOOL res = InsertMenuItem(menu, position, TRUE, &mii);
-
-	if (!res)
-	{
-		return FALSE;
-	}
+	MenuHelper::AddSubMenuItem(menu, id, bookmarkItem->GetName(), std::move(ownedSubMenu), position,
+		true);
 
 	AddIconToMenuItem(menu, position, bookmarkItem, bookmarkIconManager, menuImages);
 

@@ -12,7 +12,7 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "HolderWindow.h"
-#include "MainMenuSubMenuView.h"
+#include "MainMenuSubMenuHost.h"
 #include "MainRebarStorage.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
@@ -381,6 +381,26 @@ const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 void Explorerplusplus::StartMainToolbarCustomization()
 {
 	m_mainToolbar->StartCustomization();
+}
+
+void Explorerplusplus::NotifyTopLevelMenuShown()
+{
+	m_numTopLevelMenusActive++;
+
+	if (m_numTopLevelMenusActive == 1)
+	{
+		m_statusBar->NotifyMenuLoopStarted();
+	}
+}
+
+void Explorerplusplus::NotifyTopLevelMenuClosed()
+{
+	m_numTopLevelMenusActive--;
+
+	if (m_numTopLevelMenusActive == 0)
+	{
+		m_statusBar->NotifyMenuLoopEnded();
+	}
 }
 
 void Explorerplusplus::MenuItemSelected(HMENU menu, UINT itemId, UINT flags)

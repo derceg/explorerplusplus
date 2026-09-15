@@ -45,7 +45,7 @@ class DisplayWindow;
 class DrivesToolbar;
 class FeatureList;
 class HolderWindow;
-class MainMenuSubMenuView;
+class MainMenuSubMenuHost;
 class MainRebarView;
 class MainToolbar;
 class MenuBase;
@@ -113,6 +113,8 @@ public:
 	void Close() override;
 
 	// MenuHelpTextHost
+	void NotifyTopLevelMenuShown() override;
+	void NotifyTopLevelMenuClosed() override;
 	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override;
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
@@ -161,7 +163,7 @@ private:
 
 	struct MainMenuSubMenu
 	{
-		std::unique_ptr<MainMenuSubMenuView> view;
+		std::unique_ptr<MainMenuSubMenuHost> menuHost;
 		std::unique_ptr<MenuBase> menu;
 	};
 
@@ -299,9 +301,9 @@ private:
 	boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) override;
 	void OnInitMenu(HMENU menu);
+	void OnEnterMenuLoop(bool shortcutMenu);
 	void OnExitMenuLoop(bool shortcutMenu);
 	void OnInitMenuPopup(HMENU menu);
-	void OnUninitMenuPopup(HMENU menu);
 	bool MaybeHandleMainMenuItemSelection(UINT id);
 	boost::signals2::connection AddMainMenuItemMiddleClickedObserver(
 		const MainMenuItemMiddleClickedSignal::slot_type &observer) override;
@@ -367,6 +369,7 @@ private:
 	bool m_mainMenuShowing = false;
 	std::vector<MainMenuSubMenu> m_mainMenuSubMenus;
 
+	int m_numTopLevelMenusActive = 0;
 	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
 
 	// Treeview

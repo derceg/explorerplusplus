@@ -4,19 +4,41 @@
 
 #include "stdafx.h"
 #include "MenuView.h"
-#include "../Helper/DpiCompatibility.h"
-#include "../Helper/MenuHelpTextHost.h"
+#include "TestHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WeakPtr.h"
 #include <ranges>
 
-MenuView::MenuView(MenuHelpTextHost *menuHelpTextHost) : m_menuHelpTextHost(menuHelpTextHost)
+MenuView::MenuView(HMENU menu) : m_menu(menu)
 {
+}
+
+bool MenuView::IsRoot() const
+{
+	return m_parent == nullptr;
 }
 
 void MenuView::SetDelegate(MenuDelegate *delegate)
 {
 	m_delegate = delegate;
+}
+
+// If no delegate is set, a search for a delegate will proceed up the tree. This allows a menu with
+// multiple submenus to be managed by a single delegate, while also allowing a submenu to be managed
+// independently.
+MenuDelegate *MenuView::MaybeGetDelegate()
+{
+	if (m_delegate)
+	{
+		return m_delegate;
+	}
+
+	if (m_parent)
+	{
+		return m_parent->MaybeGetDelegate();
+	}
+
+	return nullptr;
 }
 
 void MenuView::AppendItem(UINT id, const std::wstring &text,
@@ -25,7 +47,7 @@ void MenuView::AppendItem(UINT id, const std::wstring &text,
 {
 	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
 	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
-	DCHECK_NE(id, 0U);
+	CHECK_NE(id, 0U);
 
 	std::wstring finalText = text;
 
@@ -39,8 +61,7 @@ void MenuView::AppendItem(UINT id, const std::wstring &text,
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
 	menuItemInfo.wID = id;
 	menuItemInfo.dwTypeData = finalText.data();
-
-	auto res = InsertMenuItem(GetMenu(), GetMenuItemCount(GetMenu()), true, &menuItemInfo);
+	auto res = InsertMenuItem(m_menu, GetMenuItemCount(m_menu), true, &menuItemInfo);
 	CHECK(res);
 
 	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, std::move(iconModel), helpText);
@@ -54,6 +75,30 @@ void MenuView::AppendItem(UINT id, const std::wstring &text,
 	{
 		SetItemImage(id);
 	}
+}
+
+MenuView *MenuView::AppendSubMenu(UINT id, const std::wstring &text,
+	std::unique_ptr<const IconModel> iconModel)
+{
+	auto ownedSubMenu = MenuHelper::CheckedCreatePopupMenu();
+	auto subMenu = ownedSubMenu.get();
+	MenuHelper::AddSubMenuItem(m_menu, id, text, std::move(ownedSubMenu));
+
+	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, std::move(iconModel), L"");
+	CHECK(didInsert);
+
+	if (m_currentDpi)
+	{
+		SetItemImage(id);
+	}
+
+	auto ownedView = std::make_unique<MenuView>(subMenu);
+	auto *view = ownedView.get();
+	view->m_parent = this;
+
+	m_subMenus.push_back(std::move(ownedView));
+
+	return view;
 }
 
 void MenuView::SetItemImage(UINT id)
@@ -87,82 +132,105 @@ void MenuView::UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap)
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_BITMAP;
 	menuItemInfo.hbmpItem = bitmap.get();
-	auto res = SetMenuItemInfo(GetMenu(), id, false, &menuItemInfo);
+	auto res = SetMenuItemInfo(m_menu, id, false, &menuItemInfo);
 	CHECK(res);
 
-	if (bitmap)
-	{
-		auto *item = GetItem(id);
-		item->bitmap = std::move(bitmap);
-	}
+	auto *item = GetItem(id);
+	item->bitmap = std::move(bitmap);
 }
 
 void MenuView::AppendSeparator()
 {
-	MenuHelper::AddSeparator(GetMenu());
+	MenuHelper::AddSeparator(m_menu);
 }
 
 void MenuView::EnableItem(UINT id, bool enable)
 {
-	MenuHelper::EnableItem(GetMenu(), id, enable);
+	MenuHelper::EnableItem(m_menu, id, enable);
 }
 
 void MenuView::CheckItem(UINT id, bool check)
 {
-	MenuHelper::CheckItem(GetMenu(), id, check);
+	MenuHelper::CheckItem(m_menu, id, check);
 }
 
 void MenuView::RemoveTrailingSeparators()
 {
-	MenuHelper::RemoveTrailingSeparators(GetMenu());
+	MenuHelper::RemoveTrailingSeparators(m_menu);
 }
 
 void MenuView::ClearMenu()
 {
-	for (int i = GetMenuItemCount(GetMenu()) - 1; i >= 0; i--)
+	for (int i = GetMenuItemCount(m_menu) - 1; i >= 0; i--)
 	{
-		auto res = DeleteMenu(GetMenu(), i, MF_BYPOSITION);
-		DCHECK(res);
+		auto res = DeleteMenu(m_menu, i, MF_BYPOSITION);
+		CHECK(res);
 	}
 
+	m_subMenus.clear();
 	m_idToItemMap.clear();
 	m_lastRenderedImageDpi.reset();
 	m_weakPtrFactory.InvalidateWeakPtrs();
 }
 
-void MenuView::OnMenuWillShow(HWND ownerWindow)
+bool MenuView::IsItemEnabled(UINT id) const
 {
-	OnMenuWillShowForDpi(DpiCompatibility::GetInstance().GetDpiForWindow(ownerWindow));
+	return MenuHelper::IsMenuItemEnabled(m_menu, id, false);
 }
 
-void MenuView::OnMenuWillShowForDpi(UINT dpi)
+int MenuView::GetNumItems() const
 {
-	DCHECK(!m_currentDpi);
+	int numItems = GetMenuItemCount(m_menu);
+	CHECK(numItems != -1);
+	return numItems;
+}
 
+void MenuView::OnPopupWillShowForDpi(UINT dpi)
+{
 	m_currentDpi = dpi;
 
 	MaybeAddImagesToMenu();
-
-	m_helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
-		std::bind_front(&MenuView::OnHelpTextRequested, this));
 }
 
-void MenuView::OnMenuClosed()
+void MenuView::OnPopupClosed()
 {
-	DCHECK(m_currentDpi);
-
 	m_currentDpi.reset();
-	m_helpTextConnection.disconnect();
 }
 
-std::optional<std::wstring> MenuView::OnHelpTextRequested(HMENU menu, int id)
+MenuView *MenuView::MaybeGetMenuViewForNativeMenu(HMENU menu)
 {
-	if (!MenuHelper::IsPartOfMenu(GetMenu(), menu))
+	if (m_menu == menu)
 	{
-		return std::nullopt;
+		return this;
 	}
 
-	return GetItemHelpText(id);
+	for (auto &submenu : m_subMenus)
+	{
+		if (auto *view = submenu->MaybeGetMenuViewForNativeMenu(menu))
+		{
+			return view;
+		}
+	}
+
+	return nullptr;
+}
+
+MenuView *MenuView::MaybeGetMenuViewForItem(UINT id)
+{
+	if (m_idToItemMap.contains(id))
+	{
+		return this;
+	}
+
+	for (auto &subMenu : m_subMenus)
+	{
+		if (auto *view = subMenu->MaybeGetMenuViewForItem(id))
+		{
+			return view;
+		}
+	}
+
+	return nullptr;
 }
 
 void MenuView::MaybeAddImagesToMenu()
@@ -174,6 +242,9 @@ void MenuView::MaybeAddImagesToMenu()
 		return;
 	}
 
+	// If the DPI has changed, any previous image requests can be ignored.
+	m_weakPtrFactory.InvalidateWeakPtrs();
+
 	for (UINT id : m_idToItemMap | std::views::keys)
 	{
 		SetItemImage(id);
@@ -182,7 +253,7 @@ void MenuView::MaybeAddImagesToMenu()
 	m_lastRenderedImageDpi = GetCurrentDpi();
 }
 
-UINT MenuView::GetCurrentDpi()
+UINT MenuView::GetCurrentDpi() const
 {
 	CHECK(m_currentDpi);
 	return *m_currentDpi;
@@ -208,22 +279,71 @@ const MenuView::Item *MenuView::GetItem(int id) const
 	return &itr->second;
 }
 
-void MenuView::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+std::optional<UINT> MenuView::MaybeGetItemAtPoint(const POINT &ptScreen) const
 {
-	if (!m_delegate || !MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
-	{
-		return;
-	}
-
-	m_delegate->OnItemSelected(id, isCtrlKeyDown, isShiftKeyDown);
+	return MenuHelper::MaybeGetMenuItemAtPoint(m_menu, ptScreen);
 }
 
-void MenuView::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+HMENU MenuView::GetNativeMenuForTesting() const
 {
-	if (!m_delegate || !MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
-	{
-		return;
-	}
+	CHECK(IsInTest());
 
-	m_delegate->OnItemMiddleClicked(id, isCtrlKeyDown, isShiftKeyDown);
+	return m_menu;
+}
+
+UINT MenuView::GetItemIdForTesting(int index) const
+{
+	CHECK(IsInTest());
+
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_ID;
+	auto res = GetMenuItemInfo(m_menu, index, true, &menuItemInfo);
+	CHECK(res);
+
+	return menuItemInfo.wID;
+}
+
+std::wstring MenuView::GetItemTextForTesting(UINT id) const
+{
+	CHECK(IsInTest());
+
+	wchar_t text[256];
+
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_STRING;
+	menuItemInfo.dwTypeData = text;
+	menuItemInfo.cch = std::size(text);
+	auto res = GetMenuItemInfo(m_menu, id, false, &menuItemInfo);
+	CHECK(res);
+
+	return text;
+}
+
+HBITMAP MenuView::GetItemBitmapForTesting(UINT id) const
+{
+	CHECK(IsInTest());
+
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_BITMAP;
+	auto res = GetMenuItemInfo(m_menu, id, false, &menuItemInfo);
+	CHECK(res);
+
+	return menuItemInfo.hbmpItem;
+}
+
+void MenuView::OnPopupWillShowForTesting(UINT dpi)
+{
+	CHECK(IsInTest());
+
+	OnPopupWillShowForDpi(dpi);
+}
+
+void MenuView::OnPopupClosedForTesting()
+{
+	CHECK(IsInTest());
+
+	OnPopupClosed();
 }

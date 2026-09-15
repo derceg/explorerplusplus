@@ -78,7 +78,7 @@ protected:
 	ShellContextMenuBuilderTest() :
 		m_idGenerator(1),
 		m_idRemapper(&m_delegate, &m_idGenerator),
-		m_menu(CreatePopupMenu()),
+		m_menu(MenuHelper::CheckedCreatePopupMenu()),
 		m_contextMenu(winrt::make_self<ContextMenuFake>()),
 		m_builder(m_menu.get(), m_contextMenu.get(), &m_idRemapper)
 	{
@@ -119,7 +119,7 @@ TEST_F(ShellContextMenuBuilderTest, AddSubMenuItem)
 {
 	const UINT startId = 1006;
 
-	wil::unique_hmenu subMenu(CreatePopupMenu());
+	auto subMenu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(subMenu.get(), startId, L"First");
 	MenuHelper::AddStringItem(subMenu.get(), startId + 1, L"Second");
 	MenuHelper::AddSeparator(subMenu.get());

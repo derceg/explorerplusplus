@@ -9,7 +9,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "BrowserWindow.h"
 #include "NavigationHelper.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include <glog/logging.h>
 
 BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree, BrowserWindow *browser,
@@ -42,8 +42,8 @@ void BookmarkMenuController::OnMenuItemMiddleClicked(const BookmarkItem *bookmar
 
 void BookmarkMenuController::OnMenuItemRightClicked(BookmarkItem *bookmarkItem, const POINT &pt)
 {
-	PopupMenuView popupMenu(m_browser);
-	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
+	PopupMenuRunner popupRunner(m_browser);
+	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
-	popupMenu.Show(m_parentWindow, pt);
+	popupRunner.Show(m_parentWindow, pt);
 }

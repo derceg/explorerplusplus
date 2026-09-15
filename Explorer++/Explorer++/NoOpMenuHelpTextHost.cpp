@@ -5,6 +5,14 @@
 #include "stdafx.h"
 #include "NoOpMenuHelpTextHost.h"
 
+void NoOpMenuHelpTextHost::NotifyTopLevelMenuShown()
+{
+}
+
+void NoOpMenuHelpTextHost::NotifyTopLevelMenuClosed()
+{
+}
+
 void NoOpMenuHelpTextHost::MenuItemSelected(HMENU menu, UINT itemId, UINT flags)
 {
 	UNREFERENCED_PARAMETER(menu);

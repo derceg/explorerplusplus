@@ -277,6 +277,14 @@ void BrowserWindowFake::NotifyBrowserClosing()
 	GetActiveTabContainer()->CloseAllTabs();
 }
 
+void BrowserWindowFake::NotifyTopLevelMenuShown()
+{
+}
+
+void BrowserWindowFake::NotifyTopLevelMenuClosed()
+{
+}
+
 void BrowserWindowFake::MenuItemSelected(HMENU menu, UINT itemId, UINT flags)
 {
 	UNREFERENCED_PARAMETER(menu);

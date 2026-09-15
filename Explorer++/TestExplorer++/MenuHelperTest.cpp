@@ -14,7 +14,7 @@ TEST(RemoveDuplicateSeperatorsTest, RemoveDuplicates)
 	const UINT item1Id = 1;
 	const UINT item2Id = 2;
 
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), item1Id, L"Item 1");
 	MenuHelper::AddSeparator(menu.get());
 	MenuHelper::AddSeparator(menu.get());
@@ -32,7 +32,7 @@ TEST(RemoveTrailingSeparatorsTest, RemoveTrailing)
 {
 	const UINT itemId = 1;
 
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 	MenuHelper::AddSeparator(menu.get());
 	MenuHelper::AddSeparator(menu.get());
@@ -47,16 +47,16 @@ TEST(FindParentMenuTest, FindSubItem)
 {
 	UINT idCounter = 1;
 
-	wil::unique_hmenu nestedSubmenu(CreatePopupMenu());
+	auto nestedSubmenu = MenuHelper::CheckedCreatePopupMenu();
 	auto rawNestedSubmenu = nestedSubmenu.get();
 	auto nestedItemId = idCounter++;
 	MenuHelper::AddStringItem(nestedSubmenu.get(), nestedItemId, L"Nested item");
 
-	wil::unique_hmenu submenu(CreatePopupMenu());
+	auto submenu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddSubMenuItem(submenu.get(), idCounter++, L"Nested submenu",
 		std::move(nestedSubmenu));
 
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddSubMenuItem(menu.get(), idCounter++, L"Submenu", std::move(submenu));
 
 	EXPECT_EQ(MenuHelper::FindParentMenu(menu.get(), nestedItemId), rawNestedSubmenu);
@@ -66,7 +66,7 @@ TEST(GetMenuItemStringTest, GetString)
 {
 	const UINT itemId = 1;
 
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 
 	auto text = MenuHelper::GetMenuItemString(menu.get(), itemId, false);
@@ -78,9 +78,9 @@ TEST(GetMenuItemIDIncludingSubmenuTest, GetId)
 	const UINT itemId = 1;
 	const UINT submenuItemId = 2;
 
-	wil::unique_hmenu submenu(CreatePopupMenu());
+	auto submenu = MenuHelper::CheckedCreatePopupMenu();
 
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 	MenuHelper::AddSubMenuItem(menu.get(), submenuItemId, L"Submenu", std::move(submenu));
 
@@ -97,17 +97,17 @@ protected:
 	{
 		UINT idCounter = 1;
 
-		wil::unique_hmenu nestedSubmenu(CreatePopupMenu());
+		auto nestedSubmenu = MenuHelper::CheckedCreatePopupMenu();
 		m_rawNestedSubmenu = nestedSubmenu.get();
 		MenuHelper::AddStringItem(nestedSubmenu.get(), idCounter++, L"Nested submenu item");
 
-		wil::unique_hmenu submenu(CreatePopupMenu());
+		auto submenu = MenuHelper::CheckedCreatePopupMenu();
 		m_rawSubmenu = submenu.get();
 		MenuHelper::AddStringItem(submenu.get(), idCounter++, L"Submenu item");
 		MenuHelper::AddSubMenuItem(submenu.get(), idCounter++, L"Nested submenu",
 			std::move(nestedSubmenu));
 
-		m_menu.reset(CreatePopupMenu());
+		m_menu = MenuHelper::CheckedCreatePopupMenu();
 		MenuHelper::AddStringItem(m_menu.get(), idCounter++, L"Item");
 		MenuHelper::AddSubMenuItem(m_menu.get(), idCounter++, L"Submenu", std::move(submenu));
 	}
@@ -130,7 +130,7 @@ TEST_F(IsPartOfMenuTest, Submenu)
 
 TEST_F(IsPartOfMenuTest, SeparateMenu)
 {
-	wil::unique_hmenu otherMenu(CreatePopupMenu());
+	auto otherMenu = MenuHelper::CheckedCreatePopupMenu();
 
 	EXPECT_FALSE(MenuHelper::IsPartOfMenu(m_menu.get(), otherMenu.get()));
 }
@@ -139,7 +139,7 @@ TEST(IsMenuItemEnabledTest, CheckEnabled)
 {
 	const UINT itemId = 1;
 
-	wil::unique_hmenu menu(CreatePopupMenu());
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(menu.get(), itemId, false));
 

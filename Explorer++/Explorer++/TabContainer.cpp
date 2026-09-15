@@ -9,7 +9,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainTabView.h"
-#include "PopupMenuView.h"
+#include "PopupMenuRunner.h"
 #include "PreservedTab.h"
 #include "RuntimeHelper.h"
 #include "ShellBrowser/NavigateParams.h"
@@ -230,10 +230,10 @@ void TabContainer::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 	BOOL res = ClientToScreen(m_hwnd, &ptScreen);
 	CHECK(res);
 
-	PopupMenuView popupMenu(m_browser);
-	TabContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), tab->GetWeakPtr(), this,
-		m_tabEvents, m_appServices->GetResourceLoader());
-	popupMenu.Show(m_hwnd, ptScreen);
+	PopupMenuRunner popupRunner(m_browser);
+	TabContextMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(),
+		tab->GetWeakPtr(), this, m_tabEvents, m_appServices->GetResourceLoader());
+	popupRunner.Show(m_hwnd, ptScreen);
 }
 
 LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -261,11 +261,12 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 	POINT ptScreen = ptClient;
 	ClientToScreen(m_hwnd, &ptScreen);
 
-	PopupMenuView popupMenu(m_browser);
-	TabContainerBackgroundContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), this,
-		m_appServices->GetTabRestorer(), m_appServices->GetBookmarkTree(), m_browser,
-		m_appServices->GetResourceLoader(), m_appServices->GetPlatformContext());
-	popupMenu.Show(m_hwnd, ptScreen);
+	PopupMenuRunner popupRunner(m_browser);
+	TabContainerBackgroundContextMenu menu(popupRunner.GetView(),
+		m_appServices->GetAcceleratorManager(), this, m_appServices->GetTabRestorer(),
+		m_appServices->GetBookmarkTree(), m_browser, m_appServices->GetResourceLoader(),
+		m_appServices->GetPlatformContext());
+	popupRunner.Show(m_hwnd, ptScreen);
 }
 
 void TabContainer::OnTabSelected(const Tab &tab)

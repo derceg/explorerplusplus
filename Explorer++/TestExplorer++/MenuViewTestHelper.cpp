@@ -3,17 +3,17 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "MenuViewFakeTestHelper.h"
-#include "MenuViewFake.h"
+#include "MenuViewTestHelper.h"
+#include "MenuView.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
-namespace MenuViewFakeTestHelper
+namespace MenuViewTestHelper
 {
 
-void CheckItemDetails(MenuViewFake *menuView, const std::vector<PidlAbsolute> &expectedItems)
+void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &expectedItems)
 {
-	ASSERT_EQ(static_cast<size_t>(menuView->GetItemCount()), expectedItems.size());
+	ASSERT_EQ(static_cast<size_t>(menuView->GetNumItems()), expectedItems.size());
 
 	for (size_t i = 0; i < expectedItems.size(); i++)
 	{
@@ -25,8 +25,8 @@ void CheckItemDetails(MenuViewFake *menuView, const std::vector<PidlAbsolute> &e
 		hr = GetDisplayName(expectedItems[i].Raw(), SHGDN_FORPARSING, path);
 		ASSERT_HRESULT_SUCCEEDED(hr);
 
-		auto id = menuView->GetItemId(static_cast<int>(i));
-		EXPECT_EQ(menuView->GetItemText(id), name);
+		auto id = menuView->GetItemIdForTesting(static_cast<int>(i));
+		EXPECT_EQ(menuView->GetItemTextForTesting(id), name);
 		EXPECT_EQ(menuView->GetItemHelpText(id), path);
 	}
 }
