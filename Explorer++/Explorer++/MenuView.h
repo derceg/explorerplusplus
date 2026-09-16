@@ -74,6 +74,7 @@ private:
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
 
+	UINT GetItemId(int index) const;
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
 	const HMENU m_menu;

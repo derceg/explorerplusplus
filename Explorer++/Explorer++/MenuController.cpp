@@ -64,6 +64,10 @@ LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 		OnMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
 			WI_IsFlagSet(wParam, MK_CONTROL), WI_IsFlagSet(wParam, MK_SHIFT));
 		break;
+
+	case WM_MENURBUTTONUP:
+		OnMenuRightButtonUp(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam));
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -116,6 +120,20 @@ void MenuController::OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool 
 	MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
 }
 
+void MenuController::OnMenuRightButtonUp(HMENU menu, int index)
+{
+	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(menu);
+
+	if (!view)
+	{
+		return;
+	}
+
+	DWORD messagePos = GetMessagePos();
+	POINT ptScreen = { GET_X_LPARAM(messagePos), GET_Y_LPARAM(messagePos) };
+	RightClickItem(view->GetItemId(index), ptScreen);
+}
+
 std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, int id)
 {
 	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(menu);
@@ -130,15 +148,7 @@ std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, int 
 
 void MenuController::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-	CHECK(view);
-
-	if (!view->IsItemEnabled(id))
-	{
-		return;
-	}
-
-	auto *delegate = view->MaybeGetDelegate();
+	auto *delegate = MaybeGetDelegateForActionableItem(id);
 
 	if (!delegate)
 	{
@@ -150,15 +160,7 @@ void MenuController::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown
 
 void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-	CHECK(view);
-
-	if (!view->IsItemEnabled(id))
-	{
-		return;
-	}
-
-	auto *delegate = view->MaybeGetDelegate();
+	auto *delegate = MaybeGetDelegateForActionableItem(id);
 
 	if (!delegate)
 	{
@@ -166,6 +168,31 @@ void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKe
 	}
 
 	delegate->OnItemMiddleClicked(id, isCtrlKeyDown, isShiftKeyDown);
+}
+
+void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
+{
+	auto *delegate = MaybeGetDelegateForActionableItem(id);
+
+	if (!delegate)
+	{
+		return;
+	}
+
+	delegate->OnItemRightClicked(id, ptScreen);
+}
+
+MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
+{
+	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	if (!view->IsItemEnabled(id))
+	{
+		return nullptr;
+	}
+
+	return view->MaybeGetDelegate();
 }
 
 void MenuController::NotifyMenuWillShowForTesting(UINT dpi)

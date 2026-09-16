@@ -17,4 +17,10 @@ public:
 		UNREFERENCED_PARAMETER(isCtrlKeyDown);
 		UNREFERENCED_PARAMETER(isShiftKeyDown);
 	}
+
+	virtual void OnItemRightClicked(UINT id, const POINT &ptScreen)
+	{
+		UNREFERENCED_PARAMETER(id);
+		UNREFERENCED_PARAMETER(ptScreen);
+	}
 };

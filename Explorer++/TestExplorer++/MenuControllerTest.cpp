@@ -15,6 +15,11 @@ using namespace testing;
 namespace
 {
 
+MATCHER_P2(PointEq, x, y, "")
+{
+	return arg.x == x && arg.y == y;
+}
+
 class MenuHelpTextHostFake : public MenuHelpTextHost
 {
 public:
@@ -55,6 +60,7 @@ public:
 		(override));
 	MOCK_METHOD(void, OnItemMiddleClicked, (UINT id, bool isCtrlKeyDown, bool isShiftKeyDown),
 		(override));
+	MOCK_METHOD(void, OnItemRightClicked, (UINT id, const POINT &ptScreen), (override));
 };
 
 }
@@ -203,6 +209,31 @@ TEST_F(MenuControllerTest, MiddleClickSelection)
 
 	EXPECT_CALL(subMenuViewDelegate, OnItemMiddleClicked(itemId2, true, true));
 	m_controller.MiddleClickItem(itemId2, true, true);
+}
+
+TEST_F(MenuControllerTest, RightClick)
+{
+	MenuDelegateMock rootDelegate;
+	m_view.SetDelegate(&rootDelegate);
+
+	UINT idCounter = 1;
+
+	UINT itemId1 = idCounter++;
+	m_view.AppendItem(itemId1, L"Item 1");
+
+	auto *subMenuView = m_view.AppendSubMenu(idCounter++, L"Submenu");
+
+	MenuDelegateMock subMenuViewDelegate;
+	subMenuView->SetDelegate(&subMenuViewDelegate);
+
+	UINT itemId2 = idCounter++;
+	subMenuView->AppendItem(itemId2, L"Item 2");
+
+	EXPECT_CALL(rootDelegate, OnItemRightClicked(itemId1, PointEq(100, 200)));
+	m_controller.RightClickItem(itemId1, { 100, 200 });
+
+	EXPECT_CALL(subMenuViewDelegate, OnItemRightClicked(itemId2, PointEq(50, 270)));
+	m_controller.RightClickItem(itemId2, { 50, 270 });
 }
 
 TEST_F(MenuControllerTest, HelpTextRequest)

@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 
+class MenuDelegate;
 class MenuHelpTextHost;
 class MenuView;
 class WindowSubclass;
@@ -23,6 +24,7 @@ public:
 
 	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
+	void RightClickItem(UINT id, const POINT &ptScreen);
 
 	void NotifyMenuWillShowForTesting(UINT dpi);
 	void NotifyMenuClosedForTesting();
@@ -35,8 +37,11 @@ private:
 	void OnUninitMenuPopup(HMENU menu);
 	void OnMenuClosed();
 	void OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
+	void OnMenuRightButtonUp(HMENU menu, int index);
 
 	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, int id);
+
+	MenuDelegate *MaybeGetDelegateForActionableItem(UINT id);
 
 	MenuView *const m_rootView;
 	MenuHelpTextHost *const m_menuHelpTextHost;

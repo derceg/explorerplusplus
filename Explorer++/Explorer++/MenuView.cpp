@@ -279,6 +279,17 @@ const MenuView::Item *MenuView::GetItem(int id) const
 	return &itr->second;
 }
 
+UINT MenuView::GetItemId(int index) const
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_ID;
+	auto res = GetMenuItemInfo(m_menu, index, true, &menuItemInfo);
+	CHECK(res);
+
+	return menuItemInfo.wID;
+}
+
 std::optional<UINT> MenuView::MaybeGetItemAtPoint(const POINT &ptScreen) const
 {
 	return MenuHelper::MaybeGetMenuItemAtPoint(m_menu, ptScreen);
@@ -295,13 +306,7 @@ UINT MenuView::GetItemIdForTesting(int index) const
 {
 	CHECK(IsInTest());
 
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_ID;
-	auto res = GetMenuItemInfo(m_menu, index, true, &menuItemInfo);
-	CHECK(res);
-
-	return menuItemInfo.wID;
+	return GetItemId(index);
 }
 
 std::wstring MenuView::GetItemTextForTesting(UINT id) const
