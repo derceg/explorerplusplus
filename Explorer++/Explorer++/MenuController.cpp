@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MenuController.h"
+#include "MenuDelegate.h"
 #include "MenuView.h"
 #include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -68,6 +69,12 @@ LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 	case WM_MENURBUTTONUP:
 		OnMenuRightButtonUp(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam));
 		break;
+
+	case WM_MENUDRAG:
+		return OnMenuDrag(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam));
+
+	case WM_MENUGETOBJECT:
+		return OnMenuGetObject(reinterpret_cast<MENUGETOBJECTINFO *>(lParam));
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -104,6 +111,7 @@ void MenuController::OnUninitMenuPopup(HMENU menu)
 
 void MenuController::OnMenuClosed()
 {
+	m_dropTarget.reset();
 	m_subclass.reset();
 	m_helpTextConnection.disconnect();
 }
@@ -132,6 +140,132 @@ void MenuController::OnMenuRightButtonUp(HMENU menu, int index)
 	DWORD messagePos = GetMessagePos();
 	POINT ptScreen = { GET_X_LPARAM(messagePos), GET_Y_LPARAM(messagePos) };
 	RightClickItem(view->GetItemId(index), ptScreen);
+}
+
+LRESULT MenuController::OnMenuDrag(HMENU menu, int index)
+{
+	// It appears that dragging at the very top of the menu (above the first item) or at the very
+	// bottom of the menu (below the last item) will trigger a WM_MENUDRAG message, with a position
+	// of -1. It doesn't make sense to begin a drag here in that case, though, since no actual item
+	// is being dragged.
+	if (index == -1)
+	{
+		return MND_CONTINUE;
+	}
+
+	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(menu);
+
+	if (!view)
+	{
+		return MND_CONTINUE;
+	}
+
+	UINT id = view->GetItemId(index);
+	auto *delegate = MaybeGetDelegateForActionableItem(id);
+
+	if (!delegate)
+	{
+		return MND_CONTINUE;
+	}
+
+	auto action = delegate->OnItemDragged(id);
+	return action == MenuDragAction::ContinueMenu ? MND_CONTINUE : MND_ENDMENU;
+}
+
+LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
+{
+	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(objectInfo->hmenu);
+
+	if (!view)
+	{
+		return MNGO_NOINTERFACE;
+	}
+
+	auto requestedIid = static_cast<const IID *>(objectInfo->riid);
+
+	if (!IsEqualIID(*requestedIid, IID_IDropTarget))
+	{
+		return MNGO_NOINTERFACE;
+	}
+
+	MenuDropLocation dropLocation;
+
+	// If neither MNGOF_TOPGAP or MNGOF_BOTTOMGAP is set, the cursor is over an item.
+	if (WI_AreAllFlagsClear(objectInfo->dwFlags, MNGOF_TOPGAP | MNGOF_BOTTOMGAP))
+	{
+		dropLocation = { view->GetItemId(objectInfo->uPos), MenuDropLocation::Position::On };
+	}
+	else
+	{
+		// The documentation for the MENUGETOBJECTINFO structure appears to be worded somewhat
+		// misleadingly. It states that MNGOF_TOPGAP will be set if "The mouse is on the top of the
+		// item indicated by uPos.", while MNGOF_BOTTOMGAP will be set if "The mouse is on the
+		// bottom of the item indicated by uPos.". If there are, for example, 3 items in the menu
+		// and the source is dragged between the second and third items:
+		//
+		// A
+		// B
+		// <-- Drag position
+		// C
+		//
+		// The following values will be set:
+		// dwFlags = MNGOF_BOTTOMGAP
+		// uPos = 2
+		//
+		// That doesn't really align with the documentation, since the cursor is not at the bottom
+		// of item 2. It can be considered to be at the bottom of item 1 or the top of item 2, but
+		// it can't be at the bottom of item 2.
+		//
+		// On the other hand, if the cursor is at the top of the first item:
+		//
+		// <-- Drag position
+		// A
+		// B
+		// C
+		//
+		// The following values will be set:
+		// dwFlags = MNGOF_TOPGAP
+		// uPos = 0
+		//
+		// Which matches the explanation given in the documentation.
+		//
+		// Ultimately, it appears the uPos indicates the target drop position and
+		// MNGOF_TOPGAP/MNGOF_BOTTOMGAP can be effectively ignored (since the relative position has
+		// already been incorporated into uPos).
+		if (objectInfo->uPos == static_cast<UINT>(view->GetNumItems()))
+		{
+			// It's not considered valid for a menu to have no items, so this shouldn't trigger.
+			CHECK(view->GetNumItems() != 0);
+
+			dropLocation = { view->GetItemId(objectInfo->uPos - 1),
+				MenuDropLocation::Position::After };
+		}
+		else
+		{
+			dropLocation = { view->GetItemId(objectInfo->uPos),
+				MenuDropLocation::Position::Before };
+		}
+	}
+
+	auto *delegate = view->MaybeGetDelegate();
+
+	if (!delegate)
+	{
+		return MNGO_NOINTERFACE;
+	}
+
+	// This represents the drop target for the specified item. It needs to be held either until
+	// another target is requested, or the menu is closed.
+	m_dropTarget = delegate->MaybeGetDropTargetForLocation(dropLocation);
+
+	if (!m_dropTarget)
+	{
+		return MNGO_NOINTERFACE;
+	}
+
+	objectInfo->pvObj = m_dropTarget.get();
+
+	return MNGO_NOERROR;
 }
 
 std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, int id)

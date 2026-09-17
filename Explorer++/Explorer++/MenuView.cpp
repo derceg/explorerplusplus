@@ -41,6 +41,27 @@ MenuDelegate *MenuView::MaybeGetDelegate()
 	return nullptr;
 }
 
+void MenuView::EnableDragAndDrop(bool enable)
+{
+	MENUINFO menuInfo = {};
+	menuInfo.cbSize = sizeof(menuInfo);
+	menuInfo.fMask = MIM_STYLE;
+	auto res = GetMenuInfo(m_menu, &menuInfo);
+	CHECK(res);
+
+	if (enable)
+	{
+		WI_SetFlag(menuInfo.dwStyle, MNS_DRAGDROP);
+	}
+	else
+	{
+		WI_ClearFlag(menuInfo.dwStyle, MNS_DRAGDROP);
+	}
+
+	res = SetMenuInfo(m_menu, &menuInfo);
+	CHECK(res);
+}
+
 void MenuView::AppendItem(UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 	const std::optional<std::wstring> &acceleratorText)

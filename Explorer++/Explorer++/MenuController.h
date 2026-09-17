@@ -5,6 +5,7 @@
 #pragma once
 
 #include <boost/signals2.hpp>
+#include <wil/com.h>
 #include <memory>
 #include <optional>
 #include <string>
@@ -38,6 +39,8 @@ private:
 	void OnMenuClosed();
 	void OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void OnMenuRightButtonUp(HMENU menu, int index);
+	LRESULT OnMenuDrag(HMENU menu, int index);
+	LRESULT OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
 
 	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, int id);
 
@@ -47,4 +50,5 @@ private:
 	MenuHelpTextHost *const m_menuHelpTextHost;
 	std::unique_ptr<WindowSubclass> m_subclass;
 	boost::signals2::scoped_connection m_helpTextConnection;
+	wil::com_ptr_nothrow<IDropTarget> m_dropTarget;
 };

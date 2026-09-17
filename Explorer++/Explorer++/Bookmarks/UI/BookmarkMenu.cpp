@@ -107,10 +107,6 @@ void BookmarkMenu::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, boo
 
 LRESULT BookmarkMenu::OnMenuDrag(HMENU menu, int itemPosition)
 {
-	// It appears that dragging at the very top of the menu (above the first item) or at the very
-	// bottom of the menu (below the last item) will trigger a WM_MENUDRAG message, with a position
-	// of -1. It doesn't make sense to begin a drag here in that case, though, since no actual item
-	// is being dragged.
 	if (!m_activeMenu || !MenuHelper::IsPartOfMenu(m_activeMenu, menu) || itemPosition == -1)
 	{
 		return MND_CONTINUE;
@@ -144,7 +140,7 @@ LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		return MNGO_NOINTERFACE;
 	}
 
-	auto requestedIid = reinterpret_cast<IID *>(objectInfo->riid);
+	auto requestedIid = static_cast<IID *>(objectInfo->riid);
 
 	if (!IsEqualIID(*requestedIid, IID_IDropTarget))
 	{
@@ -188,49 +184,11 @@ LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		}
 		else
 		{
-			// The documentation for the MENUGETOBJECTINFO structure appears to be worded somewhat
-			// misleadingly. It states that MNGOF_TOPGAP will be set if "The mouse is on the top of
-			// the item indicated by uPos.", while MNGOF_BOTTOMGAP will be set if "The mouse is on
-			// the bottom of the item indicated by uPos.".
-			// If there are, for example, 3 items in the menu and the source is dragged between the
-			// second and third items:
-			//
-			// A
-			// B
-			// <-- Drag position
-			// C
-			//
-			// The following values will be set:
-			// dwFlags = MNGOF_BOTTOMGAP
-			// uPos = 2
-			//
-			// That doesn't really align with the documentation, since the cursor is not at the
-			// bottom of item 2. It can be considered to be at the bottom of item 1 or the top of
-			// item 2, but it can't be at the bottom of item 2.
-			//
-			// On the other hand, if the cursor is at the top of the first item:
-			//
-			// <-- Drag position
-			// A
-			// B
-			// C
-			//
-			// The following values will be set:
-			// dwFlags = MNGOF_TOPGAP
-			// uPos = 0
-			//
-			// Which matches the explanation given in the documentation.
-			//
-			// Ultimately, it appears the uPos indicates the target drop position and
-			// MNGOF_TOPGAP/MNGOF_BOTTOMGAP can be effectively ignored (since the relative position
-			// has already been incorporated into uPos).
 			targetFolder = itr->second.bookmarkItem->GetParent();
 			targetIndex = objectInfo->uPos;
 		}
 	}
 
-	// This needs to be held in a member variable, otherwise it would be immediately released when
-	// returning from this method.
 	m_dropTarget =
 		winrt::make_self<BookmarkMenuDropTarget>(targetFolder, targetIndex, m_bookmarkTree);
 

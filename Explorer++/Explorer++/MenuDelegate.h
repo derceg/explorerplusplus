@@ -4,6 +4,33 @@
 
 #pragma once
 
+#include <wil/com.h>
+#include <oleidl.h>
+
+struct MenuDropLocation
+{
+	enum class Position
+	{
+		On,
+		Before,
+		After
+	};
+
+	UINT id;
+	Position position;
+
+	bool operator==(const MenuDropLocation &) const = default;
+};
+
+enum class MenuDragAction
+{
+	// Indicates that the menu should continue running on return.
+	ContinueMenu,
+
+	// Indicates that the menu should close on return.
+	CloseMenu
+};
+
 class MenuDelegate
 {
 public:
@@ -22,5 +49,20 @@ public:
 	{
 		UNREFERENCED_PARAMETER(id);
 		UNREFERENCED_PARAMETER(ptScreen);
+	}
+
+	virtual MenuDragAction OnItemDragged(UINT id)
+	{
+		UNREFERENCED_PARAMETER(id);
+
+		return MenuDragAction::ContinueMenu;
+	}
+
+	virtual wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForLocation(
+		const MenuDropLocation &dropLocation)
+	{
+		UNREFERENCED_PARAMETER(dropLocation);
+
+		return nullptr;
 	}
 };

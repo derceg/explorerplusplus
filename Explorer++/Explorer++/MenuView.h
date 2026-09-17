@@ -21,6 +21,8 @@ public:
 	bool IsRoot() const;
 	void SetDelegate(MenuDelegate *delegate);
 
+	void EnableDragAndDrop(bool enable);
+
 	void AppendItem(UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);

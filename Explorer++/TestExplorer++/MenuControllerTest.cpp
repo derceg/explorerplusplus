@@ -20,6 +20,12 @@ MATCHER_P2(PointEq, x, y, "")
 	return arg.x == x && arg.y == y;
 }
 
+MATCHER_P2(IsGapBetween, beforeId, afterId, "")
+{
+	return (arg.id == beforeId && arg.position == MenuDropLocation::Position::After)
+		|| (arg.id == afterId && arg.position == MenuDropLocation::Position::Before);
+}
+
 class MenuHelpTextHostFake : public MenuHelpTextHost
 {
 public:
@@ -61,6 +67,8 @@ public:
 	MOCK_METHOD(void, OnItemMiddleClicked, (UINT id, bool isCtrlKeyDown, bool isShiftKeyDown),
 		(override));
 	MOCK_METHOD(void, OnItemRightClicked, (UINT id, const POINT &ptScreen), (override));
+	MOCK_METHOD(wil::com_ptr_nothrow<IDropTarget>, MaybeGetDropTargetForLocation,
+		(const MenuDropLocation &dropLocation), (override));
 };
 
 }
@@ -73,6 +81,26 @@ protected:
 		m_view(m_ownedMenu.get()),
 		m_controller(&m_view, &m_menuHelpTextHost)
 	{
+	}
+
+	wil::unique_hwnd CreateWindowForMessageTest()
+	{
+		wil::unique_hwnd hwnd(CreateWindow(WC_STATIC, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
+			GetModuleHandle(nullptr), nullptr));
+		CHECK(hwnd);
+		return hwnd;
+	}
+
+	void SendMenuGetObject(HWND hwnd, DWORD flags, UINT index)
+	{
+		IID iid = IID_IDropTarget;
+
+		MENUGETOBJECTINFO info = {};
+		info.dwFlags = flags;
+		info.uPos = index;
+		info.hmenu = m_view.GetNativeMenuForTesting();
+		info.riid = &iid;
+		SendMessage(hwnd, WM_MENUGETOBJECT, 0, reinterpret_cast<LPARAM>(&info));
 	}
 
 	MenuHelpTextHostFake m_menuHelpTextHost;
@@ -287,4 +315,43 @@ TEST_F(MenuControllerTest, SubMenuHelpTextRequest)
 	retrievedHelpText =
 		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
+}
+
+TEST_F(MenuControllerTest, DropLocation)
+{
+	MenuDelegateMock delegate;
+	m_view.SetDelegate(&delegate);
+
+	UINT idCounter = 100;
+
+	UINT itemId1 = idCounter++;
+	m_view.AppendItem(itemId1, L"Item 1");
+
+	UINT itemId2 = idCounter++;
+	m_view.AppendItem(itemId2, L"Item 2");
+
+	UINT itemId3 = idCounter++;
+	m_view.AppendItem(itemId3, L"Item 3");
+
+	auto hwnd = CreateWindowForMessageTest();
+	m_controller.NotifyMenuWillShow(hwnd.get());
+
+	InSequence seq;
+
+	EXPECT_CALL(delegate,
+		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId2, MenuDropLocation::Position::On }));
+	SendMenuGetObject(hwnd.get(), 0, 1);
+
+	EXPECT_CALL(delegate,
+		MaybeGetDropTargetForLocation(
+			MenuDropLocation{ itemId1, MenuDropLocation::Position::Before }));
+	SendMenuGetObject(hwnd.get(), MNGOF_TOPGAP, 0);
+
+	EXPECT_CALL(delegate, MaybeGetDropTargetForLocation(IsGapBetween(itemId2, itemId3)));
+	SendMenuGetObject(hwnd.get(), MNGOF_TOPGAP, 2);
+
+	EXPECT_CALL(delegate,
+		MaybeGetDropTargetForLocation(
+			MenuDropLocation{ itemId3, MenuDropLocation::Position::After }));
+	SendMenuGetObject(hwnd.get(), MNGOF_TOPGAP, 3);
 }
