@@ -35,6 +35,7 @@ public:
 	void ClearMenu();
 
 	bool IsItemEnabled(UINT id) const;
+	bool IsItemChecked(UINT id) const;
 	int GetNumItems() const;
 
 	std::wstring GetItemHelpText(UINT id) const;

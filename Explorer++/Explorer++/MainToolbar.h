@@ -76,10 +76,10 @@ private:
 	void OnTBChange();
 	void OnTBGetInfoTip(LPARAM lParam);
 	std::optional<std::wstring> MaybeGetCustomizedUpInfoTip();
-	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
-	void ShowHistoryMenu(TabHistoryMenu::MenuType historyType);
-	void ShowUpNavigationMenu();
-	void ShowToolbarViewsMenu();
+	LRESULT OnDropDown(const NMTOOLBAR *nmtb);
+	void ShowHistoryMenu(TabHistoryMenu::MenuType historyType, const POINT &ptScreen);
+	void ShowUpNavigationMenu(const POINT &ptScreen);
+	void ShowViewsMenu(const POINT &ptScreen);
 	POINT GetMenuPositionForButton(MainToolbarButton button);
 
 	void OnTabSelected(const Tab &tab);

@@ -448,6 +448,7 @@
     <ClCompile Include="VersionHelperTest.cpp" />
     <ClCompile Include="VersionTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
+    <ClCompile Include="ViewsMenuTest.cpp" />
     <ClCompile Include="WeakPtrFactoryTest.cpp" />
     <ClCompile Include="WindowHelperTest.cpp" />
     <ClCompile Include="WindowRegistryStorageTest.cpp" />

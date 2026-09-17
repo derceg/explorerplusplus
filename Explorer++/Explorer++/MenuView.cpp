@@ -199,6 +199,11 @@ bool MenuView::IsItemEnabled(UINT id) const
 	return MenuHelper::IsMenuItemEnabled(m_menu, id, false);
 }
 
+bool MenuView::IsItemChecked(UINT id) const
+{
+	return MenuHelper::IsMenuItemChecked(m_menu, id, false);
+}
+
 int MenuView::GetNumItems() const
 {
 	int numItems = GetMenuItemCount(m_menu);

@@ -934,6 +934,9 @@
     <ClCompile Include="MenuController.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="ViewsMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2033,6 +2036,9 @@
     </ClInclude>
     <ClInclude Include="MenuController.h">
       <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewsMenu.h">
+      <Filter>Menus\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

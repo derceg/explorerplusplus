@@ -18,7 +18,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabEvents.h"
 #include "TabParentItemsMenu.h"
-#include "ViewsMenuBuilder.h"
+#include "ViewsMenu.h"
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -278,7 +278,7 @@ LRESULT MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 				break;
 
 			case TBN_DROPDOWN:
-				return OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
+				return OnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
 
 			case TBN_INITCUSTOMIZE:
 				return TBNRF_HIDEHELP;
@@ -664,33 +664,36 @@ std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 	return infoTip;
 }
 
-LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
+LRESULT MainToolbar::OnDropDown(const NMTOOLBAR *nmtb)
 {
-	if (nmtb->iItem == MainToolbarButton::Back)
-	{
-		ShowHistoryMenu(TabHistoryMenu::MenuType::Back);
-		return TBDDRET_DEFAULT;
-	}
-	else if (nmtb->iItem == MainToolbarButton::Forward)
-	{
-		ShowHistoryMenu(TabHistoryMenu::MenuType::Forward);
-		return TBDDRET_DEFAULT;
-	}
-	else if (nmtb->iItem == MainToolbarButton::Up)
-	{
-		ShowUpNavigationMenu();
-		return TBDDRET_DEFAULT;
-	}
-	else if (nmtb->iItem == MainToolbarButton::Views)
-	{
-		ShowToolbarViewsMenu();
-		return TBDDRET_DEFAULT;
-	}
+	auto button = MainToolbarButton::_from_integral_nothrow(nmtb->iItem);
+	CHECK(button);
+	auto menuPosition = GetMenuPositionForButton(*button);
 
-	return TBDDRET_NODEFAULT;
+	switch (*button)
+	{
+	case MainToolbarButton::Back:
+		ShowHistoryMenu(TabHistoryMenu::MenuType::Back, menuPosition);
+		return TBDDRET_DEFAULT;
+
+	case MainToolbarButton::Forward:
+		ShowHistoryMenu(TabHistoryMenu::MenuType::Forward, menuPosition);
+		return TBDDRET_DEFAULT;
+
+	case MainToolbarButton::Up:
+		ShowUpNavigationMenu(menuPosition);
+		return TBDDRET_DEFAULT;
+
+	case MainToolbarButton::Views:
+		ShowViewsMenu(menuPosition);
+		return TBDDRET_DEFAULT;
+
+	default:
+		return TBDDRET_NODEFAULT;
+	}
 }
 
-void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
+void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType, const POINT &ptScreen)
 {
 	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	const auto *navigationController = shellBrowser->GetNavigationController();
@@ -702,38 +705,26 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 		return;
 	}
 
-	MainToolbarButton button;
-
-	if (historyType == TabHistoryMenu::MenuType::Back)
-	{
-		button = MainToolbarButton::Back;
-	}
-	else
-	{
-		button = MainToolbarButton::Forward;
-	}
-
 	PopupMenuRunner popupRunner(m_browser);
 	TabHistoryMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(), m_browser,
 		m_shellIconLoader, historyType);
-	popupRunner.Show(m_hwnd, GetMenuPositionForButton(button));
+	popupRunner.Show(m_hwnd, ptScreen);
 }
 
-void MainToolbar::ShowUpNavigationMenu()
+void MainToolbar::ShowUpNavigationMenu(const POINT &ptScreen)
 {
 	PopupMenuRunner popupRunner(m_browser);
 	TabParentItemsMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(),
 		m_browser, m_shellIconLoader);
-	popupRunner.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
+	popupRunner.Show(m_hwnd, ptScreen);
 }
 
-void MainToolbar::ShowToolbarViewsMenu()
+void MainToolbar::ShowViewsMenu(const POINT &ptScreen)
 {
-	ViewsMenuBuilder viewsMenuBuilder(m_resourceLoader);
-	auto viewsMenu = viewsMenuBuilder.BuildMenu(m_browser);
-
-	auto pt = GetMenuPositionForButton(MainToolbarButton::Views);
-	TrackPopupMenu(viewsMenu.get(), TPM_LEFTALIGN, pt.x, pt.y, 0, m_hwnd, nullptr);
+	PopupMenuRunner popupRunner(m_browser);
+	ViewsMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(), m_browser,
+		m_resourceLoader);
+	popupRunner.Show(m_hwnd, ptScreen);
 }
 
 // Returns the position a menu should be anchored at for a particular toolbar button.

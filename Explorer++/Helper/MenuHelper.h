@@ -35,6 +35,8 @@ std::wstring GetMenuItemString(HMENU menu, UINT item, bool byPosition);
 UINT GetMenuItemIDIncludingSubmenu(HMENU menu, int index);
 bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu);
 bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition);
+bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition);
+UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition);
 
 std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen);
 

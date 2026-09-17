@@ -277,13 +277,25 @@ bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu)
 
 bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition)
 {
+	UINT state = GetMenuItemState(menu, item, byPosition);
+	return !(state & MFS_DISABLED);
+}
+
+bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition)
+{
+	UINT state = GetMenuItemState(menu, item, byPosition);
+	return WI_IsFlagSet(state, MFS_CHECKED);
+}
+
+UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition)
+{
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_STATE;
 	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
 	CHECK(res);
 
-	return !(menuItemInfo.fState & MFS_DISABLED);
+	return menuItemInfo.fState;
 }
 
 // Returns the ID of the menu item at the specified point in screen coordinates, if there is such an
