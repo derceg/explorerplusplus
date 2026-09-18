@@ -31,6 +31,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/ShellBackgroundContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ShellItemContextMenu.h"
@@ -1088,10 +1089,7 @@ void ShellBrowserImpl::OnListViewHeaderEndDrag(const NMHEADER *changeInfo)
 
 void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)
 {
-	wil::unique_hmenu headerPopupMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_HEADER_MENU)));
-	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
-
+	auto headerMenu = MenuHelper::CheckedCreatePopupMenu();
 	auto commonColumns = GetColumnHeaderMenuList(m_directoryState.directory.c_str());
 
 	std::unordered_map<int, ColumnType> menuItemMappings;
@@ -1141,16 +1139,20 @@ void ShellBrowserImpl::OnListViewHeaderRightClick(const POINTS &cursorPos)
 
 		mii.dwTypeData = columnName.data();
 		mii.wID = id;
-		InsertMenuItem(headerMenu, currentPosition, TRUE, &mii);
+		InsertMenuItem(headerMenu.get(), currentPosition, TRUE, &mii);
 
 		menuItemMappings.insert({ id, column.type });
 
 		totalInserted++;
 	}
 
-	int cmd =
-		TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-			cursorPos.x, cursorPos.y, 0, m_listView, nullptr);
+	MenuHelper::AddSeparator(headerMenu.get());
+	MenuHelper::AddStringItem(headerMenu.get(), IDM_HEADER_MORE,
+		m_resourceLoader->LoadString(IDS_HEADER_MORE));
+
+	int cmd = TrackPopupMenu(headerMenu.get(),
+		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, cursorPos.x, cursorPos.y, 0,
+		m_listView, nullptr);
 
 	if (cmd == 0)
 	{
