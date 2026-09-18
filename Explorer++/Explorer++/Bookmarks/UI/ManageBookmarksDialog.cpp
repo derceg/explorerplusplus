@@ -4,12 +4,11 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
-#include "Bookmarks/BookmarkHelper.h"
-#include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkNavigationController.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkListPresenter.h"
 #include "Bookmarks/UI/BookmarkTreePresenter.h"
+#include "Bookmarks/UI/ManageBookmarksViewsMenu.h"
 #include "LabelEditHandler.h"
 #include "ListView.h"
 #include "MainResource.h"
@@ -22,7 +21,6 @@
 #include "TreeView.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -31,22 +29,19 @@
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog *ManageBookmarksDialog::Create(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, BookmarkTree *bookmarkTree,
-	const BrowserList *browserList, const Config *config,
+	HWND hParent, BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
 	PlatformContext *platformContext)
 {
-	return new ManageBookmarksDialog(resourceLoader, resourceInstance, hParent, bookmarkTree,
-		browserList, config, acceleratorManager, iconFetcher, platformContext);
+	return new ManageBookmarksDialog(resourceLoader, hParent, bookmarkTree, browserList, config,
+		acceleratorManager, iconFetcher, platformContext);
 }
 
-ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader,
-	HINSTANCE resourceInstance, HWND hParent, BookmarkTree *bookmarkTree,
-	const BrowserList *browserList, const Config *config,
+ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader, HWND hParent,
+	BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
 	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
 	PlatformContext *platformContext) :
 	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
-	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
 	m_browserList(browserList),
 	m_config(config),
@@ -319,205 +314,25 @@ void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 
 void ManageBookmarksDialog::ShowViewMenu()
 {
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU)));
-
-	if (!parentMenu)
-	{
-		return;
-	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	auto columnsMenu = BuildColumnsMenu();
-
-	if (!columnsMenu)
-	{
-		return;
-	}
-
-	MenuHelper::EnableItem(columnsMenu.get(), BookmarkColumn::Name, FALSE);
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_SUBMENU;
-	mii.hSubMenu = columnsMenu.get();
-	SetMenuItemInfo(menu, IDM_POPUP_SHOW_COLUMNS, FALSE, &mii);
-
-	// As the columns menu is now part of the parent views menu, it will be destroyed when the
-	// parent menu is destroyed.
-	columnsMenu.release();
-
-	SetViewMenuItemStates(menu);
-
 	RECT rc;
 	BOOL res = static_cast<BOOL>(
 		SendMessage(m_hToolbar, TB_GETRECT, TOOLBAR_ID_VIEWS, reinterpret_cast<LPARAM>(&rc)));
-
-	if (!res)
-	{
-		return;
-	}
+	CHECK(res);
 
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
 	res = ClientToScreen(m_hToolbar, &pt);
-
-	if (!res)
-	{
-		return;
-	}
+	CHECK(res);
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(TRUE, 0));
 
-	int menuItemId =
-		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hDlg, nullptr);
-
-	if (menuItemId != 0)
-	{
-		OnViewMenuItemSelected(menuItemId);
-	}
+	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	ManageBookmarksViewsMenu menu(popupRunner.GetView(), m_acceleratorManager,
+		m_bookmarkListPresenter.get(), m_resourceLoader);
+	popupRunner.Show(m_hDlg, pt);
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(FALSE, 0));
-}
-
-wil::unique_hmenu ManageBookmarksDialog::BuildColumnsMenu()
-{
-	auto menu = MenuHelper::CheckedCreatePopupMenu();
-
-	const auto *columnModel = m_bookmarkListPresenter->GetColumnModel();
-
-	for (auto columnId : columnModel->GetAllColumnIds())
-	{
-		const auto &column = columnModel->GetColumnById(columnId);
-		MenuHelper::AddStringItem(menu.get(), columnId.value,
-			m_resourceLoader->LoadString(column.nameStringId));
-		MenuHelper::CheckItem(menu.get(), columnId.value, column.visible);
-	}
-
-	return menu;
-}
-
-void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
-{
-	auto sortColumn = m_bookmarkListPresenter->GetSortColumn();
-	UINT itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
-
-	if (sortColumn)
-	{
-		switch (*sortColumn)
-		{
-		case BookmarkColumn::Name:
-			itemToCheck = IDM_MB_VIEW_SORTBYNAME;
-			break;
-
-		case BookmarkColumn::Location:
-			itemToCheck = IDM_MB_VIEW_SORTBYLOCATION;
-			break;
-
-		case BookmarkColumn::DateCreated:
-			itemToCheck = IDM_MB_VIEW_SORTBYADDED;
-			break;
-
-		case BookmarkColumn::DateModified:
-			itemToCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
-			break;
-
-		default:
-			DCHECK(false);
-			break;
-		}
-	}
-
-	CheckMenuRadioItem(menu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, itemToCheck,
-		MF_BYCOMMAND);
-
-	if (!sortColumn)
-	{
-		MenuHelper::EnableItem(menu, IDM_MB_VIEW_SORTASCENDING, FALSE);
-		MenuHelper::EnableItem(menu, IDM_MB_VIEW_SORTDESCENDING, FALSE);
-	}
-	else
-	{
-		if (m_bookmarkListPresenter->GetSortDirection() == +SortDirection::Ascending)
-		{
-			itemToCheck = IDM_MB_VIEW_SORTASCENDING;
-		}
-		else
-		{
-			itemToCheck = IDM_MB_VIEW_SORTDESCENDING;
-		}
-
-		CheckMenuRadioItem(menu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, itemToCheck,
-			MF_BYCOMMAND);
-	}
-}
-
-void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
-{
-	switch (menuItemId)
-	{
-	case BookmarkColumn::Name:
-		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::Name);
-		break;
-
-	case BookmarkColumn::Location:
-		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::Location);
-		break;
-
-	case BookmarkColumn::DateCreated:
-		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::DateCreated);
-		break;
-
-	case BookmarkColumn::DateModified:
-		m_bookmarkListPresenter->ToggleColumn(BookmarkColumn::DateModified);
-		break;
-
-	case IDM_MB_VIEW_SORT_BY_DEFAULT:
-		m_bookmarkListPresenter->SetSortDetails(std::nullopt, SortDirection::Ascending);
-		break;
-
-	case IDM_MB_VIEW_SORTBYNAME:
-		UpdateSortColumn(BookmarkColumn::Name);
-		break;
-
-	case IDM_MB_VIEW_SORTBYLOCATION:
-		UpdateSortColumn(BookmarkColumn::Location);
-		break;
-
-	case IDM_MB_VIEW_SORTBYADDED:
-		UpdateSortColumn(BookmarkColumn::DateCreated);
-		break;
-
-	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		UpdateSortColumn(BookmarkColumn::DateModified);
-		break;
-
-	case IDM_MB_VIEW_SORTASCENDING:
-		m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
-			SortDirection::Ascending);
-		break;
-
-	case IDM_MB_VIEW_SORTDESCENDING:
-		m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
-			SortDirection::Descending);
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
-}
-
-void ManageBookmarksDialog::UpdateSortColumn(BookmarkColumn sortColumn)
-{
-	if (m_bookmarkListPresenter->GetSortColumn() == sortColumn)
-	{
-		return;
-	}
-
-	m_bookmarkListPresenter->SetSortDetails(sortColumn, SortDirection::Ascending);
 }
 
 void ManageBookmarksDialog::ShowOrganizeMenu()

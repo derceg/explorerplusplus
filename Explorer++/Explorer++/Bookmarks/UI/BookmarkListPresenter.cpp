@@ -303,16 +303,14 @@ RawBookmarkItems BookmarkListPresenter::GetBookmarksForItems(
 			[this](auto *item) { return m_model->GetBookmarkForItem(item); }));
 }
 
-const BookmarkColumnModel *BookmarkListPresenter::GetColumnModel() const
+BookmarkColumnModel *BookmarkListPresenter::GetColumnModel()
 {
 	return m_model->GetColumnModel();
 }
 
-void BookmarkListPresenter::ToggleColumn(BookmarkColumn column)
+const BookmarkColumnModel *BookmarkListPresenter::GetColumnModel() const
 {
-	auto *columnModel = m_model->GetColumnModel();
-	auto columnId = BookmarkColumnModel::BookmarkColumnToColumnId(column);
-	columnModel->SetColumnVisible(columnId, !columnModel->IsColumnVisible(columnId));
+	return m_model->GetColumnModel();
 }
 
 void BookmarkListPresenter::OnBeginDrag(const std::vector<ListViewItem *> &items)

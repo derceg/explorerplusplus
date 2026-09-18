@@ -52,9 +52,8 @@ private:
 class ManageBookmarksDialog : public BaseDialog
 {
 public:
-	static ManageBookmarksDialog *Create(const ResourceLoader *resourceLoader,
-		HINSTANCE resourceInstance, HWND hParent, BookmarkTree *bookmarkTree,
-		const BrowserList *browserList, const Config *config,
+	static ManageBookmarksDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
+		BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
 		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
 		PlatformContext *platformContext);
 
@@ -74,10 +73,10 @@ private:
 	static const int TOOLBAR_ID_ORGANIZE = 10002;
 	static const int TOOLBAR_ID_VIEWS = 10003;
 
-	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HINSTANCE resourceInstance,
-		HWND hParent, BookmarkTree *bookmarkTree, const BrowserList *browserList,
-		const Config *config, const AcceleratorManager *acceleratorManager,
-		IconFetcher *iconFetcher, PlatformContext *platformContext);
+	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HWND hParent,
+		BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
+		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
+		PlatformContext *platformContext);
 	~ManageBookmarksDialog() = default;
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
@@ -100,15 +99,7 @@ private:
 	LRESULT HandleMenuOrAccelerator(WPARAM wParam);
 
 	void OnTbnDropDown(NMTOOLBAR *nmtb);
-
-	// View menu
 	void ShowViewMenu();
-	wil::unique_hmenu BuildColumnsMenu();
-	void SetViewMenuItemStates(HMENU menu);
-	void OnViewMenuItemSelected(int menuItemId);
-	void UpdateSortColumn(BookmarkColumn sortColumn);
-
-	// Organize menu
 	void ShowOrganizeMenu();
 
 	void OnOk();
@@ -119,7 +110,6 @@ private:
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
 
-	const HINSTANCE m_resourceInstance;
 	BookmarkTree *const m_bookmarkTree;
 	const BrowserList *const m_browserList;
 	const Config *const m_config;

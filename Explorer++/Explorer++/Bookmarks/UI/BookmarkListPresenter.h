@@ -64,8 +64,8 @@ public:
 	void CreateBookmark(BookmarkItem *parentFolder, size_t index) override;
 	void CreateFolder(BookmarkItem *parentFolder, size_t index) override;
 
+	BookmarkColumnModel *GetColumnModel();
 	const BookmarkColumnModel *GetColumnModel() const;
-	void ToggleColumn(BookmarkColumn column);
 	std::optional<BookmarkColumn> GetSortColumn() const;
 	SortDirection GetSortDirection() const;
 	void SetSortDetails(std::optional<BookmarkColumn> sortColumn, SortDirection direction);

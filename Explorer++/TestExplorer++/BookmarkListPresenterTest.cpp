@@ -169,37 +169,6 @@ TEST_F(BookmarkListPresenterTest, CreateFolder)
 	EXPECT_THAT(presenter->GetSelectedItems(), ElementsAre(createdBookmarkItem));
 }
 
-TEST_F(BookmarkListPresenterTest, ToggleColumn)
-{
-	auto presenter = BuildPresenter();
-	presenter->NavigateToBookmarkFolder(m_bookmarkTree.GetBookmarksMenuFolder());
-
-	const auto *columnModel = presenter->GetColumnModel();
-	BookmarkColumn column = BookmarkColumn::DateCreated;
-	auto columnId = columnModel->BookmarkColumnToColumnId(column);
-
-	bool originalVisibility = columnModel->IsColumnVisible(columnId);
-	presenter->ToggleColumn(column);
-	EXPECT_EQ(columnModel->IsColumnVisible(columnId), !originalVisibility);
-
-	presenter->ToggleColumn(column);
-	EXPECT_EQ(columnModel->IsColumnVisible(columnId), originalVisibility);
-}
-
-TEST_F(BookmarkListPresenterTest, TogglePrimaryColumn)
-{
-	auto presenter = BuildPresenter();
-	presenter->NavigateToBookmarkFolder(m_bookmarkTree.GetBookmarksMenuFolder());
-
-	const auto *columnModel = presenter->GetColumnModel();
-
-	// Attempting to toggle the name column off should have no effect, since it's the primary
-	// column.
-	presenter->ToggleColumn(BookmarkColumn::Name);
-	EXPECT_TRUE(
-		columnModel->IsColumnVisible(columnModel->BookmarkColumnToColumnId(BookmarkColumn::Name)));
-}
-
 TEST_F(BookmarkListPresenterTest, SortColumn)
 {
 	auto *targetFolder = m_bookmarkTree.GetBookmarksMenuFolder();

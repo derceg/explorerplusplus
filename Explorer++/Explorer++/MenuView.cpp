@@ -175,6 +175,11 @@ void MenuView::CheckItem(UINT id, bool check)
 	MenuHelper::CheckItem(m_menu, id, check);
 }
 
+void MenuView::CheckRadioItem(UINT id, bool check)
+{
+	MenuHelper::CheckRadioItem(m_menu, id, check);
+}
+
 void MenuView::RemoveTrailingSeparators()
 {
 	MenuHelper::RemoveTrailingSeparators(m_menu);

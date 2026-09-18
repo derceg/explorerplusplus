@@ -20,6 +20,7 @@ HMENU AttachNewSubMenu(HMENU parentMenu, UINT item, BOOL byPosition);
 void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition);
 
 void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck);
+void CheckRadioItem(HMENU hMenu, UINT itemID, BOOL bCheck);
 void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable);
 
 void SetMenuStyle(HMENU menu, DWORD style);

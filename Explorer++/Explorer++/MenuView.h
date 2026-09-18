@@ -31,6 +31,7 @@ public:
 	void AppendSeparator();
 	void EnableItem(UINT id, bool enable);
 	void CheckItem(UINT id, bool check);
+	void CheckRadioItem(UINT id, bool check);
 	void RemoveTrailingSeparators();
 	void ClearMenu();
 

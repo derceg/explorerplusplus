@@ -91,6 +91,29 @@ void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
 	CHECK_NE(res, static_cast<DWORD>(-1));
 }
 
+void CheckRadioItem(HMENU hMenu, UINT itemID, BOOL bCheck)
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_FTYPE | MIIM_STATE;
+	auto res = GetMenuItemInfo(hMenu, itemID, false, &menuItemInfo);
+	CHECK(res);
+
+	WI_SetFlag(menuItemInfo.fType, MFT_RADIOCHECK);
+
+	if (bCheck)
+	{
+		WI_SetFlag(menuItemInfo.fState, MFS_CHECKED);
+	}
+	else
+	{
+		WI_ClearFlag(menuItemInfo.fState, MFS_CHECKED);
+	}
+
+	res = SetMenuItemInfo(hMenu, itemID, false, &menuItemInfo);
+	CHECK(res);
+}
+
 void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable)
 {
 	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
