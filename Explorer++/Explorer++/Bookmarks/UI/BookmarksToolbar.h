@@ -6,7 +6,6 @@
 
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
-#include "Bookmarks/UI/BookmarkMenu.h"
 #include <boost/signals2.hpp>
 #include <memory>
 #include <vector>
@@ -86,12 +85,7 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	BookmarkTree *const m_bookmarkTree;
 	PlatformContext *const m_platformContext;
-
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
-	BookmarkMenu m_bookmarkMenu;
-
-	// Drag and drop
 	BookmarkItem *m_dropTargetFolder = nullptr;
-
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

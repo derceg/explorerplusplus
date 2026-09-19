@@ -106,6 +106,7 @@ public:
 	void VisitRecursively(std::function<void(BookmarkItem *currentItem)> callback);
 
 	WeakPtr<BookmarkItem> GetWeakPtr();
+	WeakPtr<BookmarkItem, const BookmarkItem> GetWeakPtr() const;
 
 	// Signals
 	SignalWrapper<BookmarkItem, void(BookmarkItem &bookmarkItem, PropertyType propertyType)>

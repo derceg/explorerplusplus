@@ -220,9 +220,6 @@
     <ClCompile Include="Bookmarks\UI\BookmarkListPresenter.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp">
-      <Filter>Bookmarks\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Bookmarks\UI\BookmarkMenuBuilder.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
@@ -940,6 +937,9 @@
     <ClCompile Include="Bookmarks\UI\ManageBookmarksViewsMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarksMenu.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1159,9 +1159,6 @@
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkListPresenter.h">
-      <Filter>Bookmarks\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarkMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h">
@@ -2044,6 +2041,9 @@
       <Filter>Menus\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\ManageBookmarksViewsMenu.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarksMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>

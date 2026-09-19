@@ -1198,6 +1198,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarkListViewContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListViewItem.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListViewModel.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarksMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewAdapter.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewNode.cpp" />
@@ -1408,7 +1409,6 @@
     <ClCompile Include="SortMenuBuilder.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListPresenter.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreePresenter.cpp" />
     <ClCompile Include="ColorRuleEditorDialog.cpp" />
     <ClCompile Include="Plugins\CommandApi\Events\CommandInvoked.cpp" />
@@ -1554,6 +1554,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarkListViewContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkListViewItem.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkListViewModel.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarksMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewAdapter.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewNode.h" />
@@ -1792,7 +1793,6 @@
     <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h" />
     <ClInclude Include="Bookmarks\BookmarkRegistryStorage.h" />
     <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarkMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h" />
     <ClInclude Include="Bookmarks\BookmarkStorage.h" />
     <ClInclude Include="Bookmarks\BookmarkTree.h" />

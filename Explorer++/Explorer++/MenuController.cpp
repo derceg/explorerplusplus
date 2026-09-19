@@ -306,7 +306,10 @@ void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKe
 
 void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 {
-	auto *delegate = MaybeGetDelegateForActionableItem(id);
+	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	auto *delegate = view->MaybeGetDelegate();
 
 	if (!delegate)
 	{

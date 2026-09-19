@@ -628,6 +628,9 @@
     <ClCompile Include="ViewsMenuTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarksMenuTest.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

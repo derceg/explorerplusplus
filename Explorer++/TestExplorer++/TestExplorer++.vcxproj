@@ -230,6 +230,7 @@
     <ClCompile Include="BookmarkHelperTest.cpp" />
     <ClCompile Include="BookmarkListPresenterTest.cpp" />
     <ClCompile Include="BookmarkListViewContextMenuTest.cpp" />
+    <ClCompile Include="BookmarksMenuTest.cpp" />
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
     <ClCompile Include="BookmarksToolbarTest.cpp" />
     <ClCompile Include="BookmarkStorageTestHelper.cpp" />

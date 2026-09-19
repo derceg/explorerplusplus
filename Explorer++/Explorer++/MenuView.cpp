@@ -117,7 +117,7 @@ MenuView *MenuView::AppendSubMenu(UINT id, const std::wstring &text,
 	auto *view = ownedView.get();
 	view->m_parent = this;
 
-	m_subMenus.push_back(std::move(ownedView));
+	m_idToSubMenuMap.insert({ id, std::move(ownedView) });
 
 	return view;
 }
@@ -193,7 +193,7 @@ void MenuView::ClearMenu()
 		CHECK(res);
 	}
 
-	m_subMenus.clear();
+	m_idToSubMenuMap.clear();
 	m_idToItemMap.clear();
 	m_lastRenderedImageDpi.reset();
 	m_weakPtrFactory.InvalidateWeakPtrs();
@@ -235,7 +235,7 @@ MenuView *MenuView::MaybeGetMenuViewForNativeMenu(HMENU menu)
 		return this;
 	}
 
-	for (auto &submenu : m_subMenus)
+	for (auto &submenu : m_idToSubMenuMap | std::views::values)
 	{
 		if (auto *view = submenu->MaybeGetMenuViewForNativeMenu(menu))
 		{
@@ -253,7 +253,7 @@ MenuView *MenuView::MaybeGetMenuViewForItem(UINT id)
 		return this;
 	}
 
-	for (auto &subMenu : m_subMenus)
+	for (auto &subMenu : m_idToSubMenuMap | std::views::values)
 	{
 		if (auto *view = subMenu->MaybeGetMenuViewForItem(id))
 		{
@@ -333,6 +333,13 @@ HMENU MenuView::GetNativeMenuForTesting() const
 	return m_menu;
 }
 
+MenuDelegate *MenuView::MaybeGetDelegateForTesting()
+{
+	CHECK(IsInTest());
+
+	return MaybeGetDelegate();
+}
+
 UINT MenuView::GetItemIdForTesting(int index) const
 {
 	CHECK(IsInTest());
@@ -368,6 +375,15 @@ HBITMAP MenuView::GetItemBitmapForTesting(UINT id) const
 	CHECK(res);
 
 	return menuItemInfo.hbmpItem;
+}
+
+const MenuView *MenuView::GetSubMenuViewForTesting(UINT id) const
+{
+	CHECK(IsInTest());
+
+	auto itr = m_idToSubMenuMap.find(id);
+	CHECK(itr != m_idToSubMenuMap.end());
+	return itr->second.get();
 }
 
 void MenuView::OnPopupWillShowForTesting(UINT dpi)

@@ -321,8 +321,6 @@ UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition)
 	return menuItemInfo.fState;
 }
 
-// Returns the ID of the menu item at the specified point in screen coordinates, if there is such an
-// item. Only items that are part of the provided menu will be considered.
 std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 {
 	// Note that the POINT passed to MenuItemFromPoint() needs to be in screen coordinates (even

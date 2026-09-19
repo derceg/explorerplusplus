@@ -259,3 +259,8 @@ WeakPtr<BookmarkItem> BookmarkItem::GetWeakPtr()
 {
 	return m_weakPtrFactory.GetWeakPtr();
 }
+
+WeakPtr<BookmarkItem, const BookmarkItem> BookmarkItem::GetWeakPtr() const
+{
+	return m_weakPtrFactory.GetWeakPtr();
+}

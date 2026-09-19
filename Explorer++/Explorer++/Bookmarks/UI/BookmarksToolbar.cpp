@@ -9,9 +9,9 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "Bookmarks/UI/BookmarksMenu.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserWindow.h"
-#include "Config.h"
 #include "NavigationHelper.h"
 #include "PopupMenuRunner.h"
 #include "../Helper/DpiCompatibility.h"
@@ -138,9 +138,7 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_bookmarkTree(bookmarkTree),
-	m_platformContext(platformContext),
-	m_bookmarkMenu(bookmarkTree, resourceLoader, browser, acceleratorManager, iconFetcher,
-		view->GetHWND(), platformContext)
+	m_platformContext(platformContext)
 {
 	Initialize(iconFetcher, resourceLoader);
 }
@@ -286,7 +284,11 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 	POINT pt = { buttonRect.left, buttonRect.bottom };
 	ClientToScreen(m_view->GetHWND(), &pt);
 
-	m_bookmarkMenu.ShowMenu(bookmarkItem, pt);
+	PopupMenuRunner popupRunner(m_browser);
+	BookmarksMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree, bookmarkItem,
+		m_bookmarkIconManager.get(), m_browser, m_view->GetHWND(), m_platformContext,
+		m_resourceLoader);
+	popupRunner.Show(m_view->GetHWND(), pt);
 }
 
 void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
@@ -314,12 +316,18 @@ BookmarksToolbarView *BookmarksToolbar::GetView() const
 
 void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 {
-	m_bookmarkMenu.ShowMenu(m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
-		[this](const BookmarkItem *bookmarkItem)
-		{
-			auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
-			return !m_view->IsButtonVisible(index);
-		});
+	auto includePredicate = [this](const BookmarkItem *bookmarkItem)
+	{
+		// Only items that aren't visible need to be displayed in the overflow menu.
+		auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+		return !m_view->IsButtonVisible(index);
+	};
+
+	PopupMenuRunner popupRunner(m_browser);
+	BookmarksMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
+		m_bookmarkTree->GetBookmarksToolbarFolder(), m_bookmarkIconManager.get(), m_browser,
+		m_view->GetHWND(), m_platformContext, m_resourceLoader, includePredicate);
+	popupRunner.Show(m_view->GetHWND(), ptScreen);
 }
 
 void BookmarksToolbar::OnWindowDestroyed()

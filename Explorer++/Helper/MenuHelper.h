@@ -39,6 +39,10 @@ bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition);
 bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition);
 UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition);
 
+// Returns the ID of the menu item at the specified point in screen coordinates, if there is such an
+// item. Only items that are part of the provided menu will be considered. Note that a value will
+// only be returned if the menu is the top-most menu. If another menu is shown on top, no result
+// will be returned, regardless of the location provided.
 std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen);
 
 wil::unique_hmenu CheckedCreatePopupMenu();

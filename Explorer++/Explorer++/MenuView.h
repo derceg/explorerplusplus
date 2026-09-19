@@ -11,7 +11,6 @@
 #include <memory>
 #include <optional>
 #include <unordered_map>
-#include <vector>
 
 class MenuView
 {
@@ -42,9 +41,11 @@ public:
 	std::wstring GetItemHelpText(UINT id) const;
 
 	HMENU GetNativeMenuForTesting() const;
+	MenuDelegate *MaybeGetDelegateForTesting();
 	UINT GetItemIdForTesting(int index) const;
 	std::wstring GetItemTextForTesting(UINT id) const;
 	HBITMAP GetItemBitmapForTesting(UINT id) const;
+	const MenuView *GetSubMenuViewForTesting(UINT id) const;
 	void OnPopupWillShowForTesting(UINT dpi);
 	void OnPopupClosedForTesting();
 
@@ -84,7 +85,7 @@ private:
 	const HMENU m_menu;
 	MenuDelegate *m_delegate = nullptr;
 	MenuView *m_parent = nullptr;
-	std::vector<std::unique_ptr<MenuView>> m_subMenus;
+	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 
 	std::unordered_map<UINT, Item> m_idToItemMap;
 
