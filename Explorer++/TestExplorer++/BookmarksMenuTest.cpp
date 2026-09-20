@@ -82,7 +82,7 @@ protected:
 	void SimulateDropOnMenuView(MenuView *menuView, const MenuDropLocation &dropLocation,
 		const std::vector<PidlAbsolute> &items)
 	{
-		auto *delegate = menuView->MaybeGetDelegateForTesting();
+		auto *delegate = menuView->GetDelegateForItemForTesting(dropLocation.id);
 		ASSERT_NE(delegate, nullptr);
 
 		auto dropTarget = delegate->MaybeGetDropTargetForLocation(dropLocation);
@@ -357,7 +357,7 @@ TEST_F(BookmarksMenuTest, ActionsAfterRemoval)
 	menuHost.MiddleClickItemAtIndex(0, false, false);
 	EXPECT_EQ(tabContainer->GetNumTabs(), 1);
 
-	auto *delegate = menuView->MaybeGetDelegateForTesting();
+	auto *delegate = menuView->GetDelegateForItemForTesting(menuView->GetItemIdForTesting(0));
 	ASSERT_NE(delegate, nullptr);
 
 	auto dropTarget = delegate->MaybeGetDropTargetForLocation(

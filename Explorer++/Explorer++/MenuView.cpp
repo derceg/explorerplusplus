@@ -18,29 +18,6 @@ bool MenuView::IsRoot() const
 	return m_parent == nullptr;
 }
 
-void MenuView::SetDelegate(MenuDelegate *delegate)
-{
-	m_delegate = delegate;
-}
-
-// If no delegate is set, a search for a delegate will proceed up the tree. This allows a menu with
-// multiple submenus to be managed by a single delegate, while also allowing a submenu to be managed
-// independently.
-MenuDelegate *MenuView::MaybeGetDelegate()
-{
-	if (m_delegate)
-	{
-		return m_delegate;
-	}
-
-	if (m_parent)
-	{
-		return m_parent->MaybeGetDelegate();
-	}
-
-	return nullptr;
-}
-
 void MenuView::EnableDragAndDrop(bool enable)
 {
 	MENUINFO menuInfo = {};
@@ -62,7 +39,7 @@ void MenuView::EnableDragAndDrop(bool enable)
 	CHECK(res);
 }
 
-void MenuView::AppendItem(UINT id, const std::wstring &text,
+void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 	const std::optional<std::wstring> &acceleratorText)
 {
@@ -85,7 +62,7 @@ void MenuView::AppendItem(UINT id, const std::wstring &text,
 	auto res = InsertMenuItem(m_menu, GetMenuItemCount(m_menu), true, &menuItemInfo);
 	CHECK(res);
 
-	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, std::move(iconModel), helpText);
+	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, delegate, std::move(iconModel), helpText);
 	CHECK(didInsert);
 
 	// It's only possible to add images to the menu when the DPI is known (so that the appropriate
@@ -98,14 +75,14 @@ void MenuView::AppendItem(UINT id, const std::wstring &text,
 	}
 }
 
-MenuView *MenuView::AppendSubMenu(UINT id, const std::wstring &text,
+MenuView *MenuView::AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel)
 {
 	auto ownedSubMenu = MenuHelper::CheckedCreatePopupMenu();
 	auto subMenu = ownedSubMenu.get();
 	MenuHelper::AddSubMenuItem(m_menu, id, text, std::move(ownedSubMenu));
 
-	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, std::move(iconModel), L"");
+	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, delegate, std::move(iconModel), L"");
 	CHECK(didInsert);
 
 	if (m_currentDpi)
@@ -321,6 +298,13 @@ UINT MenuView::GetItemId(int index) const
 	return menuItemInfo.wID;
 }
 
+MenuDelegate *MenuView::GetDelegateForItem(UINT id)
+{
+	auto itr = m_idToItemMap.find(id);
+	CHECK(itr != m_idToItemMap.end());
+	return itr->second.delegate;
+}
+
 std::optional<UINT> MenuView::MaybeGetItemAtPoint(const POINT &ptScreen) const
 {
 	return MenuHelper::MaybeGetMenuItemAtPoint(m_menu, ptScreen);
@@ -333,18 +317,18 @@ HMENU MenuView::GetNativeMenuForTesting() const
 	return m_menu;
 }
 
-MenuDelegate *MenuView::MaybeGetDelegateForTesting()
-{
-	CHECK(IsInTest());
-
-	return MaybeGetDelegate();
-}
-
 UINT MenuView::GetItemIdForTesting(int index) const
 {
 	CHECK(IsInTest());
 
 	return GetItemId(index);
+}
+
+MenuDelegate *MenuView::GetDelegateForItemForTesting(UINT id)
+{
+	CHECK(IsInTest());
+
+	return GetDelegateForItem(id);
 }
 
 std::wstring MenuView::GetItemTextForTesting(UINT id) const

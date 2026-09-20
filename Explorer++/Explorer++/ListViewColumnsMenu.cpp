@@ -16,8 +16,6 @@ ListViewColumnsMenu::ListViewColumnsMenu(MenuView *menuView,
 	m_columnModel(columnModel),
 	m_resourceLoader(resourceLoader)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
@@ -28,7 +26,7 @@ void ListViewColumnsMenu::BuildMenu()
 		const auto &column = m_columnModel->GetColumnById(columnId);
 
 		UINT id = m_idCounter++;
-		m_menuView->AppendItem(id, m_resourceLoader->LoadString(column.nameStringId));
+		m_menuView->AppendItem(this, id, m_resourceLoader->LoadString(column.nameStringId));
 		m_menuView->CheckItem(id, column.visible);
 
 		// The primary column can't be removed.

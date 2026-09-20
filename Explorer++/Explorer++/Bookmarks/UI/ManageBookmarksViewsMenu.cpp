@@ -17,8 +17,6 @@ ManageBookmarksViewsMenu::ManageBookmarksViewsMenu(MenuView *menuView,
 	MenuBase(menuView, acceleratorManager),
 	m_bookmarkListPresenter(bookmarkListPresenter)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu(resourceLoader);
 }
 
@@ -27,35 +25,36 @@ ManageBookmarksViewsMenu::~ManageBookmarksViewsMenu() = default;
 void ManageBookmarksViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
 	auto *columnsSubMenuView =
-		m_menuView->AppendSubMenu(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP,
+		m_menuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP,
 			resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP));
 	m_columnsMenu = std::make_unique<ListViewColumnsMenu>(columnsSubMenuView, m_acceleratorManager,
 		m_bookmarkListPresenter->GetColumnModel(), resourceLoader);
 
-	auto *sortSubMenuView = m_menuView->AppendSubMenu(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP));
+	auto *sortSubMenuView =
+		m_menuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP,
+			resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP));
 	BuildSortMenu(sortSubMenuView, resourceLoader);
 }
 
 void ManageBookmarksViewsMenu::BuildSortMenu(MenuView *sortMenuView,
 	const ResourceLoader *resourceLoader)
 {
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT));
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME));
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION));
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED));
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED));
 
 	sortMenuView->AppendSeparator();
 
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING));
-	sortMenuView->AppendItem(IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING,
+	sortMenuView->AppendItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING,
 		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING));
 
 	UpdateSortMenuItemStates(sortMenuView);

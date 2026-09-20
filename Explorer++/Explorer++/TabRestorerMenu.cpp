@@ -11,7 +11,6 @@
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellIconModel.h"
 #include "TabRestorer.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <ranges>
 
@@ -23,8 +22,6 @@ TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *a
 	m_shellIconLoader(shellIconLoader),
 	m_resourceLoader(resourceLoader)
 {
-	m_menuView->SetDelegate(this);
-
 	RebuildMenu();
 
 	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
@@ -40,7 +37,7 @@ void TabRestorerMenu::RebuildMenu()
 	if (m_tabRestorer->IsEmpty())
 	{
 		auto id = m_idCounter++;
-		m_menuView->AppendItem(id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
+		m_menuView->AppendItem(this, id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
 		m_menuView->EnableItem(id, false);
 		return;
 	}
@@ -77,7 +74,7 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 		acceleratorText = GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB);
 	}
 
-	m_menuView->AppendItem(id, menuText,
+	m_menuView->AppendItem(this, id, menuText,
 		std::make_unique<ShellIconModel>(m_shellIconLoader, currentEntry->GetPidl().Raw()),
 		helpText, acceleratorText);
 

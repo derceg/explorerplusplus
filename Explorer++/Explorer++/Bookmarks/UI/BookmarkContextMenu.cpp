@@ -26,8 +26,6 @@ BookmarkContextMenu::BookmarkContextMenu(MenuView *menuView,
 	m_parentWindow(parentWindow),
 	m_platformContext(platformContext)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
@@ -41,10 +39,10 @@ void BookmarkContextMenu::BuildMenu()
 
 	if (singleBookmarkSelected)
 	{
-		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN,
+		m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_OPEN,
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN), {},
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_HELP_TEXT));
-		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB,
+		m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB,
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB), {},
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB_HELP_TEXT));
 
@@ -54,7 +52,7 @@ void BookmarkContextMenu::BuildMenu()
 	{
 		size_t totalBookmarks = GetTotalBookmarks();
 
-		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL,
+		m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL,
 			std::format(L"{}\t{}", m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_ALL),
 				totalBookmarks),
 			{}, m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_ALL_HELP_TEXT));
@@ -66,29 +64,29 @@ void BookmarkContextMenu::BuildMenu()
 
 	if (m_bookmarkItems.size() == 1)
 	{
-		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK,
+		m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK,
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK), {},
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_BOOKMARK_HELP_TEXT));
-		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_NEW_FOLDER,
+		m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_NEW_FOLDER,
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_FOLDER), {},
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_NEW_FOLDER_HELP_TEXT));
 
 		m_menuView->AppendSeparator();
 	}
 
-	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_CUT,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_CUT,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_CUT), {},
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_CUT_HELP_TEXT));
-	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_COPY,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_COPY,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_COPY), {},
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_COPY_HELP_TEXT));
-	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_PASTE,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PASTE), {},
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PASTE_HELP_TEXT));
 
 	m_menuView->AppendSeparator();
 
-	m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_DELETE,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_DELETE), {},
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_DELETE_HELP_TEXT));
 
@@ -102,7 +100,7 @@ void BookmarkContextMenu::BuildMenu()
 	{
 		m_menuView->AppendSeparator();
 
-		m_menuView->AppendItem(IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES,
+		m_menuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES,
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PROPERTIES), {},
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
 

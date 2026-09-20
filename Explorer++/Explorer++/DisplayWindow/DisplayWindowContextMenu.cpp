@@ -19,23 +19,21 @@ DisplayWindowContextMenu::DisplayWindowContextMenu(MenuView *menuView,
 	m_config(config),
 	m_resourceLoader(resourceLoader)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
 void DisplayWindowContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(IDM_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS,
+	m_menuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS,
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS), {},
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS_HELP_TEXT));
 
 	m_menuView->AppendSeparator();
 
-	m_menuView->AppendItem(IDM_DISPLAY_WINDOW_CONTEXT_MENU_HIDE,
+	m_menuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_HIDE,
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_HIDE), {},
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_HIDE_HELP_TEXT));
-	m_menuView->AppendItem(IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT,
+	m_menuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT,
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT), {},
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT_HELP_TEXT));
 

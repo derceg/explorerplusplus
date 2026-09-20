@@ -24,7 +24,7 @@ protected:
 	void CheckAppendItem(UINT itemId, const std::wstring &text, const std::wstring &helpText,
 		const std::optional<std::wstring> &acceleratorText = std::nullopt)
 	{
-		m_menuView.AppendItem(itemId, text, {}, helpText, acceleratorText);
+		m_menuView.AppendItem(nullptr, itemId, text, {}, helpText, acceleratorText);
 		m_appendItemCount++;
 
 		EXPECT_EQ(m_menuView.GetNumItems(), m_appendItemCount);
@@ -45,7 +45,7 @@ TEST_F(MenuViewTest, IsRoot)
 {
 	EXPECT_TRUE(m_menuView.IsRoot());
 
-	auto *subMenu = m_menuView.AppendSubMenu(1, L"SubMenu");
+	auto *subMenu = m_menuView.AppendSubMenu(nullptr, 1, L"SubMenu");
 	EXPECT_FALSE(subMenu->IsRoot());
 }
 
@@ -65,7 +65,7 @@ TEST_F(MenuViewTest, AppendItem)
 TEST_F(MenuViewTest, AppendSubMenu)
 {
 	UINT subMenuItemId = 1;
-	m_menuView.AppendSubMenu(subMenuItemId, L"SubMenu");
+	m_menuView.AppendSubMenu(nullptr, subMenuItemId, L"SubMenu");
 	ASSERT_EQ(m_menuView.GetNumItems(), 1);
 	EXPECT_EQ(m_menuView.GetItemIdForTesting(0), subMenuItemId);
 	EXPECT_EQ(m_menuView.GetItemTextForTesting(subMenuItemId), L"SubMenu");
@@ -79,7 +79,7 @@ TEST_F(MenuViewTest, ClearEmptyMenu)
 
 TEST_F(MenuViewTest, ClearMenu)
 {
-	m_menuView.AppendItem(1, L"Item");
+	m_menuView.AppendItem(nullptr, 1, L"Item");
 
 	m_menuView.ClearMenu();
 	EXPECT_EQ(m_menuView.GetNumItems(), 0);
@@ -90,7 +90,7 @@ using MenuViewDeathTest = MenuViewTest;
 TEST_F(MenuViewDeathTest, RetrieveHelpTextAfterClearingMenu)
 {
 	UINT itemId = 1;
-	m_menuView.AppendItem(itemId, L"Item", {}, L"Help text");
+	m_menuView.AppendItem(nullptr, itemId, L"Item", {}, L"Help text");
 
 	m_menuView.ClearMenu();
 
@@ -125,7 +125,8 @@ protected:
 				iconModel = std::make_unique<ShellIconModel>(&m_shellIconLoader, pidl.Raw());
 			}
 
-			menuView->AppendItem(m_idCounter++, std::format(L"Item {}", i), std::move(iconModel));
+			menuView->AppendItem(nullptr, m_idCounter++, std::format(L"Item {}", i),
+				std::move(iconModel));
 		}
 	}
 

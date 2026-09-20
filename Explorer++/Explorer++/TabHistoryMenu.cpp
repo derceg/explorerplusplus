@@ -19,8 +19,6 @@ TabHistoryMenu::TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acc
 	m_shellIconLoader(shellIconLoader),
 	m_type(type)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
@@ -51,7 +49,8 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 {
 	auto id = m_idCounter++;
 
-	m_menuView->AppendItem(id, GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
+	m_menuView->AppendItem(this, id,
+		GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
 		std::make_unique<ShellIconModel>(m_shellIconLoader, entry->GetPidl().Raw()));
 }
 

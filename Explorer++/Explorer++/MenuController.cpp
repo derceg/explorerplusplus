@@ -247,12 +247,7 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		}
 	}
 
-	auto *delegate = view->MaybeGetDelegate();
-
-	if (!delegate)
-	{
-		return MNGO_NOINTERFACE;
-	}
+	auto *delegate = view->GetDelegateForItem(dropLocation.id);
 
 	// This represents the drop target for the specified item. It needs to be held either until
 	// another target is requested, or the menu is closed.
@@ -309,13 +304,7 @@ void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
-	auto *delegate = view->MaybeGetDelegate();
-
-	if (!delegate)
-	{
-		return;
-	}
-
+	auto *delegate = view->GetDelegateForItem(id);
 	delegate->OnItemRightClicked(id, ptScreen);
 }
 
@@ -329,7 +318,7 @@ MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
 		return nullptr;
 	}
 
-	return view->MaybeGetDelegate();
+	return view->GetDelegateForItem(id);
 }
 
 void MenuController::NotifyMenuWillShowForTesting(UINT dpi)

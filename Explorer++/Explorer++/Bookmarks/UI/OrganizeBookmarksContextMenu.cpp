@@ -26,32 +26,30 @@ OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 	m_clipboardStore(clipboardStore),
 	m_resourceLoader(resourceLoader)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
 void OrganizeBookmarksContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK));
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER));
 
 	m_menuView->AppendSeparator();
 
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_CUT));
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_COPY));
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_PASTE));
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_DELETE));
 
 	m_menuView->AppendSeparator();
 
-	m_menuView->AppendItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
+	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
 
 	auto selectedBookmarkItems = m_delegate->GetSelectedItems();

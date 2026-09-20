@@ -18,8 +18,6 @@ ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acc
 	m_browserWindow(browserWindow),
 	m_shellIconLoader(shellIconLoader)
 {
-	m_menuView->SetDelegate(this);
-
 	RebuildMenu(pidls);
 }
 
@@ -44,7 +42,7 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	m_menuView->AppendItem(id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
+	m_menuView->AppendItem(this, id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
 		std::make_unique<ShellIconModel>(m_shellIconLoader, pidl),
 		GetFolderPathForDisplayWithFallback(pidl));
 

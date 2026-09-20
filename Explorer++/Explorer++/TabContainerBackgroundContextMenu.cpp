@@ -24,20 +24,18 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 	m_resourceLoader(resourceLoader),
 	m_platformContext(platformContext)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
 void TabContainerBackgroundContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(IDM_TAB_CONTAINER_NEW_TAB,
+	m_menuView->AppendItem(this, IDM_TAB_CONTAINER_NEW_TAB,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
 		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
-	m_menuView->AppendItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
+	m_menuView->AppendItem(this, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
 		GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
-	m_menuView->AppendItem(IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
+	m_menuView->AppendItem(this, IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 

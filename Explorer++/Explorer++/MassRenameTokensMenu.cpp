@@ -16,8 +16,6 @@ MassRenameTokensMenu::MassRenameTokensMenu(MenuView *menuView,
 	m_tokenSelectedCallback(tokenSelectedCallback),
 	m_resourceLoader(resourceLoader)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
@@ -27,7 +25,7 @@ void MassRenameTokensMenu::BuildMenu()
 
 	for (auto token : MassRenameToken::_values())
 	{
-		m_menuView->AppendItem(idCounter, BuildTokenMenuText(token));
+		m_menuView->AppendItem(this, idCounter, BuildTokenMenuText(token));
 		m_idToTokenMap.insert({ idCounter, token });
 		idCounter++;
 	}

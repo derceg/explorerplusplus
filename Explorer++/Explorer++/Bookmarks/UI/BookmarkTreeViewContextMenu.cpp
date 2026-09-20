@@ -23,18 +23,16 @@ BookmarkTreeViewContextMenu::BookmarkTreeViewContextMenu(MenuView *menuView,
 	// that the target item will be a folder.
 	DCHECK(targetFolder->IsFolder());
 
-	m_menuView->SetDelegate(this);
-
 	BuildMenu();
 }
 
 void BookmarkTreeViewContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME));
-	m_menuView->AppendItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE));
-	m_menuView->AppendItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER,
+	m_menuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER));
 
 	m_menuView->EnableItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME,

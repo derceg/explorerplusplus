@@ -24,29 +24,27 @@ ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, Browse
 	m_browser(browser),
 	m_appServices(appServices)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu(source, appServices->GetResourceLoader());
 }
 
 void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resourceLoader)
 {
-	m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR,
+	m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR_HELP_TEXT));
-	m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR,
+	m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR_HELP_TEXT));
-	m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR,
+	m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR_HELP_TEXT));
-	m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR,
+	m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR_HELP_TEXT));
-	m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR,
+	m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR_HELP_TEXT));
-	m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS,
+	m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS_HELP_TEXT));
 
@@ -64,19 +62,19 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 
 	if (source == Source::MainToolbar)
 	{
-		m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_CUSTOMIZE,
+		m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_CUSTOMIZE,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_CUSTOMIZE), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_CUSTOMIZE_HELP_TEXT));
 	}
 	else if (source == Source::BookmarksToolbar)
 	{
-		m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK,
+		m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_HELP_TEXT));
-		m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_FOLDER,
+		m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_FOLDER,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_FOLDER), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_FOLDER_HELP_TEXT));
-		m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK,
+		m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK_HELP_TEXT));
 
@@ -88,7 +86,7 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 	}
 	else if (source == Source::ApplicationToolbar)
 	{
-		m_menuView->AppendItem(IDM_TOOLBAR_CONTEXT_MENU_NEW_APPLICATION,
+		m_menuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_NEW_APPLICATION,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_APPLICATION), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_APPLICATION_HELP_TEXT));
 	}

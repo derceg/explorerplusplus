@@ -14,8 +14,6 @@ ViewsMenu::ViewsMenu(MenuView *menuView, const AcceleratorManager *acceleratorMa
 	MenuBase(menuView, acceleratorManager),
 	m_browser(browser)
 {
-	m_menuView->SetDelegate(this);
-
 	BuildMenu(resourceLoader);
 }
 
@@ -26,7 +24,7 @@ void ViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 	for (auto viewMode : VIEW_MODES)
 	{
 		auto id = m_idCounter++;
-		m_menuView->AppendItem(id, GetViewModeMenuText(resourceLoader, viewMode));
+		m_menuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode));
 
 		if (viewMode == currentViewMode)
 		{

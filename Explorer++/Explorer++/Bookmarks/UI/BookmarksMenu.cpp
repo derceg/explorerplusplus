@@ -58,7 +58,6 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 {
 	DCHECK(bookmarkFolder->IsFolder());
 
-	m_menuView->SetDelegate(this);
 	m_menuView->EnableDragAndDrop(true);
 
 	BuildMenu(m_menuView, bookmarkFolder, includePredicate);
@@ -73,7 +72,7 @@ void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 
 		std::wstring menuText =
 			std::format(L"({})", m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY));
-		menuView->AppendItem(id, menuText);
+		menuView->AppendItem(this, id, menuText);
 		menuView->EnableItem(id, false);
 
 		// This effectively maps the empty item to the parent folder, so that operations on this
@@ -98,12 +97,12 @@ void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 		if (childItem->IsFolder())
 		{
 			auto *subMenuView =
-				menuView->AppendSubMenu(id, childItem->GetName(), std::move(iconModel));
+				menuView->AppendSubMenu(this, id, childItem->GetName(), std::move(iconModel));
 			BuildMenu(subMenuView, childItem.get());
 		}
 		else
 		{
-			menuView->AppendItem(id, childItem->GetName(), std::move(iconModel),
+			menuView->AppendItem(this, id, childItem->GetName(), std::move(iconModel),
 				childItem->GetLocation());
 		}
 

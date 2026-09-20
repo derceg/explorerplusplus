@@ -18,14 +18,13 @@ public:
 	MenuView(HMENU menu);
 
 	bool IsRoot() const;
-	void SetDelegate(MenuDelegate *delegate);
 
 	void EnableDragAndDrop(bool enable);
 
-	void AppendItem(UINT id, const std::wstring &text,
+	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
-	MenuView *AppendSubMenu(UINT id, const std::wstring &text,
+	MenuView *AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {});
 	void AppendSeparator();
 	void EnableItem(UINT id, bool enable);
@@ -41,8 +40,8 @@ public:
 	std::wstring GetItemHelpText(UINT id) const;
 
 	HMENU GetNativeMenuForTesting() const;
-	MenuDelegate *MaybeGetDelegateForTesting();
 	UINT GetItemIdForTesting(int index) const;
+	MenuDelegate *GetDelegateForItemForTesting(UINT id);
 	std::wstring GetItemTextForTesting(UINT id) const;
 	HBITMAP GetItemBitmapForTesting(UINT id) const;
 	const MenuView *GetSubMenuViewForTesting(UINT id) const;
@@ -54,18 +53,19 @@ private:
 
 	struct Item
 	{
-		Item(std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText) :
+		Item(MenuDelegate *delegate, std::unique_ptr<const IconModel> iconModel,
+			const std::wstring &helpText) :
+			delegate(delegate),
 			iconModel(std::move(iconModel)),
 			helpText(helpText)
 		{
 		}
 
+		MenuDelegate *const delegate;
 		const std::unique_ptr<const IconModel> iconModel;
 		wil::unique_hbitmap bitmap;
 		const std::wstring helpText;
 	};
-
-	MenuDelegate *MaybeGetDelegate();
 
 	void OnPopupWillShowForDpi(UINT dpi);
 	void OnPopupClosed();
@@ -80,10 +80,10 @@ private:
 	const Item *GetItem(int id) const;
 
 	UINT GetItemId(int index) const;
+	MenuDelegate *GetDelegateForItem(UINT id);
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
 	const HMENU m_menu;
-	MenuDelegate *m_delegate = nullptr;
 	MenuView *m_parent = nullptr;
 	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 
