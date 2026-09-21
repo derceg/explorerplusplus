@@ -4,55 +4,39 @@
 
 #pragma once
 
-#include "Bookmarks/UI/BookmarkMenuBuilder.h"
-#include "Bookmarks/UI/BookmarkMenuController.h"
+#include "MenuBase.h"
 #include <boost/signals2.hpp>
-#include <wil/resource.h>
+#include <memory>
+#include <vector>
 
-class AcceleratorManager;
-class AppServices;
+class BookmarkIconManager;
+class BookmarksMenu;
 class BookmarkTree;
 class BrowserWindow;
-class CoreInterface;
 class IconFetcher;
+class PlatformContext;
 class ResourceLoader;
 
-class BookmarksMainMenu
+class BookmarksMainMenu : public MenuBase
 {
 public:
-	BookmarksMainMenu(BrowserWindow *browserWindow,
-		const BookmarkMenuBuilder::MenuIdRange &menuIdRange, AppServices *appServices,
-		IconFetcher *iconFetcher, CoreInterface *coreInterface);
+	BookmarksMainMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		BookmarkTree *bookmarkTree, BrowserWindow *browser, IconFetcher *iconFetcher,
+		PlatformContext *platformContext, const ResourceLoader *resourceLoader, UINT startId,
+		UINT endId);
 	~BookmarksMainMenu();
 
-	void OnMenuItemClicked(UINT menuItemId);
-
 private:
-	void OnMainMenuPreShow(HMENU mainMenu);
-	wil::unique_hmenu BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::MenuInfo &menuInfo);
-	void AddBookmarkItemsToMenu(HMENU menu, const BookmarkMenuBuilder::MenuIdRange &menuIdRange,
-		int position, std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::MenuInfo &menuInfo);
-	void AddOtherBookmarksToMenu(HMENU menu, const BookmarkMenuBuilder::MenuIdRange &menuIdRange,
-		int position, std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::MenuInfo &menuInfo);
-	std::optional<std::wstring> MaybeGetMenuHelpText(HMENU menu, UINT id);
-	bool OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
-	bool OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt);
+	void RebuildMenu();
+	void BuildMenu();
 
-	BrowserWindow *const m_browserWindow;
-	const ResourceLoader *const m_resourceLoader;
 	BookmarkTree *const m_bookmarkTree;
-	AcceleratorManager *const m_acceleratorManager;
-	const BookmarkMenuBuilder::MenuIdRange m_menuIdRange;
-	BookmarkMenuBuilder m_menuBuilder;
-
-	wil::unique_hmenu m_bookmarksMenu;
-	std::vector<wil::unique_hbitmap> m_menuImages;
-	BookmarkMenuBuilder::MenuInfo m_menuInfo;
-
-	BookmarkMenuController m_controller;
-
+	BrowserWindow *const m_browser;
+	PlatformContext *const m_platformContext;
+	const ResourceLoader *const m_resourceLoader;
+	const int m_defaultDpiIconSize;
+	std::unique_ptr<BookmarkIconManager> m_iconManager;
+	std::unique_ptr<BookmarksMenu> m_bookmarksMenuContents;
+	std::unique_ptr<BookmarksMenu> m_otherBookmarksMenuContents;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

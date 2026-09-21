@@ -247,7 +247,12 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		}
 	}
 
-	auto *delegate = view->GetDelegateForItem(dropLocation.id);
+	auto *delegate = view->MaybeGetDelegateForItem(dropLocation.id);
+
+	if (!delegate)
+	{
+		return MNGO_NOINTERFACE;
+	}
 
 	// This represents the drop target for the specified item. It needs to be held either until
 	// another target is requested, or the menu is closed.
@@ -301,15 +306,32 @@ void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKe
 
 void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 {
+	if (id == 0)
+	{
+		// This is a separator item.
+		return;
+	}
+
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
-	auto *delegate = view->GetDelegateForItem(id);
+	auto *delegate = view->MaybeGetDelegateForItem(id);
+
+	if (!delegate)
+	{
+		return;
+	}
+
 	delegate->OnItemRightClicked(id, ptScreen);
 }
 
 MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
 {
+	if (id == 0)
+	{
+		return nullptr;
+	}
+
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
@@ -318,7 +340,7 @@ MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
 		return nullptr;
 	}
 
-	return view->GetDelegateForItem(id);
+	return view->MaybeGetDelegateForItem(id);
 }
 
 void MenuController::NotifyMenuWillShowForTesting(UINT dpi)

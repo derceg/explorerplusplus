@@ -11,7 +11,6 @@
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
 #include "Bookmarks/BookmarkHelper.h"
-#include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
@@ -71,20 +70,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	case WM_MENUSELECT:
 		MenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
 		break;
-
-	case WM_MBUTTONUP:
-		OnMenuMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
-			WI_IsFlagSet(wParam, MK_CONTROL), WI_IsFlagSet(wParam, MK_SHIFT));
-		break;
-
-	case WM_MENURBUTTONUP:
-	{
-		POINT pt;
-		DWORD messagePos = GetMessagePos();
-		POINTSTOPOINT(pt, MAKEPOINTS(messagePos));
-		OnMenuRightButtonUp(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam), pt);
-	}
-	break;
 
 	case WM_TIMER:
 		if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
@@ -236,12 +221,7 @@ LRESULT Explorerplusplus::CommandHandler(HWND hwnd, HWND control, UINT id, UINT 
 LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id,
 	UINT notificationCode)
 {
-	if (notificationCode == 0 && id >= MENU_BOOKMARK_START_ID && id < MENU_BOOKMARK_END_ID)
-	{
-		m_bookmarksMainMenu->OnMenuItemClicked(id);
-		return 0;
-	}
-	else if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)
+	if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)
 	{
 		m_appServices->GetPluginMenuManager()->OnMenuItemClicked(id);
 		return 0;
@@ -844,7 +824,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case MainToolbarButton::AddBookmark:
-	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
+	case IDM_BOOKMARKS_BOOKMARK_THIS_TAB:
 		BookmarkHelper::AddBookmarkItem(m_appServices->GetBookmarkTree(),
 			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, hwnd, this, m_acceleratorManager,
 			m_resourceLoader, m_platformContext);
@@ -855,7 +835,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case MainToolbarButton::Bookmarks:
-	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
+	case IDM_BOOKMARKS_MANAGE_BOOKMARKS:
 		CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(),
 			L"ManageBookmarksDialog",
 			[this, hwnd]

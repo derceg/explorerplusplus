@@ -26,7 +26,10 @@ public:
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkFolder,
 		BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser, HWND parentWindow,
 		PlatformContext *platformContext, const ResourceLoader *resourceLoader,
-		BookmarkMenuBuilder::IncludePredicate includePredicate = {});
+		BookmarkMenuBuilder::IncludePredicate includePredicate = {},
+		UINT startId = DEFAULT_START_ID, UINT endId = DEFAULT_END_ID);
+
+	UINT GetNextId() const;
 
 private:
 	enum class MenuItemType
@@ -53,6 +56,7 @@ private:
 
 	void BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = {});
+	void AddEmptyItem(MenuView *menuView, BookmarkItem *bookmarkFolder);
 
 	// MenuDelegate
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
@@ -65,7 +69,7 @@ private:
 	BookmarkItem *MaybeGetBookmarkItemForMenuItem(UINT id);
 	const MenuItemEntry *GetEntryForMenuItem(UINT id) const;
 
-	UINT m_idCounter = 1;
+	UINT m_idCounter;
 	BookmarkTree *const m_bookmarkTree;
 	BookmarkIconManager *const m_bookmarkIconManager;
 	BrowserWindow *const m_browser;

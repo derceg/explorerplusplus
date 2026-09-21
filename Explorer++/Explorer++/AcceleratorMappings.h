@@ -238,8 +238,8 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{ L"go_network_places", IDM_GO_NETWORK },
 	{ L"go_wsl_distributions", IDM_GO_WSL_DISTRIBUTIONS },
 
-	{ L"bookmark_tab", IDM_BOOKMARKS_BOOKMARKTHISTAB },
-	{ L"manage_bookmarks", IDM_BOOKMARKS_MANAGEBOOKMARKS },
+	{ L"bookmark_tab", IDM_BOOKMARKS_BOOKMARK_THIS_TAB },
+	{ L"manage_bookmarks", IDM_BOOKMARKS_MANAGE_BOOKMARKS },
 
 	{ L"search", IDM_TOOLS_SEARCH },
 	{ L"customize_colors", IDM_TOOLS_CUSTOMIZECOLORS },

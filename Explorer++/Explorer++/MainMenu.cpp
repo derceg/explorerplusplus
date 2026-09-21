@@ -22,6 +22,7 @@
 #include "TabRestorerMenu.h"
 #include "ViewsMenuBuilder.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -130,6 +131,15 @@ void Explorerplusplus::InitializeMainMenu()
 			return std::make_unique<FrequentLocationsMenu>(menuView, m_acceleratorManager,
 				m_appServices->GetFrequentLocationsModel(), this, &m_shellIconLoader,
 				MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID);
+		});
+
+	AddMainMenuSubmenu(mainMenu, IDM_BOOKMARKS,
+		[this](MenuView *menuView)
+		{
+			return std::make_unique<BookmarksMainMenu>(menuView, m_acceleratorManager,
+				m_appServices->GetBookmarkTree(), this, &m_iconFetcher,
+				m_appServices->GetPlatformContext(), m_resourceLoader, MENU_BOOKMARK_START_ID,
+				MENU_BOOKMARK_END_ID);
 		});
 
 	UpdateMenuAcceleratorStrings(mainMenu, m_acceleratorManager);
@@ -287,12 +297,6 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pi
 		});
 }
 
-boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(
-	const MainMenuPreShowSignal::slot_type &observer)
-{
-	return m_mainMenuPreShowSignal.connect(observer);
-}
-
 void Explorerplusplus::OnInitMenu(HMENU menu)
 {
 	// Note that as per
@@ -307,9 +311,6 @@ void Explorerplusplus::OnInitMenu(HMENU menu)
 	if (menu == GetMenu(m_hwnd))
 	{
 		SetMainMenuItemStates(menu);
-
-		m_mainMenuPreShowSignal(menu);
-		m_mainMenuShowing = true;
 	}
 }
 
@@ -326,8 +327,6 @@ void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
 	if (!shortcutMenu)
 	{
 		NotifyTopLevelMenuClosed();
-
-		m_mainMenuShowing = false;
 	}
 }
 
@@ -356,39 +355,6 @@ bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)
 	subMenu->menuHost->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 
 	return true;
-}
-
-boost::signals2::connection Explorerplusplus::AddMainMenuItemMiddleClickedObserver(
-	const MainMenuItemMiddleClickedSignal::slot_type &observer)
-{
-	return m_mainMenuItemMiddleClickedSignal.connect(observer);
-}
-
-void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
-{
-	if (!m_mainMenuShowing)
-	{
-		return;
-	}
-
-	m_mainMenuItemMiddleClickedSignal(pt, isCtrlKeyDown, isShiftKeyDown);
-}
-
-boost::signals2::connection Explorerplusplus::AddMainMenuItemRightClickedObserver(
-	const MainMenuItemRightClickedSignal::slot_type &observer)
-{
-	return m_mainMenuItemRightClickedSignal.connect(observer);
-}
-
-void Explorerplusplus::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
-{
-	if (!m_mainMenuShowing)
-	{
-		return;
-	}
-
-	m_mainMenuItemRightClickedSignal(menu, index, pt);
 }
 
 Explorerplusplus::MainMenuSubMenu *Explorerplusplus::MaybeGetMainMenuSubMenuFromId(UINT id)

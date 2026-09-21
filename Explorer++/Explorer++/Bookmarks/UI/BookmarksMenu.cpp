@@ -47,8 +47,9 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkFolder,
 	BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser, HWND parentWindow,
 	PlatformContext *platformContext, const ResourceLoader *resourceLoader,
-	BookmarkMenuBuilder::IncludePredicate includePredicate) :
-	MenuBase(menuView, acceleratorManager),
+	BookmarkMenuBuilder::IncludePredicate includePredicate, UINT startId, UINT endId) :
+	MenuBase(menuView, acceleratorManager, startId, endId),
+	m_idCounter(startId),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkIconManager(bookmarkIconManager),
 	m_browser(browser),
@@ -63,22 +64,17 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 	BuildMenu(m_menuView, bookmarkFolder, includePredicate);
 }
 
+UINT BookmarksMenu::GetNextId() const
+{
+	return m_idCounter;
+}
+
 void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 	BookmarkMenuBuilder::IncludePredicate includePredicate)
 {
 	if (bookmarkFolder->GetChildren().empty())
 	{
-		UINT id = m_idCounter++;
-
-		std::wstring menuText =
-			std::format(L"({})", m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY));
-		menuView->AppendItem(this, id, menuText);
-		menuView->EnableItem(id, false);
-
-		// This effectively maps the empty item to the parent folder, so that operations on this
-		// item will occur on the parent.
-		m_idToBookmarkMap.insert({ id, { bookmarkFolder->GetWeakPtr(), MenuItemType::EmptyItem } });
-
+		AddEmptyItem(menuView, bookmarkFolder);
 		return;
 	}
 
@@ -89,10 +85,15 @@ void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 			continue;
 		}
 
+		UINT id = m_idCounter++;
+
+		if (id >= GetIdRange().endId)
+		{
+			return;
+		}
+
 		auto iconModel = std::make_unique<BookmarkIconModel>(m_bookmarkIconManager,
 			static_cast<const BookmarkItem *>(childItem.get())->GetWeakPtr());
-
-		UINT id = m_idCounter++;
 
 		if (childItem->IsFolder())
 		{
@@ -108,6 +109,25 @@ void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 
 		m_idToBookmarkMap.insert({ id, { childItem->GetWeakPtr(), MenuItemType::BookmarkItem } });
 	}
+}
+
+void BookmarksMenu::AddEmptyItem(MenuView *menuView, BookmarkItem *bookmarkFolder)
+{
+	UINT id = m_idCounter++;
+
+	if (id >= GetIdRange().endId)
+	{
+		return;
+	}
+
+	std::wstring menuText =
+		std::format(L"({})", m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY));
+	menuView->AppendItem(this, id, menuText);
+	menuView->EnableItem(id, false);
+
+	// This effectively maps the empty item to the parent folder, so that operations on this item
+	// will occur on the parent.
+	m_idToBookmarkMap.insert({ id, { bookmarkFolder->GetWeakPtr(), MenuItemType::EmptyItem } });
 }
 
 void BookmarksMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

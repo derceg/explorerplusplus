@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "AppInfo.h"
 #include "AppServices.h"
-#include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "BrowserList.h"
 #include "BrowserView.h"
 #include "Config.h"
@@ -158,10 +157,6 @@ void Explorerplusplus::SetUpLayoutConfigListeners()
 
 void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 {
-	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this,
-		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID },
-		m_appServices, &m_iconFetcher, this);
-
 	m_view = BrowserView::Create(m_hwnd, this, m_config, m_tabEvents, m_shellBrowserEvents,
 		m_navigationEvents, m_resourceLoader);
 

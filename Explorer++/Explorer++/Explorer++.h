@@ -36,7 +36,6 @@
 class AcceleratorManager;
 class AddressBar;
 class AppServices;
-class BookmarksMainMenu;
 class BookmarksToolbar;
 class BrowserList;
 class BrowserView;
@@ -298,19 +297,11 @@ private:
 	void AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl);
 	void AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
 		std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator);
-	boost::signals2::connection AddMainMenuPreShowObserver(
-		const MainMenuPreShowSignal::slot_type &observer) override;
 	void OnInitMenu(HMENU menu);
 	void OnEnterMenuLoop(bool shortcutMenu);
 	void OnExitMenuLoop(bool shortcutMenu);
 	void OnInitMenuPopup(HMENU menu);
 	bool MaybeHandleMainMenuItemSelection(UINT id);
-	boost::signals2::connection AddMainMenuItemMiddleClickedObserver(
-		const MainMenuItemMiddleClickedSignal::slot_type &observer) override;
-	void OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
-	boost::signals2::connection AddMainMenuItemRightClickedObserver(
-		const MainMenuItemRightClickedSignal::slot_type &observer) override;
-	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
 	MainMenuSubMenu *MaybeGetMainMenuSubMenuFromId(UINT id);
 	void SetMainMenuItemStates(HMENU mainMenu);
 
@@ -363,10 +354,6 @@ private:
 
 	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
 	std::vector<wil::unique_hbitmap> m_mainMenuImages;
-	MainMenuPreShowSignal m_mainMenuPreShowSignal;
-	MainMenuItemMiddleClickedSignal m_mainMenuItemMiddleClickedSignal;
-	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
-	bool m_mainMenuShowing = false;
 	std::vector<MainMenuSubMenu> m_mainMenuSubMenus;
 
 	int m_numTopLevelMenusActive = 0;
@@ -395,7 +382,6 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	/* Bookmarks. */
-	std::unique_ptr<BookmarksMainMenu> m_bookmarksMainMenu;
 	BookmarksToolbar *m_bookmarksToolbar;
 
 	// IconFetcher retrieves file icons in a background thread. A queue of requests is maintained

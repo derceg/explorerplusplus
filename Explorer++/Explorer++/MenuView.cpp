@@ -298,7 +298,7 @@ UINT MenuView::GetItemId(int index) const
 	return menuItemInfo.wID;
 }
 
-MenuDelegate *MenuView::GetDelegateForItem(UINT id)
+MenuDelegate *MenuView::MaybeGetDelegateForItem(UINT id)
 {
 	auto itr = m_idToItemMap.find(id);
 	CHECK(itr != m_idToItemMap.end());
@@ -324,11 +324,11 @@ UINT MenuView::GetItemIdForTesting(int index) const
 	return GetItemId(index);
 }
 
-MenuDelegate *MenuView::GetDelegateForItemForTesting(UINT id)
+MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id)
 {
 	CHECK(IsInTest());
 
-	return GetDelegateForItem(id);
+	return MaybeGetDelegateForItem(id);
 }
 
 std::wstring MenuView::GetItemTextForTesting(UINT id) const

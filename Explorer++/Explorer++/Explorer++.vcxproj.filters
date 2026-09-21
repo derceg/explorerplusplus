@@ -271,9 +271,6 @@
     <ClCompile Include="ApplicationHelper.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp">
-      <Filter>Bookmarks\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -1208,9 +1205,6 @@
     </ClInclude>
     <ClInclude Include="ApplicationHelper.h">
       <Filter>Application Toolbar</Filter>
-    </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h">
-      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkIconManager.h">
       <Filter>Bookmarks</Filter>

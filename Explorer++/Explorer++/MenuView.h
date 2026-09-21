@@ -41,7 +41,7 @@ public:
 
 	HMENU GetNativeMenuForTesting() const;
 	UINT GetItemIdForTesting(int index) const;
-	MenuDelegate *GetDelegateForItemForTesting(UINT id);
+	MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id);
 	std::wstring GetItemTextForTesting(UINT id) const;
 	HBITMAP GetItemBitmapForTesting(UINT id) const;
 	const MenuView *GetSubMenuViewForTesting(UINT id) const;
@@ -80,7 +80,7 @@ private:
 	const Item *GetItem(int id) const;
 
 	UINT GetItemId(int index) const;
-	MenuDelegate *GetDelegateForItem(UINT id);
+	MenuDelegate *MaybeGetDelegateForItem(UINT id);
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
 	const HMENU m_menu;
