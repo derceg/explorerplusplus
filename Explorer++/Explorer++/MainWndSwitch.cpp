@@ -55,18 +55,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		OnInitMenu(reinterpret_cast<HMENU>(wParam));
 		break;
 
-	case WM_ENTERMENULOOP:
-		OnEnterMenuLoop(wParam);
-		break;
-
-	case WM_EXITMENULOOP:
-		OnExitMenuLoop(wParam);
-		break;
-
-	case WM_INITMENUPOPUP:
-		OnInitMenuPopup(reinterpret_cast<HMENU>(wParam));
-		break;
-
 	case WM_MENUSELECT:
 		MenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
 		break;

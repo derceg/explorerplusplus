@@ -49,7 +49,7 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 {
 	auto id = m_idCounter++;
 
-	m_menuView->AppendItem(this, id,
+	m_rootMenuView->AppendItem(this, id,
 		GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
 		std::make_unique<ShellIconModel>(m_shellIconLoader, entry->GetPidl().Raw()));
 }

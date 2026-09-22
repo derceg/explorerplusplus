@@ -3,506 +3,503 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Explorer++.h"
-#include "AcceleratorHelper.h"
+#include "MainMenu.h"
 #include "AppServices.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
-#include "Config.h"
 #include "FeatureList.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
-#include "Icon.h"
-#include "MainMenuSubMenuHost.h"
 #include "MainResource.h"
 #include "MenuRanges.h"
-#include "ResourceHelper.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
-#include "SortMenuBuilder.h"
-#include "TabContainer.h"
+#include "MenuView.h"
+#include "ResourceIconModel.h"
+#include "ResourceLoader.h"
+#include "ShellBrowser/ViewModes.h"
+#include "ShellIconModel.h"
+#include "StockIconModel.h"
 #include "TabRestorerMenu.h"
-#include "ViewsMenuBuilder.h"
-#include "../Helper/DpiCompatibility.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
-#include "../Helper/MenuHelper.h"
+#include "ViewModeHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
-#include <wil/resource.h>
-#include <map>
 
-const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, Icon::NewTab },
-	{ IDM_FILE_CLOSETAB, Icon::CloseTab },
-	{ IDM_FILE_OPENCOMMANDPROMPT, Icon::CommandLine },
-	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, Icon::CommandLineAdmin },
-	{ IDM_FILE_DELETE, Icon::Delete },
-	{ IDM_FILE_DELETEPERMANENTLY, Icon::DeletePermanently },
-	{ IDM_FILE_RENAME, Icon::Rename },
-	{ IDM_FILE_PROPERTIES, Icon::Properties },
-
-	{ IDM_EDIT_UNDO, Icon::Undo },
-	{ IDM_EDIT_COPY, Icon::Copy },
-	{ IDM_EDIT_CUT, Icon::Cut },
-	{ IDM_EDIT_PASTE, Icon::Paste },
-	{ IDM_EDIT_PASTESHORTCUT, Icon::PasteShortcut },
-
-	{ IDM_EDIT_COPYTOFOLDER, Icon::CopyTo },
-	{ IDM_EDIT_MOVETOFOLDER, Icon::MoveTo },
-
-	{ IDM_ACTIONS_NEWFOLDER, Icon::NewFolder },
-	{ IDM_ACTIONS_SPLITFILE, Icon::SplitFiles },
-	{ IDM_ACTIONS_MERGEFILES, Icon::MergeFiles },
-
-	{ IDM_VIEW_REFRESH, Icon::Refresh },
-	{ IDM_VIEW_SELECTCOLUMNS, Icon::SelectColumns },
-
-	{ IDM_FILTER_FILTERRESULTS, Icon::Filter },
-
-	{ IDM_GO_BACK, Icon::Back },
-	{ IDM_GO_FORWARD, Icon::Forward },
-	{ IDM_GO_UP, Icon::Up },
-
-	{ IDM_TOOLS_SEARCH, Icon::Search },
-	{ IDM_TOOLS_CUSTOMIZECOLORS, Icon::CustomizeColors },
-	{ IDM_TOOLS_OPTIONS, Icon::Options },
-
-	{ IDM_HELP_ONLINE_DOCUMENTATION, Icon::Help },
-};
-
-void Explorerplusplus::InitializeMainMenu()
+MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
+	ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher) :
+	MenuBase(menuView, appServices->GetAcceleratorManager()),
+	m_resourceLoader(appServices->GetResourceLoader())
 {
-	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_mainMenuSystemImageList)));
+	// Some items on the main menu support drag and drop (e.g. bookmark items), so drag and drop is
+	// enabled here. This is necessary, since drag and drop won't work if the style is simply set on
+	// a submenu. For items that don't support drag and drop, setting this will have no effect.
+	m_rootMenuView->EnableDragAndDrop(true);
 
-	// These need to occur after the language module has been initialized, but
-	// before the tabs are restored.
-	HMENU mainMenu = LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU));
+	BuildMenu(browser, appServices->GetFeatureList(), appServices, shellIconLoader, iconFetcher);
+}
 
-	if (!m_featureList->IsEnabled(Feature::MultipleWindowsPerSession))
+void MainMenu::BuildMenu(BrowserWindow *browser, const FeatureList *featureList,
+	AppServices *appServices, ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher)
+{
+	BuildFileMenu(featureList, appServices, shellIconLoader);
+	BuildEditMenu();
+	BuildSelectionMenu();
+	BuildViewMenu(featureList);
+	BuildActionsMenu();
+	BuildGoMenu(browser, appServices, shellIconLoader);
+	BuildBookmarksMenu(browser, appServices, iconFetcher);
+	BuildToolsMenu(featureList);
+	BuildWindowMenu();
+	BuildHelpMenu();
+}
+
+void MainMenu::BuildFileMenu(const FeatureList *featureList, AppServices *appServices,
+	ShellIconLoader *shellIconLoader)
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_FILE_POPUP, IDS_FILE_POPUP);
+
+	AppendItem(menuView, IDM_FILE_NEWTAB, IDS_FILE_NEWTAB);
+	AppendItem(menuView, IDM_FILE_CLOSETAB, IDS_FILE_CLOSETAB);
+
+	if (featureList->IsEnabled(Feature::MultipleWindowsPerSession))
 	{
-		DeleteMenu(mainMenu, IDM_FILE_NEW_WINDOW, MF_BYCOMMAND);
+		AppendItem(menuView, IDM_FILE_NEW_WINDOW, IDS_FILE_NEW_WINDOW);
 	}
-	else
+
+	auto *recentTabsSubMenuView =
+		AppendSubMenu(menuView, IDM_FILE_REOPEN_RECENT_TAB_POPUP, IDS_FILE_REOPEN_RECENT_TAB_POPUP);
+	m_childMenus.push_back(std::make_unique<TabRestorerMenu>(recentTabsSubMenuView,
+		m_acceleratorManager, appServices->GetTabRestorer(), shellIconLoader, m_resourceLoader,
+		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID));
+
+	if (!featureList->IsEnabled(Feature::MultipleWindowsPerSession))
 	{
 		// TODO: Selecting clone window launches a separate process. That doesn't fit in with how
 		// MultipleWindowsPerSession is designed to work and the menu item should be removed when
 		// the feature is enabled by default.
-		DeleteMenu(mainMenu, IDM_FILE_CLONEWINDOW, MF_BYCOMMAND);
+		AppendItem(menuView, IDM_FILE_CLONEWINDOW, IDS_FILE_CLONEWINDOW);
 	}
 
-	if (!m_featureList->IsEnabled(Feature::DualPane))
-	{
-		DeleteMenu(mainMenu, IDM_VIEW_DUAL_PANE, MF_BYCOMMAND);
-	}
+	menuView->AppendSeparator();
 
-	if (!m_featureList->IsEnabled(Feature::Plugins))
-	{
-		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
-	}
+	AppendItem(menuView, IDM_FILE_SAVEDIRECTORYLISTING, IDS_FILE_SAVEDIRECTORYLISTING);
+	AppendItem(menuView, IDM_FILE_OPENCOMMANDPROMPT, IDS_FILE_OPENCOMMANDPROMPT);
+	AppendItem(menuView, IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR,
+		IDS_FILE_OPENCOMMANDPROMPTADMINISTRATOR);
+	AppendItem(menuView, IDM_FILE_COPYFOLDERPATH, IDS_FILE_COPYFOLDERPATH);
+	AppendItem(menuView, IDM_FILE_COPYITEMPATH, IDS_FILE_COPYITEMPATH);
+	AppendItem(menuView, IDM_FILE_COPYUNIVERSALFILEPATHS, IDS_FILE_COPYUNIVERSALFILEPATHS);
+	AppendItem(menuView, IDM_FILE_COPYCOLUMNTEXT, IDS_FILE_COPYCOLUMNTEXT);
 
-	SetMenu(m_hwnd, mainMenu);
+	menuView->AppendSeparator();
 
-	AddMainMenuSubmenu(mainMenu, IDM_FILE_REOPEN_RECENT_TAB,
-		[this](MenuView *menuView)
-		{
-			return std::make_unique<TabRestorerMenu>(menuView, m_acceleratorManager,
-				m_appServices->GetTabRestorer(), &m_shellIconLoader, m_resourceLoader,
-				MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
-		});
+	AppendItem(menuView, IDM_FILE_SETFILEATTRIBUTES, IDS_FILE_SETFILEATTRIBUTES);
+	AppendItem(menuView, IDM_FILE_DELETE, IDS_FILE_DELETE);
+	AppendItem(menuView, IDM_FILE_DELETEPERMANENTLY, IDS_FILE_DELETEPERMANENTLY);
+	AppendItem(menuView, IDM_FILE_RENAME, IDS_FILE_RENAME);
+	AppendItem(menuView, IDM_FILE_PROPERTIES, IDS_FILE_PROPERTIES);
 
-	ViewsMenuBuilder viewsMenuBuilder(m_resourceLoader);
-	viewsMenuBuilder.AddViewModesToMenu(mainMenu, IDM_VIEW_PLACEHOLDER, false);
-	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
+	menuView->AppendSeparator();
 
-	SetMainMenuImages();
-
-	InitializeGoMenu(mainMenu);
-
-	AddMainMenuSubmenu(mainMenu, IDM_GO_HISTORY,
-		[this](MenuView *menuView)
-		{
-			return std::make_unique<HistoryMenu>(menuView, m_acceleratorManager,
-				m_appServices->GetHistoryModel(), this, &m_shellIconLoader, MENU_HISTORY_START_ID,
-				MENU_HISTORY_END_ID);
-		});
-
-	AddMainMenuSubmenu(mainMenu, IDM_GO_FREQUENT_LOCATIONS,
-		[this](MenuView *menuView)
-		{
-			return std::make_unique<FrequentLocationsMenu>(menuView, m_acceleratorManager,
-				m_appServices->GetFrequentLocationsModel(), this, &m_shellIconLoader,
-				MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID);
-		});
-
-	AddMainMenuSubmenu(mainMenu, IDM_BOOKMARKS,
-		[this](MenuView *menuView)
-		{
-			return std::make_unique<BookmarksMainMenu>(menuView, m_acceleratorManager,
-				m_appServices->GetBookmarkTree(), this, &m_iconFetcher,
-				m_appServices->GetPlatformContext(), m_resourceLoader, MENU_BOOKMARK_START_ID,
-				MENU_BOOKMARK_END_ID);
-		});
-
-	UpdateMenuAcceleratorStrings(mainMenu, m_acceleratorManager);
+	AppendItem(menuView, IDM_FILE_EXIT, IDS_FILE_EXIT);
 }
 
-void Explorerplusplus::AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
-	std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator)
+void MainMenu::BuildEditMenu()
 {
-	auto menuHost = std::make_unique<MainMenuSubMenuHost>(this, mainMenu, subMenuItemId);
-	auto menu = menuCreator(menuHost->GetView());
-	m_mainMenuSubMenus.emplace_back(std::move(menuHost), std::move(menu));
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_EDIT_POPUP, IDS_EDIT_POPUP);
+
+	AppendItem(menuView, IDM_EDIT_UNDO, IDS_EDIT_UNDO);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_EDIT_CUT, IDS_EDIT_CUT);
+	AppendItem(menuView, IDM_EDIT_COPY, IDS_EDIT_COPY);
+	AppendItem(menuView, IDM_EDIT_PASTE, IDS_EDIT_PASTE);
+	AppendItem(menuView, IDM_EDIT_PASTESHORTCUT, IDS_EDIT_PASTESHORTCUT);
+	AppendItem(menuView, IDM_EDIT_PASTEHARDLINK, IDS_EDIT_PASTEHARDLINK);
+	AppendItem(menuView, IDM_EDIT_PASTE_SYMBOLIC_LINK, IDS_EDIT_PASTE_SYMBOLIC_LINK);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_EDIT_COPYTOFOLDER, IDS_EDIT_COPYTOFOLDER);
+	AppendItem(menuView, IDM_EDIT_MOVETOFOLDER, IDS_EDIT_MOVETOFOLDER);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_EDIT_RESOLVELINK, IDS_EDIT_RESOLVELINK);
 }
 
-void Explorerplusplus::SetMainMenuImages()
+void MainMenu::BuildSelectionMenu()
 {
-	HMENU mainMenu = GetMenu(m_hwnd);
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_SELECTION_POPUP, IDS_SELECTION_POPUP);
 
-	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
+	AppendItem(menuView, IDM_EDIT_SELECTALL, IDS_EDIT_SELECTALL);
+	AppendItem(menuView, IDM_EDIT_INVERTSELECTION, IDS_EDIT_INVERTSELECTION);
+	AppendItem(menuView, IDM_EDIT_SELECTALLOFSAMETYPE, IDS_EDIT_SELECTALLOFSAMETYPE);
+	AppendItem(menuView, IDM_EDIT_SELECTNONE, IDS_EDIT_SELECTNONE);
+	AppendItem(menuView, IDM_EDIT_WILDCARDSELECTION, IDS_EDIT_WILDCARDSELECTION);
+	AppendItem(menuView, IDM_EDIT_WILDCARDDESELECT, IDS_EDIT_WILDCARDDESELECT);
+}
+
+void MainMenu::BuildViewMenu(const FeatureList *featureList)
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_VIEW_POPUP, IDS_VIEW_POPUP);
+
+	if (featureList->IsEnabled(Feature::DualPane))
 	{
-		ResourceHelper::SetMenuItemImage(mainMenu, mapping.first, m_resourceLoader, mapping.second,
-			dpi, m_mainMenuImages);
+		AppendItem(menuView, IDM_VIEW_DUAL_PANE, IDS_VIEW_DUAL_PANE);
 	}
 
-	SetPasteSymLinkElevationIcon();
+	AppendItem(menuView, IDM_VIEW_STATUSBAR, IDS_VIEW_STATUSBAR);
+	AppendItem(menuView, IDM_VIEW_FOLDERS, IDS_VIEW_FOLDERS);
+	AppendItem(menuView, IDM_VIEW_DISPLAYWINDOW, IDS_VIEW_DISPLAYWINDOW);
+
+	auto *toolbarsMenuView =
+		AppendSubMenu(menuView, IDM_VIEW_TOOLBARS_POPUP, IDS_VIEW_TOOLBARS_POPUP);
+	BuildToolbarsSubMenu(toolbarsMenuView);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_VIEW_DECREASE_TEXT_SIZE, IDS_VIEW_DECREASE_TEXT_SIZE);
+	AppendItem(menuView, IDM_VIEW_INCREASE_TEXT_SIZE, IDS_VIEW_INCREASE_TEXT_SIZE);
+
+	menuView->AppendSeparator();
+
+	for (auto viewMode : VIEW_MODES)
+	{
+		AppendItem(menuView, GetViewModeMenuId(viewMode), GetViewModeMenuStringId(viewMode));
+	}
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_VIEW_AUTOARRANGE, IDS_VIEW_AUTOARRANGE);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_VIEW_SORTBY, IDS_VIEW_SORTBY);
+	AppendItem(menuView, IDM_VIEW_GROUPBY, IDS_VIEW_GROUPBY);
+	AppendItem(menuView, IDM_VIEW_SHOWHIDDENFILES, IDS_VIEW_SHOWHIDDENFILES);
+	AppendItem(menuView, IDM_VIEW_REFRESH, IDS_VIEW_REFRESH);
+	AppendItem(menuView, IDM_VIEW_SELECTCOLUMNS, IDS_VIEW_SELECTCOLUMNS);
+	AppendItem(menuView, IDM_VIEW_AUTOSIZECOLUMNS, IDS_VIEW_AUTOSIZECOLUMNS);
+	AppendItem(menuView, IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT, IDS_VIEW_SAVECOLUMNLAYOUTASDEFAULT);
+	AppendItem(menuView, IDM_VIEW_CHANGEDISPLAYCOLOURS, IDS_VIEW_CHANGEDISPLAYCOLOURS);
+
+	menuView->AppendSeparator();
+
+	auto *filterMenuView = AppendSubMenu(menuView, IDM_VIEW_FILTER_POPUP, IDS_VIEW_FILTER_POPUP);
+	BuildFilterSubMenu(filterMenuView);
 }
 
-void Explorerplusplus::SetPasteSymLinkElevationIcon()
+void MainMenu::BuildToolbarsSubMenu(MenuView *toolbarsMenuView)
+{
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_ADDRESS_BAR, IDS_VIEW_TOOLBARS_ADDRESS_BAR);
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_MAIN_TOOLBAR, IDS_VIEW_TOOLBARS_MAIN_TOOLBAR);
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR,
+		IDS_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR);
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR,
+		IDS_VIEW_TOOLBARS_DRIVES_TOOLBAR);
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR,
+		IDS_VIEW_TOOLBARS_APPLICATION_TOOLBAR);
+
+	toolbarsMenuView->AppendSeparator();
+
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_LOCK_TOOLBARS, IDS_VIEW_TOOLBARS_LOCK_TOOLBARS);
+	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_CUSTOMIZE, IDS_VIEW_TOOLBARS_CUSTOMIZE);
+}
+
+void MainMenu::BuildFilterSubMenu(MenuView *filterMenuView)
+{
+	AppendItem(filterMenuView, IDM_FILTER_FILTERRESULTS, IDS_FILTER_FILTERRESULTS);
+	AppendItem(filterMenuView, IDM_FILTER_ENABLE_FILTER, IDS_FILTER_ENABLE_FILTER);
+}
+
+void MainMenu::BuildActionsMenu()
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_ACTIONS_POPUP, IDS_ACTIONS_POPUP);
+
+	AppendItem(menuView, IDM_ACTIONS_NEWFOLDER, IDS_ACTIONS_NEWFOLDER);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_ACTIONS_SPLITFILE, IDS_ACTIONS_SPLITFILE);
+	AppendItem(menuView, IDM_ACTIONS_MERGEFILES, IDS_ACTIONS_MERGEFILES);
+	AppendItem(menuView, IDM_ACTIONS_DESTROYFILES, IDS_ACTIONS_DESTROYFILES);
+}
+
+void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
+	ShellIconLoader *shellIconLoader)
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_GO_POPUP, IDS_GO_POPUP);
+
+	AppendItem(menuView, IDM_GO_BACK, IDS_GO_BACK);
+	AppendItem(menuView, IDM_GO_FORWARD, IDS_GO_FORWARD);
+	AppendItem(menuView, IDM_GO_UP, IDS_GO_UP);
+
+	menuView->AppendSeparator();
+
+	auto *historySubMenuView = AppendSubMenu(menuView, IDM_GO_HISTORY_POPUP, IDS_GO_HISTORY_POPUP);
+	m_childMenus.push_back(std::make_unique<HistoryMenu>(historySubMenuView, m_acceleratorManager,
+		appServices->GetHistoryModel(), browser, shellIconLoader, MENU_HISTORY_START_ID,
+		MENU_HISTORY_END_ID));
+
+	auto *frequentLocationsSubMenuView =
+		AppendSubMenu(menuView, IDM_GO_FREQUENT_LOCATIONS_POPUP, IDS_GO_FREQUENT_LOCATIONS_POPUP);
+	m_childMenus.push_back(std::make_unique<FrequentLocationsMenu>(frequentLocationsSubMenuView,
+		m_acceleratorManager, appServices->GetFrequentLocationsModel(), browser, shellIconLoader,
+		MENU_FREQUENT_LOCATIONS_START_ID, MENU_FREQUENT_LOCATIONS_END_ID));
+
+	menuView->AppendSeparator();
+
+	// This is the quick access/home folder in Windows 10/11.
+	AppendGoMenuItem(menuView, IDM_GO_QUICK_ACCESS, QUICK_ACCESS_PATH, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_COMPUTER, FOLDERID_ComputerFolder, shellIconLoader);
+
+	menuView->AppendSeparator();
+
+	AppendGoMenuItem(menuView, IDM_GO_DOCUMENTS, FOLDERID_Documents, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_DOWNLOADS, FOLDERID_Downloads, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_MUSIC, FOLDERID_Music, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_PICTURES, FOLDERID_Pictures, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_VIDEOS, FOLDERID_Videos, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_DESKTOP, FOLDERID_Desktop, shellIconLoader);
+
+	menuView->AppendSeparator();
+
+	AppendGoMenuItem(menuView, IDM_GO_RECYCLE_BIN, FOLDERID_RecycleBinFolder, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_CONTROL_PANEL, FOLDERID_ControlPanelFolder, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_PRINTERS, FOLDERID_PrintersFolder, shellIconLoader);
+	AppendGoMenuItem(menuView, IDM_GO_NETWORK, FOLDERID_NetworkFolder, shellIconLoader);
+
+	menuView->AppendSeparator();
+
+	AppendGoMenuItem(menuView, IDM_GO_WSL_DISTRIBUTIONS, WSL_DISTRIBUTIONS_PATH, shellIconLoader);
+
+	menuView->RemoveDuplicateSeparators();
+	menuView->RemoveTrailingSeparators();
+}
+
+void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const KNOWNFOLDERID &folderId,
+	ShellIconLoader *shellIconLoader)
+{
+	PidlAbsolute pidl;
+	HRESULT hr = SHGetKnownFolderIDList(folderId, KF_FLAG_DEFAULT, nullptr, PidlOutParam(pidl));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	AppendGoMenuItem(goMenuView, id, pidl, shellIconLoader);
+}
+
+void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const std::wstring &path,
+	ShellIconLoader *shellIconLoader)
+{
+	PidlAbsolute pidl;
+	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, PidlOutParam(pidl), 0, nullptr);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	AppendGoMenuItem(goMenuView, id, pidl, shellIconLoader);
+}
+
+void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const PidlAbsolute &pidl,
+	ShellIconLoader *shellIconLoader)
+{
+	std::wstring folderName;
+	HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_INFOLDER, folderName);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	std::wstring folderPath;
+	hr = GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, folderPath);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	goMenuView->AppendItem(nullptr, id, folderName,
+		std::make_unique<ShellIconModel>(shellIconLoader, pidl.Raw()), folderPath);
+}
+
+void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
+	IconFetcher *iconFetcher)
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_BOOKMARKS_POPUP, IDS_BOOKMARKS_POPUP);
+
+	m_childMenus.push_back(std::make_unique<BookmarksMainMenu>(menuView, m_acceleratorManager,
+		appServices->GetBookmarkTree(), browser, iconFetcher, appServices->GetPlatformContext(),
+		m_resourceLoader, MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID));
+}
+
+void MainMenu::BuildToolsMenu(const FeatureList *featureList)
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_TOOLS_POPUP, IDS_TOOLS_POPUP);
+
+	AppendItem(menuView, IDM_TOOLS_SEARCH, IDS_TOOLS_SEARCH);
+	AppendItem(menuView, IDM_TOOLS_CUSTOMIZECOLORS, IDS_TOOLS_CUSTOMIZECOLORS);
+
+	menuView->AppendSeparator();
+
+	if (featureList->IsEnabled(Feature::Plugins))
+	{
+		AppendItem(menuView, IDM_TOOLS_RUNSCRIPT, IDS_TOOLS_RUNSCRIPT);
+	}
+
+	AppendItem(menuView, IDM_TOOLS_OPTIONS, IDS_TOOLS_OPTIONS);
+}
+
+void MainMenu::BuildWindowMenu()
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_WINDOW_POPUP, IDS_WINDOW_POPUP);
+
+	AppendItem(menuView, IDM_WINDOW_SEARCH_TABS, IDS_WINDOW_SEARCH_TABS);
+}
+
+void MainMenu::BuildHelpMenu()
+{
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_HELP_POPUP, IDS_HELP_POPUP);
+
+	AppendItem(menuView, IDM_HELP_ONLINE_DOCUMENTATION, IDS_HELP_ONLINE_DOCUMENTATION);
+
+	menuView->AppendSeparator();
+
+	AppendItem(menuView, IDM_HELP_CHECKFORUPDATES, IDS_HELP_CHECKFORUPDATES);
+	AppendItem(menuView, IDM_HELP_ABOUT, IDS_HELP_ABOUT);
+}
+
+void MainMenu::AppendItem(MenuView *menuView, UINT id, UINT textResourceId)
+{
+	auto helpText = m_resourceLoader->MaybeLoadString(id);
+	menuView->AppendItem(nullptr, id, m_resourceLoader->LoadString(textResourceId),
+		MaybeCreateIconModel(id), helpText.value_or(L""), GetAcceleratorTextForId(id));
+}
+
+MenuView *MainMenu::AppendSubMenu(MenuView *menuView, UINT id, UINT textResourceId)
+{
+	return menuView->AppendSubMenu(nullptr, id, m_resourceLoader->LoadString(textResourceId),
+		MaybeCreateIconModel(id));
+}
+
+std::unique_ptr<IconModel> MainMenu::MaybeCreateIconModel(UINT id) const
 {
 	// Creating a symlink typically requires elevation. However, if the application is already
 	// elevated, there's no need to show the shield icon (which is used to indicate that elevation
 	// is required).
+	//
 	// Note that elevation isn't required if developer mode is enabled on Windows 10 and above.
 	// Since the status of developer mode isn't checked here, the shield icon may be shown in cases
 	// where elevation isn't actually required. That's not too much of an issue, since the icon here
 	// is considered to be a hint that elevation may be required.
-	if (IsProcessElevated())
+	if (id == IDM_EDIT_PASTE_SYMBOLIC_LINK && !IsProcessElevated())
 	{
-		return;
+		return std::make_unique<StockIconModel>(SIID_SHIELD, IconSize::Small);
 	}
 
-	SHSTOCKICONINFO info = {};
-	info.cbSize = sizeof(info);
-	HRESULT hr = SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &info);
+	auto icon = GetIconForCommand(id);
 
-	if (FAILED(hr))
-	{
-		DCHECK(false);
-		return;
-	}
-
-	wil::unique_hbitmap bitmap;
-	ImageHelper::CreateHBITMAPFromImageListIcon(m_mainMenuSystemImageList.get(),
-		info.iSysImageIndex, bitmap);
-
-	HMENU mainMenu = GetMenu(m_hwnd);
-	MenuHelper::SetBitmapForItem(mainMenu, IDM_EDIT_PASTE_SYMBOLIC_LINK, bitmap.get());
-	m_mainMenuImages.push_back(std::move(bitmap));
-}
-
-void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
-{
-	// This is a bit indirect, but it's better than using something like GetSubMenu(), which would
-	// rely on the "Go" menu remaining in a fixed position.
-	HMENU goMenu = MenuHelper::FindParentMenu(mainMenu, IDM_GO_BACK);
-	CHECK(goMenu);
-
-	MenuHelper::AddSeparator(goMenu);
-
-	// This is the quick access/home folder in Windows 10/11.
-	AddGoMenuItem(goMenu, IDM_GO_QUICK_ACCESS, QUICK_ACCESS_PATH);
-	AddGoMenuItem(goMenu, IDM_GO_COMPUTER, FOLDERID_ComputerFolder);
-
-	MenuHelper::AddSeparator(goMenu);
-
-	AddGoMenuItem(goMenu, IDM_GO_DOCUMENTS, FOLDERID_Documents);
-	AddGoMenuItem(goMenu, IDM_GO_DOWNLOADS, FOLDERID_Downloads);
-	AddGoMenuItem(goMenu, IDM_GO_MUSIC, FOLDERID_Music);
-	AddGoMenuItem(goMenu, IDM_GO_PICTURES, FOLDERID_Pictures);
-	AddGoMenuItem(goMenu, IDM_GO_VIDEOS, FOLDERID_Videos);
-	AddGoMenuItem(goMenu, IDM_GO_DESKTOP, FOLDERID_Desktop);
-
-	MenuHelper::AddSeparator(goMenu);
-
-	AddGoMenuItem(goMenu, IDM_GO_RECYCLE_BIN, FOLDERID_RecycleBinFolder);
-	AddGoMenuItem(goMenu, IDM_GO_CONTROL_PANEL, FOLDERID_ControlPanelFolder);
-	AddGoMenuItem(goMenu, IDM_GO_PRINTERS, FOLDERID_PrintersFolder);
-	AddGoMenuItem(goMenu, IDM_GO_NETWORK, FOLDERID_NetworkFolder);
-
-	MenuHelper::AddSeparator(goMenu);
-
-	AddGoMenuItem(goMenu, IDM_GO_WSL_DISTRIBUTIONS, WSL_DISTRIBUTIONS_PATH);
-
-	MenuHelper::RemoveDuplicateSeperators(goMenu);
-	MenuHelper::RemoveTrailingSeparators(goMenu);
-}
-
-void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId)
-{
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetKnownFolderIDList(folderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	AddGoMenuItem(goMenu, id, pidl.get());
-}
-
-void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, const std::wstring &path)
-{
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	AddGoMenuItem(goMenu, id, pidl.get());
-}
-
-void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl)
-{
-	std::wstring folderName;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, folderName);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	MenuHelper::AddStringItem(goMenu, id, folderName);
-
-	m_iconFetcher.QueueIconTask(pidl,
-		[this, goMenu, id](int iconIndex, int overlayIndex)
-		{
-			UNREFERENCED_PARAMETER(overlayIndex);
-
-			// Accessing the Explorerplusplus instance here should always be safe. This callback is
-			// run on the main thread and will either run before the instance is destroyed, or not
-			// at all. It's not feasible for the callback to run while the destruction of the
-			// Explorerplusplus instance is ongoing (which would be unsafe), since even if messages
-			// were pumped, the window message handler that the class sets up will no longer be
-			// active. So, once destruction of the Explorerplusplus instance has started, there's no
-			// way for this callback to run.
-			wil::unique_hbitmap bitmap;
-			ImageHelper::CreateHBITMAPFromImageListIcon(m_mainMenuSystemImageList.get(), iconIndex,
-				bitmap);
-
-			MenuHelper::SetBitmapForItem(goMenu, id, bitmap.get());
-
-			m_mainMenuImages.push_back(std::move(bitmap));
-		});
-}
-
-void Explorerplusplus::OnInitMenu(HMENU menu)
-{
-	// Note that as per
-	// https://stackoverflow.com/questions/69917594/wm-initmenu-has-unexpected-wparam-for-system-menu#comment123596433_69917594,
-	// the menu parameter passed to WM_INITMENU will be the main menu, even if the user is selecting
-	// an item from the system menu. Additionally, WM_INITMENU will be sent simply when clicking a
-	// blank spot the menu bar.
-	// That can result in some unnecessary work (to update the state of the main menu), but
-	// shouldn't have any functional issues. When an item is right-clicked, for example, the handle
-	// to the menu the click occurred on will be passed in and that can be used to determine whether
-	// or not the click should be processed.
-	if (menu == GetMenu(m_hwnd))
-	{
-		SetMainMenuItemStates(menu);
-	}
-}
-
-void Explorerplusplus::OnEnterMenuLoop(bool shortcutMenu)
-{
-	if (!shortcutMenu)
-	{
-		NotifyTopLevelMenuShown();
-	}
-}
-
-void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
-{
-	if (!shortcutMenu)
-	{
-		NotifyTopLevelMenuClosed();
-	}
-}
-
-void Explorerplusplus::OnInitMenuPopup(HMENU menu)
-{
-	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
-		[menu](const auto &currentSubMenu) { return currentSubMenu.menuHost->GetMenu() == menu; });
-
-	if (subMenu == m_mainMenuSubMenus.end())
-	{
-		return;
-	}
-
-	subMenu->menuHost->OnSubMenuWillShow();
-}
-
-bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)
-{
-	auto *subMenu = MaybeGetMainMenuSubMenuFromId(id);
-
-	if (!subMenu)
-	{
-		return false;
-	}
-
-	subMenu->menuHost->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
-
-	return true;
-}
-
-Explorerplusplus::MainMenuSubMenu *Explorerplusplus::MaybeGetMainMenuSubMenuFromId(UINT id)
-{
-	auto subMenu = std::ranges::find_if(m_mainMenuSubMenus,
-		[id](const auto &currentSubMenu)
-		{
-			return id >= currentSubMenu.menu->GetIdRange().startId
-				&& id < currentSubMenu.menu->GetIdRange().endId;
-		});
-
-	if (subMenu == m_mainMenuSubMenus.end())
+	if (!icon)
 	{
 		return nullptr;
 	}
 
-	return &*subMenu;
+	return std::make_unique<ResourceIconModel>(*icon, IconSize::Small, m_resourceLoader);
 }
 
-void Explorerplusplus::SetMainMenuItemStates(HMENU mainMenu)
+std::optional<Icon> MainMenu::GetIconForCommand(UINT id)
 {
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-
-	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
-
-	int numSelected = tab.GetShellBrowserImpl()->GetNumSelected();
-	bool anySelected = (numSelected > 0);
-
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_COPYITEMPATH,
-		m_commandController.IsCommandEnabled(IDM_FILE_COPYITEMPATH));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_COPYUNIVERSALFILEPATHS,
-		m_commandController.IsCommandEnabled(IDM_FILE_COPYUNIVERSALFILEPATHS));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_SETFILEATTRIBUTES,
-		m_commandController.IsCommandEnabled(IDM_FILE_SETFILEATTRIBUTES));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_OPENCOMMANDPROMPT,
-		m_commandController.IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR,
-		m_commandController.IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_SAVEDIRECTORYLISTING,
-		m_commandController.IsCommandEnabled(IDM_FILE_SAVEDIRECTORYLISTING));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_COPYCOLUMNTEXT,
-		anySelected && (viewMode == +ViewMode::Details));
-
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_RENAME,
-		m_commandController.IsCommandEnabled(IDM_FILE_RENAME));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_DELETE,
-		m_commandController.IsCommandEnabled(IDM_FILE_DELETE));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_DELETEPERMANENTLY,
-		m_commandController.IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
-	MenuHelper::EnableItem(mainMenu, IDM_FILE_PROPERTIES,
-		m_commandController.IsCommandEnabled(IDM_FILE_PROPERTIES));
-
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_UNDO, m_fileActionHandler.CanUndo());
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_PASTE, CanPaste(PasteType::Normal));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_PASTESHORTCUT, CanPaste(PasteType::Shortcut));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_PASTEHARDLINK, CanPasteLink());
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_PASTE_SYMBOLIC_LINK, CanPasteLink());
-
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_CUT,
-		m_commandController.IsCommandEnabled(IDM_EDIT_CUT));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_COPY,
-		m_commandController.IsCommandEnabled(IDM_EDIT_COPY));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_MOVETOFOLDER,
-		m_commandController.IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_COPYTOFOLDER,
-		m_commandController.IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_WILDCARDDESELECT,
-		m_commandController.IsCommandEnabled(IDM_EDIT_WILDCARDDESELECT));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_SELECTNONE,
-		m_commandController.IsCommandEnabled(IDM_EDIT_SELECTNONE));
-	MenuHelper::EnableItem(mainMenu, IDM_EDIT_RESOLVELINK, anySelected);
-
-	if (m_featureList->IsEnabled(Feature::DualPane))
+	switch (id)
 	{
-		MenuHelper::CheckItem(mainMenu, IDM_VIEW_DUAL_PANE, m_config->dualPane);
+	case IDM_FILE_NEWTAB:
+		return Icon::NewTab;
+
+	case IDM_FILE_CLOSETAB:
+		return Icon::CloseTab;
+
+	case IDM_FILE_OPENCOMMANDPROMPT:
+		return Icon::CommandLine;
+
+	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
+		return Icon::CommandLineAdmin;
+
+	case IDM_FILE_DELETE:
+		return Icon::Delete;
+
+	case IDM_FILE_DELETEPERMANENTLY:
+		return Icon::DeletePermanently;
+
+	case IDM_FILE_RENAME:
+		return Icon::Rename;
+
+	case IDM_FILE_PROPERTIES:
+		return Icon::Properties;
+
+	case IDM_EDIT_UNDO:
+		return Icon::Undo;
+
+	case IDM_EDIT_COPY:
+		return Icon::Copy;
+
+	case IDM_EDIT_CUT:
+		return Icon::Cut;
+
+	case IDM_EDIT_PASTE:
+		return Icon::Paste;
+
+	case IDM_EDIT_PASTESHORTCUT:
+		return Icon::PasteShortcut;
+
+	case IDM_EDIT_COPYTOFOLDER:
+		return Icon::CopyTo;
+
+	case IDM_EDIT_MOVETOFOLDER:
+		return Icon::MoveTo;
+
+	case IDM_ACTIONS_NEWFOLDER:
+		return Icon::NewFolder;
+
+	case IDM_ACTIONS_SPLITFILE:
+		return Icon::SplitFiles;
+
+	case IDM_ACTIONS_MERGEFILES:
+		return Icon::MergeFiles;
+
+	case IDM_VIEW_REFRESH:
+		return Icon::Refresh;
+
+	case IDM_VIEW_SELECTCOLUMNS:
+		return Icon::SelectColumns;
+
+	case IDM_FILTER_FILTERRESULTS:
+		return Icon::Filter;
+
+	case IDM_GO_BACK:
+		return Icon::Back;
+
+	case IDM_GO_FORWARD:
+		return Icon::Forward;
+
+	case IDM_GO_UP:
+		return Icon::Up;
+
+	case IDM_TOOLS_SEARCH:
+		return Icon::Search;
+
+	case IDM_TOOLS_CUSTOMIZECOLORS:
+		return Icon::CustomizeColors;
+
+	case IDM_TOOLS_OPTIONS:
+		return Icon::Options;
+
+	case IDM_HELP_ONLINE_DOCUMENTATION:
+		return Icon::Help;
+
+	default:
+		return std::nullopt;
 	}
-
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_STATUSBAR, m_config->showStatusBar.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_FOLDERS, m_config->showFolders.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_DISPLAYWINDOW, m_config->showDisplayWindow.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_TOOLBARS_ADDRESS_BAR, m_config->showAddressBar.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_TOOLBARS_MAIN_TOOLBAR,
-		m_config->showMainToolbar.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR,
-		m_config->showBookmarksToolbar.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR,
-		m_config->showDrivesToolbar.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR,
-		m_config->showApplicationToolbar.get());
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_TOOLBARS_LOCK_TOOLBARS, m_config->lockToolbars.get());
-
-	MenuHelper::EnableItem(mainMenu, IDM_VIEW_DECREASE_TEXT_SIZE,
-		m_commandController.IsCommandEnabled(IDM_VIEW_DECREASE_TEXT_SIZE));
-	MenuHelper::EnableItem(mainMenu, IDM_VIEW_INCREASE_TEXT_SIZE,
-		m_commandController.IsCommandEnabled(IDM_VIEW_INCREASE_TEXT_SIZE));
-
-	MenuHelper::CheckItem(mainMenu, IDM_VIEW_SHOWHIDDENFILES,
-		tab.GetShellBrowserImpl()->GetShowHidden());
-	MenuHelper::CheckItem(mainMenu, IDM_FILTER_ENABLE_FILTER,
-		tab.GetShellBrowserImpl()->IsFilterEnabled());
-
-	MenuHelper::EnableItem(mainMenu, IDM_ACTIONS_NEWFOLDER,
-		m_commandController.IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
-	MenuHelper::EnableItem(mainMenu, IDM_ACTIONS_SPLITFILE,
-		m_commandController.IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
-	MenuHelper::EnableItem(mainMenu, IDM_ACTIONS_MERGEFILES,
-		m_commandController.IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
-	MenuHelper::EnableItem(mainMenu, IDM_ACTIONS_DESTROYFILES, anySelected);
-
-	UINT itemToCheck = GetViewModeMenuId(viewMode);
-	CheckMenuRadioItem(mainMenu, IDM_VIEW_EXTRALARGEICONS, IDM_VIEW_TILES, itemToCheck,
-		MF_BYCOMMAND);
-
-	MenuHelper::EnableItem(mainMenu, IDM_GO_BACK,
-		m_commandController.IsCommandEnabled(IDM_GO_BACK));
-	MenuHelper::EnableItem(mainMenu, IDM_GO_FORWARD,
-		m_commandController.IsCommandEnabled(IDM_GO_FORWARD));
-	MenuHelper::EnableItem(mainMenu, IDM_GO_UP, m_commandController.IsCommandEnabled(IDM_GO_UP));
-
-	MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOSIZECOLUMNS,
-		m_commandController.IsCommandEnabled(IDM_VIEW_AUTOSIZECOLUMNS));
-
-	if (viewMode == +ViewMode::Details)
-	{
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
-		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
-
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, TRUE);
-	}
-	else if (viewMode == +ViewMode::List)
-	{
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, FALSE);
-
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
-		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
-	}
-	else
-	{
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, TRUE);
-
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, TRUE);
-		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE,
-			tab.GetShellBrowser()->IsAutoArrangeEnabled());
-	}
-
-	SortMenuBuilder sortMenuBuilder(m_resourceLoader);
-	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(tab);
-
-	MenuHelper::AttachSubMenu(mainMenu, std::move(sortByMenu), IDM_VIEW_SORTBY, FALSE);
-	MenuHelper::AttachSubMenu(mainMenu, std::move(groupByMenu), IDM_VIEW_GROUPBY, FALSE);
 }

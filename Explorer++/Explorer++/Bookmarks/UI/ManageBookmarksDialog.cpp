@@ -327,10 +327,10 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(TRUE, 0));
 
-	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
 	ManageBookmarksViewsMenu menu(popupRunner.GetView(), m_acceleratorManager,
 		m_bookmarkListPresenter.get(), m_resourceLoader);
-	popupRunner.Show(m_hDlg, pt);
+	popupRunner.Show(pt);
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(FALSE, 0));
 }
@@ -364,11 +364,11 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(TRUE, 0));
 	DCHECK(res);
 
-	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
 	OrganizeBookmarksContextMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		m_currentBookmarkFolder->GetWeakPtr(), delegate, m_platformContext->GetClipboardStore(),
 		m_resourceLoader);
-	popupRunner.Show(m_hDlg, pt);
+	popupRunner.Show(pt);
 
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));
 	DCHECK(res);

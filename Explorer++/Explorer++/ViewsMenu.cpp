@@ -24,11 +24,11 @@ void ViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 	for (auto viewMode : VIEW_MODES)
 	{
 		auto id = m_idCounter++;
-		m_menuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode));
+		m_rootMenuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode));
 
 		if (viewMode == currentViewMode)
 		{
-			m_menuView->CheckItem(id, true);
+			m_rootMenuView->CheckItem(id, true);
 		}
 
 		m_idToViewModeMap.insert({ id, viewMode });

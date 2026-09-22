@@ -11,43 +11,39 @@
 #include "../Helper/MenuHelpTextHost.h"
 #include "../Helper/WindowSubclass.h"
 
-MenuController::MenuController(MenuView *rootView, MenuHelpTextHost *menuHelpTextHost) :
+MenuController::MenuController(MenuView *rootView, HWND ownerWindow,
+	MenuHelpTextHost *menuHelpTextHost) :
 	m_rootView(rootView),
 	m_menuHelpTextHost(menuHelpTextHost)
 {
-	// This class is designed to be used when a top-level menu is displayed. That will typically be
-	// a popup menu, but it can also be a submenu of a menu not managed with MenuView.
+	// This class is designed to be used when a top-level menu (i.e. a context menu or window menu)
+	// is displayed.
 	DCHECK(m_rootView->IsRoot());
+
+	// ownerWindow can be null in tests only.
+	CHECK(ownerWindow || IsInTest());
+
+	if (ownerWindow)
+	{
+		m_subclass = std::make_unique<WindowSubclass>(ownerWindow,
+			std::bind_front(&MenuController::OwnerWindowSubclass, this));
+	}
 }
 
 MenuController::~MenuController() = default;
-
-void MenuController::NotifyMenuWillShow(HWND ownerWindow)
-{
-	DCHECK(!m_subclass);
-	m_subclass = std::make_unique<WindowSubclass>(ownerWindow,
-		std::bind_front(&MenuController::OwnerWindowSubclass, this));
-
-	NotifyMenuWillShowForDpi(DpiCompatibility::GetInstance().GetDpiForWindow(ownerWindow));
-}
-
-void MenuController::NotifyMenuWillShowForDpi(UINT dpi)
-{
-	DCHECK_GT(m_rootView->GetNumItems(), 0);
-
-	m_helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
-		std::bind_front(&MenuController::OnHelpTextRequested, this));
-
-	// When the associated menu is a submenu of a menu not managed with MenuView, the window
-	// subclass that's installed will be set up too late to catch the WM_INITMENUPOPUP message.
-	// Manually invoking this method here ensures that it's always called.
-	m_rootView->OnPopupWillShowForDpi(dpi);
-}
 
 LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case WM_ENTERMENULOOP:
+		OnEnterMenuLoop(wParam);
+		break;
+
+	case WM_EXITMENULOOP:
+		OnExitMenuLoop(wParam);
+		break;
+
 	case WM_INITMENUPOPUP:
 		OnInitMenuPopup(hwnd, reinterpret_cast<HMENU>(wParam));
 		break;
@@ -80,6 +76,22 @@ LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
+void MenuController::OnEnterMenuLoop(bool shortcutMenu)
+{
+	if (!shortcutMenu)
+	{
+		OnMenuOpened();
+	}
+}
+
+void MenuController::OnExitMenuLoop(bool shortcutMenu)
+{
+	if (!shortcutMenu)
+	{
+		OnMenuClosed();
+	}
+}
+
 void MenuController::OnInitMenuPopup(HWND hwnd, HMENU menu)
 {
 	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(menu);
@@ -87,6 +99,11 @@ void MenuController::OnInitMenuPopup(HWND hwnd, HMENU menu)
 	if (!view)
 	{
 		return;
+	}
+
+	if (view == m_rootView)
+	{
+		OnMenuOpened();
 	}
 
 	view->OnPopupWillShowForDpi(DpiCompatibility::GetInstance().GetDpiForWindow(hwnd));
@@ -109,10 +126,21 @@ void MenuController::OnUninitMenuPopup(HMENU menu)
 	}
 }
 
+void MenuController::OnMenuOpened()
+{
+	DCHECK_GT(m_rootView->GetNumItems(), 0);
+
+	m_helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
+		std::bind_front(&MenuController::OnHelpTextRequested, this));
+
+	m_menuHelpTextHost->NotifyTopLevelMenuShown();
+}
+
 void MenuController::OnMenuClosed()
 {
+	m_menuHelpTextHost->NotifyTopLevelMenuClosed();
+
 	m_dropTarget.reset();
-	m_subclass.reset();
 	m_helpTextConnection.disconnect();
 }
 
@@ -137,9 +165,16 @@ void MenuController::OnMenuRightButtonUp(HMENU menu, int index)
 		return;
 	}
 
+	auto id = view->MaybeGetItemId(index);
+
+	if (!id)
+	{
+		return;
+	}
+
 	DWORD messagePos = GetMessagePos();
 	POINT ptScreen = { GET_X_LPARAM(messagePos), GET_Y_LPARAM(messagePos) };
-	RightClickItem(view->GetItemId(index), ptScreen);
+	RightClickItem(*id, ptScreen);
 }
 
 LRESULT MenuController::OnMenuDrag(HMENU menu, int index)
@@ -160,15 +195,21 @@ LRESULT MenuController::OnMenuDrag(HMENU menu, int index)
 		return MND_CONTINUE;
 	}
 
-	UINT id = view->GetItemId(index);
-	auto *delegate = MaybeGetDelegateForActionableItem(id);
+	auto id = view->MaybeGetItemId(index);
+
+	if (!id)
+	{
+		return MND_CONTINUE;
+	}
+
+	auto *delegate = MaybeGetDelegateForActionableItem(*id);
 
 	if (!delegate)
 	{
 		return MND_CONTINUE;
 	}
 
-	auto action = delegate->OnItemDragged(id);
+	auto action = delegate->OnItemDragged(*id);
 	return action == MenuDragAction::ContinueMenu ? MND_CONTINUE : MND_ENDMENU;
 }
 
@@ -188,12 +229,14 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		return MNGO_NOINTERFACE;
 	}
 
-	MenuDropLocation dropLocation;
+	UINT dropIndex;
+	MenuDropLocation::Position dropPosition;
 
 	// If neither MNGOF_TOPGAP or MNGOF_BOTTOMGAP is set, the cursor is over an item.
 	if (WI_AreAllFlagsClear(objectInfo->dwFlags, MNGOF_TOPGAP | MNGOF_BOTTOMGAP))
 	{
-		dropLocation = { view->GetItemId(objectInfo->uPos), MenuDropLocation::Position::On };
+		dropIndex = objectInfo->uPos;
+		dropPosition = MenuDropLocation::Position::On;
 	}
 	else
 	{
@@ -237,17 +280,24 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 			// It's not considered valid for a menu to have no items, so this shouldn't trigger.
 			CHECK(view->GetNumItems() != 0);
 
-			dropLocation = { view->GetItemId(objectInfo->uPos - 1),
-				MenuDropLocation::Position::After };
+			dropIndex = objectInfo->uPos - 1;
+			dropPosition = MenuDropLocation::Position::After;
 		}
 		else
 		{
-			dropLocation = { view->GetItemId(objectInfo->uPos),
-				MenuDropLocation::Position::Before };
+			dropIndex = objectInfo->uPos;
+			dropPosition = MenuDropLocation::Position::Before;
 		}
 	}
 
-	auto *delegate = view->MaybeGetDelegateForItem(dropLocation.id);
+	auto dropId = view->MaybeGetItemId(dropIndex);
+
+	if (!dropId)
+	{
+		return MNGO_NOINTERFACE;
+	}
+
+	auto *delegate = view->MaybeGetDelegateForItem(*dropId);
 
 	if (!delegate)
 	{
@@ -256,7 +306,7 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 
 	// This represents the drop target for the specified item. It needs to be held either until
 	// another target is requested, or the menu is closed.
-	m_dropTarget = delegate->MaybeGetDropTargetForLocation(dropLocation);
+	m_dropTarget = delegate->MaybeGetDropTargetForLocation({ *dropId, dropPosition });
 
 	if (!m_dropTarget)
 	{
@@ -278,6 +328,25 @@ std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, int 
 	}
 
 	return view->GetItemHelpText(id);
+}
+
+bool MenuController::CanHandleSelection(UINT id) const
+{
+	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
+
+	if (!view)
+	{
+		return false;
+	}
+
+	auto *delegate = view->MaybeGetDelegateForItem(id);
+
+	if (!delegate)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void MenuController::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
@@ -306,12 +375,6 @@ void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKe
 
 void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 {
-	if (id == 0)
-	{
-		// This is a separator item.
-		return;
-	}
-
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
@@ -327,11 +390,6 @@ void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 
 MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
 {
-	if (id == 0)
-	{
-		return nullptr;
-	}
-
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
@@ -343,11 +401,11 @@ MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
 	return view->MaybeGetDelegateForItem(id);
 }
 
-void MenuController::NotifyMenuWillShowForTesting(UINT dpi)
+void MenuController::NotifyMenuOpenedForTesting()
 {
 	CHECK(IsInTest());
 
-	NotifyMenuWillShowForDpi(dpi);
+	OnMenuOpened();
 }
 
 void MenuController::NotifyMenuClosedForTesting()

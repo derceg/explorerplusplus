@@ -14,7 +14,7 @@ class ResourceIconModelTest : public Test
 protected:
 	ResourceIconModelTest() :
 		m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr),
-		m_iconModel(Icon::Refresh, DEFAULT_SIZE, &m_resourceLoader)
+		m_iconModel(Icon::Refresh, IconSize::Small, &m_resourceLoader)
 	{
 	}
 
@@ -27,13 +27,12 @@ protected:
 		int res = GetObject(bitmap.get(), sizeof(bitmapInfo), &bitmapInfo);
 		ASSERT_NE(res, 0);
 
-		EXPECT_EQ(bitmapInfo.bmWidth, DEFAULT_SIZE * scale);
-		EXPECT_EQ(bitmapInfo.bmHeight, DEFAULT_SIZE * scale);
+		int defaultPixelSize = GetIconPixelSizeAtDefaultDpi(IconSize::Small);
+		EXPECT_EQ(bitmapInfo.bmWidth, defaultPixelSize * scale);
+		EXPECT_EQ(bitmapInfo.bmHeight, defaultPixelSize * scale);
 	}
 
 private:
-	static constexpr int DEFAULT_SIZE = 16;
-
 	Win32ResourceLoader m_resourceLoader;
 	ResourceIconModel m_iconModel;
 };

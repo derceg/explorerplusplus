@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include "IconSize.h"
 #include "Pidl.h"
 #include "WilExtraTypes.h"
+#include <wil/com.h>
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
 #include <shellapi.h>
+#include <wincodec.h>
 #include <optional>
 #include <string>
 #include <vector>
@@ -145,3 +148,5 @@ ShellIconInfo ExtractShellIconParts(int iconIndexAndOverlay);
 PidlAbsolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl);
 
 bool DoesItemExist(PCIDLIST_ABSOLUTE pidl);
+
+wil::com_ptr_nothrow<IWICBitmapSource> GetStockIconImage(SHSTOCKICONID id, IconSize size);

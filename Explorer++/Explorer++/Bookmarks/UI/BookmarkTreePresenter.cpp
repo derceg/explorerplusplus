@@ -170,10 +170,10 @@ void BookmarkTreePresenter::OnSelectionChanged(TreeViewNode *selectedNode)
 
 void BookmarkTreePresenter::OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen)
 {
-	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	PopupMenuRunner popupRunner(m_view->GetHWND(), NoOpMenuHelpTextHost::GetInstance());
 	BookmarkTreeViewContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, this,
 		m_bookmarkTree, m_adapter->GetBookmarkForNode(targetNode)->GetWeakPtr(), m_resourceLoader);
-	popupRunner.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 void BookmarkTreePresenter::OnBeginDrag(TreeViewNode *targetNode)

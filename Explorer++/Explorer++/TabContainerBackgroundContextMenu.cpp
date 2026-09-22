@@ -29,19 +29,19 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 
 void TabContainerBackgroundContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(this, IDM_TAB_CONTAINER_NEW_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_NEW_TAB,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
 		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
-	m_menuView->AppendItem(this, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
 		GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
-	m_menuView->AppendItem(this, IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
 	if (m_tabRestorer->IsEmpty())
 	{
-		m_menuView->EnableItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, false);
+		m_rootMenuView->EnableItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, false);
 	}
 }
 

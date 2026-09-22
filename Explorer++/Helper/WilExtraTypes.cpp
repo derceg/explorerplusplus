@@ -12,3 +12,18 @@ void ReleaseFormatEtc(FORMATETC *formatEtc)
 		CoTaskMemFree(formatEtc->ptd);
 	}
 }
+
+void InitializeStockIconInfo(SHSTOCKICONINFO *info)
+{
+	*info = {};
+	info->cbSize = sizeof(*info);
+}
+
+void DestroyStockIconInfo(SHSTOCKICONINFO *info)
+{
+	if (info->hIcon)
+	{
+		auto res = DestroyIcon(info->hIcon);
+		DCHECK(res);
+	}
+}

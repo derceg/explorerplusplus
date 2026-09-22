@@ -5,19 +5,15 @@
 #pragma once
 
 #include "IconUpdateCallback.h"
+#include "../Helper/IconSize.h"
 #include <wil/resource.h>
 #include <shtypes.h>
-
-enum class ShellIconSize
-{
-	Small
-};
 
 class ShellIconLoader
 {
 public:
 	virtual ~ShellIconLoader() = default;
 
-	virtual wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, ShellIconSize size,
+	virtual wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
 		IconUpdateCallback updateCallback) = 0;
 };

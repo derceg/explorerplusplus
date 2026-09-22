@@ -16,7 +16,6 @@
 #include "Tab.h"
 #include "TabContainer.h"
 #include "TabEvents.h"
-#include "../Helper/DpiCompatibility.h"
 #include <ranges>
 
 TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -33,70 +32,67 @@ TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acc
 
 void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
-	int size = DpiCompatibility::GetInstance().GetSystemMetricsForDpi(SM_CXSMICON,
-		USER_DEFAULT_SCREEN_DPI);
-
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_NEW_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_NEW_TAB,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB),
-		std::make_unique<ResourceIconModel>(Icon::NewTab, size, resourceLoader),
+		std::make_unique<ResourceIconModel>(Icon::NewTab, IconSize::Small, resourceLoader),
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB_HELP_TEXT),
 		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
 
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB_HELP_TEXT),
 		GetAcceleratorTextForId(IDA_DUPLICATE_TAB));
 
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB_HELP_TEXT));
 
-	m_menuView->EnableItem(IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB,
+	m_rootMenuView->EnableItem(IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB,
 		m_tab->GetShellBrowser()->GetNavigationController()->CanGoUp());
 
-	m_menuView->AppendSeparator();
+	m_rootMenuView->AppendSeparator();
 
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH),
-		std::make_unique<ResourceIconModel>(Icon::Refresh, size, resourceLoader),
+		std::make_unique<ResourceIconModel>(Icon::Refresh, IconSize::Small, resourceLoader),
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_HELP_TEXT),
 		GetAcceleratorTextForId(IDM_VIEW_REFRESH));
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH_ALL,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH_ALL,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_ALL), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_ALL_HELP_TEXT));
 
-	m_menuView->AppendSeparator();
+	m_rootMenuView->AppendSeparator();
 
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_RENAME_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_RENAME_TAB,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_RENAME_TAB), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_RENAME_TAB_HELP_TEXT));
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_LOCK_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_LOCK_TAB,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_HELP_TEXT));
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS_HELP_TEXT));
 
-	m_menuView->CheckItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB,
+	m_rootMenuView->CheckItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB,
 		m_tab->GetLockState() == Tab::LockState::Locked);
-	m_menuView->CheckItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS,
+	m_rootMenuView->CheckItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS,
 		m_tab->GetLockState() == Tab::LockState::AddressLocked);
 
-	m_menuView->AppendSeparator();
+	m_rootMenuView->AppendSeparator();
 
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB),
-		std::make_unique<ResourceIconModel>(Icon::CloseTab, size, resourceLoader),
+		std::make_unique<ResourceIconModel>(Icon::CloseTab, IconSize::Small, resourceLoader),
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB_HELP_TEXT),
 		GetAcceleratorTextForId(IDM_FILE_CLOSETAB));
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS_HELP_TEXT));
-	m_menuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT,
+	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT_HELP_TEXT));
 
-	m_menuView->EnableItem(IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
+	m_rootMenuView->EnableItem(IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
 		m_tab->GetLockState() == Tab::LockState::NotLocked);
 }
 

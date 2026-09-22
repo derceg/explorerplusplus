@@ -22,12 +22,11 @@ BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView,
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
 	m_platformContext(platformContext),
-	m_resourceLoader(resourceLoader),
-	m_defaultDpiIconSize(DpiCompatibility::GetInstance().GetSystemMetricsForDpi(SM_CXSMICON,
-		USER_DEFAULT_SCREEN_DPI))
+	m_resourceLoader(resourceLoader)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
-	int scaledIconSize = dpiCompat.ScaleValue(m_browser->GetHWND(), m_defaultDpiIconSize);
+	int scaledIconSize =
+		dpiCompat.ScaleValue(m_browser->GetHWND(), GetIconPixelSizeAtDefaultDpi(IconSize::Small));
 	m_iconManager = std::make_unique<BookmarkIconManager>(resourceLoader, iconFetcher,
 		scaledIconSize, scaledIconSize);
 
@@ -52,30 +51,27 @@ BookmarksMainMenu::~BookmarksMainMenu() = default;
 
 void BookmarksMainMenu::RebuildMenu()
 {
-	m_menuView->ClearMenu();
-	m_bookmarksMenuContents.reset();
-	m_otherBookmarksMenuContents.reset();
+	m_rootMenuView->ClearMenu();
+	m_childMenus.clear();
 	BuildMenu();
 }
 
 void BookmarksMainMenu::BuildMenu()
 {
-	m_menuView->AppendItem(nullptr, IDM_BOOKMARKS_BOOKMARK_THIS_TAB,
+	m_rootMenuView->AppendItem(nullptr, IDM_BOOKMARKS_BOOKMARK_THIS_TAB,
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB),
-		std::make_unique<ResourceIconModel>(Icon::AddBookmark, m_defaultDpiIconSize,
-			m_resourceLoader),
+		std::make_unique<ResourceIconModel>(Icon::AddBookmark, IconSize::Small, m_resourceLoader),
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB_HELP_TEXT),
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_THIS_TAB));
 
-	m_menuView->AppendItem(nullptr, IDM_BOOKMARKS_BOOKMARK_ALL_TABS,
+	m_rootMenuView->AppendItem(nullptr, IDM_BOOKMARKS_BOOKMARK_ALL_TABS,
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS), {},
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS_HELP_TEXT),
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
-	m_menuView->AppendItem(nullptr, IDM_BOOKMARKS_MANAGE_BOOKMARKS,
+	m_rootMenuView->AppendItem(nullptr, IDM_BOOKMARKS_MANAGE_BOOKMARKS,
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS),
-		std::make_unique<ResourceIconModel>(Icon::Bookmarks, m_defaultDpiIconSize,
-			m_resourceLoader),
+		std::make_unique<ResourceIconModel>(Icon::Bookmarks, IconSize::Small, m_resourceLoader),
 		m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS_HELP_TEXT),
 		GetAcceleratorTextForId(IDM_BOOKMARKS_MANAGE_BOOKMARKS));
 
@@ -85,27 +81,29 @@ void BookmarksMainMenu::BuildMenu()
 
 	if (!bookmarksMenuFolder->GetChildren().empty())
 	{
-		m_menuView->AppendSeparator();
+		m_rootMenuView->AppendSeparator();
 
-		m_bookmarksMenuContents = std::make_unique<BookmarksMenu>(m_menuView, m_acceleratorManager,
-			m_bookmarkTree, bookmarksMenuFolder, m_iconManager.get(), m_browser,
-			m_browser->GetHWND(), m_platformContext, m_resourceLoader, nullptr, startId, endId);
+		auto bookmarksMenuFolderMenu =
+			std::make_unique<BookmarksMenu>(m_rootMenuView, m_acceleratorManager, m_bookmarkTree,
+				bookmarksMenuFolder, m_iconManager.get(), m_browser, m_browser->GetHWND(),
+				m_platformContext, m_resourceLoader, nullptr, startId, endId);
+		startId = bookmarksMenuFolderMenu->GetNextId();
 
-		startId = m_bookmarksMenuContents->GetNextId();
+		m_childMenus.push_back(std::move(bookmarksMenuFolderMenu));
 	}
 
 	auto *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
 
 	if (!otherBookmarksFolder->GetChildren().empty())
 	{
-		m_menuView->AppendSeparator();
+		m_rootMenuView->AppendSeparator();
 
-		auto *otherBookmarksMenu = m_menuView->AppendSubMenu(nullptr,
+		auto *otherBookmarksMenu = m_rootMenuView->AppendSubMenu(nullptr,
 			IDM_BOOKMARKS_OTHER_BOOKMARKS_POPUP, otherBookmarksFolder->GetName());
 
-		m_otherBookmarksMenuContents =
-			std::make_unique<BookmarksMenu>(otherBookmarksMenu, m_acceleratorManager,
-				m_bookmarkTree, otherBookmarksFolder, m_iconManager.get(), m_browser,
-				m_browser->GetHWND(), m_platformContext, m_resourceLoader, nullptr, startId, endId);
+		m_childMenus.push_back(std::make_unique<BookmarksMenu>(otherBookmarksMenu,
+			m_acceleratorManager, m_bookmarkTree, otherBookmarksFolder, m_iconManager.get(),
+			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader, nullptr, startId,
+			endId));
 	}
 }

@@ -207,10 +207,10 @@ void MassRenameDialog::OnShowTokensMenu()
 			reinterpret_cast<LPARAM>(GetMassRenameTokenText(token).c_str()));
 	};
 
-	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
 	MassRenameTokensMenu menu(popupRunner.GetView(), m_acceleratorManager, tokenSelectedCallback,
 		m_resourceLoader);
-	popupRunner.Show(m_hDlg, { rc.left, rc.top });
+	popupRunner.Show({ rc.left, rc.top });
 }
 
 void MassRenameDialog::OnOk()

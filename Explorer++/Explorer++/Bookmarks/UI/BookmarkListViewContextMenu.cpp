@@ -23,9 +23,9 @@ BookmarkListViewContextMenu::BookmarkListViewContextMenu(MenuView *menuView,
 
 void BookmarkListViewContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(this, IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK,
+	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK));
-	m_menuView->AppendItem(this, IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER,
+	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER));
 }
 

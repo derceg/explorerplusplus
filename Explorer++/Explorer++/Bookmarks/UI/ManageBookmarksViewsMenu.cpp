@@ -25,13 +25,13 @@ ManageBookmarksViewsMenu::~ManageBookmarksViewsMenu() = default;
 void ManageBookmarksViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
 	auto *columnsSubMenuView =
-		m_menuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP,
+		m_rootMenuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP,
 			resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP));
 	m_columnsMenu = std::make_unique<ListViewColumnsMenu>(columnsSubMenuView, m_acceleratorManager,
 		m_bookmarkListPresenter->GetColumnModel(), resourceLoader);
 
 	auto *sortSubMenuView =
-		m_menuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP,
+		m_rootMenuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP,
 			resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP));
 	BuildSortMenu(sortSubMenuView, resourceLoader);
 }

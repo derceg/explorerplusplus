@@ -44,7 +44,8 @@ class DisplayWindow;
 class DrivesToolbar;
 class FeatureList;
 class HolderWindow;
-class MainMenuSubMenuHost;
+class MainMenu;
+class MainMenuHost;
 class MainRebarView;
 class MainToolbar;
 class MenuBase;
@@ -158,12 +159,6 @@ private:
 	{
 		void *pContainer;
 		int uId;
-	};
-
-	struct MainMenuSubMenu
-	{
-		std::unique_ptr<MainMenuSubMenuHost> menuHost;
-		std::unique_ptr<MenuBase> menu;
 	};
 
 	Explorerplusplus(const WindowStorageData &storageData, AppServices *appServices,
@@ -287,23 +282,11 @@ private:
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainer *GetTabContainer() const override;
 
-	/* Menus. */
+	// Main menu
 	void InitializeMainMenu();
-	void SetMainMenuImages();
-	void SetPasteSymLinkElevationIcon();
-	void InitializeGoMenu(HMENU mainMenu);
-	void AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId);
-	void AddGoMenuItem(HMENU goMenu, UINT id, const std::wstring &path);
-	void AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl);
-	void AddMainMenuSubmenu(HMENU mainMenu, UINT subMenuItemId,
-		std::function<std::unique_ptr<MenuBase>(MenuView *menuView)> menuCreator);
 	void OnInitMenu(HMENU menu);
-	void OnEnterMenuLoop(bool shortcutMenu);
-	void OnExitMenuLoop(bool shortcutMenu);
-	void OnInitMenuPopup(HMENU menu);
-	bool MaybeHandleMainMenuItemSelection(UINT id);
-	MainMenuSubMenu *MaybeGetMainMenuSubMenuFromId(UINT id);
 	void SetMainMenuItemStates(HMENU mainMenu);
+	bool MaybeHandleMainMenuItemSelection(UINT id);
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
@@ -352,9 +335,8 @@ private:
 	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	int m_displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
-	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
-	std::vector<wil::unique_hbitmap> m_mainMenuImages;
-	std::vector<MainMenuSubMenu> m_mainMenuSubMenus;
+	std::unique_ptr<MainMenuHost> m_mainMenuHost;
+	std::unique_ptr<MainMenu> m_mainMenu;
 
 	int m_numTopLevelMenusActive = 0;
 	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;

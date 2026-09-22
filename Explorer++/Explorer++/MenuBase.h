@@ -38,7 +38,7 @@ protected:
 
 	std::optional<std::wstring> GetAcceleratorTextForId(UINT id) const;
 
-	MenuView *const m_menuView;
+	MenuView *const m_rootMenuView;
 	const AcceleratorManager *const m_acceleratorManager;
 
 private:

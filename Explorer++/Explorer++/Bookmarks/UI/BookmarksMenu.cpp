@@ -59,9 +59,9 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 {
 	DCHECK(bookmarkFolder->IsFolder());
 
-	m_menuView->EnableDragAndDrop(true);
+	m_rootMenuView->EnableDragAndDrop(true);
 
-	BuildMenu(m_menuView, bookmarkFolder, includePredicate);
+	BuildMenu(m_rootMenuView, bookmarkFolder, includePredicate);
 }
 
 UINT BookmarksMenu::GetNextId() const
@@ -167,10 +167,10 @@ void BookmarksMenu::OnItemRightClicked(UINT id, const POINT &ptScreen)
 		return;
 	}
 
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_parentWindow, m_browser);
 	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
-	popupRunner.Show(m_parentWindow, ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 MenuDragAction BookmarksMenu::OnItemDragged(UINT id)

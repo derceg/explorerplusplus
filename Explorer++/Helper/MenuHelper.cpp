@@ -64,14 +64,6 @@ void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_h
 	subMenu.release();
 }
 
-HMENU AttachNewSubMenu(HMENU parentMenu, UINT item, BOOL byPosition)
-{
-	auto ownedSubMenu = CheckedCreatePopupMenu();
-	auto subMenu = ownedSubMenu.get();
-	AttachSubMenu(parentMenu, std::move(ownedSubMenu), item, byPosition);
-	return subMenu;
-}
-
 void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
 {
 	MENUITEMINFO menuItemInfo = {};
@@ -141,12 +133,12 @@ void SetBitmapForItem(HMENU menu, UINT id, HBITMAP bitmap)
 	CHECK(res);
 }
 
-void RemoveDuplicateSeperators(HMENU menu)
+void RemoveDuplicateSeparators(HMENU menu)
 {
 	int count = GetMenuItemCount(menu);
 	CHECK_NE(count, -1);
 
-	bool previousItemSeperator = false;
+	bool previousItemSeparator = false;
 
 	for (int i = count - 1; i >= 0; i--)
 	{
@@ -158,14 +150,14 @@ void RemoveDuplicateSeperators(HMENU menu)
 
 		bool currentItemSeparator = WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR);
 
-		if (previousItemSeperator && currentItemSeparator)
+		if (previousItemSeparator && currentItemSeparator)
 		{
 			res = DeleteMenu(menu, i, MF_BYPOSITION);
 			CHECK(res);
 		}
 		else
 		{
-			previousItemSeperator = currentItemSeparator;
+			previousItemSeparator = currentItemSeparator;
 		}
 	}
 }
@@ -196,37 +188,6 @@ void RemoveTrailingSeparators(HMENU menu)
 		res = DeleteMenu(menu, i, MF_BYPOSITION);
 		CHECK(res);
 	}
-}
-
-// Finds the parent of the specified menu item, within the provided menu. The return value will be
-// the menu itself, or one of its submenus.
-HMENU FindParentMenu(HMENU menu, UINT id)
-{
-	int numItems = GetMenuItemCount(menu);
-
-	for (int i = 0; i < numItems; i++)
-	{
-		UINT currentId = GetMenuItemID(menu, i);
-
-		if (currentId != static_cast<UINT>(-1) && currentId == id)
-		{
-			return menu;
-		}
-
-		HMENU subMenu = GetSubMenu(menu, i);
-
-		if (subMenu)
-		{
-			HMENU parentMenu = FindParentMenu(subMenu, id);
-
-			if (parentMenu)
-			{
-				return parentMenu;
-			}
-		}
-	}
-
-	return nullptr;
 }
 
 std::wstring GetMenuItemString(HMENU menu, UINT item, bool byPosition)
@@ -362,6 +323,13 @@ std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 	}
 
 	return std::nullopt;
+}
+
+wil::unique_hmenu CheckedCreateMenu()
+{
+	wil::unique_hmenu menu(CreateMenu());
+	CHECK(menu);
+	return menu;
 }
 
 wil::unique_hmenu CheckedCreatePopupMenu()

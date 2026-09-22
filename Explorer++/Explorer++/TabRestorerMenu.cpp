@@ -30,15 +30,15 @@ TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *a
 
 void TabRestorerMenu::RebuildMenu()
 {
-	m_menuView->ClearMenu();
+	m_rootMenuView->ClearMenu();
 	m_idCounter = GetIdRange().startId;
 	m_menuItemMappings.clear();
 
 	if (m_tabRestorer->IsEmpty())
 	{
 		auto id = m_idCounter++;
-		m_menuView->AppendItem(this, id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
-		m_menuView->EnableItem(id, false);
+		m_rootMenuView->AppendItem(this, id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
+		m_rootMenuView->EnableItem(id, false);
 		return;
 	}
 
@@ -74,7 +74,7 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 		acceleratorText = GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB);
 	}
 
-	m_menuView->AppendItem(this, id, menuText,
+	m_rootMenuView->AppendItem(this, id, menuText,
 		std::make_unique<ShellIconModel>(m_shellIconLoader, currentEntry->GetPidl().Raw()),
 		helpText, acceleratorText);
 

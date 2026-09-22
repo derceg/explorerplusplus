@@ -13,14 +13,14 @@ class MenuHelpTextHost;
 class PopupMenuRunner
 {
 public:
-	PopupMenuRunner(MenuHelpTextHost *menuHelpTextHost);
+	PopupMenuRunner(HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost);
 
 	MenuView *GetView();
-	void Show(HWND hwnd, const POINT &ptScreen);
+	void Show(const POINT &ptScreen);
 
 private:
-	wil::unique_hmenu m_ownedMenu;
+	const HWND m_ownerWindow;
+	const wil::unique_hmenu m_ownedMenu;
 	MenuView m_view;
 	MenuController m_controller;
-	MenuHelpTextHost *const m_menuHelpTextHost;
 };

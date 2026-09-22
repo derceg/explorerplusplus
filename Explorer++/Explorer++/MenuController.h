@@ -18,24 +18,24 @@ class WindowSubclass;
 class MenuController
 {
 public:
-	MenuController(MenuView *rootView, MenuHelpTextHost *menuHelpTextHost);
+	MenuController(MenuView *rootView, HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost);
 	~MenuController();
 
-	void NotifyMenuWillShow(HWND ownerWindow);
-
+	bool CanHandleSelection(UINT id) const;
 	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void RightClickItem(UINT id, const POINT &ptScreen);
 
-	void NotifyMenuWillShowForTesting(UINT dpi);
+	void NotifyMenuOpenedForTesting();
 	void NotifyMenuClosedForTesting();
 
 private:
-	void NotifyMenuWillShowForDpi(UINT dpi);
-
 	LRESULT OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnEnterMenuLoop(bool shortcutMenu);
+	void OnExitMenuLoop(bool shortcutMenu);
 	void OnInitMenuPopup(HWND hwnd, HMENU menu);
 	void OnUninitMenuPopup(HMENU menu);
+	void OnMenuOpened();
 	void OnMenuClosed();
 	void OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void OnMenuRightButtonUp(HMENU menu, int index);

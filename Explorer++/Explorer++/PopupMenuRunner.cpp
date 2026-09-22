@@ -5,14 +5,13 @@
 #include "stdafx.h"
 #include "PopupMenuRunner.h"
 #include "../Helper/Helper.h"
-#include "../Helper/MenuHelpTextHost.h"
 #include "../Helper/MenuHelper.h"
 
-PopupMenuRunner::PopupMenuRunner(MenuHelpTextHost *menuHelpTextHost) :
+PopupMenuRunner::PopupMenuRunner(HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost) :
+	m_ownerWindow(ownerWindow),
 	m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
 	m_view(m_ownedMenu.get()),
-	m_controller(&m_view, menuHelpTextHost),
-	m_menuHelpTextHost(menuHelpTextHost)
+	m_controller(&m_view, ownerWindow, menuHelpTextHost)
 {
 }
 
@@ -21,10 +20,9 @@ MenuView *PopupMenuRunner::GetView()
 	return &m_view;
 }
 
-void PopupMenuRunner::Show(HWND hwnd, const POINT &ptScreen)
+void PopupMenuRunner::Show(const POINT &ptScreen)
 {
-	m_menuHelpTextHost->NotifyTopLevelMenuShown();
-	m_controller.NotifyMenuWillShow(hwnd);
+	SetLastError(0);
 
 	// Without the TPM_RECURSE flag, TrackPopupMenu() will silently fail if another menu is
 	// currently showing. It's hard to see how that would ever be the intended behavior. That is,
@@ -32,13 +30,13 @@ void PopupMenuRunner::Show(HWND hwnd, const POINT &ptScreen)
 	// fail because another menu is being shown isn't useful. Therefore, the TPM_RECURSE flag will
 	// always be passed in.
 	UINT cmd = TrackPopupMenu(m_ownedMenu.get(),
-		TPM_LEFTALIGN | TPM_VERTICAL | TPM_RECURSE | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0, hwnd,
-		nullptr);
-
-	m_menuHelpTextHost->NotifyTopLevelMenuClosed();
+		(GetSystemMetrics(SM_MENUDROPALIGNMENT) == 0 ? TPM_LEFTALIGN : TPM_RIGHTALIGN)
+			| TPM_VERTICAL | TPM_RECURSE | TPM_RETURNCMD,
+		ptScreen.x, ptScreen.y, 0, m_ownerWindow, nullptr);
 
 	if (cmd == 0)
 	{
+		DCHECK_EQ(GetLastError(), 0u);
 		return;
 	}
 

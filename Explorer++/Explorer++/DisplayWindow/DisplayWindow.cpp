@@ -668,10 +668,10 @@ void DisplayWindow::OnShowContextMenu(const POINT &ptScreen)
 	}
 	else
 	{
-		PopupMenuRunner popupRunner(m_browser);
+		PopupMenuRunner popupRunner(m_hwnd, m_browser);
 		DisplayWindowContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_browser,
 			m_config, m_resourceLoader);
-		popupRunner.Show(m_hwnd, ptScreen);
+		popupRunner.Show(ptScreen);
 	}
 }
 

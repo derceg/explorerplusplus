@@ -13,10 +13,10 @@ ShellIconLoaderImpl::ShellIconLoaderImpl(IconFetcher *iconFetcher) : m_iconFetch
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 }
 
-wil::unique_hbitmap ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, ShellIconSize size,
+wil::unique_hbitmap ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
 	IconUpdateCallback updateCallback)
 {
-	if (size != ShellIconSize::Small)
+	if (size != IconSize::Small)
 	{
 		return nullptr;
 	}

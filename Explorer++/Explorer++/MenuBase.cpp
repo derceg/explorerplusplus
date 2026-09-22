@@ -11,7 +11,7 @@
 
 MenuBase::MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager, UINT startId,
 	UINT endId) :
-	m_menuView(menuView),
+	m_rootMenuView(menuView),
 	m_acceleratorManager(acceleratorManager),
 	m_idRange(std::max(startId, 1u), std::max({ endId, startId, 1u }))
 {

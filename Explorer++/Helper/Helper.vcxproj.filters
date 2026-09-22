@@ -223,6 +223,9 @@
     <ClCompile Include="GraphicsFactories.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="IconSize.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -514,6 +517,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsFactories.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="IconSize.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>

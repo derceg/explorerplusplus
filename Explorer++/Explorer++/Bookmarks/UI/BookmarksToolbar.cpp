@@ -284,11 +284,11 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 	POINT pt = { buttonRect.left, buttonRect.bottom };
 	ClientToScreen(m_view->GetHWND(), &pt);
 
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_view->GetHWND(), m_browser);
 	BookmarksMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree, bookmarkItem,
 		m_bookmarkIconManager.get(), m_browser, m_view->GetHWND(), m_platformContext,
 		m_resourceLoader);
-	popupRunner.Show(m_view->GetHWND(), pt);
+	popupRunner.Show(pt);
 }
 
 void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
@@ -303,10 +303,10 @@ void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_browser->GetHWND(), m_browser);
 	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_platformContext);
-	popupRunner.Show(m_browser->GetHWND(), ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 BookmarksToolbarView *BookmarksToolbar::GetView() const
@@ -323,11 +323,11 @@ void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 		return !m_view->IsButtonVisible(index);
 	};
 
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_view->GetHWND(), m_browser);
 	BookmarksMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		m_bookmarkTree->GetBookmarksToolbarFolder(), m_bookmarkIconManager.get(), m_browser,
 		m_view->GetHWND(), m_platformContext, m_resourceLoader, includePredicate);
-	popupRunner.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 void BookmarksToolbar::OnWindowDestroyed()

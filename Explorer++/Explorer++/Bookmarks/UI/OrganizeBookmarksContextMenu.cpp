@@ -31,40 +31,40 @@ OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 
 void OrganizeBookmarksContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK));
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER));
 
-	m_menuView->AppendSeparator();
+	m_rootMenuView->AppendSeparator();
 
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_CUT));
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_COPY));
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_PASTE));
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_DELETE));
 
-	m_menuView->AppendSeparator();
+	m_rootMenuView->AppendSeparator();
 
-	m_menuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
+	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
 
 	auto selectedBookmarkItems = m_delegate->GetSelectedItems();
 	bool canDelete = !selectedBookmarkItems.empty()
 		&& std::ranges::none_of(selectedBookmarkItems, [this](const auto *bookmarkItem)
 			{ return m_bookmarkTree->IsPermanentNode(bookmarkItem); });
-	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT, canDelete);
-	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, !selectedBookmarkItems.empty());
+	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT, canDelete);
+	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, !selectedBookmarkItems.empty());
 
-	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
+	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
 		m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()));
 
-	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, canDelete);
+	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, canDelete);
 
-	m_menuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
+	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
 		!m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems());
 }
 

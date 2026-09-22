@@ -165,10 +165,10 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_view->GetHWND(), m_browser);
 	ApplicationContextMenu menu(popupRunner.GetView(), m_acceleratorManager, m_model, application,
 		m_applicationExecutor, m_browser, m_resourceLoader);
-	popupRunner.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 void ApplicationToolbar::OnWindowDestroyed()

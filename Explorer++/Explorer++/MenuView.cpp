@@ -39,6 +39,8 @@ void MenuView::EnableDragAndDrop(bool enable)
 	CHECK(res);
 }
 
+// Note that MenuDelegate is effectively a menu-level class, but it can be set with item-level
+// granularity. That allows different items on the same menu to be managed by different delegates.
 void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 	const std::optional<std::wstring> &acceleratorText)
@@ -157,6 +159,11 @@ void MenuView::CheckRadioItem(UINT id, bool check)
 	MenuHelper::CheckRadioItem(m_menu, id, check);
 }
 
+void MenuView::RemoveDuplicateSeparators()
+{
+	MenuHelper::RemoveDuplicateSeparators(m_menu);
+}
+
 void MenuView::RemoveTrailingSeparators()
 {
 	MenuHelper::RemoveTrailingSeparators(m_menu);
@@ -225,6 +232,11 @@ MenuView *MenuView::MaybeGetMenuViewForNativeMenu(HMENU menu)
 
 MenuView *MenuView::MaybeGetMenuViewForItem(UINT id)
 {
+	return const_cast<MenuView *>(std::as_const(*this).MaybeGetMenuViewForItem(id));
+}
+
+const MenuView *MenuView::MaybeGetMenuViewForItem(UINT id) const
+{
 	if (m_idToItemMap.contains(id))
 	{
 		return this;
@@ -287,13 +299,20 @@ const MenuView::Item *MenuView::GetItem(int id) const
 	return &itr->second;
 }
 
-UINT MenuView::GetItemId(int index) const
+// This will only return IDs for non-separators.
+std::optional<UINT> MenuView::MaybeGetItemId(int index) const
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_ID;
 	auto res = GetMenuItemInfo(m_menu, index, true, &menuItemInfo);
 	CHECK(res);
+
+	if (menuItemInfo.wID == 0)
+	{
+		// This is a separator item.
+		return std::nullopt;
+	}
 
 	return menuItemInfo.wID;
 }
@@ -307,7 +326,14 @@ MenuDelegate *MenuView::MaybeGetDelegateForItem(UINT id)
 
 std::optional<UINT> MenuView::MaybeGetItemAtPoint(const POINT &ptScreen) const
 {
-	return MenuHelper::MaybeGetMenuItemAtPoint(m_menu, ptScreen);
+	auto id = MenuHelper::MaybeGetMenuItemAtPoint(m_menu, ptScreen);
+
+	if (!id || !MaybeGetMenuViewForItem(*id))
+	{
+		return std::nullopt;
+	}
+
+	return *id;
 }
 
 HMENU MenuView::GetNativeMenuForTesting() const
@@ -321,7 +347,9 @@ UINT MenuView::GetItemIdForTesting(int index) const
 {
 	CHECK(IsInTest());
 
-	return GetItemId(index);
+	auto id = MaybeGetItemId(index);
+	CHECK(id);
+	return *id;
 }
 
 MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id)

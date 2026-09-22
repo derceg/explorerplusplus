@@ -77,13 +77,14 @@ class MenuControllerTest : public Test
 {
 protected:
 	MenuControllerTest() :
+		m_ownerWindow(CreateOwnerWindow()),
 		m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
 		m_view(m_ownedMenu.get()),
-		m_controller(&m_view, &m_menuHelpTextHost)
+		m_controller(&m_view, m_ownerWindow.get(), &m_menuHelpTextHost)
 	{
 	}
 
-	wil::unique_hwnd CreateWindowForMessageTest()
+	wil::unique_hwnd CreateOwnerWindow()
 	{
 		wil::unique_hwnd hwnd(CreateWindow(WC_STATIC, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
 			GetModuleHandle(nullptr), nullptr));
@@ -104,6 +105,7 @@ protected:
 	}
 
 	MenuHelpTextHostFake m_menuHelpTextHost;
+	wil::unique_hwnd m_ownerWindow;
 	wil::unique_hmenu m_ownedMenu;
 	MenuView m_view;
 	MenuController m_controller;
@@ -267,7 +269,7 @@ TEST_F(MenuControllerTest, HelpTextRequest)
 		m_menuHelpTextHost.TriggerHelpTextRequest(m_view.GetNativeMenuForTesting(), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
 
-	m_controller.NotifyMenuWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+	m_controller.NotifyMenuOpenedForTesting();
 
 	// The menu is now being shown, so help text should be returned.
 	retrievedHelpText =
@@ -296,7 +298,7 @@ TEST_F(MenuControllerTest, SubMenuHelpTextRequest)
 		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
 
-	m_controller.NotifyMenuWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+	m_controller.NotifyMenuOpenedForTesting();
 
 	retrievedHelpText =
 		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
@@ -324,25 +326,22 @@ TEST_F(MenuControllerTest, DropLocation)
 	UINT itemId3 = idCounter++;
 	m_view.AppendItem(&delegate, itemId3, L"Item 3");
 
-	auto hwnd = CreateWindowForMessageTest();
-	m_controller.NotifyMenuWillShow(hwnd.get());
-
 	InSequence seq;
 
 	EXPECT_CALL(delegate,
 		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId2, MenuDropLocation::Position::On }));
-	SendMenuGetObject(hwnd.get(), 0, 1);
+	SendMenuGetObject(m_ownerWindow.get(), 0, 1);
 
 	EXPECT_CALL(delegate,
 		MaybeGetDropTargetForLocation(
 			MenuDropLocation{ itemId1, MenuDropLocation::Position::Before }));
-	SendMenuGetObject(hwnd.get(), MNGOF_TOPGAP, 0);
+	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 0);
 
 	EXPECT_CALL(delegate, MaybeGetDropTargetForLocation(IsGapBetween(itemId2, itemId3)));
-	SendMenuGetObject(hwnd.get(), MNGOF_TOPGAP, 2);
+	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 2);
 
 	EXPECT_CALL(delegate,
 		MaybeGetDropTargetForLocation(
 			MenuDropLocation{ itemId3, MenuDropLocation::Position::After }));
-	SendMenuGetObject(hwnd.get(), MNGOF_TOPGAP, 3);
+	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 3);
 }

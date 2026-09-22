@@ -6,9 +6,10 @@
 #include "ResourceIconModel.h"
 #include "ResourceLoader.h"
 
-ResourceIconModel::ResourceIconModel(Icon icon, int size, const ResourceLoader *resourceLoader) :
+ResourceIconModel::ResourceIconModel(Icon icon, IconSize size,
+	const ResourceLoader *resourceLoader) :
 	m_icon(icon),
-	m_size(std::max(size, 1)),
+	m_size(size),
 	m_resourceLoader(resourceLoader)
 {
 }
@@ -17,5 +18,6 @@ wil::unique_hbitmap ResourceIconModel::GetBitmap(UINT dpi, IconUpdateCallback up
 {
 	UNREFERENCED_PARAMETER(updateCallback);
 
-	return m_resourceLoader->LoadBitmapFromPNGForDpi(m_icon, m_size, m_size, dpi);
+	int pixelSize = GetIconPixelSizeAtDefaultDpi(m_size);
+	return m_resourceLoader->LoadBitmapFromPNGForDpi(m_icon, pixelSize, pixelSize, dpi);
 }

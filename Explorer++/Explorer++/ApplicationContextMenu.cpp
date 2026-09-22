@@ -32,18 +32,18 @@ ApplicationContextMenu::ApplicationContextMenu(MenuView *menuView,
 
 void ApplicationContextMenu::BuildMenu()
 {
-	m_menuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_OPEN,
+	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_OPEN,
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN), {},
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN_HELP_TEXT));
-	m_menuView->AppendSeparator();
-	m_menuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_NEW,
+	m_rootMenuView->AppendSeparator();
+	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_NEW,
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW), {},
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW_HELP_TEXT));
-	m_menuView->AppendSeparator();
-	m_menuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_DELETE,
+	m_rootMenuView->AppendSeparator();
+	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_DELETE,
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE), {},
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE_HELP_TEXT));
-	m_menuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_PROPERTIES,
+	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_PROPERTIES,
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES), {},
 		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
 }

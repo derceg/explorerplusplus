@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellHelper.h"
 #include "Helper.h"
+#include "ImageInterop.h"
 #include "ProcessHelper.h"
 #include "StringHelper.h"
 #include "WinRTBaseWrapper.h"
@@ -1273,4 +1274,26 @@ bool DoesItemExist(PCIDLIST_ABSOLUTE pidl)
 	// SFGAO_VALIDATE is never returned in the output attributes, so provided the call above
 	// succeeded, the item exists.
 	return true;
+}
+
+wil::com_ptr_nothrow<IWICBitmapSource> GetStockIconImage(SHSTOCKICONID id, IconSize size)
+{
+	unique_stock_icon_info info;
+	HRESULT hr = SHGetStockIconInfo(id,
+		SHGSI_ICON | (size == IconSize::Small ? SHGSI_SMALLICON : SHGSI_LARGEICON), &info);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	hr = ImageInterop::CreateWICBitmapFromHICON(info.hIcon, bitmap);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return bitmap;
 }

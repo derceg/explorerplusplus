@@ -49,7 +49,7 @@ void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, UINT
 	UpdateMenuEntries(menu.get());
 
 	MenuHelper::RemoveTrailingSeparators(menu.get());
-	MenuHelper::RemoveDuplicateSeperators(menu.get());
+	MenuHelper::RemoveDuplicateSeparators(menu.get());
 
 	if (GetMenuItemCount(menu.get()) == 0)
 	{

@@ -9,7 +9,7 @@
 
 using namespace testing;
 
-TEST(RemoveDuplicateSeperatorsTest, RemoveDuplicates)
+TEST(RemoveDuplicateSeparatorsTest, RemoveDuplicates)
 {
 	const UINT item1Id = 1;
 	const UINT item2Id = 2;
@@ -22,7 +22,7 @@ TEST(RemoveDuplicateSeperatorsTest, RemoveDuplicates)
 	MenuHelper::AddStringItem(menu.get(), item2Id, L"Item 2");
 
 	// This should leave a single separator, along with the two other menu items.
-	MenuHelper::RemoveDuplicateSeperators(menu.get());
+	MenuHelper::RemoveDuplicateSeparators(menu.get());
 	EXPECT_EQ(GetMenuItemCount(menu.get()), 3);
 	EXPECT_EQ(GetMenuItemID(menu.get(), 0), item1Id);
 	EXPECT_EQ(GetMenuItemID(menu.get(), 2), item2Id);
@@ -41,25 +41,6 @@ TEST(RemoveTrailingSeparatorsTest, RemoveTrailing)
 	MenuHelper::RemoveTrailingSeparators(menu.get());
 	EXPECT_EQ(GetMenuItemCount(menu.get()), 1);
 	EXPECT_EQ(GetMenuItemID(menu.get(), 0), itemId);
-}
-
-TEST(FindParentMenuTest, FindSubItem)
-{
-	UINT idCounter = 1;
-
-	auto nestedSubmenu = MenuHelper::CheckedCreatePopupMenu();
-	auto rawNestedSubmenu = nestedSubmenu.get();
-	auto nestedItemId = idCounter++;
-	MenuHelper::AddStringItem(nestedSubmenu.get(), nestedItemId, L"Nested item");
-
-	auto submenu = MenuHelper::CheckedCreatePopupMenu();
-	MenuHelper::AddSubMenuItem(submenu.get(), idCounter++, L"Nested submenu",
-		std::move(nestedSubmenu));
-
-	auto menu = MenuHelper::CheckedCreatePopupMenu();
-	MenuHelper::AddSubMenuItem(menu.get(), idCounter++, L"Submenu", std::move(submenu));
-
-	EXPECT_EQ(MenuHelper::FindParentMenu(menu.get(), nestedItemId), rawNestedSubmenu);
 }
 
 TEST(GetMenuItemStringTest, GetString)

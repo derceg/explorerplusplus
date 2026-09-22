@@ -682,10 +682,10 @@ void ListView::OnShowHeaderContextMenu(const POINT &ptScreen)
 		return;
 	}
 
-	PopupMenuRunner popupRunner(m_menuHelpTextHost);
+	PopupMenuRunner popupRunner(m_hwnd, m_menuHelpTextHost);
 	ListViewColumnsMenu menu(popupRunner.GetView(), m_acceleratorManager, columnModel,
 		m_resourceLoader);
-	popupRunner.Show(m_hwnd, ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 LRESULT ListView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

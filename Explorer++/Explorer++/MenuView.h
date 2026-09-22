@@ -30,6 +30,7 @@ public:
 	void EnableItem(UINT id, bool enable);
 	void CheckItem(UINT id, bool check);
 	void CheckRadioItem(UINT id, bool check);
+	void RemoveDuplicateSeparators();
 	void RemoveTrailingSeparators();
 	void ClearMenu();
 
@@ -71,6 +72,7 @@ private:
 	void OnPopupClosed();
 	MenuView *MaybeGetMenuViewForNativeMenu(HMENU menu);
 	MenuView *MaybeGetMenuViewForItem(UINT id);
+	const MenuView *MaybeGetMenuViewForItem(UINT id) const;
 
 	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
@@ -79,7 +81,7 @@ private:
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
 
-	UINT GetItemId(int index) const;
+	std::optional<UINT> MaybeGetItemId(int index) const;
 	MenuDelegate *MaybeGetDelegateForItem(UINT id);
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 

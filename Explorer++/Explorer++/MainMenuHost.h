@@ -6,22 +6,24 @@
 
 #include "MenuController.h"
 #include "MenuView.h"
+#include <wil/resource.h>
 
 class BrowserWindow;
 
-class MainMenuSubMenuHost
+class MainMenuHost
 {
 public:
-	MainMenuSubMenuHost(BrowserWindow *browser, HMENU mainMenu, UINT subMenuItemId);
+	MainMenuHost(BrowserWindow *browser);
+
+	HMENU ReleaseMenu();
 
 	MenuView *GetView();
-	HMENU GetMenu() const;
-	void OnSubMenuWillShow();
+
+	bool CanHandleSelection(UINT id) const;
 	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 
 private:
-	const HMENU m_menu;
+	wil::unique_hmenu m_menu;
 	MenuView m_view;
 	MenuController m_controller;
-	const HWND m_hwnd;
 };

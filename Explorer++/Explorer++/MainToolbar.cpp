@@ -705,26 +705,26 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType, const PO
 		return;
 	}
 
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_hwnd, m_browser);
 	TabHistoryMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(), m_browser,
 		m_shellIconLoader, historyType);
-	popupRunner.Show(m_hwnd, ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 void MainToolbar::ShowUpNavigationMenu(const POINT &ptScreen)
 {
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_hwnd, m_browser);
 	TabParentItemsMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(),
 		m_browser, m_shellIconLoader);
-	popupRunner.Show(m_hwnd, ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 void MainToolbar::ShowViewsMenu(const POINT &ptScreen)
 {
-	PopupMenuRunner popupRunner(m_browser);
+	PopupMenuRunner popupRunner(m_hwnd, m_browser);
 	ViewsMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(), m_browser,
 		m_resourceLoader);
-	popupRunner.Show(m_hwnd, ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 // Returns the position a menu should be anchored at for a particular toolbar button.

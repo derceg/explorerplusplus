@@ -9,7 +9,7 @@
 MenuTestHost::MenuTestHost(MenuHelpTextHost *menuHelpTextHost) :
 	m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
 	m_view(m_ownedMenu.get()),
-	m_controller(&m_view, menuHelpTextHost)
+	m_controller(&m_view, nullptr, menuHelpTextHost)
 {
 }
 

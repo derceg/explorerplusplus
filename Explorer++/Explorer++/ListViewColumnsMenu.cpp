@@ -26,11 +26,11 @@ void ListViewColumnsMenu::BuildMenu()
 		const auto &column = m_columnModel->GetColumnById(columnId);
 
 		UINT id = m_idCounter++;
-		m_menuView->AppendItem(this, id, m_resourceLoader->LoadString(column.nameStringId));
-		m_menuView->CheckItem(id, column.visible);
+		m_rootMenuView->AppendItem(this, id, m_resourceLoader->LoadString(column.nameStringId));
+		m_rootMenuView->CheckItem(id, column.visible);
 
 		// The primary column can't be removed.
-		m_menuView->EnableItem(id, !m_columnModel->IsPrimaryColumnId(columnId));
+		m_rootMenuView->EnableItem(id, !m_columnModel->IsPrimaryColumnId(columnId));
 
 		m_idToColumnMap.insert({ id, columnId });
 	}

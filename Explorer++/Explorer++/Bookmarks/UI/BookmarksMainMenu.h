@@ -10,7 +10,6 @@
 #include <vector>
 
 class BookmarkIconManager;
-class BookmarksMenu;
 class BookmarkTree;
 class BrowserWindow;
 class IconFetcher;
@@ -34,9 +33,7 @@ private:
 	BrowserWindow *const m_browser;
 	PlatformContext *const m_platformContext;
 	const ResourceLoader *const m_resourceLoader;
-	const int m_defaultDpiIconSize;
 	std::unique_ptr<BookmarkIconManager> m_iconManager;
-	std::unique_ptr<BookmarksMenu> m_bookmarksMenuContents;
-	std::unique_ptr<BookmarksMenu> m_otherBookmarksMenuContents;
+	std::vector<std::unique_ptr<MenuBase>> m_childMenus;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

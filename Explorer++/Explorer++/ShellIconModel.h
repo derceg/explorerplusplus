@@ -6,6 +6,7 @@
 
 #include "IconModel.h"
 #include "ShellIconLoader.h"
+#include "../Helper/IconSize.h"
 #include "../Helper/Pidl.h"
 
 // Represents a shell icon (i.e. the icon for a shell item). Using this class, it's possible to
@@ -15,12 +16,12 @@ class ShellIconModel : public IconModel
 {
 public:
 	ShellIconModel(ShellIconLoader *shellIconLoader, PCIDLIST_ABSOLUTE pidl,
-		ShellIconSize size = ShellIconSize::Small);
+		IconSize size = IconSize::Small);
 
 	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
 
 private:
 	ShellIconLoader *const m_shellIconLoader;
 	const PidlAbsolute m_pidl;
-	const ShellIconSize m_size;
+	const IconSize m_size;
 };

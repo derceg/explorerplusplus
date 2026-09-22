@@ -25,3 +25,4 @@ bool IsThumbnailsViewMode(ViewMode viewMode);
 
 UINT GetViewModeMenuId(ViewMode viewMode);
 std::wstring GetViewModeMenuText(const ResourceLoader *resourceLoader, ViewMode viewMode);
+UINT GetViewModeMenuStringId(ViewMode viewMode);

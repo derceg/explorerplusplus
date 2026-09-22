@@ -6,6 +6,7 @@
 
 #include "Icon.h"
 #include "IconModel.h"
+#include "../Helper/IconSize.h"
 
 class ResourceLoader;
 
@@ -15,12 +16,12 @@ class ResourceLoader;
 class ResourceIconModel : public IconModel
 {
 public:
-	ResourceIconModel(Icon icon, int size, const ResourceLoader *resourceLoader);
+	ResourceIconModel(Icon icon, IconSize size, const ResourceLoader *resourceLoader);
 
 	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
 
 private:
 	const Icon m_icon;
-	const int m_size;
+	const IconSize m_size;
 	const ResourceLoader *const m_resourceLoader;
 };

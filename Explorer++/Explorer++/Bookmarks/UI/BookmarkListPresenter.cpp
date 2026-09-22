@@ -272,10 +272,10 @@ void BookmarkListPresenter::OnPaste(ListViewItem *lastSelectedItemOpt)
 
 void BookmarkListPresenter::OnShowBackgroundContextMenu(const POINT &ptScreen)
 {
-	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	PopupMenuRunner popupRunner(m_view->GetHWND(), NoOpMenuHelpTextHost::GetInstance());
 	BookmarkListViewContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, this,
 		m_currentBookmarkFolder->GetWeakPtr(), m_resourceLoader);
-	popupRunner.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem *> &items,
@@ -288,11 +288,11 @@ void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem
 		return;
 	}
 
-	PopupMenuRunner popupRunner(NoOpMenuHelpTextHost::GetInstance());
+	PopupMenuRunner popupRunner(m_view->GetHWND(), NoOpMenuHelpTextHost::GetInstance());
 	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
 		GetBookmarksForItems(items), m_resourceLoader, browser, m_view->GetHWND(),
 		m_platformContext);
-	popupRunner.Show(m_view->GetHWND(), ptScreen);
+	popupRunner.Show(ptScreen);
 }
 
 RawBookmarkItems BookmarkListPresenter::GetBookmarksForItems(

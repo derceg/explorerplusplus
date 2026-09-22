@@ -23,7 +23,7 @@ ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acc
 
 void ShellItemsMenu::RebuildMenu(const std::vector<PidlAbsolute> &pidls)
 {
-	m_menuView->ClearMenu();
+	m_rootMenuView->ClearMenu();
 	m_idCounter = GetIdRange().startId;
 	m_idPidlMap.clear();
 
@@ -42,7 +42,7 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	m_menuView->AppendItem(this, id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
+	m_rootMenuView->AppendItem(this, id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
 		std::make_unique<ShellIconModel>(m_shellIconLoader, pidl),
 		GetFolderPathForDisplayWithFallback(pidl));
 

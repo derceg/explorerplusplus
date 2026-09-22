@@ -1223,6 +1223,8 @@
     <ClCompile Include="ListViewColumnsMenu.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
     <ClCompile Include="ListViewModel.cpp" />
+    <ClCompile Include="MainMenuHost.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="MassRenameHelper.cpp" />
@@ -1244,6 +1246,7 @@
     <ClCompile Include="ShellWatcherManager.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
+    <ClCompile Include="StockIconModel.cpp" />
     <ClCompile Include="TabBacking.cpp" />
     <ClCompile Include="TabContextMenu.cpp" />
     <ClCompile Include="TabView.cpp" />
@@ -1304,7 +1307,6 @@
     <ClCompile Include="LanguageHelper.cpp" />
     <ClCompile Include="LayoutDefaults.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
-    <ClCompile Include="MainMenuSubMenuHost.cpp" />
     <ClCompile Include="BrowserList.cpp" />
     <ClCompile Include="MainRebarView.cpp" />
     <ClCompile Include="ModelessDialogHelper.cpp" />
@@ -1427,7 +1429,6 @@
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
-    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="BrowserView.cpp" />
     <ClCompile Include="AcceleratorHelper.cpp" />
     <ClCompile Include="ServiceProvider.cpp" />
@@ -1591,6 +1592,8 @@
     <ClInclude Include="ListViewDelegate.h" />
     <ClInclude Include="ListViewItem.h" />
     <ClInclude Include="ListViewModel.h" />
+    <ClInclude Include="MainMenuHost.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MassRenameHelper.h" />
@@ -1620,6 +1623,7 @@
     <ClInclude Include="ShellWatcherManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />
+    <ClInclude Include="StockIconModel.h" />
     <ClInclude Include="TabContextMenu.h" />
     <ClInclude Include="TabView.h" />
     <ClInclude Include="TabViewDelegate.h" />
@@ -1689,7 +1693,6 @@
     <ClInclude Include="TabEvents.h" />
     <ClInclude Include="LanguageHelper.h" />
     <ClInclude Include="LocationVisitInfo.h" />
-    <ClInclude Include="MainMenuSubMenuHost.h" />
     <ClInclude Include="BrowserList.h" />
     <ClInclude Include="MainRebarView.h" />
     <ClInclude Include="ModelessDialogHelper.h" />

@@ -55,6 +55,11 @@ UINT GetViewModeMenuId(ViewMode viewMode)
 
 std::wstring GetViewModeMenuText(const ResourceLoader *resourceLoader, ViewMode viewMode)
 {
+	return resourceLoader->LoadString(GetViewModeMenuStringId(viewMode));
+}
+
+UINT GetViewModeMenuStringId(ViewMode viewMode)
+{
 	UINT stringId;
 
 	switch (viewMode)
@@ -104,5 +109,5 @@ std::wstring GetViewModeMenuText(const ResourceLoader *resourceLoader, ViewMode 
 		__assume(0);
 	}
 
-	return resourceLoader->LoadString(stringId);
+	return stringId;
 }

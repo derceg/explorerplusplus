@@ -798,6 +798,7 @@
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileDialogs.cpp" />
     <ClCompile Include="GraphicsFactories.cpp" />
+    <ClCompile Include="IconSize.cpp" />
     <ClCompile Include="ImageInterop.cpp" />
     <ClCompile Include="ImageOperations.cpp" />
     <ClCompile Include="KeyboardStateImpl.cpp" />
@@ -901,6 +902,7 @@
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
     <ClInclude Include="GraphicsFactories.h" />
+    <ClInclude Include="IconSize.h" />
     <ClInclude Include="ImageInterop.h" />
     <ClInclude Include="ImageOperations.h" />
     <ClInclude Include="PassKey.h" />

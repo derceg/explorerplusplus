@@ -6,7 +6,7 @@
 #include "ShellIconModel.h"
 
 ShellIconModel::ShellIconModel(ShellIconLoader *shellIconLoader, PCIDLIST_ABSOLUTE pidl,
-	ShellIconSize size) :
+	IconSize size) :
 	m_shellIconLoader(shellIconLoader),
 	m_pidl(pidl),
 	m_size(size)
