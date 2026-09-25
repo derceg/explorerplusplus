@@ -123,11 +123,22 @@ void BookmarksMenu::AddEmptyItem(MenuView *menuView, BookmarkItem *bookmarkFolde
 	std::wstring menuText =
 		std::format(L"({})", m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY));
 	menuView->AppendItem(this, id, menuText);
-	menuView->EnableItem(id, false);
 
 	// This effectively maps the empty item to the parent folder, so that operations on this item
 	// will occur on the parent.
 	m_idToBookmarkMap.insert({ id, { bookmarkFolder->GetWeakPtr(), MenuItemType::EmptyItem } });
+}
+
+bool BookmarksMenu::IsItemEnabled(UINT id) const
+{
+	auto *entry = GetEntryForMenuItem(id);
+
+	if (entry->menuItemType == MenuItemType::EmptyItem)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void BookmarksMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

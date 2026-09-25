@@ -12,6 +12,7 @@
 #include "CopiedBookmark.h"
 #include "MainResource.h"
 #include "MenuTestHost.h"
+#include "MenuViewTestHelper.h"
 #include "ResourceLoaderFake.h"
 #include "SimulatedClipboardStore.h"
 #include <gmock/gmock.h>
@@ -99,9 +100,9 @@ TEST_F(OrganizeBookmarksContextMenuTest, ItemStatesWithNoSelection)
 	OrganizeBookmarksContextMenuDelegateFake delegate;
 	auto menu = BuildContextMenu(menuView, &delegate);
 
-	EXPECT_FALSE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT));
-	EXPECT_FALSE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY));
-	EXPECT_FALSE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT, false);
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, false);
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, ItemStatesWithSelection)
@@ -111,9 +112,9 @@ TEST_F(OrganizeBookmarksContextMenuTest, ItemStatesWithSelection)
 	OrganizeBookmarksContextMenuDelegateFake delegate({ m_targetFolder->GetChildren()[0].get() });
 	auto menu = BuildContextMenu(menuView, &delegate);
 
-	EXPECT_TRUE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT));
-	EXPECT_TRUE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY));
-	EXPECT_TRUE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT, true);
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, true);
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, true);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithEmptyClipboard)
@@ -124,7 +125,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithEmptyClipboard)
 	auto menu = BuildContextMenu(menuView, &delegate);
 
 	// There are no bookmarks on the clipboard, so it shouldn't be possible to paste.
-	EXPECT_FALSE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE, false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithNonEmptyClipboard)
@@ -137,7 +138,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithNonEmptyClipboard)
 	OrganizeBookmarksContextMenuDelegateFake delegate;
 	auto menu = BuildContextMenu(menuView, &delegate);
 
-	EXPECT_TRUE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE, true);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllDisabledState)
@@ -148,7 +149,8 @@ TEST_F(OrganizeBookmarksContextMenuTest, SelectAllDisabledState)
 	delegate.SetCanSelectAllItems(false);
 	auto menu = BuildContextMenu(menuView, &delegate);
 
-	EXPECT_FALSE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
+		false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithNoChildItems)
@@ -165,7 +167,8 @@ TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithNoChildItems)
 	// Although the delegate allows all items to be selected, there are no child items in the target
 	// folder, so there's nothing to select. Therefore, the select all menu item should remain
 	// disabled.
-	EXPECT_FALSE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
+		false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithChildItems)
@@ -176,7 +179,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithChildItems)
 	delegate.SetCanSelectAllItems(true);
 	auto menu = BuildContextMenu(menuView, &delegate);
 
-	EXPECT_TRUE(menuView->IsItemEnabled(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
+	MenuViewTestHelper::ExpectItemEnabled(menuView, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL, true);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, NewFolderWithNoSelection)

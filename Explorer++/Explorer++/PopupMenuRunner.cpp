@@ -22,8 +22,6 @@ MenuView *PopupMenuRunner::GetView()
 
 void PopupMenuRunner::Show(const POINT &ptScreen)
 {
-	SetLastError(0);
-
 	// Without the TPM_RECURSE flag, TrackPopupMenu() will silently fail if another menu is
 	// currently showing. It's hard to see how that would ever be the intended behavior. That is,
 	// the caller has explicitly called Show(), to display the menu. Having the operation silently
@@ -36,7 +34,6 @@ void PopupMenuRunner::Show(const POINT &ptScreen)
 
 	if (cmd == 0)
 	{
-		DCHECK_EQ(GetLastError(), 0u);
 		return;
 	}
 

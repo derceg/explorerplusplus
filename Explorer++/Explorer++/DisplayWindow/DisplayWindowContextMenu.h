@@ -21,6 +21,7 @@ private:
 	void BuildMenu();
 
 	// MenuDelegate
+	bool IsItemChecked(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	BrowserWindow *const m_browser;

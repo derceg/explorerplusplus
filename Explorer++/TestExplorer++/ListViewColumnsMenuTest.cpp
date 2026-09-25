@@ -8,6 +8,7 @@
 #include "GeneratorTestHelper.h"
 #include "ListViewColumnModel.h"
 #include "MenuTestHost.h"
+#include "MenuViewTestHelper.h"
 #include "ResourceLoaderFake.h"
 #include <gtest/gtest.h>
 
@@ -49,7 +50,7 @@ TEST_F(ListViewColumnsMenuTest, MenuItemStates)
 		// The primary column can't be removed, so its menu item should be disabled. All other items
 		// should be enabled.
 		auto columnId = columnIds[i];
-		EXPECT_EQ(menuView->IsItemEnabled(menuView->GetItemIdForTesting(i)),
+		MenuViewTestHelper::ExpectItemEnabled(menuView, menuView->GetItemIdForTesting(i),
 			!m_model.IsPrimaryColumnId(columnId));
 	}
 }

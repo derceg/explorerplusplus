@@ -34,8 +34,6 @@ void BookmarkContextMenu::BuildMenu()
 	CHECK(AreBookmarkItemsValid());
 
 	bool singleBookmarkSelected = (m_bookmarkItems.size() == 1) && m_bookmarkItems[0]->IsBookmark();
-	bool permanentNodeSelected =
-		(m_bookmarkItems.size() == 1) && m_bookmarkTree->IsPermanentNode(m_bookmarkItems[0]);
 
 	if (singleBookmarkSelected)
 	{
@@ -50,14 +48,10 @@ void BookmarkContextMenu::BuildMenu()
 	}
 	else
 	{
-		size_t totalBookmarks = GetTotalBookmarks();
-
 		m_rootMenuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL,
 			std::format(L"{}\t{}", m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_ALL),
-				totalBookmarks),
+				GetTotalBookmarks()),
 			{}, m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_OPEN_ALL_HELP_TEXT));
-
-		m_rootMenuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL, totalBookmarks > 0);
 
 		m_rootMenuView->AppendSeparator();
 	}
@@ -90,12 +84,6 @@ void BookmarkContextMenu::BuildMenu()
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_DELETE), {},
 		m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_DELETE_HELP_TEXT));
 
-	m_rootMenuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, !permanentNodeSelected);
-	m_rootMenuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE,
-		m_platformContext->GetClipboardStore()->IsDataAvailable(
-			BookmarkClipboard::GetClipboardFormat()));
-	m_rootMenuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, !permanentNodeSelected);
-
 	if (m_bookmarkItems.size() == 1)
 	{
 		m_rootMenuView->AppendSeparator();
@@ -103,12 +91,10 @@ void BookmarkContextMenu::BuildMenu()
 		m_rootMenuView->AppendItem(this, IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES,
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PROPERTIES), {},
 			m_resourceLoader->LoadString(IDS_BOOKMARK_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
-
-		m_rootMenuView->EnableItem(IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES, !permanentNodeSelected);
 	}
 }
 
-bool BookmarkContextMenu::AreBookmarkItemsValid()
+bool BookmarkContextMenu::AreBookmarkItemsValid() const
 {
 	if (m_bookmarkItems.empty())
 	{
@@ -122,7 +108,31 @@ bool BookmarkContextMenu::AreBookmarkItemsValid()
 		{ return bookmarkItem->GetParent() == parentFolder; });
 }
 
-size_t BookmarkContextMenu::GetTotalBookmarks()
+bool BookmarkContextMenu::IsItemEnabled(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL:
+		return GetTotalBookmarks() > 0;
+
+	case IDM_BOOKMARK_CONTEXT_MENU_CUT:
+		return !HasPermanentNode();
+
+	case IDM_BOOKMARK_CONTEXT_MENU_PASTE:
+		return m_platformContext->GetClipboardStore()->IsDataAvailable(
+			BookmarkClipboard::GetClipboardFormat());
+
+	case IDM_BOOKMARK_CONTEXT_MENU_DELETE:
+		return !HasPermanentNode();
+
+	case IDM_BOOKMARK_CONTEXT_MENU_PROPERTIES:
+		return !HasPermanentNode();
+	}
+
+	return true;
+}
+
+size_t BookmarkContextMenu::GetTotalBookmarks() const
 {
 	size_t totalBookmarks = 0;
 
@@ -144,6 +154,12 @@ size_t BookmarkContextMenu::GetTotalBookmarks()
 	}
 
 	return totalBookmarks;
+}
+
+bool BookmarkContextMenu::HasPermanentNode() const
+{
+	return std::ranges::any_of(m_bookmarkItems,
+		[this](const auto *bookmarkItem) { return m_bookmarkTree->IsPermanentNode(bookmarkItem); });
 }
 
 void BookmarkContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

@@ -27,7 +27,10 @@ private:
 	void BuildMenu();
 
 	// MenuDelegate
+	bool IsItemEnabled(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
+	bool CanRemoveSelectedItems() const;
 
 	void OnCopy(ClipboardAction action);
 	void OnPaste();

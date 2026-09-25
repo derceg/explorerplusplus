@@ -16,4 +16,7 @@ namespace MenuViewTestHelper
 // each item in the menu match the details of the corresponding pidl.
 void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &expectedItems);
 
+void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled);
+void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked);
+
 }

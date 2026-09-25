@@ -62,6 +62,12 @@ private:
 class MenuDelegateMock : public MenuDelegate
 {
 public:
+	MenuDelegateMock()
+	{
+		ON_CALL(*this, IsItemEnabled).WillByDefault(Return(true));
+	}
+
+	MOCK_METHOD(bool, IsItemEnabled, (UINT id), (const, override));
 	MOCK_METHOD(void, OnItemSelected, (UINT id, bool isCtrlKeyDown, bool isShiftKeyDown),
 		(override));
 	MOCK_METHOD(void, OnItemMiddleClicked, (UINT id, bool isCtrlKeyDown, bool isShiftKeyDown),
@@ -134,13 +140,13 @@ TEST_F(MenuControllerTest, DisabledItemSelection)
 {
 	MenuDelegateMock delegate;
 
-	UINT itemId1 = 1;
-	m_view.AppendItem(&delegate, itemId1, L"Item 1");
-	m_view.EnableItem(itemId1, false);
+	UINT itemId = 1;
+	m_view.AppendItem(&delegate, itemId, L"Item 1");
 
 	// Selecting a disabled item should have no effect.
+	ON_CALL(delegate, IsItemEnabled(itemId)).WillByDefault(Return(false));
 	EXPECT_CALL(delegate, OnItemSelected(_, _, _)).Times(0);
-	m_controller.SelectItem(itemId1, false, false);
+	m_controller.SelectItem(itemId, false, false);
 }
 
 TEST_F(MenuControllerTest, SelectionWithSubmenus)

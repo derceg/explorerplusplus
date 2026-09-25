@@ -31,6 +31,7 @@ private:
 	void OnRestoreItemsChanged();
 
 	// MenuDelegate
+	bool IsItemEnabled(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 	void OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 

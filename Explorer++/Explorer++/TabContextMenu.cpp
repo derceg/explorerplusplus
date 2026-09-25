@@ -47,9 +47,6 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB_HELP_TEXT));
 
-	m_rootMenuView->EnableItem(IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB,
-		m_tab->GetShellBrowser()->GetNavigationController()->CanGoUp());
-
 	m_rootMenuView->AppendSeparator();
 
 	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH,
@@ -73,11 +70,6 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS_HELP_TEXT));
 
-	m_rootMenuView->CheckItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB,
-		m_tab->GetLockState() == Tab::LockState::Locked);
-	m_rootMenuView->CheckItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS,
-		m_tab->GetLockState() == Tab::LockState::AddressLocked);
-
 	m_rootMenuView->AppendSeparator();
 
 	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
@@ -91,9 +83,34 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT,
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT), {},
 		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT_HELP_TEXT));
+}
 
-	m_rootMenuView->EnableItem(IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
-		m_tab->GetLockState() == Tab::LockState::NotLocked);
+bool TabContextMenu::IsItemEnabled(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB:
+		return m_tab->GetShellBrowser()->GetNavigationController()->CanGoUp();
+
+	case IDM_TAB_CONTEXT_MENU_CLOSE_TAB:
+		return m_tab->GetLockState() == Tab::LockState::NotLocked;
+	}
+
+	return true;
+}
+
+bool TabContextMenu::IsItemChecked(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_TAB_CONTEXT_MENU_LOCK_TAB:
+		return m_tab->GetLockState() == Tab::LockState::Locked;
+
+	case IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS:
+		return m_tab->GetLockState() == Tab::LockState::AddressLocked;
+	}
+
+	return false;
 }
 
 void TabContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

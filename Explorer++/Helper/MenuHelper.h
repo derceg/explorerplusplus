@@ -19,12 +19,7 @@ void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_h
 void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition);
 
 void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck);
-void CheckRadioItem(HMENU hMenu, UINT itemID, BOOL bCheck);
 void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable);
-
-void SetMenuStyle(HMENU menu, DWORD style);
-
-void SetBitmapForItem(HMENU menu, UINT id, HBITMAP bitmap);
 
 void RemoveDuplicateSeparators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
@@ -35,6 +30,7 @@ bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu);
 bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition);
 bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition);
 UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition);
+UINT GetMenuItemType(HMENU menu, UINT item, bool byPosition);
 
 // Returns the ID of the menu item at the specified point in screen coordinates, if there is such an
 // item. Only items that are part of the provided menu will be considered. Note that a value will

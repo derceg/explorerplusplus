@@ -10,6 +10,7 @@
 #include "BrowserWindowFake.h"
 #include "IconFetcherFake.h"
 #include "MenuTestHost.h"
+#include "MenuViewTestHelper.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/DragDropHelper.h"
@@ -43,7 +44,8 @@ protected:
 			// The folder has no children, but the menu should still have a single item added
 			// (indicating that the menu is empty).
 			ASSERT_EQ(menuView->GetNumItems(), 1);
-			EXPECT_FALSE(menuView->IsItemEnabled(menuView->GetItemIdForTesting(0)));
+			MenuViewTestHelper::ExpectItemEnabled(menuView, menuView->GetItemIdForTesting(0),
+				false);
 			return;
 		}
 

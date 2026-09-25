@@ -31,4 +31,20 @@ void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &
 	}
 }
 
+void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled)
+{
+	auto *delegate = menuView->MaybeGetDelegateForItemForTesting(id);
+	ASSERT_NE(delegate, nullptr);
+
+	EXPECT_EQ(delegate->IsItemEnabled(id), enabled);
+}
+
+void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked)
+{
+	auto *delegate = menuView->MaybeGetDelegateForItemForTesting(id);
+	ASSERT_NE(delegate, nullptr);
+
+	EXPECT_EQ(delegate->IsItemChecked(id), checked);
+}
+
 }

@@ -34,11 +34,18 @@ void BookmarkTreeViewContextMenu::BuildMenu()
 		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE));
 	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER,
 		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER));
+}
 
-	m_rootMenuView->EnableItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME,
-		!m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()));
-	m_rootMenuView->EnableItem(IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE,
-		!m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()));
+bool BookmarkTreeViewContextMenu::IsItemEnabled(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME:
+	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE:
+		return !m_bookmarkTree->IsPermanentNode(m_targetFolder.Get());
+	}
+
+	return true;
 }
 
 void BookmarkTreeViewContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

@@ -36,9 +36,17 @@ void DisplayWindowContextMenu::BuildMenu()
 	m_rootMenuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT,
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT), {},
 		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT_HELP_TEXT));
+}
 
-	m_rootMenuView->CheckItem(IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT,
-		m_config->displayWindowVertical.get());
+bool DisplayWindowContextMenu::IsItemChecked(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT:
+		return m_config->displayWindowVertical.get();
+	}
+
+	return false;
 }
 
 void DisplayWindowContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

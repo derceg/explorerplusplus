@@ -36,6 +36,20 @@ class MenuDelegate
 public:
 	virtual ~MenuDelegate() = default;
 
+	virtual bool IsItemEnabled(UINT id) const
+	{
+		UNREFERENCED_PARAMETER(id);
+
+		return true;
+	}
+
+	virtual bool IsItemChecked(UINT id) const
+	{
+		UNREFERENCED_PARAMETER(id);
+
+		return false;
+	}
+
 	virtual void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) = 0;
 
 	virtual void OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

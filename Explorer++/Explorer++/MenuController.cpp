@@ -393,12 +393,20 @@ MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
-	if (!view->IsItemEnabled(id))
+	auto *delegate = view->MaybeGetDelegateForItem(id);
+
+	if (!delegate)
 	{
 		return nullptr;
 	}
 
-	return view->MaybeGetDelegateForItem(id);
+	if (!delegate->IsItemEnabled(id))
+	{
+		// Only enabled items can be actioned.
+		return nullptr;
+	}
+
+	return delegate;
 }
 
 void MenuController::NotifyMenuOpenedForTesting()

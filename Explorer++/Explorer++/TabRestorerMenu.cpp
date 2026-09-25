@@ -38,7 +38,6 @@ void TabRestorerMenu::RebuildMenu()
 	{
 		auto id = m_idCounter++;
 		m_rootMenuView->AppendItem(this, id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
-		m_rootMenuView->EnableItem(id, false);
 		return;
 	}
 
@@ -85,6 +84,13 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 void TabRestorerMenu::OnRestoreItemsChanged()
 {
 	RebuildMenu();
+}
+
+bool TabRestorerMenu::IsItemEnabled(UINT id) const
+{
+	// If m_menuItemMappings contains this item, then it represents a tab that can be restored. If
+	// the item isn't present, then the specified item is the empty item.
+	return m_menuItemMappings.contains(id);
 }
 
 void TabRestorerMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

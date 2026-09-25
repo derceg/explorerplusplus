@@ -39,11 +39,27 @@ void MenuView::EnableDragAndDrop(bool enable)
 	CHECK(res);
 }
 
+void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
+	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
+	const std::optional<std::wstring> &acceleratorText)
+{
+	AppendItem(delegate, id, text, std::move(iconModel), helpText, acceleratorText,
+		CheckStyle::Normal);
+}
+
+void MenuView::AppendRadioItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
+	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
+	const std::optional<std::wstring> &acceleratorText)
+{
+	AppendItem(delegate, id, text, std::move(iconModel), helpText, acceleratorText,
+		CheckStyle::Radio);
+}
+
 // Note that MenuDelegate is effectively a menu-level class, but it can be set with item-level
 // granularity. That allows different items on the same menu to be managed by different delegates.
 void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-	const std::optional<std::wstring> &acceleratorText)
+	const std::optional<std::wstring> &acceleratorText, CheckStyle checkStyle)
 {
 	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
 	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
@@ -61,19 +77,22 @@ void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &t
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
 	menuItemInfo.wID = id;
 	menuItemInfo.dwTypeData = finalText.data();
+
+	if (checkStyle == CheckStyle::Radio)
+	{
+		WI_SetFlag(menuItemInfo.fMask, MIIM_FTYPE);
+		menuItemInfo.fType = MFT_RADIOCHECK;
+	}
+
 	auto res = InsertMenuItem(m_menu, GetMenuItemCount(m_menu), true, &menuItemInfo);
 	CHECK(res);
 
 	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, delegate, std::move(iconModel), helpText);
 	CHECK(didInsert);
 
-	// It's only possible to add images to the menu when the DPI is known (so that the appropriate
-	// DPI scaling factor can be applied). If there is no current DPI set (because the menu isn't
-	// being shown), nothing needs to be done. The image will be added to the menu once the menu is
-	// shown.
-	if (m_currentDpi)
+	if (m_isShowing)
 	{
-		SetItemImage(id);
+		UpdateDynamicPropertiesForItem(id);
 	}
 }
 
@@ -87,76 +106,23 @@ MenuView *MenuView::AppendSubMenu(MenuDelegate *delegate, UINT id, const std::ws
 	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, delegate, std::move(iconModel), L"");
 	CHECK(didInsert);
 
-	if (m_currentDpi)
-	{
-		SetItemImage(id);
-	}
-
 	auto ownedView = std::make_unique<MenuView>(subMenu);
 	auto *view = ownedView.get();
 	view->m_parent = this;
 
 	m_idToSubMenuMap.insert({ id, std::move(ownedView) });
 
-	return view;
-}
-
-void MenuView::SetItemImage(UINT id)
-{
-	const auto *item = GetItem(id);
-
-	if (!item->iconModel)
+	if (m_isShowing)
 	{
-		return;
+		UpdateDynamicPropertiesForItem(id);
 	}
 
-	auto bitmap = item->iconModel->GetBitmap(GetCurrentDpi(),
-		[id, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedBitmap)
-		{
-			if (!self)
-			{
-				// The updated image can be returned after the menu has been closed or cleared. In
-				// either case, there's nothing that needs to be done.
-				return;
-			}
-
-			self->UpdateItemBitmap(id, std::move(updatedBitmap));
-		});
-
-	UpdateItemBitmap(id, std::move(bitmap));
-}
-
-void MenuView::UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap)
-{
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_BITMAP;
-	menuItemInfo.hbmpItem = bitmap.get();
-	auto res = SetMenuItemInfo(m_menu, id, false, &menuItemInfo);
-	CHECK(res);
-
-	auto *item = GetItem(id);
-	item->bitmap = std::move(bitmap);
+	return view;
 }
 
 void MenuView::AppendSeparator()
 {
 	MenuHelper::AddSeparator(m_menu);
-}
-
-void MenuView::EnableItem(UINT id, bool enable)
-{
-	MenuHelper::EnableItem(m_menu, id, enable);
-}
-
-void MenuView::CheckItem(UINT id, bool check)
-{
-	MenuHelper::CheckItem(m_menu, id, check);
-}
-
-void MenuView::CheckRadioItem(UINT id, bool check)
-{
-	MenuHelper::CheckRadioItem(m_menu, id, check);
 }
 
 void MenuView::RemoveDuplicateSeparators()
@@ -179,18 +145,7 @@ void MenuView::ClearMenu()
 
 	m_idToSubMenuMap.clear();
 	m_idToItemMap.clear();
-	m_lastRenderedImageDpi.reset();
 	m_weakPtrFactory.InvalidateWeakPtrs();
-}
-
-bool MenuView::IsItemEnabled(UINT id) const
-{
-	return MenuHelper::IsMenuItemEnabled(m_menu, id, false);
-}
-
-bool MenuView::IsItemChecked(UINT id) const
-{
-	return MenuHelper::IsMenuItemChecked(m_menu, id, false);
 }
 
 int MenuView::GetNumItems() const
@@ -202,14 +157,23 @@ int MenuView::GetNumItems() const
 
 void MenuView::OnPopupWillShowForDpi(UINT dpi)
 {
-	m_currentDpi = dpi;
+	if (m_currentDpi && dpi != m_currentDpi)
+	{
+		// The DPI has changed, so any previous image requests can be ignored.
+		m_weakPtrFactory.InvalidateWeakPtrs();
 
-	MaybeAddImagesToMenu();
+		ClearItemImages();
+	}
+
+	m_currentDpi = dpi;
+	m_isShowing = true;
+
+	UpdateDynamicPropertiesForAllItems();
 }
 
 void MenuView::OnPopupClosed()
 {
-	m_currentDpi.reset();
+	m_isShowing = false;
 }
 
 MenuView *MenuView::MaybeGetMenuViewForNativeMenu(HMENU menu)
@@ -253,24 +217,78 @@ const MenuView *MenuView::MaybeGetMenuViewForItem(UINT id) const
 	return nullptr;
 }
 
-void MenuView::MaybeAddImagesToMenu()
+void MenuView::ClearItemImages()
 {
-	if (GetCurrentDpi() == m_lastRenderedImageDpi)
+	for (UINT id : m_idToItemMap | std::views::keys)
 	{
-		// The DPI hasn't changed since the images were last added, so there's nothing that needs to
-		// be done.
+		UpdateItemBitmap(id, nullptr);
+	}
+}
+
+void MenuView::UpdateDynamicPropertiesForAllItems()
+{
+	for (UINT id : m_idToItemMap | std::views::keys)
+	{
+		UpdateDynamicPropertiesForItem(id);
+	}
+}
+
+// Updates item properties that are only set when the menu is shown.
+void MenuView::UpdateDynamicPropertiesForItem(UINT id)
+{
+	UpdateItemState(id);
+	SetItemImage(id);
+}
+
+void MenuView::UpdateItemState(UINT id)
+{
+	auto *delegate = MaybeGetDelegateForItem(id);
+
+	if (!delegate)
+	{
 		return;
 	}
 
-	// If the DPI has changed, any previous image requests can be ignored.
-	m_weakPtrFactory.InvalidateWeakPtrs();
+	MenuHelper::EnableItem(m_menu, id, delegate->IsItemEnabled(id));
+	MenuHelper::CheckItem(m_menu, id, delegate->IsItemChecked(id));
+}
 
-	for (UINT id : m_idToItemMap | std::views::keys)
+void MenuView::SetItemImage(UINT id)
+{
+	const auto *item = GetItem(id);
+
+	if (!item->iconModel || item->bitmap)
 	{
-		SetItemImage(id);
+		return;
 	}
 
-	m_lastRenderedImageDpi = GetCurrentDpi();
+	auto bitmap = item->iconModel->GetBitmap(GetCurrentDpi(),
+		[id, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedBitmap)
+		{
+			if (!self)
+			{
+				// The updated image can be returned after the menu has been closed or cleared. In
+				// either case, there's nothing that needs to be done.
+				return;
+			}
+
+			self->UpdateItemBitmap(id, std::move(updatedBitmap));
+		});
+
+	UpdateItemBitmap(id, std::move(bitmap));
+}
+
+void MenuView::UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap)
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_BITMAP;
+	menuItemInfo.hbmpItem = bitmap.get();
+	auto res = SetMenuItemInfo(m_menu, id, false, &menuItemInfo);
+	CHECK(res);
+
+	auto *item = GetItem(id);
+	item->bitmap = std::move(bitmap);
 }
 
 UINT MenuView::GetCurrentDpi() const
@@ -319,6 +337,11 @@ std::optional<UINT> MenuView::MaybeGetItemId(int index) const
 
 MenuDelegate *MenuView::MaybeGetDelegateForItem(UINT id)
 {
+	return const_cast<MenuDelegate *>(std::as_const(*this).MaybeGetDelegateForItem(id));
+}
+
+const MenuDelegate *MenuView::MaybeGetDelegateForItem(UINT id) const
+{
 	auto itr = m_idToItemMap.find(id);
 	CHECK(itr != m_idToItemMap.end());
 	return itr->second.delegate;
@@ -353,6 +376,13 @@ UINT MenuView::GetItemIdForTesting(int index) const
 }
 
 MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id)
+{
+	CHECK(IsInTest());
+
+	return MaybeGetDelegateForItem(id);
+}
+
+const MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id) const
 {
 	CHECK(IsInTest());
 

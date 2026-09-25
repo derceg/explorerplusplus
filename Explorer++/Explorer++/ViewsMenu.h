@@ -25,9 +25,11 @@ private:
 	void BuildMenu(const ResourceLoader *resourceLoader);
 
 	// MenuDelegate
+	bool IsItemChecked(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
-	ShellBrowser *GetActiveShellBrowser();
+	ViewMode GetViewModeForItem(UINT id) const;
+	ShellBrowser *GetActiveShellBrowser() const;
 
 	BrowserWindow *const m_browser;
 	UINT m_idCounter = 1;

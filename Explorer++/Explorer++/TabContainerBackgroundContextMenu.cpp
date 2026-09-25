@@ -38,11 +38,17 @@ void TabContainerBackgroundContextMenu::BuildMenu()
 	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
 		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
+}
 
-	if (m_tabRestorer->IsEmpty())
+bool TabContainerBackgroundContextMenu::IsItemEnabled(UINT id) const
+{
+	switch (id)
 	{
-		m_rootMenuView->EnableItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, false);
+	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
+		return !m_tabRestorer->IsEmpty();
 	}
+
+	return true;
 }
 
 void TabContainerBackgroundContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown,

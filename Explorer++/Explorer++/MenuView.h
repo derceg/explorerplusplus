@@ -24,18 +24,16 @@ public:
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
+	void AppendRadioItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
+		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
+		const std::optional<std::wstring> &acceleratorText = std::nullopt);
 	MenuView *AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {});
 	void AppendSeparator();
-	void EnableItem(UINT id, bool enable);
-	void CheckItem(UINT id, bool check);
-	void CheckRadioItem(UINT id, bool check);
 	void RemoveDuplicateSeparators();
 	void RemoveTrailingSeparators();
 	void ClearMenu();
 
-	bool IsItemEnabled(UINT id) const;
-	bool IsItemChecked(UINT id) const;
 	int GetNumItems() const;
 
 	std::wstring GetItemHelpText(UINT id) const;
@@ -43,6 +41,7 @@ public:
 	HMENU GetNativeMenuForTesting() const;
 	UINT GetItemIdForTesting(int index) const;
 	MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id);
+	const MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id) const;
 	std::wstring GetItemTextForTesting(UINT id) const;
 	HBITMAP GetItemBitmapForTesting(UINT id) const;
 	const MenuView *GetSubMenuViewForTesting(UINT id) const;
@@ -51,6 +50,12 @@ public:
 
 private:
 	friend class MenuController;
+
+	enum class CheckStyle
+	{
+		Normal,
+		Radio
+	};
 
 	struct Item
 	{
@@ -68,21 +73,29 @@ private:
 		const std::wstring helpText;
 	};
 
+	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
+		std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
+		const std::optional<std::wstring> &acceleratorText, CheckStyle checkStyle);
+
 	void OnPopupWillShowForDpi(UINT dpi);
 	void OnPopupClosed();
 	MenuView *MaybeGetMenuViewForNativeMenu(HMENU menu);
 	MenuView *MaybeGetMenuViewForItem(UINT id);
 	const MenuView *MaybeGetMenuViewForItem(UINT id) const;
 
+	void ClearItemImages();
+	void UpdateDynamicPropertiesForAllItems();
+	void UpdateDynamicPropertiesForItem(UINT id);
+	void UpdateItemState(UINT id);
 	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
-	void MaybeAddImagesToMenu();
 	UINT GetCurrentDpi() const;
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
 
 	std::optional<UINT> MaybeGetItemId(int index) const;
 	MenuDelegate *MaybeGetDelegateForItem(UINT id);
+	const MenuDelegate *MaybeGetDelegateForItem(UINT id) const;
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
 	const HMENU m_menu;
@@ -91,16 +104,10 @@ private:
 
 	std::unordered_map<UINT, Item> m_idToItemMap;
 
-	// This will only be set whilst the menu is being shown.
-	std::optional<UINT> m_currentDpi;
+	bool m_isShowing = false;
 
-	// If images have been added to the menu, this will indicate the DPI that was in effect at the
-	// time. This can be used to detect a change in the DPI, allowing images to be re-added, if
-	// necessary.
-	//
-	// If no images have been added yet (e.g. because the menu hasn't yet been shown), this value
-	// will be empty.
-	std::optional<UINT> m_lastRenderedImageDpi;
+	// This will only be set after the menu is first shown.
+	std::optional<UINT> m_currentDpi;
 
 	WeakPtrFactory<MenuView> m_weakPtrFactory{ this };
 };

@@ -10,6 +10,7 @@
 
 class AppServices;
 class BrowserWindow;
+struct Config;
 class ResourceLoader;
 
 class ToolbarContextMenu : public MenuBase, private MenuDelegate
@@ -31,6 +32,8 @@ private:
 	void BuildMenu(Source source, const ResourceLoader *resourceLoader);
 
 	// MenuDelegate
+	bool IsItemEnabled(UINT id) const override;
+	bool IsItemChecked(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	void OnNewBookmarkItem(BookmarkItem::Type type);
@@ -39,4 +42,5 @@ private:
 
 	BrowserWindow *const m_browser;
 	AppServices *const m_appServices;
+	const Config *const m_config;
 };

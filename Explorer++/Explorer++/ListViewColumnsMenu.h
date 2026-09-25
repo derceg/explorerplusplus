@@ -24,7 +24,11 @@ private:
 	void BuildMenu();
 
 	// MenuDelegate
+	bool IsItemEnabled(UINT id) const override;
+	bool IsItemChecked(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
+	ListViewColumnId GetColumnIdForItem(UINT id) const;
 
 	ListViewColumnModel *const m_columnModel;
 	const ResourceLoader *const m_resourceLoader;

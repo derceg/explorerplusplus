@@ -19,20 +19,18 @@ ViewsMenu::ViewsMenu(MenuView *menuView, const AcceleratorManager *acceleratorMa
 
 void ViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
-	ViewMode currentViewMode = GetActiveShellBrowser()->GetViewMode();
-
 	for (auto viewMode : VIEW_MODES)
 	{
 		auto id = m_idCounter++;
 		m_rootMenuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode));
 
-		if (viewMode == currentViewMode)
-		{
-			m_rootMenuView->CheckItem(id, true);
-		}
-
 		m_idToViewModeMap.insert({ id, viewMode });
 	}
+}
+
+bool ViewsMenu::IsItemChecked(UINT id) const
+{
+	return GetViewModeForItem(id) == GetActiveShellBrowser()->GetViewMode();
 }
 
 void ViewsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
@@ -40,12 +38,17 @@ void ViewsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 	UNREFERENCED_PARAMETER(isCtrlKeyDown);
 	UNREFERENCED_PARAMETER(isShiftKeyDown);
 
-	auto itr = m_idToViewModeMap.find(id);
-	CHECK(itr != m_idToViewModeMap.end());
-	GetActiveShellBrowser()->SetViewMode(itr->second);
+	GetActiveShellBrowser()->SetViewMode(GetViewModeForItem(id));
 }
 
-ShellBrowser *ViewsMenu::GetActiveShellBrowser()
+ViewMode ViewsMenu::GetViewModeForItem(UINT id) const
+{
+	auto itr = m_idToViewModeMap.find(id);
+	CHECK(itr != m_idToViewModeMap.end());
+	return itr->second;
+}
+
+ShellBrowser *ViewsMenu::GetActiveShellBrowser() const
 {
 	return m_browser->GetActiveShellBrowser();
 }

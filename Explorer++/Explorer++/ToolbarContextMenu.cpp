@@ -22,7 +22,8 @@ ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, Browse
 	AppServices *appServices) :
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
 	m_browser(browser),
-	m_appServices(appServices)
+	m_appServices(appServices),
+	m_config(appServices->GetConfig())
 {
 	BuildMenu(source, appServices->GetResourceLoader());
 }
@@ -50,17 +51,6 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 
 	m_rootMenuView->AppendSeparator();
 
-	const auto *config = m_appServices->GetConfig();
-	m_rootMenuView->CheckItem(IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR, config->showAddressBar.get());
-	m_rootMenuView->CheckItem(IDM_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR, config->showMainToolbar.get());
-	m_rootMenuView->CheckItem(IDM_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR,
-		config->showBookmarksToolbar.get());
-	m_rootMenuView->CheckItem(IDM_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR,
-		config->showDrivesToolbar.get());
-	m_rootMenuView->CheckItem(IDM_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR,
-		config->showApplicationToolbar.get());
-	m_rootMenuView->CheckItem(IDM_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS, config->lockToolbars.get());
-
 	if (source == Source::MainToolbar)
 	{
 		m_rootMenuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_CUSTOMIZE,
@@ -78,12 +68,6 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 		m_rootMenuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK), {},
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK_HELP_TEXT));
-
-		if (!m_appServices->GetPlatformContext()->GetClipboardStore()->IsDataAvailable(
-				BookmarkClipboard::GetClipboardFormat()))
-		{
-			m_rootMenuView->EnableItem(IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK, false);
-		}
 	}
 	else if (source == Source::ApplicationToolbar)
 	{
@@ -93,6 +77,44 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 	}
 
 	m_rootMenuView->RemoveTrailingSeparators();
+}
+
+bool ToolbarContextMenu::IsItemEnabled(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK:
+		return m_appServices->GetPlatformContext()->GetClipboardStore()->IsDataAvailable(
+			BookmarkClipboard::GetClipboardFormat());
+	}
+
+	return true;
+}
+
+bool ToolbarContextMenu::IsItemChecked(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR:
+		return m_config->showAddressBar.get();
+
+	case IDM_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR:
+		return m_config->showMainToolbar.get();
+
+	case IDM_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR:
+		return m_config->showBookmarksToolbar.get();
+
+	case IDM_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR:
+		return m_config->showDrivesToolbar.get();
+
+	case IDM_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR:
+		return m_config->showApplicationToolbar.get();
+
+	case IDM_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS:
+		return m_config->lockToolbars.get();
+	}
+
+	return false;
 }
 
 void ToolbarContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

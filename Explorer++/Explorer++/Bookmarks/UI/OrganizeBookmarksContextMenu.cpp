@@ -51,21 +51,37 @@ void OrganizeBookmarksContextMenu::BuildMenu()
 
 	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
 		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
+}
 
+bool OrganizeBookmarksContextMenu::IsItemEnabled(UINT id) const
+{
+	switch (id)
+	{
+	case IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT:
+		return CanRemoveSelectedItems();
+
+	case IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY:
+		return !m_delegate->GetSelectedItems().empty();
+
+	case IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE:
+		return m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat());
+
+	case IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE:
+		return CanRemoveSelectedItems();
+
+	case IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL:
+		return !m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems();
+	}
+
+	return true;
+}
+
+bool OrganizeBookmarksContextMenu::CanRemoveSelectedItems() const
+{
 	auto selectedBookmarkItems = m_delegate->GetSelectedItems();
-	bool canDelete = !selectedBookmarkItems.empty()
+	return !selectedBookmarkItems.empty()
 		&& std::ranges::none_of(selectedBookmarkItems, [this](const auto *bookmarkItem)
 			{ return m_bookmarkTree->IsPermanentNode(bookmarkItem); });
-	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT, canDelete);
-	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY, !selectedBookmarkItems.empty());
-
-	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
-		m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat()));
-
-	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE, canDelete);
-
-	m_rootMenuView->EnableItem(IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
-		!m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems());
 }
 
 void OrganizeBookmarksContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)

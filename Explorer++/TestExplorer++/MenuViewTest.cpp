@@ -11,8 +11,63 @@
 #include "../Helper/MenuHelper.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
+#include <unordered_set>
 
 using namespace testing;
+
+namespace
+{
+
+class MenuDelegateFake : public MenuDelegate
+{
+public:
+	bool IsItemEnabled(UINT id) const override
+	{
+		return !m_disabledItems.contains(id);
+	}
+
+	bool IsItemChecked(UINT id) const override
+	{
+		return m_checkedItems.contains(id);
+	}
+
+	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override
+	{
+		UNREFERENCED_PARAMETER(id);
+		UNREFERENCED_PARAMETER(isCtrlKeyDown);
+		UNREFERENCED_PARAMETER(isShiftKeyDown);
+	}
+
+	void SetItemEnabled(UINT id, bool enabled)
+	{
+		if (enabled)
+		{
+			m_disabledItems.erase(id);
+		}
+		else
+		{
+			m_disabledItems.insert(id);
+		}
+	}
+
+	void SetItemChecked(UINT id, bool checked)
+	{
+		if (checked)
+		{
+			m_checkedItems.insert(id);
+		}
+		else
+		{
+			m_checkedItems.erase(id);
+		}
+	}
+
+private:
+	std::unordered_set<UINT> m_disabledItems;
+	std::unordered_set<UINT> m_checkedItems;
+};
+
+}
 
 class MenuViewTest : public Test
 {
@@ -52,14 +107,21 @@ TEST_F(MenuViewTest, IsRoot)
 TEST_F(MenuViewTest, AppendItem)
 {
 	UINT idCounter = 100;
-
-	auto pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
 	CheckAppendItem(idCounter++, L"Item 1", L"Help text for item 1", L"Ctrl+A");
-
-	auto pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
 	CheckAppendItem(idCounter++, L"Item 2", L"Help text for item 2", L"Ctrl+Shift+T");
-
 	CheckAppendItem(idCounter++, L"Item 3", L"Help text for item 3");
+}
+
+TEST_F(MenuViewTest, AppendRadioItem)
+{
+	UINT idCounter = 100;
+
+	UINT itemId = idCounter++;
+	m_menuView.AppendRadioItem(nullptr, itemId, L"Radio item");
+
+	EXPECT_TRUE(WI_IsFlagSet(
+		MenuHelper::GetMenuItemType(m_menuView.GetNativeMenuForTesting(), itemId, false),
+		MFT_RADIOCHECK));
 }
 
 TEST_F(MenuViewTest, AppendSubMenu)
@@ -69,6 +131,64 @@ TEST_F(MenuViewTest, AppendSubMenu)
 	ASSERT_EQ(m_menuView.GetNumItems(), 1);
 	EXPECT_EQ(m_menuView.GetItemIdForTesting(0), subMenuItemId);
 	EXPECT_EQ(m_menuView.GetItemTextForTesting(subMenuItemId), L"SubMenu");
+}
+
+TEST_F(MenuViewTest, ItemStates)
+{
+	MenuDelegateFake delegate;
+	UINT idCounter = 100;
+
+	UINT itemId1 = idCounter++;
+	m_menuView.AppendItem(nullptr, itemId1, L"Item 1");
+
+	UINT itemId2 = idCounter++;
+	m_menuView.AppendItem(&delegate, itemId2, L"Item 2");
+
+	UINT itemId3 = idCounter++;
+	m_menuView.AppendItem(&delegate, itemId3, L"Item 3");
+
+	delegate.SetItemEnabled(itemId2, false);
+	delegate.SetItemChecked(itemId3, true);
+
+	m_menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+
+	HMENU nativeMenu = m_menuView.GetNativeMenuForTesting();
+
+	// Item 1 has no delegate, so it should be enabled and unchecked by default.
+	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId1, false));
+	EXPECT_FALSE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId1, false));
+
+	EXPECT_FALSE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId2, false));
+	EXPECT_FALSE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId2, false));
+	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId3, false));
+	EXPECT_TRUE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId3, false));
+}
+
+TEST_F(MenuViewTest, ItemStatesAfterShow)
+{
+	MenuDelegateFake delegate;
+	UINT idCounter = 100;
+
+	UINT itemId1 = idCounter++;
+	m_menuView.AppendItem(nullptr, itemId1, L"Item 1");
+
+	m_menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+
+	UINT itemId2 = idCounter++;
+	UINT itemId3 = idCounter++;
+	delegate.SetItemEnabled(itemId2, false);
+	delegate.SetItemChecked(itemId3, true);
+
+	m_menuView.AppendItem(&delegate, itemId2, L"Item 2");
+	m_menuView.AppendItem(&delegate, itemId3, L"Item 3");
+
+	// Items that are dynamically added, whilst the menu is being shown, should have their states
+	// set correctly.
+	HMENU nativeMenu = m_menuView.GetNativeMenuForTesting();
+	EXPECT_FALSE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId2, false));
+	EXPECT_FALSE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId2, false));
+	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId3, false));
+	EXPECT_TRUE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId3, false));
 }
 
 TEST_F(MenuViewTest, ClearEmptyMenu)

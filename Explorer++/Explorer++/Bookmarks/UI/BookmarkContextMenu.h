@@ -27,10 +27,12 @@ public:
 
 private:
 	void BuildMenu();
-	bool AreBookmarkItemsValid();
-	size_t GetTotalBookmarks();
+	bool AreBookmarkItemsValid() const;
+	size_t GetTotalBookmarks() const;
+	bool HasPermanentNode() const;
 
 	// MenuDelegate
+	bool IsItemEnabled(UINT id) const override;
 	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	void OnOpen();

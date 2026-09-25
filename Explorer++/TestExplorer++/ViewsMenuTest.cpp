@@ -7,6 +7,7 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "MenuTestHost.h"
+#include "MenuViewTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ViewModeHelper.h"
 #include <gtest/gtest.h>
@@ -31,7 +32,7 @@ protected:
 
 		for (int i = 0; i < menuView->GetNumItems(); i++)
 		{
-			EXPECT_EQ(menuView->IsItemChecked(menuView->GetItemIdForTesting(i)),
+			MenuViewTestHelper::ExpectItemChecked(menuView, menuView->GetItemIdForTesting(i),
 				VIEW_MODES[i] == viewMode);
 		}
 	}

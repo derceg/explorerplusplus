@@ -27,13 +27,21 @@ void ListViewColumnsMenu::BuildMenu()
 
 		UINT id = m_idCounter++;
 		m_rootMenuView->AppendItem(this, id, m_resourceLoader->LoadString(column.nameStringId));
-		m_rootMenuView->CheckItem(id, column.visible);
-
-		// The primary column can't be removed.
-		m_rootMenuView->EnableItem(id, !m_columnModel->IsPrimaryColumnId(columnId));
 
 		m_idToColumnMap.insert({ id, columnId });
 	}
+}
+
+bool ListViewColumnsMenu::IsItemEnabled(UINT id) const
+{
+	// The primary column can't be removed.
+	return !m_columnModel->IsPrimaryColumnId(GetColumnIdForItem(id));
+}
+
+bool ListViewColumnsMenu::IsItemChecked(UINT id) const
+{
+	const auto &column = m_columnModel->GetColumnById(GetColumnIdForItem(id));
+	return column.visible;
 }
 
 void ListViewColumnsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
@@ -41,7 +49,13 @@ void ListViewColumnsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShi
 	UNREFERENCED_PARAMETER(isCtrlKeyDown);
 	UNREFERENCED_PARAMETER(isShiftKeyDown);
 
+	auto columnId = GetColumnIdForItem(id);
+	m_columnModel->SetColumnVisible(columnId, !m_columnModel->IsColumnVisible(columnId));
+}
+
+ListViewColumnId ListViewColumnsMenu::GetColumnIdForItem(UINT id) const
+{
 	auto itr = m_idToColumnMap.find(id);
 	CHECK(itr != m_idToColumnMap.end());
-	m_columnModel->SetColumnVisible(itr->second, !m_columnModel->IsColumnVisible(itr->second));
+	return itr->second;
 }
