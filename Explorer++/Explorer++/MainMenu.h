@@ -19,6 +19,7 @@ class IconModel;
 class PidlAbsolute;
 class ResourceLoader;
 class ShellIconLoader;
+class TabRestorer;
 
 class MainMenu : public MenuBase
 {
@@ -27,14 +28,13 @@ public:
 		ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher);
 
 private:
-	void BuildMenu(BrowserWindow *browser, const FeatureList *featureList, AppServices *appServices,
+	void BuildMenu(BrowserWindow *browser, AppServices *appServices,
 		ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher);
-	void BuildFileMenu(const FeatureList *featureList, AppServices *appServices,
+	void BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featureList,
 		ShellIconLoader *shellIconLoader);
 	void BuildEditMenu();
 	void BuildSelectionMenu();
-	void BuildViewMenu(BrowserWindow *browser, const FeatureList *featureList);
-	void BuildToolbarsSubMenu(MenuView *toolbarsMenuView);
+	void BuildViewMenu(BrowserWindow *browser, AppServices *appServices);
 	void BuildFilterSubMenu(MenuView *filterMenuView);
 	void BuildActionsMenu();
 	void BuildGoMenu(BrowserWindow *browser, AppServices *appServices,

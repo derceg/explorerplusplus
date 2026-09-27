@@ -13,7 +13,7 @@ class BrowserWindow;
 struct Config;
 class ResourceLoader;
 
-class ToolbarContextMenu : public MenuBase, private MenuDelegate
+class ToolbarOptionsMenu : public MenuBase, private MenuDelegate
 {
 public:
 	enum class Source
@@ -22,10 +22,11 @@ public:
 		MainToolbar,
 		BookmarksToolbar,
 		DrivesToolbar,
-		ApplicationToolbar
+		ApplicationToolbar,
+		MainMenu
 	};
 
-	ToolbarContextMenu(MenuView *menuView, Source source, BrowserWindow *browser,
+	ToolbarOptionsMenu(MenuView *menuView, Source source, BrowserWindow *browser,
 		AppServices *appServices);
 
 private:
@@ -42,5 +43,5 @@ private:
 
 	BrowserWindow *const m_browser;
 	AppServices *const m_appServices;
-	const Config *const m_config;
+	Config *const m_config;
 };

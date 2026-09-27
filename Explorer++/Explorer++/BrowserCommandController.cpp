@@ -242,34 +242,6 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		m_config->showDisplayWindow = !m_config->showDisplayWindow.get();
 		break;
 
-	case IDM_VIEW_TOOLBARS_ADDRESS_BAR:
-		m_config->showAddressBar = !m_config->showAddressBar.get();
-		break;
-
-	case IDM_VIEW_TOOLBARS_MAIN_TOOLBAR:
-		m_config->showMainToolbar = !m_config->showMainToolbar.get();
-		break;
-
-	case IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR:
-		m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar.get();
-		break;
-
-	case IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR:
-		m_config->showDrivesToolbar = !m_config->showDrivesToolbar.get();
-		break;
-
-	case IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR:
-		m_config->showApplicationToolbar = !m_config->showApplicationToolbar.get();
-		break;
-
-	case IDM_VIEW_TOOLBARS_LOCK_TOOLBARS:
-		m_config->lockToolbars = !m_config->lockToolbars.get();
-		break;
-
-	case IDM_VIEW_TOOLBARS_CUSTOMIZE:
-		m_browser->StartMainToolbarCustomization();
-		break;
-
 	case IDM_VIEW_DECREASE_TEXT_SIZE:
 		OnChangeMainFontSize(FontSizeType::Decrease);
 		break;

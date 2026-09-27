@@ -23,7 +23,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
-#include "ToolbarContextMenu.h"
+#include "ToolbarOptionsMenu.h"
 #include "../Helper/WindowHelper.h"
 
 void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &storageData)
@@ -204,27 +204,27 @@ bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 		return false;
 	}
 
-	ToolbarContextMenu::Source source = ToolbarContextMenu::Source::MainToolbar;
+	ToolbarOptionsMenu::Source source = ToolbarOptionsMenu::Source::MainToolbar;
 
 	if (mouseInfo->hdr.hwndFrom == m_addressBar->GetView()->GetHWND())
 	{
-		source = ToolbarContextMenu::Source::AddressBar;
+		source = ToolbarOptionsMenu::Source::AddressBar;
 	}
 	else if (mouseInfo->hdr.hwndFrom == m_mainToolbar->GetHWND())
 	{
-		source = ToolbarContextMenu::Source::MainToolbar;
+		source = ToolbarOptionsMenu::Source::MainToolbar;
 	}
 	else if (mouseInfo->hdr.hwndFrom == m_bookmarksToolbar->GetView()->GetHWND())
 	{
-		source = ToolbarContextMenu::Source::BookmarksToolbar;
+		source = ToolbarOptionsMenu::Source::BookmarksToolbar;
 	}
 	else if (mouseInfo->hdr.hwndFrom == m_drivesToolbar->GetView()->GetHWND())
 	{
-		source = ToolbarContextMenu::Source::DrivesToolbar;
+		source = ToolbarOptionsMenu::Source::DrivesToolbar;
 	}
 	else if (mouseInfo->hdr.hwndFrom == m_applicationToolbar->GetView()->GetHWND())
 	{
-		source = ToolbarContextMenu::Source::ApplicationToolbar;
+		source = ToolbarOptionsMenu::Source::ApplicationToolbar;
 	}
 	else
 	{
@@ -235,7 +235,7 @@ bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
 	ClientToScreen(mouseInfo->hdr.hwndFrom, &ptScreen);
 
 	PopupMenuRunner popupRunner(m_hwnd, this);
-	ToolbarContextMenu toolbarContextMenu(popupRunner.GetView(), source, this, m_appServices);
+	ToolbarOptionsMenu menu(popupRunner.GetView(), source, this, m_appServices);
 	popupRunner.Show(ptScreen);
 
 	return true;

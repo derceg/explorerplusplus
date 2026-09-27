@@ -59,13 +59,6 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{ L"toggle_status_bar", IDM_VIEW_STATUSBAR },
 	{ L"toggle_folders", IDM_VIEW_FOLDERS },
 	{ L"toggle_display_window", IDM_VIEW_DISPLAYWINDOW },
-	{ L"toggle_address_bar", IDM_VIEW_TOOLBARS_ADDRESS_BAR },
-	{ L"toggle_main_toolbar", IDM_VIEW_TOOLBARS_MAIN_TOOLBAR },
-	{ L"toggle_bookmarks_toolbar", IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR },
-	{ L"toggle_drives_toolbar", IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR },
-	{ L"toggle_application_toolbar", IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR },
-	{ L"lock_toolbars", IDM_VIEW_TOOLBARS_LOCK_TOOLBARS },
-	{ L"customize_toolbars", IDM_VIEW_TOOLBARS_CUSTOMIZE },
 
 	{ L"view_mode_thumbnails", IDM_VIEW_THUMBNAILS },
 	{ L"view_mode_tiles", IDM_VIEW_TILES },

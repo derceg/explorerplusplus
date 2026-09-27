@@ -3,13 +3,12 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ToolbarContextMenu.h"
+#include "ToolbarOptionsMenu.h"
 #include "AppServices.h"
 #include "ApplicationEditorDialog.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "BrowserCommandController.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainResource.h"
@@ -18,7 +17,7 @@
 #include "ResourceLoader.h"
 #include "../Helper/ClipboardStore.h"
 
-ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, BrowserWindow *browser,
+ToolbarOptionsMenu::ToolbarOptionsMenu(MenuView *menuView, Source source, BrowserWindow *browser,
 	AppServices *appServices) :
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
 	m_browser(browser),
@@ -28,7 +27,7 @@ ToolbarContextMenu::ToolbarContextMenu(MenuView *menuView, Source source, Browse
 	BuildMenu(source, appServices->GetResourceLoader());
 }
 
-void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resourceLoader)
+void ToolbarOptionsMenu::BuildMenu(Source source, const ResourceLoader *resourceLoader)
 {
 	m_rootMenuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR), {},
@@ -45,13 +44,16 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 	m_rootMenuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR_HELP_TEXT));
+
+	m_rootMenuView->AppendSeparator();
+
 	m_rootMenuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS,
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS), {},
 		resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS_HELP_TEXT));
 
 	m_rootMenuView->AppendSeparator();
 
-	if (source == Source::MainToolbar)
+	if (source == Source::MainToolbar || source == Source::MainMenu)
 	{
 		m_rootMenuView->AppendItem(this, IDM_TOOLBAR_CONTEXT_MENU_CUSTOMIZE,
 			resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_CUSTOMIZE), {},
@@ -79,7 +81,7 @@ void ToolbarContextMenu::BuildMenu(Source source, const ResourceLoader *resource
 	m_rootMenuView->RemoveTrailingSeparators();
 }
 
-bool ToolbarContextMenu::IsItemEnabled(UINT id) const
+bool ToolbarOptionsMenu::IsItemEnabled(UINT id) const
 {
 	switch (id)
 	{
@@ -91,7 +93,7 @@ bool ToolbarContextMenu::IsItemEnabled(UINT id) const
 	return true;
 }
 
-bool ToolbarContextMenu::IsItemChecked(UINT id) const
+bool ToolbarOptionsMenu::IsItemChecked(UINT id) const
 {
 	switch (id)
 	{
@@ -117,41 +119,39 @@ bool ToolbarContextMenu::IsItemChecked(UINT id) const
 	return false;
 }
 
-void ToolbarContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+void ToolbarOptionsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	UNREFERENCED_PARAMETER(isCtrlKeyDown);
 	UNREFERENCED_PARAMETER(isShiftKeyDown);
 
-	auto *commandController = m_browser->GetCommandController();
-
 	switch (id)
 	{
 	case IDM_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_ADDRESS_BAR);
+		m_config->showAddressBar = !m_config->showAddressBar.get();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_MAIN_TOOLBAR);
+		m_config->showMainToolbar = !m_config->showMainToolbar.get();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR);
+		m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar.get();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR);
+		m_config->showDrivesToolbar = !m_config->showDrivesToolbar.get();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR);
+		m_config->showApplicationToolbar = !m_config->showApplicationToolbar.get();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_LOCK_TOOLBARS);
+		m_config->lockToolbars = !m_config->lockToolbars.get();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_CUSTOMIZE:
-		commandController->ExecuteCommand(IDM_VIEW_TOOLBARS_CUSTOMIZE);
+		m_browser->StartMainToolbarCustomization();
 		break;
 
 	case IDM_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK:
@@ -176,7 +176,7 @@ void ToolbarContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShif
 	}
 }
 
-void ToolbarContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
+void ToolbarOptionsMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	auto *bookmarkTree = m_appServices->GetBookmarkTree();
 	BookmarkHelper::AddBookmarkItem(bookmarkTree, type, bookmarkTree->GetBookmarksToolbarFolder(),
@@ -184,7 +184,7 @@ void ToolbarContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 		m_appServices->GetResourceLoader(), m_appServices->GetPlatformContext());
 }
 
-void ToolbarContextMenu::OnPasteBookmark()
+void ToolbarOptionsMenu::OnPasteBookmark()
 {
 	auto *bookmarkTree = m_appServices->GetBookmarkTree();
 	auto *bookmarksToolbarFolder = bookmarkTree->GetBookmarksToolbarFolder();
@@ -192,7 +192,7 @@ void ToolbarContextMenu::OnPasteBookmark()
 		bookmarkTree, bookmarksToolbarFolder, bookmarksToolbarFolder->GetChildren().size());
 }
 
-void ToolbarContextMenu::OnNewApplication()
+void ToolbarOptionsMenu::OnNewApplication()
 {
 	using namespace Applications;
 

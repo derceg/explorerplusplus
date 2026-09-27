@@ -17,6 +17,7 @@
 #include "ShellIconModel.h"
 #include "StockIconModel.h"
 #include "TabRestorerMenu.h"
+#include "ToolbarOptionsMenu.h"
 #include "ViewsMenu.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
@@ -31,25 +32,25 @@ MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appS
 	// a submenu. For items that don't support drag and drop, setting this will have no effect.
 	m_rootMenuView->EnableDragAndDrop(true);
 
-	BuildMenu(browser, appServices->GetFeatureList(), appServices, shellIconLoader, iconFetcher);
+	BuildMenu(browser, appServices, shellIconLoader, iconFetcher);
 }
 
-void MainMenu::BuildMenu(BrowserWindow *browser, const FeatureList *featureList,
-	AppServices *appServices, ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher)
+void MainMenu::BuildMenu(BrowserWindow *browser, AppServices *appServices,
+	ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher)
 {
-	BuildFileMenu(featureList, appServices, shellIconLoader);
+	BuildFileMenu(appServices->GetTabRestorer(), appServices->GetFeatureList(), shellIconLoader);
 	BuildEditMenu();
 	BuildSelectionMenu();
-	BuildViewMenu(browser, featureList);
+	BuildViewMenu(browser, appServices);
 	BuildActionsMenu();
 	BuildGoMenu(browser, appServices, shellIconLoader);
 	BuildBookmarksMenu(browser, appServices, iconFetcher);
-	BuildToolsMenu(featureList);
+	BuildToolsMenu(appServices->GetFeatureList());
 	BuildWindowMenu();
 	BuildHelpMenu();
 }
 
-void MainMenu::BuildFileMenu(const FeatureList *featureList, AppServices *appServices,
+void MainMenu::BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featureList,
 	ShellIconLoader *shellIconLoader)
 {
 	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_FILE_POPUP, IDS_FILE_POPUP);
@@ -64,9 +65,9 @@ void MainMenu::BuildFileMenu(const FeatureList *featureList, AppServices *appSer
 
 	auto *recentTabsSubMenuView =
 		AppendSubMenu(menuView, IDM_FILE_REOPEN_RECENT_TAB_POPUP, IDS_FILE_REOPEN_RECENT_TAB_POPUP);
-	m_childMenus.push_back(std::make_unique<TabRestorerMenu>(recentTabsSubMenuView,
-		m_acceleratorManager, appServices->GetTabRestorer(), shellIconLoader, m_resourceLoader,
-		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID));
+	m_childMenus.push_back(
+		std::make_unique<TabRestorerMenu>(recentTabsSubMenuView, m_acceleratorManager, tabRestorer,
+			shellIconLoader, m_resourceLoader, MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID));
 
 	if (!featureList->IsEnabled(Feature::MultipleWindowsPerSession))
 	{
@@ -137,11 +138,11 @@ void MainMenu::BuildSelectionMenu()
 	AppendItem(menuView, IDM_EDIT_WILDCARDDESELECT, IDS_EDIT_WILDCARDDESELECT);
 }
 
-void MainMenu::BuildViewMenu(BrowserWindow *browser, const FeatureList *featureList)
+void MainMenu::BuildViewMenu(BrowserWindow *browser, AppServices *appServices)
 {
 	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_VIEW_POPUP, IDS_VIEW_POPUP);
 
-	if (featureList->IsEnabled(Feature::DualPane))
+	if (appServices->GetFeatureList()->IsEnabled(Feature::DualPane))
 	{
 		AppendItem(menuView, IDM_VIEW_DUAL_PANE, IDS_VIEW_DUAL_PANE);
 	}
@@ -152,7 +153,8 @@ void MainMenu::BuildViewMenu(BrowserWindow *browser, const FeatureList *featureL
 
 	auto *toolbarsMenuView =
 		AppendSubMenu(menuView, IDM_VIEW_TOOLBARS_POPUP, IDS_VIEW_TOOLBARS_POPUP);
-	BuildToolbarsSubMenu(toolbarsMenuView);
+	m_childMenus.push_back(std::make_unique<ToolbarOptionsMenu>(toolbarsMenuView,
+		ToolbarOptionsMenu::Source::MainMenu, browser, appServices));
 
 	menuView->AppendSeparator();
 
@@ -183,23 +185,6 @@ void MainMenu::BuildViewMenu(BrowserWindow *browser, const FeatureList *featureL
 
 	auto *filterMenuView = AppendSubMenu(menuView, IDM_VIEW_FILTER_POPUP, IDS_VIEW_FILTER_POPUP);
 	BuildFilterSubMenu(filterMenuView);
-}
-
-void MainMenu::BuildToolbarsSubMenu(MenuView *toolbarsMenuView)
-{
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_ADDRESS_BAR, IDS_VIEW_TOOLBARS_ADDRESS_BAR);
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_MAIN_TOOLBAR, IDS_VIEW_TOOLBARS_MAIN_TOOLBAR);
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR,
-		IDS_VIEW_TOOLBARS_BOOKMARKS_TOOLBAR);
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_DRIVES_TOOLBAR,
-		IDS_VIEW_TOOLBARS_DRIVES_TOOLBAR);
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_APPLICATION_TOOLBAR,
-		IDS_VIEW_TOOLBARS_APPLICATION_TOOLBAR);
-
-	toolbarsMenuView->AppendSeparator();
-
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_LOCK_TOOLBARS, IDS_VIEW_TOOLBARS_LOCK_TOOLBARS);
-	AppendItem(toolbarsMenuView, IDM_VIEW_TOOLBARS_CUSTOMIZE, IDS_VIEW_TOOLBARS_CUSTOMIZE);
 }
 
 void MainMenu::BuildFilterSubMenu(MenuView *filterMenuView)

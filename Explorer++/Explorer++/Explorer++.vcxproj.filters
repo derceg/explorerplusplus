@@ -781,7 +781,7 @@
     <ClCompile Include="TabParentItemsMenu.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
-    <ClCompile Include="ToolbarContextMenu.cpp">
+    <ClCompile Include="ToolbarOptionsMenu.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
     <ClCompile Include="ShellIconModel.cpp">
@@ -1809,7 +1809,7 @@
     <ClInclude Include="TabParentItemsMenu.h">
       <Filter>Menus\UI</Filter>
     </ClInclude>
-    <ClInclude Include="ToolbarContextMenu.h">
+    <ClInclude Include="ToolbarOptionsMenu.h">
       <Filter>Menus\UI</Filter>
     </ClInclude>
     <ClInclude Include="ResourceIconModel.h">
