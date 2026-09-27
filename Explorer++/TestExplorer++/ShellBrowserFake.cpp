@@ -106,6 +106,36 @@ void ShellBrowserFake::SetSortDirection(SortDirection direction)
 	m_folderSettings.sortDirection = direction;
 }
 
+bool ShellBrowserFake::GetShowInGroups() const
+{
+	return m_folderSettings.showInGroups;
+}
+
+void ShellBrowserFake::SetShowInGroups(bool showInGroups)
+{
+	m_folderSettings.showInGroups = showInGroups;
+}
+
+SortMode ShellBrowserFake::GetGroupMode() const
+{
+	return m_folderSettings.groupMode;
+}
+
+void ShellBrowserFake::SetGroupMode(SortMode groupMode)
+{
+	m_folderSettings.groupMode = groupMode;
+}
+
+SortDirection ShellBrowserFake::GetGroupSortDirection() const
+{
+	return m_folderSettings.groupSortDirection;
+}
+
+void ShellBrowserFake::SetGroupSortDirection(SortDirection direction)
+{
+	m_folderSettings.groupSortDirection = direction;
+}
+
 void ShellBrowserFake::SetAllColumnSets(const FolderColumns &folderColumns)
 {
 	m_folderColumns = folderColumns;

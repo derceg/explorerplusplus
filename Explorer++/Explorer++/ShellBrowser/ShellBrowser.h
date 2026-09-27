@@ -46,6 +46,13 @@ public:
 	virtual SortDirection GetSortDirection() const = 0;
 	virtual void SetSortDirection(SortDirection direction) = 0;
 
+	virtual bool GetShowInGroups() const = 0;
+	virtual void SetShowInGroups(bool showInGroups) = 0;
+	virtual SortMode GetGroupMode() const = 0;
+	virtual void SetGroupMode(SortMode groupMode) = 0;
+	virtual SortDirection GetGroupSortDirection() const = 0;
+	virtual void SetGroupSortDirection(SortDirection direction) = 0;
+
 	virtual void SetAllColumnSets(const FolderColumns &folderColumns) = 0;
 	virtual const FolderColumns &GetAllColumnSets() const = 0;
 

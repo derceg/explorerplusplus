@@ -532,9 +532,9 @@ SortMode ShellBrowserImpl::GetGroupMode() const
 	return m_folderSettings.groupMode;
 }
 
-void ShellBrowserImpl::SetGroupMode(SortMode sortMode)
+void ShellBrowserImpl::SetGroupMode(SortMode groupMode)
 {
-	m_folderSettings.groupMode = sortMode;
+	m_folderSettings.groupMode = groupMode;
 
 	if (m_folderSettings.showInGroups)
 	{

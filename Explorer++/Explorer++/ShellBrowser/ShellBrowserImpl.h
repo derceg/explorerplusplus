@@ -88,6 +88,12 @@ public:
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;
 	void SetSortDirection(SortDirection direction) override;
+	bool GetShowInGroups() const override;
+	void SetShowInGroups(bool showInGroups) override;
+	SortMode GetGroupMode() const override;
+	void SetGroupMode(SortMode groupMode) override;
+	SortDirection GetGroupSortDirection() const override;
+	void SetGroupSortDirection(SortDirection direction) override;
 	void SetAllColumnSets(const FolderColumns &folderColumns) override;
 	const FolderColumns &GetAllColumnSets() const override;
 	bool IsAutoArrangeEnabled() const override;
@@ -125,10 +131,6 @@ public:
 	/* Get/Set current state. */
 	int GetUniqueFolderId() const;
 	void CycleViewMode(bool cycleForward);
-	SortMode GetGroupMode() const;
-	void SetGroupMode(SortMode sortMode);
-	SortDirection GetGroupSortDirection() const;
-	void SetGroupSortDirection(SortDirection direction);
 	bool GetShowHidden() const;
 	void SetShowHidden(bool showHidden);
 	int GetNumItems() const;
@@ -160,9 +162,6 @@ public:
 	void PasteSymLinks();
 	void OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems);
 	void StartRenamingItems(const std::vector<PidlAbsolute> &items);
-
-	bool GetShowInGroups() const;
-	void SetShowInGroups(bool showInGroups);
 
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
 

@@ -636,30 +636,30 @@ void Explorerplusplus::OnCloneWindow()
 void Explorerplusplus::OnGroupBy(SortMode groupMode)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	SortMode currentGroupMode = selectedTab.GetShellBrowserImpl()->GetGroupMode();
+	SortMode currentGroupMode = selectedTab.GetShellBrowser()->GetGroupMode();
 
-	if (selectedTab.GetShellBrowserImpl()->GetShowInGroups() && groupMode == currentGroupMode)
+	if (selectedTab.GetShellBrowser()->GetShowInGroups() && groupMode == currentGroupMode)
 	{
-		selectedTab.GetShellBrowserImpl()->SetGroupSortDirection(
-			InvertSortDirection(selectedTab.GetShellBrowserImpl()->GetGroupSortDirection()));
+		selectedTab.GetShellBrowser()->SetGroupSortDirection(
+			InvertSortDirection(selectedTab.GetShellBrowser()->GetGroupSortDirection()));
 	}
 	else
 	{
-		selectedTab.GetShellBrowserImpl()->SetGroupMode(groupMode);
-		selectedTab.GetShellBrowserImpl()->SetShowInGroups(true);
+		selectedTab.GetShellBrowser()->SetGroupMode(groupMode);
+		selectedTab.GetShellBrowser()->SetShowInGroups(true);
 	}
 }
 
 void Explorerplusplus::OnGroupByNone()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->SetShowInGroups(false);
+	selectedTab.GetShellBrowser()->SetShowInGroups(false);
 }
 
 void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->SetGroupSortDirection(direction);
+	selectedTab.GetShellBrowser()->SetGroupSortDirection(direction);
 }
 
 ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowserImpl() const

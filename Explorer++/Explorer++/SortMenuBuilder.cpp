@@ -40,7 +40,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 		position++;
 	}
 
-	if (tab.GetShellBrowserImpl()->GetShowInGroups())
+	if (tab.GetShellBrowser()->GetShowInGroups())
 	{
 		std::wstring groupByNoneText = m_resourceLoader->LoadString(IDS_GROUP_BY_NONE);
 		MenuHelper::AddStringItem(groupByMenu.get(), IDM_GROUP_BY_NONE, groupByNoneText, position++,
@@ -75,28 +75,28 @@ wil::unique_hmenu SortMenuBuilder::CreateDefaultMenu(UINT ascendingMenuItemId,
 
 void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab)
 {
-	SortMode sortMode = tab.GetShellBrowserImpl()->GetSortMode();
+	SortMode sortMode = tab.GetShellBrowser()->GetSortMode();
 	CheckMenuRadioItem(sortByMenu, IDM_SORTBY_NAME,
 		IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1), GetMenuItemIdForSortMode(sortMode),
 		MF_BYCOMMAND);
 
 	CheckMenuRadioItem(sortByMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
-		tab.GetShellBrowserImpl()->GetSortDirection() == +SortDirection::Ascending
+		tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending
 			? IDM_SORT_ASCENDING
 			: IDM_SORT_DESCENDING,
 		MF_BYCOMMAND);
 
-	BOOL showInGroups = tab.GetShellBrowserImpl()->GetShowInGroups();
+	BOOL showInGroups = tab.GetShellBrowser()->GetShowInGroups();
 
 	if (showInGroups)
 	{
-		SortMode groupMode = tab.GetShellBrowserImpl()->GetGroupMode();
+		SortMode groupMode = tab.GetShellBrowser()->GetGroupMode();
 		CheckMenuRadioItem(groupByMenu, IDM_GROUPBY_NAME,
 			IDM_GROUPBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1),
 			DetermineGroupModeMenuId(groupMode), MF_BYCOMMAND);
 
 		CheckMenuRadioItem(groupByMenu, IDM_GROUP_SORT_ASCENDING, IDM_GROUP_SORT_DESCENDING,
-			tab.GetShellBrowserImpl()->GetGroupSortDirection() == +SortDirection::Ascending
+			tab.GetShellBrowser()->GetGroupSortDirection() == +SortDirection::Ascending
 				? IDM_GROUP_SORT_ASCENDING
 				: IDM_GROUP_SORT_DESCENDING,
 			MF_BYCOMMAND);
