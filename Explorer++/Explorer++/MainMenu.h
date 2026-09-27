@@ -33,7 +33,7 @@ private:
 		ShellIconLoader *shellIconLoader);
 	void BuildEditMenu();
 	void BuildSelectionMenu();
-	void BuildViewMenu(const FeatureList *featureList);
+	void BuildViewMenu(BrowserWindow *browser, const FeatureList *featureList);
 	void BuildToolbarsSubMenu(MenuView *toolbarsMenuView);
 	void BuildFilterSubMenu(MenuView *filterMenuView);
 	void BuildActionsMenu();

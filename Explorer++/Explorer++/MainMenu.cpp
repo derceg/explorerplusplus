@@ -14,11 +14,10 @@
 #include "MenuView.h"
 #include "ResourceIconModel.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/ViewModes.h"
 #include "ShellIconModel.h"
 #include "StockIconModel.h"
 #include "TabRestorerMenu.h"
-#include "ViewModeHelper.h"
+#include "ViewsMenu.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
@@ -41,7 +40,7 @@ void MainMenu::BuildMenu(BrowserWindow *browser, const FeatureList *featureList,
 	BuildFileMenu(featureList, appServices, shellIconLoader);
 	BuildEditMenu();
 	BuildSelectionMenu();
-	BuildViewMenu(featureList);
+	BuildViewMenu(browser, featureList);
 	BuildActionsMenu();
 	BuildGoMenu(browser, appServices, shellIconLoader);
 	BuildBookmarksMenu(browser, appServices, iconFetcher);
@@ -138,7 +137,7 @@ void MainMenu::BuildSelectionMenu()
 	AppendItem(menuView, IDM_EDIT_WILDCARDDESELECT, IDS_EDIT_WILDCARDDESELECT);
 }
 
-void MainMenu::BuildViewMenu(const FeatureList *featureList)
+void MainMenu::BuildViewMenu(BrowserWindow *browser, const FeatureList *featureList)
 {
 	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_VIEW_POPUP, IDS_VIEW_POPUP);
 
@@ -162,10 +161,8 @@ void MainMenu::BuildViewMenu(const FeatureList *featureList)
 
 	menuView->AppendSeparator();
 
-	for (auto viewMode : VIEW_MODES)
-	{
-		AppendItem(menuView, GetViewModeMenuId(viewMode), GetViewModeMenuStringId(viewMode));
-	}
+	m_childMenus.push_back(
+		std::make_unique<ViewsMenu>(menuView, m_acceleratorManager, browser, m_resourceLoader));
 
 	menuView->AppendSeparator();
 

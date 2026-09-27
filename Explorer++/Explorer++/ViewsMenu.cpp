@@ -22,7 +22,8 @@ void ViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 	for (auto viewMode : VIEW_MODES)
 	{
 		auto id = m_idCounter++;
-		m_rootMenuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode));
+		m_rootMenuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode), {}, L"",
+			GetAcceleratorTextForId(GetViewModeMenuId(viewMode)));
 
 		m_idToViewModeMap.insert({ id, viewMode });
 	}
