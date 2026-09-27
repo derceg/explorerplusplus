@@ -10,6 +10,7 @@
 #include "../Helper/Pidl.h"
 #include "../Helper/SortDirection.h"
 #include <boost/signals2.hpp>
+#include <vector>
 
 struct FolderColumns;
 struct FolderSettings;
@@ -41,6 +42,7 @@ public:
 	virtual ViewMode GetViewMode() const = 0;
 	virtual void SetViewMode(ViewMode viewMode) = 0;
 
+	virtual std::vector<SortMode> GetAvailableSortModes() const = 0;
 	virtual SortMode GetSortMode() const = 0;
 	virtual void SetSortMode(SortMode sortMode) = 0;
 	virtual SortDirection GetSortDirection() const = 0;

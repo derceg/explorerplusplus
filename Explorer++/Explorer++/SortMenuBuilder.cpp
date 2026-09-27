@@ -6,7 +6,7 @@
 #include "SortMenuBuilder.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "SortModeMenuMappings.h"
 #include "Tab.h"
 #include "../Helper/MenuHelper.h"
@@ -23,7 +23,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 	auto sortByMenu = CreateDefaultMenu(IDM_SORT_ASCENDING, IDM_SORT_DESCENDING);
 	auto groupByMenu = CreateDefaultMenu(IDM_GROUP_SORT_ASCENDING, IDM_GROUP_SORT_DESCENDING);
 
-	auto sortModes = tab.GetShellBrowserImpl()->GetAvailableSortModes();
+	auto sortModes = tab.GetShellBrowser()->GetAvailableSortModes();
 	int position = 0;
 
 	for (SortMode sortMode : sortModes)

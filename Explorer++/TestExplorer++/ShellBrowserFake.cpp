@@ -86,6 +86,11 @@ void ShellBrowserFake::SetViewMode(ViewMode viewMode)
 	m_folderSettings.viewMode = viewMode;
 }
 
+std::vector<SortMode> ShellBrowserFake::GetAvailableSortModes() const
+{
+	return {};
+}
+
 SortMode ShellBrowserFake::GetSortMode() const
 {
 	return m_folderSettings.sortMode;

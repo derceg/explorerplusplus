@@ -36,6 +36,7 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	std::vector<SortMode> GetAvailableSortModes() const override;
 	SortMode GetSortMode() const override;
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;

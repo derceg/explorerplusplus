@@ -84,6 +84,7 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	std::vector<SortMode> GetAvailableSortModes() const override;
 	SortMode GetSortMode() const override;
 	void SetSortMode(SortMode sortMode) override;
 	SortDirection GetSortDirection() const override;
@@ -165,7 +166,6 @@ public:
 
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
 
-	std::vector<SortMode> GetAvailableSortModes() const;
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 
 	// BrowserCommandTarget
