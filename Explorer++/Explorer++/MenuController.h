@@ -12,6 +12,7 @@
 
 class MenuDelegate;
 class MenuHelpTextHost;
+class MenuItemKey;
 class MenuView;
 class WindowSubclass;
 
@@ -22,6 +23,7 @@ public:
 	~MenuController();
 
 	bool CanHandleSelection(UINT id) const;
+	void SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void RightClickItem(UINT id, const POINT &ptScreen);

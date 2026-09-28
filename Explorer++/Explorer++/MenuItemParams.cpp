@@ -10,6 +10,17 @@ MenuItemParams::MenuItemParams(const std::wstring &text) : m_text(text)
 {
 }
 
+MenuItemParams &MenuItemParams::SetKey(const MenuItemKey &key) &
+{
+	m_key = key;
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetKey(const MenuItemKey &key) &&
+{
+	return std::move(SetKey(key));
+}
+
 MenuItemParams &MenuItemParams::SetIconModel(std::unique_ptr<const IconModel> iconModel) &
 {
 	m_iconModel = std::move(iconModel);
@@ -91,6 +102,11 @@ MenuItemParams &MenuItemParams::SetSelectedCallback(std::function<void()> callba
 MenuItemParams &&MenuItemParams::SetSelectedCallback(std::function<void()> callback) &&
 {
 	return std::move(SetSelectedCallback(std::move(callback)));
+}
+
+const std::optional<MenuItemKey> &MenuItemParams::GetKey() const
+{
+	return m_key;
 }
 
 const std::wstring &MenuItemParams::GetText() const

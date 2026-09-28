@@ -32,152 +32,119 @@ TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acc
 
 void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_NEW_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB),
-		std::make_unique<ResourceIconModel>(Icon::NewTab, IconSize::Small, resourceLoader),
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB_HELP_TEXT),
-		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB))
+			.SetKey(Item::NewTab)
+			.SetIconModel(
+				std::make_unique<ResourceIconModel>(Icon::NewTab, IconSize::Small, resourceLoader))
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_NEWTAB))
+			.SetSelectedCallback(
+				[this] { m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true }); }));
 
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB_HELP_TEXT),
-		GetAcceleratorTextForId(IDA_DUPLICATE_TAB));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB))
+			.SetKey(Item::DuplicateTab)
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDA_DUPLICATE_TAB))
+			.SetSelectedCallback([this] { OnDuplicateTab(); }));
 
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB_HELP_TEXT));
-
-	m_rootMenuView->AppendSeparator();
-
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH),
-		std::make_unique<ResourceIconModel>(Icon::Refresh, IconSize::Small, resourceLoader),
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_HELP_TEXT),
-		GetAcceleratorTextForId(IDM_VIEW_REFRESH));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_REFRESH_ALL,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_ALL), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_ALL_HELP_TEXT));
-
-	m_rootMenuView->AppendSeparator();
-
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_RENAME_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_RENAME_TAB), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_RENAME_TAB_HELP_TEXT));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_LOCK_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_HELP_TEXT));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS_HELP_TEXT));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB))
+			.SetKey(Item::OpenParentInNewTab)
+			.SetHelpText(
+				resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB_HELP_TEXT))
+			.SetEnabledCallback(
+				[this] { return m_tab->GetShellBrowser()->GetNavigationController()->CanGoUp(); })
+			.SetSelectedCallback([this] { OnOpenParentInNewTab(); }));
 
 	m_rootMenuView->AppendSeparator();
 
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TAB,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB),
-		std::make_unique<ResourceIconModel>(Icon::CloseTab, IconSize::Small, resourceLoader),
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB_HELP_TEXT),
-		GetAcceleratorTextForId(IDM_FILE_CLOSETAB));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS_HELP_TEXT));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT,
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT), {},
-		resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT_HELP_TEXT));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH))
+			.SetKey(Item::Refresh)
+			.SetIconModel(
+				std::make_unique<ResourceIconModel>(Icon::Refresh, IconSize::Small, resourceLoader))
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_VIEW_REFRESH))
+			.SetSelectedCallback([this] { OnRefresh(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_ALL))
+			.SetKey(Item::RefreshAll)
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_REFRESH_ALL_HELP_TEXT))
+			.SetSelectedCallback([this] { OnRefreshAllTabs(); }));
+
+	m_rootMenuView->AppendSeparator();
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_RENAME_TAB))
+			.SetKey(Item::RenameTab)
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_RENAME_TAB_HELP_TEXT))
+			.SetSelectedCallback([this] { OnRenameTab(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB))
+			.SetKey(Item::LockTab)
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_HELP_TEXT))
+			.SetCheckedCallback([this] { return m_tab->GetLockState() == Tab::LockState::Locked; })
+			.SetSelectedCallback([this] { OnLockTab(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS))
+			.SetKey(Item::LockTabAndAddress)
+			.SetHelpText(
+				resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS_HELP_TEXT))
+			.SetCheckedCallback(
+				[this] { return m_tab->GetLockState() == Tab::LockState::AddressLocked; })
+			.SetSelectedCallback([this] { OnLockTabAndAddress(); }));
+
+	m_rootMenuView->AppendSeparator();
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB))
+			.SetKey(Item::CloseTab)
+			.SetIconModel(std::make_unique<ResourceIconModel>(Icon::CloseTab, IconSize::Small,
+				resourceLoader))
+			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_CLOSETAB))
+			.SetEnabledCallback(
+				[this] { return m_tab->GetLockState() == Tab::LockState::NotLocked; })
+			.SetSelectedCallback([this] { OnCloseTab(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS))
+			.SetKey(Item::CloseOtherTabs)
+			.SetHelpText(
+				resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS_HELP_TEXT))
+			.SetSelectedCallback([this] { OnCloseOtherTabs(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT))
+			.SetKey(Item::CloseTabsToRight)
+			.SetHelpText(
+				resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT_HELP_TEXT))
+			.SetSelectedCallback([this] { OnCloseTabsToRight(); }));
 }
 
-bool TabContextMenu::IsItemEnabled(UINT id) const
+void TabContextMenu::OnDuplicateTab()
 {
-	switch (id)
-	{
-	case IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB:
-		return m_tab->GetShellBrowser()->GetNavigationController()->CanGoUp();
-
-	case IDM_TAB_CONTEXT_MENU_CLOSE_TAB:
-		return m_tab->GetLockState() == Tab::LockState::NotLocked;
-	}
-
-	return true;
-}
-
-bool TabContextMenu::IsItemChecked(UINT id) const
-{
-	switch (id)
-	{
-	case IDM_TAB_CONTEXT_MENU_LOCK_TAB:
-		return m_tab->GetLockState() == Tab::LockState::Locked;
-
-	case IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS:
-		return m_tab->GetLockState() == Tab::LockState::AddressLocked;
-	}
-
-	return false;
-}
-
-void TabContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
 	if (!m_tab)
 	{
 		// The tab has been closed, so there's nothing that needs to be done.
 		return;
 	}
 
-	switch (id)
-	{
-	case IDM_TAB_CONTEXT_MENU_NEW_TAB:
-		m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true });
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB:
-		m_tabContainer->DuplicateTab(*m_tab);
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB:
-		OnOpenParentInNewTab();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_REFRESH:
-		m_tab->GetShellBrowser()->GetNavigationController()->Refresh();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_REFRESH_ALL:
-		OnRefreshAllTabs();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_RENAME_TAB:
-		OnRenameTab();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_LOCK_TAB:
-		OnLockTab();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS:
-		OnLockTabAndAddress();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_CLOSE_TAB:
-		m_tabContainer->CloseTab(*m_tab);
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS:
-		OnCloseOtherTabs();
-		break;
-
-	case IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT:
-		OnCloseTabsToRight();
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+	m_tabContainer->DuplicateTab(*m_tab);
 }
 
 void TabContextMenu::OnOpenParentInNewTab()
 {
+	if (!m_tab)
+	{
+		return;
+	}
+
 	const auto &pidl = m_tab->GetShellBrowser()->GetDirectory();
 
 	unique_pidl_absolute pidlParent;
@@ -190,6 +157,16 @@ void TabContextMenu::OnOpenParentInNewTab()
 	}
 }
 
+void TabContextMenu::OnRefresh()
+{
+	if (!m_tab)
+	{
+		return;
+	}
+
+	m_tab->GetShellBrowser()->GetNavigationController()->Refresh();
+}
+
 void TabContextMenu::OnRefreshAllTabs()
 {
 	for (auto &tab : m_tabContainer->GetAllTabs() | std::views::values)
@@ -200,6 +177,11 @@ void TabContextMenu::OnRefreshAllTabs()
 
 void TabContextMenu::OnRenameTab()
 {
+	if (!m_tab)
+	{
+		return;
+	}
+
 	auto *renameTabDialog = RenameTabDialog::Create(m_tab->GetBrowser()->GetHWND(), m_tab.Get(),
 		m_tabEvents, m_resourceLoader);
 	renameTabDialog->ShowModalDialog();
@@ -207,6 +189,11 @@ void TabContextMenu::OnRenameTab()
 
 void TabContextMenu::OnLockTab()
 {
+	if (!m_tab)
+	{
+		return;
+	}
+
 	if (m_tab->GetLockState() == Tab::LockState::Locked)
 	{
 		m_tab->SetLockState(Tab::LockState::NotLocked);
@@ -219,6 +206,11 @@ void TabContextMenu::OnLockTab()
 
 void TabContextMenu::OnLockTabAndAddress()
 {
+	if (!m_tab)
+	{
+		return;
+	}
+
 	if (m_tab->GetLockState() == Tab::LockState::AddressLocked)
 	{
 		m_tab->SetLockState(Tab::LockState::NotLocked);
@@ -229,8 +221,23 @@ void TabContextMenu::OnLockTabAndAddress()
 	}
 }
 
+void TabContextMenu::OnCloseTab()
+{
+	if (!m_tab)
+	{
+		return;
+	}
+
+	m_tabContainer->CloseTab(*m_tab);
+}
+
 void TabContextMenu::OnCloseOtherTabs()
 {
+	if (!m_tab)
+	{
+		return;
+	}
+
 	int index = m_tabContainer->GetTabIndex(*m_tab);
 	int numTabs = m_tabContainer->GetNumTabs();
 
@@ -246,6 +253,11 @@ void TabContextMenu::OnCloseOtherTabs()
 
 void TabContextMenu::OnCloseTabsToRight()
 {
+	if (!m_tab)
+	{
+		return;
+	}
+
 	int index = m_tabContainer->GetTabIndex(*m_tab);
 	int numTabs = m_tabContainer->GetNumTabs();
 

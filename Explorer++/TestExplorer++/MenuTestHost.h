@@ -16,6 +16,7 @@ public:
 
 	MenuView *GetView();
 
+	void SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void SelectItemAtIndex(int index, bool isCtrlKeyDown, bool isShiftKeyDown);

@@ -255,6 +255,7 @@
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
     <ClCompile Include="MenuControllerTest.cpp" />
+    <ClCompile Include="MenuItemKeyTest.cpp" />
     <ClCompile Include="MenuTestHost.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />

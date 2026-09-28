@@ -2055,6 +2055,9 @@
     <ClInclude Include="MenuItemParams.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
+    <ClInclude Include="MenuItemKey.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

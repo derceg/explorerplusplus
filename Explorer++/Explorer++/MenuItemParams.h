@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MenuItemKey.h"
 #include <functional>
 #include <memory>
 #include <optional>
@@ -25,6 +26,9 @@ public:
 	MenuItemParams(MenuItemParams &&) = default;
 	MenuItemParams &operator=(MenuItemParams &&) = default;
 
+	MenuItemParams &SetKey(const MenuItemKey &key) &;
+	MenuItemParams &&SetKey(const MenuItemKey &key) &&;
+
 	MenuItemParams &SetIconModel(std::unique_ptr<const IconModel> iconModel) &;
 	MenuItemParams &&SetIconModel(std::unique_ptr<const IconModel> iconModel) &&;
 	MenuItemParams &SetHelpText(const std::wstring &helpText) &;
@@ -41,6 +45,7 @@ public:
 	MenuItemParams &SetSelectedCallback(std::function<void()> callback) &;
 	MenuItemParams &&SetSelectedCallback(std::function<void()> callback) &&;
 
+	const std::optional<MenuItemKey> &GetKey() const;
 	const std::wstring &GetText() const;
 	std::unique_ptr<const IconModel> TakeIconModel();
 	const std::wstring &GetHelpText() const;
@@ -50,6 +55,7 @@ public:
 	MenuItemSelectedCallback TakeSelectedCallback();
 
 private:
+	std::optional<MenuItemKey> m_key;
 	std::wstring m_text;
 	std::unique_ptr<const IconModel> m_iconModel;
 	std::wstring m_helpText;

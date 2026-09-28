@@ -349,6 +349,13 @@ bool MenuController::CanHandleSelection(UINT id) const
 	return true;
 }
 
+void MenuController::SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	auto id = m_rootView->MaybeGetIdForKey(key);
+	CHECK(id);
+	SelectItem(*id, isCtrlKeyDown, isShiftKeyDown);
+}
+
 void MenuController::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	auto *delegate = MaybeGetDelegateForActionableItem(id);

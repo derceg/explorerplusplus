@@ -5,7 +5,6 @@
 #pragma once
 
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 #include "../Helper/WeakPtr.h"
 
 class ResourceLoader;
@@ -13,9 +12,24 @@ class Tab;
 class TabContainer;
 class TabEvents;
 
-class TabContextMenu : public MenuBase, private MenuDelegate
+class TabContextMenu : public MenuBase
 {
 public:
+	enum class Item
+	{
+		NewTab,
+		DuplicateTab,
+		OpenParentInNewTab,
+		Refresh,
+		RefreshAll,
+		RenameTab,
+		LockTab,
+		LockTabAndAddress,
+		CloseTab,
+		CloseOtherTabs,
+		CloseTabsToRight
+	};
+
 	TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		WeakPtr<Tab> tab, TabContainer *tabContainer, TabEvents *tabEvents,
 		const ResourceLoader *resourceLoader);
@@ -23,16 +37,14 @@ public:
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);
 
-	// MenuDelegate
-	bool IsItemEnabled(UINT id) const override;
-	bool IsItemChecked(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-
+	void OnDuplicateTab();
 	void OnOpenParentInNewTab();
+	void OnRefresh();
 	void OnRefreshAllTabs();
 	void OnRenameTab();
 	void OnLockTab();
 	void OnLockTabAndAddress();
+	void OnCloseTab();
 	void OnCloseOtherTabs();
 	void OnCloseTabsToRight();
 

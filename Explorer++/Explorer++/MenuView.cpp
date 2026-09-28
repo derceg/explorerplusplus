@@ -48,6 +48,11 @@ void MenuView::AppendItem(MenuItemParams params)
 	AppendItem(delegate.get(), id, params.GetText(), params.TakeIconModel(), params.GetHelpText(),
 		params.GetAcceleratorText());
 
+	if (params.GetKey())
+	{
+		m_keyToIdMap.insert({ *params.GetKey(), id });
+	}
+
 	auto *item = GetItem(id);
 	item->ownedDelegate = std::move(delegate);
 }
@@ -176,6 +181,7 @@ void MenuView::ClearMenu()
 
 	m_idToSubMenuMap.clear();
 	m_idToItemMap.clear();
+	m_keyToIdMap.clear();
 	m_weakPtrFactory.InvalidateWeakPtrs();
 
 	if (IsRoot())
@@ -251,6 +257,26 @@ const MenuView *MenuView::MaybeGetMenuViewForItem(UINT id) const
 	}
 
 	return nullptr;
+}
+
+std::optional<UINT> MenuView::MaybeGetIdForKey(const MenuItemKey &key) const
+{
+	auto itr = m_keyToIdMap.find(key);
+
+	if (itr != m_keyToIdMap.end())
+	{
+		return itr->second;
+	}
+
+	for (auto &subMenu : m_idToSubMenuMap | std::views::values)
+	{
+		if (auto id = subMenu->MaybeGetIdForKey(key))
+		{
+			return *id;
+		}
+	}
+
+	return std::nullopt;
 }
 
 void MenuView::ClearItemImages()

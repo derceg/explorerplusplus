@@ -18,6 +18,11 @@ MenuView *MenuTestHost::GetView()
 	return &m_view;
 }
 
+void MenuTestHost::SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	m_controller.SelectItem(key, isCtrlKeyDown, isShiftKeyDown);
+}
+
 void MenuTestHost::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	m_controller.SelectItem(id, isCtrlKeyDown, isShiftKeyDown);

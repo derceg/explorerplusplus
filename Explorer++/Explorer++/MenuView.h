@@ -6,6 +6,7 @@
 
 #include "IconModel.h"
 #include "MenuDelegate.h"
+#include "MenuItemKey.h"
 #include "MenuItemParams.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <wil/resource.h>
@@ -105,6 +106,7 @@ private:
 	MenuView *MaybeGetMenuViewForNativeMenu(HMENU menu);
 	MenuView *MaybeGetMenuViewForItem(UINT id);
 	const MenuView *MaybeGetMenuViewForItem(UINT id) const;
+	std::optional<UINT> MaybeGetIdForKey(const MenuItemKey &key) const;
 
 	void ClearItemImages();
 	void UpdateDynamicPropertiesForAllItems();
@@ -130,6 +132,7 @@ private:
 
 	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 	std::unordered_map<UINT, Item> m_idToItemMap;
+	std::unordered_map<MenuItemKey, UINT, boost::hash<MenuItemKey>> m_keyToIdMap;
 
 	bool m_isShowing = false;
 

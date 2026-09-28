@@ -58,7 +58,7 @@ TEST_F(TabContextMenuTest, DuplicateTab)
 	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab1->GetWeakPtr(),
 		m_tabContainer, &m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_DUPLICATE_TAB, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::DuplicateTab, false, false);
 	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
 
 	const auto &tab2 = m_tabContainer->GetTabByIndex(1);
@@ -73,7 +73,7 @@ TEST_F(TabContextMenuTest, OpenParentInNewTab)
 	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab1->GetWeakPtr(),
 		m_tabContainer, &m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_OPEN_PARENT_IN_NEW_TAB, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::OpenParentInNewTab, false, false);
 	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
 
 	const auto &tab2 = m_tabContainer->GetTabByIndex(1);
@@ -89,7 +89,7 @@ TEST_F(TabContextMenuTest, Refresh)
 	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab->GetWeakPtr(),
 		m_tabContainer, &m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_REFRESH, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::Refresh, false, false);
 	VerifyTabRefreshed(snapshot);
 }
 
@@ -106,7 +106,7 @@ TEST_F(TabContextMenuTest, RefreshAll)
 	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab1->GetWeakPtr(),
 		m_tabContainer, &m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_REFRESH_ALL, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::RefreshAll, false, false);
 
 	for (const auto &snapshot : snapshots)
 	{
@@ -122,11 +122,11 @@ TEST_F(TabContextMenuTest, LockTab)
 	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab->GetWeakPtr(),
 		m_tabContainer, &m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::LockTab, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::Locked);
 
 	// Selecting the item again should toggle the lock state.
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::LockTab, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::NotLocked);
 }
 
@@ -138,10 +138,10 @@ TEST_F(TabContextMenuTest, LockTabAndAddress)
 	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab->GetWeakPtr(),
 		m_tabContainer, &m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::LockTabAndAddress, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::AddressLocked);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_LOCK_TAB_AND_ADDRESS, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::LockTabAndAddress, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::NotLocked);
 }
 
@@ -156,7 +156,7 @@ TEST_F(TabContextMenuTest, CloseTab)
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_TAB, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::CloseTab, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId3)));
 }
@@ -173,7 +173,7 @@ TEST_F(TabContextMenuTest, CloseOtherTabs)
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_OTHER_TABS, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::CloseOtherTabs, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(Property(&Tab::GetId, tabId2)));
 }
 
@@ -189,7 +189,7 @@ TEST_F(TabContextMenuTest, CloseTabsToRight)
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::CloseTabsToRight, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId2)));
 }
@@ -210,7 +210,7 @@ TEST_F(TabContextMenuTest, SelectionAfterTabClosed)
 
 	// The tab associated with the context menu was closed, so selecting a menu item should have no
 	// effect.
-	menuHost.SelectItem(IDM_TAB_CONTEXT_MENU_CLOSE_TABS_TO_RIGHT, false, false);
+	menuHost.SelectItem(TabContextMenu::Item::CloseTabsToRight, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId3),
 			Property(&Tab::GetId, tabId4)));
