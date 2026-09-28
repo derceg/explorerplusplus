@@ -16,60 +16,36 @@ DisplayWindowContextMenu::DisplayWindowContextMenu(MenuView *menuView,
 	const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_browser(browser),
-	m_config(config),
-	m_resourceLoader(resourceLoader)
+	m_config(config)
 {
-	BuildMenu();
+	BuildMenu(resourceLoader);
 }
 
-void DisplayWindowContextMenu::BuildMenu()
+void DisplayWindowContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
-	m_rootMenuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS,
-		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS), {},
-		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS_HELP_TEXT));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS))
+			.SetHelpText(
+				resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS_HELP_TEXT))
+			.SetSelectedCallback([this] { OnChangeColors(); }));
 
 	m_rootMenuView->AppendSeparator();
 
-	m_rootMenuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_HIDE,
-		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_HIDE), {},
-		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_HIDE_HELP_TEXT));
-	m_rootMenuView->AppendItem(this, IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT,
-		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT), {},
-		m_resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT_HELP_TEXT));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_HIDE))
+			.SetHelpText(resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_HIDE_HELP_TEXT))
+			.SetSelectedCallback([this] { m_config->showDisplayWindow = false; }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT))
+			.SetHelpText(resourceLoader->LoadString(
+				IDS_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT_HELP_TEXT))
+			.SetCheckedCallback([this] { return m_config->displayWindowVertical.get(); })
+			.SetSelectedCallback([this]
+				{ m_config->displayWindowVertical = !m_config->displayWindowVertical.get(); }));
 }
 
-bool DisplayWindowContextMenu::IsItemChecked(UINT id) const
+void DisplayWindowContextMenu::OnChangeColors()
 {
-	switch (id)
-	{
-	case IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT:
-		return m_config->displayWindowVertical.get();
-	}
-
-	return false;
-}
-
-void DisplayWindowContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
-	switch (id)
-	{
-	case IDM_DISPLAY_WINDOW_CONTEXT_MENU_CHANGE_COLORS:
-		m_browser->GetCommandController()->ExecuteCommand(IDM_VIEW_CHANGEDISPLAYCOLOURS);
-		break;
-
-	case IDM_DISPLAY_WINDOW_CONTEXT_MENU_HIDE:
-		m_config->showDisplayWindow = false;
-		break;
-
-	case IDM_DISPLAY_WINDOW_CONTEXT_MENU_POSITION_RIGHT:
-		m_config->displayWindowVertical = !m_config->displayWindowVertical.get();
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+	m_browser->GetCommandController()->ExecuteCommand(IDM_VIEW_CHANGEDISPLAYCOLOURS);
 }

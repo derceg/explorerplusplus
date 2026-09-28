@@ -5,26 +5,21 @@
 #pragma once
 
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 
 class BrowserWindow;
 struct Config;
 class ResourceLoader;
 
-class DisplayWindowContextMenu : public MenuBase, private MenuDelegate
+class DisplayWindowContextMenu : public MenuBase
 {
 public:
 	DisplayWindowContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BrowserWindow *browser, Config *config, const ResourceLoader *resourceLoader);
 
 private:
-	void BuildMenu();
-
-	// MenuDelegate
-	bool IsItemChecked(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void BuildMenu(const ResourceLoader *resourceLoader);
+	void OnChangeColors();
 
 	BrowserWindow *const m_browser;
 	Config *const m_config;
-	const ResourceLoader *const m_resourceLoader;
 };
