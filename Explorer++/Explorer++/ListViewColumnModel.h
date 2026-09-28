@@ -41,6 +41,7 @@ public:
 	std::optional<int> MaybeGetColumnVisibleIndex(ListViewColumnId columnId) const;
 	ListViewColumnId GetColumnIdAtVisibleIndex(int visibleIndex) const;
 	bool IsColumnVisible(ListViewColumnId columnId) const;
+	void ToggleColumnVisibility(ListViewColumnId columnId);
 	void SetColumnVisible(ListViewColumnId columnId, bool visible);
 	void OnColumnWidthChanged(ListViewColumnId columnId, int width);
 

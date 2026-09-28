@@ -91,6 +91,11 @@ bool ListViewColumnModel::IsColumnVisible(ListViewColumnId columnId) const
 	return column.visible;
 }
 
+void ListViewColumnModel::ToggleColumnVisibility(ListViewColumnId columnId)
+{
+	SetColumnVisible(columnId, !IsColumnVisible(columnId));
+}
+
 void ListViewColumnModel::SetColumnVisible(ListViewColumnId columnId, bool visible)
 {
 	if (m_layoutChanges == LayoutChanges::Disallowed)
