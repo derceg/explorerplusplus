@@ -110,6 +110,7 @@ void StatusBar::NotifyMenuLoopStarted()
 	m_showingMenuHelpText = true;
 
 	m_view->SetParts({ 100 });
+	m_view->SetPartText(0, L"");
 }
 
 void StatusBar::NotifyMenuLoopEnded()
