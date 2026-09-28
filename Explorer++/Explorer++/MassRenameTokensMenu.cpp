@@ -21,13 +21,10 @@ MassRenameTokensMenu::MassRenameTokensMenu(MenuView *menuView,
 
 void MassRenameTokensMenu::BuildMenu()
 {
-	UINT idCounter = 1;
-
 	for (auto token : MassRenameToken::_values())
 	{
-		m_rootMenuView->AppendItem(this, idCounter, BuildTokenMenuText(token));
-		m_idToTokenMap.insert({ idCounter, token });
-		idCounter++;
+		m_rootMenuView->AppendItem(MenuItemParams(BuildTokenMenuText(token))
+				.SetSelectedCallback([this, token] { m_tokenSelectedCallback(token); }));
 	}
 }
 
@@ -66,14 +63,4 @@ std::wstring MassRenameTokensMenu::BuildTokenMenuText(MassRenameToken token)
 
 	return std::format(L"{} {}", GetMassRenameTokenText(token),
 		m_resourceLoader->LoadString(*stringId));
-}
-
-void MassRenameTokensMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
-	auto itr = m_idToTokenMap.find(id);
-	CHECK(itr != m_idToTokenMap.end());
-	m_tokenSelectedCallback(itr->second);
 }

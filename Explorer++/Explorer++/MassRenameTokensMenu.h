@@ -6,14 +6,12 @@
 
 #include "MassRenameHelper.h"
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 #include <functional>
 #include <string>
-#include <unordered_map>
 
 class ResourceLoader;
 
-class MassRenameTokensMenu : public MenuBase, private MenuDelegate
+class MassRenameTokensMenu : public MenuBase
 {
 public:
 	using TokenSelectedCallback = std::function<void(MassRenameToken token)>;
@@ -25,10 +23,6 @@ private:
 	void BuildMenu();
 	std::wstring BuildTokenMenuText(MassRenameToken token);
 
-	// MenuDelegate
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-
-	std::unordered_map<UINT, MassRenameToken> m_idToTokenMap;
 	const TokenSelectedCallback m_tokenSelectedCallback;
 	const ResourceLoader *const m_resourceLoader;
 };
