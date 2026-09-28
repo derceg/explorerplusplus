@@ -59,6 +59,9 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 		return;
 	}
 
+	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
+	DCHECK(didInsert);
+
 	const auto &preservedShellBrowser = closedTab->preservedShellBrowser;
 	const auto *currentEntry =
 		preservedShellBrowser.history[preservedShellBrowser.currentEntry].get();
@@ -76,9 +79,6 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 	m_rootMenuView->AppendItem(this, id, menuText,
 		std::make_unique<ShellIconModel>(m_shellIconLoader, currentEntry->GetPidl().Raw()),
 		helpText, acceleratorText);
-
-	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
-	DCHECK(didInsert);
 }
 
 void TabRestorerMenu::OnRestoreItemsChanged()
