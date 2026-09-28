@@ -56,6 +56,17 @@ MenuItemParams &&MenuItemParams::SetEnabledCallback(MenuItemEnabledCallback call
 	return std::move(SetEnabledCallback(std::move(callback)));
 }
 
+MenuItemParams &MenuItemParams::SetCheckedCallback(MenuItemCheckedCallback callback) &
+{
+	m_checkedCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetCheckedCallback(MenuItemCheckedCallback callback) &&
+{
+	return std::move(SetCheckedCallback(std::move(callback)));
+}
+
 MenuItemParams &MenuItemParams::SetSelectedCallback(MenuItemSelectedCallback callback) &
 {
 	m_selectedCallback = std::move(callback);
@@ -105,6 +116,11 @@ const std::optional<std::wstring> &MenuItemParams::GetAcceleratorText() const
 MenuItemEnabledCallback MenuItemParams::TakeEnabledCallback()
 {
 	return std::move(m_enabledCallback);
+}
+
+MenuItemCheckedCallback MenuItemParams::TakeCheckedCallback()
+{
+	return std::move(m_checkedCallback);
 }
 
 MenuItemSelectedCallback MenuItemParams::TakeSelectedCallback()

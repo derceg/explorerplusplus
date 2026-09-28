@@ -64,14 +64,16 @@ private:
 	{
 	public:
 		InternalMenuDelegate(MenuItemEnabledCallback enabledCallback,
-			MenuItemSelectedCallback selectedCallback);
+			MenuItemCheckedCallback checkedCallback, MenuItemSelectedCallback selectedCallback);
 
 		// MenuDelegate
 		bool IsItemEnabled(UINT id) const override;
+		bool IsItemChecked(UINT id) const override;
 		void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	private:
 		MenuItemEnabledCallback m_enabledCallback;
+		MenuItemCheckedCallback m_checkedCallback;
 		MenuItemSelectedCallback m_selectedCallback;
 	};
 

@@ -42,7 +42,7 @@ void MenuView::EnableDragAndDrop(bool enable)
 void MenuView::AppendItem(MenuItemParams params)
 {
 	auto delegate = std::make_unique<InternalMenuDelegate>(params.TakeEnabledCallback(),
-		params.TakeSelectedCallback());
+		params.TakeCheckedCallback(), params.TakeSelectedCallback());
 
 	UINT id = AllocateId();
 	AppendItem(delegate.get(), id, params.GetText(), params.TakeIconModel(), params.GetHelpText(),
@@ -479,8 +479,9 @@ void MenuView::OnPopupClosedForTesting()
 }
 
 MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemEnabledCallback enabledCallback,
-	MenuItemSelectedCallback selectedCallback) :
+	MenuItemCheckedCallback checkedCallback, MenuItemSelectedCallback selectedCallback) :
 	m_enabledCallback(std::move(enabledCallback)),
+	m_checkedCallback(std::move(checkedCallback)),
 	m_selectedCallback(std::move(selectedCallback))
 {
 }
@@ -495,6 +496,18 @@ bool MenuView::InternalMenuDelegate::IsItemEnabled(UINT id) const
 	}
 
 	return true;
+}
+
+bool MenuView::InternalMenuDelegate::IsItemChecked(UINT id) const
+{
+	UNREFERENCED_PARAMETER(id);
+
+	if (m_checkedCallback)
+	{
+		return m_checkedCallback();
+	}
+
+	return false;
 }
 
 void MenuView::InternalMenuDelegate::OnItemSelected(UINT id, bool isCtrlKeyDown,

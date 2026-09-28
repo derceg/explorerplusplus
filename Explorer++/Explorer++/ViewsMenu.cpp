@@ -7,6 +7,7 @@
 #include "BrowserWindow.h"
 #include "MenuView.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ViewModes.h"
 #include "ViewModeHelper.h"
 
 ViewsMenu::ViewsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -21,32 +22,13 @@ void ViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
 	for (auto viewMode : VIEW_MODES)
 	{
-		auto id = m_idCounter++;
-		m_rootMenuView->AppendItem(this, id, GetViewModeMenuText(resourceLoader, viewMode), {}, L"",
-			GetAcceleratorTextForId(GetViewModeMenuId(viewMode)));
-
-		m_idToViewModeMap.insert({ id, viewMode });
+		m_rootMenuView->AppendItem(MenuItemParams(GetViewModeMenuText(resourceLoader, viewMode))
+				.SetAcceleratorText(GetAcceleratorTextForId(GetViewModeMenuId(viewMode)))
+				.SetCheckedCallback(
+					[this, viewMode] { return viewMode == GetActiveShellBrowser()->GetViewMode(); })
+				.SetSelectedCallback(
+					[this, viewMode] { GetActiveShellBrowser()->SetViewMode(viewMode); }));
 	}
-}
-
-bool ViewsMenu::IsItemChecked(UINT id) const
-{
-	return GetViewModeForItem(id) == GetActiveShellBrowser()->GetViewMode();
-}
-
-void ViewsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
-	GetActiveShellBrowser()->SetViewMode(GetViewModeForItem(id));
-}
-
-ViewMode ViewsMenu::GetViewModeForItem(UINT id) const
-{
-	auto itr = m_idToViewModeMap.find(id);
-	CHECK(itr != m_idToViewModeMap.end());
-	return itr->second;
 }
 
 ShellBrowser *ViewsMenu::GetActiveShellBrowser() const

@@ -12,6 +12,7 @@
 class IconModel;
 
 using MenuItemEnabledCallback = std::function<bool()>;
+using MenuItemCheckedCallback = std::function<bool()>;
 using MenuItemSelectedCallback = std::function<void(bool isCtrlKeyDown, bool isShiftKeyDown)>;
 
 class MenuItemParams
@@ -33,6 +34,8 @@ public:
 
 	MenuItemParams &SetEnabledCallback(MenuItemEnabledCallback callback) &;
 	MenuItemParams &&SetEnabledCallback(MenuItemEnabledCallback callback) &&;
+	MenuItemParams &SetCheckedCallback(MenuItemCheckedCallback callback) &;
+	MenuItemParams &&SetCheckedCallback(MenuItemCheckedCallback callback) &&;
 	MenuItemParams &SetSelectedCallback(MenuItemSelectedCallback callback) &;
 	MenuItemParams &&SetSelectedCallback(MenuItemSelectedCallback callback) &&;
 	MenuItemParams &SetSelectedCallback(std::function<void()> callback) &;
@@ -43,6 +46,7 @@ public:
 	const std::wstring &GetHelpText() const;
 	const std::optional<std::wstring> &GetAcceleratorText() const;
 	MenuItemEnabledCallback TakeEnabledCallback();
+	MenuItemCheckedCallback TakeCheckedCallback();
 	MenuItemSelectedCallback TakeSelectedCallback();
 
 private:
@@ -51,5 +55,6 @@ private:
 	std::wstring m_helpText;
 	std::optional<std::wstring> m_acceleratorText;
 	MenuItemEnabledCallback m_enabledCallback;
+	MenuItemCheckedCallback m_checkedCallback;
 	MenuItemSelectedCallback m_selectedCallback;
 };
