@@ -1,0 +1,113 @@
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+#include "stdafx.h"
+#include "MenuItemParams.h"
+#include "IconModel.h"
+
+MenuItemParams::MenuItemParams(const std::wstring &text) : m_text(text)
+{
+}
+
+MenuItemParams &MenuItemParams::SetIconModel(std::unique_ptr<const IconModel> iconModel) &
+{
+	m_iconModel = std::move(iconModel);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetIconModel(std::unique_ptr<const IconModel> iconModel) &&
+{
+	return std::move(SetIconModel(std::move(iconModel)));
+}
+
+MenuItemParams &MenuItemParams::SetHelpText(const std::wstring &helpText) &
+{
+	m_helpText = helpText;
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetHelpText(const std::wstring &helpText) &&
+{
+	return std::move(SetHelpText(helpText));
+}
+
+MenuItemParams &MenuItemParams::SetAcceleratorText(
+	const std::optional<std::wstring> &acceleratorText) &
+{
+	m_acceleratorText = acceleratorText;
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetAcceleratorText(
+	const std::optional<std::wstring> &acceleratorText) &&
+{
+	return std::move(SetAcceleratorText(acceleratorText));
+}
+
+MenuItemParams &MenuItemParams::SetEnabledCallback(MenuItemEnabledCallback callback) &
+{
+	m_enabledCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetEnabledCallback(MenuItemEnabledCallback callback) &&
+{
+	return std::move(SetEnabledCallback(std::move(callback)));
+}
+
+MenuItemParams &MenuItemParams::SetSelectedCallback(MenuItemSelectedCallback callback) &
+{
+	m_selectedCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetSelectedCallback(MenuItemSelectedCallback callback) &&
+{
+	return std::move(SetSelectedCallback(std::move(callback)));
+}
+
+MenuItemParams &MenuItemParams::SetSelectedCallback(std::function<void()> callback) &
+{
+	m_selectedCallback = [callback = std::move(callback)](bool, bool)
+	{
+		callback();
+	};
+
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetSelectedCallback(std::function<void()> callback) &&
+{
+	return std::move(SetSelectedCallback(std::move(callback)));
+}
+
+const std::wstring &MenuItemParams::GetText() const
+{
+	return m_text;
+}
+
+std::unique_ptr<const IconModel> MenuItemParams::TakeIconModel()
+{
+	return std::move(m_iconModel);
+}
+
+const std::wstring &MenuItemParams::GetHelpText() const
+{
+	return m_helpText;
+}
+
+const std::optional<std::wstring> &MenuItemParams::GetAcceleratorText() const
+{
+	return m_acceleratorText;
+}
+
+MenuItemEnabledCallback MenuItemParams::TakeEnabledCallback()
+{
+	return std::move(m_enabledCallback);
+}
+
+MenuItemSelectedCallback MenuItemParams::TakeSelectedCallback()
+{
+	return std::move(m_selectedCallback);
+}

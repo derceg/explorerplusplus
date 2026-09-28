@@ -39,6 +39,19 @@ void MenuView::EnableDragAndDrop(bool enable)
 	CHECK(res);
 }
 
+void MenuView::AppendItem(MenuItemParams params)
+{
+	auto delegate = std::make_unique<InternalMenuDelegate>(params.TakeEnabledCallback(),
+		params.TakeSelectedCallback());
+
+	UINT id = AllocateId();
+	AppendItem(delegate.get(), id, params.GetText(), params.TakeIconModel(), params.GetHelpText(),
+		params.GetAcceleratorText());
+
+	auto *item = GetItem(id);
+	item->ownedDelegate = std::move(delegate);
+}
+
 void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 	const std::optional<std::wstring> &acceleratorText)
@@ -120,6 +133,24 @@ MenuView *MenuView::AppendSubMenu(MenuDelegate *delegate, UINT id, const std::ws
 	return view;
 }
 
+UINT MenuView::AllocateId()
+{
+	auto *root = GetRoot();
+	return root->m_idCounter++;
+}
+
+MenuView *MenuView::GetRoot()
+{
+	auto *menuView = this;
+
+	while (menuView->m_parent)
+	{
+		menuView = menuView->m_parent;
+	}
+
+	return menuView;
+}
+
 void MenuView::AppendSeparator()
 {
 	MenuHelper::AddSeparator(m_menu);
@@ -146,6 +177,11 @@ void MenuView::ClearMenu()
 	m_idToSubMenuMap.clear();
 	m_idToItemMap.clear();
 	m_weakPtrFactory.InvalidateWeakPtrs();
+
+	if (IsRoot())
+	{
+		m_idCounter = 1;
+	}
 }
 
 int MenuView::GetNumItems() const
@@ -440,4 +476,34 @@ void MenuView::OnPopupClosedForTesting()
 	CHECK(IsInTest());
 
 	OnPopupClosed();
+}
+
+MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemEnabledCallback enabledCallback,
+	MenuItemSelectedCallback selectedCallback) :
+	m_enabledCallback(std::move(enabledCallback)),
+	m_selectedCallback(std::move(selectedCallback))
+{
+}
+
+bool MenuView::InternalMenuDelegate::IsItemEnabled(UINT id) const
+{
+	UNREFERENCED_PARAMETER(id);
+
+	if (m_enabledCallback)
+	{
+		return m_enabledCallback();
+	}
+
+	return true;
+}
+
+void MenuView::InternalMenuDelegate::OnItemSelected(UINT id, bool isCtrlKeyDown,
+	bool isShiftKeyDown)
+{
+	UNREFERENCED_PARAMETER(id);
+
+	if (m_selectedCallback)
+	{
+		m_selectedCallback(isCtrlKeyDown, isShiftKeyDown);
+	}
 }

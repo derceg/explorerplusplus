@@ -6,6 +6,7 @@
 
 #include "IconModel.h"
 #include "MenuDelegate.h"
+#include "MenuItemParams.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <wil/resource.h>
 #include <memory>
@@ -20,6 +21,8 @@ public:
 	bool IsRoot() const;
 
 	void EnableDragAndDrop(bool enable);
+
+	void AppendItem(MenuItemParams params);
 
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
@@ -57,6 +60,21 @@ private:
 		Radio
 	};
 
+	class InternalMenuDelegate : public MenuDelegate
+	{
+	public:
+		InternalMenuDelegate(MenuItemEnabledCallback enabledCallback,
+			MenuItemSelectedCallback selectedCallback);
+
+		// MenuDelegate
+		bool IsItemEnabled(UINT id) const override;
+		void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
+	private:
+		MenuItemEnabledCallback m_enabledCallback;
+		MenuItemSelectedCallback m_selectedCallback;
+	};
+
 	struct Item
 	{
 		Item(MenuDelegate *delegate, std::unique_ptr<const IconModel> iconModel,
@@ -67,6 +85,7 @@ private:
 		{
 		}
 
+		std::unique_ptr<InternalMenuDelegate> ownedDelegate;
 		MenuDelegate *const delegate;
 		const std::unique_ptr<const IconModel> iconModel;
 		wil::unique_hbitmap bitmap;
@@ -76,6 +95,8 @@ private:
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 		const std::optional<std::wstring> &acceleratorText, CheckStyle checkStyle);
+	UINT AllocateId();
+	MenuView *GetRoot();
 
 	void OnPopupWillShowForDpi(UINT dpi);
 	void OnPopupClosed();
@@ -100,8 +121,12 @@ private:
 
 	const HMENU m_menu;
 	MenuView *m_parent = nullptr;
-	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 
+	// This exists on every MenuView instance, but is only used on the root menu. That is, IDs are
+	// always generated from the root menu.
+	UINT m_idCounter = 1;
+
+	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 	std::unordered_map<UINT, Item> m_idToItemMap;
 
 	bool m_isShowing = false;

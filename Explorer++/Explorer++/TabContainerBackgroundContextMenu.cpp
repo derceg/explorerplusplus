@@ -29,51 +29,25 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 
 void TabContainerBackgroundContextMenu::BuildMenu()
 {
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_NEW_TAB,
-		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
-		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
-		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
-		GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
-	m_rootMenuView->AppendItem(this, IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
-		m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
-		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
-}
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_NEWTAB))
+			.SetSelectedCallback(
+				[this] { m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true }); }));
 
-bool TabContainerBackgroundContextMenu::IsItemEnabled(UINT id) const
-{
-	switch (id)
-	{
-	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
-		return !m_tabRestorer->IsEmpty();
-	}
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB))
+			.SetEnabledCallback([this] { return !m_tabRestorer->IsEmpty(); })
+			.SetSelectedCallback([this] { m_tabRestorer->RestoreLastTab(); }));
 
-	return true;
-}
-
-void TabContainerBackgroundContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
-	switch (id)
-	{
-	case IDM_TAB_CONTAINER_NEW_TAB:
-		m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true });
-		break;
-
-	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
-		m_tabRestorer->RestoreLastTab();
-		break;
-
-	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_browser, m_platformContext,
-			m_acceleratorManager, m_resourceLoader);
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS))
+			.SetSelectedCallback(
+				[this]
+				{
+					BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_browser, m_platformContext,
+						m_acceleratorManager, m_resourceLoader);
+				}));
 }

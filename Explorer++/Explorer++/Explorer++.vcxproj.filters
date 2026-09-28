@@ -940,6 +940,9 @@
     <ClCompile Include="StockIconModel.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MenuItemParams.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2048,6 +2051,9 @@
     </ClInclude>
     <ClInclude Include="StockIconModel.h">
       <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuItemParams.h">
+      <Filter>Menus\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

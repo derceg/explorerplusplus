@@ -1230,6 +1230,7 @@
     <ClCompile Include="MassRenameHelper.cpp" />
     <ClCompile Include="MassRenameTokensMenu.cpp" />
     <ClCompile Include="MenuController.cpp" />
+    <ClCompile Include="MenuItemParams.cpp" />
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp" />
     <ClCompile Include="OpenItemsContextMenuDelegate.cpp" />
@@ -1600,6 +1601,7 @@
     <ClInclude Include="MassRenameTokensMenu.h" />
     <ClInclude Include="MenuController.h" />
     <ClInclude Include="MenuDelegate.h" />
+    <ClInclude Include="MenuItemParams.h" />
     <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="NoOpMenuHelpTextHost.h" />
     <ClInclude Include="OpenItemLocationContextMenuDelegate.h" />
