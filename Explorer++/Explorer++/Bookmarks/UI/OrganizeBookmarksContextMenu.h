@@ -4,20 +4,30 @@
 
 #pragma once
 
+#include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/WeakPtr.h"
 
-class BookmarkItem;
 class BookmarkTree;
 class ClipboardStore;
 class OrganizeBookmarksContextMenuDelegate;
 class ResourceLoader;
 
-class OrganizeBookmarksContextMenu : public MenuBase, private MenuDelegate
+class OrganizeBookmarksContextMenu : public MenuBase
 {
 public:
+	enum class Item
+	{
+		NewBookmark,
+		NewFolder,
+		Cut,
+		Copy,
+		Paste,
+		Delete,
+		SelectAll
+	};
+
 	OrganizeBookmarksContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTree *bookmarkTree, WeakPtr<BookmarkItem> targetFolder,
 		OrganizeBookmarksContextMenuDelegate *delegate, ClipboardStore *clipboardStore,
@@ -26,16 +36,14 @@ public:
 private:
 	void BuildMenu();
 
-	// MenuDelegate
-	bool IsItemEnabled(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-
+	bool CanPaste() const;
 	bool CanRemoveSelectedItems() const;
+	bool CanSelectAll() const;
 
+	void OnNewBookmarkItem(BookmarkItem::Type type);
 	void OnCopy(ClipboardAction action);
 	void OnPaste();
 	void OnDelete();
-	void OnSelectAll();
 	size_t GetTargetIndex() const;
 
 	BookmarkTree *const m_bookmarkTree;

@@ -437,6 +437,13 @@ UINT MenuView::GetItemIdForTesting(int index) const
 	return *id;
 }
 
+std::optional<UINT> MenuView::MaybeGetIdForKeyForTesting(const MenuItemKey &key) const
+{
+	CHECK(IsInTest());
+
+	return MaybeGetIdForKey(key);
+}
+
 MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id)
 {
 	CHECK(IsInTest());

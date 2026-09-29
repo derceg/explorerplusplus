@@ -31,6 +31,13 @@ void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &
 	}
 }
 
+void ExpectItemEnabled(const MenuView *menuView, const MenuItemKey &key, bool enabled)
+{
+	auto id = menuView->MaybeGetIdForKeyForTesting(key);
+	CHECK(id);
+	ExpectItemEnabled(menuView, *id, enabled);
+}
+
 void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled)
 {
 	auto *delegate = menuView->MaybeGetDelegateForItemForTesting(id);

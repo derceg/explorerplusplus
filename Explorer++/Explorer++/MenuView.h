@@ -44,6 +44,7 @@ public:
 
 	HMENU GetNativeMenuForTesting() const;
 	UINT GetItemIdForTesting(int index) const;
+	std::optional<UINT> MaybeGetIdForKeyForTesting(const MenuItemKey &key) const;
 	MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id);
 	const MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id) const;
 	std::wstring GetItemTextForTesting(UINT id) const;

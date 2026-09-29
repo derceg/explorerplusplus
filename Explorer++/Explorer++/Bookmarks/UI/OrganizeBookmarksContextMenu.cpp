@@ -31,49 +31,54 @@ OrganizeBookmarksContextMenu::OrganizeBookmarksContextMenu(MenuView *menuView,
 
 void OrganizeBookmarksContextMenu::BuildMenu()
 {
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK));
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK))
+			.SetKey(Item::NewBookmark)
+			.SetSelectedCallback([this] { OnNewBookmarkItem(BookmarkItem::Type::Bookmark); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER))
+			.SetKey(Item::NewFolder)
+			.SetSelectedCallback([this] { OnNewBookmarkItem(BookmarkItem::Type::Folder); }));
 
 	m_rootMenuView->AppendSeparator();
 
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_CUT));
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_COPY));
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_PASTE));
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_DELETE));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_CUT))
+			.SetKey(Item::Cut)
+			.SetEnabledCallback([this] { return CanRemoveSelectedItems(); })
+			.SetSelectedCallback([this] { OnCopy(ClipboardAction::Cut); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_COPY))
+			.SetKey(Item::Copy)
+			.SetEnabledCallback([this] { return !m_delegate->GetSelectedItems().empty(); })
+			.SetSelectedCallback([this] { OnCopy(ClipboardAction::Copy); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_PASTE))
+			.SetKey(Item::Paste)
+			.SetEnabledCallback([this] { return CanPaste(); })
+			.SetSelectedCallback([this] { OnPaste(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_DELETE))
+			.SetKey(Item::Delete)
+			.SetEnabledCallback([this] { return CanRemoveSelectedItems(); })
+			.SetSelectedCallback([this] { OnDelete(); }));
 
 	m_rootMenuView->AppendSeparator();
 
-	m_rootMenuView->AppendItem(this, IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL,
-		m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL))
+			.SetKey(Item::SelectAll)
+			.SetEnabledCallback([this] { return CanSelectAll(); })
+			.SetSelectedCallback([this] { m_delegate->SelectAllItems(); }));
 }
 
-bool OrganizeBookmarksContextMenu::IsItemEnabled(UINT id) const
+bool OrganizeBookmarksContextMenu::CanPaste() const
 {
-	switch (id)
-	{
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT:
-		return CanRemoveSelectedItems();
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY:
-		return !m_delegate->GetSelectedItems().empty();
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE:
-		return m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat());
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE:
-		return CanRemoveSelectedItems();
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL:
-		return !m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems();
-	}
-
-	return true;
+	return m_clipboardStore->IsDataAvailable(BookmarkClipboard::GetClipboardFormat());
 }
 
 bool OrganizeBookmarksContextMenu::CanRemoveSelectedItems() const
@@ -84,49 +89,25 @@ bool OrganizeBookmarksContextMenu::CanRemoveSelectedItems() const
 			{ return m_bookmarkTree->IsPermanentNode(bookmarkItem); });
 }
 
-void OrganizeBookmarksContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+bool OrganizeBookmarksContextMenu::CanSelectAll() const
 {
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
+	return !m_targetFolder->GetChildren().empty() && m_delegate->CanSelectAllItems();
+}
 
+void OrganizeBookmarksContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
+{
 	if (!m_targetFolder)
 	{
 		return;
 	}
 
-	switch (id)
+	if (type == BookmarkItem::Type::Bookmark)
 	{
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_BOOKMARK:
 		m_delegate->CreateBookmark(m_targetFolder.Get(), GetTargetIndex());
-		break;
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_NEW_FOLDER:
+	}
+	else
+	{
 		m_delegate->CreateFolder(m_targetFolder.Get(), GetTargetIndex());
-		break;
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_CUT:
-		OnCopy(ClipboardAction::Cut);
-		break;
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_COPY:
-		OnCopy(ClipboardAction::Copy);
-		break;
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_PASTE:
-		OnPaste();
-		break;
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_DELETE:
-		OnDelete();
-		break;
-
-	case IDM_ORGANIZE_BOOKMARKS_CXMENU_SELECT_ALL:
-		OnSelectAll();
-		break;
-
-	default:
-		DCHECK(false);
-		break;
 	}
 }
 
@@ -144,6 +125,11 @@ void OrganizeBookmarksContextMenu::OnCopy(ClipboardAction action)
 
 void OrganizeBookmarksContextMenu::OnPaste()
 {
+	if (!m_targetFolder)
+	{
+		return;
+	}
+
 	BookmarkHelper::PasteBookmarkItems(m_clipboardStore, m_bookmarkTree, m_targetFolder.Get(),
 		GetTargetIndex());
 }
@@ -151,11 +137,6 @@ void OrganizeBookmarksContextMenu::OnPaste()
 void OrganizeBookmarksContextMenu::OnDelete()
 {
 	BookmarkHelper::RemoveBookmarks(m_bookmarkTree, m_delegate->GetSelectedItems());
-}
-
-void OrganizeBookmarksContextMenu::OnSelectAll()
-{
-	m_delegate->SelectAllItems();
 }
 
 size_t OrganizeBookmarksContextMenu::GetTargetIndex() const
