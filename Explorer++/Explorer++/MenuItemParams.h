@@ -15,6 +15,7 @@ class IconModel;
 using MenuItemEnabledCallback = std::function<bool()>;
 using MenuItemCheckedCallback = std::function<bool()>;
 using MenuItemSelectedCallback = std::function<void(bool isCtrlKeyDown, bool isShiftKeyDown)>;
+using MenuItemMiddleClickedCallback = std::function<void(bool isCtrlKeyDown, bool isShiftKeyDown)>;
 
 class MenuItemParams
 {
@@ -40,10 +41,15 @@ public:
 	MenuItemParams &&SetEnabledCallback(MenuItemEnabledCallback callback) &&;
 	MenuItemParams &SetCheckedCallback(MenuItemCheckedCallback callback) &;
 	MenuItemParams &&SetCheckedCallback(MenuItemCheckedCallback callback) &&;
+
 	MenuItemParams &SetSelectedCallback(MenuItemSelectedCallback callback) &;
 	MenuItemParams &&SetSelectedCallback(MenuItemSelectedCallback callback) &&;
 	MenuItemParams &SetSelectedCallback(std::function<void()> callback) &;
 	MenuItemParams &&SetSelectedCallback(std::function<void()> callback) &&;
+	MenuItemParams &SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &;
+	MenuItemParams &&SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &&;
+	MenuItemParams &SetMiddleClickedCallback(std::function<void()> callback) &;
+	MenuItemParams &&SetMiddleClickedCallback(std::function<void()> callback) &&;
 
 	const std::optional<MenuItemKey> &GetKey() const;
 	const std::wstring &GetText() const;
@@ -53,6 +59,7 @@ public:
 	MenuItemEnabledCallback TakeEnabledCallback();
 	MenuItemCheckedCallback TakeCheckedCallback();
 	MenuItemSelectedCallback TakeSelectedCallback();
+	MenuItemMiddleClickedCallback TakeMiddleClickedCallback();
 
 private:
 	std::optional<MenuItemKey> m_key;
@@ -63,4 +70,5 @@ private:
 	MenuItemEnabledCallback m_enabledCallback;
 	MenuItemCheckedCallback m_checkedCallback;
 	MenuItemSelectedCallback m_selectedCallback;
+	MenuItemMiddleClickedCallback m_middleClickedCallback;
 };

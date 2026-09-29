@@ -16,8 +16,8 @@
 
 TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader,
-	const ResourceLoader *resourceLoader, UINT startId, UINT endId) :
-	MenuBase(menuView, acceleratorManager, startId, endId),
+	const ResourceLoader *resourceLoader) :
+	MenuBase(menuView, acceleratorManager),
 	m_tabRestorer(tabRestorer),
 	m_shellIconLoader(shellIconLoader),
 	m_resourceLoader(resourceLoader)
@@ -31,37 +31,32 @@ TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *a
 void TabRestorerMenu::RebuildMenu()
 {
 	m_rootMenuView->ClearMenu();
-	m_idCounter = GetIdRange().startId;
-	m_menuItemMappings.clear();
 
 	if (m_tabRestorer->IsEmpty())
 	{
-		auto id = m_idCounter++;
-		m_rootMenuView->AppendItem(this, id, m_resourceLoader->LoadString(IDS_NO_RECENT_TABS));
+		m_rootMenuView->AppendItem(MenuItemParams(m_resourceLoader->LoadString(IDS_NO_RECENT_TABS))
+				.SetEnabledCallback([] { return false; }));
 		return;
 	}
 
 	for (size_t index = 0;
 		const auto &closedTab : m_tabRestorer->GetClosedTabs() | std::views::take(MAX_MENU_ITEMS))
 	{
-		AddMenuItemForClosedTab(closedTab.get(), index == 0);
+		auto params = BuildMenuItemParamsForClosedTab(closedTab.get());
+
+		if (index == 0)
+		{
+			params.SetAcceleratorText(GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
+		}
+
+		m_rootMenuView->AppendItem(std::move(params));
+
 		index++;
 	}
 }
 
-void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
-	bool addAcceleratorText)
+MenuItemParams TabRestorerMenu::BuildMenuItemParamsForClosedTab(const PreservedTab *closedTab)
 {
-	UINT id = m_idCounter++;
-
-	if (id >= GetIdRange().endId)
-	{
-		return;
-	}
-
-	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
-	DCHECK(didInsert);
-
 	const auto &preservedShellBrowser = closedTab->preservedShellBrowser;
 	const auto *currentEntry =
 		preservedShellBrowser.history[preservedShellBrowser.currentEntry].get();
@@ -69,49 +64,20 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 	auto menuText = GetDisplayNameWithFallback(currentEntry->GetPidl().Raw(), SHGDN_INFOLDER);
 	auto helpText = GetFolderPathForDisplayWithFallback(currentEntry->GetPidl().Raw());
 
-	std::optional<std::wstring> acceleratorText;
-
-	if (addAcceleratorText)
+	auto clickCallback = [this, closedTabId = closedTab->id]
 	{
-		acceleratorText = GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB);
-	}
+		m_tabRestorer->RestoreTabById(closedTabId);
+	};
 
-	m_rootMenuView->AppendItem(this, id, menuText,
-		std::make_unique<ShellIconModel>(m_shellIconLoader, currentEntry->GetPidl().Raw()),
-		helpText, acceleratorText);
+	return MenuItemParams(menuText)
+		.SetIconModel(
+			std::make_unique<ShellIconModel>(m_shellIconLoader, currentEntry->GetPidl().Raw()))
+		.SetHelpText(helpText)
+		.SetSelectedCallback(clickCallback)
+		.SetMiddleClickedCallback(clickCallback);
 }
 
 void TabRestorerMenu::OnRestoreItemsChanged()
 {
 	RebuildMenu();
-}
-
-bool TabRestorerMenu::IsItemEnabled(UINT id) const
-{
-	// If m_menuItemMappings contains this item, then it represents a tab that can be restored. If
-	// the item isn't present, then the specified item is the empty item.
-	return m_menuItemMappings.contains(id);
-}
-
-void TabRestorerMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
-	RestoreTabForMenuItem(id);
-}
-
-void TabRestorerMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
-	RestoreTabForMenuItem(id);
-}
-
-void TabRestorerMenu::RestoreTabForMenuItem(UINT id)
-{
-	auto itr = m_menuItemMappings.find(id);
-	CHECK(itr != m_menuItemMappings.end());
-	m_tabRestorer->RestoreTabById(itr->second);
 }

@@ -65,18 +65,19 @@ private:
 	class InternalMenuDelegate : public MenuDelegate
 	{
 	public:
-		InternalMenuDelegate(MenuItemEnabledCallback enabledCallback,
-			MenuItemCheckedCallback checkedCallback, MenuItemSelectedCallback selectedCallback);
+		InternalMenuDelegate(MenuItemParams &params);
 
 		// MenuDelegate
 		bool IsItemEnabled(UINT id) const override;
 		bool IsItemChecked(UINT id) const override;
 		void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+		void OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	private:
 		MenuItemEnabledCallback m_enabledCallback;
 		MenuItemCheckedCallback m_checkedCallback;
 		MenuItemSelectedCallback m_selectedCallback;
+		MenuItemMiddleClickedCallback m_middleClickedCallback;
 	};
 
 	struct Item

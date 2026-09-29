@@ -104,6 +104,32 @@ MenuItemParams &&MenuItemParams::SetSelectedCallback(std::function<void()> callb
 	return std::move(SetSelectedCallback(std::move(callback)));
 }
 
+MenuItemParams &MenuItemParams::SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &
+{
+	m_middleClickedCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &&
+{
+	return std::move(SetMiddleClickedCallback(std::move(callback)));
+}
+
+MenuItemParams &MenuItemParams::SetMiddleClickedCallback(std::function<void()> callback) &
+{
+	m_middleClickedCallback = [callback = std::move(callback)](bool, bool)
+	{
+		callback();
+	};
+
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetMiddleClickedCallback(std::function<void()> callback) &&
+{
+	return std::move(SetMiddleClickedCallback(std::move(callback)));
+}
+
 const std::optional<MenuItemKey> &MenuItemParams::GetKey() const
 {
 	return m_key;
@@ -142,4 +168,9 @@ MenuItemCheckedCallback MenuItemParams::TakeCheckedCallback()
 MenuItemSelectedCallback MenuItemParams::TakeSelectedCallback()
 {
 	return std::move(m_selectedCallback);
+}
+
+MenuItemMiddleClickedCallback MenuItemParams::TakeMiddleClickedCallback()
+{
+	return std::move(m_middleClickedCallback);
 }

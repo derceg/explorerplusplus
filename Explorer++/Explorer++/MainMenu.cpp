@@ -65,9 +65,8 @@ void MainMenu::BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featur
 
 	auto *recentTabsSubMenuView =
 		AppendSubMenu(menuView, IDM_FILE_REOPEN_RECENT_TAB_POPUP, IDS_FILE_REOPEN_RECENT_TAB_POPUP);
-	m_childMenus.push_back(
-		std::make_unique<TabRestorerMenu>(recentTabsSubMenuView, m_acceleratorManager, tabRestorer,
-			shellIconLoader, m_resourceLoader, MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID));
+	m_childMenus.push_back(std::make_unique<TabRestorerMenu>(recentTabsSubMenuView,
+		m_acceleratorManager, tabRestorer, shellIconLoader, m_resourceLoader));
 
 	if (!featureList->IsEnabled(Feature::MultipleWindowsPerSession))
 	{
