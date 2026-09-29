@@ -5,7 +5,6 @@
 #pragma once
 
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 #include "../Helper/WeakPtr.h"
 
 class BookmarkItem;
@@ -21,9 +20,16 @@ public:
 	virtual void CreateFolder(BookmarkItem *parentFolder, size_t index) = 0;
 };
 
-class BookmarkTreeViewContextMenu : public MenuBase, private MenuDelegate
+class BookmarkTreeViewContextMenu : public MenuBase
 {
 public:
+	enum class Item
+	{
+		Rename,
+		Delete,
+		NewFolder
+	};
+
 	BookmarkTreeViewContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTreeViewContextMenuDelegate *delegate, BookmarkTree *bookmarkTree,
 		WeakPtr<BookmarkItem> targetFolder, const ResourceLoader *resourceLoader);
@@ -31,11 +37,9 @@ public:
 private:
 	void BuildMenu();
 
-	// MenuDelegate
-	bool IsItemEnabled(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-
-	void DeleteItem();
+	void OnRename();
+	void OnDelete();
+	void OnNewFolder();
 
 	BookmarkTreeViewContextMenuDelegate *const m_delegate;
 	BookmarkTree *const m_bookmarkTree;

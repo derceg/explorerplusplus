@@ -28,57 +28,52 @@ BookmarkTreeViewContextMenu::BookmarkTreeViewContextMenu(MenuView *menuView,
 
 void BookmarkTreeViewContextMenu::BuildMenu()
 {
-	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME,
-		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME));
-	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE,
-		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE));
-	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER,
-		m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME))
+			.SetKey(Item::Rename)
+			.SetEnabledCallback(
+				[this] { return !m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()); })
+			.SetSelectedCallback([this] { OnRename(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE))
+			.SetKey(Item::Delete)
+			.SetEnabledCallback(
+				[this] { return !m_bookmarkTree->IsPermanentNode(m_targetFolder.Get()); })
+			.SetSelectedCallback([this] { OnDelete(); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER))
+			.SetKey(Item::NewFolder)
+			.SetSelectedCallback([this] { OnNewFolder(); }));
 }
 
-bool BookmarkTreeViewContextMenu::IsItemEnabled(UINT id) const
+void BookmarkTreeViewContextMenu::OnRename()
 {
-	switch (id)
-	{
-	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME:
-	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE:
-		return !m_bookmarkTree->IsPermanentNode(m_targetFolder.Get());
-	}
-
-	return true;
-}
-
-void BookmarkTreeViewContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
 	if (!m_targetFolder)
 	{
 		return;
 	}
 
-	switch (id)
-	{
-	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_RENAME:
-		m_delegate->StartRenamingFolder(m_targetFolder.Get());
-		break;
-
-	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_DELETE:
-		DeleteItem();
-		break;
-
-	case IDM_BOOKMARK_TREEVIEW_CONTEXT_MENU_NEW_FOLDER:
-		m_delegate->CreateFolder(m_targetFolder.Get(), m_targetFolder->GetChildren().size());
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+	m_delegate->StartRenamingFolder(m_targetFolder.Get());
 }
 
-void BookmarkTreeViewContextMenu::DeleteItem()
+void BookmarkTreeViewContextMenu::OnDelete()
 {
+	if (!m_targetFolder)
+	{
+		return;
+	}
+
 	m_bookmarkTree->RemoveBookmarkItem(m_targetFolder.Get());
+}
+
+void BookmarkTreeViewContextMenu::OnNewFolder()
+{
+	if (!m_targetFolder)
+	{
+		return;
+	}
+
+	m_delegate->CreateFolder(m_targetFolder.Get(), m_targetFolder->GetChildren().size());
 }
