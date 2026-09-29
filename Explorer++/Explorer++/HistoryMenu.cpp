@@ -7,10 +7,9 @@
 #include "HistoryModel.h"
 
 HistoryMenu::HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
-	UINT startId, UINT endId) :
+	HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
 	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyModel), browserWindow,
-		shellIconLoader, startId, endId),
+		shellIconLoader),
 	m_historyModel(historyModel)
 {
 	m_connections.push_back(m_historyModel->AddHistoryChangedObserver(

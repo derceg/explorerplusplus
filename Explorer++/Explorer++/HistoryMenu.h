@@ -13,8 +13,7 @@ class HistoryMenu : public ShellItemsMenu
 {
 public:
 	HistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
-		UINT startId = DEFAULT_START_ID, UINT endId = DEFAULT_END_ID);
+		HistoryModel *historyModel, BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader);
 
 private:
 	void OnHistoryChanged();

@@ -33,14 +33,6 @@ protected:
 		return pidls;
 	}
 
-	void CheckIdRange(UINT startId, UINT endId, UINT expectedStartId, UINT expectedEndId)
-	{
-		MenuTestHost menuHost;
-		ShellItemsMenu menu(menuHost.GetView(), &m_acceleratorManager,
-			{ CreateSimplePidlForTest(L"c:\\") }, m_browser, &m_shellIconLoader, startId, endId);
-		EXPECT_EQ(menu.GetIdRange(), MenuBase::IdRange(expectedStartId, expectedEndId));
-	}
-
 	ShellIconLoaderFake m_shellIconLoader;
 
 	BrowserWindowFake *const m_browser;
@@ -70,34 +62,6 @@ TEST_F(ShellItemsMenuTest, CheckItemBitmapsAssigned)
 	{
 		EXPECT_NE(menuView->GetItemBitmapForTesting(menuView->GetItemIdForTesting(i)), nullptr);
 	}
-}
-
-TEST_F(ShellItemsMenuTest, MaxItems)
-{
-	MenuTestHost menuHost;
-	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(menuHost.GetView(), &m_acceleratorManager, pidls, m_browser,
-		&m_shellIconLoader, 1, 2);
-
-	// The menu only has a single ID it can assign from the provided range of [1,2). So, although 3
-	// items were passed in, only the first item should be added to the menu.
-	MenuViewTestHelper::CheckShellItemDetails(menuHost.GetView(), { pidls[0] });
-}
-
-TEST_F(ShellItemsMenuTest, GetIdRange)
-{
-	CheckIdRange(20, 100, 20, 100);
-
-	// 0 isn't a valid start ID, so the final ID range should start from 1.
-	CheckIdRange(0, 46, 1, 46);
-
-	// 0 isn't a valid end ID either, so the end ID should be set to the start ID.
-	CheckIdRange(11, 0, 11, 11);
-
-	CheckIdRange(0, 0, 1, 1);
-
-	// The end ID should always be greater or equal to the start ID.
-	CheckIdRange(200, 148, 200, 200);
 }
 
 TEST_F(ShellItemsMenuTest, RebuildMenu)

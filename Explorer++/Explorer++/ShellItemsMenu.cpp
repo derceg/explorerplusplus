@@ -8,13 +8,13 @@
 #include "MenuView.h"
 #include "NavigationHelper.h"
 #include "ShellIconModel.h"
+#include "../Helper/Pidl.h"
 #include "../Helper/ShellHelper.h"
-#include <glog/logging.h>
 
 ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
-	ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
-	MenuBase(menuView, acceleratorManager, startId, endId),
+	ShellIconLoader *shellIconLoader) :
+	MenuBase(menuView, acceleratorManager),
 	m_browserWindow(browserWindow),
 	m_shellIconLoader(shellIconLoader)
 {
@@ -24,47 +24,27 @@ ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acc
 void ShellItemsMenu::RebuildMenu(const std::vector<PidlAbsolute> &pidls)
 {
 	m_rootMenuView->ClearMenu();
-	m_idCounter = GetIdRange().startId;
-	m_idPidlMap.clear();
 
 	for (const auto &pidl : pidls)
 	{
-		AddMenuItemForPidl(pidl.Raw());
+		AddMenuItemForPidl(pidl);
 	}
 }
 
-void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
+void ShellItemsMenu::AddMenuItemForPidl(const PidlAbsolute &pidl)
 {
-	auto id = m_idCounter++;
-
-	if (id >= GetIdRange().endId)
-	{
-		return;
-	}
-
-	m_rootMenuView->AppendItem(this, id, GetDisplayNameWithFallback(pidl, SHGDN_NORMAL),
-		std::make_unique<ShellIconModel>(m_shellIconLoader, pidl),
-		GetFolderPathForDisplayWithFallback(pidl));
-
-	auto [itr, didInsert] = m_idPidlMap.insert({ id, pidl });
-	DCHECK(didInsert);
+	m_rootMenuView->AppendItem(MenuItemParams(GetDisplayNameWithFallback(pidl.Raw(), SHGDN_NORMAL))
+			.SetIconModel(std::make_unique<ShellIconModel>(m_shellIconLoader, pidl.Raw()))
+			.SetHelpText(GetFolderPathForDisplayWithFallback(pidl.Raw()))
+			.SetSelectedCallback([this, pidl](bool isCtrlKeyDown, bool isShiftKeyDown)
+				{ OpenSelectedItem(pidl.Raw(), false, isCtrlKeyDown, isShiftKeyDown); })
+			.SetMiddleClickedCallback([this, pidl](bool isCtrlKeyDown, bool isShiftKeyDown)
+				{ OpenSelectedItem(pidl.Raw(), true, isCtrlKeyDown, isShiftKeyDown); }));
 }
 
-void ShellItemsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+void ShellItemsMenu::OpenSelectedItem(PCIDLIST_ABSOLUTE pidl, bool isMiddleButtonDown,
+	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	OpenSelectedItem(id, false, isCtrlKeyDown, isShiftKeyDown);
-}
-
-void ShellItemsMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	OpenSelectedItem(id, true, isCtrlKeyDown, isShiftKeyDown);
-}
-
-void ShellItemsMenu::OpenSelectedItem(UINT id, bool isMiddleButtonDown, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
-{
-	auto itr = m_idPidlMap.find(id);
-	CHECK(itr != m_idPidlMap.end());
-	m_browserWindow->OpenItem(itr->second.Raw(),
+	m_browserWindow->OpenItem(pidl,
 		DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
 }

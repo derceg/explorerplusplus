@@ -9,9 +9,9 @@
 
 FrequentLocationsMenu::FrequentLocationsMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, FrequentLocationsModel *frequentLocationsModel,
-	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
+	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
 	ShellItemsMenu(menuView, acceleratorManager, GetLocations(frequentLocationsModel),
-		browserWindow, shellIconLoader, startId, endId),
+		browserWindow, shellIconLoader),
 	m_frequentLocationsModel(frequentLocationsModel)
 {
 	m_connections.push_back(m_frequentLocationsModel->AddLocationsChangedObserver(

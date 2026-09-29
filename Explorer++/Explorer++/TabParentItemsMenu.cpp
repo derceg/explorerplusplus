@@ -11,10 +11,10 @@
 
 TabParentItemsMenu::TabParentItemsMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, BrowserWindow *browserWindow,
-	ShellIconLoader *shellIconLoader, UINT startId, UINT endId) :
+	ShellIconLoader *shellIconLoader) :
 	ShellItemsMenu(menuView, acceleratorManager,
 		GetParentPidlCollection(browserWindow->GetActiveShellBrowser()), browserWindow,
-		shellIconLoader, startId, endId)
+		shellIconLoader)
 {
 }
 
