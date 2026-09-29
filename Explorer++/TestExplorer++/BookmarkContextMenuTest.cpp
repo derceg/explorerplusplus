@@ -56,7 +56,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Open)
 	MenuTestHost menuHost;
 	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::Open, false, false);
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
 
@@ -69,7 +69,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, OpenInNewTab)
 	MenuTestHost menuHost;
 	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_IN_NEW_TAB, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::OpenInNewTab, false, false);
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
@@ -87,7 +87,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Cut)
 	CopiedBookmark copiedBookmark(*m_bookmark);
 	const auto *parentFolder = m_bookmark->GetParent();
 
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_CUT, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::Cut, false, false);
 
 	// Cutting the bookmark should have removed it from the tree.
 	ASSERT_TRUE(parentFolder->GetChildren().empty());
@@ -104,7 +104,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Copy)
 
 	CopiedBookmark copiedBookmark(*m_bookmark);
 
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_COPY, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::Copy, false, false);
 
 	BookmarkClipboard bookmarkClipboard(m_platformContext.GetClipboardStore());
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
@@ -126,7 +126,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 	MenuTestHost menuHost;
 	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_PASTE, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::Paste, false, false);
 
 	const auto *parentFolder = m_bookmark->GetParent();
 	ASSERT_EQ(parentFolder->GetChildren().size(), 2u);
@@ -142,7 +142,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Delete)
 	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(removedCallback.AsStdFunction());
 
 	EXPECT_CALL(removedCallback, Call(m_bookmark->GetGUID()));
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_DELETE, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::Delete, false, false);
 }
 
 class BookmarkContextMenuMultipleBookmarksTest : public BookmarkContextMenuTestBase
@@ -177,7 +177,7 @@ TEST_F(BookmarkContextMenuMultipleBookmarksTest, OpenAll)
 	MenuTestHost menuHost;
 	auto contextMenu = BuildContextMenu(menuHost.GetView());
 
-	menuHost.SelectItem(IDM_BOOKMARK_CONTEXT_MENU_OPEN_ALL, false, false);
+	menuHost.SelectItem(BookmarkContextMenu::Item::OpenAll, false, false);
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	int numBookmarks = static_cast<int>(m_bookmarkItems.size());

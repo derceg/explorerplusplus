@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 #include "../Helper/FileOperations.h"
 
 class BookmarkTree;
@@ -17,33 +16,50 @@ class ResourceLoader;
 
 // Displays a context menu for one or more bookmarks. If multiple bookmarks are provided, they
 // should all reside in the same parent folder.
-class BookmarkContextMenu : public MenuBase, private MenuDelegate
+class BookmarkContextMenu : public MenuBase
 {
 public:
+	enum class Item
+	{
+		Open,
+		OpenInNewTab,
+		OpenAll,
+		NewBookmark,
+		NewFolder,
+		Cut,
+		Copy,
+		Paste,
+		Delete,
+		Properties
+	};
+
 	BookmarkContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems,
 		const ResourceLoader *resourceLoader, BrowserWindow *browser, HWND parentWindow,
 		PlatformContext *platformContext);
 
 private:
+	struct CreationTarget
+	{
+		BookmarkItem *folder = nullptr;
+		size_t index = 0;
+	};
+
 	void BuildMenu();
 	bool AreBookmarkItemsValid() const;
 	size_t GetTotalBookmarks() const;
 	bool HasPermanentNode() const;
-
-	// MenuDelegate
-	bool IsItemEnabled(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	bool CanPaste() const;
 
 	void OnOpen();
 	void OnOpenInNewTab();
 	void OnOpenAll();
-	void OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *targetParentFolder,
-		size_t targetIndex);
+	void OnNewBookmarkItem(BookmarkItem::Type type);
 	void OnCopy(ClipboardAction action);
-	void OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex);
+	void OnPaste();
 	void OnDelete();
 	void OnShowProperties();
+	CreationTarget GetCreationTarget() const;
 
 	BookmarkTree *const m_bookmarkTree;
 	const RawBookmarkItems m_bookmarkItems;
