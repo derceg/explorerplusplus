@@ -6,14 +6,13 @@
 
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 
 class AppServices;
 class BrowserWindow;
 struct Config;
 class ResourceLoader;
 
-class ToolbarOptionsMenu : public MenuBase, private MenuDelegate
+class ToolbarOptionsMenu : public MenuBase
 {
 public:
 	enum class Source
@@ -31,11 +30,7 @@ public:
 
 private:
 	void BuildMenu(Source source, const ResourceLoader *resourceLoader);
-
-	// MenuDelegate
-	bool IsItemEnabled(UINT id) const override;
-	bool IsItemChecked(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	bool CanPasteBookmark() const;
 
 	void OnNewBookmarkItem(BookmarkItem::Type type);
 	void OnPasteBookmark();
