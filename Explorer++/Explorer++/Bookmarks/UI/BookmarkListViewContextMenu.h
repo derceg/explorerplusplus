@@ -4,26 +4,29 @@
 
 #pragma once
 
+#include "Bookmarks/BookmarkItem.h"
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 #include "../Helper/WeakPtr.h"
 
-class BookmarkItem;
 class BookmarkItemCreationDelegate;
 class ResourceLoader;
 
-class BookmarkListViewContextMenu : public MenuBase, private MenuDelegate
+class BookmarkListViewContextMenu : public MenuBase
 {
 public:
+	enum class Item
+	{
+		NewBookmark,
+		NewFolder
+	};
+
 	BookmarkListViewContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkItemCreationDelegate *delegate, WeakPtr<BookmarkItem> targetFolder,
 		const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu();
-
-	// MenuDelegate
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void CreateBookmarkItem(BookmarkItem::Type type);
 
 	BookmarkItemCreationDelegate *const m_delegate;
 	WeakPtr<BookmarkItem> m_targetFolder;

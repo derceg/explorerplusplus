@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkListViewContextMenu.h"
-#include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkItemCreationDelegate.h"
 #include "MainResource.h"
 #include "MenuView.h"
@@ -23,17 +22,19 @@ BookmarkListViewContextMenu::BookmarkListViewContextMenu(MenuView *menuView,
 
 void BookmarkListViewContextMenu::BuildMenu()
 {
-	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK,
-		m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK));
-	m_rootMenuView->AppendItem(this, IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER,
-		m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER));
+	m_rootMenuView->AppendItem(MenuItemParams(
+		m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK))
+			.SetKey(Item::NewBookmark)
+			.SetSelectedCallback([this] { CreateBookmarkItem(BookmarkItem::Type::Bookmark); }));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER))
+			.SetKey(Item::NewFolder)
+			.SetSelectedCallback([this] { CreateBookmarkItem(BookmarkItem::Type::Folder); }));
 }
 
-void BookmarkListViewContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+void BookmarkListViewContextMenu::CreateBookmarkItem(BookmarkItem::Type type)
 {
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
-
 	if (!m_targetFolder)
 	{
 		return;
@@ -41,18 +42,12 @@ void BookmarkListViewContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bo
 
 	auto index = m_targetFolder->GetChildren().size();
 
-	switch (id)
+	if (type == BookmarkItem::Type::Bookmark)
 	{
-	case IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK:
 		m_delegate->CreateBookmark(m_targetFolder.Get(), index);
-		break;
-
-	case IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER:
+	}
+	else
+	{
 		m_delegate->CreateFolder(m_targetFolder.Get(), index);
-		break;
-
-	default:
-		DCHECK(false);
-		break;
 	}
 }

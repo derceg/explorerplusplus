@@ -57,10 +57,10 @@ TEST_F(BookmarkListViewContextMenuTest, Selection)
 {
 	// The target folder has 2 bookmarks, so the new bookmark should be added after those.
 	EXPECT_CALL(m_delegate, CreateBookmark(m_targetFolder, 2));
-	m_menuHost.SelectItem(IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK, false, false);
+	m_menuHost.SelectItem(BookmarkListViewContextMenu::Item::NewBookmark, false, false);
 
 	EXPECT_CALL(m_delegate, CreateFolder(m_targetFolder, 2));
-	m_menuHost.SelectItem(IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_FOLDER, false, false);
+	m_menuHost.SelectItem(BookmarkListViewContextMenu::Item::NewFolder, false, false);
 }
 
 TEST_F(BookmarkListViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
@@ -68,5 +68,5 @@ TEST_F(BookmarkListViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
 	m_bookmarkTree.RemoveBookmarkItem(m_targetFolder);
 
 	EXPECT_CALL(m_delegate, CreateBookmark(_, _)).Times(0);
-	m_menuHost.SelectItem(IDM_BOOKMARK_LISTVIEW_CONTEXT_MENU_NEW_BOOKMARK, false, false);
+	m_menuHost.SelectItem(BookmarkListViewContextMenu::Item::NewBookmark, false, false);
 }
