@@ -45,7 +45,7 @@ void MenuView::AppendItem(MenuItemParams params)
 
 	UINT id = AllocateId();
 	AppendItem(delegate.get(), id, params.GetText(), params.TakeIconModel(), params.GetHelpText(),
-		params.GetAcceleratorText());
+		params.GetAcceleratorText(), params.GetCheckStyle());
 
 	if (params.GetKey())
 	{
@@ -61,22 +61,14 @@ void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &t
 	const std::optional<std::wstring> &acceleratorText)
 {
 	AppendItem(delegate, id, text, std::move(iconModel), helpText, acceleratorText,
-		CheckStyle::Normal);
-}
-
-void MenuView::AppendRadioItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
-	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-	const std::optional<std::wstring> &acceleratorText)
-{
-	AppendItem(delegate, id, text, std::move(iconModel), helpText, acceleratorText,
-		CheckStyle::Radio);
+		MenuItemCheckStyle::Normal);
 }
 
 // Note that MenuDelegate is effectively a menu-level class, but it can be set with item-level
 // granularity. That allows different items on the same menu to be managed by different delegates.
 void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-	const std::optional<std::wstring> &acceleratorText, CheckStyle checkStyle)
+	const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle)
 {
 	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
 	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
@@ -95,7 +87,7 @@ void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &t
 	menuItemInfo.wID = id;
 	menuItemInfo.dwTypeData = finalText.data();
 
-	if (checkStyle == CheckStyle::Radio)
+	if (checkStyle == MenuItemCheckStyle::Radio)
 	{
 		WI_SetFlag(menuItemInfo.fMask, MIIM_FTYPE);
 		menuItemInfo.fType = MFT_RADIOCHECK;
@@ -111,6 +103,24 @@ void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &t
 	{
 		UpdateDynamicPropertiesForItem(id);
 	}
+}
+
+MenuView *MenuView::AppendSubMenu(SubMenuItemParams params)
+{
+	auto delegate = std::make_unique<InternalMenuDelegate>(params);
+
+	UINT id = AllocateId();
+	auto *view = AppendSubMenu(delegate.get(), id, params.GetText(), params.TakeIconModel());
+
+	if (params.GetKey())
+	{
+		m_keyToIdMap.insert({ *params.GetKey(), id });
+	}
+
+	auto *item = GetItem(id);
+	item->ownedDelegate = std::move(delegate);
+
+	return view;
 }
 
 MenuView *MenuView::AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
@@ -487,6 +497,15 @@ HBITMAP MenuView::GetItemBitmapForTesting(UINT id) const
 	return menuItemInfo.hbmpItem;
 }
 
+const MenuView *MenuView::GetSubMenuViewForTesting(const MenuItemKey &key) const
+{
+	CHECK(IsInTest());
+
+	auto id = MaybeGetIdForKey(key);
+	CHECK(id);
+	return GetSubMenuViewForTesting(*id);
+}
+
 const MenuView *MenuView::GetSubMenuViewForTesting(UINT id) const
 {
 	CHECK(IsInTest());
@@ -514,6 +533,11 @@ MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemParams &params) :
 	m_enabledCallback(params.TakeEnabledCallback()),
 	m_checkedCallback(params.TakeCheckedCallback()),
 	m_selectedCallback(params.TakeSelectedCallback()),
+	m_middleClickedCallback(params.TakeMiddleClickedCallback())
+{
+}
+
+MenuView::InternalMenuDelegate::InternalMenuDelegate(SubMenuItemParams &params) :
 	m_middleClickedCallback(params.TakeMiddleClickedCallback())
 {
 }

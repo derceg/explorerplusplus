@@ -252,6 +252,7 @@
     <ClCompile Include="ImageInteropTest.cpp" />
     <ClCompile Include="ImageOperationsTest.cpp" />
     <ClCompile Include="ListViewColumnsMenuTest.cpp" />
+    <ClCompile Include="ManageBookmarksViewsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
     <ClCompile Include="MenuControllerTest.cpp" />

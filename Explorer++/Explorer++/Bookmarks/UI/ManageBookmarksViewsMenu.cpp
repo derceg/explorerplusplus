@@ -24,126 +24,81 @@ ManageBookmarksViewsMenu::~ManageBookmarksViewsMenu() = default;
 
 void ManageBookmarksViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 {
-	auto *columnsSubMenuView =
-		m_rootMenuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP,
-			resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP));
+	auto *columnsSubMenuView = m_rootMenuView->AppendSubMenu(SubMenuItemParams(
+		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SHOW_COLUMNS_POPUP))
+			.SetKey(Item::ColumnsPopup));
 	m_columnsMenu = std::make_unique<ListViewColumnsMenu>(columnsSubMenuView, m_acceleratorManager,
 		m_bookmarkListPresenter->GetColumnModel(), resourceLoader);
 
-	auto *sortSubMenuView =
-		m_rootMenuView->AppendSubMenu(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP,
-			resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP));
+	auto *sortSubMenuView = m_rootMenuView->AppendSubMenu(
+		SubMenuItemParams(resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_POPUP))
+			.SetKey(Item::SortByPopup));
 	BuildSortMenu(sortSubMenuView, resourceLoader);
 }
 
 void ManageBookmarksViewsMenu::BuildSortMenu(MenuView *sortMenuView,
 	const ResourceLoader *resourceLoader)
 {
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT));
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME));
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION));
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED));
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED));
+	sortMenuView->AppendItem(
+		MenuItemParams(resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT))
+			.SetKey(Item::SortByDefault)
+			.SetCheckStyle(MenuItemCheckStyle::Radio)
+			.SetCheckedCallback([this] { return !HasSortColumn(); })
+			.SetSelectedCallback([this] { ResetSortColumn(); }));
+
+	AppendSortItem(sortMenuView, Item::SortByName, IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME,
+		BookmarkColumn::Name, resourceLoader);
+	AppendSortItem(sortMenuView, Item::SortByLocation,
+		IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION, BookmarkColumn::Location, resourceLoader);
+	AppendSortItem(sortMenuView, Item::SortByDateCreated,
+		IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED, BookmarkColumn::DateCreated, resourceLoader);
+	AppendSortItem(sortMenuView, Item::SortByDateModified,
+		IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED, BookmarkColumn::DateModified,
+		resourceLoader);
 
 	sortMenuView->AppendSeparator();
 
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING));
-	sortMenuView->AppendRadioItem(this, IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING,
-		resourceLoader->LoadString(IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING));
+	AppendSortDirectionItem(sortMenuView, Item::SortAscending,
+		IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING, SortDirection::Ascending, resourceLoader);
+	AppendSortDirectionItem(sortMenuView, Item::SortDescending,
+		IDS_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING, SortDirection::Descending, resourceLoader);
 }
 
-bool ManageBookmarksViewsMenu::IsItemEnabled(UINT id) const
+void ManageBookmarksViewsMenu::AppendSortItem(MenuView *sortMenuView, Item itemKey, UINT stringId,
+	BookmarkColumn column, const ResourceLoader *resourceLoader)
 {
-	switch (id)
-	{
-	// If there is no sort column set, then the default sort order applies and the
-	// ascending/descending options aren't relevant.
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING:
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING:
-		return m_bookmarkListPresenter->GetSortColumn() != std::nullopt;
-	}
-
-	return true;
+	sortMenuView->AppendItem(MenuItemParams(resourceLoader->LoadString(stringId))
+			.SetKey(itemKey)
+			.SetCheckStyle(MenuItemCheckStyle::Radio)
+			.SetCheckedCallback(
+				[this, column] { return m_bookmarkListPresenter->GetSortColumn() == column; })
+			.SetSelectedCallback([this, column] { UpdateSortColumn(column); }));
 }
 
-bool ManageBookmarksViewsMenu::IsItemChecked(UINT id) const
+void ManageBookmarksViewsMenu::AppendSortDirectionItem(MenuView *sortMenuView, Item itemKey,
+	UINT stringId, SortDirection sortDirection, const ResourceLoader *resourceLoader)
 {
-	switch (id)
-	{
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT:
-		return m_bookmarkListPresenter->GetSortColumn() == std::nullopt;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME:
-		return m_bookmarkListPresenter->GetSortColumn() == +BookmarkColumn::Name;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION:
-		return m_bookmarkListPresenter->GetSortColumn() == +BookmarkColumn::Location;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED:
-		return m_bookmarkListPresenter->GetSortColumn() == +BookmarkColumn::DateCreated;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED:
-		return m_bookmarkListPresenter->GetSortColumn() == +BookmarkColumn::DateModified;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING:
-		return m_bookmarkListPresenter->GetSortColumn() != std::nullopt
-			&& m_bookmarkListPresenter->GetSortDirection() == +SortDirection::Ascending;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING:
-		return m_bookmarkListPresenter->GetSortColumn() != std::nullopt
-			&& m_bookmarkListPresenter->GetSortDirection() == +SortDirection::Descending;
-	}
-
-	return false;
+	sortMenuView->AppendItem(MenuItemParams(resourceLoader->LoadString(stringId))
+			.SetKey(itemKey)
+			.SetCheckStyle(MenuItemCheckStyle::Radio)
+			.SetEnabledCallback([this] { return HasSortColumn(); })
+			.SetCheckedCallback(
+				[this, sortDirection]
+				{
+					return HasSortColumn()
+						&& m_bookmarkListPresenter->GetSortDirection() == sortDirection;
+				})
+			.SetSelectedCallback([this, sortDirection] { UpdateSortDirection(sortDirection); }));
 }
 
-void ManageBookmarksViewsMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+bool ManageBookmarksViewsMenu::HasSortColumn() const
 {
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
+	return m_bookmarkListPresenter->GetSortColumn() != std::nullopt;
+}
 
-	switch (id)
-	{
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_DEFAULT:
-		m_bookmarkListPresenter->SetSortDetails(std::nullopt, SortDirection::Ascending);
-		break;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_NAME:
-		UpdateSortColumn(BookmarkColumn::Name);
-		break;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LOCATION:
-		UpdateSortColumn(BookmarkColumn::Location);
-		break;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_ADDED:
-		UpdateSortColumn(BookmarkColumn::DateCreated);
-		break;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_BY_LAST_MODIFIED:
-		UpdateSortColumn(BookmarkColumn::DateModified);
-		break;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_ASCENDING:
-		m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
-			SortDirection::Ascending);
-		break;
-
-	case IDM_MANAGE_BOOKMARKS_VIEWS_MENU_SORT_DESCENDING:
-		m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
-			SortDirection::Descending);
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+void ManageBookmarksViewsMenu::ResetSortColumn()
+{
+	m_bookmarkListPresenter->SetSortDetails(std::nullopt, SortDirection::Ascending);
 }
 
 void ManageBookmarksViewsMenu::UpdateSortColumn(BookmarkColumn sortColumn)
@@ -154,4 +109,10 @@ void ManageBookmarksViewsMenu::UpdateSortColumn(BookmarkColumn sortColumn)
 	}
 
 	m_bookmarkListPresenter->SetSortDetails(sortColumn, SortDirection::Ascending);
+}
+
+void ManageBookmarksViewsMenu::UpdateSortDirection(SortDirection sortDirection)
+{
+	m_bookmarkListPresenter->SetSortDetails(m_bookmarkListPresenter->GetSortColumn(),
+		sortDirection);
 }

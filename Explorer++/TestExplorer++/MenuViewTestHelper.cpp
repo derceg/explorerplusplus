@@ -46,6 +46,13 @@ void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled)
 	EXPECT_EQ(delegate->IsItemEnabled(id), enabled);
 }
 
+void ExpectItemChecked(const MenuView *menuView, const MenuItemKey &key, bool checked)
+{
+	auto id = menuView->MaybeGetIdForKeyForTesting(key);
+	CHECK(id);
+	ExpectItemChecked(menuView, *id, checked);
+}
+
 void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked)
 {
 	auto *delegate = menuView->MaybeGetDelegateForItemForTesting(id);

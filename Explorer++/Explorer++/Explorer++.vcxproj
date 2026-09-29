@@ -1248,6 +1248,7 @@
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
     <ClCompile Include="StockIconModel.cpp" />
+    <ClCompile Include="SubMenuItemParams.cpp" />
     <ClCompile Include="TabBacking.cpp" />
     <ClCompile Include="TabContextMenu.cpp" />
     <ClCompile Include="TabView.cpp" />
@@ -1601,6 +1602,7 @@
     <ClInclude Include="MassRenameTokensMenu.h" />
     <ClInclude Include="MenuController.h" />
     <ClInclude Include="MenuDelegate.h" />
+    <ClInclude Include="MenuItemCallbacks.h" />
     <ClInclude Include="MenuItemKey.h" />
     <ClInclude Include="MenuItemParams.h" />
     <ClInclude Include="MouseEvent.h" />
@@ -1627,6 +1629,7 @@
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
     <ClInclude Include="SortModeMenuMappings.h" />
     <ClInclude Include="StockIconModel.h" />
+    <ClInclude Include="SubMenuItemParams.h" />
     <ClInclude Include="TabContextMenu.h" />
     <ClInclude Include="TabView.h" />
     <ClInclude Include="TabViewDelegate.h" />

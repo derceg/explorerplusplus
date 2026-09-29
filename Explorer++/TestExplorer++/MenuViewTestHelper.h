@@ -19,6 +19,7 @@ void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &
 
 void ExpectItemEnabled(const MenuView *menuView, const MenuItemKey &key, bool enabled);
 void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled);
+void ExpectItemChecked(const MenuView *menuView, const MenuItemKey &key, bool checked);
 void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked);
 
 }

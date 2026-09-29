@@ -943,6 +943,9 @@
     <ClCompile Include="MenuItemParams.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="SubMenuItemParams.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2056,6 +2059,12 @@
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MenuItemKey.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="SubMenuItemParams.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuItemCallbacks.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>

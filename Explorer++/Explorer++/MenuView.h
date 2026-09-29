@@ -8,6 +8,7 @@
 #include "MenuDelegate.h"
 #include "MenuItemKey.h"
 #include "MenuItemParams.h"
+#include "SubMenuItemParams.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <wil/resource.h>
 #include <memory>
@@ -24,11 +25,9 @@ public:
 	void EnableDragAndDrop(bool enable);
 
 	void AppendItem(MenuItemParams params);
+	MenuView *AppendSubMenu(SubMenuItemParams params);
 
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
-		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
-		const std::optional<std::wstring> &acceleratorText = std::nullopt);
-	void AppendRadioItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
 	MenuView *AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
@@ -49,6 +48,7 @@ public:
 	const MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id) const;
 	std::wstring GetItemTextForTesting(UINT id) const;
 	HBITMAP GetItemBitmapForTesting(UINT id) const;
+	const MenuView *GetSubMenuViewForTesting(const MenuItemKey &key) const;
 	const MenuView *GetSubMenuViewForTesting(UINT id) const;
 	void OnPopupWillShowForTesting(UINT dpi);
 	void OnPopupClosedForTesting();
@@ -56,16 +56,11 @@ public:
 private:
 	friend class MenuController;
 
-	enum class CheckStyle
-	{
-		Normal,
-		Radio
-	};
-
 	class InternalMenuDelegate : public MenuDelegate
 	{
 	public:
 		InternalMenuDelegate(MenuItemParams &params);
+		InternalMenuDelegate(SubMenuItemParams &params);
 
 		// MenuDelegate
 		bool IsItemEnabled(UINT id) const override;
@@ -99,7 +94,7 @@ private:
 
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-		const std::optional<std::wstring> &acceleratorText, CheckStyle checkStyle);
+		const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle);
 	UINT AllocateId();
 	MenuView *GetRoot();
 

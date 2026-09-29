@@ -6,16 +6,29 @@
 
 #include "Bookmarks/UI/BookmarkColumn.h"
 #include "MenuBase.h"
-#include "MenuDelegate.h"
+#include "../Helper/SortDirection.h"
 #include <memory>
 
 class BookmarkListPresenter;
 class ListViewColumnsMenu;
 class ResourceLoader;
 
-class ManageBookmarksViewsMenu : public MenuBase, private MenuDelegate
+class ManageBookmarksViewsMenu : public MenuBase
 {
 public:
+	enum class Item
+	{
+		ColumnsPopup,
+		SortByPopup,
+		SortByDefault,
+		SortByName,
+		SortByLocation,
+		SortByDateCreated,
+		SortByDateModified,
+		SortAscending,
+		SortDescending
+	};
+
 	ManageBookmarksViewsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkListPresenter *bookmarkListPresenter, const ResourceLoader *resourceLoader);
 	~ManageBookmarksViewsMenu();
@@ -23,13 +36,15 @@ public:
 private:
 	void BuildMenu(const ResourceLoader *resourceLoader);
 	void BuildSortMenu(MenuView *sortMenuView, const ResourceLoader *resourceLoader);
+	void AppendSortItem(MenuView *sortMenuView, Item itemKey, UINT stringId, BookmarkColumn column,
+		const ResourceLoader *resourceLoader);
+	void AppendSortDirectionItem(MenuView *sortMenuView, Item itemKey, UINT stringId,
+		SortDirection sortDirection, const ResourceLoader *resourceLoader);
+	bool HasSortColumn() const;
 
-	// MenuDelegate
-	bool IsItemEnabled(UINT id) const override;
-	bool IsItemChecked(UINT id) const override;
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-
+	void ResetSortColumn();
 	void UpdateSortColumn(BookmarkColumn sortColumn);
+	void UpdateSortDirection(SortDirection sortDirection);
 
 	BookmarkListPresenter *const m_bookmarkListPresenter;
 	std::unique_ptr<ListViewColumnsMenu> m_columnsMenu;

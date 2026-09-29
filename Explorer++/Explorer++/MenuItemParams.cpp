@@ -21,6 +21,17 @@ MenuItemParams &&MenuItemParams::SetKey(const MenuItemKey &key) &&
 	return std::move(SetKey(key));
 }
 
+MenuItemParams &MenuItemParams::SetCheckStyle(MenuItemCheckStyle checkStyle) &
+{
+	m_checkStyle = checkStyle;
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetCheckStyle(MenuItemCheckStyle checkStyle) &&
+{
+	return std::move(SetCheckStyle(checkStyle));
+}
+
 MenuItemParams &MenuItemParams::SetIconModel(std::unique_ptr<const IconModel> iconModel) &
 {
 	m_iconModel = std::move(iconModel);
@@ -138,6 +149,11 @@ const std::optional<MenuItemKey> &MenuItemParams::GetKey() const
 const std::wstring &MenuItemParams::GetText() const
 {
 	return m_text;
+}
+
+MenuItemCheckStyle MenuItemParams::GetCheckStyle() const
+{
+	return m_checkStyle;
 }
 
 std::unique_ptr<const IconModel> MenuItemParams::TakeIconModel()

@@ -112,16 +112,13 @@ TEST_F(MenuViewTest, AppendItem)
 	CheckAppendItem(idCounter++, L"Item 3", L"Help text for item 3");
 }
 
-TEST_F(MenuViewTest, AppendRadioItem)
+TEST_F(MenuViewTest, SetCheckStyle)
 {
-	UINT idCounter = 100;
+	m_menuView.AppendItem(MenuItemParams(L"Radio item").SetCheckStyle(MenuItemCheckStyle::Radio));
 
-	UINT itemId = idCounter++;
-	m_menuView.AppendRadioItem(nullptr, itemId, L"Radio item");
-
-	EXPECT_TRUE(WI_IsFlagSet(
-		MenuHelper::GetMenuItemType(m_menuView.GetNativeMenuForTesting(), itemId, false),
-		MFT_RADIOCHECK));
+	EXPECT_TRUE(
+		WI_IsFlagSet(MenuHelper::GetMenuItemType(m_menuView.GetNativeMenuForTesting(), 0, true),
+			MFT_RADIOCHECK));
 }
 
 TEST_F(MenuViewTest, AppendSubMenu)
