@@ -32,49 +32,31 @@ ApplicationContextMenu::ApplicationContextMenu(MenuView *menuView,
 
 void ApplicationContextMenu::BuildMenu()
 {
-	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_OPEN,
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN), {},
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN_HELP_TEXT));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN))
+			.SetHelpText(m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN_HELP_TEXT))
+			.SetSelectedCallback([this] { OnOpen(); }));
+
 	m_rootMenuView->AppendSeparator();
-	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_NEW,
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW), {},
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW_HELP_TEXT));
+
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW))
+			.SetHelpText(m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW_HELP_TEXT))
+			.SetSelectedCallback([this] { OnNew(); }));
+
 	m_rootMenuView->AppendSeparator();
-	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_DELETE,
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE), {},
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE_HELP_TEXT));
-	m_rootMenuView->AppendItem(this, IDM_APPLICATION_CONTEXT_MENU_PROPERTIES,
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES), {},
-		m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
-}
 
-void ApplicationContextMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	UNREFERENCED_PARAMETER(isCtrlKeyDown);
-	UNREFERENCED_PARAMETER(isShiftKeyDown);
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE))
+			.SetHelpText(
+				m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE_HELP_TEXT))
+			.SetSelectedCallback([this] { OnDelete(); }));
 
-	switch (id)
-	{
-	case IDM_APPLICATION_CONTEXT_MENU_OPEN:
-		OnOpen();
-		break;
-
-	case IDM_APPLICATION_CONTEXT_MENU_NEW:
-		OnNew();
-		break;
-
-	case IDM_APPLICATION_CONTEXT_MENU_DELETE:
-		OnDelete();
-		break;
-
-	case IDM_APPLICATION_CONTEXT_MENU_PROPERTIES:
-		OnShowProperties();
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES))
+			.SetHelpText(
+				m_resourceLoader->LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES_HELP_TEXT))
+			.SetSelectedCallback([this] { OnShowProperties(); }));
 }
 
 void ApplicationContextMenu::OnOpen()

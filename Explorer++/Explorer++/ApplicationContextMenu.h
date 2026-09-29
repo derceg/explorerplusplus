@@ -5,7 +5,6 @@
 #pragma once
 
 #include "MenuBase.h"
-#include "MenuDelegate.h"
 
 class BrowserWindow;
 class MenuView;
@@ -18,7 +17,7 @@ class Application;
 class ApplicationExecutor;
 class ApplicationModel;
 
-class ApplicationContextMenu : public MenuBase, private MenuDelegate
+class ApplicationContextMenu : public MenuBase
 {
 public:
 	ApplicationContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -27,9 +26,6 @@ public:
 
 private:
 	void BuildMenu();
-
-	// MenuDelegate
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	void OnOpen();
 	void OnNew();
