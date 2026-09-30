@@ -11,23 +11,22 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellIconModel.h"
+#include "../Helper/ShellHelper.h"
 
 TabHistoryMenu::TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, MenuType type) :
 	MenuBase(menuView, acceleratorManager),
-	m_browserWindow(browserWindow),
-	m_shellIconLoader(shellIconLoader),
-	m_type(type)
+	m_browserWindow(browserWindow)
 {
-	BuildMenu();
+	BuildMenu(shellIconLoader, type);
 }
 
-void TabHistoryMenu::BuildMenu()
+void TabHistoryMenu::BuildMenu(ShellIconLoader *shellIconLoader, MenuType type)
 {
 	auto *shellBrowser = GetShellBrowser();
 	std::vector<HistoryEntry *> history;
 
-	if (m_type == MenuType::Back)
+	if (type == MenuType::Back)
 	{
 		history = shellBrowser->GetNavigationController()->GetBackHistory();
 	}
@@ -38,42 +37,29 @@ void TabHistoryMenu::BuildMenu()
 
 	// This class shouldn't be invoked in a situation where there is no history for a tab.
 	DCHECK(!history.empty());
+	int index = 0;
 
 	for (auto *entry : history)
 	{
-		AddMenuItemForHistoryEntry(entry);
+		const auto &pidl = entry->GetPidl();
+		int offset = (index + 1) * (type == MenuType::Back ? -1 : 1);
+
+		m_rootMenuView->AppendItem(
+			MenuItemParams(GetDisplayNameWithFallback(pidl.Raw(), SHGDN_INFOLDER))
+				.SetIconModel(std::make_unique<ShellIconModel>(shellIconLoader, pidl.Raw()))
+				.SetHelpText(GetFolderPathForDisplayWithFallback(pidl.Raw()))
+				.SetSelectedCallback([this, offset](bool isCtrlKeyDown, bool isShiftKeyDown)
+					{ NavigateToHistoryEntry(offset, false, isCtrlKeyDown, isShiftKeyDown); })
+				.SetMiddleClickedCallback([this, offset](bool isCtrlKeyDown, bool isShiftKeyDown)
+					{ NavigateToHistoryEntry(offset, true, isCtrlKeyDown, isShiftKeyDown); }));
+
+		index++;
 	}
 }
 
-void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
-{
-	auto id = m_idCounter++;
-
-	m_rootMenuView->AppendItem(this, id,
-		GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER),
-		std::make_unique<ShellIconModel>(m_shellIconLoader, entry->GetPidl().Raw()));
-}
-
-void TabHistoryMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	NavigateToHistoryEntry(id, false, isCtrlKeyDown, isShiftKeyDown);
-}
-
-void TabHistoryMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	NavigateToHistoryEntry(id, true, isCtrlKeyDown, isShiftKeyDown);
-}
-
-void TabHistoryMenu::NavigateToHistoryEntry(UINT id, bool isMiddleButtonDown, bool isCtrlKeyDown,
+void TabHistoryMenu::NavigateToHistoryEntry(int offset, bool isMiddleButtonDown, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
-	int offset = id;
-
-	if (m_type == MenuType::Back)
-	{
-		offset = -offset;
-	}
-
 	auto *shellBrowser = GetShellBrowser();
 	auto *entry = shellBrowser->GetNavigationController()->GetEntry(offset);
 
