@@ -53,7 +53,7 @@ void MainMenu::BuildMenu(BrowserWindow *browser, AppServices *appServices,
 void MainMenu::BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featureList,
 	ShellIconLoader *shellIconLoader)
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_FILE_POPUP, IDS_FILE_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_FILE_POPUP);
 
 	AppendItem(menuView, IDM_FILE_NEWTAB, IDS_FILE_NEWTAB);
 	AppendItem(menuView, IDM_FILE_CLOSETAB, IDS_FILE_CLOSETAB);
@@ -63,8 +63,7 @@ void MainMenu::BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featur
 		AppendItem(menuView, IDM_FILE_NEW_WINDOW, IDS_FILE_NEW_WINDOW);
 	}
 
-	auto *recentTabsSubMenuView =
-		AppendSubMenu(menuView, IDM_FILE_REOPEN_RECENT_TAB_POPUP, IDS_FILE_REOPEN_RECENT_TAB_POPUP);
+	auto *recentTabsSubMenuView = AppendSubMenu(menuView, IDS_FILE_REOPEN_RECENT_TAB_POPUP);
 	m_childMenus.push_back(std::make_unique<TabRestorerMenu>(recentTabsSubMenuView,
 		m_acceleratorManager, tabRestorer, shellIconLoader, m_resourceLoader));
 
@@ -102,7 +101,7 @@ void MainMenu::BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featur
 
 void MainMenu::BuildEditMenu()
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_EDIT_POPUP, IDS_EDIT_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_EDIT_POPUP);
 
 	AppendItem(menuView, IDM_EDIT_UNDO, IDS_EDIT_UNDO);
 
@@ -127,7 +126,7 @@ void MainMenu::BuildEditMenu()
 
 void MainMenu::BuildSelectionMenu()
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_SELECTION_POPUP, IDS_SELECTION_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_SELECTION_POPUP);
 
 	AppendItem(menuView, IDM_EDIT_SELECTALL, IDS_EDIT_SELECTALL);
 	AppendItem(menuView, IDM_EDIT_INVERTSELECTION, IDS_EDIT_INVERTSELECTION);
@@ -139,7 +138,7 @@ void MainMenu::BuildSelectionMenu()
 
 void MainMenu::BuildViewMenu(BrowserWindow *browser, AppServices *appServices)
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_VIEW_POPUP, IDS_VIEW_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_VIEW_POPUP);
 
 	if (appServices->GetFeatureList()->IsEnabled(Feature::DualPane))
 	{
@@ -150,8 +149,7 @@ void MainMenu::BuildViewMenu(BrowserWindow *browser, AppServices *appServices)
 	AppendItem(menuView, IDM_VIEW_FOLDERS, IDS_VIEW_FOLDERS);
 	AppendItem(menuView, IDM_VIEW_DISPLAYWINDOW, IDS_VIEW_DISPLAYWINDOW);
 
-	auto *toolbarsMenuView =
-		AppendSubMenu(menuView, IDM_VIEW_TOOLBARS_POPUP, IDS_VIEW_TOOLBARS_POPUP);
+	auto *toolbarsMenuView = AppendSubMenu(menuView, IDS_VIEW_TOOLBARS_POPUP);
 	m_childMenus.push_back(std::make_unique<ToolbarOptionsMenu>(toolbarsMenuView,
 		ToolbarOptionsMenu::Source::MainMenu, browser, appServices));
 
@@ -182,7 +180,7 @@ void MainMenu::BuildViewMenu(BrowserWindow *browser, AppServices *appServices)
 
 	menuView->AppendSeparator();
 
-	auto *filterMenuView = AppendSubMenu(menuView, IDM_VIEW_FILTER_POPUP, IDS_VIEW_FILTER_POPUP);
+	auto *filterMenuView = AppendSubMenu(menuView, IDS_VIEW_FILTER_POPUP);
 	BuildFilterSubMenu(filterMenuView);
 }
 
@@ -194,7 +192,7 @@ void MainMenu::BuildFilterSubMenu(MenuView *filterMenuView)
 
 void MainMenu::BuildActionsMenu()
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_ACTIONS_POPUP, IDS_ACTIONS_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_ACTIONS_POPUP);
 
 	AppendItem(menuView, IDM_ACTIONS_NEWFOLDER, IDS_ACTIONS_NEWFOLDER);
 
@@ -208,7 +206,7 @@ void MainMenu::BuildActionsMenu()
 void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
 	ShellIconLoader *shellIconLoader)
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_GO_POPUP, IDS_GO_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_GO_POPUP);
 
 	AppendItem(menuView, IDM_GO_BACK, IDS_GO_BACK);
 	AppendItem(menuView, IDM_GO_FORWARD, IDS_GO_FORWARD);
@@ -216,12 +214,11 @@ void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
 
 	menuView->AppendSeparator();
 
-	auto *historySubMenuView = AppendSubMenu(menuView, IDM_GO_HISTORY_POPUP, IDS_GO_HISTORY_POPUP);
+	auto *historySubMenuView = AppendSubMenu(menuView, IDS_GO_HISTORY_POPUP);
 	m_childMenus.push_back(std::make_unique<HistoryMenu>(historySubMenuView, m_acceleratorManager,
 		appServices->GetHistoryModel(), browser, shellIconLoader));
 
-	auto *frequentLocationsSubMenuView =
-		AppendSubMenu(menuView, IDM_GO_FREQUENT_LOCATIONS_POPUP, IDS_GO_FREQUENT_LOCATIONS_POPUP);
+	auto *frequentLocationsSubMenuView = AppendSubMenu(menuView, IDS_GO_FREQUENT_LOCATIONS_POPUP);
 	m_childMenus.push_back(std::make_unique<FrequentLocationsMenu>(frequentLocationsSubMenuView,
 		m_acceleratorManager, appServices->GetFrequentLocationsModel(), browser, shellIconLoader));
 
@@ -309,7 +306,7 @@ void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const PidlAbsolut
 void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
 	IconFetcher *iconFetcher)
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_BOOKMARKS_POPUP, IDS_BOOKMARKS_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_BOOKMARKS_POPUP);
 
 	m_childMenus.push_back(std::make_unique<BookmarksMainMenu>(menuView, m_acceleratorManager,
 		appServices->GetBookmarkTree(), browser, iconFetcher, appServices->GetPlatformContext(),
@@ -318,7 +315,7 @@ void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServic
 
 void MainMenu::BuildToolsMenu(const FeatureList *featureList)
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_TOOLS_POPUP, IDS_TOOLS_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_TOOLS_POPUP);
 
 	AppendItem(menuView, IDM_TOOLS_SEARCH, IDS_TOOLS_SEARCH);
 	AppendItem(menuView, IDM_TOOLS_CUSTOMIZECOLORS, IDS_TOOLS_CUSTOMIZECOLORS);
@@ -335,14 +332,14 @@ void MainMenu::BuildToolsMenu(const FeatureList *featureList)
 
 void MainMenu::BuildWindowMenu()
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_WINDOW_POPUP, IDS_WINDOW_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_WINDOW_POPUP);
 
 	AppendItem(menuView, IDM_WINDOW_SEARCH_TABS, IDS_WINDOW_SEARCH_TABS);
 }
 
 void MainMenu::BuildHelpMenu()
 {
-	auto *menuView = AppendSubMenu(m_rootMenuView, IDM_HELP_POPUP, IDS_HELP_POPUP);
+	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_HELP_POPUP);
 
 	AppendItem(menuView, IDM_HELP_ONLINE_DOCUMENTATION, IDS_HELP_ONLINE_DOCUMENTATION);
 
@@ -359,10 +356,9 @@ void MainMenu::AppendItem(MenuView *menuView, UINT id, UINT textResourceId)
 		MaybeCreateIconModel(id), helpText.value_or(L""), GetAcceleratorTextForId(id));
 }
 
-MenuView *MainMenu::AppendSubMenu(MenuView *menuView, UINT id, UINT textResourceId)
+MenuView *MainMenu::AppendSubMenu(MenuView *menuView, UINT textResourceId)
 {
-	return menuView->AppendSubMenu(nullptr, id, m_resourceLoader->LoadString(textResourceId),
-		MaybeCreateIconModel(id));
+	return menuView->AppendSubMenu(m_resourceLoader->LoadString(textResourceId));
 }
 
 std::unique_ptr<IconModel> MainMenu::MaybeCreateIconModel(UINT id) const

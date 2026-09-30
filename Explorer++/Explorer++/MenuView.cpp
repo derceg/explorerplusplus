@@ -107,37 +107,28 @@ void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &t
 
 MenuView *MenuView::AppendSubMenu(SubMenuItemParams params)
 {
+	UINT id = AllocateId();
 	auto delegate = std::make_unique<InternalMenuDelegate>(params);
 
-	UINT id = AllocateId();
-	auto *view = AppendSubMenu(delegate.get(), id, params.GetText(), params.TakeIconModel());
-
-	if (params.GetKey())
-	{
-		m_keyToIdMap.insert({ *params.GetKey(), id });
-	}
-
-	auto *item = GetItem(id);
-	item->ownedDelegate = std::move(delegate);
-
-	return view;
-}
-
-MenuView *MenuView::AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
-	std::unique_ptr<const IconModel> iconModel)
-{
 	auto ownedSubMenu = MenuHelper::CheckedCreatePopupMenu();
 	auto subMenu = ownedSubMenu.get();
-	MenuHelper::AddSubMenuItem(m_menu, id, text, std::move(ownedSubMenu));
+	MenuHelper::AddSubMenuItem(m_menu, id, params.GetText(), std::move(ownedSubMenu));
 
-	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, delegate, std::move(iconModel), L"");
+	auto [itr, didInsert] =
+		m_idToItemMap.try_emplace(id, delegate.get(), std::move(params.TakeIconModel()), L"");
 	CHECK(didInsert);
+	itr->second.ownedDelegate = std::move(delegate);
 
 	auto ownedView = std::make_unique<MenuView>(subMenu);
 	auto *view = ownedView.get();
 	view->m_parent = this;
 
 	m_idToSubMenuMap.insert({ id, std::move(ownedView) });
+
+	if (params.GetKey())
+	{
+		m_keyToIdMap.insert({ *params.GetKey(), id });
+	}
 
 	if (m_isShowing)
 	{

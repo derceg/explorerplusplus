@@ -153,17 +153,17 @@ TEST_F(MenuControllerTest, SelectionWithSubmenus)
 {
 	MenuDelegateMock delegate;
 
-	UINT idCounter = 1;
+	UINT idCounter = 100;
 
 	UINT itemId1 = idCounter++;
 	m_view.AppendItem(&delegate, itemId1, L"Item 1");
 
-	auto *subMenuView1 = m_view.AppendSubMenu(&delegate, idCounter++, L"Submenu 1");
+	auto *subMenuView1 = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu 1"));
 
 	UINT itemId2 = idCounter++;
 	subMenuView1->AppendItem(&delegate, itemId2, L"Item 2");
 
-	auto *subMenuView2 = subMenuView1->AppendSubMenu(&delegate, idCounter++, L"Submenu 2");
+	auto *subMenuView2 = subMenuView1->AppendSubMenu(SubMenuItemParams(L"Submenu 2"));
 
 	UINT itemId3 = idCounter++;
 	subMenuView2->AppendItem(&delegate, itemId3, L"Item 3");
@@ -182,25 +182,24 @@ TEST_F(MenuControllerTest, SelectionWithSubmenusAndDifferentDelegates)
 {
 	MenuDelegateMock rootDelegate;
 
-	UINT idCounter = 1;
+	UINT idCounter = 100;
 
 	UINT itemId1 = idCounter++;
 	m_view.AppendItem(&rootDelegate, itemId1, L"Item 1");
 
-	auto *subMenuView1 = m_view.AppendSubMenu(&rootDelegate, idCounter++, L"Submenu 1");
+	auto *subMenuView1 = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu 1"));
 
 	UINT itemId2 = idCounter++;
 	subMenuView1->AppendItem(&rootDelegate, itemId2, L"Item 2");
 
-	auto *subMenuView2 = subMenuView1->AppendSubMenu(&rootDelegate, idCounter++, L"Submenu 2");
+	auto *subMenuView2 = subMenuView1->AppendSubMenu(SubMenuItemParams(L"Submenu 2"));
 
 	MenuDelegateMock subMenuView2Delegate;
 
 	UINT itemId3 = idCounter++;
 	subMenuView2->AppendItem(&subMenuView2Delegate, itemId3, L"Item 3");
 
-	auto *subMenuView3 =
-		subMenuView2->AppendSubMenu(&subMenuView2Delegate, idCounter++, L"Submenu 3");
+	auto *subMenuView3 = subMenuView2->AppendSubMenu(SubMenuItemParams(L"Submenu 3"));
 
 	UINT itemId4 = idCounter++;
 	subMenuView3->AppendItem(&subMenuView2Delegate, itemId4, L"Item 4");
@@ -222,12 +221,12 @@ TEST_F(MenuControllerTest, MiddleClickSelection)
 {
 	MenuDelegateMock rootDelegate;
 
-	UINT idCounter = 1;
+	UINT idCounter = 100;
 
 	UINT itemId1 = idCounter++;
 	m_view.AppendItem(&rootDelegate, itemId1, L"Item 1");
 
-	auto *subMenuView = m_view.AppendSubMenu(&rootDelegate, idCounter++, L"Submenu");
+	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu"));
 
 	MenuDelegateMock subMenuViewDelegate;
 
@@ -245,12 +244,12 @@ TEST_F(MenuControllerTest, RightClick)
 {
 	MenuDelegateMock rootDelegate;
 
-	UINT idCounter = 1;
+	UINT idCounter = 100;
 
 	UINT itemId1 = idCounter++;
 	m_view.AppendItem(&rootDelegate, itemId1, L"Item 1");
 
-	auto *subMenuView = m_view.AppendSubMenu(&rootDelegate, idCounter++, L"Submenu");
+	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu"));
 
 	MenuDelegateMock subMenuViewDelegate;
 
@@ -292,9 +291,9 @@ TEST_F(MenuControllerTest, HelpTextRequest)
 
 TEST_F(MenuControllerTest, SubMenuHelpTextRequest)
 {
-	UINT idCounter = 1;
+	UINT idCounter = 100;
 
-	auto *subMenuView = m_view.AppendSubMenu(nullptr, idCounter++, L"SubMenu");
+	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"SubMenu"));
 
 	UINT itemId = idCounter++;
 	std::wstring helpText = L"Help text";

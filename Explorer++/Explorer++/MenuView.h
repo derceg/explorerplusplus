@@ -30,8 +30,6 @@ public:
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
-	MenuView *AppendSubMenu(MenuDelegate *delegate, UINT id, const std::wstring &text,
-		std::unique_ptr<const IconModel> iconModel = {});
 	void AppendSeparator();
 	void RemoveDuplicateSeparators();
 	void RemoveTrailingSeparators();

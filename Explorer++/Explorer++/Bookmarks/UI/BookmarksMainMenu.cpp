@@ -94,8 +94,7 @@ void BookmarksMainMenu::BuildMenu()
 	{
 		m_rootMenuView->AppendSeparator();
 
-		auto *otherBookmarksMenu = m_rootMenuView->AppendSubMenu(nullptr,
-			IDM_BOOKMARKS_OTHER_BOOKMARKS_POPUP, otherBookmarksFolder->GetName());
+		auto *otherBookmarksMenu = m_rootMenuView->AppendSubMenu(otherBookmarksFolder->GetName());
 
 		m_childMenus.push_back(std::make_unique<BookmarksMenu>(otherBookmarksMenu,
 			m_acceleratorManager, m_bookmarkTree, otherBookmarksFolder, m_iconManager.get(),

@@ -100,7 +100,7 @@ TEST_F(MenuViewTest, IsRoot)
 {
 	EXPECT_TRUE(m_menuView.IsRoot());
 
-	auto *subMenu = m_menuView.AppendSubMenu(nullptr, 1, L"SubMenu");
+	auto *subMenu = m_menuView.AppendSubMenu(SubMenuItemParams(L"SubMenu"));
 	EXPECT_FALSE(subMenu->IsRoot());
 }
 
@@ -123,11 +123,17 @@ TEST_F(MenuViewTest, SetCheckStyle)
 
 TEST_F(MenuViewTest, AppendSubMenu)
 {
-	UINT subMenuItemId = 1;
-	m_menuView.AppendSubMenu(nullptr, subMenuItemId, L"SubMenu");
+	enum class Item
+	{
+		SubMenu
+	};
+
+	m_menuView.AppendSubMenu(SubMenuItemParams(L"SubMenu").SetKey(Item::SubMenu));
 	ASSERT_EQ(m_menuView.GetNumItems(), 1);
-	EXPECT_EQ(m_menuView.GetItemIdForTesting(0), subMenuItemId);
-	EXPECT_EQ(m_menuView.GetItemTextForTesting(subMenuItemId), L"SubMenu");
+
+	auto id = m_menuView.MaybeGetIdForKeyForTesting(Item::SubMenu);
+	ASSERT_NE(id, std::nullopt);
+	EXPECT_EQ(m_menuView.GetItemTextForTesting(*id), L"SubMenu");
 }
 
 TEST_F(MenuViewTest, ItemStates)
