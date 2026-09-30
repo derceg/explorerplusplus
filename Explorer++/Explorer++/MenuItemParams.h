@@ -54,6 +54,12 @@ public:
 	MenuItemParams &&SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &&;
 	MenuItemParams &SetMiddleClickedCallback(std::function<void()> callback) &;
 	MenuItemParams &&SetMiddleClickedCallback(std::function<void()> callback) &&;
+	MenuItemParams &SetRightClickedCallback(MenuItemRightClickedCallback callback) &;
+	MenuItemParams &&SetRightClickedCallback(MenuItemRightClickedCallback callback) &&;
+	MenuItemParams &SetDraggedCallback(MenuItemDraggedCallback callback) &;
+	MenuItemParams &&SetDraggedCallback(MenuItemDraggedCallback callback) &&;
+	MenuItemParams &SetMaybeGetDropTargetCallback(MenuItemMaybeGetDropTargetCallback callback) &;
+	MenuItemParams &&SetMaybeGetDropTargetCallback(MenuItemMaybeGetDropTargetCallback callback) &&;
 
 	const std::optional<MenuItemKey> &GetKey() const;
 	const std::wstring &GetText() const;
@@ -65,6 +71,9 @@ public:
 	MenuItemCheckedCallback TakeCheckedCallback();
 	MenuItemSelectedCallback TakeSelectedCallback();
 	MenuItemMiddleClickedCallback TakeMiddleClickedCallback();
+	MenuItemRightClickedCallback TakeRightClickedCallback();
+	MenuItemDraggedCallback TakeDraggedCallback();
+	MenuItemMaybeGetDropTargetCallback TakeMaybeGetDropTargetCallback();
 
 private:
 	std::optional<MenuItemKey> m_key;
@@ -77,4 +86,7 @@ private:
 	MenuItemCheckedCallback m_checkedCallback;
 	MenuItemSelectedCallback m_selectedCallback;
 	MenuItemMiddleClickedCallback m_middleClickedCallback;
+	MenuItemRightClickedCallback m_rightClickedCallback;
+	MenuItemDraggedCallback m_draggedCallback;
+	MenuItemMaybeGetDropTargetCallback m_maybeGetDropTargetCallback;
 };

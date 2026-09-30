@@ -141,6 +141,41 @@ MenuItemParams &&MenuItemParams::SetMiddleClickedCallback(std::function<void()> 
 	return std::move(SetMiddleClickedCallback(std::move(callback)));
 }
 
+MenuItemParams &MenuItemParams::SetRightClickedCallback(MenuItemRightClickedCallback callback) &
+{
+	m_rightClickedCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetRightClickedCallback(MenuItemRightClickedCallback callback) &&
+{
+	return std::move(SetRightClickedCallback(std::move(callback)));
+}
+
+MenuItemParams &MenuItemParams::SetDraggedCallback(MenuItemDraggedCallback callback) &
+{
+	m_draggedCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetDraggedCallback(MenuItemDraggedCallback callback) &&
+{
+	return std::move(SetDraggedCallback(std::move(callback)));
+}
+
+MenuItemParams &MenuItemParams::SetMaybeGetDropTargetCallback(
+	MenuItemMaybeGetDropTargetCallback callback) &
+{
+	m_maybeGetDropTargetCallback = std::move(callback);
+	return *this;
+}
+
+MenuItemParams &&MenuItemParams::SetMaybeGetDropTargetCallback(
+	MenuItemMaybeGetDropTargetCallback callback) &&
+{
+	return std::move(SetMaybeGetDropTargetCallback(std::move(callback)));
+}
+
 const std::optional<MenuItemKey> &MenuItemParams::GetKey() const
 {
 	return m_key;
@@ -189,4 +224,19 @@ MenuItemSelectedCallback MenuItemParams::TakeSelectedCallback()
 MenuItemMiddleClickedCallback MenuItemParams::TakeMiddleClickedCallback()
 {
 	return std::move(m_middleClickedCallback);
+}
+
+MenuItemRightClickedCallback MenuItemParams::TakeRightClickedCallback()
+{
+	return std::move(m_rightClickedCallback);
+}
+
+MenuItemDraggedCallback MenuItemParams::TakeDraggedCallback()
+{
+	return std::move(m_draggedCallback);
+}
+
+MenuItemMaybeGetDropTargetCallback MenuItemParams::TakeMaybeGetDropTargetCallback()
+{
+	return std::move(m_maybeGetDropTargetCallback);
 }

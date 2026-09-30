@@ -1393,7 +1393,6 @@
     <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp" />
     <ClCompile Include="Bookmarks\BookmarkRegistryStorage.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarksMainMenu.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarkMenuBuilder.cpp" />
     <ClCompile Include="Bookmarks\BookmarkTree.cpp" />
     <ClCompile Include="Bookmarks\BookmarkXmlStorage.cpp" />
     <ClCompile Include="DisplayWindow\DisplayWindow.cpp" />
@@ -1800,7 +1799,6 @@
     <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h" />
     <ClInclude Include="Bookmarks\BookmarkRegistryStorage.h" />
     <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h" />
     <ClInclude Include="Bookmarks\BookmarkStorage.h" />
     <ClInclude Include="Bookmarks\BookmarkTree.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreePresenter.h" />

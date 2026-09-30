@@ -533,12 +533,18 @@ MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemParams &params) :
 	m_enabledCallback(params.TakeEnabledCallback()),
 	m_checkedCallback(params.TakeCheckedCallback()),
 	m_selectedCallback(params.TakeSelectedCallback()),
-	m_middleClickedCallback(params.TakeMiddleClickedCallback())
+	m_middleClickedCallback(params.TakeMiddleClickedCallback()),
+	m_rightClickedCallback(params.TakeRightClickedCallback()),
+	m_draggedCallback(params.TakeDraggedCallback()),
+	m_maybeGetDropTargetCallback(params.TakeMaybeGetDropTargetCallback())
 {
 }
 
 MenuView::InternalMenuDelegate::InternalMenuDelegate(SubMenuItemParams &params) :
-	m_middleClickedCallback(params.TakeMiddleClickedCallback())
+	m_middleClickedCallback(params.TakeMiddleClickedCallback()),
+	m_rightClickedCallback(params.TakeRightClickedCallback()),
+	m_draggedCallback(params.TakeDraggedCallback()),
+	m_maybeGetDropTargetCallback(params.TakeMaybeGetDropTargetCallback())
 {
 }
 
@@ -586,4 +592,37 @@ void MenuView::InternalMenuDelegate::OnItemMiddleClicked(UINT id, bool isCtrlKey
 	{
 		m_middleClickedCallback(isCtrlKeyDown, isShiftKeyDown);
 	}
+}
+
+void MenuView::InternalMenuDelegate::OnItemRightClicked(UINT id, const POINT &ptScreen)
+{
+	UNREFERENCED_PARAMETER(id);
+
+	if (m_rightClickedCallback)
+	{
+		m_rightClickedCallback(ptScreen);
+	}
+}
+
+MenuDragAction MenuView::InternalMenuDelegate::OnItemDragged(UINT id)
+{
+	UNREFERENCED_PARAMETER(id);
+
+	if (m_draggedCallback)
+	{
+		return m_draggedCallback();
+	}
+
+	return MenuDragAction::ContinueMenu;
+}
+
+wil::com_ptr_nothrow<IDropTarget> MenuView::InternalMenuDelegate::MaybeGetDropTargetForLocation(
+	const MenuDropLocation &dropLocation)
+{
+	if (m_maybeGetDropTargetCallback)
+	{
+		return m_maybeGetDropTargetCallback(dropLocation.position);
+	}
+
+	return nullptr;
 }

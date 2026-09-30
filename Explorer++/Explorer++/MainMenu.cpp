@@ -313,7 +313,7 @@ void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServic
 
 	m_childMenus.push_back(std::make_unique<BookmarksMainMenu>(menuView, m_acceleratorManager,
 		appServices->GetBookmarkTree(), browser, iconFetcher, appServices->GetPlatformContext(),
-		m_resourceLoader, MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID));
+		m_resourceLoader));
 }
 
 void MainMenu::BuildToolsMenu(const FeatureList *featureList)

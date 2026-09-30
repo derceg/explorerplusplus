@@ -67,12 +67,19 @@ private:
 		bool IsItemChecked(UINT id) const override;
 		void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 		void OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+		void OnItemRightClicked(UINT id, const POINT &ptScreen) override;
+		MenuDragAction OnItemDragged(UINT id) override;
+		wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForLocation(
+			const MenuDropLocation &dropLocation) override;
 
 	private:
 		MenuItemEnabledCallback m_enabledCallback;
 		MenuItemCheckedCallback m_checkedCallback;
 		MenuItemSelectedCallback m_selectedCallback;
 		MenuItemMiddleClickedCallback m_middleClickedCallback;
+		MenuItemRightClickedCallback m_rightClickedCallback;
+		MenuItemDraggedCallback m_draggedCallback;
+		MenuItemMaybeGetDropTargetCallback m_maybeGetDropTargetCallback;
 	};
 
 	struct Item

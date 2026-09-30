@@ -230,13 +230,13 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 	}
 
 	UINT dropIndex;
-	MenuDropLocation::Position dropPosition;
+	MenuDropPosition dropPosition;
 
 	// If neither MNGOF_TOPGAP or MNGOF_BOTTOMGAP is set, the cursor is over an item.
 	if (WI_AreAllFlagsClear(objectInfo->dwFlags, MNGOF_TOPGAP | MNGOF_BOTTOMGAP))
 	{
 		dropIndex = objectInfo->uPos;
-		dropPosition = MenuDropLocation::Position::On;
+		dropPosition = MenuDropPosition::On;
 	}
 	else
 	{
@@ -281,12 +281,12 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 			CHECK(view->GetNumItems() != 0);
 
 			dropIndex = objectInfo->uPos - 1;
-			dropPosition = MenuDropLocation::Position::After;
+			dropPosition = MenuDropPosition::After;
 		}
 		else
 		{
 			dropIndex = objectInfo->uPos;
-			dropPosition = MenuDropLocation::Position::Before;
+			dropPosition = MenuDropPosition::Before;
 		}
 	}
 

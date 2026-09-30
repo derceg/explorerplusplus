@@ -22,8 +22,8 @@ MATCHER_P2(PointEq, x, y, "")
 
 MATCHER_P2(IsGapBetween, beforeId, afterId, "")
 {
-	return (arg.id == beforeId && arg.position == MenuDropLocation::Position::After)
-		|| (arg.id == afterId && arg.position == MenuDropLocation::Position::Before);
+	return (arg.id == beforeId && arg.position == MenuDropPosition::After)
+		|| (arg.id == afterId && arg.position == MenuDropPosition::Before);
 }
 
 class MenuHelpTextHostFake : public MenuHelpTextHost
@@ -335,19 +335,17 @@ TEST_F(MenuControllerTest, DropLocation)
 	InSequence seq;
 
 	EXPECT_CALL(delegate,
-		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId2, MenuDropLocation::Position::On }));
+		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId2, MenuDropPosition::On }));
 	SendMenuGetObject(m_ownerWindow.get(), 0, 1);
 
 	EXPECT_CALL(delegate,
-		MaybeGetDropTargetForLocation(
-			MenuDropLocation{ itemId1, MenuDropLocation::Position::Before }));
+		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId1, MenuDropPosition::Before }));
 	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 0);
 
 	EXPECT_CALL(delegate, MaybeGetDropTargetForLocation(IsGapBetween(itemId2, itemId3)));
 	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 2);
 
 	EXPECT_CALL(delegate,
-		MaybeGetDropTargetForLocation(
-			MenuDropLocation{ itemId3, MenuDropLocation::Position::After }));
+		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId3, MenuDropPosition::After }));
 	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 3);
 }

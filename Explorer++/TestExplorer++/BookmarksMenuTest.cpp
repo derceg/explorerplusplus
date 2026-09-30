@@ -29,7 +29,7 @@ protected:
 	}
 
 	[[nodiscard]] BookmarksMenu BuildMenu(MenuView *menuView, BookmarkItem *targetFolder,
-		BookmarkMenuBuilder::IncludePredicate includePredicate = {})
+		BookmarksMenu::IncludePredicate includePredicate = {})
 	{
 		return { menuView, &m_acceleratorManager, &m_bookmarkTree, targetFolder, &m_iconManager,
 			m_browser, m_browser->GetHWND(), &m_platformContext, &m_resourceLoader,
@@ -37,7 +37,7 @@ protected:
 	}
 
 	void VerifyMenuItems(const MenuView *menuView, const BookmarkItem *bookmarkFolder,
-		BookmarkMenuBuilder::IncludePredicate includePredicate = {})
+		BookmarksMenu::IncludePredicate includePredicate = {})
 	{
 		if (bookmarkFolder->GetChildren().empty())
 		{
@@ -259,8 +259,8 @@ TEST_F(BookmarksMenuTest, DropAtIndex)
 	auto menu = BuildMenu(menuView, targetFolder);
 
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView,
-		{ menuView->GetItemIdForTesting(1), MenuDropLocation::Position::Before }, { dropItem });
+	SimulateDropOnMenuView(menuView, { menuView->GetItemIdForTesting(1), MenuDropPosition::Before },
+		{ dropItem });
 
 	ASSERT_EQ(targetFolder->GetChildren().size(), 4u);
 
@@ -285,8 +285,8 @@ TEST_F(BookmarksMenuTest, DropOnFolder)
 	auto menu = BuildMenu(menuView, targetFolder);
 
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView,
-		{ menuView->GetItemIdForTesting(1), MenuDropLocation::Position::On }, { dropItem });
+	SimulateDropOnMenuView(menuView, { menuView->GetItemIdForTesting(1), MenuDropPosition::On },
+		{ dropItem });
 
 	ASSERT_EQ(subFolder->GetChildren().size(), 2u);
 
@@ -308,8 +308,8 @@ TEST_F(BookmarksMenuTest, DropOnEmptyItem)
 	// The target folder is empty, so only the "empty" menu item should be shown. This checks that
 	// dropping on that item results in the dropped bookmark being added to the parent.
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView,
-		{ menuView->GetItemIdForTesting(0), MenuDropLocation::Position::On }, { dropItem });
+	SimulateDropOnMenuView(menuView, { menuView->GetItemIdForTesting(0), MenuDropPosition::On },
+		{ dropItem });
 
 	ASSERT_EQ(targetFolder->GetChildren().size(), 1u);
 
@@ -328,8 +328,8 @@ TEST_F(BookmarksMenuTest, DropAfterEmptyItem)
 	auto menu = BuildMenu(menuView, targetFolder);
 
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView,
-		{ menuView->GetItemIdForTesting(0), MenuDropLocation::Position::After }, { dropItem });
+	SimulateDropOnMenuView(menuView, { menuView->GetItemIdForTesting(0), MenuDropPosition::After },
+		{ dropItem });
 
 	ASSERT_EQ(targetFolder->GetChildren().size(), 1u);
 
@@ -363,6 +363,6 @@ TEST_F(BookmarksMenuTest, ActionsAfterRemoval)
 	ASSERT_NE(delegate, nullptr);
 
 	auto dropTarget = delegate->MaybeGetDropTargetForLocation(
-		{ menuView->GetItemIdForTesting(0), MenuDropLocation::Position::On });
+		{ menuView->GetItemIdForTesting(0), MenuDropPosition::On });
 	EXPECT_EQ(dropTarget, nullptr);
 }

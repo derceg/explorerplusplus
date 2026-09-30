@@ -47,9 +47,8 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkFolder,
 	BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser, HWND parentWindow,
 	PlatformContext *platformContext, const ResourceLoader *resourceLoader,
-	BookmarkMenuBuilder::IncludePredicate includePredicate, UINT startId, UINT endId) :
-	MenuBase(menuView, acceleratorManager, startId, endId),
-	m_idCounter(startId),
+	IncludePredicate includePredicate) :
+	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkIconManager(bookmarkIconManager),
 	m_browser(browser),
@@ -64,13 +63,8 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 	BuildMenu(m_rootMenuView, bookmarkFolder, includePredicate);
 }
 
-UINT BookmarksMenu::GetNextId() const
-{
-	return m_idCounter;
-}
-
 void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
-	BookmarkMenuBuilder::IncludePredicate includePredicate)
+	IncludePredicate includePredicate)
 {
 	if (bookmarkFolder->GetChildren().empty())
 	{
@@ -85,94 +79,88 @@ void BookmarksMenu::BuildMenu(MenuView *menuView, BookmarkItem *bookmarkFolder,
 			continue;
 		}
 
-		UINT id = m_idCounter++;
-
-		if (id >= GetIdRange().endId)
-		{
-			return;
-		}
-
-		auto iconModel = std::make_unique<BookmarkIconModel>(m_bookmarkIconManager,
-			static_cast<const BookmarkItem *>(childItem.get())->GetWeakPtr());
-
-		if (childItem->IsFolder())
-		{
-			auto *subMenuView =
-				menuView->AppendSubMenu(this, id, childItem->GetName(), std::move(iconModel));
-			BuildMenu(subMenuView, childItem.get());
-		}
-		else
-		{
-			menuView->AppendItem(this, id, childItem->GetName(), std::move(iconModel),
-				childItem->GetLocation());
-		}
-
-		m_idToBookmarkMap.insert({ id, { childItem->GetWeakPtr(), MenuItemType::BookmarkItem } });
+		AddBookmarkItem(menuView, childItem.get());
 	}
 }
 
 void BookmarksMenu::AddEmptyItem(MenuView *menuView, BookmarkItem *bookmarkFolder)
 {
-	UINT id = m_idCounter++;
+	auto weakBookmarkFolder = bookmarkFolder->GetWeakPtr();
+	menuView->AppendItem(MenuItemParams(
+		std::format(L"({})", m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY)))
+			.SetEnabledCallback([] { return false; })
+			.SetRightClickedCallback(std::bind_front(&BookmarksMenu::OnBookmarkItemRightClicked,
+				this, weakBookmarkFolder))
+			.SetMaybeGetDropTargetCallback(std::bind_front(&BookmarksMenu::MaybeGetDropTarget, this,
+				weakBookmarkFolder, MenuItemType::EmptyItem)));
+}
 
-	if (id >= GetIdRange().endId)
+void BookmarksMenu::AddBookmarkItem(MenuView *menuView, BookmarkItem *bookmarkItem)
+{
+	auto iconModel = std::make_unique<BookmarkIconModel>(m_bookmarkIconManager,
+		static_cast<const BookmarkItem *>(bookmarkItem)->GetWeakPtr());
+	auto weakBookmarkItem = bookmarkItem->GetWeakPtr();
+
+	if (bookmarkItem->IsFolder())
+	{
+		auto *subMenuView = menuView->AppendSubMenu(SubMenuItemParams(bookmarkItem->GetName())
+				.SetIconModel(std::move(iconModel))
+				.SetMiddleClickedCallback(std::bind_front(
+					&BookmarksMenu::OnBookmarkItemMiddleClicked, this, weakBookmarkItem))
+				.SetRightClickedCallback(std::bind_front(&BookmarksMenu::OnBookmarkItemRightClicked,
+					this, weakBookmarkItem))
+				.SetDraggedCallback(
+					std::bind_front(&BookmarksMenu::OnBookmarkItemDragged, this, weakBookmarkItem))
+				.SetMaybeGetDropTargetCallback(std::bind_front(&BookmarksMenu::MaybeGetDropTarget,
+					this, weakBookmarkItem, MenuItemType::BookmarkItem)));
+
+		BuildMenu(subMenuView, bookmarkItem);
+	}
+	else
+	{
+		menuView->AppendItem(MenuItemParams(bookmarkItem->GetName())
+				.SetIconModel(std::move(iconModel))
+				.SetHelpText(bookmarkItem->GetLocation())
+				.SetSelectedCallback(
+					std::bind_front(&BookmarksMenu::OnBookmarkSelected, this, weakBookmarkItem))
+				.SetMiddleClickedCallback(std::bind_front(
+					&BookmarksMenu::OnBookmarkItemMiddleClicked, this, weakBookmarkItem))
+				.SetRightClickedCallback(std::bind_front(&BookmarksMenu::OnBookmarkItemRightClicked,
+					this, weakBookmarkItem))
+				.SetDraggedCallback(
+					std::bind_front(&BookmarksMenu::OnBookmarkItemDragged, this, weakBookmarkItem))
+				.SetMaybeGetDropTargetCallback(std::bind_front(&BookmarksMenu::MaybeGetDropTarget,
+					this, weakBookmarkItem, MenuItemType::BookmarkItem)));
+	}
+}
+
+void BookmarksMenu::OnBookmarkSelected(WeakPtr<BookmarkItem> bookmark, bool isCtrlKeyDown,
+	bool isShiftKeyDown)
+{
+	if (!bookmark)
 	{
 		return;
 	}
 
-	std::wstring menuText =
-		std::format(L"({})", m_resourceLoader->LoadString(IDS_BOOKMARK_FOLDER_EMPTY));
-	menuView->AppendItem(this, id, menuText);
-
-	// This effectively maps the empty item to the parent folder, so that operations on this item
-	// will occur on the parent.
-	m_idToBookmarkMap.insert({ id, { bookmarkFolder->GetWeakPtr(), MenuItemType::EmptyItem } });
-}
-
-bool BookmarksMenu::IsItemEnabled(UINT id) const
-{
-	auto *entry = GetEntryForMenuItem(id);
-
-	if (entry->menuItemType == MenuItemType::EmptyItem)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-void BookmarksMenu::OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	const auto *bookmarkItem = MaybeGetBookmarkItemForMenuItem(id);
-
-	if (!bookmarkItem)
-	{
-		return;
-	}
-
-	DCHECK(bookmarkItem->IsBookmark());
-
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmark.Get(),
 		DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown), m_browser);
 }
 
-void BookmarksMenu::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+void BookmarksMenu::OnBookmarkItemMiddleClicked(WeakPtr<BookmarkItem> bookmarkItem,
+	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	const auto *bookmarkItem = MaybeGetBookmarkItemForMenuItem(id);
-
 	if (!bookmarkItem)
 	{
 		return;
 	}
 
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem.Get(),
 		DetermineOpenDisposition(true, isCtrlKeyDown, isShiftKeyDown), m_browser);
 }
 
-void BookmarksMenu::OnItemRightClicked(UINT id, const POINT &ptScreen)
+void BookmarksMenu::OnBookmarkItemRightClicked(WeakPtr<BookmarkItem> bookmarkItem,
+	const POINT &ptScreen)
 {
-	auto *bookmarkItem = MaybeGetBookmarkItemForMenuItem(id);
-
 	if (!bookmarkItem)
 	{
 		return;
@@ -180,23 +168,18 @@ void BookmarksMenu::OnItemRightClicked(UINT id, const POINT &ptScreen)
 
 	PopupMenuRunner popupRunner(m_parentWindow, m_browser);
 	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
-		{ bookmarkItem }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
+		{ bookmarkItem.Get() }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
 	popupRunner.Show(ptScreen);
 }
 
-MenuDragAction BookmarksMenu::OnItemDragged(UINT id)
+MenuDragAction BookmarksMenu::OnBookmarkItemDragged(WeakPtr<BookmarkItem> bookmarkItem)
 {
-	auto *entry = GetEntryForMenuItem(id);
-	auto &weakBookmarkItem = entry->bookmarkItem;
-
-	if (entry->menuItemType == MenuItemType::EmptyItem || !weakBookmarkItem)
+	if (!bookmarkItem)
 	{
 		return MenuDragAction::ContinueMenu;
 	}
 
-	auto *bookmarkItem = weakBookmarkItem.Get();
-
-	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
+	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem.Get());
 	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
 	auto dropSource = winrt::make_self<DropSourceImpl>();
@@ -212,38 +195,33 @@ MenuDragAction BookmarksMenu::OnItemDragged(UINT id)
 	return MenuDragAction::CloseMenu;
 }
 
-wil::com_ptr_nothrow<IDropTarget> BookmarksMenu::MaybeGetDropTargetForLocation(
-	const MenuDropLocation &dropLocation)
+wil::com_ptr_nothrow<IDropTarget> BookmarksMenu::MaybeGetDropTarget(
+	WeakPtr<BookmarkItem> bookmarkItem, MenuItemType itemType, MenuDropPosition position)
 {
-	auto *entry = GetEntryForMenuItem(dropLocation.id);
-	auto &weakBookmarkItem = entry->bookmarkItem;
-
-	if (!weakBookmarkItem)
+	if (!bookmarkItem)
 	{
 		return nullptr;
 	}
 
-	auto *bookmarkItem = weakBookmarkItem.Get();
-
 	BookmarkItem *targetFolder = nullptr;
 	size_t targetIndex;
 
-	if (entry->menuItemType == MenuItemType::EmptyItem)
+	if (itemType == MenuItemType::EmptyItem)
 	{
-		targetFolder = bookmarkItem;
+		targetFolder = bookmarkItem.Get();
 		targetIndex = 0;
 	}
-	else if (dropLocation.position == MenuDropLocation::Position::On && bookmarkItem->IsFolder())
+	else if (position == MenuDropPosition::On && bookmarkItem->IsFolder())
 	{
-		targetFolder = bookmarkItem;
+		targetFolder = bookmarkItem.Get();
 		targetIndex = targetFolder->GetChildren().size();
 	}
 	else
 	{
 		targetFolder = bookmarkItem->GetParent();
-		targetIndex = targetFolder->GetChildIndex(bookmarkItem);
+		targetIndex = targetFolder->GetChildIndex(bookmarkItem.Get());
 
-		if (dropLocation.position == MenuDropLocation::Position::After)
+		if (position == MenuDropPosition::After)
 		{
 			targetIndex++;
 		}
@@ -253,26 +231,6 @@ wil::com_ptr_nothrow<IDropTarget> BookmarksMenu::MaybeGetDropTargetForLocation(
 		winrt::make_self<BookmarkMenuDropTarget>(targetFolder, targetIndex, m_bookmarkTree);
 
 	return dropTarget.get();
-}
-
-BookmarkItem *BookmarksMenu::MaybeGetBookmarkItemForMenuItem(UINT id)
-{
-	auto *entry = GetEntryForMenuItem(id);
-	auto &weakBookmarkItem = entry->bookmarkItem;
-
-	if (!weakBookmarkItem)
-	{
-		return nullptr;
-	}
-
-	return weakBookmarkItem.Get();
-}
-
-const BookmarksMenu::MenuItemEntry *BookmarksMenu::GetEntryForMenuItem(UINT id) const
-{
-	auto itr = m_idToBookmarkMap.find(id);
-	CHECK(itr != m_idToBookmarkMap.end());
-	return &itr->second;
 }
 
 namespace

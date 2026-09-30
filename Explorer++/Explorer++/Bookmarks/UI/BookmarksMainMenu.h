@@ -21,8 +21,7 @@ class BookmarksMainMenu : public MenuBase
 public:
 	BookmarksMainMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTree *bookmarkTree, BrowserWindow *browser, IconFetcher *iconFetcher,
-		PlatformContext *platformContext, const ResourceLoader *resourceLoader, UINT startId,
-		UINT endId);
+		PlatformContext *platformContext, const ResourceLoader *resourceLoader);
 	~BookmarksMainMenu();
 
 private:

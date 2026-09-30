@@ -17,8 +17,8 @@
 BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
 	BrowserWindow *browser, IconFetcher *iconFetcher, PlatformContext *platformContext,
-	const ResourceLoader *resourceLoader, UINT startId, UINT endId) :
-	MenuBase(menuView, acceleratorManager, startId, endId),
+	const ResourceLoader *resourceLoader) :
+	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
 	m_platformContext(platformContext),
@@ -76,18 +76,14 @@ void BookmarksMainMenu::BuildMenu()
 		GetAcceleratorTextForId(IDM_BOOKMARKS_MANAGE_BOOKMARKS));
 
 	auto *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
-	UINT startId = GetIdRange().startId;
-	UINT endId = GetIdRange().endId;
 
 	if (!bookmarksMenuFolder->GetChildren().empty())
 	{
 		m_rootMenuView->AppendSeparator();
 
-		auto bookmarksMenuFolderMenu =
-			std::make_unique<BookmarksMenu>(m_rootMenuView, m_acceleratorManager, m_bookmarkTree,
-				bookmarksMenuFolder, m_iconManager.get(), m_browser, m_browser->GetHWND(),
-				m_platformContext, m_resourceLoader, nullptr, startId, endId);
-		startId = bookmarksMenuFolderMenu->GetNextId();
+		auto bookmarksMenuFolderMenu = std::make_unique<BookmarksMenu>(m_rootMenuView,
+			m_acceleratorManager, m_bookmarkTree, bookmarksMenuFolder, m_iconManager.get(),
+			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader);
 
 		m_childMenus.push_back(std::move(bookmarksMenuFolderMenu));
 	}
@@ -103,7 +99,6 @@ void BookmarksMainMenu::BuildMenu()
 
 		m_childMenus.push_back(std::make_unique<BookmarksMenu>(otherBookmarksMenu,
 			m_acceleratorManager, m_bookmarkTree, otherBookmarksFolder, m_iconManager.get(),
-			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader, nullptr, startId,
-			endId));
+			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader));
 	}
 }

@@ -9,17 +9,10 @@
 #include "MenuView.h"
 #include <boost/numeric/conversion/cast.hpp>
 
-MenuBase::MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager, UINT startId,
-	UINT endId) :
+MenuBase::MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager) :
 	m_rootMenuView(menuView),
-	m_acceleratorManager(acceleratorManager),
-	m_idRange(std::max(startId, 1u), std::max({ endId, startId, 1u }))
+	m_acceleratorManager(acceleratorManager)
 {
-}
-
-const MenuBase::IdRange &MenuBase::GetIdRange() const
-{
-	return m_idRange;
 }
 
 std::optional<std::wstring> MenuBase::GetAcceleratorTextForId(UINT id) const

@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <optional>
+#include <string>
+
 class AcceleratorManager;
 class MenuView;
 
@@ -13,34 +16,12 @@ class MenuView;
 class MenuBase
 {
 public:
-	struct IdRange
-	{
-		UINT startId;
-		UINT endId;
-
-		IdRange(UINT startId, UINT endId) : startId(startId), endId(endId)
-		{
-		}
-
-		// This is only used in tests.
-		bool operator==(const IdRange &) const = default;
-	};
-
-	MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		UINT startId = DEFAULT_START_ID, UINT endId = DEFAULT_END_ID);
+	MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager);
 	virtual ~MenuBase() = default;
 
-	const IdRange &GetIdRange() const;
-
 protected:
-	static constexpr UINT DEFAULT_START_ID = 1;
-	static constexpr UINT DEFAULT_END_ID = std::numeric_limits<UINT>::max();
-
 	std::optional<std::wstring> GetAcceleratorTextForId(UINT id) const;
 
 	MenuView *const m_rootMenuView;
 	const AcceleratorManager *const m_acceleratorManager;
-
-private:
-	const IdRange m_idRange;
 };

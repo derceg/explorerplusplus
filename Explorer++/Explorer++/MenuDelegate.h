@@ -4,31 +4,16 @@
 
 #pragma once
 
+#include "MenuItemCallbacks.h"
 #include <wil/com.h>
 #include <oleidl.h>
 
 struct MenuDropLocation
 {
-	enum class Position
-	{
-		On,
-		Before,
-		After
-	};
-
 	UINT id;
-	Position position;
+	MenuDropPosition position;
 
 	bool operator==(const MenuDropLocation &) const = default;
-};
-
-enum class MenuDragAction
-{
-	// Indicates that the menu should continue running on return.
-	ContinueMenu,
-
-	// Indicates that the menu should close on return.
-	CloseMenu
 };
 
 class MenuDelegate
