@@ -25,11 +25,9 @@ public:
 	SignalWrapper<MainFontSetter, void()> fontUpdatedSignal;
 
 private:
-	void SubclassWindowForDpiChanges();
+	void InstallWindowSubclass();
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnDpiChanged();
-	void MaybeSubclassSpecificWindowClasses();
-	LRESULT TooltipWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void UpdateFont();
 
 	HWND m_hwnd;

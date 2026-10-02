@@ -7,12 +7,15 @@
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "CustomFont.h"
+#include "FontHelper.h"
 #include "IconFetcherFake.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
+#include <uxtheme.h>
 
 class BookmarksToolbarTest : public BrowserTestBase
 {
@@ -137,4 +140,55 @@ TEST_F(BookmarksToolbarTest, OpenBookmarkOnClick)
 		ASSERT_NE(currentEntry, nullptr);
 		EXPECT_EQ(currentEntry->GetPidl(), CreateSimplePidlForTest(bookmark->GetLocation()));
 	}
+}
+
+class BookmarksToolbarFontTest : public BrowserTestBase
+{
+protected:
+	BookmarksToolbarFontTest() :
+		m_browser(AddBrowser()),
+		m_bookmarksToolbarView(CreateBookmarksToolbarView(m_browser->GetHWND(), &m_config))
+	{
+		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
+			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\path"));
+
+		m_bookmarksToolbar =
+			BookmarksToolbar::Create(m_bookmarksToolbarView, m_browser, &m_acceleratorManager,
+				&m_resourceLoader, &m_iconFetcher, &m_bookmarkTree, &m_platformContext);
+	}
+
+	static BookmarksToolbarView *CreateBookmarksToolbarView(HWND parent, Config *config)
+	{
+		config->mainFont = CustomFont(L"Segoe UI", 15);
+		return BookmarksToolbarView::Create(parent, config);
+	}
+
+	IconFetcherFake m_iconFetcher;
+	BrowserWindowFake *const m_browser;
+	BookmarksToolbarView *const m_bookmarksToolbarView;
+	BookmarksToolbar *m_bookmarksToolbar = nullptr;
+};
+
+TEST_F(BookmarksToolbarFontTest, UsesConfiguredFontOnStartup)
+{
+	// The theme is applied after the main window and all its child controls have been created.
+	ASSERT_TRUE(SUCCEEDED(SetWindowTheme(m_bookmarksToolbarView->GetHWND(), L"", nullptr)));
+
+	auto toolbarFont = reinterpret_cast<HFONT>(
+		SendMessage(m_bookmarksToolbarView->GetHWND(), WM_GETFONT, 0, 0));
+	ASSERT_NE(toolbarFont, nullptr);
+
+	LOGFONT toolbarLogFont;
+	ASSERT_EQ(GetObject(toolbarFont, sizeof(toolbarLogFont), &toolbarLogFont),
+		static_cast<int>(sizeof(toolbarLogFont)));
+
+	auto expectedFont = CreateFontFromNameAndSize(L"Segoe UI", 15,
+		m_bookmarksToolbarView->GetHWND());
+	ASSERT_NE(expectedFont, nullptr);
+
+	LOGFONT expectedLogFont;
+	ASSERT_EQ(GetObject(expectedFont.get(), sizeof(expectedLogFont), &expectedLogFont),
+		static_cast<int>(sizeof(expectedLogFont)));
+
+	EXPECT_EQ(toolbarLogFont, expectedLogFont);
 }
