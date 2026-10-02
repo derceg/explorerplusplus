@@ -22,10 +22,12 @@
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/EnumHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+#include <magic_enum/magic_enum.hpp>
 #include <windowsx.h>
 #include <algorithm>
 
@@ -69,7 +71,7 @@ constexpr auto BUTTON_ICON_MAPPINGS = std::to_array<ButtonIconMapping>({
 
 // There should be an icon for each button. Note that the MainToolbarButton enum contains one
 // additional item - for the separator.
-static_assert(BUTTON_ICON_MAPPINGS.size() == (MainToolbarButton::_size() - 1));
+static_assert(BUTTON_ICON_MAPPINGS.size() == (magic_enum::enum_count<MainToolbarButton>() - 1));
 
 constexpr bool VerifyButtonIconMappings(std::span<const ButtonIconMapping> mappings)
 {
@@ -138,10 +140,12 @@ void MainToolbar::Initialize(HWND parent,
 	int dpiScaledSizeSmall = MulDiv(TOOLBAR_IMAGE_SIZE_SMALL, dpi, USER_DEFAULT_SCREEN_DPI);
 	int dpiScaledSizeLarge = MulDiv(TOOLBAR_IMAGE_SIZE_LARGE, dpi, USER_DEFAULT_SCREEN_DPI);
 
-	m_imageListSmall.reset(ImageList_Create(dpiScaledSizeSmall, dpiScaledSizeSmall,
-		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(MainToolbarButton::_size() - 1)));
-	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
-		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(MainToolbarButton::_size() - 1)));
+	m_imageListSmall.reset(
+		ImageList_Create(dpiScaledSizeSmall, dpiScaledSizeSmall, ILC_COLOR32 | ILC_MASK, 0,
+			static_cast<int>(magic_enum::enum_count<MainToolbarButton>() - 1)));
+	m_imageListLarge.reset(
+		ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge, ILC_COLOR32 | ILC_MASK, 0,
+			static_cast<int>(magic_enum::enum_count<MainToolbarButton>() - 1)));
 
 	m_toolbarImageMapSmall =
 		SetUpToolbarImageList(m_imageListSmall.get(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
@@ -202,10 +206,10 @@ void MainToolbar::SetTooolbarImageList()
 	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
 }
 
-std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList, int iconSize,
-	UINT dpi)
+std::unordered_map<MainToolbarButton, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList,
+	int iconSize, UINT dpi)
 {
-	std::unordered_map<int, int> imageListMappings;
+	std::unordered_map<MainToolbarButton, int> imageListMappings;
 
 	for (const auto &mapping : BUTTON_ICON_MAPPINGS)
 	{
@@ -305,8 +309,8 @@ void MainToolbar::AddButtonsToToolbar(const std::vector<MainToolbarButton> &butt
 
 void MainToolbar::AddButtonToToolbar(MainToolbarButton button)
 {
-	if (button != +MainToolbarButton::Separator
-		&& SendMessage(m_hwnd, TB_COMMANDTOINDEX, button, 0) != -1)
+	if (button != MainToolbarButton::Separator
+		&& SendMessage(m_hwnd, TB_COMMANDTOINDEX, ToUnderlying(button), 0) != -1)
 	{
 		DCHECK(false) << "Toolbar button already exists";
 		return;
@@ -324,7 +328,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 {
 	TBBUTTON tbButton = {};
 
-	if (button == +MainToolbarButton::Separator)
+	if (button == MainToolbarButton::Separator)
 	{
 		tbButton.iBitmap = 0;
 		tbButton.idCommand = 0;
@@ -350,7 +354,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 		}
 
 		tbButton.iBitmap = imagePosition;
-		tbButton.idCommand = button;
+		tbButton.idCommand = ToUnderlying(button);
 		tbButton.fsState = TBSTATE_ENABLED;
 		tbButton.fsStyle = standardStyle | LookupToolbarButtonExtraStyles(button);
 		tbButton.dwData = 0;
@@ -509,15 +513,18 @@ void MainToolbar::UpdateToolbarButtonImageIndexes()
 			continue;
 		}
 
+		auto button = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
+		CHECK(button);
+
 		int imagePosition;
 
 		if (m_config->useLargeToolbarIcons.get())
 		{
-			imagePosition = m_toolbarImageMapLarge.at(tbButton.idCommand);
+			imagePosition = m_toolbarImageMapLarge.at(*button);
 		}
 		else
 		{
-			imagePosition = m_toolbarImageMapSmall.at(tbButton.idCommand);
+			imagePosition = m_toolbarImageMapSmall.at(*button);
 		}
 
 		SendMessage(m_hwnd, TB_CHANGEBITMAP, 0, imagePosition);
@@ -526,7 +533,7 @@ void MainToolbar::UpdateToolbarButtonImageIndexes()
 
 void MainToolbar::OnShowFoldersUpdated(bool showFolders)
 {
-	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders, showFolders);
+	SendMessage(m_hwnd, TB_CHECKBUTTON, ToUnderlying(MainToolbarButton::Folders), showFolders);
 }
 
 BOOL MainToolbar::OnTBQueryInsert()
@@ -550,11 +557,12 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 	auto *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
 
 	if ((pnmtb->iItem >= 0)
-		&& (static_cast<std::size_t>(pnmtb->iItem) < (MainToolbarButton::_size() - 1)))
+		&& (static_cast<std::size_t>(pnmtb->iItem)
+			< (magic_enum::enum_count<MainToolbarButton>() - 1)))
 	{
 		// Note that the separator (which is the first item in the enumeration) is skipped.
-		assert(MainToolbarButton::_values()[0] == +MainToolbarButton::Separator);
-		MainToolbarButton button = MainToolbarButton::_values()[pnmtb->iItem + 1];
+		assert(magic_enum::enum_values<MainToolbarButton>()[0] == MainToolbarButton::Separator);
+		MainToolbarButton button = magic_enum::enum_values<MainToolbarButton>()[pnmtb->iItem + 1];
 		pnmtb->tbButton = GetToolbarButtonDetails(button);
 
 		auto buttonText = GetToolbarButtonText(button);
@@ -596,8 +604,10 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, L"");
 
 	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
+	auto button = magic_enum::enum_cast<MainToolbarButton>(ptbgit->iItem);
+	CHECK(button);
 
-	if (ptbgit->iItem == MainToolbarButton::Back)
+	if (button == MainToolbarButton::Back)
 	{
 		auto entry = shellBrowser->GetNavigationController()->GetEntry(-1);
 
@@ -610,7 +620,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
 		}
 	}
-	else if (ptbgit->iItem == MainToolbarButton::Forward)
+	else if (button == MainToolbarButton::Forward)
 	{
 		auto entry = shellBrowser->GetNavigationController()->GetEntry(1);
 
@@ -623,7 +633,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
 		}
 	}
-	else if (ptbgit->iItem == MainToolbarButton::Up)
+	else if (button == MainToolbarButton::Up)
 	{
 		auto customizedInfoTip = MaybeGetCustomizedUpInfoTip();
 
@@ -666,7 +676,7 @@ std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 
 LRESULT MainToolbar::OnDropDown(const NMTOOLBAR *nmtb)
 {
-	auto button = MainToolbarButton::_from_integral_nothrow(nmtb->iItem);
+	auto button = magic_enum::enum_cast<MainToolbarButton>(nmtb->iItem);
 	CHECK(button);
 	auto menuPosition = GetMenuPositionForButton(*button);
 
@@ -731,7 +741,8 @@ void MainToolbar::ShowViewsMenu(const POINT &ptScreen)
 POINT MainToolbar::GetMenuPositionForButton(MainToolbarButton button)
 {
 	RECT rcButton;
-	auto res = SendMessage(m_hwnd, TB_GETRECT, button, reinterpret_cast<LPARAM>(&rcButton));
+	auto res =
+		SendMessage(m_hwnd, TB_GETRECT, ToUnderlying(button), reinterpret_cast<LPARAM>(&rcButton));
 	CHECK(res);
 
 	POINT pt = { rcButton.left, rcButton.bottom };
@@ -751,7 +762,8 @@ HWND MainToolbar::GetHWND() const
 // or file selection.
 void MainToolbar::UpdateConfigDependentButtonStates()
 {
-	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders, m_config->showFolders.get());
+	SendMessage(m_hwnd, TB_CHECKBUTTON, ToUnderlying(MainToolbarButton::Folders),
+		m_config->showFolders.get());
 }
 
 void MainToolbar::UpdateToolbarButtonStates()
@@ -763,36 +775,34 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 	auto *browserController = m_browser->GetCommandController();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
-		browserController->IsCommandEnabled(IDM_GO_BACK));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Forward,
-		browserController->IsCommandEnabled(IDM_GO_FORWARD));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Up,
-		browserController->IsCommandEnabled(IDM_GO_UP));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut,
-		browserController->IsCommandEnabled(IDM_EDIT_CUT));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy,
-		browserController->IsCommandEnabled(IDM_EDIT_COPY));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MoveTo,
+	EnableButton(MainToolbarButton::Back, browserController->IsCommandEnabled(IDM_GO_BACK));
+	EnableButton(MainToolbarButton::Forward, browserController->IsCommandEnabled(IDM_GO_FORWARD));
+	EnableButton(MainToolbarButton::Up, browserController->IsCommandEnabled(IDM_GO_UP));
+	EnableButton(MainToolbarButton::Cut, browserController->IsCommandEnabled(IDM_EDIT_CUT));
+	EnableButton(MainToolbarButton::Copy, browserController->IsCommandEnabled(IDM_EDIT_COPY));
+	EnableButton(MainToolbarButton::MoveTo,
 		browserController->IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
+	EnableButton(MainToolbarButton::CopyTo,
 		browserController->IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
-		m_coreInterface->CanPaste(PasteType::Normal));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,
+	EnableButton(MainToolbarButton::Paste, m_coreInterface->CanPaste(PasteType::Normal));
+	EnableButton(MainToolbarButton::Properties,
 		browserController->IsCommandEnabled(IDM_FILE_PROPERTIES));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete,
-		browserController->IsCommandEnabled(IDM_FILE_DELETE));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,
+	EnableButton(MainToolbarButton::Delete, browserController->IsCommandEnabled(IDM_FILE_DELETE));
+	EnableButton(MainToolbarButton::DeletePermanently,
 		browserController->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
+	EnableButton(MainToolbarButton::SplitFile,
 		browserController->IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
+	EnableButton(MainToolbarButton::MergeFiles,
 		browserController->IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt,
+	EnableButton(MainToolbarButton::OpenCommandPrompt,
 		browserController->IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder,
+	EnableButton(MainToolbarButton::NewFolder,
 		browserController->IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
+}
+
+void MainToolbar::EnableButton(MainToolbarButton button, bool enable)
+{
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToUnderlying(button), enable);
 }
 
 void MainToolbar::OnClipboardUpdate()
@@ -802,8 +812,7 @@ void MainToolbar::OnClipboardUpdate()
 		return;
 	}
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
-		m_coreInterface->CanPaste(PasteType::Normal));
+	EnableButton(MainToolbarButton::Paste, m_coreInterface->CanPaste(PasteType::Normal));
 }
 
 void MainToolbar::OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown)
@@ -855,8 +864,10 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 	auto disposition = DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
 		WI_IsFlagSet(keysDown, MK_SHIFT));
 	auto *commandController = m_browser->GetCommandController();
+	auto button = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
+	CHECK(button);
 
-	switch (tbButton.idCommand)
+	switch (*button)
 	{
 	case MainToolbarButton::Back:
 		commandController->ExecuteCommand(IDM_GO_BACK, disposition);
@@ -868,6 +879,10 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 
 	case MainToolbarButton::Up:
 		commandController->ExecuteCommand(IDM_GO_UP, disposition);
+		break;
+
+	default:
+		// By default, nothing needs to happen.
 		break;
 	}
 }
@@ -915,21 +930,17 @@ MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
 			continue;
 		}
 
-		int id;
-
 		if (tbButton.idCommand == 0)
 		{
-			id = MainToolbarButton::Separator;
+			buttons.AddButton(MainToolbarButton::Separator);
 		}
 		else
 		{
-			id = tbButton.idCommand;
+			auto buttonType = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
+			CHECK(buttonType);
+
+			buttons.AddButton(*buttonType);
 		}
-
-		auto buttonType = MainToolbarButton::_from_integral_nothrow(id);
-		CHECK(buttonType);
-
-		buttons.AddButton(*buttonType);
 	}
 
 	return buttons;

@@ -886,7 +886,6 @@
     <ClInclude Include="AutoReset.h" />
     <ClInclude Include="Base64Wrapper.h" />
     <ClInclude Include="BaseWindow.h" />
-    <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="BulkClipboardWriter.h" />
     <ClInclude Include="CachedIcons.h" />
     <ClInclude Include="ClipboardStore.h" />
@@ -901,6 +900,7 @@
     <ClInclude Include="D2DHelper.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
+    <ClInclude Include="EnumHelper.h" />
     <ClInclude Include="GraphicsFactories.h" />
     <ClInclude Include="IconSize.h" />
     <ClInclude Include="ImageInterop.h" />

@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
-
-BETTER_ENUM(Feature, int,
+enum class Feature
+{
 	DualPane,
 	Plugins,
 
@@ -20,4 +19,4 @@ BETTER_ENUM(Feature, int,
 	// When enabled, directory enumeration will be performed on a background thread, rather than the
 	// main thread.
 	BackgroundThreadEnumeration
-)
+};

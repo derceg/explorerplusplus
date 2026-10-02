@@ -81,9 +81,8 @@ void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, con
 		MF_BYCOMMAND);
 
 	CheckMenuRadioItem(sortByMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
-		tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending
-			? IDM_SORT_ASCENDING
-			: IDM_SORT_DESCENDING,
+		tab.GetShellBrowser()->GetSortDirection() == SortDirection::Ascending ? IDM_SORT_ASCENDING
+																			  : IDM_SORT_DESCENDING,
 		MF_BYCOMMAND);
 
 	BOOL showInGroups = tab.GetShellBrowser()->GetShowInGroups();
@@ -96,7 +95,7 @@ void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, con
 			DetermineGroupModeMenuId(groupMode), MF_BYCOMMAND);
 
 		CheckMenuRadioItem(groupByMenu, IDM_GROUP_SORT_ASCENDING, IDM_GROUP_SORT_DESCENDING,
-			tab.GetShellBrowser()->GetGroupSortDirection() == +SortDirection::Ascending
+			tab.GetShellBrowser()->GetGroupSortDirection() == SortDirection::Ascending
 				? IDM_GROUP_SORT_ASCENDING
 				: IDM_GROUP_SORT_DESCENDING,
 			MF_BYCOMMAND);

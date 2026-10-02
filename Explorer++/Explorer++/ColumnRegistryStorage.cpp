@@ -38,7 +38,9 @@ struct SavedColumn
 
 	SavedColumn() = default;
 
-	SavedColumn(const Column_t &column) : type(column.type._to_integral()), checked(column.checked)
+	SavedColumn(const Column_t &column) :
+		type(static_cast<unsigned int>(column.type)),
+		checked(column.checked)
 	{
 	}
 };
@@ -53,7 +55,9 @@ struct SavedColumnWidth
 
 	SavedColumnWidth() = default;
 
-	SavedColumnWidth(const Column_t &column) : type(column.type._to_integral()), width(column.width)
+	SavedColumnWidth(const Column_t &column) :
+		type(static_cast<unsigned int>(column.type)),
+		width(column.width)
 	{
 	}
 };
@@ -85,7 +89,7 @@ void LoadColumnSet(HKEY parentKey, const std::wstring &columnsKeyName,
 
 	for (const auto &savedColumn : savedColumns)
 	{
-		auto columnType = ColumnType::_from_integral_nothrow(savedColumn.type);
+		auto columnType = magic_enum::enum_cast<ColumnType>(savedColumn.type);
 
 		if (!columnType)
 		{

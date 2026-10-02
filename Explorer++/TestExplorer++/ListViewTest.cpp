@@ -145,11 +145,11 @@ TEST_F(ListViewTest, ColumnClicked)
 
 	SimulateClickOnColumnHeader(ListViewColumnModelFake::COLUMN_DATA_1);
 	EXPECT_EQ(m_model.GetSortColumnId(), ListViewColumnModelFake::COLUMN_DATA_1);
-	EXPECT_EQ(m_model.GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(m_model.GetSortDirection(), SortDirection::Ascending);
 
 	SimulateClickOnColumnHeader(ListViewColumnModelFake::COLUMN_DATA_1);
 	EXPECT_EQ(m_model.GetSortColumnId(), ListViewColumnModelFake::COLUMN_DATA_1);
-	EXPECT_EQ(m_model.GetSortDirection(), +SortDirection::Descending);
+	EXPECT_EQ(m_model.GetSortDirection(), SortDirection::Descending);
 }
 
 TEST_F(ListViewTest, ColumnClickedWithDefaultSortOrder)
@@ -163,7 +163,7 @@ TEST_F(ListViewTest, ColumnClickedWithDefaultSortOrder)
 	SimulateClickOnColumnHeader(ListViewColumnModelFake::COLUMN_DATA_1);
 	SimulateClickOnColumnHeader(ListViewColumnModelFake::COLUMN_DATA_1);
 	EXPECT_EQ(model.GetSortColumnId(), std::nullopt);
-	EXPECT_EQ(model.GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(model.GetSortDirection(), SortDirection::Ascending);
 }
 
 TEST_F(ListViewTest, ColumnClickedWithoutDefaultSortOrder)
@@ -178,7 +178,7 @@ TEST_F(ListViewTest, ColumnClickedWithoutDefaultSortOrder)
 	SimulateClickOnColumnHeader(ListViewColumnModelFake::COLUMN_DATA_1);
 	SimulateClickOnColumnHeader(ListViewColumnModelFake::COLUMN_DATA_1);
 	EXPECT_EQ(model.GetSortColumnId(), ListViewColumnModelFake::COLUMN_DATA_1);
-	EXPECT_EQ(model.GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(model.GetSortDirection(), SortDirection::Ascending);
 }
 
 TEST_F(ListViewTest, ColumnResized)

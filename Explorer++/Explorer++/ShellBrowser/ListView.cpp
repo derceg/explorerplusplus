@@ -586,7 +586,7 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 		return;
 	}
 
-	if (m_folderSettings.viewMode == +ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
+	if (m_folderSettings.viewMode == ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
 		auto columnType = GetColumnTypeByIndex(plvItem->iSubItem);
 		CHECK(columnType);
@@ -708,7 +708,7 @@ std::optional<ShellBrowserImpl::InfoTipResult> ShellBrowserImpl::GetInfoTipAsync
 
 	/* Use Explorer infotips if the option is selected, or this is a
 	virtual folder. Otherwise, show the modified date. */
-	if ((config.infoTipType == +InfoTipType::System) || virtualFolder)
+	if ((config.infoTipType == InfoTipType::System) || virtualFolder)
 	{
 		std::wstring infoTipText;
 		HRESULT hr = GetItemInfoTip(basicItemInfo.pidlComplete.get(), infoTipText);
@@ -1335,12 +1335,12 @@ void ShellBrowserImpl::StartDrag(int draggedItem, const POINT &startPoint)
 
 bool ShellBrowserImpl::CanAutoSizeColumns() const
 {
-	return m_folderSettings.viewMode == +ViewMode::Details;
+	return m_folderSettings.viewMode == ViewMode::Details;
 }
 
 void ShellBrowserImpl::AutoSizeColumns()
 {
-	if (m_folderSettings.viewMode != +ViewMode::Details)
+	if (m_folderSettings.viewMode != ViewMode::Details)
 	{
 		return;
 	}

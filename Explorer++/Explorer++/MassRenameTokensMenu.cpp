@@ -7,6 +7,7 @@
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
+#include <magic_enum/magic_enum.hpp>
 #include <format>
 
 MassRenameTokensMenu::MassRenameTokensMenu(MenuView *menuView,
@@ -21,7 +22,7 @@ MassRenameTokensMenu::MassRenameTokensMenu(MenuView *menuView,
 
 void MassRenameTokensMenu::BuildMenu()
 {
-	for (auto token : MassRenameToken::_values())
+	for (auto token : magic_enum::enum_values<MassRenameToken>())
 	{
 		m_rootMenuView->AppendItem(MenuItemParams(BuildTokenMenuText(token))
 				.SetSelectedCallback([this, token] { m_tokenSelectedCallback(token); }));

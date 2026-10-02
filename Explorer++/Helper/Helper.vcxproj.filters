@@ -381,9 +381,6 @@
     <ClInclude Include="DetoursHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="BetterEnumsWrapper.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
@@ -521,6 +518,9 @@
     </ClInclude>
     <ClInclude Include="IconSize.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumHelper.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

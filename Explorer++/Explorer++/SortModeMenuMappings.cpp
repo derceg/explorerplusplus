@@ -6,6 +6,7 @@
 #include "SortModeMenuMappings.h"
 #include "MainResource.h"
 #include <boost/bimap.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <algorithm>
 #include <span>
 
@@ -82,13 +83,13 @@ constexpr MenuItemIdToSortModePair MENU_ITEM_SORT_MODE_MAPPINGS[] = {
 
 constexpr bool VerifyMappings(std::span<const MenuItemIdToSortModePair> mappings)
 {
-	if (mappings.size() != SortMode::_size())
+	if (mappings.size() != magic_enum::enum_count<SortMode>())
 	{
 		return false;
 	}
 
 	// Each sort mode should appear.
-	for (auto sortMode : SortMode::_values())
+	for (auto sortMode : magic_enum::enum_values<SortMode>())
 	{
 		auto itr = std::ranges::find_if(mappings,
 			[sortMode](const auto &mapping) { return mapping.second == sortMode; });

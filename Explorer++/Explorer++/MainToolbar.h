@@ -58,8 +58,8 @@ private:
 	void Initialize(HWND parent,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	void SetTooolbarImageList();
-	std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList, int iconSize,
-		UINT dpi);
+	std::unordered_map<MainToolbarButton, int> SetUpToolbarImageList(HIMAGELIST imageList,
+		int iconSize, UINT dpi);
 	std::vector<MainToolbarButton> GetDefaultButtons() const;
 	void AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons);
 	void AddButtonToToolbar(MainToolbarButton button);
@@ -92,6 +92,7 @@ private:
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	void OnShowFoldersUpdated(bool showFolders);
 
+	void EnableButton(MainToolbarButton button, bool enable);
 	void OnClipboardUpdate();
 	void OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown);
 	void OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown);
@@ -108,8 +109,8 @@ private:
 
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
-	std::unordered_map<int, int> m_toolbarImageMapSmall;
-	std::unordered_map<int, int> m_toolbarImageMapLarge;
+	std::unordered_map<MainToolbarButton, int> m_toolbarImageMapSmall;
+	std::unordered_map<MainToolbarButton, int> m_toolbarImageMapLarge;
 
 	MainFontSetter m_fontSetter;
 	MainFontSetter m_tooltipFontSetter;

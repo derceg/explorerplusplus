@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
-
 // These are used for both sorting and grouping. For example, it's possible to both sort a folder by
 // name and group a folder by name.
-BETTER_ENUM(SortMode, int,
+//
+// These values are used when loading and saving data and shouldn't be changed.
+enum class SortMode
+{
 	Name = 1,
 	DateModified = 2,
 	Size = 3,
@@ -80,4 +81,4 @@ BETTER_ENUM(SortMode, int,
 	MediaPublisher = 62,
 	MediaWriter = 63,
 	MediaYear = 64
-)
+};

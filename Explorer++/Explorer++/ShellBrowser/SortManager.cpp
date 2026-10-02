@@ -19,7 +19,7 @@ void ShellBrowserImpl::SortFolder()
 	SendMessage(m_listView, LVM_SORTITEMS, reinterpret_cast<WPARAM>(this),
 		reinterpret_cast<LPARAM>(SortStub));
 
-	if (m_folderSettings.viewMode == +ViewMode::Details)
+	if (m_folderSettings.viewMode == ViewMode::Details)
 	{
 		ApplyHeaderSortArrow();
 	}
@@ -373,7 +373,7 @@ int CALLBACK ShellBrowserImpl::Sort(int InternalIndex1, int InternalIndex2) cons
 		}
 	}
 
-	if (m_folderSettings.sortDirection == +SortDirection::Descending)
+	if (m_folderSettings.sortDirection == SortDirection::Descending)
 	{
 		comparisonResult = -comparisonResult;
 	}

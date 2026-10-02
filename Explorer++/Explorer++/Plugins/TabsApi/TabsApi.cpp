@@ -15,6 +15,7 @@
 #include "ShellBrowser/SortModes.h"
 #include "TabContainer.h"
 #include "TabList.h"
+#include <magic_enum/magic_enum.hpp>
 #include <sol/sol.hpp>
 
 Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowserImpl &shellBrowser)
@@ -32,12 +33,12 @@ Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowserImpl &shellBr
 std::wstring Plugins::TabsApi::FolderSettings::ToString()
 {
 	// clang-format off
-	return _T("sortMode = ") + utf8StrToWstr(sortMode._to_string())
-		+ _T(", groupMode = ") + utf8StrToWstr(groupMode._to_string())
-		+ _T(", viewMode = ") + utf8StrToWstr(viewMode._to_string())
+	return _T("sortMode = ") + utf8StrToWstr(magic_enum::enum_name(sortMode))
+		+ _T(", groupMode = ") + utf8StrToWstr(magic_enum::enum_name(groupMode))
+		+ _T(", viewMode = ") + utf8StrToWstr(magic_enum::enum_name(viewMode))
 		+ _T(", autoArrange = ") + std::to_wstring(autoArrange)
-		+ _T(", sortDirection = ") + std::to_wstring(sortDirection)
-		+ _T(", groupSortDirection = ") + std::to_wstring(groupSortDirection)
+		+ _T(", sortDirection = ") + utf8StrToWstr(magic_enum::enum_name(sortDirection))
+		+ _T(", groupSortDirection = ") + utf8StrToWstr(magic_enum::enum_name(groupSortDirection))
 		+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 		+ _T(", showHidden = ") + std::to_wstring(showHidden);
 	// clang-format on
@@ -180,10 +181,14 @@ void Plugins::TabsApi::ExtractTabPropertiesForCreation(sol::table createProperti
 
 	sol::optional<int> lockState = createProperties[TabConstants::LOCK_STATE];
 
-	// TODO: Verify that lockState has a valid value.
 	if (lockState)
 	{
-		tabSettings.lockState = static_cast<::Tab::LockState>(*lockState);
+		auto value = magic_enum::enum_cast<::Tab::LockState>(*lockState);
+
+		if (value)
+		{
+			tabSettings.lockState = *value;
+		}
 	}
 }
 
@@ -192,23 +197,38 @@ void Plugins::TabsApi::ExtractFolderSettingsForCreation(sol::table folderSetting
 {
 	sol::optional<int> sortMode = folderSettingsTable[FolderSettingsConstants::SORT_MODE];
 
-	if (sortMode && SortMode::_is_valid(*sortMode))
+	if (sortMode)
 	{
-		folderSettings.sortMode = SortMode::_from_integral(*sortMode);
+		auto value = magic_enum::enum_cast<SortMode>(*sortMode);
+
+		if (value)
+		{
+			folderSettings.sortMode = *value;
+		}
 	}
 
 	sol::optional<int> groupMode = folderSettingsTable[FolderSettingsConstants::GROUP_MODE];
 
-	if (groupMode && SortMode::_is_valid(*groupMode))
+	if (groupMode)
 	{
-		folderSettings.groupMode = SortMode::_from_integral(*groupMode);
+		auto value = magic_enum::enum_cast<SortMode>(*groupMode);
+
+		if (value)
+		{
+			folderSettings.groupMode = *value;
+		}
 	}
 
 	sol::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
-	if (viewMode && ViewMode::_is_valid(*viewMode))
+	if (viewMode)
 	{
-		folderSettings.viewMode = ViewMode::_from_integral(*viewMode);
+		auto value = magic_enum::enum_cast<ViewMode>(*viewMode);
+
+		if (value)
+		{
+			folderSettings.viewMode = *value;
+		}
 	}
 
 	sol::optional<bool> autoArrange = folderSettingsTable[FolderSettingsConstants::AUTO_ARRANGE];
@@ -220,17 +240,27 @@ void Plugins::TabsApi::ExtractFolderSettingsForCreation(sol::table folderSetting
 
 	sol::optional<int> sortDirection = folderSettingsTable[FolderSettingsConstants::SORT_DIRECTION];
 
-	if (sortDirection && SortDirection::_is_valid(*sortDirection))
+	if (sortDirection)
 	{
-		folderSettings.sortDirection = SortDirection::_from_integral(*sortDirection);
+		auto value = magic_enum::enum_cast<SortDirection>(*sortDirection);
+
+		if (value)
+		{
+			folderSettings.sortDirection = *value;
+		}
 	}
 
 	sol::optional<int> groupSortDirection =
 		folderSettingsTable[FolderSettingsConstants::GROUP_SORT_DIRECTION];
 
-	if (groupSortDirection && SortDirection::_is_valid(*groupSortDirection))
+	if (groupSortDirection)
 	{
-		folderSettings.groupSortDirection = SortDirection::_from_integral(*groupSortDirection);
+		auto value = magic_enum::enum_cast<SortDirection>(*groupSortDirection);
+
+		if (value)
+		{
+			folderSettings.groupSortDirection = *value;
+		}
 	}
 
 	sol::optional<bool> showInGroups = folderSettingsTable[FolderSettingsConstants::SHOW_IN_GROUPS];
@@ -280,10 +310,14 @@ void Plugins::TabsApi::Update(int tabId, sol::table properties)
 
 	sol::optional<int> lockState = properties[TabConstants::LOCK_STATE];
 
-	// TODO: Verify that lockState has a valid value.
 	if (lockState)
 	{
-		tabInternal->SetLockState(static_cast<::Tab::LockState>(*lockState));
+		auto value = magic_enum::enum_cast<::Tab::LockState>(*lockState);
+
+		if (value)
+		{
+			tabInternal->SetLockState(*value);
+		}
 	}
 
 	sol::optional<bool> active = properties[TabConstants::ACTIVE];

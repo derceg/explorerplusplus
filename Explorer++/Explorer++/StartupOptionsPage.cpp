@@ -85,7 +85,7 @@ void StartupOptionsPage::SetUpListView()
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(listView,
 		std::bind_front(&StartupOptionsPage::ListViewWndProc, this)));
 
-	EnableWindow(listView, m_config->startupMode == +StartupMode::CustomFolders);
+	EnableWindow(listView, m_config->startupMode == StartupMode::CustomFolders);
 }
 
 int StartupOptionsPage::MapStartupModeToControlId(StartupMode startupMode)

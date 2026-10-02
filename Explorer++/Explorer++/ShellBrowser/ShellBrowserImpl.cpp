@@ -432,13 +432,13 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 		break;
 	}
 
-	if (viewMode != +ViewMode::Details)
+	if (viewMode != ViewMode::Details)
 	{
 		m_columnThreadPool.clear_queue();
 		m_columnResults.clear();
 	}
 
-	if (viewMode != +ViewMode::Details && viewMode != +ViewMode::Tiles)
+	if (viewMode != ViewMode::Details && viewMode != ViewMode::Tiles)
 	{
 		AddFirstColumn();
 	}
@@ -448,21 +448,21 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 
 	SendMessage(m_listView, LVM_SETVIEW, dwStyle, 0);
 
-	if (previousViewMode != +ViewMode::Details && viewMode == +ViewMode::Details)
+	if (previousViewMode != ViewMode::Details && viewMode == ViewMode::Details)
 	{
 		auto firstColumn = GetFirstCheckedColumn();
 
-		if (firstColumn.type != +ColumnType::Name)
+		if (firstColumn.type != ColumnType::Name)
 		{
 			SetFirstColumnTextToCallback();
 		}
 	}
-	else if (previousViewMode == +ViewMode::Details && viewMode != +ViewMode::Details)
+	else if (previousViewMode == ViewMode::Details && viewMode != ViewMode::Details)
 	{
 		auto firstColumn = GetFirstCheckedColumn();
 
 		// The item text in non-details view is always the filename.
-		if (firstColumn.type != +ColumnType::Name)
+		if (firstColumn.type != ColumnType::Name)
 		{
 			SetFirstColumnTextToFilename();
 		}

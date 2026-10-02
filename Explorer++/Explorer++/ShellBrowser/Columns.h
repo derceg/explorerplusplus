@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
-
-BETTER_ENUM(ColumnType, unsigned int,
+// These values are used when loading and saving data and shouldn't be changed.
+enum class ColumnType
+{
 	Name = 1,
 	Type = 2,
 	Size = 3,
@@ -91,7 +91,7 @@ BETTER_ENUM(ColumnType, unsigned int,
 
 	/* Printer columns. */
 	PrinterModel = 64
-)
+};
 
 struct Column_t
 {

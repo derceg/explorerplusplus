@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
-
-BETTER_ENUM(BookmarkColumn, int,
-	Name = 1,
-	Location = 2,
-	DateCreated = 3,
-	DateModified = 4
-)
+enum class BookmarkColumn
+{
+	Name,
+	Location,
+	DateCreated,
+	DateModified
+};

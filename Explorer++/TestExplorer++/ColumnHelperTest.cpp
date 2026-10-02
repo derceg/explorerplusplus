@@ -6,6 +6,7 @@
 #include "ShellBrowser/ColumnHelper.h"
 #include "ResourceLoaderFake.h"
 #include <gtest/gtest.h>
+#include <magic_enum/magic_enum.hpp>
 
 TEST(ColumnHelperTest, CheckEveryColumnHasAName)
 {
@@ -13,7 +14,7 @@ TEST(ColumnHelperTest, CheckEveryColumnHasAName)
 
 	// Each column should have a name. `GetColumnName` will trigger a CHECK failure if a particular
 	// column isn't handled, so this test will fail in that case.
-	for (auto columnType : ColumnType::_values())
+	for (auto columnType : magic_enum::enum_values<ColumnType>())
 	{
 		GetColumnName(&resourceLoader, columnType);
 	}

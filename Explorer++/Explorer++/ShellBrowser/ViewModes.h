@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
-
 class ResourceLoader;
 
-BETTER_ENUM(ViewMode, int,
+// These values are used when loading and saving data and shouldn't be changed.
+enum class ViewMode
+{
 	Icons = 1,
 	SmallIcons = 2,
 	List = 3,
@@ -19,7 +19,7 @@ BETTER_ENUM(ViewMode, int,
 	LargeIcons = 8,
 	ExtraLargeThumbnails = 9,
 	LargeThumbnails = 10
-)
+};
 
 bool IsThumbnailsViewMode(ViewMode viewMode);
 

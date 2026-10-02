@@ -11,6 +11,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <glog/logging.h>
+#include <magic_enum/magic_enum.hpp>
 
 AppearanceOptionsPage::AppearanceOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
 	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
@@ -60,23 +61,23 @@ void AppearanceOptionsPage::InitializeControls()
 
 	std::vector<ComboBoxItem> iconSetItems;
 
-	for (auto iconSet : IconSet::_values())
+	for (auto iconSet : magic_enum::enum_values<IconSet>())
 	{
-		iconSetItems.emplace_back(iconSet, GetIconSetText(iconSet));
+		iconSetItems.emplace_back(static_cast<int>(iconSet), GetIconSetText(iconSet));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_ICON_SET), iconSetItems,
-		m_config->iconSet);
+		static_cast<int>(m_config->iconSet));
 
 	std::vector<ComboBoxItem> themeItems;
 
-	for (auto theme : Theme::_values())
+	for (auto theme : magic_enum::enum_values<Theme>())
 	{
-		themeItems.emplace_back(theme, GetThemeText(theme, m_resourceLoader));
+		themeItems.emplace_back(static_cast<int>(theme), GetThemeText(theme, m_resourceLoader));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), themeItems,
-		m_config->theme.get());
+		static_cast<int>(m_config->theme.get()));
 }
 
 std::wstring AppearanceOptionsPage::GetIconSetText(IconSet iconSet)
@@ -134,11 +135,15 @@ void AppearanceOptionsPage::SaveSettings()
 		static_cast<int>(SendDlgItemMessage(GetDialog(), IDC_OPTIONS_ICON_SET, CB_GETCURSEL, 0, 0));
 	int iconSetItemData = static_cast<int>(
 		SendDlgItemMessage(GetDialog(), IDC_OPTIONS_ICON_SET, CB_GETITEMDATA, selectedIndex, 0));
-	m_config->iconSet = IconSet::_from_integral(iconSetItemData);
+	auto iconSet = magic_enum::enum_cast<IconSet>(iconSetItemData);
+	CHECK(iconSet);
+	m_config->iconSet = *iconSet;
 
 	selectedIndex =
 		static_cast<int>(SendDlgItemMessage(GetDialog(), IDC_OPTIONS_THEME, CB_GETCURSEL, 0, 0));
 	int themeItemData = static_cast<int>(
 		SendDlgItemMessage(GetDialog(), IDC_OPTIONS_THEME, CB_GETITEMDATA, selectedIndex, 0));
-	m_config->theme = Theme::_from_integral(themeItemData);
+	auto theme = magic_enum::enum_cast<Theme>(themeItemData);
+	CHECK(theme);
+	m_config->theme = *theme;
 }

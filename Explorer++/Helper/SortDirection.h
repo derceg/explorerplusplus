@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
-
-BETTER_ENUM(SortDirection, int,
+enum class SortDirection
+{
 	Ascending = 0,
 	Descending = 1
-)
+};
 
 constexpr SortDirection InvertSortDirection(SortDirection direction)
 {
-	return direction == +SortDirection::Ascending ? SortDirection::Descending
-												  : SortDirection::Ascending;
+	return direction == SortDirection::Ascending ? SortDirection::Descending
+												 : SortDirection::Ascending;
 }

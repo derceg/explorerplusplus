@@ -145,7 +145,7 @@ void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 			continue;
 		}
 
-		if (m_folderSettings.viewMode == +ViewMode::Details)
+		if (m_folderSettings.viewMode == ViewMode::Details)
 		{
 			LVITEM lvItem;
 			POINT ptItem;

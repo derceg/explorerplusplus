@@ -118,7 +118,7 @@ int ShellBrowserImpl::GroupComparison(int id1, int id2)
 		comparisonResult = GroupNameComparison(group1, group2);
 	}
 
-	if (m_folderSettings.groupSortDirection == +SortDirection::Descending)
+	if (m_folderSettings.groupSortDirection == SortDirection::Descending)
 	{
 		comparisonResult = -comparisonResult;
 	}

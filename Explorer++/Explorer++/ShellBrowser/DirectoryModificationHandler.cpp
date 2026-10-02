@@ -317,7 +317,7 @@ void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE upda
 
 	InvalidateIconForItem(*itemIndex);
 
-	if (m_folderSettings.viewMode == +ViewMode::Details)
+	if (m_folderSettings.viewMode == ViewMode::Details)
 	{
 		InvalidateAllColumnsForItem(*itemIndex);
 	}
@@ -385,7 +385,7 @@ void ShellBrowserImpl::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld,
 
 void ShellBrowserImpl::InvalidateAllColumnsForItem(int itemIndex)
 {
-	if (m_folderSettings.viewMode != +ViewMode::Details)
+	if (m_folderSettings.viewMode != ViewMode::Details)
 	{
 		return;
 	}

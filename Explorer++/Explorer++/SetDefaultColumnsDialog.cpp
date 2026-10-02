@@ -13,6 +13,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <glog/logging.h>
+#include <magic_enum/magic_enum.hpp>
 #include <algorithm>
 
 const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
@@ -240,8 +241,8 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 
 		/* Since the column list will be rebuilt, find this column
 		in the current list, and reuse its width. */
-		auto columnType =
-			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
+		auto columnType = magic_enum::enum_cast<ColumnType>(
+			static_cast<std::underlying_type_t<ColumnType>>(lvItem.lParam));
 		CHECK(columnType);
 		auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
 			[&columnType](const Column_t &column) { return column.type == *columnType; });
@@ -327,8 +328,8 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		auto columnType =
-			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
+		auto columnType = magic_enum::enum_cast<ColumnType>(
+			static_cast<std::underlying_type_t<ColumnType>>(lvItem.lParam));
 		CHECK(columnType);
 
 		auto columnDescription = GetColumnDescription(m_resourceLoader, *columnType);

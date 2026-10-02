@@ -106,7 +106,7 @@ void DarkModeManagerImpl::OnSettingChange(const wchar_t *systemParameter)
 	// Windows mode setting will be ignored, as the app mode setting is what's used to determine
 	// whether a light or dark theme is used.
 	if (lstrcmp(systemParameter, L"ImmersiveColorSet") == 0
-		&& m_config->theme.get() == +Theme::System)
+		&& m_config->theme.get() == Theme::System)
 	{
 		UpdateAppDarkModeStatus();
 	}
@@ -172,8 +172,8 @@ void DarkModeManagerImpl::UpdateAppDarkModeStatus()
 
 bool DarkModeManagerImpl::ShouldEnableDarkMode() const
 {
-	return m_config->theme == +Theme::Dark
-		|| (m_config->theme == +Theme::System && !IsSystemAppModeLight());
+	return m_config->theme == Theme::Dark
+		|| (m_config->theme == Theme::System && !IsSystemAppModeLight());
 }
 
 void DarkModeManagerImpl::AllowDarkModeForApp(bool allow)

@@ -15,6 +15,8 @@
 #include "Plugins/TabsApi/TabsApi.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
+#include "../Helper/EnumHelper.h"
+#include <magic_enum/magic_enum.hpp>
 #include <sol/sol.hpp>
 
 void BindTabsAPI(sol::state &state, TabEvents *tabEvents, BrowserList *browserList,
@@ -25,7 +27,7 @@ void BindCommandApi(int pluginId, sol::state &state,
 template <typename T>
 void BindObserverMethods(sol::state &state, sol::table &parentTable,
 	const std::string &observerTableName, const std::shared_ptr<T> &object);
-template <typename T>
+template <Enum T>
 void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
@@ -132,17 +134,16 @@ void BindObserverMethods(sol::state &state, sol::table &parentTable,
 // enum values that are created at runtime.
 // The new_enum function is simple enough to emulate though, as all it
 // does is create a (possibly read-only) table with the specified enum
-// values. Note that this function is only designed to work with Better
-// Enums (though there's currently no static type check).
-template <typename T>
+// values.
+template <Enum T>
 void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name)
 {
 	sol::table enumTable = parentTable.create_named(name);
 	sol::table enumMetaTable = MarkTableReadOnly(state, enumTable);
 
-	for (auto item : T::_values())
+	for (auto &[enumValue, enumName] : magic_enum::enum_entries<T>())
 	{
-		enumMetaTable.set(item._to_string(), item._to_integral());
+		enumMetaTable.set(enumName, enumValue);
 	}
 }
 

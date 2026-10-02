@@ -80,7 +80,7 @@ void ShellBrowserImpl::SetTileViewItemInfo(int iItem, int iItemInternal)
 
 		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
-			: +SizeDisplayFormat::None;
+			: SizeDisplayFormat::None;
 		std::wstring fileSizeText = FormatSizeString(fileSize.QuadPart, displayFormat);
 		ListView_SetItemText(m_listView, iItem, 2, fileSizeText.data());
 	}

@@ -75,7 +75,7 @@ std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAn
 {
 	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
-	if (m_iconSet == +IconSet::Color || !m_darkModeManager->IsDarkModeEnabled())
+	if (m_iconSet == IconSet::Color || !m_darkModeManager->IsDarkModeEnabled())
 	{
 		return bitmap;
 	}

@@ -535,7 +535,7 @@ void ListView::SetHeaderSortArrow()
 
 	int sortOption;
 
-	if (m_model->GetSortDirection() == +SortDirection::Ascending)
+	if (m_model->GetSortDirection() == SortDirection::Ascending)
 	{
 		sortOption = HDF_SORTUP;
 	}
@@ -898,7 +898,7 @@ void ListView::OnHeaderItemClick(const NMHEADER *header)
 
 	if (columnId == sortColumnId)
 	{
-		if (m_model->GetSortDirection() == +SortDirection::Ascending)
+		if (m_model->GetSortDirection() == SortDirection::Ascending)
 		{
 			m_model->SetSortDetails(columnId, SortDirection::Descending);
 		}

@@ -11,6 +11,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/ListViewHelper.h"
+#include <magic_enum/magic_enum.hpp>
 #include <Shlwapi.h>
 #include <algorithm>
 #include <functional>
@@ -205,8 +206,8 @@ void SelectColumnsDialog::OnOk()
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		auto columnType =
-			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
+		auto columnType = magic_enum::enum_cast<ColumnType>(
+			static_cast<std::underlying_type_t<ColumnType>>(lvItem.lParam));
 		CHECK(columnType);
 		auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
 			[&columnType](const Column_t &column) { return column.type == *columnType; });
@@ -286,8 +287,8 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		auto columnType =
-			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
+		auto columnType = magic_enum::enum_cast<ColumnType>(
+			static_cast<std::underlying_type_t<ColumnType>>(lvItem.lParam));
 		CHECK(columnType);
 
 		auto columnDescription = GetColumnDescription(m_resourceLoader, *columnType);

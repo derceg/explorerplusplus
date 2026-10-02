@@ -8,7 +8,9 @@
 #include "CustomFontStorage.h"
 #include "StartupFoldersXmlStorage.h"
 #include "Storage.h"
+#include "../Helper/EnumHelper.h"
 #include "../Helper/XMLSettings.h"
+#include <magic_enum/magic_enum.hpp>
 #include <wil/com.h>
 #include <format>
 
@@ -95,9 +97,8 @@ HRESULT GetBoolSetting(IXMLDOMNode *settingsNode, const std::wstring &settingNam
 	return hr;
 }
 
-template <BetterEnum T>
-HRESULT GetBetterEnumSetting(IXMLDOMNode *settingsNode, const std::wstring &settingName,
-	T &outputValue)
+template <Enum T>
+HRESULT GetEnumSetting(IXMLDOMNode *settingsNode, const std::wstring &settingName, T &outputValue)
 {
 	int value;
 	HRESULT hr = GetIntSetting(settingsNode, settingName, value);
@@ -107,12 +108,14 @@ HRESULT GetBetterEnumSetting(IXMLDOMNode *settingsNode, const std::wstring &sett
 		return hr;
 	}
 
-	if (!T::_is_valid(value))
+	auto result = magic_enum::enum_cast<T>(value);
+
+	if (!result)
 	{
 		return E_FAIL;
 	}
 
-	outputValue = T::_from_integral(value);
+	outputValue = *result;
 
 	return hr;
 }
@@ -187,7 +190,7 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 		config.globalFolderSettings.oneClickActivateHoverTime);
 	GetBoolSetting(settingsNode, L"OverwriteExistingFilesConfirmation",
 		config.overwriteExistingFilesConfirmation);
-	GetBetterEnumSetting(settingsNode, L"ReplaceExplorerMode", config.replaceExplorerMode);
+	GetEnumSetting(settingsNode, L"ReplaceExplorerMode", config.replaceExplorerMode);
 	GetBoolSetting(settingsNode, L"ShowAddressBar", config.showAddressBar);
 	GetBoolSetting(settingsNode, L"ShowApplicationToolbar", config.showApplicationToolbar);
 	GetBoolSetting(settingsNode, L"ShowBookmarksToolbar", config.showBookmarksToolbar);
@@ -211,24 +214,24 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 	GetBoolSetting(settingsNode, L"ShowTaskbarThumbnails", config.showTaskbarThumbnails);
 	GetBoolSetting(settingsNode, L"ShowToolbar", config.showMainToolbar);
 	GetBoolSetting(settingsNode, L"ShowUserNameTitleBar", config.showUserNameInTitleBar);
-	GetBetterEnumSetting(settingsNode, L"SizeDisplayFormat",
+	GetEnumSetting(settingsNode, L"SizeDisplayFormat",
 		config.globalFolderSettings.sizeDisplayFormat);
-	GetBetterEnumSetting(settingsNode, L"StartupMode", config.startupMode);
+	GetEnumSetting(settingsNode, L"StartupMode", config.startupMode);
 	GetBoolSetting(settingsNode, L"SynchronizeTreeview", config.synchronizeTreeview);
 	GetBoolSetting(settingsNode, L"TVAutoExpandSelected", config.treeViewAutoExpandSelected);
 	GetBoolSetting(settingsNode, L"UseFullRowSelect", config.useFullRowSelect);
 	GetBoolSetting(settingsNode, L"TreeViewDelayEnabled", config.treeViewDelayEnabled);
-	GetBetterEnumSetting(settingsNode, L"ViewModeGlobal", config.defaultFolderSettings.viewMode);
+	GetEnumSetting(settingsNode, L"ViewModeGlobal", config.defaultFolderSettings.viewMode);
 	GetTextSetting(settingsNode, L"NewTabDirectory", config.defaultTabDirectory);
-	GetBetterEnumSetting(settingsNode, L"InfoTipType", config.infoTipType);
-	GetBetterEnumSetting(settingsNode, L"IconTheme", config.iconSet);
+	GetEnumSetting(settingsNode, L"InfoTipType", config.infoTipType);
+	GetEnumSetting(settingsNode, L"IconTheme", config.iconSet);
 	GetBoolSetting(settingsNode, L"CheckPinnedToNamespaceTreeProperty",
 		config.checkPinnedToNamespaceTreeProperty);
 	GetBoolSetting(settingsNode, L"ShowQuickAccessInTreeView", config.showQuickAccessInTreeView);
 
 	auto theme = config.theme.get();
 
-	if (GetBetterEnumSetting(settingsNode, L"Theme", theme) != S_OK)
+	if (GetEnumSetting(settingsNode, L"Theme", theme) != S_OK)
 	{
 		if (bool enableDarkMode;
 			GetBoolSetting(settingsNode, L"EnableDarkMode", enableDarkMode) == S_OK)
@@ -254,7 +257,7 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 			sortAscending ? SortDirection::Ascending : SortDirection::Descending;
 	}
 
-	GetBetterEnumSetting(settingsNode, L"GroupSortDirectionGlobal",
+	GetEnumSetting(settingsNode, L"GroupSortDirectionGlobal",
 		config.defaultFolderSettings.groupSortDirection);
 	GetBoolSetting(settingsNode, L"GoUpOnDoubleClick", config.goUpOnDoubleClick);
 
@@ -361,7 +364,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"HideSystemFilesGlobal",
 		XMLSettings::EncodeBoolValue(config.globalFolderSettings.hideSystemFiles));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"InfoTipType",
-		XMLSettings::EncodeIntValue(config.infoTipType));
+		XMLSettings::EncodeIntValue(static_cast<int>(config.infoTipType)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"InsertSorted",
 		XMLSettings::EncodeBoolValue(config.globalFolderSettings.insertSorted));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"Language",
@@ -384,7 +387,8 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"OverwriteExistingFilesConfirmation",
 		XMLSettings::EncodeBoolValue(config.overwriteExistingFilesConfirmation));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"ReplaceExplorerMode", XMLSettings::EncodeIntValue(config.replaceExplorerMode));
+		L"ReplaceExplorerMode",
+		XMLSettings::EncodeIntValue(static_cast<int>(config.replaceExplorerMode)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"ShowAddressBar", XMLSettings::EncodeBoolValue(config.showAddressBar.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
@@ -436,13 +440,14 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"ShowUserNameTitleBar", XMLSettings::EncodeBoolValue(config.showUserNameInTitleBar.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"SizeDisplayFormat",
-		XMLSettings::EncodeIntValue(config.globalFolderSettings.sizeDisplayFormat));
+		XMLSettings::EncodeIntValue(
+			static_cast<int>(config.globalFolderSettings.sizeDisplayFormat)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"SortAscendingGlobal",
 		XMLSettings::EncodeBoolValue(
-			config.defaultFolderSettings.sortDirection == +SortDirection::Ascending));
+			config.defaultFolderSettings.sortDirection == SortDirection::Ascending));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"StartupMode",
-		XMLSettings::EncodeIntValue(config.startupMode));
+		XMLSettings::EncodeIntValue(static_cast<int>(config.startupMode)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"SynchronizeTreeview", XMLSettings::EncodeBoolValue(config.synchronizeTreeview.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
@@ -450,11 +455,12 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"UseFullRowSelect", XMLSettings::EncodeBoolValue(config.useFullRowSelect.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"IconTheme",
-		XMLSettings::EncodeIntValue(config.iconSet));
+		XMLSettings::EncodeIntValue(static_cast<int>(config.iconSet)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"TreeViewDelayEnabled", XMLSettings::EncodeBoolValue(config.treeViewDelayEnabled));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
-		L"ViewModeGlobal", XMLSettings::EncodeIntValue(config.defaultFolderSettings.viewMode));
+		L"ViewModeGlobal",
+		XMLSettings::EncodeIntValue(static_cast<int>(config.defaultFolderSettings.viewMode)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"CheckPinnedToNamespaceTreeProperty",
 		XMLSettings::EncodeBoolValue(config.checkPinnedToNamespaceTreeProperty));
@@ -462,7 +468,7 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"ShowQuickAccessInTreeView",
 		XMLSettings::EncodeBoolValue(config.showQuickAccessInTreeView.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME, L"Theme",
-		XMLSettings::EncodeIntValue(config.theme.get()));
+		XMLSettings::EncodeIntValue(static_cast<int>(config.theme.get())));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"DisplayMixedFilesAndFolders",
 		XMLSettings::EncodeBoolValue(config.globalFolderSettings.displayMixedFilesAndFolders));
@@ -473,7 +479,8 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		L"OpenTabsInForeground", XMLSettings::EncodeBoolValue(config.openTabsInForeground));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"GroupSortDirectionGlobal",
-		XMLSettings::EncodeIntValue(config.defaultFolderSettings.groupSortDirection));
+		XMLSettings::EncodeIntValue(
+			static_cast<int>(config.defaultFolderSettings.groupSortDirection)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"GoUpOnDoubleClick", XMLSettings::EncodeBoolValue(config.goUpOnDoubleClick));
 

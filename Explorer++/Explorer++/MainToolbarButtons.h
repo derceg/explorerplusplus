@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
+#include <magic_enum/magic_enum.hpp>
 
 // Note that these values are used to save the toolbar state and should not be changed.
-BETTER_ENUM(MainToolbarButton, int,
+enum class MainToolbarButton
+{
 	Separator = 45001,
 	Back = 45002,
 	Forward = 45003,
@@ -32,4 +33,11 @@ BETTER_ENUM(MainToolbarButton, int,
 	SplitFile = 45023,
 	MergeFiles = 45024,
 	CloseTab = 45025
-)
+};
+
+template <>
+struct magic_enum::customize::enum_range<MainToolbarButton>
+{
+	static constexpr int min = 45001;
+	static constexpr int max = 45025;
+};

@@ -203,7 +203,7 @@ void StatusBar::UpdateText(const Tab &tab)
 	{
 		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
-			: +SizeDisplayFormat::None;
+			: SizeDisplayFormat::None;
 		sizeText =
 			FormatSizeString(tab.GetShellBrowserImpl()->GetTotalDirectorySize(), displayFormat);
 	}
@@ -214,7 +214,7 @@ void StatusBar::UpdateText(const Tab &tab)
 		{
 			auto displayFormat = m_config->globalFolderSettings.forceSize
 				? m_config->globalFolderSettings.sizeDisplayFormat
-				: +SizeDisplayFormat::None;
+				: SizeDisplayFormat::None;
 			sizeText =
 				FormatSizeString(tab.GetShellBrowserImpl()->GetSelectionSize(), displayFormat);
 		}

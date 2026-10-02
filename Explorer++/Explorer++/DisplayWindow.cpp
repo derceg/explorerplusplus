@@ -376,7 +376,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 		uint64_t selectionSize = tab.GetShellBrowserImpl()->GetSelectionSize();
 		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
-			: +SizeDisplayFormat::None;
+			: SizeDisplayFormat::None;
 		auto selectionSizeText = FormatSizeString(selectionSize, displayFormat);
 
 		auto sizeText = m_resourceLoader->LoadString(IDS_GENERAL_TOTALFILESIZE);

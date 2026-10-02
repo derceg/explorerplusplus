@@ -16,6 +16,7 @@
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
+#include <magic_enum/magic_enum.hpp>
 
 FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
 	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
@@ -131,7 +132,7 @@ void FilesFoldersOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_OPTIONS_CHECK_SHOWINFOTIPS, BST_CHECKED);
 	}
 
-	if (m_config->infoTipType == +InfoTipType::System)
+	if (m_config->infoTipType == InfoTipType::System)
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, BST_CHECKED);
 	}
@@ -156,9 +157,9 @@ void FilesFoldersOptionsPage::InitializeControls()
 	HWND fileSizesComboBox = GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES);
 	std::vector<ComboBoxItem> fileSizeItems;
 
-	for (auto size : SizeDisplayFormat::_values())
+	for (auto size : magic_enum::enum_values<SizeDisplayFormat>())
 	{
-		if (size == +SizeDisplayFormat::None)
+		if (size == SizeDisplayFormat::None)
 		{
 			continue;
 		}
@@ -368,8 +369,11 @@ void FilesFoldersOptionsPage::SaveSettings()
 	hCBSize = GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES);
 
 	iSel = (int) SendMessage(hCBSize, CB_GETCURSEL, 0, 0);
-	m_config->globalFolderSettings.sizeDisplayFormat = SizeDisplayFormat::_from_integral(
-		static_cast<SizeDisplayFormat::_integral>(SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0)));
+	auto sizeDisplayFormat = magic_enum::enum_cast<SizeDisplayFormat>(
+		static_cast<std::underlying_type_t<SizeDisplayFormat>>(
+			SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0)));
+	CHECK(sizeDisplayFormat);
+	m_config->globalFolderSettings.sizeDisplayFormat = *sizeDisplayFormat;
 
 	for (auto &tab : m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{

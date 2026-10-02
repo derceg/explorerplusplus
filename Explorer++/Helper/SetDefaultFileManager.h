@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
-
 namespace DefaultFileManager
 {
 
-BETTER_ENUM(ReplaceExplorerMode, int,
+// These values are used when loading and saving data and shouldn't be changed.
+enum class ReplaceExplorerMode
+{
 	None = 1,
 	FileSystem = 2,
 	All = 3
-)
+};
 
 LSTATUS SetAsDefaultFileManagerFileSystem(const std::wstring &applicationKeyName,
 	const std::wstring &menuText);
@@ -23,6 +23,3 @@ LSTATUS RemoveAsDefaultFileManagerFileSystem(const std::wstring &applicationKeyN
 LSTATUS RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName);
 
 }
-
-// This is needed to be able to use the enum as a key in std::unordered_map.
-BETTER_ENUMS_DECLARE_STD_HASH(DefaultFileManager::ReplaceExplorerMode);

@@ -1,7 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "dependencies": [
-    "better-enums",
     "boost-algorithm",
     "boost-bimap",
     "boost-circular-buffer",
@@ -29,6 +28,7 @@
     "glog",
     "gtest",
     "lua",
+    "magic-enum",
     "nlohmann-json",
     "pegtl",
     "sol2",

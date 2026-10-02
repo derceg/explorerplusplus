@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
 #include <map>
 #include <string>
 
-BETTER_ENUM(MassRenameToken, int,
+enum class MassRenameToken
+{
 	// Filename + extension
 	Filename,
 
@@ -27,7 +27,7 @@ BETTER_ENUM(MassRenameToken, int,
 	// A counter, starting from 1. 0 padding can be specified by prepending 0s to the token (e.g.
 	// /00N).
 	Counter
-)
+};
 
 // Returns the string representation of a token.
 std::wstring GetMassRenameTokenText(MassRenameToken token);

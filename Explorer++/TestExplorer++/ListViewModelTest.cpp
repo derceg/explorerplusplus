@@ -107,10 +107,10 @@ TEST(ListViewModelTest, GetSortDirection)
 {
 	ListViewModelFake model;
 	model.SetSortDetails(ListViewColumnModelFake::COLUMN_DATA_1, SortDirection::Ascending);
-	EXPECT_EQ(model.GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(model.GetSortDirection(), SortDirection::Ascending);
 
 	model.SetSortDetails(ListViewColumnModelFake::COLUMN_DATA_1, SortDirection::Descending);
-	EXPECT_EQ(model.GetSortDirection(), +SortDirection::Descending);
+	EXPECT_EQ(model.GetSortDirection(), SortDirection::Descending);
 }
 
 TEST(ListViewModelTest, Sorting)

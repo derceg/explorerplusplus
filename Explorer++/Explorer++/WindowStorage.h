@@ -6,7 +6,6 @@
 
 #include "LayoutDefaults.h"
 #include "MainToolbarStorage.h"
-#include "../Helper/BetterEnumsWrapper.h"
 #include <optional>
 #include <vector>
 
@@ -14,11 +13,12 @@ struct RebarBandStorageInfo;
 struct TabStorageData;
 
 // These values are used when loading and saving data and shouldn't be changed.
-BETTER_ENUM(WindowShowState, int,
+enum class WindowShowState
+{
 	Normal = 0,
 	Minimized = 1,
 	Maximized = 2
-)
+};
 
 struct WindowStorageData
 {

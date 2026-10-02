@@ -282,7 +282,7 @@ std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo,
 
 	ULARGE_INTEGER fileSize = { { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh } };
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
-														: +SizeDisplayFormat::None;
+														: SizeDisplayFormat::None;
 	return FormatSizeString(fileSize.QuadPart, displayFormat);
 }
 
@@ -298,7 +298,7 @@ std::wstring GetFolderSizeColumnText(const BasicItemInfo_t &itemInfo,
 	// m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
 
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
-														: +SizeDisplayFormat::None;
+														: SizeDisplayFormat::None;
 	return FormatSizeString(folderInfo.size, displayFormat);
 }
 
@@ -355,7 +355,7 @@ std::wstring GetRealSizeColumnText(const BasicItemInfo_t &itemInfo,
 	}
 
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
-														: +SizeDisplayFormat::None;
+														: SizeDisplayFormat::None;
 	return FormatSizeString(realFileSize.QuadPart, displayFormat);
 }
 
@@ -1000,7 +1000,7 @@ std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool Total
 	}
 
 	auto displayFormat = globalFolderSettings.forceSize ? globalFolderSettings.sizeDisplayFormat
-														: +SizeDisplayFormat::None;
+														: SizeDisplayFormat::None;
 	return FormatSizeString(driveSpace.QuadPart, displayFormat);
 }
 

@@ -59,8 +59,8 @@ FolderSettings LoadFolderSettings(HKEY key)
 {
 	FolderSettings folderSettings;
 
-	RegistrySettings::ReadBetterEnumValue(key, SETTING_VIEW_MODE, folderSettings.viewMode);
-	RegistrySettings::ReadBetterEnumValue(key, SETTING_SORT_MODE, folderSettings.sortMode);
+	RegistrySettings::ReadEnumValue(key, SETTING_VIEW_MODE, folderSettings.viewMode);
+	RegistrySettings::ReadEnumValue(key, SETTING_SORT_MODE, folderSettings.sortMode);
 
 	// Previously, the group mode and sort mode were always the same. Therefore, the group mode is
 	// set here to preserve the behavior. This will only have an effect when updating from a version
@@ -74,8 +74,8 @@ FolderSettings LoadFolderSettings(HKEY key)
 	// always the same in previous versions.
 	folderSettings.groupSortDirection = folderSettings.sortDirection;
 
-	RegistrySettings::ReadBetterEnumValue(key, SETTING_GROUP_MODE, folderSettings.groupMode);
-	RegistrySettings::ReadBetterEnumValue(key, SETTING_GROUP_SORT_DIRECTION,
+	RegistrySettings::ReadEnumValue(key, SETTING_GROUP_MODE, folderSettings.groupMode);
+	RegistrySettings::ReadEnumValue(key, SETTING_GROUP_SORT_DIRECTION,
 		folderSettings.groupSortDirection);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
@@ -157,16 +157,19 @@ std::optional<TabStorageData> LoadTabInfo(HKEY key)
 
 void SaveFolderSettings(HKEY key, const FolderSettings &folderSettings)
 {
-	RegistrySettings::SaveDword(key, SETTING_VIEW_MODE, folderSettings.viewMode);
-	RegistrySettings::SaveDword(key, SETTING_SORT_MODE, folderSettings.sortMode);
+	RegistrySettings::SaveDword(key, SETTING_VIEW_MODE,
+		static_cast<DWORD>(folderSettings.viewMode));
+	RegistrySettings::SaveDword(key, SETTING_SORT_MODE,
+		static_cast<DWORD>(folderSettings.sortMode));
 
 	// For backwards compatibility, the value saved here is a bool.
 	RegistrySettings::SaveDword(key, SETTING_SORT_ASCENDING,
-		folderSettings.sortDirection == +SortDirection::Ascending);
+		folderSettings.sortDirection == SortDirection::Ascending);
 
-	RegistrySettings::SaveDword(key, SETTING_GROUP_MODE, folderSettings.groupMode);
+	RegistrySettings::SaveDword(key, SETTING_GROUP_MODE,
+		static_cast<DWORD>(folderSettings.groupMode));
 	RegistrySettings::SaveDword(key, SETTING_GROUP_SORT_DIRECTION,
-		folderSettings.groupSortDirection);
+		static_cast<DWORD>(folderSettings.groupSortDirection));
 	RegistrySettings::SaveDword(key, SETTING_SHOW_IN_GROUPS, folderSettings.showInGroups);
 	RegistrySettings::SaveDword(key, SETTING_APPLY_FILTER, folderSettings.filterEnabled);
 	RegistrySettings::SaveDword(key, SETTING_FILTER_CASE_SENSITIVE,

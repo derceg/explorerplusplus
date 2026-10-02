@@ -11,7 +11,7 @@
 #include <vector>
 
 class DarkModeManager;
-class StartupMode;
+enum class StartupMode;
 class ThemeManager;
 class WindowSubclass;
 

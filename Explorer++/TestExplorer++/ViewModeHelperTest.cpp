@@ -21,17 +21,17 @@ std::array<ViewMode, 8> viewModes = {
 TEST(ViewModeHelperTest, TestGetNext)
 {
 	ViewMode viewMode = GetNextViewMode(viewModes, ViewMode::List);
-	EXPECT_TRUE(viewMode == +ViewMode::SmallIcons);
+	EXPECT_TRUE(viewMode == ViewMode::SmallIcons);
 
 	viewMode = GetNextViewMode(viewModes, ViewMode::ExtraLargeIcons);
-	EXPECT_TRUE(viewMode == +ViewMode::Tiles);
+	EXPECT_TRUE(viewMode == ViewMode::Tiles);
 }
 
 TEST(ViewModeHelperTest, TestGetPrevious)
 {
 	ViewMode viewMode = GetPreviousViewMode(viewModes, ViewMode::LargeIcons);
-	EXPECT_TRUE(viewMode == +ViewMode::Icons);
+	EXPECT_TRUE(viewMode == ViewMode::Icons);
 
 	viewMode = GetPreviousViewMode(viewModes, ViewMode::Tiles);
-	EXPECT_TRUE(viewMode == +ViewMode::ExtraLargeIcons);
+	EXPECT_TRUE(viewMode == ViewMode::ExtraLargeIcons);
 }

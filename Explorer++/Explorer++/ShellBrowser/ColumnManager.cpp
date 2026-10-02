@@ -13,6 +13,8 @@
 #include "ResourceHelper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
+#include "../Helper/EnumHelper.h"
+#include <magic_enum/magic_enum.hpp>
 #include <cassert>
 #include <list>
 
@@ -69,7 +71,7 @@ void ShellBrowserImpl::ProcessColumnResult(int columnResultId)
 		return;
 	}
 
-	if (m_folderSettings.viewMode != +ViewMode::Details)
+	if (m_folderSettings.viewMode != ViewMode::Details)
 	{
 		return;
 	}
@@ -116,7 +118,7 @@ std::optional<int> ShellBrowserImpl::GetColumnIndexByType(ColumnType columnType)
 			continue;
 		}
 
-		if (static_cast<ColumnType::_integral>(hdItem.lParam) == columnType._to_integral())
+		if (hdItem.lParam == ToUnderlying(columnType))
 		{
 			return i;
 		}
@@ -138,8 +140,8 @@ std::optional<ColumnType> ShellBrowserImpl::GetColumnTypeByIndex(int index) cons
 		return std::nullopt;
 	}
 
-	auto columnType =
-		ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(hdItem.lParam));
+	auto columnType = magic_enum::enum_cast<ColumnType>(
+		static_cast<std::underlying_type_t<ColumnType>>(hdItem.lParam));
 	CHECK(columnType);
 
 	return *columnType;
@@ -193,8 +195,8 @@ void ShellBrowserImpl::InsertColumn(ColumnType columnType, int columnIndex, int 
 	lvColumn.pszText = columnName.data();
 	lvColumn.cx = width;
 
-	if (columnType == +ColumnType::Size || columnType == +ColumnType::RealSize
-		|| columnType == +ColumnType::TotalSize || columnType == +ColumnType::FreeSpace)
+	if (columnType == ColumnType::Size || columnType == ColumnType::RealSize
+		|| columnType == ColumnType::TotalSize || columnType == ColumnType::FreeSpace)
 	{
 		lvColumn.mask |= LVCF_FMT;
 		lvColumn.fmt = LVCFMT_RIGHT;
@@ -575,7 +577,7 @@ void ShellBrowserImpl::ApplyHeaderSortArrow()
 	hdItem.mask = HDI_FORMAT;
 	Header_GetItem(hHeader, iColumn, &hdItem);
 
-	if (m_folderSettings.sortDirection == +SortDirection::Ascending)
+	if (m_folderSettings.sortDirection == SortDirection::Ascending)
 	{
 		hdItem.fmt |= HDF_SORTUP;
 	}
@@ -623,7 +625,7 @@ void ShellBrowserImpl::SetCurrentColumnSet(const std::vector<Column_t> &columns)
 			sortFolder = true;
 		}
 
-		if (m_folderSettings.viewMode != +ViewMode::Details)
+		if (m_folderSettings.viewMode != ViewMode::Details)
 		{
 			continue;
 		}

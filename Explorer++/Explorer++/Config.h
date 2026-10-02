@@ -6,32 +6,31 @@
 
 #include "ChangeNotifyMode.h"
 #include "CustomFont.h"
-#include "DefaultColumns.h"
 #include "DisplayWindowDefaults.h"
 #include "FontHelper.h"
 #include "IconSet.h"
 #include "LanguageHelper.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/ViewModes.h"
 #include "Theme.h"
 #include "ValueWrapper.h"
-#include "../Helper/BetterEnumsWrapper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/StringHelper.h"
 #include <optional>
 
-BETTER_ENUM(InfoTipType, int,
+// These values are used when loading and saving data and shouldn't be changed.
+enum class InfoTipType
+{
 	System = 0,
 	Custom = 1
-)
+};
 
-// These values are used to save/load configuration data. Existing values shouldn't be changed.
-BETTER_ENUM(StartupMode, int,
+// These values are used when loading and saving data and shouldn't be changed.
+enum class StartupMode
+{
 	PreviousTabs = 1,
 	DefaultFolder = 2,
 	CustomFolders = 3
-)
+};
 
 // Holds application-wide configuration options. Options that are specific to a window or tab should
 // instead be stored in their associated class.
@@ -39,7 +38,7 @@ struct Config
 {
 	LANGID language = LanguageHelper::DEFAULT_LANGUAGE;
 	IconSet iconSet = IconSet::Color;
-	ValueWrapper<Theme> theme = +Theme::Light;
+	ValueWrapper<Theme> theme = Theme::Light;
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	ChangeNotifyMode changeNotifyMode = ChangeNotifyMode::Shell;

@@ -7,7 +7,9 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/bimap.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <wil/com.h>
+#include <algorithm>
 #include <format>
 
 namespace
@@ -46,7 +48,7 @@ const ToolbarButtonMapping::value_type g_xmlButtonMappingValues[] = {
 	{ MainToolbarButton::Separator, L"Separator" },
 };
 
-static_assert(std::size(g_xmlButtonMappingValues) == MainToolbarButton::_size());
+static_assert(std::size(g_xmlButtonMappingValues) == magic_enum::enum_count<MainToolbarButton>());
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather than button strings,
 // but changing that would at least break forward compatibility.
@@ -70,7 +72,7 @@ MainToolbarButtons::MainToolbarButtons(const std::vector<MainToolbarButton> &but
 
 void MainToolbarButtons::AddButton(MainToolbarButton button)
 {
-	if ((button != +MainToolbarButton::Separator)
+	if ((button != MainToolbarButton::Separator)
 		&& (std::find(m_buttons.begin(), m_buttons.end(), button) != m_buttons.end()))
 	{
 		return;
@@ -100,17 +102,19 @@ std::optional<MainToolbarButtons> LoadFromRegistry(HKEY parentKey, const std::ws
 	{
 		if (loadedButtonType == REGISTRY_SEPARATOR_STORAGE_ID)
 		{
-			loadedButtonType = MainToolbarButton::Separator;
+			buttons.AddButton(MainToolbarButton::Separator);
 		}
-
-		auto buttonType = MainToolbarButton::_from_integral_nothrow(loadedButtonType);
-
-		if (!buttonType)
+		else
 		{
-			continue;
-		}
+			auto buttonType = magic_enum::enum_cast<MainToolbarButton>(loadedButtonType);
 
-		buttons.AddButton(*buttonType);
+			if (!buttonType)
+			{
+				continue;
+			}
+
+			buttons.AddButton(*buttonType);
+		}
 	}
 
 	return buttons;
@@ -124,12 +128,11 @@ void SaveToRegistry(HKEY parentKey, const std::wstring &valueName,
 	std::vector<DWORD> buttonsData;
 	buttonsData.reserve(buttons.GetButtons().size());
 
-	std::transform(buttons.GetButtons().begin(), buttons.GetButtons().end(),
-		std::back_inserter(buttonsData),
+	std::ranges::transform(buttons.GetButtons(), std::back_inserter(buttonsData),
 		[](MainToolbarButton buttonType)
 		{
-			return (buttonType == +MainToolbarButton::Separator) ? REGISTRY_SEPARATOR_STORAGE_ID
-																 : buttonType;
+			return (buttonType == MainToolbarButton::Separator) ? REGISTRY_SEPARATOR_STORAGE_ID
+																: static_cast<DWORD>(buttonType);
 		});
 
 	RegistrySettings::SaveVectorToBinaryValue(parentKey, valueName, buttonsData);

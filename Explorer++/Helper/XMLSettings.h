@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
+#include "EnumHelper.h"
+#include <magic_enum/magic_enum.hpp>
 #include <wil/com.h>
 #include <MsXml2.h>
 #include <gdiplus.h>
@@ -51,19 +52,25 @@ HRESULT GetBoolFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &na
 HRESULT GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	std::wstring &outputValue);
 
-template <BetterEnum T>
-void LoadBetterEnumValue(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &valueName,
-	T &output)
+template <Enum T>
+void LoadEnumValue(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &valueName, T &output)
 {
 	int value;
 	HRESULT hr = GetIntFromMap(attributeMap, valueName, value);
 
-	if (FAILED(hr) || !T::_is_valid(value))
+	if (FAILED(hr))
 	{
 		return;
 	}
 
-	output = T::_from_integral(value);
+	auto result = magic_enum::enum_cast<T>(value);
+
+	if (!result)
+	{
+		return;
+	}
+
+	output = *result;
 }
 
 template <class T>

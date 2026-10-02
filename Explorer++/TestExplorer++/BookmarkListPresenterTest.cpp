@@ -20,6 +20,7 @@
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include <gtest/gtest.h>
+#include <magic_enum/magic_enum.hpp>
 #include <wil/resource.h>
 
 using namespace testing;
@@ -184,7 +185,7 @@ TEST_F(BookmarkListPresenterTest, SortColumn)
 	auto presenter = BuildPresenter();
 	presenter->NavigateToBookmarkFolder(targetFolder);
 
-	for (auto column : BookmarkColumn::_values())
+	for (auto column : magic_enum::enum_values<BookmarkColumn>())
 	{
 		presenter->SetSortDetails(column, SortDirection::Ascending);
 		EXPECT_EQ(presenter->GetSortColumn(), column);
@@ -208,11 +209,11 @@ TEST_F(BookmarkListPresenterTest, SortDirection)
 	presenter->NavigateToBookmarkFolder(targetFolder);
 
 	presenter->SetSortDetails(BookmarkColumn::Name, SortDirection::Descending);
-	EXPECT_EQ(presenter->GetSortDirection(), +SortDirection::Descending);
+	EXPECT_EQ(presenter->GetSortDirection(), SortDirection::Descending);
 	VerifyViewItems(presenter.get());
 
 	presenter->SetSortDetails(BookmarkColumn::Name, SortDirection::Ascending);
-	EXPECT_EQ(presenter->GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(presenter->GetSortDirection(), SortDirection::Ascending);
 	VerifyViewItems(presenter.get());
 }
 

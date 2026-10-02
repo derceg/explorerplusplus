@@ -80,7 +80,7 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 
 	WindowShowState showState = storageData.showState;
 
-	if (showState == +WindowShowState::Minimized)
+	if (showState == WindowShowState::Minimized)
 	{
 		showState = WindowShowState::Normal;
 	}

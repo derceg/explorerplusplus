@@ -112,7 +112,7 @@ TEST_F(ManageBookmarksViewsMenuTest, SelectDefaultSort)
 
 	m_menuHost.SelectItem(ManageBookmarksViewsMenu::Item::SortByDefault, false, false);
 	EXPECT_EQ(m_bookmarkListPresenter->GetSortColumn(), std::nullopt);
-	EXPECT_EQ(m_bookmarkListPresenter->GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(m_bookmarkListPresenter->GetSortDirection(), SortDirection::Ascending);
 }
 
 TEST_F(ManageBookmarksViewsMenuTest, SelectSortColumn)
@@ -120,8 +120,8 @@ TEST_F(ManageBookmarksViewsMenuTest, SelectSortColumn)
 	m_bookmarkListPresenter->SetSortDetails(BookmarkColumn::Name, SortDirection::Descending);
 
 	m_menuHost.SelectItem(ManageBookmarksViewsMenu::Item::SortByLocation, false, false);
-	EXPECT_EQ(m_bookmarkListPresenter->GetSortColumn(), +BookmarkColumn::Location);
-	EXPECT_EQ(m_bookmarkListPresenter->GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(m_bookmarkListPresenter->GetSortColumn(), BookmarkColumn::Location);
+	EXPECT_EQ(m_bookmarkListPresenter->GetSortDirection(), SortDirection::Ascending);
 }
 
 TEST_F(ManageBookmarksViewsMenuTest, SelectSortDirection)
@@ -129,6 +129,6 @@ TEST_F(ManageBookmarksViewsMenuTest, SelectSortDirection)
 	m_bookmarkListPresenter->SetSortDetails(BookmarkColumn::DateModified, SortDirection::Ascending);
 
 	m_menuHost.SelectItem(ManageBookmarksViewsMenu::Item::SortDescending, false, false);
-	EXPECT_EQ(m_bookmarkListPresenter->GetSortColumn(), +BookmarkColumn::DateModified);
-	EXPECT_EQ(m_bookmarkListPresenter->GetSortDirection(), +SortDirection::Descending);
+	EXPECT_EQ(m_bookmarkListPresenter->GetSortColumn(), BookmarkColumn::DateModified);
+	EXPECT_EQ(m_bookmarkListPresenter->GetSortDirection(), SortDirection::Descending);
 }

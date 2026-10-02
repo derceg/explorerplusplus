@@ -379,8 +379,8 @@ void GeneralOptionsPage::OnReplaceExplorerSettingChanged(ReplaceExplorerMode upd
 
 bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
 {
-	if (updatedReplaceMode != +ReplaceExplorerMode::None
-		&& m_config->replaceExplorerMode == +ReplaceExplorerMode::None)
+	if (updatedReplaceMode != ReplaceExplorerMode::None
+		&& m_config->replaceExplorerMode == ReplaceExplorerMode::None)
 	{
 		std::wstring warningMessage =
 			m_resourceLoader->LoadString(IDS_OPTIONS_DIALOG_REPLACE_EXPLORER_WARNING);

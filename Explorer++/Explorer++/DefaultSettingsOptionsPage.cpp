@@ -10,6 +10,7 @@
 #include "ViewModeHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
+#include <magic_enum/magic_enum.hpp>
 
 DefaultSettingsOptionsPage::DefaultSettingsOptionsPage(HWND parent,
 	const ResourceLoader *resourceLoader, Config *config,
@@ -49,7 +50,7 @@ void DefaultSettingsOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_AUTOARRANGEGLOBAL, BST_CHECKED);
 	}
 
-	if (m_config->defaultFolderSettings.sortDirection == +SortDirection::Ascending)
+	if (m_config->defaultFolderSettings.sortDirection == SortDirection::Ascending)
 	{
 		CheckDlgButton(GetDialog(), IDC_SORTASCENDINGGLOBAL, BST_CHECKED);
 	}
@@ -59,7 +60,7 @@ void DefaultSettingsOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_SHOWINGROUPSGLOBAL, BST_CHECKED);
 	}
 
-	if (m_config->defaultFolderSettings.groupSortDirection == +SortDirection::Ascending)
+	if (m_config->defaultFolderSettings.groupSortDirection == SortDirection::Ascending)
 	{
 		CheckDlgButton(GetDialog(), IDC_GROUP_SORT_ASCENDING_GLOBAL, BST_CHECKED);
 	}
@@ -68,11 +69,12 @@ void DefaultSettingsOptionsPage::InitializeControls()
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		viewModeItems.emplace_back(viewMode, GetViewModeMenuText(m_resourceLoader, viewMode));
+		viewModeItems.emplace_back(static_cast<int>(viewMode),
+			GetViewModeMenuText(m_resourceLoader, viewMode));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_DEFAULT_VIEW), viewModeItems,
-		m_config->defaultFolderSettings.viewMode);
+		static_cast<int>(m_config->defaultFolderSettings.viewMode));
 }
 
 void DefaultSettingsOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -133,6 +135,8 @@ void DefaultSettingsOptionsPage::SaveSettings()
 
 	HWND hComboBox = GetDlgItem(GetDialog(), IDC_OPTIONS_DEFAULT_VIEW);
 	int selectedIndex = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
-	m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(
-		static_cast<int>(SendMessage(hComboBox, CB_GETITEMDATA, selectedIndex, 0)));
+	auto viewMode = magic_enum::enum_cast<ViewMode>(static_cast<std::underlying_type_t<ViewMode>>(
+		SendMessage(hComboBox, CB_GETITEMDATA, selectedIndex, 0)));
+	CHECK(viewMode);
+	m_config->defaultFolderSettings.viewMode = *viewMode;
 }

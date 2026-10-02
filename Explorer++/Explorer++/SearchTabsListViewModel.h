@@ -8,7 +8,6 @@
 #include "ListViewItem.h"
 #include "ListViewModel.h"
 #include "Literals.h"
-#include "../Helper/BetterEnumsWrapper.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/signals2.hpp>
 #include <vector>
@@ -18,10 +17,11 @@ class SearchTabsModel;
 class Tab;
 class TabList;
 
-BETTER_ENUM(SearchTabsColumn, int,
-	TabName = 1,
-	Path = 2
-)
+enum class SearchTabsColumn
+{
+	TabName,
+	Path
+};
 
 class SearchTabsColumnModel : public ListViewColumnModel
 {

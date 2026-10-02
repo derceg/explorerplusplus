@@ -71,7 +71,7 @@ void Explorerplusplus::SetMainMenuItemStates(HMENU mainMenu)
 	MenuHelper::EnableItem(mainMenu, IDM_FILE_SAVEDIRECTORYLISTING,
 		m_commandController.IsCommandEnabled(IDM_FILE_SAVEDIRECTORYLISTING));
 	MenuHelper::EnableItem(mainMenu, IDM_FILE_COPYCOLUMNTEXT,
-		anySelected && (viewMode == +ViewMode::Details));
+		anySelected && (viewMode == ViewMode::Details));
 
 	MenuHelper::EnableItem(mainMenu, IDM_FILE_RENAME,
 		m_commandController.IsCommandEnabled(IDM_FILE_RENAME));
@@ -142,14 +142,14 @@ void Explorerplusplus::SetMainMenuItemStates(HMENU mainMenu)
 	MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOSIZECOLUMNS,
 		m_commandController.IsCommandEnabled(IDM_VIEW_AUTOSIZECOLUMNS));
 
-	if (viewMode == +ViewMode::Details)
+	if (viewMode == ViewMode::Details)
 	{
 		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 
 		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, TRUE);
 	}
-	else if (viewMode == +ViewMode::List)
+	else if (viewMode == ViewMode::List)
 	{
 		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, FALSE);
 

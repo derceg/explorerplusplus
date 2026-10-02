@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "MainResource.h"
+#include <magic_enum/magic_enum.hpp>
 
 BookmarkColumnModel::BookmarkColumnModel() :
 	ListViewColumnModel(BuildColumnSet(), BookmarkColumnToColumnId(BookmarkColumn::Name))
@@ -56,7 +57,7 @@ ListViewColumnId BookmarkColumnModel::BookmarkColumnToColumnId(BookmarkColumn co
 
 BookmarkColumn BookmarkColumnModel::ColumnIdToBookmarkColumn(ListViewColumnId columnId)
 {
-	auto column = BookmarkColumn::_from_integral_nothrow(columnId.value);
+	auto column = magic_enum::enum_cast<BookmarkColumn>(columnId.value);
 	CHECK(column);
 	return *column;
 }

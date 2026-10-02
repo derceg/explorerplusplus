@@ -19,7 +19,7 @@ std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat
 	auto sizeAsDouble = static_cast<double>(size);
 	size_t sizeIndex = 0;
 
-	if (sizeDisplayFormat != +SizeDisplayFormat::None)
+	if (sizeDisplayFormat != SizeDisplayFormat::None)
 	{
 		switch (sizeDisplayFormat)
 		{
@@ -355,14 +355,14 @@ std::optional<std::wstring> StrToWstr(const std::string &source)
 
 // Generally speaking, the string returned by this function should only be used internally. Windows
 // API functions, for example, will expect a different (non utf-8) narrow encoding.
-std::string wstrToUtf8Str(const std::wstring &source)
+std::string wstrToUtf8Str(std::wstring_view source)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	return converter.to_bytes(source);
+	return converter.to_bytes(source.data(), source.data() + source.size());
 }
 
-std::wstring utf8StrToWstr(const std::string &source)
+std::wstring utf8StrToWstr(std::string_view source)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	return converter.from_bytes(source);
+	return converter.from_bytes(source.data(), source.data() + source.size());
 }

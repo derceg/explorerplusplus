@@ -11,6 +11,7 @@
 #include "Tab.h"
 #include "TabList.h"
 #include "../Helper/Helper.h"
+#include <magic_enum/magic_enum.hpp>
 
 SearchTabsColumnModel::SearchTabsColumnModel() :
 	ListViewColumnModel(BuildColumnSet(), SearchTabsColumnToColumnId(SearchTabsColumn::TabName),
@@ -35,7 +36,7 @@ ListViewColumnId SearchTabsColumnModel::SearchTabsColumnToColumnId(SearchTabsCol
 
 SearchTabsColumn SearchTabsColumnModel::ColumnIdToSearchTabsColumn(ListViewColumnId columnId)
 {
-	auto column = SearchTabsColumn::_from_integral_nothrow(columnId.value);
+	auto column = magic_enum::enum_cast<SearchTabsColumn>(columnId.value);
 	CHECK(column);
 	return *column;
 }

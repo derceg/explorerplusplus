@@ -65,7 +65,7 @@ std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings
 		OnUpdateReplaceExplorerSetting(DefaultFileManager::ReplaceExplorerMode::None);
 	}
 	else if (commandLineSettings->replaceExplorerMode
-		!= +DefaultFileManager::ReplaceExplorerMode::None)
+		!= DefaultFileManager::ReplaceExplorerMode::None)
 	{
 		OnUpdateReplaceExplorerSetting(commandLineSettings->replaceExplorerMode);
 	}

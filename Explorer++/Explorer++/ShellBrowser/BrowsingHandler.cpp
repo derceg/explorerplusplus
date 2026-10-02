@@ -112,7 +112,7 @@ void ShellBrowserImpl::ResetFolderState()
 
 void ShellBrowserImpl::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
 {
-	if (m_config->replaceExplorerMode == +DefaultFileManager::ReplaceExplorerMode::None)
+	if (m_config->replaceExplorerMode == DefaultFileManager::ReplaceExplorerMode::None)
 	{
 		return;
 	}
@@ -571,8 +571,8 @@ void ShellBrowserImpl::InsertAwaitingItems()
 
 		auto firstColumn = GetFirstCheckedColumn();
 
-		if ((m_folderSettings.viewMode == +ViewMode::Details)
-			&& firstColumn.type != +ColumnType::Name)
+		if ((m_folderSettings.viewMode == ViewMode::Details)
+			&& firstColumn.type != ColumnType::Name)
 		{
 			lv.pszText = LPSTR_TEXTCALLBACK;
 		}
@@ -587,7 +587,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 		/* Insert the item into the list view control. */
 		int iItemIndex = ListView_InsertItem(m_listView, &lv);
 
-		if (awaitingItem.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
+		if (awaitingItem.bPosition && m_folderSettings.viewMode != ViewMode::Details)
 		{
 			POINT ptItem;
 
@@ -605,7 +605,7 @@ void ShellBrowserImpl::InsertAwaitingItems()
 			ListView_SetItemPosition32(m_listView, iItemIndex, ptItem.x, ptItem.y);
 		}
 
-		if (m_folderSettings.viewMode == +ViewMode::Tiles)
+		if (m_folderSettings.viewMode == ViewMode::Tiles)
 		{
 			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
 		}

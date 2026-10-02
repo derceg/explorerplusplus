@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/EnumHelper.h"
 #include <boost/container_hash/hash.hpp>
 #include <cstdint>
 #include <type_traits>
@@ -19,11 +20,8 @@
 class MenuItemKey
 {
 public:
-	template <typename Enum>
-		requires std::is_enum_v<Enum>
-	MenuItemKey(Enum value) :
-		m_typeToken(GetTypeToken<Enum>()),
-		m_value(static_cast<std::underlying_type_t<Enum>>(value))
+	template <Enum T>
+	MenuItemKey(T value) : m_typeToken(GetTypeToken<T>()), m_value(ToUnderlying(value))
 	{
 	}
 

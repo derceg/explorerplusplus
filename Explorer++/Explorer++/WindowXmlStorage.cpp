@@ -269,7 +269,7 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 	}
 
 	WindowShowState showState = WindowShowState::Normal;
-	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_SHOW_STATE, showState);
+	XMLSettings::LoadEnumValue(attributeMap.get(), SETTING_SHOW_STATE, showState);
 
 	std::vector<TabStorageData> tabs;
 
@@ -422,7 +422,7 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_HEIGHT,
 		XMLSettings::EncodeIntValue(GetRectHeight(&window.bounds)));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_SHOW_STATE,
-		XMLSettings::EncodeIntValue(window.showState));
+		XMLSettings::EncodeIntValue(static_cast<int>(window.showState)));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_SELECTED_TAB,
 		XMLSettings::EncodeIntValue(window.selectedTab));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_TREEVIEW_WIDTH,

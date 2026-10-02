@@ -35,19 +35,19 @@ protected:
 TEST_F(BrowserCommandControllerTest, SortBy)
 {
 	m_commandController.ExecuteCommand(IDM_SORTBY_ATTRIBUTES);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortMode(), +SortMode::Attributes);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortMode(), SortMode::Attributes);
 
 	m_tab->GetShellBrowser()->SetSortDirection(SortDirection::Ascending);
 
 	// Selecting the same sort mode again should result in the sort direction being flipped. The
 	// sort mode itself shouldn't change.
 	m_commandController.ExecuteCommand(IDM_SORTBY_ATTRIBUTES);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortMode(), +SortMode::Attributes);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortDirection(), +SortDirection::Descending);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortMode(), SortMode::Attributes);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortDirection(), SortDirection::Descending);
 
 	m_commandController.ExecuteCommand(IDM_SORTBY_ATTRIBUTES);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortMode(), +SortMode::Attributes);
-	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortDirection(), +SortDirection::Ascending);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortMode(), SortMode::Attributes);
+	EXPECT_EQ(m_tab->GetShellBrowser()->GetSortDirection(), SortDirection::Ascending);
 }
 
 TEST_F(BrowserCommandControllerTest, CloseTab)

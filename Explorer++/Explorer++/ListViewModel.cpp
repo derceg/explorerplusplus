@@ -173,7 +173,7 @@ bool ListViewModel::IsItemInSet(const ListViewItem *item) const
 bool ListViewModel::CompareItemsWrapper(const ListViewItem *first, const ListViewItem *second) const
 {
 	auto cmp = CompareItems(first, second);
-	return (GetSortDirection() == +SortDirection::Ascending) ? std::is_lt(cmp) : std::is_gt(cmp);
+	return (GetSortDirection() == SortDirection::Ascending) ? std::is_lt(cmp) : std::is_gt(cmp);
 }
 
 ListViewModel::ScopedBatchUpdate::ScopedBatchUpdate(ListViewModel *model) : m_model(model)

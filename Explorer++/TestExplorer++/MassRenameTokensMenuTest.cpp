@@ -9,6 +9,7 @@
 #include "MenuTestHost.h"
 #include "ResourceLoaderFake.h"
 #include <gtest/gtest.h>
+#include <magic_enum/magic_enum.hpp>
 
 using namespace testing;
 
@@ -25,7 +26,7 @@ TEST(MassRenameTokensMenuTest, Selection)
 
 	InSequence seq;
 
-	for (auto token : MassRenameToken::_values())
+	for (auto token : magic_enum::enum_values<MassRenameToken>())
 	{
 		EXPECT_CALL(selectionCallback, Call(token));
 	}

@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
+#include "EnumHelper.h"
 #include "Pidl.h"
+#include <magic_enum/magic_enum.hpp>
 #include <wil/registry.h>
 #include <windows.h>
 #include <functional>
@@ -110,8 +111,8 @@ LSTATUS Read64BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &o
 	return res;
 }
 
-template <BetterEnum T>
-LSTATUS ReadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
+template <Enum T>
+LSTATUS ReadEnumValue(HKEY key, const std::wstring &valueName, T &output)
 {
 	DWORD value;
 	auto res = ReadDword(key, valueName, value);
@@ -121,12 +122,14 @@ LSTATUS ReadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
 		return res;
 	}
 
-	if (!T::_is_valid(value))
+	auto result = magic_enum::enum_cast<T>(value);
+
+	if (!result)
 	{
 		return ERROR_INVALID_DATA;
 	}
 
-	output = T::_from_integral(value);
+	output = *result;
 
 	return ERROR_SUCCESS;
 }

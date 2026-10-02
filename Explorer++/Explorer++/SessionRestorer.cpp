@@ -63,7 +63,7 @@ std::vector<WindowStorageData> SessionRestorer::GetWindowsToRestore(
 		newWindowData.selectedTab = 0;
 	}
 
-	if (m_config->startupMode == +StartupMode::PreviousTabs)
+	if (m_config->startupMode == StartupMode::PreviousTabs)
 	{
 		windowsToRestore = sessionWindows;
 	}
@@ -167,7 +167,7 @@ void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 	//
 	// - The tabs are added to the restored tabs when using StartupMode::PreviousTabs.
 	// - The tabs replace the startup tabs otherwise.
-	if (m_config->startupMode != +StartupMode::PreviousTabs)
+	if (m_config->startupMode != StartupMode::PreviousTabs)
 	{
 		targetWindow.tabs.clear();
 		targetWindow.selectedTab = 0;

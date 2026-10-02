@@ -9,6 +9,7 @@
 #include "../Helper/StringHelper.h"
 #include <CLI/CLI.hpp>
 #include <boost/pfr.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <iostream>
 
 // Allows std::wstring to be used as a custom type for add_option.
@@ -89,9 +90,9 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 
 	std::map<std::string, Feature> featureMap;
 
-	for (auto item : Feature::_values())
+	for (auto &[feature, name] : magic_enum::enum_entries<Feature>())
 	{
-		featureMap.insert({ item._to_string(), item });
+		featureMap.emplace(name, feature);
 	}
 
 	app.add_option("--enable-features", settings.featuresToEnable,

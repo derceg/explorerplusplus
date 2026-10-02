@@ -6,6 +6,7 @@
 #include "MassRenameHelper.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/locale.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <filesystem>
 #include <format>
 #include <regex>
@@ -58,7 +59,7 @@ std::wstring ExpandMassRenamePattern(const std::wstring &pattern, const std::wst
 {
 	auto output = pattern;
 
-	for (auto token : MassRenameToken::_values())
+	for (auto token : magic_enum::enum_values<MassRenameToken>())
 	{
 		auto tokenText = GetMassRenameTokenText(token);
 

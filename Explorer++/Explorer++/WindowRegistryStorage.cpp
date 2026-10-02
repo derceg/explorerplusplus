@@ -160,7 +160,7 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 	}
 
 	WindowShowState showState = WindowShowState::Normal;
-	RegistrySettings::ReadBetterEnumValue(windowKey, SETTING_SHOW_STATE, showState);
+	RegistrySettings::ReadEnumValue(windowKey, SETTING_SHOW_STATE, showState);
 
 	std::vector<TabStorageData> tabs;
 
@@ -291,7 +291,8 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	RegistrySettings::SaveDword(windowKey, SETTING_Y, window.bounds.top);
 	RegistrySettings::SaveDword(windowKey, SETTING_WIDTH, GetRectWidth(&window.bounds));
 	RegistrySettings::SaveDword(windowKey, SETTING_HEIGHT, GetRectHeight(&window.bounds));
-	RegistrySettings::SaveDword(windowKey, SETTING_SHOW_STATE, window.showState);
+	RegistrySettings::SaveDword(windowKey, SETTING_SHOW_STATE,
+		static_cast<DWORD>(window.showState));
 	RegistrySettings::SaveDword(windowKey, SETTING_SELECTED_TAB, window.selectedTab);
 	RegistrySettings::SaveDword(windowKey, SETTING_TREEVIEW_WIDTH, window.treeViewWidth);
 	RegistrySettings::SaveDword(windowKey, SETTING_DISPLAY_WINDOW_WIDTH, window.displayWindowWidth);

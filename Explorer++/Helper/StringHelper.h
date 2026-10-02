@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
 #include <windows.h>
 #include <functional>
 #include <optional>
 #include <string>
+#include <string_view>
 
-BETTER_ENUM(SizeDisplayFormat, int,
+enum class SizeDisplayFormat
+{
 	None = 0,
 	Bytes = 1,
 	KB = 2,
@@ -18,7 +19,7 @@ BETTER_ENUM(SizeDisplayFormat, int,
 	GB = 4,
 	TB = 5,
 	PB = 6
-)
+};
 
 using StringComparatorFunc =
 	std::function<bool(const std::wstring &input, const std::wstring &test)>;
@@ -34,5 +35,5 @@ void TrimStringRight(std::wstring &str, const std::wstring &strWhitespace);
 void TrimString(std::wstring &str, const std::wstring &strWhitespace);
 std::optional<std::string> WstrToStr(const std::wstring &source);
 std::optional<std::wstring> StrToWstr(const std::string &source);
-std::string wstrToUtf8Str(const std::wstring &source);
-std::wstring utf8StrToWstr(const std::string &source);
+std::string wstrToUtf8Str(std::wstring_view source);
+std::wstring utf8StrToWstr(std::string_view source);

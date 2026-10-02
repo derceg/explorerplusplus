@@ -56,7 +56,7 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.useFullRowSelect);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ShowFilePreviews",
 		config.showFilePreviews);
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"ReplaceExplorerMode",
+	RegistrySettings::ReadEnumValue(settingsKey, L"ReplaceExplorerMode",
 		config.replaceExplorerMode);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ShowFullTitlePath",
 		config.showFullTitlePath);
@@ -70,9 +70,9 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.showTabBarAtBottom);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ExtendTabControl",
 		config.extendTabControl);
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"StartupMode", config.startupMode);
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"InfoTipType", config.infoTipType);
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"SizeDisplayFormat",
+	RegistrySettings::ReadEnumValue(settingsKey, L"StartupMode", config.startupMode);
+	RegistrySettings::ReadEnumValue(settingsKey, L"InfoTipType", config.infoTipType);
+	RegistrySettings::ReadEnumValue(settingsKey, L"SizeDisplayFormat",
 		config.globalFolderSettings.sizeDisplayFormat);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"AllowMultipleInstances",
 		config.allowMultipleInstances);
@@ -116,7 +116,7 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.showQuickAccessInTreeView);
 
 	auto theme = config.theme.get();
-	res = RegistrySettings::ReadBetterEnumValue(settingsKey, L"Theme", theme);
+	res = RegistrySettings::ReadEnumValue(settingsKey, L"Theme", theme);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -127,7 +127,7 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 	config.theme = theme;
 
 	RegistrySettings::ReadString(settingsKey, L"NewTabDirectory", config.defaultTabDirectory);
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"IconTheme", config.iconSet);
+	RegistrySettings::ReadEnumValue(settingsKey, L"IconTheme", config.iconSet);
 
 	DWORD language;
 	res = RegistrySettings::ReadDword(settingsKey, L"Language", language);
@@ -161,13 +161,13 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 			config.defaultFolderSettings.groupSortDirection =
 				value ? SortDirection::Ascending : SortDirection::Descending;
 		});
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"GroupSortDirectionGlobal",
+	RegistrySettings::ReadEnumValue(settingsKey, L"GroupSortDirectionGlobal",
 		config.defaultFolderSettings.groupSortDirection);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"HideSystemFilesGlobal",
 		config.globalFolderSettings.hideSystemFiles);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"HideLinkExtensionGlobal",
 		config.globalFolderSettings.hideLinkExtension);
-	RegistrySettings::ReadBetterEnumValue(settingsKey, L"ViewModeGlobal",
+	RegistrySettings::ReadEnumValue(settingsKey, L"ViewModeGlobal",
 		config.defaultFolderSettings.viewMode);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"DisplayWindowVertical",
 		config.displayWindowVertical);
@@ -253,17 +253,20 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		config.globalFolderSettings.showFolderSizes);
 	RegistrySettings::SaveDword(settingsKey, L"DisableFolderSizesNetworkRemovable",
 		config.globalFolderSettings.disableFolderSizesNetworkRemovable);
-	RegistrySettings::SaveDword(settingsKey, L"StartupMode", config.startupMode);
+	RegistrySettings::SaveDword(settingsKey, L"StartupMode",
+		static_cast<DWORD>(config.startupMode));
 	RegistrySettings::SaveDword(settingsKey, L"NextToCurrent", config.openNewTabNextToCurrent);
 	RegistrySettings::SaveDword(settingsKey, L"ConfirmCloseTabs", config.confirmCloseTabs);
 	RegistrySettings::SaveDword(settingsKey, L"ShowInfoTips", config.showInfoTips);
-	RegistrySettings::SaveDword(settingsKey, L"InfoTipType", config.infoTipType);
+	RegistrySettings::SaveDword(settingsKey, L"InfoTipType",
+		static_cast<DWORD>(config.infoTipType));
 	RegistrySettings::SaveDword(settingsKey, L"TreeViewDelayEnabled", config.treeViewDelayEnabled);
 	RegistrySettings::SaveDword(settingsKey, L"LockToolbars", config.lockToolbars.get());
 	RegistrySettings::SaveDword(settingsKey, L"ExtendTabControl", config.extendTabControl.get());
 	RegistrySettings::SaveDword(settingsKey, L"UseFullRowSelect", config.useFullRowSelect.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowFilePreviews", config.showFilePreviews);
-	RegistrySettings::SaveDword(settingsKey, L"ReplaceExplorerMode", config.replaceExplorerMode);
+	RegistrySettings::SaveDword(settingsKey, L"ReplaceExplorerMode",
+		static_cast<DWORD>(config.replaceExplorerMode));
 	RegistrySettings::SaveDword(settingsKey, L"ShowUserNameTitleBar",
 		config.showUserNameInTitleBar.get());
 	RegistrySettings::SaveDword(settingsKey, L"AllowMultipleInstances",
@@ -282,7 +285,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"CheckBoxSelection", config.checkBoxSelection.get());
 	RegistrySettings::SaveDword(settingsKey, L"ForceSize", config.globalFolderSettings.forceSize);
 	RegistrySettings::SaveDword(settingsKey, L"SizeDisplayFormat",
-		config.globalFolderSettings.sizeDisplayFormat);
+		static_cast<DWORD>(config.globalFolderSettings.sizeDisplayFormat));
 	RegistrySettings::SaveDword(settingsKey, L"ShowTabBarAtBottom",
 		config.showTabBarAtBottom.get());
 	RegistrySettings::SaveDword(settingsKey, L"OverwriteExistingFilesConfirmation",
@@ -293,9 +296,9 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		config.checkPinnedToNamespaceTreeProperty);
 	RegistrySettings::SaveDword(settingsKey, L"ShowQuickAccessInTreeView",
 		config.showQuickAccessInTreeView.get());
-	RegistrySettings::SaveDword(settingsKey, L"Theme", config.theme.get());
+	RegistrySettings::SaveDword(settingsKey, L"Theme", static_cast<DWORD>(config.theme.get()));
 	RegistrySettings::SaveString(settingsKey, L"NewTabDirectory", config.defaultTabDirectory);
-	RegistrySettings::SaveDword(settingsKey, L"IconTheme", config.iconSet);
+	RegistrySettings::SaveDword(settingsKey, L"IconTheme", static_cast<DWORD>(config.iconSet));
 	RegistrySettings::SaveDword(settingsKey, L"Language", config.language);
 	RegistrySettings::SaveDword(settingsKey, L"OpenTabsInForeground", config.openTabsInForeground);
 	RegistrySettings::SaveDword(settingsKey, L"DisplayMixedFilesAndFolders",
@@ -306,7 +309,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"ShowHiddenGlobal",
 		config.defaultFolderSettings.showHidden);
 	RegistrySettings::SaveDword(settingsKey, L"ViewModeGlobal",
-		config.defaultFolderSettings.viewMode);
+		static_cast<DWORD>(config.defaultFolderSettings.viewMode));
 	RegistrySettings::SaveDword(settingsKey, L"ShowGridlinesGlobal",
 		config.globalFolderSettings.showGridlines.get());
 	RegistrySettings::SaveDword(settingsKey, L"ShowInGroupsGlobal",
@@ -314,9 +317,9 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	RegistrySettings::SaveDword(settingsKey, L"AutoArrangeGlobal",
 		config.defaultFolderSettings.autoArrangeEnabled);
 	RegistrySettings::SaveDword(settingsKey, L"SortAscendingGlobal",
-		config.defaultFolderSettings.sortDirection == +SortDirection::Ascending);
+		config.defaultFolderSettings.sortDirection == SortDirection::Ascending);
 	RegistrySettings::SaveDword(settingsKey, L"GroupSortDirectionGlobal",
-		config.defaultFolderSettings.groupSortDirection);
+		static_cast<DWORD>(config.defaultFolderSettings.groupSortDirection));
 	RegistrySettings::SaveDword(settingsKey, L"HideSystemFilesGlobal",
 		config.globalFolderSettings.hideSystemFiles);
 	RegistrySettings::SaveDword(settingsKey, L"HideLinkExtensionGlobal",

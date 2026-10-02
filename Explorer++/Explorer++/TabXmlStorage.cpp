@@ -92,17 +92,14 @@ FolderSettings LoadFolderSettings(IXMLDOMNode *tabNode)
 		return folderSettings;
 	}
 
-	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_VIEW_MODE,
-		folderSettings.viewMode);
-	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_SORT_MODE,
-		folderSettings.sortMode);
+	XMLSettings::LoadEnumValue(attributeMap.get(), SETTING_VIEW_MODE, folderSettings.viewMode);
+	XMLSettings::LoadEnumValue(attributeMap.get(), SETTING_SORT_MODE, folderSettings.sortMode);
 	folderSettings.groupMode = folderSettings.sortMode;
 	LoadBooleanSortDirection(attributeMap.get(), SETTING_SORT_ASCENDING,
 		folderSettings.sortDirection);
 	folderSettings.groupSortDirection = folderSettings.sortDirection;
-	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_MODE,
-		folderSettings.groupMode);
-	XMLSettings::LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_SORT_DIRECTION,
+	XMLSettings::LoadEnumValue(attributeMap.get(), SETTING_GROUP_MODE, folderSettings.groupMode);
+	XMLSettings::LoadEnumValue(attributeMap.get(), SETTING_GROUP_SORT_DIRECTION,
 		folderSettings.groupSortDirection);
 	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
@@ -193,18 +190,18 @@ void SaveFolderSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 	const FolderSettings &folderSettings)
 {
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_VIEW_MODE,
-		XMLSettings::EncodeIntValue(folderSettings.viewMode));
+		XMLSettings::EncodeIntValue(static_cast<int>(folderSettings.viewMode)));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SORT_MODE,
-		XMLSettings::EncodeIntValue(folderSettings.sortMode));
+		XMLSettings::EncodeIntValue(static_cast<int>(folderSettings.sortMode)));
 
 	// For backwards compatibility, the value saved here is a bool.
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SORT_ASCENDING,
-		XMLSettings::EncodeBoolValue(folderSettings.sortDirection == +SortDirection::Ascending));
+		XMLSettings::EncodeBoolValue(folderSettings.sortDirection == SortDirection::Ascending));
 
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_GROUP_MODE,
-		XMLSettings::EncodeIntValue(folderSettings.groupMode));
+		XMLSettings::EncodeIntValue(static_cast<int>(folderSettings.groupMode)));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_GROUP_SORT_DIRECTION,
-		XMLSettings::EncodeIntValue(folderSettings.groupSortDirection));
+		XMLSettings::EncodeIntValue(static_cast<int>(folderSettings.groupSortDirection)));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_IN_GROUPS,
 		XMLSettings::EncodeBoolValue(folderSettings.showInGroups));
 	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_APPLY_FILTER,

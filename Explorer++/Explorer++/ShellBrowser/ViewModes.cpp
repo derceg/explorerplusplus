@@ -10,8 +10,8 @@
 
 bool IsThumbnailsViewMode(ViewMode viewMode)
 {
-	return (viewMode == +ViewMode::Thumbnails) || (viewMode == +ViewMode::LargeThumbnails)
-		|| (viewMode == +ViewMode::ExtraLargeThumbnails);
+	return (viewMode == ViewMode::Thumbnails) || (viewMode == ViewMode::LargeThumbnails)
+		|| (viewMode == ViewMode::ExtraLargeThumbnails);
 }
 
 UINT GetViewModeMenuId(ViewMode viewMode)
