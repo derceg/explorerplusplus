@@ -47,3 +47,9 @@ const NavigationRequest *ShellBrowser::MaybeGetLatestActiveNavigation() const
 {
 	return GetNavigationManager()->MaybeGetLatestActiveNavigation();
 }
+
+bool ShellBrowser::CanEnableGroupMode() const
+{
+	// The listview control doesn't support group functionality in list view.
+	return GetViewMode() != ViewMode::List;
+}

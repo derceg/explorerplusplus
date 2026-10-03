@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <optional>
+
 // These are used for both sorting and grouping. For example, it's possible to both sort a folder by
 // name and group a folder by name.
 //
@@ -82,3 +84,6 @@ enum class SortMode
 	MediaWriter = 63,
 	MediaYear = 64
 };
+
+UINT GetSortModeMenuStringId(SortMode sortMode);
+std::optional<UINT> MaybeGetSortModeMenuHelpStringId(SortMode sortMode);

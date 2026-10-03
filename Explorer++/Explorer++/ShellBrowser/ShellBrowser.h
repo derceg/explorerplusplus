@@ -48,6 +48,7 @@ public:
 	virtual SortDirection GetSortDirection() const = 0;
 	virtual void SetSortDirection(SortDirection direction) = 0;
 
+	bool CanEnableGroupMode() const;
 	virtual bool GetShowInGroups() const = 0;
 	virtual void SetShowInGroups(bool showInGroups) = 0;
 	virtual SortMode GetGroupMode() const = 0;

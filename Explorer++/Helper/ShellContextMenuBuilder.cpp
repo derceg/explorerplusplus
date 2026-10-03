@@ -33,11 +33,12 @@ void ShellContextMenuBuilder::AddSeparator(UINT item, bool byPosition)
 	MenuHelper::AddSeparator(m_menu, item, byPosition);
 }
 
-void ShellContextMenuBuilder::AddSubMenuItem(const std::wstring &text, wil::unique_hmenu subMenu,
-	UINT item, bool byPosition)
+void ShellContextMenuBuilder::AddSubMenuItem(UINT id, const std::wstring &text,
+	wil::unique_hmenu subMenu, UINT item, bool byPosition)
 {
 	RemapMenuIds(subMenu.get());
-	MenuHelper::AddSubMenuItem(m_menu, 0, text, std::move(subMenu), item, byPosition);
+	MenuHelper::AddSubMenuItem(m_menu, m_idRemapper->GenerateUpdatedId(id), text,
+		std::move(subMenu), item, byPosition);
 }
 
 // When a submenu is added to a shell context menu, the IDs for each of the submenu items will need

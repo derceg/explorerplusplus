@@ -190,6 +190,12 @@ void MenuView::ClearMenu()
 	}
 }
 
+boost::signals2::connection MenuView::AddPopupWillShowObserver(
+	const PopupWillShowSignal::slot_type &observer)
+{
+	return m_popupWillShowSignal.connect(observer);
+}
+
 int MenuView::GetNumItems() const
 {
 	int numItems = GetMenuItemCount(m_menu);
@@ -206,6 +212,8 @@ void MenuView::OnPopupWillShowForDpi(UINT dpi)
 
 		ClearItemImages();
 	}
+
+	m_popupWillShowSignal();
 
 	m_currentDpi = dpi;
 	m_isShowing = true;
@@ -532,6 +540,7 @@ MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemParams &params) :
 }
 
 MenuView::InternalMenuDelegate::InternalMenuDelegate(SubMenuItemParams &params) :
+	m_enabledCallback(params.TakeEnabledCallback()),
 	m_middleClickedCallback(params.TakeMiddleClickedCallback()),
 	m_rightClickedCallback(params.TakeRightClickedCallback()),
 	m_draggedCallback(params.TakeDraggedCallback()),

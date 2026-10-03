@@ -32,6 +32,17 @@ SubMenuItemParams &&SubMenuItemParams::SetIconModel(std::unique_ptr<const IconMo
 	return std::move(SetIconModel(std::move(iconModel)));
 }
 
+SubMenuItemParams &SubMenuItemParams::SetEnabledCallback(MenuItemEnabledCallback callback) &
+{
+	m_enabledCallback = std::move(callback);
+	return *this;
+}
+
+SubMenuItemParams &&SubMenuItemParams::SetEnabledCallback(MenuItemEnabledCallback callback) &&
+{
+	return std::move(SetEnabledCallback(std::move(callback)));
+}
+
 SubMenuItemParams &SubMenuItemParams::SetMiddleClickedCallback(
 	MenuItemMiddleClickedCallback callback) &
 {
@@ -110,6 +121,11 @@ const std::wstring &SubMenuItemParams::GetText() const
 std::unique_ptr<const IconModel> SubMenuItemParams::TakeIconModel()
 {
 	return std::move(m_iconModel);
+}
+
+MenuItemEnabledCallback SubMenuItemParams::TakeEnabledCallback()
+{
+	return std::move(m_enabledCallback);
 }
 
 MenuItemMiddleClickedCallback SubMenuItemParams::TakeMiddleClickedCallback()

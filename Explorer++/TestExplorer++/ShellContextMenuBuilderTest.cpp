@@ -125,7 +125,7 @@ TEST_F(ShellContextMenuBuilderTest, AddSubMenuItem)
 	MenuHelper::AddSeparator(subMenu.get());
 	MenuHelper::AddStringItem(subMenu.get(), startId + 2, L"Third");
 
-	m_builder.AddSubMenuItem(L"Sub menu", std::move(subMenu), 0, true);
+	m_builder.AddSubMenuItem(0, L"Sub menu", std::move(subMenu), 0, true);
 	ASSERT_EQ(GetMenuItemCount(m_menu.get()), 1);
 
 	HMENU insertedSubMenu = GetSubMenu(m_menu.get(), 0);

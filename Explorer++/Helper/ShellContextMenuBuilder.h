@@ -20,7 +20,7 @@ public:
 	void AddStringItem(UINT id, const std::wstring &text, UINT item, bool byPosition);
 	void EnableItem(UINT id, bool enable);
 	void AddSeparator(UINT item, bool byPosition);
-	void AddSubMenuItem(const std::wstring &text, wil::unique_hmenu subMenu, UINT item,
+	void AddSubMenuItem(UINT id, const std::wstring &text, wil::unique_hmenu subMenu, UINT item,
 		bool byPosition);
 	void RemoveShellItem(const std::wstring &targetVerb);
 

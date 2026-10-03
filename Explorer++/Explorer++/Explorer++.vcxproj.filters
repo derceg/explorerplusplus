@@ -943,6 +943,12 @@
     <ClCompile Include="SubMenuItemParams.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="SortGroupMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\SortModes.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2060,6 +2066,9 @@
     </ClInclude>
     <ClInclude Include="MenuItemCallbacks.h">
       <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="SortGroupMenu.h">
+      <Filter>Menus\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

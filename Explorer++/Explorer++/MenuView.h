@@ -10,6 +10,7 @@
 #include "MenuItemParams.h"
 #include "SubMenuItemParams.h"
 #include "../Helper/WeakPtrFactory.h"
+#include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <memory>
 #include <optional>
@@ -18,6 +19,8 @@
 class MenuView
 {
 public:
+	using PopupWillShowSignal = boost::signals2::signal<void()>;
+
 	MenuView(HMENU menu);
 
 	bool IsRoot() const;
@@ -34,6 +37,9 @@ public:
 	void RemoveDuplicateSeparators();
 	void RemoveTrailingSeparators();
 	void ClearMenu();
+
+	boost::signals2::connection AddPopupWillShowObserver(
+		const PopupWillShowSignal::slot_type &observer);
 
 	int GetNumItems() const;
 
@@ -136,6 +142,7 @@ private:
 	std::unordered_map<UINT, Item> m_idToItemMap;
 	std::unordered_map<MenuItemKey, UINT, boost::hash<MenuItemKey>> m_keyToIdMap;
 
+	PopupWillShowSignal m_popupWillShowSignal;
 	bool m_isShowing = false;
 
 	// This will only be set after the menu is first shown.

@@ -16,7 +16,6 @@
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
@@ -146,30 +145,18 @@ void Explorerplusplus::SetMainMenuItemStates(HMENU mainMenu)
 	{
 		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
-
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, TRUE);
 	}
 	else if (viewMode == ViewMode::List)
 	{
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, FALSE);
-
 		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 	}
 	else
 	{
-		MenuHelper::EnableItem(mainMenu, IDM_VIEW_GROUPBY, TRUE);
-
 		MenuHelper::EnableItem(mainMenu, IDM_VIEW_AUTOARRANGE, TRUE);
 		MenuHelper::CheckItem(mainMenu, IDM_VIEW_AUTOARRANGE,
 			tab.GetShellBrowser()->IsAutoArrangeEnabled());
 	}
-
-	SortMenuBuilder sortMenuBuilder(m_resourceLoader);
-	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(tab);
-
-	MenuHelper::AttachSubMenu(mainMenu, std::move(sortByMenu), IDM_VIEW_SORTBY, FALSE);
-	MenuHelper::AttachSubMenu(mainMenu, std::move(groupByMenu), IDM_VIEW_GROUPBY, FALSE);
 }
 
 bool Explorerplusplus::MaybeHandleMainMenuItemSelection(UINT id)

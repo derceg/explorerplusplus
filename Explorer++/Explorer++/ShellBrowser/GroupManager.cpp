@@ -40,7 +40,7 @@ bool ShellBrowserImpl::GetShowInGroups() const
 
 void ShellBrowserImpl::SetShowInGroups(bool showInGroups)
 {
-	if (showInGroups == m_folderSettings.showInGroups)
+	if (showInGroups == m_folderSettings.showInGroups || (showInGroups && !CanEnableGroupMode()))
 	{
 		return;
 	}

@@ -88,7 +88,7 @@ void ShellBrowserFake::SetViewMode(ViewMode viewMode)
 
 std::vector<SortMode> ShellBrowserFake::GetAvailableSortModes() const
 {
-	return {};
+	return m_availableSortModes;
 }
 
 SortMode ShellBrowserFake::GetSortMode() const
@@ -280,4 +280,9 @@ boost::signals2::connection ShellBrowserFake::AddDestroyedObserver(
 	const DestroyedSignal::slot_type &observer)
 {
 	return m_destroyedSignal.connect(observer);
+}
+
+void ShellBrowserFake::SetAvailableSortModes(const std::vector<SortMode> &sortModes)
+{
+	m_availableSortModes = sortModes;
 }

@@ -26,6 +26,8 @@ public:
 
 	SubMenuItemParams &SetIconModel(std::unique_ptr<const IconModel> iconModel) &;
 	SubMenuItemParams &&SetIconModel(std::unique_ptr<const IconModel> iconModel) &&;
+	SubMenuItemParams &SetEnabledCallback(MenuItemEnabledCallback callback) &;
+	SubMenuItemParams &&SetEnabledCallback(MenuItemEnabledCallback callback) &&;
 
 	SubMenuItemParams &SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &;
 	SubMenuItemParams &&SetMiddleClickedCallback(MenuItemMiddleClickedCallback callback) &&;
@@ -42,6 +44,7 @@ public:
 	const std::optional<MenuItemKey> &GetKey() const;
 	const std::wstring &GetText() const;
 	std::unique_ptr<const IconModel> TakeIconModel();
+	MenuItemEnabledCallback TakeEnabledCallback();
 	MenuItemMiddleClickedCallback TakeMiddleClickedCallback();
 	MenuItemRightClickedCallback TakeRightClickedCallback();
 	MenuItemDraggedCallback TakeDraggedCallback();
@@ -51,6 +54,7 @@ private:
 	std::optional<MenuItemKey> m_key;
 	std::wstring m_text;
 	std::unique_ptr<const IconModel> m_iconModel;
+	MenuItemEnabledCallback m_enabledCallback;
 	MenuItemMiddleClickedCallback m_middleClickedCallback;
 	MenuItemRightClickedCallback m_rightClickedCallback;
 	MenuItemDraggedCallback m_draggedCallback;

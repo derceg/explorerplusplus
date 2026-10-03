@@ -1241,11 +1241,13 @@
     <ClCompile Include="SessionRestorer.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp" />
+    <ClCompile Include="ShellBrowser\SortModes.cpp" />
     <ClCompile Include="ShellEntry.cpp" />
     <ClCompile Include="ShellEntryCollection.cpp" />
     <ClCompile Include="ShellNameParserImpl.cpp" />
     <ClCompile Include="ShellWatcherManager.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp" />
+    <ClCompile Include="SortGroupMenu.cpp" />
     <ClCompile Include="SortModeMenuMappings.cpp" />
     <ClCompile Include="StockIconModel.cpp" />
     <ClCompile Include="SubMenuItemParams.cpp" />
@@ -1626,6 +1628,7 @@
     <ClInclude Include="ShellNameParserImpl.h" />
     <ClInclude Include="ShellWatcherManager.h" />
     <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h" />
+    <ClInclude Include="SortGroupMenu.h" />
     <ClInclude Include="SortModeMenuMappings.h" />
     <ClInclude Include="StockIconModel.h" />
     <ClInclude Include="SubMenuItemParams.h" />

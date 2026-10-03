@@ -6,6 +6,7 @@
 #include "MainMenu.h"
 #include "AppServices.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "BrowserWindow.h"
 #include "FeatureList.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
@@ -14,7 +15,9 @@
 #include "MenuView.h"
 #include "ResourceIconModel.h"
 #include "ResourceLoader.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellIconModel.h"
+#include "SortGroupMenu.h"
 #include "StockIconModel.h"
 #include "TabRestorerMenu.h"
 #include "ToolbarOptionsMenu.h"
@@ -169,8 +172,17 @@ void MainMenu::BuildViewMenu(BrowserWindow *browser, AppServices *appServices)
 
 	menuView->AppendSeparator();
 
-	AppendItem(menuView, IDM_VIEW_SORTBY, IDS_VIEW_SORTBY);
-	AppendItem(menuView, IDM_VIEW_GROUPBY, IDS_VIEW_GROUPBY);
+	auto *sortByMenuView = AppendSubMenu(menuView, IDS_VIEW_SORTBY);
+	m_childMenus.push_back(std::make_unique<SortGroupMenu>(sortByMenuView, m_acceleratorManager,
+		browser, SortGroupMenu::Mode::Sort, m_resourceLoader));
+
+	auto *groupByMenuView =
+		menuView->AppendSubMenu(SubMenuItemParams(m_resourceLoader->LoadString(IDS_VIEW_GROUPBY))
+				.SetEnabledCallback(
+					[browser] { return browser->GetActiveShellBrowser()->CanEnableGroupMode(); }));
+	m_childMenus.push_back(std::make_unique<SortGroupMenu>(groupByMenuView, m_acceleratorManager,
+		browser, SortGroupMenu::Mode::Group, m_resourceLoader));
+
 	AppendItem(menuView, IDM_VIEW_SHOWHIDDENFILES, IDS_VIEW_SHOWHIDDENFILES);
 	AppendItem(menuView, IDM_VIEW_REFRESH, IDS_VIEW_REFRESH);
 	AppendItem(menuView, IDM_VIEW_SELECTCOLUMNS, IDS_VIEW_SELECTCOLUMNS);

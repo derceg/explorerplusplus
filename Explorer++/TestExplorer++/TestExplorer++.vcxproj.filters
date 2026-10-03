@@ -637,6 +637,9 @@
     <ClCompile Include="ManageBookmarksViewsMenuTest.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="SortGroupMenuTest.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

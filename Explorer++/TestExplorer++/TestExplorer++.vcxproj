@@ -312,6 +312,7 @@
     <ClCompile Include="ShellContextMenuDelegateFake.cpp" />
     <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp" />
     <ClCompile Include="ShellContextMenuIdRemapperTest.cpp" />
+    <ClCompile Include="SortGroupMenuTest.cpp" />
     <ClCompile Include="TabContainerTest.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />

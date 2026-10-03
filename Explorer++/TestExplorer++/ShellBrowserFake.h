@@ -11,6 +11,7 @@
 #include "../Helper/Pidl.h"
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
+#include <vector>
 
 class BrowserWindow;
 class NavigationEvents;
@@ -79,6 +80,8 @@ public:
 	boost::signals2::connection AddDestroyedObserver(
 		const DestroyedSignal::slot_type &observer) override;
 
+	void SetAvailableSortModes(const std::vector<SortMode> &sortModes);
+
 protected:
 	NavigationManager *GetNavigationManager() override;
 	const NavigationManager *GetNavigationManager() const override;
@@ -90,5 +93,6 @@ private:
 	const std::shared_ptr<concurrencpp::inline_executor> m_inlineExecutor;
 	NavigationManager m_navigationManager;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
+	std::vector<SortMode> m_availableSortModes;
 	DestroyedSignal m_destroyedSignal;
 };

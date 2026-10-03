@@ -32,15 +32,23 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE director
 	ViewsMenuBuilder viewsMenuBuilder(m_resourceLoader);
 	auto viewsMenu = viewsMenuBuilder.BuildMenu(m_browser);
 	std::wstring text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_VIEW);
-	builder->AddSubMenuItem(text, std::move(viewsMenu), position++, true);
+	builder->AddSubMenuItem(IDM_BACKGROUND_CONTEXT_MENU_VIEW_POPUP, text, std::move(viewsMenu),
+		position++, true);
 
 	SortMenuBuilder sortMenuBuilder(m_resourceLoader);
 	auto sortMenus = sortMenuBuilder.BuildMenus(*m_browser->GetActiveShellBrowser()->GetTab());
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
-	builder->AddSubMenuItem(text, std::move(sortMenus.sortByMenu), position++, true);
+	builder->AddSubMenuItem(IDM_BACKGROUND_CONTEXT_MENU_SORT_BY_POPUP, text,
+		std::move(sortMenus.sortByMenu), position++, true);
 
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
-	builder->AddSubMenuItem(text, std::move(sortMenus.groupByMenu), position++, true);
+	builder->AddSubMenuItem(IDM_BACKGROUND_CONTEXT_MENU_GROUP_BY_POPUP, text,
+		std::move(sortMenus.groupByMenu), position++, true);
+
+	if (!m_browser->GetActiveShellBrowser()->CanEnableGroupMode())
+	{
+		builder->EnableItem(IDM_BACKGROUND_CONTEXT_MENU_GROUP_BY_POPUP, false);
+	}
 
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_REFRESH);
 	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_REFRESH, text, position++, true);

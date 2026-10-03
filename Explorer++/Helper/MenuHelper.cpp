@@ -64,18 +64,6 @@ void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_h
 	subMenu.release();
 }
 
-void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
-{
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_SUBMENU;
-	menuItemInfo.hSubMenu = subMenu.get();
-	auto res = SetMenuItemInfo(parentMenu, item, byPosition, &menuItemInfo);
-	CHECK(res);
-
-	subMenu.release();
-}
-
 void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
 {
 	UINT state = bCheck ? MF_CHECKED : MF_UNCHECKED;
