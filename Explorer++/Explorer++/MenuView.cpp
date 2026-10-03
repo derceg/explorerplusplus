@@ -115,7 +115,7 @@ MenuView *MenuView::AppendSubMenu(SubMenuItemParams params)
 	MenuHelper::AddSubMenuItem(m_menu, id, params.GetText(), std::move(ownedSubMenu));
 
 	auto [itr, didInsert] =
-		m_idToItemMap.try_emplace(id, delegate.get(), std::move(params.TakeIconModel()), L"");
+		m_idToItemMap.try_emplace(id, delegate.get(), params.TakeIconModel(), L"");
 	CHECK(didInsert);
 	itr->second.ownedDelegate = std::move(delegate);
 
