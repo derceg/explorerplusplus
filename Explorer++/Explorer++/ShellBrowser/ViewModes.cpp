@@ -60,54 +60,76 @@ std::wstring GetViewModeMenuText(const ResourceLoader *resourceLoader, ViewMode 
 
 UINT GetViewModeMenuStringId(ViewMode viewMode)
 {
-	UINT stringId;
-
 	switch (viewMode)
 	{
-	case ViewMode::Thumbnails:
-		stringId = IDS_VIEW_THUMBNAILS;
-		break;
-
-	case ViewMode::Tiles:
-		stringId = IDS_VIEW_TILES;
-		break;
-
-	case ViewMode::ExtraLargeIcons:
-		stringId = IDS_VIEW_EXTRALARGEICONS;
-		break;
-
-	case ViewMode::LargeIcons:
-		stringId = IDS_VIEW_LARGEICONS;
-		break;
-
 	case ViewMode::Icons:
-		stringId = IDS_VIEW_MEDIUMICONS;
-		break;
+		return IDS_VIEW_MEDIUMICONS;
 
 	case ViewMode::SmallIcons:
-		stringId = IDS_VIEW_SMALLICONS;
-		break;
+		return IDS_VIEW_SMALLICONS;
 
 	case ViewMode::List:
-		stringId = IDS_VIEW_LIST;
-		break;
+		return IDS_VIEW_LIST;
 
 	case ViewMode::Details:
-		stringId = IDS_VIEW_DETAILS;
-		break;
+		return IDS_VIEW_DETAILS;
 
-	case ViewMode::LargeThumbnails:
-		stringId = IDS_VIEW_LARGETHUMBNAILS;
-		break;
+	case ViewMode::Tiles:
+		return IDS_VIEW_TILES;
+
+	case ViewMode::Thumbnails:
+		return IDS_VIEW_THUMBNAILS;
+
+	case ViewMode::ExtraLargeIcons:
+		return IDS_VIEW_EXTRALARGEICONS;
+
+	case ViewMode::LargeIcons:
+		return IDS_VIEW_LARGEICONS;
 
 	case ViewMode::ExtraLargeThumbnails:
-		stringId = IDS_VIEW_EXTRALARGETHUMBNAILS;
-		break;
+		return IDS_VIEW_EXTRALARGETHUMBNAILS;
 
-	default:
-		LOG(FATAL) << "ViewMode value not found";
-		__assume(0);
+	case ViewMode::LargeThumbnails:
+		return IDS_VIEW_LARGETHUMBNAILS;
 	}
 
-	return stringId;
+	LOG(FATAL) << "Invalid ViewMode value";
+}
+
+UINT GetViewModeMenuHelpStringId(ViewMode viewMode)
+{
+	switch (viewMode)
+	{
+	case ViewMode::Icons:
+		return IDS_VIEW_ICONS_HELP_TEXT;
+
+	case ViewMode::SmallIcons:
+		return IDS_VIEW_SMALL_ICONS_HELP_TEXT;
+
+	case ViewMode::List:
+		return IDS_VIEW_LIST_HELP_TEXT;
+
+	case ViewMode::Details:
+		return IDS_VIEW_DETAILS_HELP_TEXT;
+
+	case ViewMode::Tiles:
+		return IDS_VIEW_TILES_HELP_TEXT;
+
+	case ViewMode::Thumbnails:
+		return IDS_VIEW_THUMBNAILS_HELP_TEXT;
+
+	case ViewMode::ExtraLargeIcons:
+		return IDS_VIEW_EXTRA_LARGE_ICONS_HELP_TEXT;
+
+	case ViewMode::LargeIcons:
+		return IDS_VIEW_LARGE_ICONS_HELP_TEXT;
+
+	case ViewMode::ExtraLargeThumbnails:
+		return IDS_VIEW_EXTRA_LARGE_THUMBNAILS_HELP_TEXT;
+
+	case ViewMode::LargeThumbnails:
+		return IDS_VIEW_LARGE_THUMBNAILS_HELP_TEXT;
+	}
+
+	LOG(FATAL) << "Invalid ViewMode value";
 }

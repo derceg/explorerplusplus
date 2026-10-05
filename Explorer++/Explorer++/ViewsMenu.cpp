@@ -6,6 +6,7 @@
 #include "ViewsMenu.h"
 #include "BrowserWindow.h"
 #include "MenuView.h"
+#include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ViewModeHelper.h"
@@ -23,6 +24,7 @@ void ViewsMenu::BuildMenu(const ResourceLoader *resourceLoader)
 	for (auto viewMode : VIEW_MODES)
 	{
 		m_rootMenuView->AppendItem(MenuItemParams(GetViewModeMenuText(resourceLoader, viewMode))
+				.SetHelpText(resourceLoader->LoadString(GetViewModeMenuHelpStringId(viewMode)))
 				.SetAcceleratorText(GetAcceleratorTextForId(GetViewModeMenuId(viewMode)))
 				.SetCheckedCallback(
 					[this, viewMode] { return viewMode == GetActiveShellBrowser()->GetViewMode(); })
