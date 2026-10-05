@@ -30,40 +30,40 @@ ToolbarOptionsMenu::ToolbarOptionsMenu(MenuView *menuView, Source source, Browse
 void ToolbarOptionsMenu::BuildMenu(Source source, const ResourceLoader *resourceLoader)
 {
 	m_rootMenuView->AppendItem(
-		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR))
-			.SetHelpText(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_ADDRESS_BAR_HELP_TEXT))
+		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_ADDRESS_BAR))
+			.SetHelpText(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_ADDRESS_BAR_HELP_TEXT))
 			.SetCheckedCallback([this] { return m_config->showAddressBar.get(); })
 			.SetSelectedCallback(
 				[this] { m_config->showAddressBar = !m_config->showAddressBar.get(); }));
 
 	m_rootMenuView->AppendItem(
-		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR))
+		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_MAIN_TOOLBAR))
 			.SetHelpText(
-				resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_MAIN_TOOLBAR_HELP_TEXT))
+				resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_MAIN_TOOLBAR_HELP_TEXT))
 			.SetCheckedCallback([this] { return m_config->showMainToolbar.get(); })
 			.SetSelectedCallback(
 				[this] { m_config->showMainToolbar = !m_config->showMainToolbar.get(); }));
 
 	m_rootMenuView->AppendItem(
-		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR))
+		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_BOOKMARKS_TOOLBAR))
 			.SetHelpText(
-				resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_BOOKMARKS_TOOLBAR_HELP_TEXT))
+				resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_BOOKMARKS_TOOLBAR_HELP_TEXT))
 			.SetCheckedCallback([this] { return m_config->showBookmarksToolbar.get(); })
 			.SetSelectedCallback([this]
 				{ m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar.get(); }));
 
 	m_rootMenuView->AppendItem(
-		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR))
+		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_DRIVES_TOOLBAR))
 			.SetHelpText(
-				resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_DRIVES_TOOLBAR_HELP_TEXT))
+				resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_DRIVES_TOOLBAR_HELP_TEXT))
 			.SetCheckedCallback([this] { return m_config->showDrivesToolbar.get(); })
 			.SetSelectedCallback(
 				[this] { m_config->showDrivesToolbar = !m_config->showDrivesToolbar.get(); }));
 
 	m_rootMenuView->AppendItem(
-		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR))
+		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_APPLICATION_TOOLBAR))
 			.SetHelpText(
-				resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_APPLICATION_TOOLBAR_HELP_TEXT))
+				resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_APPLICATION_TOOLBAR_HELP_TEXT))
 			.SetCheckedCallback([this] { return m_config->showApplicationToolbar.get(); })
 			.SetSelectedCallback([this]
 				{ m_config->showApplicationToolbar = !m_config->showApplicationToolbar.get(); }));
@@ -71,9 +71,9 @@ void ToolbarOptionsMenu::BuildMenu(Source source, const ResourceLoader *resource
 	m_rootMenuView->AppendSeparator();
 
 	m_rootMenuView->AppendItem(
-		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS))
+		MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_LOCK_TOOLBARS))
 			.SetHelpText(
-				resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_LOCK_TOOLBARS_HELP_TEXT))
+				resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_LOCK_TOOLBARS_HELP_TEXT))
 			.SetCheckedCallback([this] { return m_config->lockToolbars.get(); })
 			.SetSelectedCallback(
 				[this] { m_config->lockToolbars = !m_config->lockToolbars.get(); }));
@@ -83,38 +83,38 @@ void ToolbarOptionsMenu::BuildMenu(Source source, const ResourceLoader *resource
 	if (source == Source::MainToolbar || source == Source::MainMenu)
 	{
 		m_rootMenuView->AppendItem(
-			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_CUSTOMIZE))
+			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_CUSTOMIZE))
 				.SetHelpText(
-					resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_CUSTOMIZE_HELP_TEXT))
+					resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_CUSTOMIZE_HELP_TEXT))
 				.SetSelectedCallback([this] { m_browser->StartMainToolbarCustomization(); }));
 	}
 	else if (source == Source::BookmarksToolbar)
 	{
 		m_rootMenuView->AppendItem(
-			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK))
+			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_NEW_BOOKMARK))
 				.SetHelpText(
-					resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_HELP_TEXT))
+					resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_NEW_BOOKMARK_HELP_TEXT))
 				.SetSelectedCallback([this] { OnNewBookmarkItem(BookmarkItem::Type::Bookmark); }));
 
 		m_rootMenuView->AppendItem(
-			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_FOLDER))
+			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_NEW_BOOKMARK_FOLDER))
 				.SetHelpText(resourceLoader->LoadString(
-					IDS_TOOLBAR_CONTEXT_MENU_NEW_BOOKMARK_FOLDER_HELP_TEXT))
+					IDS_TOOLBAR_OPTIONS_MENU_NEW_BOOKMARK_FOLDER_HELP_TEXT))
 				.SetSelectedCallback([this] { OnNewBookmarkItem(BookmarkItem::Type::Folder); }));
 
 		m_rootMenuView->AppendItem(
-			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK))
+			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_PASTE_BOOKMARK))
 				.SetHelpText(
-					resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_PASTE_BOOKMARK_HELP_TEXT))
+					resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_PASTE_BOOKMARK_HELP_TEXT))
 				.SetEnabledCallback([this] { return CanPasteBookmark(); })
 				.SetSelectedCallback([this] { OnPasteBookmark(); }));
 	}
 	else if (source == Source::ApplicationToolbar)
 	{
 		m_rootMenuView->AppendItem(
-			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_APPLICATION))
+			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_NEW_APPLICATION))
 				.SetHelpText(
-					resourceLoader->LoadString(IDS_TOOLBAR_CONTEXT_MENU_NEW_APPLICATION_HELP_TEXT))
+					resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_NEW_APPLICATION_HELP_TEXT))
 				.SetSelectedCallback([this] { OnNewApplication(); }));
 	}
 
