@@ -9,6 +9,7 @@
 #include "MenuItemKey.h"
 #include "MenuItemParams.h"
 #include "SubMenuItemParams.h"
+#include "../Helper/PassKey.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
@@ -18,14 +19,20 @@
 
 class MenuView
 {
+private:
+	using PassKey = PassKey<MenuView>;
+
 public:
 	using PopupWillShowSignal = boost::signals2::signal<void()>;
 
+	// This is used to construct a new root menu.
 	MenuView(HMENU menu);
 
-	bool IsRoot() const;
+	// This is used to construct a new submenu and is only used internally (external callers should
+	// use AppendSubMenu()).
+	MenuView(MenuView *parent, HMENU menu, PassKey);
 
-	void EnableDragAndDrop(bool enable);
+	bool IsRoot() const;
 
 	void AppendItem(MenuItemParams params);
 	MenuView *AppendSubMenu(SubMenuItemParams params);
@@ -103,6 +110,8 @@ private:
 		const std::wstring helpText;
 	};
 
+	void AddMenuStyles(DWORD styles);
+
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 		const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle);
@@ -131,8 +140,8 @@ private:
 	const MenuDelegate *MaybeGetDelegateForItem(UINT id) const;
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
+	MenuView *const m_parent;
 	const HMENU m_menu;
-	MenuView *m_parent = nullptr;
 
 	// This exists on every MenuView instance, but is only used on the root menu. That is, IDs are
 	// always generated from the root menu.

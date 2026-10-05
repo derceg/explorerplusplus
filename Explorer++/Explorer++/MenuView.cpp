@@ -9,7 +9,14 @@
 #include "../Helper/WeakPtr.h"
 #include <ranges>
 
-MenuView::MenuView(HMENU menu) : m_menu(menu)
+MenuView::MenuView(HMENU menu) : m_parent(nullptr), m_menu(menu)
+{
+	// Not all menus support drag and drop, but for those that don't, the menu drag messages will
+	// simply be ignored.
+	AddMenuStyles(MNS_DRAGDROP);
+}
+
+MenuView::MenuView(MenuView *parent, HMENU menu, PassKey) : m_parent(parent), m_menu(menu)
 {
 }
 
@@ -18,7 +25,7 @@ bool MenuView::IsRoot() const
 	return m_parent == nullptr;
 }
 
-void MenuView::EnableDragAndDrop(bool enable)
+void MenuView::AddMenuStyles(DWORD styles)
 {
 	MENUINFO menuInfo = {};
 	menuInfo.cbSize = sizeof(menuInfo);
@@ -26,14 +33,7 @@ void MenuView::EnableDragAndDrop(bool enable)
 	auto res = GetMenuInfo(m_menu, &menuInfo);
 	CHECK(res);
 
-	if (enable)
-	{
-		WI_SetFlag(menuInfo.dwStyle, MNS_DRAGDROP);
-	}
-	else
-	{
-		WI_ClearFlag(menuInfo.dwStyle, MNS_DRAGDROP);
-	}
+	WI_SetAllFlags(menuInfo.dwStyle, styles);
 
 	res = SetMenuInfo(m_menu, &menuInfo);
 	CHECK(res);
@@ -119,9 +119,8 @@ MenuView *MenuView::AppendSubMenu(SubMenuItemParams params)
 	CHECK(didInsert);
 	itr->second.ownedDelegate = std::move(delegate);
 
-	auto ownedView = std::make_unique<MenuView>(subMenu);
+	auto ownedView = std::make_unique<MenuView>(this, subMenu, PassKey());
 	auto *view = ownedView.get();
-	view->m_parent = this;
 
 	m_idToSubMenuMap.insert({ id, std::move(ownedView) });
 

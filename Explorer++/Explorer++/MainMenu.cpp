@@ -30,11 +30,6 @@ MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appS
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
 	m_resourceLoader(appServices->GetResourceLoader())
 {
-	// Some items on the main menu support drag and drop (e.g. bookmark items), so drag and drop is
-	// enabled here. This is necessary, since drag and drop won't work if the style is simply set on
-	// a submenu. For items that don't support drag and drop, setting this will have no effect.
-	m_rootMenuView->EnableDragAndDrop(true);
-
 	BuildMenu(browser, appServices, shellIconLoader, iconFetcher);
 }
 

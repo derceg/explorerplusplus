@@ -58,8 +58,6 @@ BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *accel
 {
 	DCHECK(bookmarkFolder->IsFolder());
 
-	m_rootMenuView->EnableDragAndDrop(true);
-
 	BuildMenu(m_rootMenuView, bookmarkFolder, includePredicate);
 }
 
