@@ -38,6 +38,7 @@ private:
 
 	bool CanStartCommandPrompt() const;
 	bool CanChangeMainFontSize(FontSizeType sizeType) const;
+	bool CanAutoArrange() const;
 
 	void OnSortBy(SortMode sortMode);
 	void OnCloseTab();

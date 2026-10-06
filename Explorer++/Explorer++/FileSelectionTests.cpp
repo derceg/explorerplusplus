@@ -22,14 +22,6 @@ BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 	return CanPasteInDirectory(m_platformContext->GetClipboardStore(), directory.Raw(), pasteType);
 }
 
-// Tests whether a hard link or symlink can be pasted.
-bool Explorerplusplus::CanPasteLink() const
-{
-	const auto *activeShellBrowser = GetActiveShellBrowserImpl();
-	return ClipboardOperations::CanPasteLinkInDirectory(m_platformContext->GetClipboardStore(),
-		activeShellBrowser->GetDirectory().Raw());
-}
-
 PidlAbsolute Explorerplusplus::MaybeGetFocusedDirectory() const
 {
 	HWND focus = GetFocus();

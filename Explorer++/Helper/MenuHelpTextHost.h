@@ -23,7 +23,7 @@ public:
 	virtual void NotifyTopLevelMenuClosed() = 0;
 
 	// Notifies the host that a menu item has been selected.
-	virtual void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) = 0;
+	virtual void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) = 0;
 
 	// Allows an observer to respond to help text requests from the host, in order to provide help
 	// text for a particular menu item.

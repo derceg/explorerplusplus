@@ -115,7 +115,7 @@ public:
 	// MenuHelpTextHost
 	void NotifyTopLevelMenuShown() override;
 	void NotifyTopLevelMenuClosed() override;
-	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override;
+	void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) override;
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 
@@ -178,6 +178,8 @@ private:
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize(const WindowStorageData &storageData);
+	void InitializeMainMenu();
+	void InitializeDisplayWindow();
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
@@ -265,7 +267,6 @@ private:
 
 	/* File selection tests. */
 	BOOL CanPaste(PasteType pasteType) const override;
-	bool CanPasteLink() const;
 	PidlAbsolute MaybeGetFocusedDirectory() const;
 
 	/* Display window. */
@@ -281,15 +282,6 @@ private:
 	/* CoreInterface methods. */
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainer *GetTabContainer() const override;
-
-	// Main menu
-	void InitializeMainMenu();
-	void OnInitMenu(HMENU menu);
-	void SetMainMenuItemStates(HMENU mainMenu);
-	bool MaybeHandleMainMenuItemSelection(UINT id);
-
-	/* Miscellaneous. */
-	void InitializeDisplayWindow();
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
 		LPVOID pData);

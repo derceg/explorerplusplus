@@ -244,7 +244,7 @@ LRESULT ShellContextMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wPara
 }
 
 std::optional<std::wstring> ShellContextMenu::MaybeGetMenuHelpText(HMENU shellContextMenu,
-	HMENU menu, int id)
+	HMENU menu, UINT id)
 {
 	if (!MenuHelper::IsPartOfMenu(shellContextMenu, menu))
 	{

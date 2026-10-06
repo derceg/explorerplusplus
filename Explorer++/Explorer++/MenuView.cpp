@@ -13,7 +13,7 @@ MenuView::MenuView(HMENU menu) : m_parent(nullptr), m_menu(menu)
 {
 	// Not all menus support drag and drop, but for those that don't, the menu drag messages will
 	// simply be ignored.
-	AddMenuStyles(MNS_DRAGDROP);
+	MenuHelper::AddMenuStyles(m_menu, MNS_DRAGDROP);
 }
 
 MenuView::MenuView(MenuView *parent, HMENU menu, PassKey) : m_parent(parent), m_menu(menu)
@@ -23,20 +23,6 @@ MenuView::MenuView(MenuView *parent, HMENU menu, PassKey) : m_parent(parent), m_
 bool MenuView::IsRoot() const
 {
 	return m_parent == nullptr;
-}
-
-void MenuView::AddMenuStyles(DWORD styles)
-{
-	MENUINFO menuInfo = {};
-	menuInfo.cbSize = sizeof(menuInfo);
-	menuInfo.fMask = MIM_STYLE;
-	auto res = GetMenuInfo(m_menu, &menuInfo);
-	CHECK(res);
-
-	WI_SetAllFlags(menuInfo.dwStyle, styles);
-
-	res = SetMenuInfo(m_menu, &menuInfo);
-	CHECK(res);
 }
 
 void MenuView::AppendItem(MenuItemParams params)
@@ -56,16 +42,6 @@ void MenuView::AppendItem(MenuItemParams params)
 	item->ownedDelegate = std::move(delegate);
 }
 
-void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
-	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-	const std::optional<std::wstring> &acceleratorText)
-{
-	AppendItem(delegate, id, text, std::move(iconModel), helpText, acceleratorText,
-		MenuItemCheckStyle::Normal);
-}
-
-// Note that MenuDelegate is effectively a menu-level class, but it can be set with item-level
-// granularity. That allows different items on the same menu to be managed by different delegates.
 void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 	const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle)
@@ -185,7 +161,7 @@ void MenuView::ClearMenu()
 
 	if (IsRoot())
 	{
-		m_idCounter = 1;
+		m_idCounter = INITIAL_ID;
 	}
 }
 

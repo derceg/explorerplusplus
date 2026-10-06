@@ -108,8 +108,7 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 				resourceLoader))
 			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_CLOSETAB))
-			.SetEnabledCallback(
-				[this] { return m_tab->GetLockState() == Tab::LockState::NotLocked; })
+			.SetEnabledCallback([this] { return m_tab->GetTabContainer()->CanCloseTab(*m_tab); })
 			.SetSelectedCallback([this] { OnCloseTab(); }));
 
 	m_rootMenuView->AppendItem(

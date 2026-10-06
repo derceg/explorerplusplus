@@ -8,6 +8,20 @@
 namespace MenuHelper
 {
 
+void AddMenuStyles(HMENU menu, DWORD styles)
+{
+	MENUINFO menuInfo = {};
+	menuInfo.cbSize = sizeof(menuInfo);
+	menuInfo.fMask = MIM_STYLE;
+	auto res = GetMenuInfo(menu, &menuInfo);
+	CHECK(res);
+
+	WI_SetAllFlags(menuInfo.dwStyle, styles);
+
+	res = SetMenuInfo(menu, &menuInfo);
+	CHECK(res);
+}
+
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text)
 {
 	AddStringItem(menu, id, text, GetMenuItemCount(menu), TRUE);
@@ -111,11 +125,7 @@ void RemoveDuplicateSeparators(HMENU menu)
 void RemoveTrailingSeparators(HMENU menu)
 {
 	int count = GetMenuItemCount(menu);
-
-	if (count == -1)
-	{
-		return;
-	}
+	CHECK_NE(count, -1);
 
 	for (int i = count - 1; i >= 0; i--)
 	{
@@ -182,7 +192,10 @@ bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu)
 		return true;
 	}
 
-	for (int i = 0; i < GetMenuItemCount(menu); i++)
+	int count = GetMenuItemCount(menu);
+	CHECK_NE(count, -1);
+
+	for (int i = 0; i < count; i++)
 	{
 		auto subMenu = GetSubMenu(menu, i);
 
@@ -238,6 +251,28 @@ UINT GetMenuItemType(HMENU menu, UINT item, bool byPosition)
 	return menuItemInfo.fType;
 }
 
+std::optional<UINT> MaybeGetHighlightedItem(HMENU menu)
+{
+	int count = GetMenuItemCount(menu);
+	CHECK_NE(count, -1);
+
+	for (int i = 0; i < count; i++)
+	{
+		MENUITEMINFO menuItemInfo = {};
+		menuItemInfo.cbSize = sizeof(menuItemInfo);
+		menuItemInfo.fMask = MIIM_ID | MIIM_STATE;
+		auto res = GetMenuItemInfo(menu, i, true, &menuItemInfo);
+		CHECK(res);
+
+		if (WI_IsFlagSet(menuItemInfo.fState, MFS_HILITE))
+		{
+			return menuItemInfo.wID;
+		}
+	}
+
+	return std::nullopt;
+}
+
 std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 {
 	// Note that the POINT passed to MenuItemFromPoint() needs to be in screen coordinates (even
@@ -259,7 +294,10 @@ std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 		return GetMenuItemIDIncludingSubmenu(menu, item);
 	}
 
-	for (int i = 0; i < GetMenuItemCount(menu); i++)
+	int count = GetMenuItemCount(menu);
+	CHECK_NE(count, -1);
+
+	for (int i = 0; i < count; i++)
 	{
 		auto subMenu = GetSubMenu(menu, i);
 

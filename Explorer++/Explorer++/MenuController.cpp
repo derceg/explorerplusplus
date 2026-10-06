@@ -57,6 +57,10 @@ LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 			HIWORD(wParam));
 		break;
 
+	case WM_MENUCOMMAND:
+		OnMenuCommand(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam));
+		break;
+
 	case WM_MBUTTONUP:
 		OnMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
 			WI_IsFlagSet(wParam, MK_CONTROL), WI_IsFlagSet(wParam, MK_SHIFT));
@@ -142,6 +146,25 @@ void MenuController::OnMenuClosed()
 
 	m_dropTarget.reset();
 	m_helpTextConnection.disconnect();
+}
+
+void MenuController::OnMenuCommand(HMENU menu, int index)
+{
+	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(menu);
+
+	if (!view)
+	{
+		return;
+	}
+
+	auto id = view->MaybeGetItemId(index);
+
+	if (!id)
+	{
+		return;
+	}
+
+	SelectItem(*id, false, false);
 }
 
 void MenuController::OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown)
@@ -318,7 +341,7 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 	return MNGO_NOERROR;
 }
 
-std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, int id)
+std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, UINT id)
 {
 	auto *view = m_rootView->MaybeGetMenuViewForNativeMenu(menu);
 
@@ -328,25 +351,6 @@ std::optional<std::wstring> MenuController::OnHelpTextRequested(HMENU menu, int 
 	}
 
 	return view->GetItemHelpText(id);
-}
-
-bool MenuController::CanHandleSelection(UINT id) const
-{
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-
-	if (!view)
-	{
-		return false;
-	}
-
-	auto *delegate = view->MaybeGetDelegateForItem(id);
-
-	if (!delegate)
-	{
-		return false;
-	}
-
-	return true;
 }
 
 void MenuController::SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown)

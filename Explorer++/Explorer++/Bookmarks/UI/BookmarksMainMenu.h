@@ -28,6 +28,8 @@ private:
 	void RebuildMenu();
 	void BuildMenu();
 
+	void SendCommandToBrowser(WORD id);
+
 	BookmarkTree *const m_bookmarkTree;
 	BrowserWindow *const m_browser;
 	PlatformContext *const m_platformContext;

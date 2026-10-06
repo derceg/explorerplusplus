@@ -52,10 +52,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		break;
 
-	case WM_INITMENU:
-		OnInitMenu(reinterpret_cast<HMENU>(wParam));
-		break;
-
 	case WM_MENUSELECT:
 		MenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
 		break;
@@ -219,10 +215,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		&& id < ACCELERATOR_PLUGIN_END_ID)
 	{
 		m_appServices->GetPluginCommandManager()->onAcceleratorPressed(id);
-		return 0;
-	}
-	else if (notificationCode == 0 && MaybeHandleMainMenuItemSelection(id))
-	{
 		return 0;
 	}
 	else if (IsSortModeMenuItemId(id))
@@ -852,12 +844,18 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDA_ADDRESSBAR:
-		SetFocus(m_addressBar->GetView()->GetHWND());
+		if (m_config->showAddressBar.get())
+		{
+			SetFocus(m_addressBar->GetView()->GetHWND());
+		}
 		break;
 
 	case IDA_COMBODROPDOWN:
-		SetFocus(m_addressBar->GetView()->GetHWND());
-		SendMessage(m_addressBar->GetView()->GetHWND(), CB_SHOWDROPDOWN, TRUE, 0);
+		if (m_config->showAddressBar.get())
+		{
+			SetFocus(m_addressBar->GetView()->GetHWND());
+			SendMessage(m_addressBar->GetView()->GetHWND(), CB_SHOWDROPDOWN, TRUE, 0);
+		}
 		break;
 
 	case IDA_PREVIOUSWINDOW:

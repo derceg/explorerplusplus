@@ -82,6 +82,7 @@ public:
 	// being closed.
 	void CloseAllTabs();
 
+	bool CanCloseTab(const Tab &tab) const;
 	bool CloseTab(const Tab &tab);
 
 	/* TODO: Ideally, there would be a method of iterating over the tabs without

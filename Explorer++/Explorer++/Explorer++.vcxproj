@@ -1437,7 +1437,6 @@
     <ClCompile Include="ServiceProvider.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Plugins\LuaPlugin.cpp" />
-    <ClCompile Include="MainMenuHandler.cpp" />
     <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />

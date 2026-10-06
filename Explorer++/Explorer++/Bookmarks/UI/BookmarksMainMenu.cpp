@@ -58,22 +58,29 @@ void BookmarksMainMenu::RebuildMenu()
 
 void BookmarksMainMenu::BuildMenu()
 {
-	m_rootMenuView->AppendItem(nullptr, IDM_BOOKMARKS_BOOKMARK_THIS_TAB,
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB),
-		std::make_unique<ResourceIconModel>(Icon::AddBookmark, IconSize::Small, m_resourceLoader),
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB_HELP_TEXT),
-		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_THIS_TAB));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB))
+			.SetIconModel(std::make_unique<ResourceIconModel>(Icon::AddBookmark, IconSize::Small,
+				m_resourceLoader))
+			.SetHelpText(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_THIS_TAB))
+			.SetSelectedCallback(
+				[this] { SendCommandToBrowser(IDM_BOOKMARKS_BOOKMARK_THIS_TAB); }));
 
-	m_rootMenuView->AppendItem(nullptr, IDM_BOOKMARKS_BOOKMARK_ALL_TABS,
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS), {},
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS_HELP_TEXT),
-		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS))
+			.SetHelpText(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS))
+			.SetSelectedCallback(
+				[this] { SendCommandToBrowser(IDM_BOOKMARKS_BOOKMARK_ALL_TABS); }));
 
-	m_rootMenuView->AppendItem(nullptr, IDM_BOOKMARKS_MANAGE_BOOKMARKS,
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS),
-		std::make_unique<ResourceIconModel>(Icon::Bookmarks, IconSize::Small, m_resourceLoader),
-		m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS_HELP_TEXT),
-		GetAcceleratorTextForId(IDM_BOOKMARKS_MANAGE_BOOKMARKS));
+	m_rootMenuView->AppendItem(
+		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS))
+			.SetIconModel(std::make_unique<ResourceIconModel>(Icon::Bookmarks, IconSize::Small,
+				m_resourceLoader))
+			.SetHelpText(m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS_HELP_TEXT))
+			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_MANAGE_BOOKMARKS))
+			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_BOOKMARKS_MANAGE_BOOKMARKS); }));
 
 	auto *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
@@ -100,4 +107,9 @@ void BookmarksMainMenu::BuildMenu()
 			m_acceleratorManager, m_bookmarkTree, otherBookmarksFolder, m_iconManager.get(),
 			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader));
 	}
+}
+
+void BookmarksMainMenu::SendCommandToBrowser(WORD id)
+{
+	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
 }

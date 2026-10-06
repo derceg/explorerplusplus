@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "MenuController.h"
-#include "MenuDelegate.h"
 #include "MenuView.h"
 #include "../Helper/MenuHelpTextHost.h"
 #include "../Helper/MenuHelper.h"
@@ -20,12 +19,6 @@ MATCHER_P2(PointEq, x, y, "")
 	return arg.x == x && arg.y == y;
 }
 
-MATCHER_P2(IsGapBetween, beforeId, afterId, "")
-{
-	return (arg.id == beforeId && arg.position == MenuDropPosition::After)
-		|| (arg.id == afterId && arg.position == MenuDropPosition::Before);
-}
-
 class MenuHelpTextHostFake : public MenuHelpTextHost
 {
 public:
@@ -37,10 +30,10 @@ public:
 	{
 	}
 
-	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override
+	void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) override
 	{
 		UNREFERENCED_PARAMETER(menu);
-		UNREFERENCED_PARAMETER(itemId);
+		UNREFERENCED_PARAMETER(indexOrId);
 		UNREFERENCED_PARAMETER(flags);
 	}
 
@@ -57,24 +50,6 @@ public:
 
 private:
 	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
-};
-
-class MenuDelegateMock : public MenuDelegate
-{
-public:
-	MenuDelegateMock()
-	{
-		ON_CALL(*this, IsItemEnabled).WillByDefault(Return(true));
-	}
-
-	MOCK_METHOD(bool, IsItemEnabled, (UINT id), (const, override));
-	MOCK_METHOD(void, OnItemSelected, (UINT id, bool isCtrlKeyDown, bool isShiftKeyDown),
-		(override));
-	MOCK_METHOD(void, OnItemMiddleClicked, (UINT id, bool isCtrlKeyDown, bool isShiftKeyDown),
-		(override));
-	MOCK_METHOD(void, OnItemRightClicked, (UINT id, const POINT &ptScreen), (override));
-	MOCK_METHOD(wil::com_ptr_nothrow<IDropTarget>, MaybeGetDropTargetForLocation,
-		(const MenuDropLocation &dropLocation), (override));
 };
 
 }
@@ -119,155 +94,104 @@ protected:
 
 TEST_F(MenuControllerTest, Selection)
 {
-	MenuDelegateMock delegate;
+	MockFunction<void()> selectedCallback1;
+	MockFunction<void()> selectedCallback2;
+	m_view.AppendItem(
+		MenuItemParams(L"Item 1").SetSelectedCallback(selectedCallback1.AsStdFunction()));
+	m_view.AppendItem(
+		MenuItemParams(L"Item 2").SetSelectedCallback(selectedCallback2.AsStdFunction()));
 
-	UINT idCounter = 1;
+	EXPECT_CALL(selectedCallback1, Call());
+	m_controller.SelectItem(m_view.GetItemIdForTesting(0), false, false);
 
-	UINT itemId1 = idCounter++;
-	m_view.AppendItem(&delegate, itemId1, L"Item 1");
-
-	UINT itemId2 = idCounter++;
-	m_view.AppendItem(&delegate, itemId2, L"Item 2");
-
-	EXPECT_CALL(delegate, OnItemSelected(itemId1, false, false));
-	m_controller.SelectItem(itemId1, false, false);
-
-	EXPECT_CALL(delegate, OnItemSelected(itemId2, true, true));
-	m_controller.SelectItem(itemId2, true, true);
+	EXPECT_CALL(selectedCallback2, Call());
+	m_controller.SelectItem(m_view.GetItemIdForTesting(1), false, false);
 }
 
 TEST_F(MenuControllerTest, DisabledItemSelection)
 {
-	MenuDelegateMock delegate;
-
-	UINT itemId = 1;
-	m_view.AppendItem(&delegate, itemId, L"Item 1");
+	MockFunction<void()> selectedCallback;
+	m_view.AppendItem(MenuItemParams(L"Item 1")
+			.SetEnabledCallback([] { return false; })
+			.SetSelectedCallback(selectedCallback.AsStdFunction()));
 
 	// Selecting a disabled item should have no effect.
-	ON_CALL(delegate, IsItemEnabled(itemId)).WillByDefault(Return(false));
-	EXPECT_CALL(delegate, OnItemSelected(_, _, _)).Times(0);
-	m_controller.SelectItem(itemId, false, false);
+	EXPECT_CALL(selectedCallback, Call()).Times(0);
+	m_controller.SelectItem(m_view.GetItemIdForTesting(0), false, false);
 }
 
 TEST_F(MenuControllerTest, SelectionWithSubmenus)
 {
-	MenuDelegateMock delegate;
-
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_view.AppendItem(&delegate, itemId1, L"Item 1");
+	MockFunction<void()> selectedCallback1;
+	m_view.AppendItem(
+		MenuItemParams(L"Item 1").SetSelectedCallback(selectedCallback1.AsStdFunction()));
 
 	auto *subMenuView1 = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu 1"));
 
-	UINT itemId2 = idCounter++;
-	subMenuView1->AppendItem(&delegate, itemId2, L"Item 2");
+	MockFunction<void()> selectedCallback2;
+	subMenuView1->AppendItem(
+		MenuItemParams(L"Item 2").SetSelectedCallback(selectedCallback2.AsStdFunction()));
 
 	auto *subMenuView2 = subMenuView1->AppendSubMenu(SubMenuItemParams(L"Submenu 2"));
 
-	UINT itemId3 = idCounter++;
-	subMenuView2->AppendItem(&delegate, itemId3, L"Item 3");
+	MockFunction<void()> selectedCallback3;
+	subMenuView2->AppendItem(
+		MenuItemParams(L"Item 3").SetSelectedCallback(selectedCallback3.AsStdFunction()));
 
-	EXPECT_CALL(delegate, OnItemSelected(itemId1, false, false));
-	m_controller.SelectItem(itemId1, false, false);
+	EXPECT_CALL(selectedCallback1, Call());
+	m_controller.SelectItem(m_view.GetItemIdForTesting(0), false, false);
 
-	EXPECT_CALL(delegate, OnItemSelected(itemId2, false, false));
-	m_controller.SelectItem(itemId2, false, false);
+	EXPECT_CALL(selectedCallback2, Call());
+	m_controller.SelectItem(subMenuView1->GetItemIdForTesting(0), false, false);
 
-	EXPECT_CALL(delegate, OnItemSelected(itemId3, true, true));
-	m_controller.SelectItem(itemId3, true, true);
-}
-
-TEST_F(MenuControllerTest, SelectionWithSubmenusAndDifferentDelegates)
-{
-	MenuDelegateMock rootDelegate;
-
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_view.AppendItem(&rootDelegate, itemId1, L"Item 1");
-
-	auto *subMenuView1 = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu 1"));
-
-	UINT itemId2 = idCounter++;
-	subMenuView1->AppendItem(&rootDelegate, itemId2, L"Item 2");
-
-	auto *subMenuView2 = subMenuView1->AppendSubMenu(SubMenuItemParams(L"Submenu 2"));
-
-	MenuDelegateMock subMenuView2Delegate;
-
-	UINT itemId3 = idCounter++;
-	subMenuView2->AppendItem(&subMenuView2Delegate, itemId3, L"Item 3");
-
-	auto *subMenuView3 = subMenuView2->AppendSubMenu(SubMenuItemParams(L"Submenu 3"));
-
-	UINT itemId4 = idCounter++;
-	subMenuView3->AppendItem(&subMenuView2Delegate, itemId4, L"Item 4");
-
-	EXPECT_CALL(rootDelegate, OnItemSelected(itemId1, false, false));
-	m_controller.SelectItem(itemId1, false, false);
-
-	EXPECT_CALL(rootDelegate, OnItemSelected(itemId2, false, false));
-	m_controller.SelectItem(itemId2, false, false);
-
-	EXPECT_CALL(subMenuView2Delegate, OnItemSelected(itemId3, false, false));
-	m_controller.SelectItem(itemId3, false, false);
-
-	EXPECT_CALL(subMenuView2Delegate, OnItemSelected(itemId4, false, false));
-	m_controller.SelectItem(itemId4, false, false);
+	EXPECT_CALL(selectedCallback3, Call());
+	m_controller.SelectItem(subMenuView2->GetItemIdForTesting(0), false, false);
 }
 
 TEST_F(MenuControllerTest, MiddleClickSelection)
 {
-	MenuDelegateMock rootDelegate;
-
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_view.AppendItem(&rootDelegate, itemId1, L"Item 1");
+	MockFunction<void()> middleClickCallback1;
+	m_view.AppendItem(
+		MenuItemParams(L"Item 1").SetMiddleClickedCallback(middleClickCallback1.AsStdFunction()));
 
 	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu"));
 
-	MenuDelegateMock subMenuViewDelegate;
+	MockFunction<void()> middleClickCallback2;
+	subMenuView->AppendItem(
+		MenuItemParams(L"Item 2").SetMiddleClickedCallback(middleClickCallback2.AsStdFunction()));
 
-	UINT itemId2 = idCounter++;
-	subMenuView->AppendItem(&subMenuViewDelegate, itemId2, L"Item 2");
+	EXPECT_CALL(middleClickCallback1, Call());
+	m_controller.MiddleClickItem(m_view.GetItemIdForTesting(0), false, false);
 
-	EXPECT_CALL(rootDelegate, OnItemMiddleClicked(itemId1, false, false));
-	m_controller.MiddleClickItem(itemId1, false, false);
-
-	EXPECT_CALL(subMenuViewDelegate, OnItemMiddleClicked(itemId2, true, true));
-	m_controller.MiddleClickItem(itemId2, true, true);
+	EXPECT_CALL(middleClickCallback2, Call());
+	m_controller.MiddleClickItem(subMenuView->GetItemIdForTesting(0), true, true);
 }
 
 TEST_F(MenuControllerTest, RightClick)
 {
-	MenuDelegateMock rootDelegate;
-
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_view.AppendItem(&rootDelegate, itemId1, L"Item 1");
+	MockFunction<void(const POINT &ptScreen)> rightClickCallback1;
+	m_view.AppendItem(
+		MenuItemParams(L"Item 1").SetRightClickedCallback(rightClickCallback1.AsStdFunction()));
 
 	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"Submenu"));
 
-	MenuDelegateMock subMenuViewDelegate;
+	MockFunction<void(const POINT &ptScreen)> rightClickCallback2;
+	subMenuView->AppendItem(
+		MenuItemParams(L"Item 2").SetRightClickedCallback(rightClickCallback2.AsStdFunction()));
 
-	UINT itemId2 = idCounter++;
-	subMenuView->AppendItem(&subMenuViewDelegate, itemId2, L"Item 2");
+	EXPECT_CALL(rightClickCallback1, Call(PointEq(100, 200)));
+	m_controller.RightClickItem(m_view.GetItemIdForTesting(0), { 100, 200 });
 
-	EXPECT_CALL(rootDelegate, OnItemRightClicked(itemId1, PointEq(100, 200)));
-	m_controller.RightClickItem(itemId1, { 100, 200 });
-
-	EXPECT_CALL(subMenuViewDelegate, OnItemRightClicked(itemId2, PointEq(50, 270)));
-	m_controller.RightClickItem(itemId2, { 50, 270 });
+	EXPECT_CALL(rightClickCallback2, Call(PointEq(50, 270)));
+	m_controller.RightClickItem(subMenuView->GetItemIdForTesting(0), { 50, 270 });
 }
 
 TEST_F(MenuControllerTest, HelpTextRequest)
 {
-	UINT itemId = 1;
 	std::wstring helpText = L"Help text";
-	m_view.AppendItem(nullptr, itemId, L"Item", {}, helpText);
+	m_view.AppendItem(MenuItemParams(L"Item").SetHelpText(helpText));
+
+	UINT itemId = m_view.GetItemIdForTesting(0);
 
 	// The menu isn't being shown, so no help text should be returned.
 	auto retrievedHelpText =
@@ -291,13 +215,12 @@ TEST_F(MenuControllerTest, HelpTextRequest)
 
 TEST_F(MenuControllerTest, SubMenuHelpTextRequest)
 {
-	UINT idCounter = 100;
-
 	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"SubMenu"));
 
-	UINT itemId = idCounter++;
 	std::wstring helpText = L"Help text";
-	subMenuView->AppendItem(nullptr, itemId, L"SubMenu Item", {}, helpText);
+	subMenuView->AppendItem(MenuItemParams(L"SubMenu Item").SetHelpText(helpText));
+
+	UINT itemId = subMenuView->GetItemIdForTesting(0);
 
 	auto retrievedHelpText =
 		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
@@ -318,33 +241,27 @@ TEST_F(MenuControllerTest, SubMenuHelpTextRequest)
 
 TEST_F(MenuControllerTest, DropLocation)
 {
-	MenuDelegateMock delegate;
-
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_view.AppendItem(&delegate, itemId1, L"Item 1");
-
-	UINT itemId2 = idCounter++;
-	m_view.AppendItem(&delegate, itemId2, L"Item 2");
-
-	UINT itemId3 = idCounter++;
-	m_view.AppendItem(&delegate, itemId3, L"Item 3");
+	MockFunction<wil::com_ptr_nothrow<IDropTarget>(MenuDropPosition position)> dropTargetCallback1;
+	MockFunction<wil::com_ptr_nothrow<IDropTarget>(MenuDropPosition position)> dropTargetCallback2;
+	MockFunction<wil::com_ptr_nothrow<IDropTarget>(MenuDropPosition position)> dropTargetCallback3;
+	m_view.AppendItem(MenuItemParams(L"Item 1").SetMaybeGetDropTargetCallback(
+		dropTargetCallback1.AsStdFunction()));
+	m_view.AppendItem(MenuItemParams(L"Item 2").SetMaybeGetDropTargetCallback(
+		dropTargetCallback2.AsStdFunction()));
+	m_view.AppendItem(MenuItemParams(L"Item 3").SetMaybeGetDropTargetCallback(
+		dropTargetCallback3.AsStdFunction()));
 
 	InSequence seq;
 
-	EXPECT_CALL(delegate,
-		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId2, MenuDropPosition::On }));
+	EXPECT_CALL(dropTargetCallback2, Call(MenuDropPosition::On));
 	SendMenuGetObject(m_ownerWindow.get(), 0, 1);
 
-	EXPECT_CALL(delegate,
-		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId1, MenuDropPosition::Before }));
+	EXPECT_CALL(dropTargetCallback1, Call(MenuDropPosition::Before));
 	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 0);
 
-	EXPECT_CALL(delegate, MaybeGetDropTargetForLocation(IsGapBetween(itemId2, itemId3)));
+	EXPECT_CALL(dropTargetCallback3, Call(MenuDropPosition::Before));
 	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 2);
 
-	EXPECT_CALL(delegate,
-		MaybeGetDropTargetForLocation(MenuDropLocation{ itemId3, MenuDropPosition::After }));
+	EXPECT_CALL(dropTargetCallback3, Call(MenuDropPosition::After));
 	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 3);
 }

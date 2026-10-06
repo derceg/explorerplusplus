@@ -12,6 +12,7 @@ MainMenuHost::MainMenuHost(BrowserWindow *browser) :
 	m_view(m_menu.get()),
 	m_controller(&m_view, browser->GetHWND(), browser)
 {
+	MenuHelper::AddMenuStyles(m_menu.get(), MNS_NOTIFYBYPOS);
 }
 
 HMENU MainMenuHost::ReleaseMenu()
@@ -23,14 +24,4 @@ HMENU MainMenuHost::ReleaseMenu()
 MenuView *MainMenuHost::GetView()
 {
 	return &m_view;
-}
-
-bool MainMenuHost::CanHandleSelection(UINT id) const
-{
-	return m_controller.CanHandleSelection(id);
-}
-
-void MainMenuHost::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	m_controller.SelectItem(id, isCtrlKeyDown, isShiftKeyDown);
 }

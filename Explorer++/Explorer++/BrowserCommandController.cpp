@@ -76,6 +76,10 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 	switch (command)
 	{
+	case IDM_FILE_CLOSETAB:
+		return m_browser->GetActiveTabContainer()->CanCloseTab(
+			m_browser->GetActiveTabContainer()->GetSelectedTab());
+
 	case IDM_FILE_SAVEDIRECTORYLISTING:
 		return GetActiveShellBrowser()->CanSaveDirectoryListing();
 
@@ -94,6 +98,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 	case IDM_VIEW_INCREASE_TEXT_SIZE:
 		return CanChangeMainFontSize(FontSizeType::Increase);
+
+	case IDM_VIEW_AUTOARRANGE:
+		return CanAutoArrange();
 
 	case IDM_VIEW_AUTOSIZECOLUMNS:
 		return GetActiveShellBrowser()->CanAutoSizeColumns();
@@ -115,11 +122,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 
 	case IDM_GO_UP:
 		return GetActiveShellBrowser()->GetNavigationController()->CanGoUp();
-
-	default:
-		DCHECK(false);
-		return false;
 	}
+
+	return true;
 }
 
 bool BrowserCommandController::CanStartCommandPrompt() const
@@ -167,8 +172,19 @@ bool BrowserCommandController::CanChangeMainFontSize(FontSizeType sizeType) cons
 	}
 }
 
+bool BrowserCommandController::CanAutoArrange() const
+{
+	auto viewMode = GetActiveShellBrowser()->GetViewMode();
+	return viewMode != ViewMode::Details && viewMode != ViewMode::List;
+}
+
 void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition disposition)
 {
+	if (!IsCommandEnabled(command))
+	{
+		return;
+	}
+
 	if (IsCommandContextSensitive(command))
 	{
 		m_browser->GetCommandTargetManager()->GetCurrentTarget()->ExecuteCommand(command);

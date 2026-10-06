@@ -6,29 +6,41 @@
 #include "MainMenu.h"
 #include "AppServices.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "BrowserCommandController.h"
 #include "BrowserWindow.h"
+#include "Config.h"
+#include "CoreInterface.h"
 #include "FeatureList.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
 #include "MainResource.h"
-#include "MenuRanges.h"
 #include "MenuView.h"
+#include "PlatformContext.h"
 #include "ResourceIconModel.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellIconModel.h"
 #include "SortGroupMenu.h"
 #include "StockIconModel.h"
+#include "TabContainer.h"
 #include "TabRestorerMenu.h"
 #include "ToolbarOptionsMenu.h"
 #include "ViewsMenu.h"
+#include "../Helper/FileActionHandler.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
 MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-	ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher) :
+	ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher,
+	const FileActionHandler *fileActionHandler, CoreInterface *coreInterface) :
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
-	m_resourceLoader(appServices->GetResourceLoader())
+	m_browser(browser),
+	m_config(appServices->GetConfig()),
+	m_clipboardStore(appServices->GetPlatformContext()->GetClipboardStore()),
+	m_fileActionHandler(fileActionHandler),
+	m_resourceLoader(appServices->GetResourceLoader()),
+	m_coreInterface(coreInterface)
 {
 	BuildMenu(browser, appServices, shellIconLoader, iconFetcher);
 }
@@ -259,7 +271,7 @@ void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
 	menuView->RemoveTrailingSeparators();
 }
 
-void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const KNOWNFOLDERID &folderId,
+void MainMenu::AppendGoMenuItem(MenuView *goMenuView, WORD id, const KNOWNFOLDERID &folderId,
 	ShellIconLoader *shellIconLoader)
 {
 	PidlAbsolute pidl;
@@ -273,7 +285,7 @@ void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const KNOWNFOLDER
 	AppendGoMenuItem(goMenuView, id, pidl, shellIconLoader);
 }
 
-void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const std::wstring &path,
+void MainMenu::AppendGoMenuItem(MenuView *goMenuView, WORD id, const std::wstring &path,
 	ShellIconLoader *shellIconLoader)
 {
 	PidlAbsolute pidl;
@@ -287,7 +299,7 @@ void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const std::wstrin
 	AppendGoMenuItem(goMenuView, id, pidl, shellIconLoader);
 }
 
-void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const PidlAbsolute &pidl,
+void MainMenu::AppendGoMenuItem(MenuView *goMenuView, WORD id, const PidlAbsolute &pidl,
 	ShellIconLoader *shellIconLoader)
 {
 	std::wstring folderName;
@@ -306,8 +318,10 @@ void MainMenu::AppendGoMenuItem(MenuView *goMenuView, UINT id, const PidlAbsolut
 		return;
 	}
 
-	goMenuView->AppendItem(nullptr, id, folderName,
-		std::make_unique<ShellIconModel>(shellIconLoader, pidl.Raw()), folderPath);
+	goMenuView->AppendItem(MenuItemParams(folderName)
+			.SetIconModel(std::make_unique<ShellIconModel>(shellIconLoader, pidl.Raw()))
+			.SetHelpText(folderPath)
+			.SetSelectedCallback([this, id] { SendCommandToBrowser(id); }));
 }
 
 void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
@@ -356,11 +370,16 @@ void MainMenu::BuildHelpMenu()
 	AppendItem(menuView, IDM_HELP_ABOUT, IDS_HELP_ABOUT);
 }
 
-void MainMenu::AppendItem(MenuView *menuView, UINT id, UINT textResourceId)
+void MainMenu::AppendItem(MenuView *menuView, WORD id, UINT textResourceId)
 {
 	auto helpText = m_resourceLoader->MaybeLoadString(id);
-	menuView->AppendItem(nullptr, id, m_resourceLoader->LoadString(textResourceId),
-		MaybeCreateIconModel(id), helpText.value_or(L""), GetAcceleratorTextForId(id));
+	menuView->AppendItem(MenuItemParams(m_resourceLoader->LoadString(textResourceId))
+			.SetIconModel(MaybeCreateIconModel(id))
+			.SetHelpText(helpText.value_or(L""))
+			.SetAcceleratorText(GetAcceleratorTextForId(id))
+			.SetEnabledCallback(MaybeGetEnabledCallback(id))
+			.SetCheckedCallback(MaybeGetCheckedCallback(id))
+			.SetSelectedCallback([this, id] { SendCommandToBrowser(id); }));
 }
 
 MenuView *MainMenu::AppendSubMenu(MenuView *menuView, UINT textResourceId)
@@ -368,7 +387,7 @@ MenuView *MainMenu::AppendSubMenu(MenuView *menuView, UINT textResourceId)
 	return menuView->AppendSubMenu(m_resourceLoader->LoadString(textResourceId));
 }
 
-std::unique_ptr<IconModel> MainMenu::MaybeCreateIconModel(UINT id) const
+std::unique_ptr<IconModel> MainMenu::MaybeCreateIconModel(WORD id) const
 {
 	// Creating a symlink typically requires elevation. However, if the application is already
 	// elevated, there's no need to show the shield icon (which is used to indicate that elevation
@@ -393,7 +412,7 @@ std::unique_ptr<IconModel> MainMenu::MaybeCreateIconModel(UINT id) const
 	return std::make_unique<ResourceIconModel>(*icon, IconSize::Small, m_resourceLoader);
 }
 
-std::optional<Icon> MainMenu::GetIconForCommand(UINT id)
+std::optional<Icon> MainMenu::GetIconForCommand(WORD id)
 {
 	switch (id)
 	{
@@ -484,4 +503,148 @@ std::optional<Icon> MainMenu::GetIconForCommand(UINT id)
 	default:
 		return std::nullopt;
 	}
+}
+
+MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
+{
+	switch (id)
+	{
+	case IDM_FILE_CLOSETAB:
+	case IDM_FILE_SAVEDIRECTORYLISTING:
+	case IDM_FILE_OPENCOMMANDPROMPT:
+	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
+	case IDM_FILE_COPYITEMPATH:
+	case IDM_FILE_COPYUNIVERSALFILEPATHS:
+	case IDM_FILE_SETFILEATTRIBUTES:
+	case IDM_FILE_DELETE:
+	case IDM_FILE_DELETEPERMANENTLY:
+	case IDM_FILE_RENAME:
+	case IDM_FILE_PROPERTIES:
+	case IDM_EDIT_CUT:
+	case IDM_EDIT_COPY:
+	case IDM_EDIT_COPYTOFOLDER:
+	case IDM_EDIT_MOVETOFOLDER:
+	case IDM_EDIT_SELECTNONE:
+	case IDM_EDIT_WILDCARDDESELECT:
+	case IDM_VIEW_DECREASE_TEXT_SIZE:
+	case IDM_VIEW_INCREASE_TEXT_SIZE:
+	case IDM_VIEW_AUTOARRANGE:
+	case IDM_VIEW_AUTOSIZECOLUMNS:
+	case IDM_ACTIONS_NEWFOLDER:
+	case IDM_ACTIONS_SPLITFILE:
+	case IDM_ACTIONS_MERGEFILES:
+	case IDM_GO_BACK:
+	case IDM_GO_FORWARD:
+	case IDM_GO_UP:
+		return [this, id]
+		{
+			return m_browser->GetCommandController()->IsCommandEnabled(id);
+		};
+
+	case IDM_FILE_COPYCOLUMNTEXT:
+		return [this]
+		{
+			auto *shellBrowser =
+				m_browser->GetActiveTabContainer()->GetSelectedTab().GetShellBrowserImpl();
+
+			return shellBrowser->GetNumSelected() > 0
+				&& (shellBrowser->GetViewMode() == ViewMode::Details);
+		};
+
+	case IDM_EDIT_UNDO:
+		return [this]
+		{
+			return m_fileActionHandler->CanUndo();
+		};
+
+	case IDM_EDIT_PASTE:
+		return [this]
+		{
+			return m_coreInterface->CanPaste(PasteType::Normal);
+		};
+
+	case IDM_EDIT_PASTESHORTCUT:
+		return [this]
+		{
+			return m_coreInterface->CanPaste(PasteType::Shortcut);
+		};
+
+	case IDM_EDIT_PASTEHARDLINK:
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
+		return [this]
+		{
+			const auto *shellBrowser = m_browser->GetActiveShellBrowser();
+			return ClipboardOperations::CanPasteLinkInDirectory(m_clipboardStore,
+				shellBrowser->GetDirectory().Raw());
+		};
+
+	case IDM_EDIT_RESOLVELINK:
+	case IDM_ACTIONS_DESTROYFILES:
+		return [this]
+		{
+			return m_browser->GetActiveTabContainer()
+					   ->GetSelectedTab()
+					   .GetShellBrowserImpl()
+					   ->GetNumSelected()
+				> 0;
+		};
+	}
+
+	return {};
+}
+
+MenuItemCheckedCallback MainMenu::MaybeGetCheckedCallback(WORD id) const
+{
+	switch (id)
+	{
+	case IDM_VIEW_DUAL_PANE:
+		return [this]
+		{
+			return m_config->dualPane;
+		};
+
+	case IDM_VIEW_STATUSBAR:
+		return [this]
+		{
+			return m_config->showStatusBar.get();
+		};
+
+	case IDM_VIEW_FOLDERS:
+		return [this]
+		{
+			return m_config->showFolders.get();
+		};
+
+	case IDM_VIEW_DISPLAYWINDOW:
+		return [this]
+		{
+			return m_config->showDisplayWindow.get();
+		};
+
+	case IDM_VIEW_AUTOARRANGE:
+		return [this]
+		{
+			return m_browser->GetCommandController()->IsCommandEnabled(IDM_VIEW_AUTOARRANGE)
+				&& m_browser->GetActiveShellBrowser()->IsAutoArrangeEnabled();
+		};
+
+	case IDM_VIEW_SHOWHIDDENFILES:
+		return [this]
+		{
+			return m_browser->GetActiveShellBrowser()->GetFolderSettings().showHidden;
+		};
+
+	case IDM_FILTER_ENABLE_FILTER:
+		return [this]
+		{
+			return m_browser->GetActiveShellBrowser()->IsFilterEnabled();
+		};
+	}
+
+	return {};
+}
+
+void MainMenu::SendCommandToBrowser(WORD id)
+{
+	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
 }

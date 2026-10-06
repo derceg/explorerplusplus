@@ -73,9 +73,6 @@
     <ClCompile Include="WinMain.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenuHandler.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="DisplayWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>

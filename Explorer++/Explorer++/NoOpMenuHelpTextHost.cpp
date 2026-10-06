@@ -13,10 +13,10 @@ void NoOpMenuHelpTextHost::NotifyTopLevelMenuClosed()
 {
 }
 
-void NoOpMenuHelpTextHost::MenuItemSelected(HMENU menu, UINT itemId, UINT flags)
+void NoOpMenuHelpTextHost::MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
 {
 	UNREFERENCED_PARAMETER(menu);
-	UNREFERENCED_PARAMETER(itemId);
+	UNREFERENCED_PARAMETER(indexOrId);
 	UNREFERENCED_PARAMETER(flags);
 }
 

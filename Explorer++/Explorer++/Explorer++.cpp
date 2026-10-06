@@ -26,6 +26,7 @@
 #include "TabStorage.h"
 #include "ThemeWindowTracker.h"
 #include "WindowStorage.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <fmt/format.h>
@@ -189,6 +190,16 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 		std::make_unique<ThemeWindowTracker>(m_hwnd, m_appServices->GetThemeManager());
 
 	SetLifecycleState(LifecycleState::Main);
+}
+
+void Explorerplusplus::InitializeMainMenu()
+{
+	m_mainMenuHost = std::make_unique<MainMenuHost>(this);
+	m_mainMenu = std::make_unique<MainMenu>(m_mainMenuHost->GetView(), this, m_appServices,
+		&m_shellIconLoader, &m_iconFetcher, &m_fileActionHandler, this);
+
+	auto res = SetMenu(m_hwnd, m_mainMenuHost->ReleaseMenu());
+	CHECK(res);
 }
 
 void Explorerplusplus::InitializeDisplayWindow()
@@ -398,9 +409,38 @@ void Explorerplusplus::NotifyTopLevelMenuClosed()
 	}
 }
 
-void Explorerplusplus::MenuItemSelected(HMENU menu, UINT itemId, UINT flags)
+void Explorerplusplus::MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
 {
-	m_statusBar->OnMenuSelect(menu, itemId, flags);
+	if (!menu)
+	{
+		return;
+	}
+
+	// This can be an index or an ID (depending on whether item is a popup item), but
+	// m_statusBar->OnMenuSelect() will only use the value if the item being selected is a non-popup
+	// item. So, as far as that method it concerned, the value is an ID.
+	UINT id = indexOrId;
+
+	if (WI_AreAllFlagsClear(flags, MF_POPUP | MF_SEPARATOR))
+	{
+		// WM_MENUSELECT silently truncates the ID to 16-bit. As IDs here can be above that range,
+		// the provided ID will be ignored and the highlighted item will be found instead.
+		auto highlightedItemId = MenuHelper::MaybeGetHighlightedItem(menu);
+
+		if (!highlightedItemId)
+		{
+			// This is invoked in response to WM_MENUSELECT, so there should be a highlighted item.
+			DCHECK(false);
+			return;
+		}
+
+		// The ID of the highlighted item should match the truncated ID that was provided.
+		DCHECK_EQ(static_cast<WORD>(*highlightedItemId), indexOrId);
+
+		id = *highlightedItemId;
+	}
+
+	m_statusBar->OnMenuSelect(menu, id, flags);
 }
 
 boost::signals2::connection Explorerplusplus::AddMenuHelpTextRequestObserver(

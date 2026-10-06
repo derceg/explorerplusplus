@@ -464,6 +464,11 @@ void TabContainer::CloseAllTabs()
 	}
 }
 
+bool TabContainer::CanCloseTab(const Tab &tab) const
+{
+	return !tab.IsLocked();
+}
+
 bool TabContainer::CloseTab(const Tab &tab)
 {
 	return CloseTab(tab, CloseMode::Normal);
@@ -471,7 +476,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 bool TabContainer::CloseTab(const Tab &tab, CloseMode closeMode)
 {
-	if (tab.IsLocked() && closeMode == CloseMode::Normal)
+	if (!CanCloseTab(tab) && closeMode == CloseMode::Normal)
 	{
 		return false;
 	}

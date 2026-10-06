@@ -6,6 +6,7 @@
 
 #include "Icon.h"
 #include "MenuBase.h"
+#include "MenuItemCallbacks.h"
 #include <memory>
 #include <optional>
 #include <string>
@@ -13,7 +14,11 @@
 
 class AppServices;
 class BrowserWindow;
+class ClipboardStore;
+struct Config;
+class CoreInterface;
 class FeatureList;
+class FileActionHandler;
 class IconFetcher;
 class IconModel;
 class PidlAbsolute;
@@ -25,7 +30,8 @@ class MainMenu : public MenuBase
 {
 public:
 	MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-		ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher);
+		ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher,
+		const FileActionHandler *fileActionHandler, CoreInterface *coreInterface);
 
 private:
 	void BuildMenu(BrowserWindow *browser, AppServices *appServices,
@@ -39,11 +45,11 @@ private:
 	void BuildActionsMenu();
 	void BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
 		ShellIconLoader *shellIconLoader);
-	void AppendGoMenuItem(MenuView *goMenuView, UINT id, const KNOWNFOLDERID &folderId,
+	void AppendGoMenuItem(MenuView *goMenuView, WORD id, const KNOWNFOLDERID &folderId,
 		ShellIconLoader *shellIconLoader);
-	void AppendGoMenuItem(MenuView *goMenuView, UINT id, const std::wstring &path,
+	void AppendGoMenuItem(MenuView *goMenuView, WORD id, const std::wstring &path,
 		ShellIconLoader *shellIconLoader);
-	void AppendGoMenuItem(MenuView *goMenuView, UINT id, const PidlAbsolute &pidl,
+	void AppendGoMenuItem(MenuView *goMenuView, WORD id, const PidlAbsolute &pidl,
 		ShellIconLoader *shellIconLoader);
 	void BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
 		IconFetcher *iconFetcher);
@@ -51,11 +57,19 @@ private:
 	void BuildWindowMenu();
 	void BuildHelpMenu();
 
-	void AppendItem(MenuView *menuView, UINT id, UINT textResourceId);
+	void AppendItem(MenuView *menuView, WORD id, UINT textResourceId);
 	MenuView *AppendSubMenu(MenuView *menuView, UINT textResourceId);
-	std::unique_ptr<IconModel> MaybeCreateIconModel(UINT id) const;
-	static std::optional<Icon> GetIconForCommand(UINT id);
+	std::unique_ptr<IconModel> MaybeCreateIconModel(WORD id) const;
+	static std::optional<Icon> GetIconForCommand(WORD id);
+	MenuItemEnabledCallback MaybeGetEnabledCallback(WORD id) const;
+	MenuItemCheckedCallback MaybeGetCheckedCallback(WORD id) const;
+	void SendCommandToBrowser(WORD id);
 
-	std::vector<std::unique_ptr<MenuBase>> m_childMenus;
+	BrowserWindow *const m_browser;
+	const Config *const m_config;
+	const ClipboardStore *const m_clipboardStore;
+	const FileActionHandler *const m_fileActionHandler;
 	const ResourceLoader *const m_resourceLoader;
+	CoreInterface *const m_coreInterface;
+	std::vector<std::unique_ptr<MenuBase>> m_childMenus;
 };

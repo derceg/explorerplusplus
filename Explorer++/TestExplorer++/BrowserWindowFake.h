@@ -50,7 +50,7 @@ public:
 	// MenuHelpTextHost
 	void NotifyTopLevelMenuShown() override;
 	void NotifyTopLevelMenuClosed() override;
-	void MenuItemSelected(HMENU menu, UINT itemId, UINT flags) override;
+	void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) override;
 	boost::signals2::connection AddMenuHelpTextRequestObserver(
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 

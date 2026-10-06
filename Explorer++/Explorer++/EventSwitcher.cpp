@@ -23,6 +23,11 @@ void Explorerplusplus::OnPaste()
 
 void Explorerplusplus::OnPasteShortcut()
 {
+	if (!CanPaste(PasteType::Shortcut))
+	{
+		return;
+	}
+
 	HWND focus = GetFocus();
 
 	if (focus == m_hActiveListView)

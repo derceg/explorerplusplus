@@ -5,9 +5,12 @@
 #pragma once
 
 #include <wil/resource.h>
+#include <optional>
 
 namespace MenuHelper
 {
+
+void AddMenuStyles(HMENU menu, DWORD styles);
 
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text);
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, BOOL byPosition);
@@ -30,6 +33,8 @@ bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition);
 bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition);
 UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition);
 UINT GetMenuItemType(HMENU menu, UINT item, bool byPosition);
+
+std::optional<UINT> MaybeGetHighlightedItem(HMENU menu);
 
 // Returns the ID of the menu item at the specified point in screen coordinates, if there is such an
 // item. Only items that are part of the provided menu will be considered. Note that a value will

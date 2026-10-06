@@ -37,9 +37,6 @@ public:
 	void AppendItem(MenuItemParams params);
 	MenuView *AppendSubMenu(SubMenuItemParams params);
 
-	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
-		std::unique_ptr<const IconModel> iconModel = {}, const std::wstring &helpText = L"",
-		const std::optional<std::wstring> &acceleratorText = std::nullopt);
 	void AppendSeparator();
 	void RemoveDuplicateSeparators();
 	void RemoveTrailingSeparators();
@@ -66,6 +63,23 @@ public:
 
 private:
 	friend class MenuController;
+
+	// Note that to avoid potential overlap between IDs generated here and existing accelerator IDs,
+	// the ID range here starts from outside the 16-bit range. That is, when WM_COMMAND is
+	// dispatched, the accelerator ID wil be stored in the low word of wParam. That constrains
+	// accelerator values to be 16-bit. So, a value above that range is guaranteed not to be an
+	// accelerator.
+	//
+	// Avoiding accelerator ID overlap is important, since whether an accelerator is dispatched
+	// depends on whether the associated item in the main menu is enabled or not. If the main menu
+	// contains an item with a particular ID and there is an accelerator with the same ID, the
+	// accelerator won't be dispatched if the menu item is disabled.
+	//
+	// This has some implications for menu functionality. Although menu item IDs are UINTs, there
+	// are some places where they're truncated to 16-bit values. WM_COMMAND is one of those places,
+	// so that shouldn't be used to handle item selection. Additionally, WM_MENUSELECT also
+	// truncates, so it can require special handling.
+	static constexpr UINT INITIAL_ID = 0x10000;
 
 	class InternalMenuDelegate : public MenuDelegate
 	{
@@ -110,8 +124,6 @@ private:
 		const std::wstring helpText;
 	};
 
-	void AddMenuStyles(DWORD styles);
-
 	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
 		std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
 		const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle);
@@ -145,7 +157,7 @@ private:
 
 	// This exists on every MenuView instance, but is only used on the root menu. That is, IDs are
 	// always generated from the root menu.
-	UINT m_idCounter = 1;
+	UINT m_idCounter = INITIAL_ID;
 
 	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 	std::unordered_map<UINT, Item> m_idToItemMap;

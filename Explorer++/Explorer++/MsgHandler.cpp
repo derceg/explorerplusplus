@@ -9,13 +9,17 @@
 #include "BrowserList.h"
 #include "Config.h"
 #include "DarkModeManager.h"
+#include "DestroyFilesDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "FeatureList.h"
 #include "HolderWindow.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
+#include "ModelessDialogHelper.h"
+#include "OptionsDialog.h"
 #include "PlatformContext.h"
 #include "Runtime.h"
+#include "SelectColumnsDialog.h"
 #include "ShellBrowser/ColumnHelper.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -26,6 +30,7 @@
 #include "TabContainer.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
@@ -709,4 +714,95 @@ bool Explorerplusplus::OnActivate(int activationState, bool minimized)
 	}
 
 	return false;
+}
+
+void Explorerplusplus::OnDestroyFiles()
+{
+	std::list<std::wstring> fullFilenameList;
+	int iItem = -1;
+
+	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
+	{
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
+		fullFilenameList.push_back(fullFilename);
+	}
+
+	auto *destroyFilesDialog = DestroyFilesDialog::Create(m_resourceLoader, m_hwnd,
+		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+	destroyFilesDialog->ShowModalDialog();
+}
+
+void Explorerplusplus::OnShowOptions()
+{
+	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"OptionsDialog",
+		[this]
+		{
+			return OptionsDialog::Create(m_resourceLoader, m_hwnd,
+				m_appServices->GetAppController(), m_config, m_appServices->GetDarkModeManager(),
+				m_appServices->GetThemeManager(), this);
+		});
+}
+
+void Explorerplusplus::OnResolveLink()
+{
+	TCHAR szFullFileName[MAX_PATH];
+	TCHAR szPath[MAX_PATH];
+	HRESULT hr;
+	int iItem;
+
+	iItem = ListView_GetNextItem(m_hActiveListView, -1, LVNI_FOCUSED);
+
+	if (iItem != -1)
+	{
+		std::wstring shortcutFileName = m_pActiveShellBrowser->GetItemFullName(iItem);
+
+		hr = FileOperations::ResolveLink(m_hwnd, 0, shortcutFileName.c_str(), szFullFileName,
+			std::size(szFullFileName));
+
+		if (hr == S_OK)
+		{
+			/* Strip the filename, just leaving the path component. */
+			StringCchCopy(szPath, std::size(szPath), szFullFileName);
+			PathRemoveFileSpec(szPath);
+
+			Tab &newTab =
+				GetActivePane()->GetTabContainer()->CreateNewTab(szPath, { .selected = true });
+
+			if (newTab.GetShellBrowser()->GetDirectoryPath() == szPath)
+			{
+				wil::com_ptr_nothrow<IShellFolder> parent;
+				hr = SHBindToObject(nullptr, newTab.GetShellBrowser()->GetDirectory().Raw(),
+					nullptr, IID_PPV_ARGS(&parent));
+
+				if (hr == S_OK)
+				{
+					auto *filename = PathFindFileName(szFullFileName);
+					assert(filename != szFullFileName);
+
+					PidlAbsolute pidl;
+					hr = CreateSimplePidl(filename, pidl, parent.get());
+
+					if (SUCCEEDED(hr))
+					{
+						m_pActiveShellBrowser->SelectItems({ pidl.Raw() });
+					}
+				}
+			}
+
+			SetFocus(m_hActiveListView);
+		}
+	}
+}
+
+void Explorerplusplus::OnGoToOffset(int offset)
+{
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
+}
+
+void Explorerplusplus::OnSelectColumns()
+{
+	auto *selectColumnsDialog = SelectColumnsDialog::Create(m_resourceLoader, m_hwnd,
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl());
+	selectColumnsDialog->ShowModalDialog();
 }

@@ -22,7 +22,6 @@ public:
 	MenuController(MenuView *rootView, HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost);
 	~MenuController();
 
-	bool CanHandleSelection(UINT id) const;
 	void SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
@@ -39,12 +38,13 @@ private:
 	void OnUninitMenuPopup(HMENU menu);
 	void OnMenuOpened();
 	void OnMenuClosed();
+	void OnMenuCommand(HMENU menu, int index);
 	void OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void OnMenuRightButtonUp(HMENU menu, int index);
 	LRESULT OnMenuDrag(HMENU menu, int index);
 	LRESULT OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
 
-	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, int id);
+	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, UINT id);
 
 	MenuDelegate *MaybeGetDelegateForActionableItem(UINT id);
 

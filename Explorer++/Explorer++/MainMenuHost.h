@@ -19,9 +19,6 @@ public:
 
 	MenuView *GetView();
 
-	bool CanHandleSelection(UINT id) const;
-	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
-
 private:
 	wil::unique_hmenu m_menu;
 	MenuView m_view;

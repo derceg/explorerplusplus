@@ -11,63 +11,8 @@
 #include "../Helper/MenuHelper.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
-#include <unordered_set>
 
 using namespace testing;
-
-namespace
-{
-
-class MenuDelegateFake : public MenuDelegate
-{
-public:
-	bool IsItemEnabled(UINT id) const override
-	{
-		return !m_disabledItems.contains(id);
-	}
-
-	bool IsItemChecked(UINT id) const override
-	{
-		return m_checkedItems.contains(id);
-	}
-
-	void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override
-	{
-		UNREFERENCED_PARAMETER(id);
-		UNREFERENCED_PARAMETER(isCtrlKeyDown);
-		UNREFERENCED_PARAMETER(isShiftKeyDown);
-	}
-
-	void SetItemEnabled(UINT id, bool enabled)
-	{
-		if (enabled)
-		{
-			m_disabledItems.erase(id);
-		}
-		else
-		{
-			m_disabledItems.insert(id);
-		}
-	}
-
-	void SetItemChecked(UINT id, bool checked)
-	{
-		if (checked)
-		{
-			m_checkedItems.insert(id);
-		}
-		else
-		{
-			m_checkedItems.erase(id);
-		}
-	}
-
-private:
-	std::unordered_set<UINT> m_disabledItems;
-	std::unordered_set<UINT> m_checkedItems;
-};
-
-}
 
 class MenuViewTest : public Test
 {
@@ -76,14 +21,16 @@ protected:
 	{
 	}
 
-	void CheckAppendItem(UINT itemId, const std::wstring &text, const std::wstring &helpText,
+	void CheckAppendItem(const std::wstring &text, const std::wstring &helpText,
 		const std::optional<std::wstring> &acceleratorText = std::nullopt)
 	{
-		m_menuView.AppendItem(nullptr, itemId, text, {}, helpText, acceleratorText);
+		m_menuView.AppendItem(
+			MenuItemParams(text).SetHelpText(helpText).SetAcceleratorText(acceleratorText));
 		m_appendItemCount++;
 
+		UINT itemId = m_menuView.GetItemIdForTesting(m_appendItemCount - 1);
+
 		EXPECT_EQ(m_menuView.GetNumItems(), m_appendItemCount);
-		EXPECT_EQ(m_menuView.GetItemIdForTesting(m_appendItemCount - 1), itemId);
 		EXPECT_EQ(m_menuView.GetItemTextForTesting(itemId),
 			acceleratorText ? text + L"\t" + *acceleratorText : text);
 		EXPECT_EQ(m_menuView.GetItemHelpText(itemId), helpText);
@@ -106,10 +53,9 @@ TEST_F(MenuViewTest, IsRoot)
 
 TEST_F(MenuViewTest, AppendItem)
 {
-	UINT idCounter = 100;
-	CheckAppendItem(idCounter++, L"Item 1", L"Help text for item 1", L"Ctrl+A");
-	CheckAppendItem(idCounter++, L"Item 2", L"Help text for item 2", L"Ctrl+Shift+T");
-	CheckAppendItem(idCounter++, L"Item 3", L"Help text for item 3");
+	CheckAppendItem(L"Item 1", L"Help text for item 1", L"Ctrl+A");
+	CheckAppendItem(L"Item 2", L"Help text for item 2", L"Ctrl+Shift+T");
+	CheckAppendItem(L"Item 3", L"Help text for item 3");
 }
 
 TEST_F(MenuViewTest, SetCheckStyle)
@@ -138,26 +84,20 @@ TEST_F(MenuViewTest, AppendSubMenu)
 
 TEST_F(MenuViewTest, ItemStates)
 {
-	MenuDelegateFake delegate;
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_menuView.AppendItem(nullptr, itemId1, L"Item 1");
-
-	UINT itemId2 = idCounter++;
-	m_menuView.AppendItem(&delegate, itemId2, L"Item 2");
-
-	UINT itemId3 = idCounter++;
-	m_menuView.AppendItem(&delegate, itemId3, L"Item 3");
-
-	delegate.SetItemEnabled(itemId2, false);
-	delegate.SetItemChecked(itemId3, true);
+	m_menuView.AppendItem(MenuItemParams(L"Item 1"));
+	m_menuView.AppendItem(MenuItemParams(L"Item 2").SetEnabledCallback([] { return false; }));
+	m_menuView.AppendItem(MenuItemParams(L"Item 3").SetCheckedCallback([] { return true; }));
 
 	m_menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
 	HMENU nativeMenu = m_menuView.GetNativeMenuForTesting();
 
-	// Item 1 has no delegate, so it should be enabled and unchecked by default.
+	UINT itemId1 = m_menuView.GetItemIdForTesting(0);
+	UINT itemId2 = m_menuView.GetItemIdForTesting(1);
+	UINT itemId3 = m_menuView.GetItemIdForTesting(2);
+
+	// If an item provides no enabled/checked callbacks, it should be enabled and unchecked by
+	// default.
 	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId1, false));
 	EXPECT_FALSE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId1, false));
 
@@ -169,25 +109,20 @@ TEST_F(MenuViewTest, ItemStates)
 
 TEST_F(MenuViewTest, ItemStatesAfterShow)
 {
-	MenuDelegateFake delegate;
-	UINT idCounter = 100;
-
-	UINT itemId1 = idCounter++;
-	m_menuView.AppendItem(nullptr, itemId1, L"Item 1");
+	m_menuView.AppendItem(MenuItemParams(L"Item 1"));
 
 	m_menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
-	UINT itemId2 = idCounter++;
-	UINT itemId3 = idCounter++;
-	delegate.SetItemEnabled(itemId2, false);
-	delegate.SetItemChecked(itemId3, true);
+	m_menuView.AppendItem(MenuItemParams(L"Item 2").SetEnabledCallback([] { return false; }));
+	m_menuView.AppendItem(MenuItemParams(L"Item 3").SetCheckedCallback([] { return true; }));
 
-	m_menuView.AppendItem(&delegate, itemId2, L"Item 2");
-	m_menuView.AppendItem(&delegate, itemId3, L"Item 3");
+	HMENU nativeMenu = m_menuView.GetNativeMenuForTesting();
+
+	UINT itemId2 = m_menuView.GetItemIdForTesting(1);
+	UINT itemId3 = m_menuView.GetItemIdForTesting(2);
 
 	// Items that are dynamically added, whilst the menu is being shown, should have their states
 	// set correctly.
-	HMENU nativeMenu = m_menuView.GetNativeMenuForTesting();
 	EXPECT_FALSE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId2, false));
 	EXPECT_FALSE(MenuHelper::IsMenuItemChecked(nativeMenu, itemId2, false));
 	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(nativeMenu, itemId3, false));
@@ -202,7 +137,7 @@ TEST_F(MenuViewTest, ClearEmptyMenu)
 
 TEST_F(MenuViewTest, ClearMenu)
 {
-	m_menuView.AppendItem(nullptr, 1, L"Item");
+	m_menuView.AppendItem(MenuItemParams(L"Item"));
 
 	m_menuView.ClearMenu();
 	EXPECT_EQ(m_menuView.GetNumItems(), 0);
@@ -212,8 +147,8 @@ using MenuViewDeathTest = MenuViewTest;
 
 TEST_F(MenuViewDeathTest, RetrieveHelpTextAfterClearingMenu)
 {
-	UINT itemId = 1;
-	m_menuView.AppendItem(nullptr, itemId, L"Item", {}, L"Help text");
+	m_menuView.AppendItem(MenuItemParams(L"Item").SetHelpText(L"Help text"));
+	UINT itemId = m_menuView.GetItemIdForTesting(0);
 
 	m_menuView.ClearMenu();
 
@@ -248,16 +183,13 @@ protected:
 				iconModel = std::make_unique<ShellIconModel>(&m_shellIconLoader, pidl.Raw());
 			}
 
-			menuView->AppendItem(nullptr, m_idCounter++, std::format(L"Item {}", i),
-				std::move(iconModel));
+			menuView->AppendItem(
+				MenuItemParams(std::format(L"Item {}", i)).SetIconModel(std::move(iconModel)));
 		}
 	}
 
 	ShellIconLoaderFake m_shellIconLoader;
 	wil::unique_hmenu m_menu;
-
-private:
-	UINT m_idCounter = 100;
 };
 
 TEST_F(MenuViewIconTest, InitialState)
