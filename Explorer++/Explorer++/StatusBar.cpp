@@ -129,6 +129,8 @@ void StatusBar::OnMenuSelect(HMENU menu, UINT itemId, UINT flags)
 		return;
 	}
 
+	DCHECK(m_showingMenuHelpText);
+
 	std::optional<std::wstring> helpText;
 
 	if (WI_AreAllFlagsClear(flags, MF_POPUP | MF_SEPARATOR))

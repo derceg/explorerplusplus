@@ -11,9 +11,10 @@
 #include "../Helper/MenuHelpTextHost.h"
 #include "../Helper/WindowSubclass.h"
 
-MenuController::MenuController(MenuView *rootView, HWND ownerWindow,
+MenuController::MenuController(MenuView *rootView, HWND ownerWindow, MenuType menuType,
 	MenuHelpTextHost *menuHelpTextHost) :
 	m_rootView(rootView),
+	m_menuType(menuType),
 	m_menuHelpTextHost(menuHelpTextHost)
 {
 	// This class is designed to be used when a top-level menu (i.e. a context menu or window menu)
@@ -82,7 +83,7 @@ LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 
 void MenuController::OnEnterMenuLoop(bool shortcutMenu)
 {
-	if (!shortcutMenu)
+	if (m_menuType == MenuType::WindowMenu && !shortcutMenu)
 	{
 		OnMenuOpened();
 	}
@@ -90,7 +91,7 @@ void MenuController::OnEnterMenuLoop(bool shortcutMenu)
 
 void MenuController::OnExitMenuLoop(bool shortcutMenu)
 {
-	if (!shortcutMenu)
+	if (m_menuType == MenuType::WindowMenu && !shortcutMenu)
 	{
 		OnMenuClosed();
 	}
@@ -105,7 +106,7 @@ void MenuController::OnInitMenuPopup(HWND hwnd, HMENU menu)
 		return;
 	}
 
-	if (view == m_rootView)
+	if (m_menuType == MenuType::ContextMenu && view == m_rootView)
 	{
 		OnMenuOpened();
 	}
@@ -124,7 +125,7 @@ void MenuController::OnUninitMenuPopup(HMENU menu)
 
 	view->OnPopupClosed();
 
-	if (view == m_rootView)
+	if (m_menuType == MenuType::ContextMenu && view == m_rootView)
 	{
 		OnMenuClosed();
 	}

@@ -402,6 +402,7 @@ void Explorerplusplus::NotifyTopLevelMenuShown()
 void Explorerplusplus::NotifyTopLevelMenuClosed()
 {
 	m_numTopLevelMenusActive--;
+	CHECK_GE(m_numTopLevelMenusActive, 0);
 
 	if (m_numTopLevelMenusActive == 0)
 	{

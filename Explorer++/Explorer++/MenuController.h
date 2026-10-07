@@ -19,7 +19,17 @@ class WindowSubclass;
 class MenuController
 {
 public:
-	MenuController(MenuView *rootView, HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost);
+	enum class MenuType
+	{
+		// Indicates the controller is managing the menu assigned to a window via SetMenu().
+		WindowMenu,
+
+		// Indicates the controller is managing a context menu.
+		ContextMenu
+	};
+
+	MenuController(MenuView *rootView, HWND ownerWindow, MenuType menuType,
+		MenuHelpTextHost *menuHelpTextHost);
 	~MenuController();
 
 	void SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool isShiftKeyDown);
@@ -49,6 +59,7 @@ private:
 	MenuDelegate *MaybeGetDelegateForActionableItem(UINT id);
 
 	MenuView *const m_rootView;
+	const MenuType m_menuType;
 	MenuHelpTextHost *const m_menuHelpTextHost;
 	std::unique_ptr<WindowSubclass> m_subclass;
 	boost::signals2::scoped_connection m_helpTextConnection;

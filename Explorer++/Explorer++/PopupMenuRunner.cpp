@@ -11,7 +11,7 @@ PopupMenuRunner::PopupMenuRunner(HWND ownerWindow, MenuHelpTextHost *menuHelpTex
 	m_ownerWindow(ownerWindow),
 	m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
 	m_view(m_ownedMenu.get()),
-	m_controller(&m_view, ownerWindow, menuHelpTextHost)
+	m_controller(&m_view, ownerWindow, MenuController::MenuType::ContextMenu, menuHelpTextHost)
 {
 }
 

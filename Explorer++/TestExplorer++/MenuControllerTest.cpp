@@ -61,7 +61,8 @@ protected:
 		m_ownerWindow(CreateOwnerWindow()),
 		m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
 		m_view(m_ownedMenu.get()),
-		m_controller(&m_view, m_ownerWindow.get(), &m_menuHelpTextHost)
+		m_controller(&m_view, m_ownerWindow.get(), MenuController::MenuType::ContextMenu,
+			&m_menuHelpTextHost)
 	{
 	}
 

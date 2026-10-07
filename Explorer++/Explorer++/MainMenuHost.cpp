@@ -10,7 +10,7 @@
 MainMenuHost::MainMenuHost(BrowserWindow *browser) :
 	m_menu(MenuHelper::CheckedCreateMenu()),
 	m_view(m_menu.get()),
-	m_controller(&m_view, browser->GetHWND(), browser)
+	m_controller(&m_view, browser->GetHWND(), MenuController::MenuType::WindowMenu, browser)
 {
 	MenuHelper::AddMenuStyles(m_menu.get(), MNS_NOTIFYBYPOS);
 }
