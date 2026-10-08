@@ -2028,9 +2028,6 @@
     <ClInclude Include="JumpListHelper.h">
       <Filter>Taskbar</Filter>
     </ClInclude>
-    <ClInclude Include="MenuDelegate.h">
-      <Filter>Menus\UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="MenuController.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>

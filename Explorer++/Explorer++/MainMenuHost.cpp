@@ -12,7 +12,7 @@ MainMenuHost::MainMenuHost(BrowserWindow *browser) :
 	m_view(m_menu.get()),
 	m_controller(&m_view, browser->GetHWND(), MenuController::MenuType::WindowMenu, browser)
 {
-	MenuHelper::AddMenuStyles(m_menu.get(), MNS_NOTIFYBYPOS);
+	MenuHelper::AddStyleFlags(m_menu.get(), MNS_NOTIFYBYPOS);
 }
 
 HMENU MainMenuHost::ReleaseMenu()

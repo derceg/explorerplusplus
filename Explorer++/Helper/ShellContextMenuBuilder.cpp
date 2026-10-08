@@ -25,7 +25,7 @@ void ShellContextMenuBuilder::AddStringItem(UINT id, const std::wstring &text, U
 
 void ShellContextMenuBuilder::EnableItem(UINT id, bool enable)
 {
-	MenuHelper::EnableItem(m_menu, m_idRemapper->GetUpdatedId(id), enable);
+	MenuHelper::SetItemEnabled(m_menu, m_idRemapper->GetUpdatedId(id), enable);
 }
 
 void ShellContextMenuBuilder::AddSeparator(UINT item, bool byPosition)

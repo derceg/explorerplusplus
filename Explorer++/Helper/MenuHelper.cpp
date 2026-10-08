@@ -8,7 +8,7 @@
 namespace MenuHelper
 {
 
-void AddMenuStyles(HMENU menu, DWORD styles)
+void AddStyleFlags(HMENU menu, DWORD styleFlags)
 {
 	MENUINFO menuInfo = {};
 	menuInfo.cbSize = sizeof(menuInfo);
@@ -16,10 +16,21 @@ void AddMenuStyles(HMENU menu, DWORD styles)
 	auto res = GetMenuInfo(menu, &menuInfo);
 	CHECK(res);
 
-	WI_SetAllFlags(menuInfo.dwStyle, styles);
+	WI_SetAllFlags(menuInfo.dwStyle, styleFlags);
 
 	res = SetMenuInfo(menu, &menuInfo);
 	CHECK(res);
+}
+
+DWORD GetStyleFlags(HMENU menu)
+{
+	MENUINFO menuInfo = {};
+	menuInfo.cbSize = sizeof(menuInfo);
+	menuInfo.fMask = MIM_STYLE;
+	auto res = GetMenuInfo(menu, &menuInfo);
+	CHECK(res);
+
+	return menuInfo.dwStyle;
 }
 
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text)
@@ -53,15 +64,20 @@ void AddSeparator(HMENU menu, UINT item, BOOL byPosition)
 	CHECK(res);
 }
 
-void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu)
+HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text)
 {
-	AddSubMenuItem(menu, id, text, std::move(subMenu), GetMenuItemCount(menu), TRUE);
+	return AddSubMenuItem(menu, id, text, CheckedCreatePopupMenu(), GetMenuItemCount(menu), TRUE);
+}
+
+HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu)
+{
+	return AddSubMenuItem(menu, id, text, std::move(subMenu), GetMenuItemCount(menu), TRUE);
 }
 
 // Note that an ID can be passed in here. While that is perhaps not the typical usage (e.g.
 // GetMenuItemID() will return -1 for a submenu item), it does work correctly. That is, the ID set
 // here can be retrieved by GetMenuItemInfo().
-void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
+HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
 	UINT item, BOOL byPosition)
 {
 	MENUITEMINFO menuItemInfo = {};
@@ -75,17 +91,30 @@ void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_h
 
 	// As the sub menu is now part of the parent menu, it will be destroyed when the parent menu is
 	// destroyed.
-	subMenu.release();
+	return subMenu.release();
 }
 
-void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
+void AddItemTypeFlags(HMENU menu, UINT id, UINT typeFlags)
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_FTYPE;
+	auto res = GetMenuItemInfo(menu, id, false, &menuItemInfo);
+	CHECK(res);
+
+	WI_SetAllFlags(menuItemInfo.fType, typeFlags);
+	res = SetMenuItemInfo(menu, id, false, &menuItemInfo);
+	CHECK(res);
+}
+
+void SetItemChecked(HMENU hMenu, UINT itemID, BOOL bCheck)
 {
 	UINT state = bCheck ? MF_CHECKED : MF_UNCHECKED;
 	auto res = CheckMenuItem(hMenu, itemID, state);
 	CHECK_NE(res, static_cast<DWORD>(-1));
 }
 
-void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable)
+void SetItemEnabled(HMENU hMenu, UINT itemID, BOOL bEnable)
 {
 	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
 	auto res = EnableMenuItem(hMenu, itemID, state);
@@ -145,7 +174,7 @@ void RemoveTrailingSeparators(HMENU menu)
 	}
 }
 
-std::wstring GetMenuItemString(HMENU menu, UINT item, bool byPosition)
+std::wstring GetItemText(HMENU menu, UINT item, bool byPosition)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -172,7 +201,7 @@ std::wstring GetMenuItemString(HMENU menu, UINT item, bool byPosition)
 // While it is possible to set the ID of a submenu item, GetMenuItemID() will explicitly return -1
 // in that case. This function, however, will call GetMenuItemInfo(), which will work even if the
 // item is a submenu item.
-UINT GetMenuItemIDIncludingSubmenu(HMENU menu, int index)
+UINT GetItemIdIncludingSubmenu(HMENU menu, int index)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -217,19 +246,30 @@ bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu)
 	return false;
 }
 
-bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition)
+HBITMAP GetItemBitmap(HMENU menu, UINT item, bool byPosition)
 {
-	UINT state = GetMenuItemState(menu, item, byPosition);
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_BITMAP;
+	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+	CHECK(res);
+
+	return menuItemInfo.hbmpItem;
+}
+
+bool IsItemEnabled(HMENU menu, UINT item, bool byPosition)
+{
+	UINT state = GetItemState(menu, item, byPosition);
 	return !(state & MFS_DISABLED);
 }
 
-bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition)
+bool IsItemChecked(HMENU menu, UINT item, bool byPosition)
 {
-	UINT state = GetMenuItemState(menu, item, byPosition);
+	UINT state = GetItemState(menu, item, byPosition);
 	return WI_IsFlagSet(state, MFS_CHECKED);
 }
 
-UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition)
+UINT GetItemState(HMENU menu, UINT item, bool byPosition)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -240,7 +280,7 @@ UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition)
 	return menuItemInfo.fState;
 }
 
-UINT GetMenuItemType(HMENU menu, UINT item, bool byPosition)
+UINT GetItemTypeFlags(HMENU menu, UINT item, bool byPosition)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -273,7 +313,7 @@ std::optional<UINT> MaybeGetHighlightedItem(HMENU menu)
 	return std::nullopt;
 }
 
-std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
+std::optional<UINT> MaybeGetItemAtPoint(HMENU menu, const POINT &ptScreen)
 {
 	// Note that the POINT passed to MenuItemFromPoint() needs to be in screen coordinates (even
 	// though the documentation for the method indicates the POINT needs to be in client
@@ -291,7 +331,7 @@ std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 	// the function isn't adhering to its documented properties in at least some cases.
 	if (item >= 0)
 	{
-		return GetMenuItemIDIncludingSubmenu(menu, item);
+		return GetItemIdIncludingSubmenu(menu, item);
 	}
 
 	int count = GetMenuItemCount(menu);
@@ -306,7 +346,7 @@ std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 			continue;
 		}
 
-		auto menuItemId = MaybeGetMenuItemAtPoint(subMenu, ptScreen);
+		auto menuItemId = MaybeGetItemAtPoint(subMenu, ptScreen);
 
 		if (!menuItemId)
 		{

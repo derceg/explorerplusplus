@@ -102,8 +102,8 @@ void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, con
 	}
 	else
 	{
-		MenuHelper::EnableItem(groupByMenu, IDM_GROUP_SORT_ASCENDING, FALSE);
-		MenuHelper::EnableItem(groupByMenu, IDM_GROUP_SORT_DESCENDING, FALSE);
+		MenuHelper::SetItemEnabled(groupByMenu, IDM_GROUP_SORT_ASCENDING, FALSE);
+		MenuHelper::SetItemEnabled(groupByMenu, IDM_GROUP_SORT_DESCENDING, FALSE);
 	}
 }
 

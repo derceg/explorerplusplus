@@ -13,7 +13,7 @@ MenuView::MenuView(HMENU menu) : m_parent(nullptr), m_menu(menu)
 {
 	// Not all menus support drag and drop, but for those that don't, the menu drag messages will
 	// simply be ignored.
-	MenuHelper::AddMenuStyles(m_menu, MNS_DRAGDROP);
+	MenuHelper::AddStyleFlags(m_menu, MNS_DRAGDROP);
 }
 
 MenuView::MenuView(MenuView *parent, HMENU menu, PassKey) : m_parent(parent), m_menu(menu)
@@ -27,90 +27,28 @@ bool MenuView::IsRoot() const
 
 void MenuView::AppendItem(MenuItemParams params)
 {
-	auto delegate = std::make_unique<InternalMenuDelegate>(params);
-
 	UINT id = AllocateId();
-	AppendItem(delegate.get(), id, params.GetText(), params.TakeIconModel(), params.GetHelpText(),
-		params.GetAcceleratorText(), params.GetCheckStyle());
+	Item item(params);
 
-	if (params.GetKey())
+	MenuHelper::AddStringItem(m_menu, id, item.GetFullText());
+
+	if (params.GetCheckStyle() == MenuItemCheckStyle::Radio)
 	{
-		m_keyToIdMap.insert({ *params.GetKey(), id });
+		MenuHelper::AddItemTypeFlags(m_menu, id, MFT_RADIOCHECK);
 	}
 
-	auto *item = GetItem(id);
-	item->ownedDelegate = std::move(delegate);
-}
-
-void MenuView::AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
-	std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-	const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle)
-{
-	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
-	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
-	CHECK_NE(id, 0U);
-
-	std::wstring finalText = text;
-
-	if (acceleratorText)
-	{
-		finalText += L"\t" + *acceleratorText;
-	}
-
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
-	menuItemInfo.wID = id;
-	menuItemInfo.dwTypeData = finalText.data();
-
-	if (checkStyle == MenuItemCheckStyle::Radio)
-	{
-		WI_SetFlag(menuItemInfo.fMask, MIIM_FTYPE);
-		menuItemInfo.fType = MFT_RADIOCHECK;
-	}
-
-	auto res = InsertMenuItem(m_menu, GetMenuItemCount(m_menu), true, &menuItemInfo);
-	CHECK(res);
-
-	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, delegate, std::move(iconModel), helpText);
-	CHECK(didInsert);
-
-	if (m_isShowing)
-	{
-		UpdateDynamicPropertiesForItem(id);
-	}
+	RegisterItem(id, std::move(item), params.GetKey());
 }
 
 MenuView *MenuView::AppendSubMenu(SubMenuItemParams params)
 {
 	UINT id = AllocateId();
-	auto delegate = std::make_unique<InternalMenuDelegate>(params);
+	HMENU subMenu = MenuHelper::AddNewSubMenuItem(m_menu, id, params.GetText());
 
-	auto ownedSubMenu = MenuHelper::CheckedCreatePopupMenu();
-	auto subMenu = ownedSubMenu.get();
-	MenuHelper::AddSubMenuItem(m_menu, id, params.GetText(), std::move(ownedSubMenu));
+	auto *item = RegisterItem(id,
+		Item(params, std::make_unique<MenuView>(this, subMenu, PassKey())), params.GetKey());
 
-	auto [itr, didInsert] =
-		m_idToItemMap.try_emplace(id, delegate.get(), params.TakeIconModel(), L"");
-	CHECK(didInsert);
-	itr->second.ownedDelegate = std::move(delegate);
-
-	auto ownedView = std::make_unique<MenuView>(this, subMenu, PassKey());
-	auto *view = ownedView.get();
-
-	m_idToSubMenuMap.insert({ id, std::move(ownedView) });
-
-	if (params.GetKey())
-	{
-		m_keyToIdMap.insert({ *params.GetKey(), id });
-	}
-
-	if (m_isShowing)
-	{
-		UpdateDynamicPropertiesForItem(id);
-	}
-
-	return view;
+	return item->GetSubMenuView();
 }
 
 UINT MenuView::AllocateId()
@@ -129,6 +67,25 @@ MenuView *MenuView::GetRoot()
 	}
 
 	return menuView;
+}
+
+MenuView::Item *MenuView::RegisterItem(UINT id, Item item, const std::optional<MenuItemKey> &key)
+{
+	auto [itr, didInsert] = m_idToItemMap.try_emplace(id, std::move(item));
+	CHECK(didInsert);
+
+	if (key)
+	{
+		auto [keyItr, didInsertKey] = m_keyToIdMap.insert({ *key, id });
+		CHECK(didInsertKey);
+	}
+
+	if (m_isShowing)
+	{
+		UpdateDynamicPropertiesForItem(id);
+	}
+
+	return &itr->second;
 }
 
 void MenuView::AppendSeparator()
@@ -154,7 +111,6 @@ void MenuView::ClearMenu()
 		CHECK(res);
 	}
 
-	m_idToSubMenuMap.clear();
 	m_idToItemMap.clear();
 	m_keyToIdMap.clear();
 	m_weakPtrFactory.InvalidateWeakPtrs();
@@ -208,9 +164,16 @@ MenuView *MenuView::MaybeGetMenuViewForNativeMenu(HMENU menu)
 		return this;
 	}
 
-	for (auto &submenu : m_idToSubMenuMap | std::views::values)
+	for (auto &menuItem : m_idToItemMap | std::views::values)
 	{
-		if (auto *view = submenu->MaybeGetMenuViewForNativeMenu(menu))
+		auto *subMenuView = menuItem.GetSubMenuView();
+
+		if (!subMenuView)
+		{
+			continue;
+		}
+
+		if (auto *view = subMenuView->MaybeGetMenuViewForNativeMenu(menu))
 		{
 			return view;
 		}
@@ -231,9 +194,16 @@ const MenuView *MenuView::MaybeGetMenuViewForItem(UINT id) const
 		return this;
 	}
 
-	for (auto &subMenu : m_idToSubMenuMap | std::views::values)
+	for (auto &menuItem : m_idToItemMap | std::views::values)
 	{
-		if (auto *view = subMenu->MaybeGetMenuViewForItem(id))
+		auto *subMenuView = menuItem.GetSubMenuView();
+
+		if (!subMenuView)
+		{
+			continue;
+		}
+
+		if (auto *view = subMenuView->MaybeGetMenuViewForItem(id))
 		{
 			return view;
 		}
@@ -251,9 +221,16 @@ std::optional<UINT> MenuView::MaybeGetIdForKey(const MenuItemKey &key) const
 		return itr->second;
 	}
 
-	for (auto &subMenu : m_idToSubMenuMap | std::views::values)
+	for (auto &menuItem : m_idToItemMap | std::views::values)
 	{
-		if (auto id = subMenu->MaybeGetIdForKey(key))
+		auto *subMenuView = menuItem.GetSubMenuView();
+
+		if (!subMenuView)
+		{
+			continue;
+		}
+
+		if (auto id = subMenuView->MaybeGetIdForKey(key))
 		{
 			return *id;
 		}
@@ -287,27 +264,21 @@ void MenuView::UpdateDynamicPropertiesForItem(UINT id)
 
 void MenuView::UpdateItemState(UINT id)
 {
-	auto *delegate = MaybeGetDelegateForItem(id);
-
-	if (!delegate)
-	{
-		return;
-	}
-
-	MenuHelper::EnableItem(m_menu, id, delegate->IsItemEnabled(id));
-	MenuHelper::CheckItem(m_menu, id, delegate->IsItemChecked(id));
+	auto *item = GetItem(id);
+	MenuHelper::SetItemEnabled(m_menu, id, item->IsEnabled());
+	MenuHelper::SetItemChecked(m_menu, id, item->IsChecked());
 }
 
 void MenuView::SetItemImage(UINT id)
 {
 	const auto *item = GetItem(id);
 
-	if (!item->iconModel || item->bitmap)
+	if (!item->GetIconModel() || item->GetBitmap())
 	{
 		return;
 	}
 
-	auto bitmap = item->iconModel->GetBitmap(GetCurrentDpi(),
+	auto bitmap = item->GetIconModel()->GetBitmap(GetCurrentDpi(),
 		[id, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedBitmap)
 		{
 			if (!self)
@@ -333,7 +304,7 @@ void MenuView::UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap)
 	CHECK(res);
 
 	auto *item = GetItem(id);
-	item->bitmap = std::move(bitmap);
+	item->UpdateBitmap(std::move(bitmap));
 }
 
 UINT MenuView::GetCurrentDpi() const
@@ -345,7 +316,7 @@ UINT MenuView::GetCurrentDpi() const
 std::wstring MenuView::GetItemHelpText(UINT id) const
 {
 	const auto *item = GetItem(id);
-	return item->helpText;
+	return item->GetHelpText();
 }
 
 MenuView::Item *MenuView::GetItem(int id)
@@ -380,21 +351,9 @@ std::optional<UINT> MenuView::MaybeGetItemId(int index) const
 	return menuItemInfo.wID;
 }
 
-MenuDelegate *MenuView::MaybeGetDelegateForItem(UINT id)
-{
-	return const_cast<MenuDelegate *>(std::as_const(*this).MaybeGetDelegateForItem(id));
-}
-
-const MenuDelegate *MenuView::MaybeGetDelegateForItem(UINT id) const
-{
-	auto itr = m_idToItemMap.find(id);
-	CHECK(itr != m_idToItemMap.end());
-	return itr->second.delegate;
-}
-
 std::optional<UINT> MenuView::MaybeGetItemAtPoint(const POINT &ptScreen) const
 {
-	auto id = MenuHelper::MaybeGetMenuItemAtPoint(m_menu, ptScreen);
+	auto id = MenuHelper::MaybeGetItemAtPoint(m_menu, ptScreen);
 
 	if (!id || !MaybeGetMenuViewForItem(*id))
 	{
@@ -427,48 +386,36 @@ std::optional<UINT> MenuView::MaybeGetIdForKeyForTesting(const MenuItemKey &key)
 	return MaybeGetIdForKey(key);
 }
 
-MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id)
+std::wstring MenuView::GetItemFullTextForTesting(UINT id) const
 {
 	CHECK(IsInTest());
 
-	return MaybeGetDelegateForItem(id);
-}
-
-const MenuDelegate *MenuView::MaybeGetDelegateForItemForTesting(UINT id) const
-{
-	CHECK(IsInTest());
-
-	return MaybeGetDelegateForItem(id);
-}
-
-std::wstring MenuView::GetItemTextForTesting(UINT id) const
-{
-	CHECK(IsInTest());
-
-	wchar_t text[256];
-
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_STRING;
-	menuItemInfo.dwTypeData = text;
-	menuItemInfo.cch = std::size(text);
-	auto res = GetMenuItemInfo(m_menu, id, false, &menuItemInfo);
-	CHECK(res);
-
-	return text;
+	auto *item = GetItem(id);
+	return item->GetFullText();
 }
 
 HBITMAP MenuView::GetItemBitmapForTesting(UINT id) const
 {
 	CHECK(IsInTest());
 
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_BITMAP;
-	auto res = GetMenuItemInfo(m_menu, id, false, &menuItemInfo);
-	CHECK(res);
+	auto *item = GetItem(id);
+	return item->GetBitmap();
+}
 
-	return menuItemInfo.hbmpItem;
+bool MenuView::IsItemEnabledForTesting(UINT id) const
+{
+	CHECK(IsInTest());
+
+	const auto *item = GetItem(id);
+	return item->IsEnabled();
+}
+
+bool MenuView::IsItemCheckedForTesting(UINT id) const
+{
+	CHECK(IsInTest());
+
+	const auto *item = GetItem(id);
+	return item->IsChecked();
 }
 
 const MenuView *MenuView::GetSubMenuViewForTesting(const MenuItemKey &key) const
@@ -484,9 +431,22 @@ const MenuView *MenuView::GetSubMenuViewForTesting(UINT id) const
 {
 	CHECK(IsInTest());
 
-	auto itr = m_idToSubMenuMap.find(id);
-	CHECK(itr != m_idToSubMenuMap.end());
-	return itr->second.get();
+	auto itr = m_idToItemMap.find(id);
+	CHECK(itr != m_idToItemMap.end());
+
+	auto *subMenuView = itr->second.GetSubMenuView();
+	CHECK(subMenuView);
+
+	return subMenuView;
+}
+
+wil::com_ptr_nothrow<IDropTarget> MenuView::MaybeGetDropTargetForTesting(UINT id,
+	MenuDropPosition position)
+{
+	CHECK(IsInTest());
+
+	auto *item = GetItem(id);
+	return item->MaybeGetDropTarget(position);
 }
 
 void MenuView::OnPopupWillShowForTesting(UINT dpi)
@@ -503,7 +463,11 @@ void MenuView::OnPopupClosedForTesting()
 	OnPopupClosed();
 }
 
-MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemParams &params) :
+MenuView::Item::Item(MenuItemParams &params) :
+	m_text(params.GetText()),
+	m_iconModel(params.TakeIconModel()),
+	m_helpText(params.GetHelpText()),
+	m_acceleratorText(params.GetAcceleratorText()),
 	m_enabledCallback(params.TakeEnabledCallback()),
 	m_checkedCallback(params.TakeCheckedCallback()),
 	m_selectedCallback(params.TakeSelectedCallback()),
@@ -514,7 +478,10 @@ MenuView::InternalMenuDelegate::InternalMenuDelegate(MenuItemParams &params) :
 {
 }
 
-MenuView::InternalMenuDelegate::InternalMenuDelegate(SubMenuItemParams &params) :
+MenuView::Item::Item(SubMenuItemParams &params, std::unique_ptr<MenuView> subMenuView) :
+	m_text(params.GetText()),
+	m_iconModel(params.TakeIconModel()),
+	m_subMenuView(std::move(subMenuView)),
 	m_enabledCallback(params.TakeEnabledCallback()),
 	m_middleClickedCallback(params.TakeMiddleClickedCallback()),
 	m_rightClickedCallback(params.TakeRightClickedCallback()),
@@ -523,10 +490,60 @@ MenuView::InternalMenuDelegate::InternalMenuDelegate(SubMenuItemParams &params) 
 {
 }
 
-bool MenuView::InternalMenuDelegate::IsItemEnabled(UINT id) const
+void MenuView::Item::UpdateBitmap(wil::unique_hbitmap bitmap)
 {
-	UNREFERENCED_PARAMETER(id);
+	m_bitmap = std::move(bitmap);
+}
 
+HBITMAP MenuView::Item::GetBitmap() const
+{
+	return m_bitmap.get();
+}
+
+const std::wstring &MenuView::Item::GetText() const
+{
+	return m_text;
+}
+
+const IconModel *MenuView::Item::GetIconModel() const
+{
+	return m_iconModel.get();
+}
+
+const std::wstring &MenuView::Item::GetHelpText() const
+{
+	return m_helpText;
+}
+
+const std::optional<std::wstring> &MenuView::Item::GetAcceleratorText() const
+{
+	return m_acceleratorText;
+}
+
+std::wstring MenuView::Item::GetFullText() const
+{
+	std::wstring fullText = m_text;
+
+	if (m_acceleratorText)
+	{
+		fullText += L"\t" + *m_acceleratorText;
+	}
+
+	return fullText;
+}
+
+MenuView *MenuView::Item::GetSubMenuView()
+{
+	return m_subMenuView.get();
+}
+
+const MenuView *MenuView::Item::GetSubMenuView() const
+{
+	return m_subMenuView.get();
+}
+
+bool MenuView::Item::IsEnabled() const
+{
 	if (m_enabledCallback)
 	{
 		return m_enabledCallback();
@@ -535,10 +552,8 @@ bool MenuView::InternalMenuDelegate::IsItemEnabled(UINT id) const
 	return true;
 }
 
-bool MenuView::InternalMenuDelegate::IsItemChecked(UINT id) const
+bool MenuView::Item::IsChecked() const
 {
-	UNREFERENCED_PARAMETER(id);
-
 	if (m_checkedCallback)
 	{
 		return m_checkedCallback();
@@ -547,10 +562,12 @@ bool MenuView::InternalMenuDelegate::IsItemChecked(UINT id) const
 	return false;
 }
 
-void MenuView::InternalMenuDelegate::OnItemSelected(UINT id, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
+void MenuView::Item::Select(bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	UNREFERENCED_PARAMETER(id);
+	if (!IsEnabled())
+	{
+		return;
+	}
 
 	if (m_selectedCallback)
 	{
@@ -558,10 +575,12 @@ void MenuView::InternalMenuDelegate::OnItemSelected(UINT id, bool isCtrlKeyDown,
 	}
 }
 
-void MenuView::InternalMenuDelegate::OnItemMiddleClicked(UINT id, bool isCtrlKeyDown,
-	bool isShiftKeyDown)
+void MenuView::Item::MiddleClick(bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	UNREFERENCED_PARAMETER(id);
+	if (!IsEnabled())
+	{
+		return;
+	}
 
 	if (m_middleClickedCallback)
 	{
@@ -569,19 +588,20 @@ void MenuView::InternalMenuDelegate::OnItemMiddleClicked(UINT id, bool isCtrlKey
 	}
 }
 
-void MenuView::InternalMenuDelegate::OnItemRightClicked(UINT id, const POINT &ptScreen)
+void MenuView::Item::RightClick(const POINT &ptScreen)
 {
-	UNREFERENCED_PARAMETER(id);
-
 	if (m_rightClickedCallback)
 	{
 		m_rightClickedCallback(ptScreen);
 	}
 }
 
-MenuDragAction MenuView::InternalMenuDelegate::OnItemDragged(UINT id)
+MenuDragAction MenuView::Item::Drag()
 {
-	UNREFERENCED_PARAMETER(id);
+	if (!IsEnabled())
+	{
+		return MenuDragAction::ContinueMenu;
+	}
 
 	if (m_draggedCallback)
 	{
@@ -591,12 +611,11 @@ MenuDragAction MenuView::InternalMenuDelegate::OnItemDragged(UINT id)
 	return MenuDragAction::ContinueMenu;
 }
 
-wil::com_ptr_nothrow<IDropTarget> MenuView::InternalMenuDelegate::MaybeGetDropTargetForLocation(
-	const MenuDropLocation &dropLocation)
+wil::com_ptr_nothrow<IDropTarget> MenuView::Item::MaybeGetDropTarget(MenuDropPosition position)
 {
 	if (m_maybeGetDropTargetCallback)
 	{
-		return m_maybeGetDropTargetCallback(dropLocation.position);
+		return m_maybeGetDropTargetCallback(position);
 	}
 
 	return nullptr;

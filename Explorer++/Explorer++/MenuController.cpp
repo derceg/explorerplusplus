@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "MenuController.h"
-#include "MenuDelegate.h"
 #include "MenuView.h"
 #include "TestHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -226,14 +225,8 @@ LRESULT MenuController::OnMenuDrag(HMENU menu, int index)
 		return MND_CONTINUE;
 	}
 
-	auto *delegate = MaybeGetDelegateForActionableItem(*id);
-
-	if (!delegate)
-	{
-		return MND_CONTINUE;
-	}
-
-	auto action = delegate->OnItemDragged(*id);
+	auto *item = view->GetItem(*id);
+	auto action = item->Drag();
 	return action == MenuDragAction::ContinueMenu ? MND_CONTINUE : MND_ENDMENU;
 }
 
@@ -321,16 +314,11 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		return MNGO_NOINTERFACE;
 	}
 
-	auto *delegate = view->MaybeGetDelegateForItem(*dropId);
-
-	if (!delegate)
-	{
-		return MNGO_NOINTERFACE;
-	}
+	auto *item = view->GetItem(*dropId);
 
 	// This represents the drop target for the specified item. It needs to be held either until
 	// another target is requested, or the menu is closed.
-	m_dropTarget = delegate->MaybeGetDropTargetForLocation({ *dropId, dropPosition });
+	m_dropTarget = item->MaybeGetDropTarget(dropPosition);
 
 	if (!m_dropTarget)
 	{
@@ -363,26 +351,20 @@ void MenuController::SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool
 
 void MenuController::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto *delegate = MaybeGetDelegateForActionableItem(id);
+	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
+	CHECK(view);
 
-	if (!delegate)
-	{
-		return;
-	}
-
-	delegate->OnItemSelected(id, isCtrlKeyDown, isShiftKeyDown);
+	auto *item = view->GetItem(id);
+	item->Select(isCtrlKeyDown, isShiftKeyDown);
 }
 
 void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto *delegate = MaybeGetDelegateForActionableItem(id);
+	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
+	CHECK(view);
 
-	if (!delegate)
-	{
-		return;
-	}
-
-	delegate->OnItemMiddleClicked(id, isCtrlKeyDown, isShiftKeyDown);
+	auto *item = view->GetItem(id);
+	item->MiddleClick(isCtrlKeyDown, isShiftKeyDown);
 }
 
 void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
@@ -390,35 +372,8 @@ void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
 	CHECK(view);
 
-	auto *delegate = view->MaybeGetDelegateForItem(id);
-
-	if (!delegate)
-	{
-		return;
-	}
-
-	delegate->OnItemRightClicked(id, ptScreen);
-}
-
-MenuDelegate *MenuController::MaybeGetDelegateForActionableItem(UINT id)
-{
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-	CHECK(view);
-
-	auto *delegate = view->MaybeGetDelegateForItem(id);
-
-	if (!delegate)
-	{
-		return nullptr;
-	}
-
-	if (!delegate->IsItemEnabled(id))
-	{
-		// Only enabled items can be actioned.
-		return nullptr;
-	}
-
-	return delegate;
+	auto *item = view->GetItem(id);
+	item->RightClick(ptScreen);
 }
 
 void MenuController::NotifyMenuOpenedForTesting()

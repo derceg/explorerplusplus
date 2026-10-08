@@ -9,7 +9,15 @@
 
 using namespace testing;
 
-TEST(RemoveDuplicateSeparatorsTest, RemoveDuplicates)
+TEST(MenuHelperTest, StyleFlags)
+{
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
+
+	MenuHelper::AddStyleFlags(menu.get(), MNS_NOTIFYBYPOS);
+	EXPECT_TRUE(WI_IsFlagSet(MenuHelper::GetStyleFlags(menu.get()), MNS_NOTIFYBYPOS));
+}
+
+TEST(MenuHelperTest, RemoveDuplicateSeparators)
 {
 	const UINT item1Id = 1;
 	const UINT item2Id = 2;
@@ -28,7 +36,7 @@ TEST(RemoveDuplicateSeparatorsTest, RemoveDuplicates)
 	EXPECT_EQ(GetMenuItemID(menu.get(), 2), item2Id);
 }
 
-TEST(RemoveTrailingSeparatorsTest, RemoveTrailing)
+TEST(MenuHelperTest, RemoveTrailingSeparators)
 {
 	const UINT itemId = 1;
 
@@ -43,18 +51,18 @@ TEST(RemoveTrailingSeparatorsTest, RemoveTrailing)
 	EXPECT_EQ(GetMenuItemID(menu.get(), 0), itemId);
 }
 
-TEST(GetMenuItemStringTest, GetString)
+TEST(MenuHelperTest, GetItemText)
 {
 	const UINT itemId = 1;
 
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 
-	auto text = MenuHelper::GetMenuItemString(menu.get(), itemId, false);
+	auto text = MenuHelper::GetItemText(menu.get(), itemId, false);
 	EXPECT_EQ(text, L"Item");
 }
 
-TEST(GetMenuItemIDIncludingSubmenuTest, GetId)
+TEST(MenuHelperTest, GetItemIdIncludingSubmenu)
 {
 	const UINT itemId = 1;
 	const UINT submenuItemId = 2;
@@ -67,8 +75,44 @@ TEST(GetMenuItemIDIncludingSubmenuTest, GetId)
 
 	// Unlike GetMenuItemID(), this function should return the ID set for both items and submenu
 	// items.
-	EXPECT_EQ(MenuHelper::GetMenuItemIDIncludingSubmenu(menu.get(), 0), itemId);
-	EXPECT_EQ(MenuHelper::GetMenuItemIDIncludingSubmenu(menu.get(), 1), submenuItemId);
+	EXPECT_EQ(MenuHelper::GetItemIdIncludingSubmenu(menu.get(), 0), itemId);
+	EXPECT_EQ(MenuHelper::GetItemIdIncludingSubmenu(menu.get(), 1), submenuItemId);
+}
+
+TEST(MenuHelperTest, EnabledState)
+{
+	const UINT itemId = 1;
+
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
+	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
+	EXPECT_TRUE(MenuHelper::IsItemEnabled(menu.get(), itemId, false));
+
+	MenuHelper::SetItemEnabled(menu.get(), itemId, false);
+	EXPECT_FALSE(MenuHelper::IsItemEnabled(menu.get(), itemId, false));
+}
+
+TEST(MenuHelperTest, CheckedState)
+{
+	const UINT itemId = 1;
+
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
+	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
+	EXPECT_FALSE(MenuHelper::IsItemChecked(menu.get(), itemId, false));
+
+	MenuHelper::SetItemChecked(menu.get(), itemId, true);
+	EXPECT_TRUE(MenuHelper::IsItemChecked(menu.get(), itemId, false));
+}
+
+TEST(MenuHelperTest, TypeFlags)
+{
+	const UINT itemId = 1;
+
+	auto menu = MenuHelper::CheckedCreatePopupMenu();
+	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
+
+	MenuHelper::AddItemTypeFlags(menu.get(), itemId, MFT_RADIOCHECK);
+	EXPECT_TRUE(
+		WI_IsFlagSet(MenuHelper::GetItemTypeFlags(menu.get(), itemId, false), MFT_RADIOCHECK));
 }
 
 class IsPartOfMenuTest : public Test
@@ -114,16 +158,4 @@ TEST_F(IsPartOfMenuTest, SeparateMenu)
 	auto otherMenu = MenuHelper::CheckedCreatePopupMenu();
 
 	EXPECT_FALSE(MenuHelper::IsPartOfMenu(m_menu.get(), otherMenu.get()));
-}
-
-TEST(IsMenuItemEnabledTest, CheckEnabled)
-{
-	const UINT itemId = 1;
-
-	auto menu = MenuHelper::CheckedCreatePopupMenu();
-	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
-	EXPECT_TRUE(MenuHelper::IsMenuItemEnabled(menu.get(), itemId, false));
-
-	MenuHelper::EnableItem(menu.get(), itemId, false);
-	EXPECT_FALSE(MenuHelper::IsMenuItemEnabled(menu.get(), itemId, false));
 }

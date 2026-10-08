@@ -26,7 +26,7 @@ void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &
 		ASSERT_HRESULT_SUCCEEDED(hr);
 
 		auto id = menuView->GetItemIdForTesting(static_cast<int>(i));
-		EXPECT_EQ(menuView->GetItemTextForTesting(id), name);
+		EXPECT_EQ(menuView->GetItemFullTextForTesting(id), name);
 		EXPECT_EQ(menuView->GetItemHelpText(id), path);
 	}
 }
@@ -40,10 +40,7 @@ void ExpectItemEnabled(const MenuView *menuView, const MenuItemKey &key, bool en
 
 void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled)
 {
-	auto *delegate = menuView->MaybeGetDelegateForItemForTesting(id);
-	ASSERT_NE(delegate, nullptr);
-
-	EXPECT_EQ(delegate->IsItemEnabled(id), enabled);
+	EXPECT_EQ(menuView->IsItemEnabledForTesting(id), enabled);
 }
 
 void ExpectItemChecked(const MenuView *menuView, const MenuItemKey &key, bool checked)
@@ -55,10 +52,7 @@ void ExpectItemChecked(const MenuView *menuView, const MenuItemKey &key, bool ch
 
 void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked)
 {
-	auto *delegate = menuView->MaybeGetDelegateForItemForTesting(id);
-	ASSERT_NE(delegate, nullptr);
-
-	EXPECT_EQ(delegate->IsItemChecked(id), checked);
+	EXPECT_EQ(menuView->IsItemCheckedForTesting(id), checked);
 }
 
 }

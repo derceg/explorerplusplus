@@ -37,8 +37,8 @@ TEST_F(TabHistoryMenuTest, BackHistory)
 		TabHistoryMenu::MenuType::Back);
 
 	ASSERT_EQ(menuView->GetNumItems(), 2);
-	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(0)), L"fake2");
-	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(1)), L"fake1");
+	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(0)), L"fake2");
+	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(1)), L"fake1");
 }
 
 TEST_F(TabHistoryMenuTest, ForwardHistory)
@@ -53,8 +53,8 @@ TEST_F(TabHistoryMenuTest, ForwardHistory)
 		TabHistoryMenu::MenuType::Forward);
 
 	ASSERT_EQ(menuView->GetNumItems(), 2);
-	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(0)), L"fake2");
-	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(1)), L"fake3");
+	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(0)), L"fake2");
+	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(1)), L"fake3");
 }
 
 TEST_F(TabHistoryMenuTest, BackSelection)

@@ -582,7 +582,7 @@ LRESULT ThemeManagerImpl::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 		CHECK(menu);
 
 		auto text =
-			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(measureItem->itemData), true);
+			MenuHelper::GetItemText(menu, static_cast<UINT>(measureItem->itemData), true);
 
 		auto logFont = GetSystemFontScaledToWindow(SystemFont::Menu, hwnd);
 		wil::unique_hfont font(CreateFontIndirect(&logFont));
@@ -707,7 +707,7 @@ LRESULT ThemeManagerImpl::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 		// drawn.
 		auto menu = reinterpret_cast<HMENU>(drawItem->hwndItem);
 		auto text =
-			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(drawItem->itemData), true);
+			MenuHelper::GetItemText(menu, static_cast<UINT>(drawItem->itemData), true);
 
 		DWORD drawFlags = drawFlagsBase;
 

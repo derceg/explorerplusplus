@@ -5,7 +5,6 @@
 #pragma once
 
 #include "IconModel.h"
-#include "MenuDelegate.h"
 #include "MenuItemKey.h"
 #include "MenuItemParams.h"
 #include "SubMenuItemParams.h"
@@ -52,12 +51,14 @@ public:
 	HMENU GetNativeMenuForTesting() const;
 	UINT GetItemIdForTesting(int index) const;
 	std::optional<UINT> MaybeGetIdForKeyForTesting(const MenuItemKey &key) const;
-	MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id);
-	const MenuDelegate *MaybeGetDelegateForItemForTesting(UINT id) const;
-	std::wstring GetItemTextForTesting(UINT id) const;
+	std::wstring GetItemFullTextForTesting(UINT id) const;
 	HBITMAP GetItemBitmapForTesting(UINT id) const;
+	bool IsItemEnabledForTesting(UINT id) const;
+	bool IsItemCheckedForTesting(UINT id) const;
 	const MenuView *GetSubMenuViewForTesting(const MenuItemKey &key) const;
 	const MenuView *GetSubMenuViewForTesting(UINT id) const;
+	wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForTesting(UINT id,
+		MenuDropPosition position);
 	void OnPopupWillShowForTesting(UINT dpi);
 	void OnPopupClosedForTesting();
 
@@ -81,23 +82,46 @@ private:
 	// truncates, so it can require special handling.
 	static constexpr UINT INITIAL_ID = 0x10000;
 
-	class InternalMenuDelegate : public MenuDelegate
+	class Item
 	{
 	public:
-		InternalMenuDelegate(MenuItemParams &params);
-		InternalMenuDelegate(SubMenuItemParams &params);
+		Item(MenuItemParams &params);
+		Item(SubMenuItemParams &params, std::unique_ptr<MenuView> subMenuView);
 
-		// MenuDelegate
-		bool IsItemEnabled(UINT id) const override;
-		bool IsItemChecked(UINT id) const override;
-		void OnItemSelected(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-		void OnItemMiddleClicked(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-		void OnItemRightClicked(UINT id, const POINT &ptScreen) override;
-		MenuDragAction OnItemDragged(UINT id) override;
-		wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForLocation(
-			const MenuDropLocation &dropLocation) override;
+		Item(const Item &) = delete;
+		Item &operator=(const Item &) = delete;
+		Item(Item &&) = default;
+		Item &operator=(Item &&) = default;
+
+		void UpdateBitmap(wil::unique_hbitmap bitmap);
+		HBITMAP GetBitmap() const;
+
+		const std::wstring &GetText() const;
+		const IconModel *GetIconModel() const;
+		const std::wstring &GetHelpText() const;
+		const std::optional<std::wstring> &GetAcceleratorText() const;
+		std::wstring GetFullText() const;
+
+		MenuView *GetSubMenuView();
+		const MenuView *GetSubMenuView() const;
+
+		bool IsEnabled() const;
+		bool IsChecked() const;
+
+		void Select(bool isCtrlKeyDown, bool isShiftKeyDown);
+		void MiddleClick(bool isCtrlKeyDown, bool isShiftKeyDown);
+		void RightClick(const POINT &ptScreen);
+		MenuDragAction Drag();
+		wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTarget(MenuDropPosition position);
 
 	private:
+		std::wstring m_text;
+		std::unique_ptr<const IconModel> m_iconModel;
+		wil::unique_hbitmap m_bitmap;
+		std::wstring m_helpText;
+		std::optional<std::wstring> m_acceleratorText;
+		std::unique_ptr<MenuView> m_subMenuView;
+
 		MenuItemEnabledCallback m_enabledCallback;
 		MenuItemCheckedCallback m_checkedCallback;
 		MenuItemSelectedCallback m_selectedCallback;
@@ -107,28 +131,9 @@ private:
 		MenuItemMaybeGetDropTargetCallback m_maybeGetDropTargetCallback;
 	};
 
-	struct Item
-	{
-		Item(MenuDelegate *delegate, std::unique_ptr<const IconModel> iconModel,
-			const std::wstring &helpText) :
-			delegate(delegate),
-			iconModel(std::move(iconModel)),
-			helpText(helpText)
-		{
-		}
-
-		std::unique_ptr<InternalMenuDelegate> ownedDelegate;
-		MenuDelegate *const delegate;
-		const std::unique_ptr<const IconModel> iconModel;
-		wil::unique_hbitmap bitmap;
-		const std::wstring helpText;
-	};
-
-	void AppendItem(MenuDelegate *delegate, UINT id, const std::wstring &text,
-		std::unique_ptr<const IconModel> iconModel, const std::wstring &helpText,
-		const std::optional<std::wstring> &acceleratorText, MenuItemCheckStyle checkStyle);
 	UINT AllocateId();
 	MenuView *GetRoot();
+	Item *RegisterItem(UINT id, Item item, const std::optional<MenuItemKey> &key);
 
 	void OnPopupWillShowForDpi(UINT dpi);
 	void OnPopupClosed();
@@ -148,8 +153,6 @@ private:
 	const Item *GetItem(int id) const;
 
 	std::optional<UINT> MaybeGetItemId(int index) const;
-	MenuDelegate *MaybeGetDelegateForItem(UINT id);
-	const MenuDelegate *MaybeGetDelegateForItem(UINT id) const;
 	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
 
 	MenuView *const m_parent;
@@ -159,7 +162,6 @@ private:
 	// always generated from the root menu.
 	UINT m_idCounter = INITIAL_ID;
 
-	std::unordered_map<UINT, std::unique_ptr<MenuView>> m_idToSubMenuMap;
 	std::unordered_map<UINT, Item> m_idToItemMap;
 	std::unordered_map<MenuItemKey, UINT, boost::hash<MenuItemKey>> m_keyToIdMap;
 

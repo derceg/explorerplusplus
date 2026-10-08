@@ -1601,7 +1601,6 @@
     <ClInclude Include="MassRenameHelper.h" />
     <ClInclude Include="MassRenameTokensMenu.h" />
     <ClInclude Include="MenuController.h" />
-    <ClInclude Include="MenuDelegate.h" />
     <ClInclude Include="MenuItemCallbacks.h" />
     <ClInclude Include="MenuItemKey.h" />
     <ClInclude Include="MenuItemParams.h" />

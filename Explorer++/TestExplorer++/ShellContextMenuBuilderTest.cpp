@@ -108,11 +108,11 @@ TEST_F(ShellContextMenuBuilderTest, EnableItem)
 	UINT originalId = 100;
 	m_builder.AddStringItem(originalId, L"Item", 0, true);
 	ASSERT_TRUE(
-		MenuHelper::IsMenuItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId), false));
+		MenuHelper::IsItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId), false));
 
 	m_builder.EnableItem(originalId, false);
 	EXPECT_FALSE(
-		MenuHelper::IsMenuItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId), false));
+		MenuHelper::IsItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId), false));
 }
 
 TEST_F(ShellContextMenuBuilderTest, AddSubMenuItem)

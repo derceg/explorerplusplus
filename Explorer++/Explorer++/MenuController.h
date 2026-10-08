@@ -10,7 +10,6 @@
 #include <optional>
 #include <string>
 
-class MenuDelegate;
 class MenuHelpTextHost;
 class MenuItemKey;
 class MenuView;
@@ -55,8 +54,6 @@ private:
 	LRESULT OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
 
 	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, UINT id);
-
-	MenuDelegate *MaybeGetDelegateForActionableItem(UINT id);
 
 	MenuView *const m_rootView;
 	const MenuType m_menuType;

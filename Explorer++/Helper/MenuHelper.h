@@ -10,29 +10,33 @@
 namespace MenuHelper
 {
 
-void AddMenuStyles(HMENU menu, DWORD styles);
+void AddStyleFlags(HMENU menu, DWORD styleFlags);
+DWORD GetStyleFlags(HMENU menu);
 
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text);
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, BOOL byPosition);
 void AddSeparator(HMENU menu);
 void AddSeparator(HMENU menu, UINT item, BOOL byPosition);
-void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu);
-void AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
+HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text);
+HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu);
+HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
 	UINT item, BOOL byPosition);
 
-void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck);
-void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable);
+void AddItemTypeFlags(HMENU menu, UINT id, UINT typeFlags);
+void SetItemChecked(HMENU hMenu, UINT itemID, BOOL bCheck);
+void SetItemEnabled(HMENU hMenu, UINT itemID, BOOL bEnable);
 
 void RemoveDuplicateSeparators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
 
-std::wstring GetMenuItemString(HMENU menu, UINT item, bool byPosition);
-UINT GetMenuItemIDIncludingSubmenu(HMENU menu, int index);
+std::wstring GetItemText(HMENU menu, UINT item, bool byPosition);
+UINT GetItemIdIncludingSubmenu(HMENU menu, int index);
 bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu);
-bool IsMenuItemEnabled(HMENU menu, UINT item, bool byPosition);
-bool IsMenuItemChecked(HMENU menu, UINT item, bool byPosition);
-UINT GetMenuItemState(HMENU menu, UINT item, bool byPosition);
-UINT GetMenuItemType(HMENU menu, UINT item, bool byPosition);
+HBITMAP GetItemBitmap(HMENU menu, UINT item, bool byPosition);
+bool IsItemEnabled(HMENU menu, UINT item, bool byPosition);
+bool IsItemChecked(HMENU menu, UINT item, bool byPosition);
+UINT GetItemState(HMENU menu, UINT item, bool byPosition);
+UINT GetItemTypeFlags(HMENU menu, UINT item, bool byPosition);
 
 std::optional<UINT> MaybeGetHighlightedItem(HMENU menu);
 
@@ -40,7 +44,7 @@ std::optional<UINT> MaybeGetHighlightedItem(HMENU menu);
 // item. Only items that are part of the provided menu will be considered. Note that a value will
 // only be returned if the menu is the top-most menu. If another menu is shown on top, no result
 // will be returned, regardless of the location provided.
-std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen);
+std::optional<UINT> MaybeGetItemAtPoint(HMENU menu, const POINT &ptScreen);
 
 wil::unique_hmenu CheckedCreateMenu();
 wil::unique_hmenu CheckedCreatePopupMenu();
