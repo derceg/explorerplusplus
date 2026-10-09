@@ -61,6 +61,7 @@ private:
 	MenuView *AppendSubMenu(MenuView *menuView, UINT textResourceId);
 	std::unique_ptr<IconModel> MaybeCreateIconModel(WORD id) const;
 	static std::optional<Icon> GetIconForCommand(WORD id);
+	static std::optional<UINT> MaybeGetHelpTextIdForCommand(WORD id);
 	MenuItemEnabledCallback MaybeGetEnabledCallback(WORD id) const;
 	MenuItemCheckedCallback MaybeGetCheckedCallback(WORD id) const;
 	void SendCommandToBrowser(WORD id);
