@@ -10,33 +10,39 @@
 namespace MenuHelper
 {
 
+enum class ItemLookup
+{
+	ById,
+	ByPosition
+};
+
 void AddStyleFlags(HMENU menu, DWORD styleFlags);
 DWORD GetStyleFlags(HMENU menu);
 
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text);
-void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, BOOL byPosition);
+void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, ItemLookup lookupType);
 void AddSeparator(HMENU menu);
-void AddSeparator(HMENU menu, UINT item, BOOL byPosition);
+void AddSeparator(HMENU menu, UINT item, ItemLookup lookupType);
 HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text);
 HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu);
 HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
-	UINT item, BOOL byPosition);
+	UINT item, ItemLookup lookupType);
 
-void AddItemTypeFlags(HMENU menu, UINT id, UINT typeFlags);
-void SetItemChecked(HMENU hMenu, UINT itemID, BOOL bCheck);
-void SetItemEnabled(HMENU hMenu, UINT itemID, BOOL bEnable);
+void AddItemTypeFlags(HMENU menu, UINT item, ItemLookup lookupType, UINT typeFlags);
+void SetItemChecked(HMENU menu, UINT item, ItemLookup lookupType, bool check);
+void SetItemEnabled(HMENU menu, UINT item, ItemLookup lookupType, bool enable);
 
 void RemoveDuplicateSeparators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
 
-std::wstring GetItemText(HMENU menu, UINT item, bool byPosition);
+std::wstring GetItemText(HMENU menu, UINT item, ItemLookup lookupType);
 UINT GetItemIdIncludingSubmenu(HMENU menu, int index);
 bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu);
-HBITMAP GetItemBitmap(HMENU menu, UINT item, bool byPosition);
-bool IsItemEnabled(HMENU menu, UINT item, bool byPosition);
-bool IsItemChecked(HMENU menu, UINT item, bool byPosition);
-UINT GetItemState(HMENU menu, UINT item, bool byPosition);
-UINT GetItemTypeFlags(HMENU menu, UINT item, bool byPosition);
+HBITMAP GetItemBitmap(HMENU menu, UINT item, ItemLookup lookupType);
+bool IsItemEnabled(HMENU menu, UINT item, ItemLookup lookupType);
+bool IsItemChecked(HMENU menu, UINT item, ItemLookup lookupType);
+UINT GetItemState(HMENU menu, UINT item, ItemLookup lookupType);
+UINT GetItemTypeFlags(HMENU menu, UINT item, ItemLookup lookupType);
 
 std::optional<UINT> MaybeGetHighlightedItem(HMENU menu);
 

@@ -581,8 +581,8 @@ LRESULT ThemeManagerImpl::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 		auto menu = GetMenu(hwnd);
 		CHECK(menu);
 
-		auto text =
-			MenuHelper::GetItemText(menu, static_cast<UINT>(measureItem->itemData), true);
+		auto text = MenuHelper::GetItemText(menu, static_cast<UINT>(measureItem->itemData),
+			MenuHelper::ItemLookup::ByPosition);
 
 		auto logFont = GetSystemFontScaledToWindow(SystemFont::Menu, hwnd);
 		wil::unique_hfont font(CreateFontIndirect(&logFont));
@@ -706,8 +706,8 @@ LRESULT ThemeManagerImpl::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 		// As per the documentation for DRAWITEMSTRUCT, this is the menu handle when a menu is being
 		// drawn.
 		auto menu = reinterpret_cast<HMENU>(drawItem->hwndItem);
-		auto text =
-			MenuHelper::GetItemText(menu, static_cast<UINT>(drawItem->itemData), true);
+		auto text = MenuHelper::GetItemText(menu, static_cast<UINT>(drawItem->itemData),
+			MenuHelper::ItemLookup::ByPosition);
 
 		DWORD drawFlags = drawFlagsBase;
 

@@ -31,8 +31,8 @@ protected:
 		UINT itemId = m_menuView.GetItemIdForTesting(m_appendItemCount - 1);
 
 		EXPECT_EQ(m_menuView.GetNumItems(), m_appendItemCount);
-		EXPECT_EQ(
-			MenuHelper::GetItemText(m_menuView.GetNativeMenuForTesting(), itemId, false),
+		EXPECT_EQ(MenuHelper::GetItemText(m_menuView.GetNativeMenuForTesting(), itemId,
+					  MenuHelper::ItemLookup::ById),
 			acceleratorText ? text + L"\t" + *acceleratorText : text);
 		EXPECT_EQ(m_menuView.GetItemHelpText(itemId), helpText);
 	}
@@ -63,9 +63,9 @@ TEST_F(MenuViewTest, SetCheckStyle)
 {
 	m_menuView.AppendItem(MenuItemParams(L"Radio item").SetCheckStyle(MenuItemCheckStyle::Radio));
 
-	EXPECT_TRUE(
-		WI_IsFlagSet(MenuHelper::GetItemTypeFlags(m_menuView.GetNativeMenuForTesting(), 0, true),
-			MFT_RADIOCHECK));
+	EXPECT_TRUE(WI_IsFlagSet(MenuHelper::GetItemTypeFlags(m_menuView.GetNativeMenuForTesting(), 0,
+								 MenuHelper::ItemLookup::ByPosition),
+		MFT_RADIOCHECK));
 }
 
 TEST_F(MenuViewTest, AppendSubMenu)
@@ -80,7 +80,8 @@ TEST_F(MenuViewTest, AppendSubMenu)
 
 	auto id = m_menuView.MaybeGetIdForKeyForTesting(Item::SubMenu);
 	ASSERT_NE(id, std::nullopt);
-	EXPECT_EQ(MenuHelper::GetItemText(m_menuView.GetNativeMenuForTesting(), *id, false),
+	EXPECT_EQ(MenuHelper::GetItemText(m_menuView.GetNativeMenuForTesting(), *id,
+				  MenuHelper::ItemLookup::ById),
 		L"SubMenu");
 }
 
@@ -96,13 +97,13 @@ TEST_F(MenuViewTest, ItemStates)
 
 	// If an item provides no enabled/checked callbacks, it should be enabled and unchecked by
 	// default.
-	EXPECT_TRUE(MenuHelper::IsItemEnabled(nativeMenu, 0, true));
-	EXPECT_FALSE(MenuHelper::IsItemChecked(nativeMenu, 0, true));
+	EXPECT_TRUE(MenuHelper::IsItemEnabled(nativeMenu, 0, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_FALSE(MenuHelper::IsItemChecked(nativeMenu, 0, MenuHelper::ItemLookup::ByPosition));
 
-	EXPECT_FALSE(MenuHelper::IsItemEnabled(nativeMenu, 1, true));
-	EXPECT_FALSE(MenuHelper::IsItemChecked(nativeMenu, 1, true));
-	EXPECT_TRUE(MenuHelper::IsItemEnabled(nativeMenu, 2, true));
-	EXPECT_TRUE(MenuHelper::IsItemChecked(nativeMenu, 2, true));
+	EXPECT_FALSE(MenuHelper::IsItemEnabled(nativeMenu, 1, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_FALSE(MenuHelper::IsItemChecked(nativeMenu, 1, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_TRUE(MenuHelper::IsItemEnabled(nativeMenu, 2, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_TRUE(MenuHelper::IsItemChecked(nativeMenu, 2, MenuHelper::ItemLookup::ByPosition));
 }
 
 TEST_F(MenuViewTest, ItemStatesAfterShow)
@@ -118,10 +119,10 @@ TEST_F(MenuViewTest, ItemStatesAfterShow)
 
 	// Items that are dynamically added, whilst the menu is being shown, should have their states
 	// set correctly.
-	EXPECT_FALSE(MenuHelper::IsItemEnabled(nativeMenu, 1, true));
-	EXPECT_FALSE(MenuHelper::IsItemChecked(nativeMenu, 1, true));
-	EXPECT_TRUE(MenuHelper::IsItemEnabled(nativeMenu, 2, true));
-	EXPECT_TRUE(MenuHelper::IsItemChecked(nativeMenu, 2, true));
+	EXPECT_FALSE(MenuHelper::IsItemEnabled(nativeMenu, 1, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_FALSE(MenuHelper::IsItemChecked(nativeMenu, 1, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_TRUE(MenuHelper::IsItemEnabled(nativeMenu, 2, MenuHelper::ItemLookup::ByPosition));
+	EXPECT_TRUE(MenuHelper::IsItemChecked(nativeMenu, 2, MenuHelper::ItemLookup::ByPosition));
 }
 
 TEST_F(MenuViewTest, ClearEmptyMenu)
@@ -194,7 +195,8 @@ TEST_F(MenuViewIconTest, InitialState)
 
 	// Even though an image was assigned to the item, no image should be added to the menu until the
 	// menu is shown (so that DPI scaling can be applied).
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, nullptr);
 }
 
@@ -211,7 +213,8 @@ TEST_F(MenuViewIconTest, OnShow)
 	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
@@ -224,7 +227,8 @@ TEST_F(MenuViewIconTest, OnShowWithNoImage)
 
 	// The item didn't have any image set, so showing the menu shouldn't result in any image being
 	// assigned.
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, nullptr);
 }
 
@@ -241,7 +245,8 @@ TEST_F(MenuViewIconTest, MenuBeingShown)
 	AddItemsToMenu(&menuView, 1);
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
@@ -261,7 +266,8 @@ TEST_F(MenuViewIconTest, ShowAfterDpiChange)
 	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI * 2);
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
@@ -281,7 +287,8 @@ TEST_F(MenuViewIconTest, ShowAtSameDpi)
 	// The menu is being shown again, at the same DPI level, so the image shouldn't be updated.
 	menuView.OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
 
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
@@ -299,7 +306,8 @@ TEST_F(MenuViewIconTest, IconUpdate)
 	m_shellIconLoader.TriggerPendingUpdateCallbacks();
 	EXPECT_NE(generatedBitmap, nullptr);
 
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, generatedBitmap);
 }
 
@@ -311,7 +319,8 @@ TEST_F(MenuViewIconTest, AddItemAfterClose)
 
 	AddItemsToMenu(&menuView, 1);
 
-	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0, true);
+	auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	EXPECT_EQ(bitmap, nullptr);
 }
 
@@ -333,7 +342,8 @@ TEST_F(MenuViewIconTest, IconRetrievalAfterMenuRebuilt)
 
 	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), i, true);
+		auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), i,
+			MenuHelper::ItemLookup::ByPosition);
 		originalBitmaps.push_back(bitmap);
 	}
 
@@ -346,7 +356,8 @@ TEST_F(MenuViewIconTest, IconRetrievalAfterMenuRebuilt)
 	// the new items shouldn't have changed.
 	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), i, true);
+		auto bitmap = MenuHelper::GetItemBitmap(menuView.GetNativeMenuForTesting(), i,
+			MenuHelper::ItemLookup::ByPosition);
 		EXPECT_EQ(bitmap, originalBitmaps[i]);
 	}
 }

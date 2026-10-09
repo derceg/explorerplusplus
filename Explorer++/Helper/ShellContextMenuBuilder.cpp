@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "ShellContextMenuBuilder.h"
-#include "MenuHelper.h"
 #include "ShellContextMenu.h"
 #include "ShellContextMenuIdRemapper.h"
 #include <boost/algorithm/string/predicate.hpp>
@@ -18,27 +17,28 @@ ShellContextMenuBuilder::ShellContextMenuBuilder(HMENU menu, IContextMenu *conte
 }
 
 void ShellContextMenuBuilder::AddStringItem(UINT id, const std::wstring &text, UINT item,
-	bool byPosition)
+	MenuHelper::ItemLookup lookupType)
 {
-	MenuHelper::AddStringItem(m_menu, m_idRemapper->GenerateUpdatedId(id), text, item, byPosition);
+	MenuHelper::AddStringItem(m_menu, m_idRemapper->GenerateUpdatedId(id), text, item, lookupType);
 }
 
 void ShellContextMenuBuilder::EnableItem(UINT id, bool enable)
 {
-	MenuHelper::SetItemEnabled(m_menu, m_idRemapper->GetUpdatedId(id), enable);
+	MenuHelper::SetItemEnabled(m_menu, m_idRemapper->GetUpdatedId(id), MenuHelper::ItemLookup::ById,
+		enable);
 }
 
-void ShellContextMenuBuilder::AddSeparator(UINT item, bool byPosition)
+void ShellContextMenuBuilder::AddSeparator(UINT item, MenuHelper::ItemLookup lookupType)
 {
-	MenuHelper::AddSeparator(m_menu, item, byPosition);
+	MenuHelper::AddSeparator(m_menu, item, lookupType);
 }
 
 void ShellContextMenuBuilder::AddSubMenuItem(UINT id, const std::wstring &text,
-	wil::unique_hmenu subMenu, UINT item, bool byPosition)
+	wil::unique_hmenu subMenu, UINT item, MenuHelper::ItemLookup lookupType)
 {
 	RemapMenuIds(subMenu.get());
 	MenuHelper::AddSubMenuItem(m_menu, m_idRemapper->GenerateUpdatedId(id), text,
-		std::move(subMenu), item, byPosition);
+		std::move(subMenu), item, lookupType);
 }
 
 // When a submenu is added to a shell context menu, the IDs for each of the submenu items will need

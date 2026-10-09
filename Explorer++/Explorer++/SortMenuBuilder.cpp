@@ -34,8 +34,10 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 		UINT stringIndex = GetSortMenuItemStringIndex(sortById);
 		std::wstring menuText = m_resourceLoader->LoadString(stringIndex);
 
-		MenuHelper::AddStringItem(sortByMenu.get(), sortById, menuText, position, TRUE);
-		MenuHelper::AddStringItem(groupByMenu.get(), groupById, menuText, position, TRUE);
+		MenuHelper::AddStringItem(sortByMenu.get(), sortById, menuText, position,
+			MenuHelper::ItemLookup::ByPosition);
+		MenuHelper::AddStringItem(groupByMenu.get(), groupById, menuText, position,
+			MenuHelper::ItemLookup::ByPosition);
 
 		position++;
 	}
@@ -44,7 +46,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 	{
 		std::wstring groupByNoneText = m_resourceLoader->LoadString(IDS_GROUP_BY_NONE);
 		MenuHelper::AddStringItem(groupByMenu.get(), IDM_GROUP_BY_NONE, groupByNoneText, position++,
-			true);
+			MenuHelper::ItemLookup::ByPosition);
 	}
 
 	SetMenuItemStates(sortByMenu.get(), groupByMenu.get(), tab);
@@ -102,8 +104,10 @@ void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, con
 	}
 	else
 	{
-		MenuHelper::SetItemEnabled(groupByMenu, IDM_GROUP_SORT_ASCENDING, FALSE);
-		MenuHelper::SetItemEnabled(groupByMenu, IDM_GROUP_SORT_DESCENDING, FALSE);
+		MenuHelper::SetItemEnabled(groupByMenu, IDM_GROUP_SORT_ASCENDING,
+			MenuHelper::ItemLookup::ById, false);
+		MenuHelper::SetItemEnabled(groupByMenu, IDM_GROUP_SORT_DESCENDING,
+			MenuHelper::ItemLookup::ById, false);
 	}
 }
 

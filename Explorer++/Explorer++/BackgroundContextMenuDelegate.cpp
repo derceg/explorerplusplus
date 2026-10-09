@@ -33,17 +33,17 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE director
 	auto viewsMenu = viewsMenuBuilder.BuildMenu(m_browser);
 	std::wstring text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_VIEW);
 	builder->AddSubMenuItem(IDM_BACKGROUND_CONTEXT_MENU_VIEW_POPUP, text, std::move(viewsMenu),
-		position++, true);
+		position++, MenuHelper::ItemLookup::ByPosition);
 
 	SortMenuBuilder sortMenuBuilder(m_resourceLoader);
 	auto sortMenus = sortMenuBuilder.BuildMenus(*m_browser->GetActiveShellBrowser()->GetTab());
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
 	builder->AddSubMenuItem(IDM_BACKGROUND_CONTEXT_MENU_SORT_BY_POPUP, text,
-		std::move(sortMenus.sortByMenu), position++, true);
+		std::move(sortMenus.sortByMenu), position++, MenuHelper::ItemLookup::ByPosition);
 
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
 	builder->AddSubMenuItem(IDM_BACKGROUND_CONTEXT_MENU_GROUP_BY_POPUP, text,
-		std::move(sortMenus.groupByMenu), position++, true);
+		std::move(sortMenus.groupByMenu), position++, MenuHelper::ItemLookup::ByPosition);
 
 	if (!m_browser->GetActiveShellBrowser()->CanEnableGroupMode())
 	{
@@ -51,19 +51,22 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE director
 	}
 
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_REFRESH);
-	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_REFRESH, text, position++, true);
+	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_REFRESH, text, position++,
+		MenuHelper::ItemLookup::ByPosition);
 
-	builder->AddSeparator(position++, true);
+	builder->AddSeparator(position++, MenuHelper::ItemLookup::ByPosition);
 
 	if (CanCustomizeDirectory(directory))
 	{
 		text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_CUSTOMIZE);
-		builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_CUSTOMIZE, text, position++, true);
-		builder->AddSeparator(position++, true);
+		builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_CUSTOMIZE, text, position++,
+			MenuHelper::ItemLookup::ByPosition);
+		builder->AddSeparator(position++, MenuHelper::ItemLookup::ByPosition);
 	}
 
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE);
-	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE, text, position++, true);
+	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE, text, position++,
+		MenuHelper::ItemLookup::ByPosition);
 
 	if (!CanPasteInDirectory(m_clipboardStore, directory, PasteType::Normal))
 	{
@@ -71,14 +74,15 @@ void BackgroundContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE director
 	}
 
 	text = m_resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT);
-	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, text, position++, true);
+	builder->AddStringItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, text, position++,
+		MenuHelper::ItemLookup::ByPosition);
 
 	if (!CanPasteInDirectory(m_clipboardStore, directory, PasteType::Shortcut))
 	{
 		builder->EnableItem(IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, false);
 	}
 
-	builder->AddSeparator(position++, true);
+	builder->AddSeparator(position++, MenuHelper::ItemLookup::ByPosition);
 }
 
 void BackgroundContextMenuDelegate::RemoveNonFunctionalItems(ShellContextMenuBuilder *builder)

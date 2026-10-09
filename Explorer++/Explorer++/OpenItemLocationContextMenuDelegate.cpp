@@ -39,7 +39,8 @@ void OpenItemLocationContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE di
 		openLocationText = m_resourceLoader->LoadString(IDS_SEARCH_OPEN_FILE_LOCATION);
 	}
 
-	builder->AddStringItem(OPEN_ITEM_LOCATION_MENU_ITEM_ID, openLocationText, 1, true);
+	builder->AddStringItem(OPEN_ITEM_LOCATION_MENU_ITEM_ID, openLocationText, 1,
+		MenuHelper::ItemLookup::ByPosition);
 }
 
 bool OpenItemLocationContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,

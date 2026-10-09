@@ -34,7 +34,7 @@ void MenuView::AppendItem(MenuItemParams params)
 
 	if (params.GetCheckStyle() == MenuItemCheckStyle::Radio)
 	{
-		MenuHelper::AddItemTypeFlags(m_menu, id, MFT_RADIOCHECK);
+		MenuHelper::AddItemTypeFlags(m_menu, id, MenuHelper::ItemLookup::ById, MFT_RADIOCHECK);
 	}
 
 	RegisterItem(id, std::move(item), params.GetKey());
@@ -265,8 +265,8 @@ void MenuView::UpdateDynamicPropertiesForItem(UINT id)
 void MenuView::UpdateItemState(UINT id)
 {
 	auto *item = GetItem(id);
-	MenuHelper::SetItemEnabled(m_menu, id, item->IsEnabled());
-	MenuHelper::SetItemChecked(m_menu, id, item->IsChecked());
+	MenuHelper::SetItemEnabled(m_menu, id, MenuHelper::ItemLookup::ById, item->IsEnabled());
+	MenuHelper::SetItemChecked(m_menu, id, MenuHelper::ItemLookup::ById, item->IsChecked());
 }
 
 void MenuView::SetItemImage(UINT id)

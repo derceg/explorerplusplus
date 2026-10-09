@@ -95,7 +95,7 @@ protected:
 TEST_F(ShellContextMenuBuilderTest, AddStringItem)
 {
 	UINT originalId = 100;
-	m_builder.AddStringItem(originalId, L"Item", 0, true);
+	m_builder.AddStringItem(originalId, L"Item", 0, MenuHelper::ItemLookup::ByPosition);
 
 	ASSERT_EQ(GetMenuItemCount(m_menu.get()), 1);
 
@@ -106,13 +106,13 @@ TEST_F(ShellContextMenuBuilderTest, AddStringItem)
 TEST_F(ShellContextMenuBuilderTest, EnableItem)
 {
 	UINT originalId = 100;
-	m_builder.AddStringItem(originalId, L"Item", 0, true);
-	ASSERT_TRUE(
-		MenuHelper::IsItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId), false));
+	m_builder.AddStringItem(originalId, L"Item", 0, MenuHelper::ItemLookup::ByPosition);
+	ASSERT_TRUE(MenuHelper::IsItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId),
+		MenuHelper::ItemLookup::ById));
 
 	m_builder.EnableItem(originalId, false);
-	EXPECT_FALSE(
-		MenuHelper::IsItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId), false));
+	EXPECT_FALSE(MenuHelper::IsItemEnabled(m_menu.get(), m_idRemapper.GetUpdatedId(originalId),
+		MenuHelper::ItemLookup::ById));
 }
 
 TEST_F(ShellContextMenuBuilderTest, AddSubMenuItem)
@@ -125,7 +125,8 @@ TEST_F(ShellContextMenuBuilderTest, AddSubMenuItem)
 	MenuHelper::AddSeparator(subMenu.get());
 	MenuHelper::AddStringItem(subMenu.get(), startId + 2, L"Third");
 
-	m_builder.AddSubMenuItem(0, L"Sub menu", std::move(subMenu), 0, true);
+	m_builder.AddSubMenuItem(0, L"Sub menu", std::move(subMenu), 0,
+		MenuHelper::ItemLookup::ByPosition);
 	ASSERT_EQ(GetMenuItemCount(m_menu.get()), 1);
 
 	HMENU insertedSubMenu = GetSubMenu(m_menu.get(), 0);

@@ -8,7 +8,6 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ViewModeHelper.h"
-#include "../Helper/MenuHelper.h"
 
 ViewsMenuBuilder::ViewsMenuBuilder(const ResourceLoader *resourceLoader) :
 	m_resourceLoader(resourceLoader)
@@ -18,7 +17,7 @@ ViewsMenuBuilder::ViewsMenuBuilder(const ResourceLoader *resourceLoader) :
 wil::unique_hmenu ViewsMenuBuilder::BuildMenu(const BrowserWindow *browser)
 {
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
-	AddViewModesToMenu(menu.get(), 0, true);
+	AddViewModesToMenu(menu.get(), 0, MenuHelper::ItemLookup::ByPosition);
 
 	ViewMode currentViewMode = browser->GetActiveShellBrowser()->GetViewMode();
 	CheckMenuRadioItem(menu.get(), IDM_VIEW_EXTRALARGEICONS, IDM_VIEW_TILES,
@@ -27,16 +26,17 @@ wil::unique_hmenu ViewsMenuBuilder::BuildMenu(const BrowserWindow *browser)
 	return menu;
 }
 
-void ViewsMenuBuilder::AddViewModesToMenu(HMENU menu, UINT startPosition, bool byPosition)
+void ViewsMenuBuilder::AddViewModesToMenu(HMENU menu, UINT startPosition,
+	MenuHelper::ItemLookup lookupType)
 {
 	UINT position = startPosition;
 
 	for (auto viewMode : VIEW_MODES)
 	{
 		MenuHelper::AddStringItem(menu, GetViewModeMenuId(viewMode),
-			GetViewModeMenuText(m_resourceLoader, viewMode), position, byPosition);
+			GetViewModeMenuText(m_resourceLoader, viewMode), position, lookupType);
 
-		if (byPosition)
+		if (lookupType == MenuHelper::ItemLookup::ByPosition)
 		{
 			position++;
 		}

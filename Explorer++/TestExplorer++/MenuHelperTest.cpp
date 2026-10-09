@@ -58,7 +58,7 @@ TEST(MenuHelperTest, GetItemText)
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 
-	auto text = MenuHelper::GetItemText(menu.get(), itemId, false);
+	auto text = MenuHelper::GetItemText(menu.get(), itemId, MenuHelper::ItemLookup::ById);
 	EXPECT_EQ(text, L"Item");
 }
 
@@ -85,10 +85,10 @@ TEST(MenuHelperTest, EnabledState)
 
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
-	EXPECT_TRUE(MenuHelper::IsItemEnabled(menu.get(), itemId, false));
+	EXPECT_TRUE(MenuHelper::IsItemEnabled(menu.get(), itemId, MenuHelper::ItemLookup::ById));
 
-	MenuHelper::SetItemEnabled(menu.get(), itemId, false);
-	EXPECT_FALSE(MenuHelper::IsItemEnabled(menu.get(), itemId, false));
+	MenuHelper::SetItemEnabled(menu.get(), itemId, MenuHelper::ItemLookup::ById, false);
+	EXPECT_FALSE(MenuHelper::IsItemEnabled(menu.get(), itemId, MenuHelper::ItemLookup::ById));
 }
 
 TEST(MenuHelperTest, CheckedState)
@@ -97,10 +97,10 @@ TEST(MenuHelperTest, CheckedState)
 
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
-	EXPECT_FALSE(MenuHelper::IsItemChecked(menu.get(), itemId, false));
+	EXPECT_FALSE(MenuHelper::IsItemChecked(menu.get(), itemId, MenuHelper::ItemLookup::ById));
 
-	MenuHelper::SetItemChecked(menu.get(), itemId, true);
-	EXPECT_TRUE(MenuHelper::IsItemChecked(menu.get(), itemId, false));
+	MenuHelper::SetItemChecked(menu.get(), itemId, MenuHelper::ItemLookup::ById, true);
+	EXPECT_TRUE(MenuHelper::IsItemChecked(menu.get(), itemId, MenuHelper::ItemLookup::ById));
 }
 
 TEST(MenuHelperTest, TypeFlags)
@@ -110,9 +110,10 @@ TEST(MenuHelperTest, TypeFlags)
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 
-	MenuHelper::AddItemTypeFlags(menu.get(), itemId, MFT_RADIOCHECK);
+	MenuHelper::AddItemTypeFlags(menu.get(), itemId, MenuHelper::ItemLookup::ById, MFT_RADIOCHECK);
 	EXPECT_TRUE(
-		WI_IsFlagSet(MenuHelper::GetItemTypeFlags(menu.get(), itemId, false), MFT_RADIOCHECK));
+		WI_IsFlagSet(MenuHelper::GetItemTypeFlags(menu.get(), itemId, MenuHelper::ItemLookup::ById),
+			MFT_RADIOCHECK));
 }
 
 class IsPartOfMenuTest : public Test

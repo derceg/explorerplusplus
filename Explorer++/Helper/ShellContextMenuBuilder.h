@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MenuHelper.h"
 #include <wil/resource.h>
 #include <ShObjIdl.h>
 #include <string>
@@ -17,11 +18,12 @@ public:
 	ShellContextMenuBuilder(HMENU menu, IContextMenu *contextMenu,
 		ShellContextMenuIdRemapper *idRemapper);
 
-	void AddStringItem(UINT id, const std::wstring &text, UINT item, bool byPosition);
+	void AddStringItem(UINT id, const std::wstring &text, UINT item,
+		MenuHelper::ItemLookup lookupType);
 	void EnableItem(UINT id, bool enable);
-	void AddSeparator(UINT item, bool byPosition);
+	void AddSeparator(UINT item, MenuHelper::ItemLookup lookupType);
 	void AddSubMenuItem(UINT id, const std::wstring &text, wil::unique_hmenu subMenu, UINT item,
-		bool byPosition);
+		MenuHelper::ItemLookup lookupType);
 	void RemoveShellItem(const std::wstring &targetVerb);
 
 private:

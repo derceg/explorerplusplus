@@ -42,7 +42,8 @@ void OpenItemsContextMenuDelegate::UpdateMenuEntries(PCIDLIST_ABSOLUTE directory
 	}
 
 	builder->AddStringItem(OPEN_IN_NEW_TAB_MENU_ITEM_ID,
-		m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB), 1, true);
+		m_resourceLoader->LoadString(IDS_GENERAL_OPEN_IN_NEW_TAB), 1,
+		MenuHelper::ItemLookup::ByPosition);
 }
 
 bool OpenItemsContextMenuDelegate::MaybeHandleShellMenuItem(PCIDLIST_ABSOLUTE directory,

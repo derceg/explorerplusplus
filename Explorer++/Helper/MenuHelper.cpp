@@ -35,50 +35,52 @@ DWORD GetStyleFlags(HMENU menu)
 
 void AddStringItem(HMENU menu, UINT id, const std::wstring &text)
 {
-	AddStringItem(menu, id, text, GetMenuItemCount(menu), TRUE);
+	AddStringItem(menu, id, text, GetMenuItemCount(menu), ItemLookup::ByPosition);
 }
 
-void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, BOOL byPosition)
+void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
 	menuItemInfo.wID = id;
 	menuItemInfo.dwTypeData = const_cast<LPWSTR>(text.c_str());
-	auto res = InsertMenuItem(menu, item, byPosition, &menuItemInfo);
+	auto res = InsertMenuItem(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 }
 
 void AddSeparator(HMENU menu)
 {
-	AddSeparator(menu, GetMenuItemCount(menu), TRUE);
+	AddSeparator(menu, GetMenuItemCount(menu), ItemLookup::ByPosition);
 }
 
-void AddSeparator(HMENU menu, UINT item, BOOL byPosition)
+void AddSeparator(HMENU menu, UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_FTYPE;
 	menuItemInfo.fType = MFT_SEPARATOR;
-	auto res = InsertMenuItem(menu, item, byPosition, &menuItemInfo);
+	auto res = InsertMenuItem(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 }
 
 HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text)
 {
-	return AddSubMenuItem(menu, id, text, CheckedCreatePopupMenu(), GetMenuItemCount(menu), TRUE);
+	return AddSubMenuItem(menu, id, text, CheckedCreatePopupMenu(), GetMenuItemCount(menu),
+		ItemLookup::ByPosition);
 }
 
 HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu)
 {
-	return AddSubMenuItem(menu, id, text, std::move(subMenu), GetMenuItemCount(menu), TRUE);
+	return AddSubMenuItem(menu, id, text, std::move(subMenu), GetMenuItemCount(menu),
+		ItemLookup::ByPosition);
 }
 
 // Note that an ID can be passed in here. While that is perhaps not the typical usage (e.g.
 // GetMenuItemID() will return -1 for a submenu item), it does work correctly. That is, the ID set
 // here can be retrieved by GetMenuItemInfo().
 HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
-	UINT item, BOOL byPosition)
+	UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -86,7 +88,7 @@ HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_
 	menuItemInfo.wID = id;
 	menuItemInfo.dwTypeData = const_cast<LPWSTR>(text.c_str());
 	menuItemInfo.hSubMenu = subMenu.get();
-	auto res = InsertMenuItem(menu, item, byPosition, &menuItemInfo);
+	auto res = InsertMenuItem(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	// As the sub menu is now part of the parent menu, it will be destroyed when the parent menu is
@@ -94,30 +96,42 @@ HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_
 	return subMenu.release();
 }
 
-void AddItemTypeFlags(HMENU menu, UINT id, UINT typeFlags)
+void AddItemTypeFlags(HMENU menu, UINT item, ItemLookup lookupType, UINT typeFlags)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_FTYPE;
-	auto res = GetMenuItemInfo(menu, id, false, &menuItemInfo);
+	auto res = GetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	WI_SetAllFlags(menuItemInfo.fType, typeFlags);
-	res = SetMenuItemInfo(menu, id, false, &menuItemInfo);
+	res = SetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 }
 
-void SetItemChecked(HMENU hMenu, UINT itemID, BOOL bCheck)
+void SetItemChecked(HMENU menu, UINT item, ItemLookup lookupType, bool check)
 {
-	UINT state = bCheck ? MF_CHECKED : MF_UNCHECKED;
-	auto res = CheckMenuItem(hMenu, itemID, state);
+	UINT state = check ? MF_CHECKED : MF_UNCHECKED;
+
+	if (lookupType == ItemLookup::ByPosition)
+	{
+		WI_SetFlag(state, MF_BYPOSITION);
+	}
+
+	auto res = CheckMenuItem(menu, item, state);
 	CHECK_NE(res, static_cast<DWORD>(-1));
 }
 
-void SetItemEnabled(HMENU hMenu, UINT itemID, BOOL bEnable)
+void SetItemEnabled(HMENU menu, UINT item, ItemLookup lookupType, bool enable)
 {
-	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
-	auto res = EnableMenuItem(hMenu, itemID, state);
+	UINT state = enable ? MF_ENABLED : MF_DISABLED;
+
+	if (lookupType == ItemLookup::ByPosition)
+	{
+		WI_SetFlag(state, MF_BYPOSITION);
+	}
+
+	auto res = EnableMenuItem(menu, item, state);
 	CHECK_NE(res, -1);
 }
 
@@ -133,7 +147,7 @@ void RemoveDuplicateSeparators(HMENU menu)
 		MENUITEMINFO menuItemInfo = {};
 		menuItemInfo.cbSize = sizeof(menuItemInfo);
 		menuItemInfo.fMask = MIIM_FTYPE;
-		auto res = GetMenuItemInfo(menu, i, TRUE, &menuItemInfo);
+		auto res = GetMenuItemInfo(menu, i, true, &menuItemInfo);
 		CHECK(res);
 
 		bool currentItemSeparator = WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR);
@@ -161,7 +175,7 @@ void RemoveTrailingSeparators(HMENU menu)
 		MENUITEMINFO menuItemInfo = {};
 		menuItemInfo.cbSize = sizeof(menuItemInfo);
 		menuItemInfo.fMask = MIIM_FTYPE;
-		auto res = GetMenuItemInfo(menu, i, TRUE, &menuItemInfo);
+		auto res = GetMenuItemInfo(menu, i, true, &menuItemInfo);
 		CHECK(res);
 
 		if (menuItemInfo.fType != MFT_SEPARATOR)
@@ -174,13 +188,13 @@ void RemoveTrailingSeparators(HMENU menu)
 	}
 }
 
-std::wstring GetItemText(HMENU menu, UINT item, bool byPosition)
+std::wstring GetItemText(HMENU menu, UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_STRING;
 	menuItemInfo.dwTypeData = nullptr;
-	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+	auto res = GetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	// The returned size doesn't include space for the terminating null character.
@@ -190,7 +204,7 @@ std::wstring GetItemText(HMENU menu, UINT item, bool byPosition)
 	text.resize(menuItemInfo.cch);
 
 	menuItemInfo.dwTypeData = text.data();
-	res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+	res = GetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	text.resize(menuItemInfo.cch);
@@ -246,46 +260,46 @@ bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu)
 	return false;
 }
 
-HBITMAP GetItemBitmap(HMENU menu, UINT item, bool byPosition)
+HBITMAP GetItemBitmap(HMENU menu, UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_BITMAP;
-	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+	auto res = GetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	return menuItemInfo.hbmpItem;
 }
 
-bool IsItemEnabled(HMENU menu, UINT item, bool byPosition)
+bool IsItemEnabled(HMENU menu, UINT item, ItemLookup lookupType)
 {
-	UINT state = GetItemState(menu, item, byPosition);
+	UINT state = GetItemState(menu, item, lookupType);
 	return !(state & MFS_DISABLED);
 }
 
-bool IsItemChecked(HMENU menu, UINT item, bool byPosition)
+bool IsItemChecked(HMENU menu, UINT item, ItemLookup lookupType)
 {
-	UINT state = GetItemState(menu, item, byPosition);
+	UINT state = GetItemState(menu, item, lookupType);
 	return WI_IsFlagSet(state, MFS_CHECKED);
 }
 
-UINT GetItemState(HMENU menu, UINT item, bool byPosition)
+UINT GetItemState(HMENU menu, UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_STATE;
-	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+	auto res = GetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	return menuItemInfo.fState;
 }
 
-UINT GetItemTypeFlags(HMENU menu, UINT item, bool byPosition)
+UINT GetItemTypeFlags(HMENU menu, UINT item, ItemLookup lookupType)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_FTYPE;
-	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+	auto res = GetMenuItemInfo(menu, item, lookupType == ItemLookup::ByPosition, &menuItemInfo);
 	CHECK(res);
 
 	return menuItemInfo.fType;
