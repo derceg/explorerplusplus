@@ -9,10 +9,26 @@
 #include "ShellIconLoaderFake.h"
 #include "ShellIconModel.h"
 #include "../Helper/MenuHelper.h"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 
 using namespace testing;
+
+namespace
+{
+
+class ExternalMenuItemDelegateMock : public ExternalMenuItemDelegate
+{
+public:
+	MOCK_METHOD(std::optional<LRESULT>, MaybeHandleMessage,
+		(UINT msg, WPARAM wParam, LPARAM lParam), (override));
+	MOCK_METHOD(std::optional<std::wstring>, MaybeGetExternalItemHelpText, (UINT id),
+		(const, override));
+	MOCK_METHOD(void, OnExternalItemSelected, (UINT id), (override));
+};
+
+}
 
 class MenuViewTest : public Test
 {
@@ -137,6 +153,54 @@ TEST_F(MenuViewTest, ClearMenu)
 
 	m_menuView.ClearMenu();
 	EXPECT_EQ(m_menuView.GetNumItems(), 0);
+}
+
+TEST_F(MenuViewTest, ExternalItemHelpText)
+{
+	ExternalMenuItemDelegateMock externalItemDelegate;
+	m_menuView.SetExternalItemDelegate(&externalItemDelegate);
+
+	HMENU menu = m_menuView.GetNativeMenuForExternalItems();
+
+	UINT idCounter = MenuView::EXTERNAL_ID_MIN;
+
+	UINT itemId1 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId1, L"External item 1");
+
+	UINT itemId2 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId2, L"External item 2");
+
+	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId1))
+		.WillOnce(Return(std::wstring(L"Help for external item 1")));
+	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId2))
+		.WillOnce(Return(std::wstring(L"Help for external item 2")));
+
+	EXPECT_EQ(m_menuView.GetItemHelpText(itemId1), L"Help for external item 1");
+	EXPECT_EQ(m_menuView.GetItemHelpText(itemId2), L"Help for external item 2");
+}
+
+TEST_F(MenuViewTest, ExternalItemSelection)
+{
+	ExternalMenuItemDelegateMock externalItemDelegate;
+	m_menuView.SetExternalItemDelegate(&externalItemDelegate);
+
+	HMENU menu = m_menuView.GetNativeMenuForExternalItems();
+
+	UINT idCounter = MenuView::EXTERNAL_ID_MIN;
+
+	UINT itemId1 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId1, L"External item 1");
+
+	UINT itemId2 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId2, L"External item 2");
+
+	InSequence seq;
+
+	EXPECT_CALL(externalItemDelegate, OnExternalItemSelected(itemId1));
+	EXPECT_CALL(externalItemDelegate, OnExternalItemSelected(itemId2));
+
+	m_menuView.SelectItem(itemId1, false, false);
+	m_menuView.SelectItem(itemId2, false, false);
 }
 
 using MenuViewDeathTest = MenuViewTest;

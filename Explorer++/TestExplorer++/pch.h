@@ -25,6 +25,7 @@
 #include <windows.h>
 // clang-format on
 #include <commctrl.h>
+#include <ocidl.h>
 #include <windowsx.h>
 
 // WinRT Header Files:

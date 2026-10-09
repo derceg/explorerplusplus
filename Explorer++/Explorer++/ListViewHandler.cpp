@@ -16,7 +16,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
-#include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
 #include "../Helper/ClipboardHelper.h"

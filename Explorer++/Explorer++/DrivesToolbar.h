@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+class AcceleratorManager;
 class BrowserWindow;
 class DriveModel;
 class DrivesToolbarView;
@@ -18,7 +19,8 @@ class DrivesToolbar
 {
 public:
 	static DrivesToolbar *Create(DrivesToolbarView *view, DriveModel *driveModel,
-		BrowserWindow *browser, const ResourceLoader *resourceLoader);
+		BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
+		const ResourceLoader *resourceLoader);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
 	DrivesToolbar(DrivesToolbar &&) = delete;
@@ -29,7 +31,7 @@ public:
 
 private:
 	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browser,
-		const ResourceLoader *resourceLoader);
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 	~DrivesToolbar();
 
 	void Initialize();
@@ -52,6 +54,7 @@ private:
 	DrivesToolbarView *const m_view;
 	DriveModel *const m_driveModel;
 	BrowserWindow *const m_browser;
+	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

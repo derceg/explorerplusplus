@@ -30,10 +30,7 @@
 #include "Plugins/PluginMenuManager.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "ShellBrowser/SortModes.h"
-#include "SortModeMenuMappings.h"
 #include "TabContainer.h"
-#include "ViewsMenuBuilder.h"
 #include "../Helper/Controls.h"
 #include "../Helper/EnumHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -217,11 +214,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_appServices->GetPluginCommandManager()->onAcceleratorPressed(id);
 		return 0;
 	}
-	else if (IsSortModeMenuItemId(id))
-	{
-		m_commandController.ExecuteCommand(id);
-		return 0;
-	}
 
 	switch (id)
 	{
@@ -309,12 +301,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case ToUnderlying(MainToolbarButton::Paste):
 	case IDM_EDIT_PASTE:
-	case IDM_BACKGROUND_CONTEXT_MENU_PASTE:
 		OnPaste();
 		break;
 
 	case IDM_EDIT_PASTESHORTCUT:
-	case IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT:
 		OnPasteShortcut();
 		break;
 
@@ -376,285 +366,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	case IDM_VIEW_DECREASE_TEXT_SIZE:
 	case IDM_VIEW_INCREASE_TEXT_SIZE:
 	case IDA_RESET_TEXT_SIZE:
-	case IDM_VIEW_EXTRALARGEICONS:
-	case IDM_VIEW_LARGEICONS:
-	case IDM_VIEW_ICONS:
-	case IDM_VIEW_SMALLICONS:
-	case IDM_VIEW_LIST:
-	case IDM_VIEW_DETAILS:
-	case IDM_VIEW_EXTRALARGETHUMBNAILS:
-	case IDM_VIEW_LARGETHUMBNAILS:
-	case IDM_VIEW_THUMBNAILS:
-	case IDM_VIEW_TILES:
 	case IDM_VIEW_CHANGEDISPLAYCOLOURS:
 	case IDM_FILTER_FILTERRESULTS:
 	case IDM_FILTER_ENABLE_FILTER:
 		m_commandController.ExecuteCommand(id);
-		break;
-
-	case IDM_GROUPBY_NAME:
-		OnGroupBy(SortMode::Name);
-		break;
-
-	case IDM_GROUPBY_SIZE:
-		OnGroupBy(SortMode::Size);
-		break;
-
-	case IDM_GROUPBY_TYPE:
-		OnGroupBy(SortMode::Type);
-		break;
-
-	case IDM_GROUPBY_DATEMODIFIED:
-		OnGroupBy(SortMode::DateModified);
-		break;
-
-	case IDM_GROUPBY_TOTALSIZE:
-		OnGroupBy(SortMode::TotalSize);
-		break;
-
-	case IDM_GROUPBY_FREESPACE:
-		OnGroupBy(SortMode::FreeSpace);
-		break;
-
-	case IDM_GROUPBY_DATEDELETED:
-		OnGroupBy(SortMode::DateDeleted);
-		break;
-
-	case IDM_GROUPBY_ORIGINALLOCATION:
-		OnGroupBy(SortMode::OriginalLocation);
-		break;
-
-	case IDM_GROUPBY_ATTRIBUTES:
-		OnGroupBy(SortMode::Attributes);
-		break;
-
-	case IDM_GROUPBY_REALSIZE:
-		OnGroupBy(SortMode::RealSize);
-		break;
-
-	case IDM_GROUPBY_SHORTNAME:
-		OnGroupBy(SortMode::ShortName);
-		break;
-
-	case IDM_GROUPBY_OWNER:
-		OnGroupBy(SortMode::Owner);
-		break;
-
-	case IDM_GROUPBY_PRODUCTNAME:
-		OnGroupBy(SortMode::ProductName);
-		break;
-
-	case IDM_GROUPBY_COMPANY:
-		OnGroupBy(SortMode::Company);
-		break;
-
-	case IDM_GROUPBY_DESCRIPTION:
-		OnGroupBy(SortMode::Description);
-		break;
-
-	case IDM_GROUPBY_FILEVERSION:
-		OnGroupBy(SortMode::FileVersion);
-		break;
-
-	case IDM_GROUPBY_PRODUCTVERSION:
-		OnGroupBy(SortMode::ProductVersion);
-		break;
-
-	case IDM_GROUPBY_SHORTCUTTO:
-		OnGroupBy(SortMode::ShortcutTo);
-		break;
-
-	case IDM_GROUPBY_HARDLINKS:
-		OnGroupBy(SortMode::HardLinks);
-		break;
-
-	case IDM_GROUPBY_EXTENSION:
-		OnGroupBy(SortMode::Extension);
-		break;
-
-	case IDM_GROUPBY_CREATED:
-		OnGroupBy(SortMode::Created);
-		break;
-
-	case IDM_GROUPBY_ACCESSED:
-		OnGroupBy(SortMode::Accessed);
-		break;
-
-	case IDM_GROUPBY_TITLE:
-		OnGroupBy(SortMode::Title);
-		break;
-
-	case IDM_GROUPBY_SUBJECT:
-		OnGroupBy(SortMode::Subject);
-		break;
-
-	case IDM_GROUPBY_AUTHOR:
-		OnGroupBy(SortMode::Authors);
-		break;
-
-	case IDM_GROUPBY_KEYWORDS:
-		OnGroupBy(SortMode::Keywords);
-		break;
-
-	case IDM_GROUPBY_COMMENTS:
-		OnGroupBy(SortMode::Comments);
-		break;
-
-	case IDM_GROUPBY_CAMERAMODEL:
-		OnGroupBy(SortMode::CameraModel);
-		break;
-
-	case IDM_GROUPBY_DATETAKEN:
-		OnGroupBy(SortMode::DateTaken);
-		break;
-
-	case IDM_GROUPBY_WIDTH:
-		OnGroupBy(SortMode::Width);
-		break;
-
-	case IDM_GROUPBY_HEIGHT:
-		OnGroupBy(SortMode::Height);
-		break;
-
-	case IDM_GROUPBY_VIRTUALCOMMENTS:
-		OnGroupBy(SortMode::VirtualComments);
-		break;
-
-	case IDM_GROUPBY_FILESYSTEM:
-		OnGroupBy(SortMode::FileSystem);
-		break;
-
-	case IDM_GROUPBY_NUMPRINTERDOCUMENTS:
-		OnGroupBy(SortMode::NumPrinterDocuments);
-		break;
-
-	case IDM_GROUPBY_PRINTERSTATUS:
-		OnGroupBy(SortMode::PrinterStatus);
-		break;
-
-	case IDM_GROUPBY_PRINTERCOMMENTS:
-		OnGroupBy(SortMode::PrinterComments);
-		break;
-
-	case IDM_GROUPBY_PRINTERLOCATION:
-		OnGroupBy(SortMode::PrinterLocation);
-		break;
-
-	case IDM_GROUPBY_NETWORKADAPTER_STATUS:
-		OnGroupBy(SortMode::NetworkAdapterStatus);
-		break;
-
-	case IDM_GROUPBY_MEDIA_BITRATE:
-		OnGroupBy(SortMode::MediaBitrate);
-		break;
-
-	case IDM_GROUPBY_MEDIA_COPYRIGHT:
-		OnGroupBy(SortMode::MediaCopyright);
-		break;
-
-	case IDM_GROUPBY_MEDIA_DURATION:
-		OnGroupBy(SortMode::MediaDuration);
-		break;
-
-	case IDM_GROUPBY_MEDIA_PROTECTED:
-		OnGroupBy(SortMode::MediaProtected);
-		break;
-
-	case IDM_GROUPBY_MEDIA_RATING:
-		OnGroupBy(SortMode::MediaRating);
-		break;
-
-	case IDM_GROUPBY_MEDIA_ALBUM_ARTIST:
-		OnGroupBy(SortMode::MediaAlbumArtist);
-		break;
-
-	case IDM_GROUPBY_MEDIA_ALBUM:
-		OnGroupBy(SortMode::MediaAlbum);
-		break;
-
-	case IDM_GROUPBY_MEDIA_BEATS_PER_MINUTE:
-		OnGroupBy(SortMode::MediaBeatsPerMinute);
-		break;
-
-	case IDM_GROUPBY_MEDIA_COMPOSER:
-		OnGroupBy(SortMode::MediaComposer);
-		break;
-
-	case IDM_GROUPBY_MEDIA_CONDUCTOR:
-		OnGroupBy(SortMode::MediaConductor);
-		break;
-
-	case IDM_GROUPBY_MEDIA_DIRECTOR:
-		OnGroupBy(SortMode::MediaDirector);
-		break;
-
-	case IDM_GROUPBY_MEDIA_GENRE:
-		OnGroupBy(SortMode::MediaGenre);
-		break;
-
-	case IDM_GROUPBY_MEDIA_LANGUAGE:
-		OnGroupBy(SortMode::MediaLanguage);
-		break;
-
-	case IDM_GROUPBY_MEDIA_BROADCAST_DATE:
-		OnGroupBy(SortMode::MediaBroadcastDate);
-		break;
-
-	case IDM_GROUPBY_MEDIA_CHANNEL:
-		OnGroupBy(SortMode::MediaChannel);
-		break;
-
-	case IDM_GROUPBY_MEDIA_STATION_NAME:
-		OnGroupBy(SortMode::MediaStationName);
-		break;
-
-	case IDM_GROUPBY_MEDIA_MOOD:
-		OnGroupBy(SortMode::MediaMood);
-		break;
-
-	case IDM_GROUPBY_MEDIA_PARENTAL_RATING:
-		OnGroupBy(SortMode::MediaParentalRating);
-		break;
-
-	case IDM_GROUPBY_MEDIA_PARENTAL_RATING_REASON:
-		OnGroupBy(SortMode::MediaParentalRatingReason);
-		break;
-
-	case IDM_GROUPBY_MEDIA_PERIOD:
-		OnGroupBy(SortMode::MediaPeriod);
-		break;
-
-	case IDM_GROUPBY_MEDIA_PRODUCER:
-		OnGroupBy(SortMode::MediaProducer);
-		break;
-
-	case IDM_GROUPBY_MEDIA_PUBLISHER:
-		OnGroupBy(SortMode::MediaPublisher);
-		break;
-
-	case IDM_GROUPBY_MEDIA_WRITER:
-		OnGroupBy(SortMode::MediaWriter);
-		break;
-
-	case IDM_GROUPBY_MEDIA_YEAR:
-		OnGroupBy(SortMode::MediaYear);
-		break;
-
-	case IDM_GROUP_BY_NONE:
-		OnGroupByNone();
-		break;
-
-	case IDM_SORT_ASCENDING:
-	case IDM_SORT_DESCENDING:
-		m_commandController.ExecuteCommand(id);
-		break;
-
-	case IDM_GROUP_SORT_ASCENDING:
-		OnGroupSortDirectionSelected(SortDirection::Ascending);
-		break;
-
-	case IDM_GROUP_SORT_DESCENDING:
-		OnGroupSortDirectionSelected(SortDirection::Descending);
 		break;
 
 	case IDM_VIEW_AUTOARRANGE:
@@ -667,7 +382,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case ToUnderlying(MainToolbarButton::Refresh):
 	case IDM_VIEW_REFRESH:
-	case IDM_BACKGROUND_CONTEXT_MENU_REFRESH:
 		m_commandController.ExecuteCommand(IDM_VIEW_REFRESH);
 		break;
 
@@ -1038,17 +752,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 								break;
 
 							case MainToolbarButton::Views:
-							{
-								ViewsMenuBuilder viewsMenuBuilder(m_resourceLoader);
-								auto viewsMenu = viewsMenuBuilder.BuildMenu(this);
-
-								// The submenu will be destroyed when the parent menu is
-								// destroyed.
-								hSubMenu = viewsMenu.release();
-
-								fMask |= MIIM_SUBMENU;
-							}
-							break;
+								// TODO: Show views menu.
+								break;
 
 							default:
 								// Most main toolbar buttons don't show a popup menu, so there's

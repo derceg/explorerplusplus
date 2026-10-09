@@ -24,16 +24,16 @@
 #include "FileOperations.h"
 #include "LabelEditHandler.h"
 #include "MainResource.h"
-#include "OpenItemsContextMenuDelegate.h"
 #include "PlatformContext.h"
+#include "PopupMenuRunner.h"
 #include "ResourceLoader.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "ShellItemContextMenu.h"
 #include "ShellTreeNode.h"
-#include "ShellTreeViewContextMenuDelegate.h"
 #include "TabContainer.h"
 #include "TabEvents.h"
 #include "../Helper/CachedIcons.h"
@@ -47,7 +47,6 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ScopedRedrawDisabler.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ShellItemContextMenu.h"
 #include <wil/common.h>
 #include <Shlwapi.h>
 #include <propkey.h>
@@ -1317,20 +1316,47 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellItemContextMenu contextMenu(pidl.get(), { child.get() }, m_browser);
-
-	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_appServices->GetResourceLoader());
-	contextMenu.AddDelegate(&openItemsDelegate);
-
-	ShellTreeViewContextMenuDelegate treeViewDelegate(this);
-	contextMenu.AddDelegate(&treeViewDelegate);
-
-	contextMenu.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
+	PopupMenuRunner popupRunner(m_hTreeView, m_browser);
+	ShellItemContextMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(),
+		pidl.get(), { child.get() }, m_hTreeView, nullptr, flags, m_browser,
+		m_appServices->GetResourceLoader(),
+		std::bind_front(&ShellTreeView::MaybeHandleShellMenuItem, this));
+	popupRunner.Show(finalPoint);
 
 	if (highlightTargetItem)
 	{
 		TreeView_SetItemState(m_hTreeView, targetItem, 0, TVIS_DROPHILITED);
 	}
+}
+
+bool ShellTreeView::MaybeHandleShellMenuItem(const PidlAbsolute &directory,
+	const std::vector<PidlChild> &items, const std::wstring &verb)
+{
+	// The context menu should only ever be shown for a single item in the treeview.
+	CHECK_EQ(items.size(), 1u);
+
+	auto pidlComplete = directory + items[0];
+
+	if (verb == L"rename")
+	{
+		StartRenamingItem(pidlComplete.Raw());
+
+		return true;
+	}
+	else if (verb == L"copy")
+	{
+		CopyItemToClipboard(pidlComplete.Raw(), ClipboardAction::Copy);
+
+		return true;
+	}
+	else if (verb == L"cut")
+	{
+		CopyItemToClipboard(pidlComplete.Raw(), ClipboardAction::Cut);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool ShellTreeView::IsCommandEnabled(int command) const

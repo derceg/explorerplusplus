@@ -638,35 +638,6 @@ void Explorerplusplus::OnCloneWindow()
 	LaunchCurrentProcess(m_hwnd, szQuotedCurrentDirectory);
 }
 
-void Explorerplusplus::OnGroupBy(SortMode groupMode)
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	SortMode currentGroupMode = selectedTab.GetShellBrowser()->GetGroupMode();
-
-	if (selectedTab.GetShellBrowser()->GetShowInGroups() && groupMode == currentGroupMode)
-	{
-		selectedTab.GetShellBrowser()->SetGroupSortDirection(
-			InvertSortDirection(selectedTab.GetShellBrowser()->GetGroupSortDirection()));
-	}
-	else
-	{
-		selectedTab.GetShellBrowser()->SetGroupMode(groupMode);
-		selectedTab.GetShellBrowser()->SetShowInGroups(true);
-	}
-}
-
-void Explorerplusplus::OnGroupByNone()
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->SetShowInGroups(false);
-}
-
-void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->SetGroupSortDirection(direction);
-}
-
 ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowserImpl() const
 {
 	return m_pActiveShellBrowser;

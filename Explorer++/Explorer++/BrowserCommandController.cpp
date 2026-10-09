@@ -23,7 +23,6 @@
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "SortModeMenuMappings.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
 #include "TabRestorer.h"
@@ -190,11 +189,6 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		m_browser->GetCommandTargetManager()->GetCurrentTarget()->ExecuteCommand(command);
 		return;
 	}
-	else if (IsSortModeMenuItemId(command))
-	{
-		OnSortBy(GetSortModeForMenuItemId(command));
-		return;
-	}
 
 	switch (command)
 	{
@@ -270,57 +264,9 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		OnResetMainFontSize();
 		break;
 
-	case IDM_VIEW_EXTRALARGEICONS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::ExtraLargeIcons);
-		break;
-
-	case IDM_VIEW_LARGEICONS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::LargeIcons);
-		break;
-
-	case IDM_VIEW_ICONS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::Icons);
-		break;
-
-	case IDM_VIEW_SMALLICONS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::SmallIcons);
-		break;
-
-	case IDM_VIEW_LIST:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::List);
-		break;
-
-	case IDM_VIEW_DETAILS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::Details);
-		break;
-
-	case IDM_VIEW_EXTRALARGETHUMBNAILS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::ExtraLargeThumbnails);
-		break;
-
-	case IDM_VIEW_LARGETHUMBNAILS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::LargeThumbnails);
-		break;
-
-	case IDM_VIEW_THUMBNAILS:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::Thumbnails);
-		break;
-
-	case IDM_VIEW_TILES:
-		GetActiveShellBrowser()->SetViewMode(ViewMode::Tiles);
-		break;
-
 	case IDM_VIEW_AUTOARRANGE:
 		GetActiveShellBrowser()->SetAutoArrangeEnabled(
 			!GetActiveShellBrowser()->IsAutoArrangeEnabled());
-		break;
-
-	case IDM_SORT_ASCENDING:
-		GetActiveShellBrowser()->SetSortDirection(SortDirection::Ascending);
-		break;
-
-	case IDM_SORT_DESCENDING:
-		GetActiveShellBrowser()->SetSortDirection(SortDirection::Descending);
 		break;
 
 	case IDM_VIEW_REFRESH:
@@ -516,21 +462,6 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 
 	default:
 		return false;
-	}
-}
-
-void BrowserCommandController::OnSortBy(SortMode sortMode)
-{
-	auto *shellBrowser = GetActiveShellBrowser();
-	SortMode currentSortMode = shellBrowser->GetSortMode();
-
-	if (sortMode == currentSortMode)
-	{
-		shellBrowser->SetSortDirection(InvertSortDirection(shellBrowser->GetSortDirection()));
-	}
-	else
-	{
-		shellBrowser->SetSortMode(sortMode);
 	}
 }
 
@@ -735,7 +666,8 @@ void BrowserCommandController::OnSearch()
 		[this]
 		{
 			return SearchDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetHWND(),
-				GetActiveShellBrowser()->GetDirectoryPath(), m_appServices->GetBrowserList());
+				GetActiveShellBrowser()->GetDirectoryPath(), m_appServices->GetBrowserList(),
+				m_appServices->GetAcceleratorManager());
 		});
 }
 

@@ -282,7 +282,7 @@ void Explorerplusplus::CreateDrivesToolbar()
 {
 	auto drivesToolbarView = DrivesToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
 	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, m_appServices->GetDriveModel(), this,
-		m_resourceLoader);
+		m_acceleratorManager, m_resourceLoader);
 	m_drivesToolbar->GetView()->AddToolbarSizeUpdatedObserver(std::bind(
 		&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
 }

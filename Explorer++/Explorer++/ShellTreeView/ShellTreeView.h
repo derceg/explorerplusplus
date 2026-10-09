@@ -142,6 +142,8 @@ private:
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	void OnShowContextMenu(const POINT &ptScreen);
+	bool MaybeHandleShellMenuItem(const PidlAbsolute &directory,
+		const std::vector<PidlChild> &items, const std::wstring &verb);
 	void UpdateSelection();
 	void StartRenamingSelectedItem();
 	void ShowPropertiesForSelectedItem() const;

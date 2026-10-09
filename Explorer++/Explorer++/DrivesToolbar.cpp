@@ -9,11 +9,11 @@
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "NavigationHelper.h"
-#include "OpenItemsContextMenuDelegate.h"
+#include "PopupMenuRunner.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
+#include "ShellItemContextMenu.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ShellItemContextMenu.h"
 #include <ShlObj.h>
 
 class DrivesToolbarButton : public ToolbarButton
@@ -62,16 +62,19 @@ private:
 };
 
 DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view, DriveModel *driveModel,
-	BrowserWindow *browser, const ResourceLoader *resourceLoader)
+	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader)
 {
-	return new DrivesToolbar(view, driveModel, browser, resourceLoader);
+	return new DrivesToolbar(view, driveModel, browser, acceleratorManager, resourceLoader);
 }
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
-	BrowserWindow *browser, const ResourceLoader *resourceLoader) :
+	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
+	const ResourceLoader *resourceLoader) :
 	m_view(view),
 	m_driveModel(driveModel),
 	m_browser(browser),
+	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader)
 {
 	Initialize();
@@ -168,8 +171,8 @@ void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const Mo
 void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient,
 	bool showExtended)
 {
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(drivePath.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+	PidlAbsolute fullPidl;
+	HRESULT hr = SHParseDisplayName(drivePath.c_str(), nullptr, PidlOutParam(fullPidl), 0, nullptr);
 
 	if (FAILED(hr))
 	{
@@ -179,10 +182,11 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 	POINT ptScreen = ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
+	auto child = fullPidl.GetLastItem();
 
-	[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
-	assert(res);
+	auto parent = fullPidl;
+	auto res = parent.RemoveLastItem();
+	DCHECK(res);
 
 	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::None;
 
@@ -191,12 +195,10 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	ShellItemContextMenu contextMenu(pidl.get(), { child.get() }, m_browser);
-
-	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_resourceLoader);
-	contextMenu.AddDelegate(&openItemsDelegate);
-
-	contextMenu.ShowMenu(m_browser->GetHWND(), &ptScreen, nullptr, flags);
+	PopupMenuRunner popupRunner(m_view->GetHWND(), m_browser);
+	ShellItemContextMenu menu(popupRunner.GetView(), m_acceleratorManager, parent, { child },
+		m_view->GetHWND(), nullptr, flags, m_browser, m_resourceLoader);
+	popupRunner.Show(ptScreen);
 }
 
 void DrivesToolbar::OnWindowDestroyed()

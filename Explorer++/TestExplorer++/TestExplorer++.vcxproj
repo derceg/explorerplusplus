@@ -261,6 +261,7 @@
     <ClCompile Include="PidlHelperTest.cpp" />
     <ClCompile Include="SearchTabsListViewModelTest.cpp" />
     <ClCompile Include="SessionRestorerTest.cpp" />
+    <ClCompile Include="ShellContextMenuTest.cpp" />
     <ClCompile Include="ShellEntryCollectionTest.cpp" />
     <ClCompile Include="ShellNameParserFake.cpp" />
     <ClCompile Include="SimulatedFileSystemWatcherFactory.cpp" />
@@ -308,10 +309,6 @@
     <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="ShellBrowserTest.cpp" />
-    <ClCompile Include="ShellContextMenuBuilderTest.cpp" />
-    <ClCompile Include="ShellContextMenuDelegateFake.cpp" />
-    <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp" />
-    <ClCompile Include="ShellContextMenuIdRemapperTest.cpp" />
     <ClCompile Include="SortGroupMenuTest.cpp" />
     <ClCompile Include="TabContainerTest.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
@@ -531,7 +528,6 @@
     <ClInclude Include="ResourceLoaderFake.h" />
     <ClInclude Include="RuntimeTestHelper.h" />
     <ClInclude Include="ScopedTestDir.h" />
-    <ClInclude Include="ShellContextMenuDelegateFake.h" />
     <ClInclude Include="ShellEnumeratorFake.h" />
     <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="PidlTestHelper.h" />

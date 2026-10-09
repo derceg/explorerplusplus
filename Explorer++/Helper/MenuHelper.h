@@ -24,9 +24,8 @@ void AddStringItem(HMENU menu, UINT id, const std::wstring &text, UINT item, Ite
 void AddSeparator(HMENU menu);
 void AddSeparator(HMENU menu, UINT item, ItemLookup lookupType);
 HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text);
-HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu);
-HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
-	UINT item, ItemLookup lookupType);
+HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text, UINT item,
+	ItemLookup lookupType);
 
 void AddItemTypeFlags(HMENU menu, UINT item, ItemLookup lookupType, UINT typeFlags);
 void SetItemChecked(HMENU menu, UINT item, ItemLookup lookupType, bool check);

@@ -427,18 +427,6 @@
     <ClCompile Include="ShellBrowserTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellContextMenuIdGeneratorTest.cpp">
-      <Filter>Helper\Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellContextMenuIdRemapperTest.cpp">
-      <Filter>Helper\Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellContextMenuBuilderTest.cpp">
-      <Filter>Helper\Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellContextMenuDelegateFake.cpp">
-      <Filter>Helper\Shell\Shell Integration</Filter>
-    </ClCompile>
     <ClCompile Include="ClipboardHelperTest.cpp">
       <Filter>Helper\Data Exchange\Clipboard</Filter>
     </ClCompile>
@@ -640,6 +628,9 @@
     <ClCompile Include="SortGroupMenuTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ShellContextMenuTest.cpp">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -786,9 +777,6 @@
     <Filter Include="Browser\Command Handling">
       <UniqueIdentifier>{1172cdbf-214a-4687-be9a-0e560e29b874}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Helper\Shell\Shell Integration">
-      <UniqueIdentifier>{f7f6433c-ee36-4e28-9fad-de2f33ce22c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Clang-CL">
       <UniqueIdentifier>{dd72ce4c-26b4-4a92-9e8b-a5a3cb190423}</UniqueIdentifier>
     </Filter>
@@ -836,6 +824,9 @@
     </Filter>
     <Filter Include="Helper\Graphics">
       <UniqueIdentifier>{0f3763ed-5a29-4838-aa28-7cb0c4f32942}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus\UI\Shell Context Menu">
+      <UniqueIdentifier>{5809d6c9-d80c-41b3-ad68-939f369c0547}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -960,9 +951,6 @@
     </ClInclude>
     <ClInclude Include="BrowserWindowMock.h">
       <Filter>Browser</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellContextMenuDelegateFake.h">
-      <Filter>Helper\Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="SimulatedClipboardDataObject.h" />

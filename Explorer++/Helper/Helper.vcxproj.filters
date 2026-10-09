@@ -34,9 +34,6 @@
     <ClCompile Include="ShellHelper.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="ShellContextMenu.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
     <ClCompile Include="SetDefaultFileManager.cpp">
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
@@ -169,24 +166,6 @@
     <ClCompile Include="DoubleBufferedPaint.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
-    <ClCompile Include="ShellContextMenuBuilder.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellContextMenuIdGenerator.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellContextMenuIdRemapper.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellBackgroundContextMenuDelegate.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellBackgroundContextMenu.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellItemContextMenu.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
     <ClCompile Include="SystemClipboardStore.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
@@ -275,9 +254,6 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellContextMenu.h">
-      <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="SetDefaultFileManager.h">
       <Filter>Shell\Shell Integration</Filter>
@@ -434,30 +410,6 @@
     </ClInclude>
     <ClInclude Include="DoubleBufferedPaint.h">
       <Filter>Control Support</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellContextMenuDelegate.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellContextMenuIdRemapper.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellContextMenuIdGenerator.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellContextMenuBuilder.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBackgroundContextMenu.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellItemContextMenu.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBackgroundContextMenuDelegate.h">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellItemContextMenuDelegate.h">
-      <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="ClipboardStore.h">
       <Filter>Data Exchange\Clipboard</Filter>

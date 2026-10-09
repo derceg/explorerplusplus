@@ -6,7 +6,6 @@
 
 #include "Literals.h"
 #include "NavigationHelper.h"
-#include "ShellBrowser/SortModes.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/core/noncopyable.hpp>
 
@@ -40,7 +39,6 @@ private:
 	bool CanChangeMainFontSize(FontSizeType sizeType) const;
 	bool CanAutoArrange() const;
 
-	void OnSortBy(SortMode sortMode);
 	void OnCloseTab();
 	void StartCommandPrompt(LaunchProcessFlags flags = LaunchProcessFlags::None);
 	void CopyFolderPath() const;

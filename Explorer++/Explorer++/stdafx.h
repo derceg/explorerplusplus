@@ -38,6 +38,7 @@
 #include <commctrl.h>
 #include <commoncontrols.h>
 #include <gdiplus.h>
+#include <ocidl.h>
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <shobjidl.h>

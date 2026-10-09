@@ -77,6 +77,14 @@ LRESULT MenuController::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 		return OnMenuGetObject(reinterpret_cast<MENUGETOBJECTINFO *>(lParam));
 	}
 
+	if (auto *externalItemDelegate = m_rootView->MaybeGetExternalItemDelegate())
+	{
+		if (auto result = externalItemDelegate->MaybeHandleMessage(msg, wParam, lParam))
+		{
+			return *result;
+		}
+	}
+
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
@@ -225,8 +233,7 @@ LRESULT MenuController::OnMenuDrag(HMENU menu, int index)
 		return MND_CONTINUE;
 	}
 
-	auto *item = view->GetItem(*id);
-	auto action = item->Drag();
+	auto action = view->DragItem(*id);
 	return action == MenuDragAction::ContinueMenu ? MND_CONTINUE : MND_ENDMENU;
 }
 
@@ -314,11 +321,9 @@ LRESULT MenuController::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		return MNGO_NOINTERFACE;
 	}
 
-	auto *item = view->GetItem(*dropId);
-
 	// This represents the drop target for the specified item. It needs to be held either until
 	// another target is requested, or the menu is closed.
-	m_dropTarget = item->MaybeGetDropTarget(dropPosition);
+	m_dropTarget = view->MaybeGetDropTargetForItem(*dropId, dropPosition);
 
 	if (!m_dropTarget)
 	{
@@ -351,29 +356,17 @@ void MenuController::SelectItem(const MenuItemKey &key, bool isCtrlKeyDown, bool
 
 void MenuController::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-	CHECK(view);
-
-	auto *item = view->GetItem(id);
-	item->Select(isCtrlKeyDown, isShiftKeyDown);
+	m_rootView->SelectItem(id, isCtrlKeyDown, isShiftKeyDown);
 }
 
 void MenuController::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-	CHECK(view);
-
-	auto *item = view->GetItem(id);
-	item->MiddleClick(isCtrlKeyDown, isShiftKeyDown);
+	m_rootView->MiddleClickItem(id, isCtrlKeyDown, isShiftKeyDown);
 }
 
 void MenuController::RightClickItem(UINT id, const POINT &ptScreen)
 {
-	auto *view = m_rootView->MaybeGetMenuViewForItem(id);
-	CHECK(view);
-
-	auto *item = view->GetItem(id);
-	item->RightClick(ptScreen);
+	m_rootView->RightClickItem(id, ptScreen);
 }
 
 void MenuController::NotifyMenuOpenedForTesting()

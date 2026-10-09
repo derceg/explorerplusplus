@@ -253,9 +253,6 @@
     <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="SortMenuBuilder.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Bookmarks\BookmarkDropper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -721,27 +718,6 @@
     <ClCompile Include="FileOperations.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="ViewsMenuBuilder.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenItemsContextMenuDelegate.cpp">
-      <Filter>Context Menu Support</Filter>
-    </ClCompile>
-    <ClCompile Include="BackgroundContextMenuDelegate.cpp">
-      <Filter>Context Menu Support</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellBrowser\ShellBrowserContextMenuDelegate.cpp">
-      <Filter>ShellBrowser\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenItemLocationContextMenuDelegate.cpp">
-      <Filter>Context Menu Support</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellTreeView\ShellTreeViewContextMenuDelegate.cpp">
-      <Filter>ShellTreeView\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="SortModeMenuMappings.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ClangCLLibs.cpp">
       <Filter>Clang-CL</Filter>
     </ClCompile>
@@ -945,6 +921,18 @@
     </ClCompile>
     <ClCompile Include="ShellBrowser\SortModes.cpp">
       <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenu.cpp">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBackgroundContextMenu.cpp">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellItemContextMenu.cpp">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchResultsItemContextMenu.cpp">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1202,9 +1190,6 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h">
       <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="SortMenuBuilder.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkDropper.h">
       <Filter>Bookmarks</Filter>
@@ -1749,28 +1734,7 @@
     <ClInclude Include="FileOperations.h">
       <Filter>Shell</Filter>
     </ClInclude>
-    <ClInclude Include="ViewsMenuBuilder.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenItemsContextMenuDelegate.h">
-      <Filter>Context Menu Support</Filter>
-    </ClInclude>
-    <ClInclude Include="BackgroundContextMenuDelegate.h">
-      <Filter>Context Menu Support</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBrowser\ShellBrowserContextMenuDelegate.h">
-      <Filter>ShellBrowser\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenItemLocationContextMenuDelegate.h">
-      <Filter>Context Menu Support</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellTreeView\ShellTreeViewContextMenuDelegate.h">
-      <Filter>ShellTreeView\Shell Integration</Filter>
-    </ClInclude>
     <ClInclude Include="SelectionType.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="SortModeMenuMappings.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ClangCLLibs.h">
@@ -2064,6 +2028,18 @@
     <ClInclude Include="SortGroupMenu.h">
       <Filter>Menus\UI</Filter>
     </ClInclude>
+    <ClInclude Include="ShellBackgroundContextMenu.h">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenu.h">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellItemContextMenu.h">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchResultsItemContextMenu.h">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2327,6 +2303,9 @@
     </Filter>
     <Filter Include="Taskbar">
       <UniqueIdentifier>{04aec467-d301-4e33-b027-bfa83b182edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menus\UI\Shell Context Menu">
+      <UniqueIdentifier>{02e0559d-0daa-460b-9b6d-1a71c140422e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,18 @@
 #include <optional>
 #include <unordered_map>
 
+// If a menu adds external menu items, this interface can be used to manage events for those items.
+// An external item refers to an item added by non-application code (e.g. by the shell).
+class ExternalMenuItemDelegate
+{
+public:
+	virtual ~ExternalMenuItemDelegate() = default;
+
+	virtual std::optional<LRESULT> MaybeHandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+	virtual std::optional<std::wstring> MaybeGetExternalItemHelpText(UINT id) const = 0;
+	virtual void OnExternalItemSelected(UINT id) = 0;
+};
+
 class MenuView
 {
 private:
@@ -23,6 +35,15 @@ private:
 
 public:
 	using PopupWillShowSignal = boost::signals2::signal<void()>;
+
+	// IDs in this range can be assigned to external menu items (e.g. shell context menu items) and
+	// will be handled differently from normal items. For example, it's only possible to select
+	// external items; middle-clicking and right-clicking an external item will have no effect.
+	// Additionally, item selection will be handled by the supplied ExternalMenuItemDelegate.
+	//
+	// Note that the range values are both inclusive.
+	static constexpr UINT EXTERNAL_ID_MIN = 1;
+	static constexpr UINT EXTERNAL_ID_MAX = 0xFFFF;
 
 	// This is used to construct a new root menu.
 	MenuView(HMENU menu);
@@ -33,7 +54,10 @@ public:
 
 	bool IsRoot() const;
 
+	void SetExternalItemDelegate(ExternalMenuItemDelegate *externalItemDelegate);
+
 	void AppendItem(MenuItemParams params);
+	void AddItem(MenuItemParams params, UINT index);
 	MenuView *AppendSubMenu(SubMenuItemParams params);
 
 	void AppendSeparator();
@@ -47,6 +71,16 @@ public:
 	int GetNumItems() const;
 
 	std::wstring GetItemHelpText(UINT id) const;
+	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
+	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
+	void RightClickItem(UINT id, const POINT &ptScreen);
+	MenuDragAction DragItem(UINT id);
+	wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForItem(UINT id, MenuDropPosition position);
+
+	// When using this to add external items, items should only be added within [EXTERNAL_ID_MIN,
+	// EXTERNAL_ID_MAX]. Adding items outside that range or otherwise altering the menu is invalid
+	// and will cause issues.
+	HMENU GetNativeMenuForExternalItems();
 
 	HMENU GetNativeMenuForTesting() const;
 	UINT GetItemIdForTesting(int index) const;
@@ -80,7 +114,7 @@ private:
 	// are some places where they're truncated to 16-bit values. WM_COMMAND is one of those places,
 	// so that shouldn't be used to handle item selection. Additionally, WM_MENUSELECT also
 	// truncates, so it can require special handling.
-	static constexpr UINT INITIAL_ID = 0x10000;
+	static constexpr UINT INITIAL_ID = EXTERNAL_ID_MAX + 1;
 
 	class Item
 	{
@@ -133,6 +167,7 @@ private:
 
 	UINT AllocateId();
 	MenuView *GetRoot();
+	const MenuView *GetRoot() const;
 	Item *RegisterItem(UINT id, Item item, const std::optional<MenuItemKey> &key);
 
 	void OnPopupWillShowForDpi(UINT dpi);
@@ -149,6 +184,11 @@ private:
 	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
 	UINT GetCurrentDpi() const;
+	std::wstring GetExternalItemHelpText(UINT id) const;
+	void SelectExternalItem(UINT id);
+	static bool IsExternalItem(UINT id);
+	ExternalMenuItemDelegate *MaybeGetExternalItemDelegate();
+	const ExternalMenuItemDelegate *MaybeGetExternalItemDelegate() const;
 	Item *GetItem(int id);
 	const Item *GetItem(int id) const;
 
@@ -157,6 +197,7 @@ private:
 
 	MenuView *const m_parent;
 	const HMENU m_menu;
+	ExternalMenuItemDelegate *m_externalItemDelegate = nullptr;
 
 	// This exists on every MenuView instance, but is only used on the root menu. That is, IDs are
 	// always generated from the root menu.

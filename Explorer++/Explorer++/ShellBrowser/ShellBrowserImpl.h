@@ -421,6 +421,9 @@ private:
 	void OnShowListViewContextMenu(const POINT &ptScreen);
 	void ShowBackgroundContextMenu(const POINT &pt);
 	void ShowItemContextMenu(const POINT &pt);
+	static bool MaybeHandleShellMenuItem(WeakPtr<ShellBrowserImpl> weakSelf,
+		const PidlAbsolute &directory, const std::vector<PidlChild> &items,
+		const std::wstring &verb);
 	bool OnSetCursor(HWND target);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);

@@ -25,12 +25,25 @@ bool MenuView::IsRoot() const
 	return m_parent == nullptr;
 }
 
+void MenuView::SetExternalItemDelegate(ExternalMenuItemDelegate *externalItemDelegate)
+{
+	CHECK(IsRoot());
+
+	m_externalItemDelegate = externalItemDelegate;
+}
+
 void MenuView::AppendItem(MenuItemParams params)
+{
+	AddItem(std::move(params), GetMenuItemCount(m_menu));
+}
+
+void MenuView::AddItem(MenuItemParams params, UINT index)
 {
 	UINT id = AllocateId();
 	Item item(params);
 
-	MenuHelper::AddStringItem(m_menu, id, item.GetFullText());
+	MenuHelper::AddStringItem(m_menu, id, item.GetFullText(), index,
+		MenuHelper::ItemLookup::ByPosition);
 
 	if (params.GetCheckStyle() == MenuItemCheckStyle::Radio)
 	{
@@ -58,6 +71,11 @@ UINT MenuView::AllocateId()
 }
 
 MenuView *MenuView::GetRoot()
+{
+	return const_cast<MenuView *>(std::as_const(*this).GetRoot());
+}
+
+const MenuView *MenuView::GetRoot() const
 {
 	auto *menuView = this;
 
@@ -315,8 +333,133 @@ UINT MenuView::GetCurrentDpi() const
 
 std::wstring MenuView::GetItemHelpText(UINT id) const
 {
+	if (IsExternalItem(id))
+	{
+		return GetExternalItemHelpText(id);
+	}
+
 	const auto *item = GetItem(id);
 	return item->GetHelpText();
+}
+
+std::wstring MenuView::GetExternalItemHelpText(UINT id) const
+{
+	auto *externalItemDelegate = MaybeGetExternalItemDelegate();
+
+	if (!externalItemDelegate)
+	{
+		return L"";
+	}
+
+	auto helpText = externalItemDelegate->MaybeGetExternalItemHelpText(id);
+
+	if (!helpText)
+	{
+		return L"";
+	}
+
+	return *helpText;
+}
+
+void MenuView::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	if (IsExternalItem(id))
+	{
+		SelectExternalItem(id);
+		return;
+	}
+
+	auto *view = MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	auto *item = view->GetItem(id);
+	item->Select(isCtrlKeyDown, isShiftKeyDown);
+}
+
+void MenuView::SelectExternalItem(UINT id)
+{
+	auto *externalItemDelegate = MaybeGetExternalItemDelegate();
+
+	if (!externalItemDelegate)
+	{
+		return;
+	}
+
+	externalItemDelegate->OnExternalItemSelected(id);
+}
+
+void MenuView::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	if (IsExternalItem(id))
+	{
+		return;
+	}
+
+	auto *view = MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	auto *item = view->GetItem(id);
+	item->MiddleClick(isCtrlKeyDown, isShiftKeyDown);
+}
+
+void MenuView::RightClickItem(UINT id, const POINT &ptScreen)
+{
+	if (IsExternalItem(id))
+	{
+		return;
+	}
+
+	auto *view = MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	auto *item = view->GetItem(id);
+	item->RightClick(ptScreen);
+}
+
+MenuDragAction MenuView::DragItem(UINT id)
+{
+	if (IsExternalItem(id))
+	{
+		return MenuDragAction::ContinueMenu;
+	}
+
+	auto *view = MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	auto *item = view->GetItem(id);
+	return item->Drag();
+}
+
+wil::com_ptr_nothrow<IDropTarget> MenuView::MaybeGetDropTargetForItem(UINT id,
+	MenuDropPosition position)
+{
+	if (IsExternalItem(id))
+	{
+		return nullptr;
+	}
+
+	auto *view = MaybeGetMenuViewForItem(id);
+	CHECK(view);
+
+	auto *item = view->GetItem(id);
+	return item->MaybeGetDropTarget(position);
+}
+
+bool MenuView::IsExternalItem(UINT id)
+{
+	return id >= EXTERNAL_ID_MIN && id <= EXTERNAL_ID_MAX;
+}
+
+ExternalMenuItemDelegate *MenuView::MaybeGetExternalItemDelegate()
+{
+	return const_cast<ExternalMenuItemDelegate *>(
+		std::as_const(*this).MaybeGetExternalItemDelegate());
+}
+
+const ExternalMenuItemDelegate *MenuView::MaybeGetExternalItemDelegate() const
+{
+	auto *root = GetRoot();
+	return root->m_externalItemDelegate;
 }
 
 MenuView::Item *MenuView::GetItem(int id)
@@ -361,6 +504,11 @@ std::optional<UINT> MenuView::MaybeGetItemAtPoint(const POINT &ptScreen) const
 	}
 
 	return *id;
+}
+
+HMENU MenuView::GetNativeMenuForExternalItems()
+{
+	return m_menu;
 }
 
 HMENU MenuView::GetNativeMenuForTesting() const

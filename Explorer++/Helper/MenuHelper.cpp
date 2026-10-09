@@ -66,22 +66,17 @@ void AddSeparator(HMENU menu, UINT item, ItemLookup lookupType)
 
 HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text)
 {
-	return AddSubMenuItem(menu, id, text, CheckedCreatePopupMenu(), GetMenuItemCount(menu),
-		ItemLookup::ByPosition);
-}
-
-HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu)
-{
-	return AddSubMenuItem(menu, id, text, std::move(subMenu), GetMenuItemCount(menu),
-		ItemLookup::ByPosition);
+	return AddNewSubMenuItem(menu, id, text, GetMenuItemCount(menu), ItemLookup::ByPosition);
 }
 
 // Note that an ID can be passed in here. While that is perhaps not the typical usage (e.g.
 // GetMenuItemID() will return -1 for a submenu item), it does work correctly. That is, the ID set
 // here can be retrieved by GetMenuItemInfo().
-HMENU AddSubMenuItem(HMENU menu, UINT id, const std::wstring &text, wil::unique_hmenu subMenu,
-	UINT item, ItemLookup lookupType)
+HMENU AddNewSubMenuItem(HMENU menu, UINT id, const std::wstring &text, UINT item,
+	ItemLookup lookupType)
 {
+	auto subMenu = CheckedCreatePopupMenu();
+
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING | MIIM_SUBMENU;

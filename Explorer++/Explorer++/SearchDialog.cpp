@@ -9,9 +9,9 @@
 #include "DialogConstants.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
-#include "OpenItemLocationContextMenuDelegate.h"
-#include "OpenItemsContextMenuDelegate.h"
+#include "PopupMenuRunner.h"
 #include "ResourceLoader.h"
+#include "SearchResultsItemContextMenu.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "../Helper/ComboBox.h"
@@ -21,7 +21,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ShellItemContextMenu.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <Shlwapi.h>
@@ -63,16 +62,20 @@ const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Direc
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
 SearchDialog *SearchDialog::Create(const ResourceLoader *resourceLoader, HWND hParent,
-	std::wstring_view searchDirectory, BrowserList *browserList)
+	std::wstring_view searchDirectory, BrowserList *browserList,
+	const AcceleratorManager *acceleratorManager)
 {
-	return new SearchDialog(resourceLoader, hParent, searchDirectory, browserList);
+	return new SearchDialog(resourceLoader, hParent, searchDirectory, browserList,
+		acceleratorManager);
 }
 
 SearchDialog::SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	std::wstring_view searchDirectory, BrowserList *browserList) :
+	std::wstring_view searchDirectory, BrowserList *browserList,
+	const AcceleratorManager *acceleratorManager) :
 	BaseDialog(resourceLoader, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
 	m_browserList(browserList),
+	m_acceleratorManager(acceleratorManager),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
 	m_pSearch(nullptr),
@@ -602,36 +605,17 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 					auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
 					CHECK(itr != m_SearchItemsMapInternal.end());
 
-					unique_pidl_absolute pidlFull;
+					PidlAbsolute pidlFull;
 					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr,
-						wil::out_param(pidlFull), 0, nullptr);
+						PidlOutParam(pidlFull), 0, nullptr);
 
 					if (hr == S_OK)
 					{
-						// The only reason this pidl is cloned at all is that ILFindLastID returns
-						// an unaligned pointer. Inserting that into the pidlItems vector then
-						// triggers a warning due to the underlying types having different
-						// __unaligned qualifiers. This only affects Itanium (which isn't
-						// supported), but cloning the pidl here is a simple way of producing an
-						// aligned version.
-						unique_pidl_child pidlItem(ILCloneChild(ILFindLastID(pidlFull.get())));
+						auto child = pidlFull.GetLastItem();
 
-						std::vector<PCITEMID_CHILD> pidlItems;
-						pidlItems.push_back(pidlItem.get());
-
-						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
-						ILRemoveLastID(pidlDirectory.get());
-
-						ShellItemContextMenu contextMenu(pidlDirectory.get(), pidlItems,
-							NoOpMenuHelpTextHost::GetInstance());
-
-						OpenItemsContextMenuDelegate openItemsDelegate(m_browserList,
-							m_resourceLoader);
-						contextMenu.AddDelegate(&openItemsDelegate);
-
-						OpenItemLocationContextMenuDelegate openLocationDelegate(m_browserList,
-							m_resourceLoader);
-						contextMenu.AddDelegate(&openLocationDelegate);
+						auto parent = pidlFull;
+						auto res = parent.RemoveLastItem();
+						DCHECK(res);
 
 						DWORD dwCursorPos = GetMessagePos();
 
@@ -646,7 +630,11 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 							WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 						}
 
-						contextMenu.ShowMenu(m_hDlg, &ptCursor, nullptr, flags);
+						PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
+						SearchResultsItemContextMenu menu(popupRunner.GetView(),
+							m_acceleratorManager, parent, { child }, m_hDlg, nullptr, flags,
+							m_browserList, m_resourceLoader);
+						popupRunner.Show(ptCursor);
 					}
 				}
 			}

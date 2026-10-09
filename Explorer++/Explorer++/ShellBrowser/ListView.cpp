@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "AppServices.h"
-#include "BackgroundContextMenuDelegate.h"
 #include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColumnHelper.h"
@@ -17,13 +16,14 @@
 #include "MainResource.h"
 #include "NavigateParams.h"
 #include "NewMenuClient.h"
-#include "OpenItemsContextMenuDelegate.h"
+#include "PopupMenuRunner.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "SelectColumnsDialog.h"
 #include "ServiceProvider.h"
-#include "ShellBrowserContextMenuDelegate.h"
+#include "ShellBackgroundContextMenu.h"
 #include "ShellBrowserEvents.h"
+#include "ShellItemContextMenu.h"
 #include "ShellNavigationController.h"
 #include "ShellView.h"
 #include "../Helper/CachedIcons.h"
@@ -32,9 +32,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/ShellBackgroundContextMenu.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ShellItemContextMenu.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -472,11 +470,6 @@ void ShellBrowserImpl::OnShowListViewContextMenu(const POINT &ptScreen)
 
 void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 {
-	ShellBackgroundContextMenu contextMenu(m_directoryState.pidlDirectory.Raw(), m_browser);
-
-	BackgroundContextMenuDelegate backgroundDelegate(m_browser, m_clipboardStore, m_resourceLoader);
-	contextMenu.AddDelegate(&backgroundDelegate);
-
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 	serviceProvider->RegisterService(IID_INewMenuClient, winrt::make<NewMenuClient>(this));
 	serviceProvider->RegisterService(IID_IFolderView,
@@ -491,7 +484,11 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 		WI_SetFlag(flags, ShellBackgroundContextMenu::Flags::ExtendedVerbs);
 	}
 
-	contextMenu.ShowMenu(m_listView, &pt, serviceProvider.get(), flags);
+	PopupMenuRunner popupRunner(m_listView, m_browser);
+	ShellBackgroundContextMenu menu(popupRunner.GetView(), m_acceleratorManager,
+		m_directoryState.pidlDirectory, m_listView, serviceProvider.get(), flags, m_browser,
+		m_clipboardStore, m_resourceLoader);
+	popupRunner.Show(pt);
 }
 
 void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
@@ -503,20 +500,12 @@ void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
 		return;
 	}
 
-	std::vector<PCITEMID_CHILD> childPidls;
+	std::vector<PidlChild> childPidls;
 
 	for (const auto &item : selectedItems)
 	{
-		childPidls.push_back(ILFindLastID(item.Raw()));
+		childPidls.push_back(item.GetLastItem());
 	}
-
-	ShellItemContextMenu contextMenu(m_directoryState.pidlDirectory.Raw(), childPidls, m_browser);
-
-	OpenItemsContextMenuDelegate openItemsDelegate(m_browser, m_resourceLoader);
-	contextMenu.AddDelegate(&openItemsDelegate);
-
-	ShellBrowserContextMenuDelegate shellBrowserDelegate(m_weakPtrFactory.GetWeakPtr());
-	contextMenu.AddDelegate(&shellBrowserDelegate);
 
 	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::Rename;
 
@@ -525,7 +514,60 @@ void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	contextMenu.ShowMenu(m_listView, &pt, nullptr, flags);
+	PopupMenuRunner popupRunner(m_listView, m_browser);
+	ShellItemContextMenu menu(popupRunner.GetView(), m_acceleratorManager,
+		m_directoryState.pidlDirectory, childPidls, m_listView, nullptr, flags, m_browser,
+		m_resourceLoader,
+		std::bind_front(&ShellBrowserImpl::MaybeHandleShellMenuItem,
+			m_weakPtrFactory.GetWeakPtr()));
+	popupRunner.Show(pt);
+}
+
+bool ShellBrowserImpl::MaybeHandleShellMenuItem(WeakPtr<ShellBrowserImpl> weakSelf,
+	const PidlAbsolute &directory, const std::vector<PidlChild> &items, const std::wstring &verb)
+{
+	if (!weakSelf)
+	{
+		// The directory can change whilst the shell context menu is being shown (e.g. by using the
+		// back/forward buttons on a mouse). In that situation, the weak pointers will be
+		// invalidated and there's no need to try to do anything. For example, if the directory has
+		// changed, the selected item can't be put into rename mode, since they no longer exist in
+		// the listview.
+		return false;
+	}
+
+	auto buildItemList = [&directory, &items]
+	{
+		std::vector<PidlAbsolute> fullPidls;
+
+		for (const auto &child : items)
+		{
+			fullPidls.push_back(directory + child);
+		}
+
+		return fullPidls;
+	};
+
+	if (verb == L"rename")
+	{
+		weakSelf->StartRenamingItems(buildItemList());
+
+		return true;
+	}
+	else if (verb == L"copy")
+	{
+		weakSelf->CopyItemsToClipboard(buildItemList(), ClipboardAction::Copy);
+
+		return true;
+	}
+	else if (verb == L"cut")
+	{
+		weakSelf->CopyItemsToClipboard(buildItemList(), ClipboardAction::Cut);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool ShellBrowserImpl::OnSetCursor(HWND target)

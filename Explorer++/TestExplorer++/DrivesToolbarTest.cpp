@@ -25,8 +25,8 @@ protected:
 		m_driveWatcher.AddDrive(L"F:\\");
 		m_driveWatcher.AddDrive(L"H:\\");
 
-		m_drivesToolbar =
-			DrivesToolbar::Create(m_drivesToolbarView, &m_driveModel, m_browser, nullptr);
+		m_drivesToolbar = DrivesToolbar::Create(m_drivesToolbarView, &m_driveModel, m_browser,
+			&m_acceleratorManager, &m_resourceLoader);
 	}
 
 	void VerifyToolbarButtons()

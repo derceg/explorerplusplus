@@ -67,11 +67,9 @@ TEST(MenuHelperTest, GetItemIdIncludingSubmenu)
 	const UINT itemId = 1;
 	const UINT submenuItemId = 2;
 
-	auto submenu = MenuHelper::CheckedCreatePopupMenu();
-
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
-	MenuHelper::AddSubMenuItem(menu.get(), submenuItemId, L"Submenu", std::move(submenu));
+	MenuHelper::AddNewSubMenuItem(menu.get(), submenuItemId, L"Submenu");
 
 	// Unlike GetMenuItemID(), this function should return the ID set for both items and submenu
 	// items.
@@ -123,24 +121,19 @@ protected:
 	{
 		UINT idCounter = 1;
 
-		auto nestedSubmenu = MenuHelper::CheckedCreatePopupMenu();
-		m_rawNestedSubmenu = nestedSubmenu.get();
-		MenuHelper::AddStringItem(nestedSubmenu.get(), idCounter++, L"Nested submenu item");
-
-		auto submenu = MenuHelper::CheckedCreatePopupMenu();
-		m_rawSubmenu = submenu.get();
-		MenuHelper::AddStringItem(submenu.get(), idCounter++, L"Submenu item");
-		MenuHelper::AddSubMenuItem(submenu.get(), idCounter++, L"Nested submenu",
-			std::move(nestedSubmenu));
-
 		m_menu = MenuHelper::CheckedCreatePopupMenu();
 		MenuHelper::AddStringItem(m_menu.get(), idCounter++, L"Item");
-		MenuHelper::AddSubMenuItem(m_menu.get(), idCounter++, L"Submenu", std::move(submenu));
+
+		m_subMenu = MenuHelper::AddNewSubMenuItem(m_menu.get(), idCounter++, L"Submenu");
+		MenuHelper::AddStringItem(m_subMenu, idCounter++, L"Submenu item");
+
+		m_nestedSubMenu = MenuHelper::AddNewSubMenuItem(m_subMenu, idCounter++, L"Nested submenu");
+		MenuHelper::AddStringItem(m_nestedSubMenu, idCounter++, L"Nested submenu item");
 	}
 
 	wil::unique_hmenu m_menu;
-	HMENU m_rawSubmenu = nullptr;
-	HMENU m_rawNestedSubmenu = nullptr;
+	HMENU m_subMenu = nullptr;
+	HMENU m_nestedSubMenu = nullptr;
 };
 
 TEST_F(IsPartOfMenuTest, TopLevelMenu)
@@ -150,8 +143,8 @@ TEST_F(IsPartOfMenuTest, TopLevelMenu)
 
 TEST_F(IsPartOfMenuTest, Submenu)
 {
-	EXPECT_TRUE(MenuHelper::IsPartOfMenu(m_menu.get(), m_rawSubmenu));
-	EXPECT_TRUE(MenuHelper::IsPartOfMenu(m_menu.get(), m_rawNestedSubmenu));
+	EXPECT_TRUE(MenuHelper::IsPartOfMenu(m_menu.get(), m_subMenu));
+	EXPECT_TRUE(MenuHelper::IsPartOfMenu(m_menu.get(), m_nestedSubMenu));
 }
 
 TEST_F(IsPartOfMenuTest, SeparateMenu)

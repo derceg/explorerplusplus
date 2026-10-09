@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <vector>
 
+class AcceleratorManager;
 class BrowserList;
 class ResourceLoader;
 class SearchDialog;
@@ -135,7 +136,8 @@ class SearchDialog : public BaseDialog
 {
 public:
 	static SearchDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
-		std::wstring_view searchDirectory, BrowserList *browserList);
+		std::wstring_view searchDirectory, BrowserList *browserList,
+		const AcceleratorManager *acceleratorManager);
 
 	/* Sorting methods. */
 	int CALLBACK SortResults(LPARAM lParam1, LPARAM lParam2);
@@ -159,7 +161,8 @@ private:
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
 	SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
-		std::wstring_view searchDirectory, BrowserList *browserList);
+		std::wstring_view searchDirectory, BrowserList *browserList,
+		const AcceleratorManager *acceleratorManager);
 	~SearchDialog();
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
@@ -174,6 +177,7 @@ private:
 
 	std::wstring m_searchDirectory;
 	BrowserList *const m_browserList;
+	const AcceleratorManager *const m_acceleratorManager;
 	wil::unique_hicon m_directoryIcon;
 	BOOL m_bSearching;
 	BOOL m_bStopSearching;

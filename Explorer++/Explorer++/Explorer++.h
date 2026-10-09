@@ -15,14 +15,12 @@
 #include "MainToolbarStorage.h"
 #include "RebarView.h"
 #include "ShellBrowser/ShellBrowserFactoryImpl.h"
-#include "ShellBrowser/SortModes.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
 #include "TaskbarTabManager.h"
 #include "WindowStorage.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/FileActionHandler.h"
-#include "../Helper/SortDirection.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
@@ -196,9 +194,6 @@ private:
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnResolveLink();
-	void OnGroupBy(SortMode groupMode);
-	void OnGroupByNone();
-	void OnGroupSortDirectionSelected(SortDirection direction);
 	void OnShowHiddenFiles();
 	void OnSelectColumns();
 	void OnDestroyFiles();
