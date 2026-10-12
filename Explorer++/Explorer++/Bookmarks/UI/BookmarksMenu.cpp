@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkItem.h"
+#include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkMenuDropTarget.h"
 #include "BrowserWindow.h"
@@ -172,7 +173,7 @@ void BookmarksMenu::OnBookmarkItemRightClicked(WeakPtr<BookmarkItem> bookmarkIte
 
 MenuDragAction BookmarksMenu::OnBookmarkItemDragged(WeakPtr<BookmarkItem> bookmarkItem)
 {
-	if (!bookmarkItem)
+	if (!bookmarkItem || m_bookmarkTree->IsPermanentNode(bookmarkItem.Get()))
 	{
 		return MenuDragAction::ContinueMenu;
 	}

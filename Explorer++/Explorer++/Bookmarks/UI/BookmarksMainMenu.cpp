@@ -101,11 +101,11 @@ void BookmarksMainMenu::BuildMenu()
 	{
 		m_rootMenuView->AppendSeparator();
 
-		auto *otherBookmarksMenu = m_rootMenuView->AppendSubMenu(otherBookmarksFolder->GetName());
-
-		m_childMenus.push_back(std::make_unique<BookmarksMenu>(otherBookmarksMenu,
-			m_acceleratorManager, m_bookmarkTree, otherBookmarksFolder, m_iconManager.get(),
-			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader));
+		m_childMenus.push_back(std::make_unique<BookmarksMenu>(m_rootMenuView, m_acceleratorManager,
+			m_bookmarkTree, m_bookmarkTree->GetRoot(), m_iconManager.get(), m_browser,
+			m_browser->GetHWND(), m_platformContext, m_resourceLoader,
+			[otherBookmarksFolder](const BookmarkItem *bookmarkItem)
+			{ return bookmarkItem == otherBookmarksFolder; }));
 	}
 }
 
