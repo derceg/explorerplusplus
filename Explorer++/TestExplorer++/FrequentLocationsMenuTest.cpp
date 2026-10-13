@@ -6,10 +6,10 @@
 #include "FrequentLocationsMenu.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "MenuTestHost.h"
 #include "MenuViewTestHelper.h"
 #include "PidlTestHelper.h"
 #include "ShellIconLoaderFake.h"
+#include "TestMenuView.h"
 #include <gtest/gtest.h>
 
 class FrequentLocationsMenuTest : public BrowserTestBase
@@ -17,7 +17,7 @@ class FrequentLocationsMenuTest : public BrowserTestBase
 protected:
 	FrequentLocationsMenuTest() :
 		m_browser(AddBrowser()),
-		m_menu(m_menuHost.GetView(), &m_acceleratorManager, &m_frequentLocationsModel, m_browser,
+		m_menu(&m_menuView, &m_acceleratorManager, &m_frequentLocationsModel, m_browser,
 			&m_shellIconLoader)
 	{
 	}
@@ -26,7 +26,7 @@ protected:
 
 	BrowserWindowFake *const m_browser;
 
-	MenuTestHost m_menuHost;
+	TestMenuView m_menuView;
 	FrequentLocationsMenu m_menu;
 };
 
@@ -44,7 +44,7 @@ TEST_F(FrequentLocationsMenuTest, CheckItems)
 	m_browser->AddTab(path3);
 	m_browser->AddTab(path3);
 
-	MenuViewTestHelper::CheckShellItemDetails(m_menuHost.GetView(),
+	MenuViewTestHelper::CheckShellItemDetails(&m_menuView,
 		{ CreateSimplePidlForTest(path3), CreateSimplePidlForTest(path1),
 			CreateSimplePidlForTest(path2) });
 }

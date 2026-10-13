@@ -3,31 +3,25 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
 
-PopupMenuRunner::PopupMenuRunner(HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost) :
-	m_ownerWindow(ownerWindow),
-	m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
-	m_view(m_ownedMenu.get()),
-	m_controller(&m_view, ownerWindow, MenuController::MenuType::ContextMenu, menuHelpTextHost)
+PopupMenuView::PopupMenuView(HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost) :
+	RootMenuView(MenuHelper::CheckedCreatePopupMenu(), ownerWindow, MenuType::ContextMenu,
+		menuHelpTextHost),
+	m_ownerWindow(ownerWindow)
 {
 }
 
-MenuView *PopupMenuRunner::GetView()
-{
-	return &m_view;
-}
-
-void PopupMenuRunner::Show(const POINT &ptScreen)
+void PopupMenuView::Show(const POINT &ptScreen)
 {
 	// Without the TPM_RECURSE flag, TrackPopupMenu() will silently fail if another menu is
 	// currently showing. It's hard to see how that would ever be the intended behavior. That is,
 	// the caller has explicitly called Show(), to display the menu. Having the operation silently
 	// fail because another menu is being shown isn't useful. Therefore, the TPM_RECURSE flag will
 	// always be passed in.
-	UINT cmd = TrackPopupMenu(m_ownedMenu.get(),
+	UINT cmd = TrackPopupMenu(m_menu,
 		(GetSystemMetrics(SM_MENUDROPALIGNMENT) == 0 ? TPM_LEFTALIGN : TPM_RIGHTALIGN)
 			| TPM_VERTICAL | TPM_RECURSE | TPM_RETURNCMD,
 		ptScreen.x, ptScreen.y, 0, m_ownerWindow, nullptr);
@@ -41,5 +35,5 @@ void PopupMenuRunner::Show(const POINT &ptScreen)
 	// menu should be closed when an item from this menu has been selected.
 	EndMenu();
 
-	m_controller.SelectItem(cmd, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+	SelectItem(cmd, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 }

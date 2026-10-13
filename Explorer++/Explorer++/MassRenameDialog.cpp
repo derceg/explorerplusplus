@@ -7,7 +7,7 @@
 #include "MainResource.h"
 #include "MassRenameTokensMenu.h"
 #include "NoOpMenuHelpTextHost.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/RegistrySettings.h"
@@ -207,10 +207,10 @@ void MassRenameDialog::OnShowTokensMenu()
 			reinterpret_cast<LPARAM>(GetMassRenameTokenText(token).c_str()));
 	};
 
-	PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
-	MassRenameTokensMenu menu(popupRunner.GetView(), m_acceleratorManager, tokenSelectedCallback,
+	PopupMenuView popupMenu(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
+	MassRenameTokensMenu menu(&popupMenu, m_acceleratorManager, tokenSelectedCallback,
 		m_resourceLoader);
-	popupRunner.Show({ rc.left, rc.top });
+	popupMenu.Show({ rc.left, rc.top });
 }
 
 void MassRenameDialog::OnOk()

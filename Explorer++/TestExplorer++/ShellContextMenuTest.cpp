@@ -5,7 +5,10 @@
 #include "pch.h"
 #include "ShellContextMenu.h"
 #include "AcceleratorManager.h"
-#include "MenuTestHost.h"
+#include "MenuHelpTextHostFake.h"
+#include "MenuViewTestApi.h"
+#include "RootMenuViewTestApi.h"
+#include "TestMenuView.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <gtest/gtest.h>
@@ -153,14 +156,16 @@ class ShellContextMenuTest : public Test
 {
 protected:
 	ShellContextMenuTest() :
+		m_menuView(nullptr, &m_menuHelpTextHost),
 		m_externalContextMenu(winrt::make_self<ContextMenuFake>()),
-		m_menu(m_menuHost.GetView(), &m_acceleratorManager, m_externalContextMenu.get())
+		m_menu(&m_menuView, &m_acceleratorManager, m_externalContextMenu.get())
 	{
 	}
 
 	AcceleratorManager m_acceleratorManager;
 
-	MenuTestHost m_menuHost;
+	MenuHelpTextHostFake m_menuHelpTextHost;
+	TestMenuView m_menuView;
 	winrt::com_ptr<ContextMenuFake> m_externalContextMenu;
 	TestShellContextMenu m_menu;
 };
@@ -181,33 +186,34 @@ TEST_F(ShellContextMenuTest, RemoveShellItems)
 	m_menu.RemoveShellItems({ L"open", L"paste" });
 
 	// The two items specified should have been removed, leaving just the copy item.
-	auto *menuView = m_menuHost.GetView();
-	ASSERT_EQ(menuView->GetNumItems(), 1);
-	EXPECT_EQ(menuView->GetItemIdForTesting(0), MenuView::EXTERNAL_ID_MIN + 1);
+	ASSERT_EQ(m_menuView.GetNumItems(), 1);
+	EXPECT_EQ(MenuViewTestApi::GetItemId(&m_menuView, 0), MenuView::EXTERNAL_ID_MIN + 1);
 }
 
 TEST_F(ShellContextMenuTest, HelpText)
 {
-	auto *menuView = m_menuHost.GetView();
+	RootMenuViewTestApi::NotifyMenuOpened(&m_menuView);
 
 	for (UINT i = 0; i < std::size(ContextMenuFake::ITEMS); i++)
 	{
 		const auto &item = ContextMenuFake::ITEMS[i];
-		EXPECT_EQ(menuView->GetItemHelpText(MenuView::EXTERNAL_ID_MIN + i), item.helpText);
+		auto retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
+			MenuViewTestApi::GetNativeMenu(&m_menuView), MenuView::EXTERNAL_ID_MIN + i);
+		EXPECT_EQ(retrievedHelpText, item.helpText);
 	}
+
+	RootMenuViewTestApi::NotifyMenuClosed(&m_menuView);
 }
 
 TEST_F(ShellContextMenuTest, Selection)
 {
-	auto *menuView = m_menuHost.GetView();
-
-	menuView->SelectItem(MenuView::EXTERNAL_ID_MIN + 2, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, MenuView::EXTERNAL_ID_MIN + 2, false, false);
 	EXPECT_THAT(m_externalContextMenu->GetInvokedCommandOffsets(), ElementsAre(2));
 
-	menuView->SelectItem(MenuView::EXTERNAL_ID_MIN + 0, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, MenuView::EXTERNAL_ID_MIN + 0, false, false);
 	EXPECT_THAT(m_externalContextMenu->GetInvokedCommandOffsets(), ElementsAre(2, 0));
 
-	menuView->SelectItem(MenuView::EXTERNAL_ID_MIN + 1, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, MenuView::EXTERNAL_ID_MIN + 1, false, false);
 	EXPECT_THAT(m_externalContextMenu->GetInvokedCommandOffsets(), ElementsAre(2, 0, 1));
 }
 
@@ -215,17 +221,15 @@ TEST_F(ShellContextMenuTest, SelectionWithInternalHandling)
 {
 	m_menu.SetVerbsToHandleInternally({ L"open" });
 
-	auto *menuView = m_menuHost.GetView();
-
 	// The "open" item is handled internally, so selecting it shouldn't result in a call to
 	// InvokeCommand().
-	menuView->SelectItem(MenuView::EXTERNAL_ID_MIN + 0, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, MenuView::EXTERNAL_ID_MIN + 0, false, false);
 	EXPECT_THAT(m_externalContextMenu->GetInvokedCommandOffsets(), IsEmpty());
 
 	// Selecting the other two commands should work normally, though.
-	menuView->SelectItem(MenuView::EXTERNAL_ID_MIN + 1, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, MenuView::EXTERNAL_ID_MIN + 1, false, false);
 	EXPECT_THAT(m_externalContextMenu->GetInvokedCommandOffsets(), ElementsAre(1));
 
-	menuView->SelectItem(MenuView::EXTERNAL_ID_MIN + 2, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, MenuView::EXTERNAL_ID_MIN + 2, false, false);
 	EXPECT_THAT(m_externalContextMenu->GetInvokedCommandOffsets(), ElementsAre(1, 2));
 }

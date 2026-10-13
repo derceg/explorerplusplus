@@ -8,7 +8,7 @@
 #include "ListViewColumnsMenu.h"
 #include "ListViewItem.h"
 #include "ListViewModel.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
 #include "../Helper/KeyboardState.h"
@@ -682,10 +682,9 @@ void ListView::OnShowHeaderContextMenu(const POINT &ptScreen)
 		return;
 	}
 
-	PopupMenuRunner popupRunner(m_hwnd, m_menuHelpTextHost);
-	ListViewColumnsMenu menu(popupRunner.GetView(), m_acceleratorManager, columnModel,
-		m_resourceLoader);
-	popupRunner.Show(ptScreen);
+	PopupMenuView popupMenu(m_hwnd, m_menuHelpTextHost);
+	ListViewColumnsMenu menu(&popupMenu, m_acceleratorManager, columnModel, m_resourceLoader);
+	popupMenu.Show(ptScreen);
 }
 
 LRESULT ListView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

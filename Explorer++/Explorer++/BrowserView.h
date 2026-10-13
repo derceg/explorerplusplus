@@ -32,6 +32,7 @@ public:
 		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 		NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader);
 
+	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
 
 private:

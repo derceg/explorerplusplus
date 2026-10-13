@@ -12,7 +12,7 @@
 #include "ApplicationToolbarView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
 #include "../Helper/DragDropHelper.h"
@@ -165,10 +165,10 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	PopupMenuRunner popupRunner(m_view->GetHWND(), m_browser);
-	ApplicationContextMenu menu(popupRunner.GetView(), m_acceleratorManager, m_model, application,
+	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
+	ApplicationContextMenu menu(&popupMenu, m_acceleratorManager, m_model, application,
 		m_applicationExecutor, m_browser, m_resourceLoader);
-	popupRunner.Show(ptScreen);
+	popupMenu.Show(ptScreen);
 }
 
 void ApplicationToolbar::OnWindowDestroyed()

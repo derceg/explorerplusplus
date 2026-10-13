@@ -607,10 +607,7 @@
     <ClCompile Include="D2DHelperTest.cpp">
       <Filter>Helper\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="MenuControllerTest.cpp">
-      <Filter>Menus\UI\Views</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuTestHost.cpp">
+    <ClCompile Include="RootMenuViewTest.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="ViewsMenuTest.cpp">
@@ -630,6 +627,18 @@
     </ClCompile>
     <ClCompile Include="ShellContextMenuTest.cpp">
       <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuViewTestApi.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="RootMenuViewTestApi.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="TestMenuView.cpp">
+      <Filter>Menus\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuHelpTextHostFake.cpp">
+      <Filter>Helper\Control Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1035,7 +1044,16 @@
     <ClInclude Include="ShellNameParserFake.h">
       <Filter>Shell</Filter>
     </ClInclude>
-    <ClInclude Include="MenuTestHost.h">
+    <ClInclude Include="MenuHelpTextHostFake.h">
+      <Filter>Helper\Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuViewTestApi.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="TestMenuView.h">
+      <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="RootMenuViewTestApi.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>

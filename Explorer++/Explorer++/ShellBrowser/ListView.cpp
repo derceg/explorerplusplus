@@ -16,7 +16,7 @@
 #include "MainResource.h"
 #include "NavigateParams.h"
 #include "NewMenuClient.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "SelectColumnsDialog.h"
@@ -484,11 +484,11 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 		WI_SetFlag(flags, ShellBackgroundContextMenu::Flags::ExtendedVerbs);
 	}
 
-	PopupMenuRunner popupRunner(m_listView, m_browser);
-	ShellBackgroundContextMenu menu(popupRunner.GetView(), m_acceleratorManager,
+	PopupMenuView popupMenu(m_listView, m_browser);
+	ShellBackgroundContextMenu menu(&popupMenu, m_acceleratorManager,
 		m_directoryState.pidlDirectory, m_listView, serviceProvider.get(), flags, m_browser,
 		m_clipboardStore, m_resourceLoader);
-	popupRunner.Show(pt);
+	popupMenu.Show(pt);
 }
 
 void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
@@ -514,13 +514,12 @@ void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	PopupMenuRunner popupRunner(m_listView, m_browser);
-	ShellItemContextMenu menu(popupRunner.GetView(), m_acceleratorManager,
-		m_directoryState.pidlDirectory, childPidls, m_listView, nullptr, flags, m_browser,
-		m_resourceLoader,
+	PopupMenuView popupMenu(m_listView, m_browser);
+	ShellItemContextMenu menu(&popupMenu, m_acceleratorManager, m_directoryState.pidlDirectory,
+		childPidls, m_listView, nullptr, flags, m_browser, m_resourceLoader,
 		std::bind_front(&ShellBrowserImpl::MaybeHandleShellMenuItem,
 			m_weakPtrFactory.GetWeakPtr()));
-	popupRunner.Show(pt);
+	popupMenu.Show(pt);
 }
 
 bool ShellBrowserImpl::MaybeHandleShellMenuItem(WeakPtr<ShellBrowserImpl> weakSelf,

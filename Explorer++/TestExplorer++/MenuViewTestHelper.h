@@ -7,7 +7,6 @@
 #include "../Helper/Pidl.h"
 #include <vector>
 
-class MenuItemKey;
 class MenuView;
 
 namespace MenuViewTestHelper
@@ -16,10 +15,5 @@ namespace MenuViewTestHelper
 // For a MenuView that contains a list of shell items, this function verifies that the details of
 // each item in the menu match the details of the corresponding pidl.
 void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &expectedItems);
-
-void ExpectItemEnabled(const MenuView *menuView, const MenuItemKey &key, bool enabled);
-void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled);
-void ExpectItemChecked(const MenuView *menuView, const MenuItemKey &key, bool checked);
-void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked);
 
 }

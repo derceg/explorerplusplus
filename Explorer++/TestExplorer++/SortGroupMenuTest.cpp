@@ -6,9 +6,11 @@
 #include "SortGroupMenu.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "MenuTestHost.h"
+#include "MenuViewTestApi.h"
 #include "MenuViewTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellBrowserFake.h"
+#include "TestMenuView.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -19,7 +21,7 @@ protected:
 	SortGroupMenuTestBase(SortGroupMenu::Mode mode) :
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab(L"c:\\")),
-		m_menu(m_menuHost.GetView(), &m_acceleratorManager, m_browser, mode, &m_resourceLoader)
+		m_menu(&m_menuView, &m_acceleratorManager, m_browser, mode, &m_resourceLoader)
 	{
 		auto *shellBrowser = GetShellBrowserFake(m_tab);
 
@@ -39,7 +41,7 @@ protected:
 		}
 
 		// The menu is only built when being shown, which is why this call is necessary.
-		m_menuHost.GetView()->OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+		MenuViewTestApi::OnPopupWillShowForDpi(&m_menuView, USER_DEFAULT_SCREEN_DPI);
 	}
 
 	ShellBrowserFake *GetShellBrowserFake(Tab *tab)
@@ -52,7 +54,7 @@ protected:
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
 
-	MenuTestHost m_menuHost;
+	TestMenuView m_menuView;
 	SortGroupMenu m_menu;
 };
 
@@ -68,18 +70,17 @@ protected:
 
 TEST_P(SortGroupMenuTest, SortDirectionStates)
 {
-	auto *menuView = m_menuHost.GetView();
-	MenuViewTestHelper::ExpectItemEnabled(menuView, SortDirection::Ascending, true);
-	MenuViewTestHelper::ExpectItemEnabled(menuView, SortDirection::Descending, true);
+	EXPECT_TRUE(MenuViewTestApi::IsItemEnabled(&m_menuView, SortDirection::Ascending));
+	EXPECT_TRUE(MenuViewTestApi::IsItemEnabled(&m_menuView, SortDirection::Descending));
 
 	if (GetParam() == SortGroupMenu::Mode::Group)
 	{
 		m_tab->GetShellBrowser()->SetShowInGroups(false);
-		m_menuHost.GetView()->OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+		MenuViewTestApi::OnPopupWillShowForDpi(&m_menuView, USER_DEFAULT_SCREEN_DPI);
 
 		// Group mode is now disabled, so the sort direction items should be disabled.
-		MenuViewTestHelper::ExpectItemEnabled(menuView, SortDirection::Ascending, false);
-		MenuViewTestHelper::ExpectItemEnabled(menuView, SortDirection::Descending, false);
+		EXPECT_FALSE(MenuViewTestApi::IsItemEnabled(&m_menuView, SortDirection::Ascending));
+		EXPECT_FALSE(MenuViewTestApi::IsItemEnabled(&m_menuView, SortDirection::Descending));
 	}
 }
 
@@ -91,7 +92,7 @@ TEST_P(SortGroupMenuTest, SelectSortMode)
 	// in the ShellBrowser's sort mode being updated.
 	for (auto sortMode : shellBrowser->GetAvailableSortModes())
 	{
-		m_menuHost.SelectItem(sortMode, false, false);
+		RootMenuViewTestApi::SelectItem(&m_menuView, sortMode, false, false);
 
 		if (GetParam() == SortGroupMenu::Mode::Sort)
 		{
@@ -106,7 +107,7 @@ TEST_P(SortGroupMenuTest, SelectSortMode)
 
 TEST_P(SortGroupMenuTest, SelectCurrentSortMode)
 {
-	m_menuHost.SelectItem(SortMode::Name, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, SortMode::Name, false, false);
 	auto *shellBrowser = m_tab->GetShellBrowser();
 
 	// Selecting the current sort/group mode should result in the sort direction switching.
@@ -122,7 +123,7 @@ TEST_P(SortGroupMenuTest, SelectCurrentSortMode)
 
 TEST_P(SortGroupMenuTest, SelectSortDirection)
 {
-	m_menuHost.SelectItem(SortDirection::Descending, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, SortDirection::Descending, false, false);
 	auto *shellBrowser = m_tab->GetShellBrowser();
 
 	if (GetParam() == SortGroupMenu::Mode::Sort)
@@ -134,7 +135,7 @@ TEST_P(SortGroupMenuTest, SelectSortDirection)
 		EXPECT_EQ(shellBrowser->GetGroupSortDirection(), SortDirection::Descending);
 	}
 
-	m_menuHost.SelectItem(SortDirection::Ascending, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, SortDirection::Ascending, false, false);
 
 	if (GetParam() == SortGroupMenu::Mode::Sort)
 	{
@@ -159,6 +160,6 @@ protected:
 
 TEST_F(GroupMenuTest, SelectGroupByNone)
 {
-	m_menuHost.SelectItem(SortGroupMenu::Item::GroupByNone, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, SortGroupMenu::Item::GroupByNone, false, false);
 	EXPECT_FALSE(m_tab->GetShellBrowser()->GetShowInGroups());
 }

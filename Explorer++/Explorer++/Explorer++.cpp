@@ -12,7 +12,6 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "HolderWindow.h"
 #include "MainMenu.h"
-#include "MainMenuHost.h"
 #include "MainRebarStorage.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
@@ -25,6 +24,7 @@
 #include "TabRestorer.h"
 #include "TabStorage.h"
 #include "ThemeWindowTracker.h"
+#include "WindowMenuView.h"
 #include "WindowStorage.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -194,12 +194,13 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 void Explorerplusplus::InitializeMainMenu()
 {
-	m_mainMenuHost = std::make_unique<MainMenuHost>(this);
-	m_mainMenu = std::make_unique<MainMenu>(m_mainMenuHost->GetView(), this, m_appServices,
+	m_mainMenuView = std::make_unique<WindowMenuView>(m_hwnd, this);
+	m_mainMenu = std::make_unique<MainMenu>(m_mainMenuView.get(), this, m_appServices,
 		&m_shellIconLoader, &m_iconFetcher, &m_fileActionHandler, this);
 
-	auto res = SetMenu(m_hwnd, m_mainMenuHost->ReleaseMenu());
-	CHECK(res);
+	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly
+	// redrawn.
+	m_view->RedrawMenuBar();
 }
 
 void Explorerplusplus::InitializeDisplayWindow()

@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "MenuViewTestHelper.h"
 #include "MenuView.h"
+#include "MenuViewTestApi.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
@@ -25,34 +26,10 @@ void CheckShellItemDetails(MenuView *menuView, const std::vector<PidlAbsolute> &
 		hr = GetDisplayName(expectedItems[i].Raw(), SHGDN_FORPARSING, path);
 		ASSERT_HRESULT_SUCCEEDED(hr);
 
-		auto id = menuView->GetItemIdForTesting(static_cast<int>(i));
-		EXPECT_EQ(menuView->GetItemFullTextForTesting(id), name);
-		EXPECT_EQ(menuView->GetItemHelpText(id), path);
+		auto id = MenuViewTestApi::GetItemId(menuView, static_cast<int>(i));
+		EXPECT_EQ(MenuViewTestApi::GetItemFullText(menuView, id), name);
+		EXPECT_EQ(MenuViewTestApi::GetItemHelpText(menuView, id), path);
 	}
-}
-
-void ExpectItemEnabled(const MenuView *menuView, const MenuItemKey &key, bool enabled)
-{
-	auto id = menuView->MaybeGetIdForKeyForTesting(key);
-	CHECK(id);
-	ExpectItemEnabled(menuView, *id, enabled);
-}
-
-void ExpectItemEnabled(const MenuView *menuView, UINT id, bool enabled)
-{
-	EXPECT_EQ(menuView->IsItemEnabledForTesting(id), enabled);
-}
-
-void ExpectItemChecked(const MenuView *menuView, const MenuItemKey &key, bool checked)
-{
-	auto id = menuView->MaybeGetIdForKeyForTesting(key);
-	CHECK(id);
-	ExpectItemChecked(menuView, *id, checked);
-}
-
-void ExpectItemChecked(const MenuView *menuView, UINT id, bool checked)
-{
-	EXPECT_EQ(menuView->IsItemCheckedForTesting(id), checked);
 }
 
 }

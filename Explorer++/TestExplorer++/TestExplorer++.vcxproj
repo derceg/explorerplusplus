@@ -254,11 +254,13 @@
     <ClCompile Include="ManageBookmarksViewsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
-    <ClCompile Include="MenuControllerTest.cpp" />
+    <ClCompile Include="MenuHelpTextHostFake.cpp" />
+    <ClCompile Include="MenuViewTestApi.cpp" />
+    <ClCompile Include="RootMenuViewTest.cpp" />
     <ClCompile Include="MenuItemKeyTest.cpp" />
-    <ClCompile Include="MenuTestHost.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />
+    <ClCompile Include="RootMenuViewTestApi.cpp" />
     <ClCompile Include="SearchTabsListViewModelTest.cpp" />
     <ClCompile Include="SessionRestorerTest.cpp" />
     <ClCompile Include="ShellContextMenuTest.cpp" />
@@ -314,6 +316,7 @@
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
     <ClCompile Include="TaskbarTabManagerTest.cpp" />
+    <ClCompile Include="TestMenuView.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
@@ -481,11 +484,13 @@
     <ClInclude Include="BrowserWindowFactoryFake.h" />
     <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowMock.h" />
-    <ClInclude Include="MenuTestHost.h" />
+    <ClInclude Include="MenuHelpTextHostFake.h" />
+    <ClInclude Include="MenuViewTestApi.h" />
     <ClInclude Include="NoOpClipboardWatcher.h" />
     <ClInclude Include="CopiedBookmark.h" />
     <ClInclude Include="DarkModeManagerFake.h" />
     <ClInclude Include="NoOpThemeManager.h" />
+    <ClInclude Include="RootMenuViewTestApi.h" />
     <ClInclude Include="ShellNameParserFake.h" />
     <ClInclude Include="SimulatedFileSystemWatcherFactory.h" />
     <ClInclude Include="SimulatedFileSystemWatcher.h" />
@@ -534,6 +539,7 @@
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />
+    <ClInclude Include="TestMenuView.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />

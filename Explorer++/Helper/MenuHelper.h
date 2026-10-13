@@ -35,7 +35,7 @@ void RemoveDuplicateSeparators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
 
 std::wstring GetItemText(HMENU menu, UINT item, ItemLookup lookupType);
-UINT GetItemIdIncludingSubmenu(HMENU menu, int index);
+std::optional<UINT> MaybeGetItemIdIncludingSubmenu(HMENU menu, int index);
 bool IsPartOfMenu(HMENU menu, HMENU potentiallyRelatedMenu);
 HBITMAP GetItemBitmap(HMENU menu, UINT item, ItemLookup lookupType);
 bool IsItemEnabled(HMENU menu, UINT item, ItemLookup lookupType);

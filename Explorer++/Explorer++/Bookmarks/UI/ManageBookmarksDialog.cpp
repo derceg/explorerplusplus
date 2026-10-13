@@ -15,7 +15,7 @@
 #include "NoOpMenuHelpTextHost.h"
 #include "OrganizeBookmarksContextMenu.h"
 #include "PlatformContext.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "TreeView.h"
@@ -327,10 +327,10 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(TRUE, 0));
 
-	PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
-	ManageBookmarksViewsMenu menu(popupRunner.GetView(), m_acceleratorManager,
-		m_bookmarkListPresenter.get(), m_resourceLoader);
-	popupRunner.Show(pt);
+	PopupMenuView popupMenu(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
+	ManageBookmarksViewsMenu menu(&popupMenu, m_acceleratorManager, m_bookmarkListPresenter.get(),
+		m_resourceLoader);
+	popupMenu.Show(pt);
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKELPARAM(FALSE, 0));
 }
@@ -364,11 +364,11 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(TRUE, 0));
 	DCHECK(res);
 
-	PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
-	OrganizeBookmarksContextMenu menu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
+	PopupMenuView popupMenu(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
+	OrganizeBookmarksContextMenu menu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		m_currentBookmarkFolder->GetWeakPtr(), delegate, m_platformContext->GetClipboardStore(),
 		m_resourceLoader);
-	popupRunner.Show(pt);
+	popupMenu.Show(pt);
 
 	res = SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKELPARAM(FALSE, 0));
 	DCHECK(res);

@@ -62,7 +62,7 @@ TEST(MenuHelperTest, GetItemText)
 	EXPECT_EQ(text, L"Item");
 }
 
-TEST(MenuHelperTest, GetItemIdIncludingSubmenu)
+TEST(MenuHelperTest, MaybeGetItemIdIncludingSubmenu)
 {
 	const UINT itemId = 1;
 	const UINT submenuItemId = 2;
@@ -70,11 +70,15 @@ TEST(MenuHelperTest, GetItemIdIncludingSubmenu)
 	auto menu = MenuHelper::CheckedCreatePopupMenu();
 	MenuHelper::AddStringItem(menu.get(), itemId, L"Item");
 	MenuHelper::AddNewSubMenuItem(menu.get(), submenuItemId, L"Submenu");
+	MenuHelper::AddSeparator(menu.get());
 
 	// Unlike GetMenuItemID(), this function should return the ID set for both items and submenu
 	// items.
-	EXPECT_EQ(MenuHelper::GetItemIdIncludingSubmenu(menu.get(), 0), itemId);
-	EXPECT_EQ(MenuHelper::GetItemIdIncludingSubmenu(menu.get(), 1), submenuItemId);
+	EXPECT_EQ(MenuHelper::MaybeGetItemIdIncludingSubmenu(menu.get(), 0), itemId);
+	EXPECT_EQ(MenuHelper::MaybeGetItemIdIncludingSubmenu(menu.get(), 1), submenuItemId);
+
+	// No ID should be returned for separator items.
+	EXPECT_EQ(MenuHelper::MaybeGetItemIdIncludingSubmenu(menu.get(), 2), std::nullopt);
 }
 
 TEST(MenuHelperTest, EnabledState)

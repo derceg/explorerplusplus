@@ -33,6 +33,8 @@ class MenuView
 private:
 	using PassKey = PassKey<MenuView>;
 
+	class Item;
+
 public:
 	using PopupWillShowSignal = boost::signals2::signal<void()>;
 
@@ -45,22 +47,18 @@ public:
 	static constexpr UINT EXTERNAL_ID_MIN = 1;
 	static constexpr UINT EXTERNAL_ID_MAX = 0xFFFF;
 
-	// This is used to construct a new root menu.
-	MenuView(HMENU menu);
-
 	// This is used to construct a new submenu and is only used internally (external callers should
 	// use AppendSubMenu()).
 	MenuView(MenuView *parent, HMENU menu, PassKey);
-
-	bool IsRoot() const;
+	virtual ~MenuView() = default;
 
 	void SetExternalItemDelegate(ExternalMenuItemDelegate *externalItemDelegate);
 
 	void AppendItem(MenuItemParams params);
 	void AddItem(MenuItemParams params, UINT index);
 	MenuView *AppendSubMenu(SubMenuItemParams params);
-
 	void AppendSeparator();
+
 	void RemoveDuplicateSeparators();
 	void RemoveTrailingSeparators();
 	void ClearMenu();
@@ -70,34 +68,34 @@ public:
 
 	int GetNumItems() const;
 
-	std::wstring GetItemHelpText(UINT id) const;
-	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
-	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
-	void RightClickItem(UINT id, const POINT &ptScreen);
-	MenuDragAction DragItem(UINT id);
-	wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForItem(UINT id, MenuDropPosition position);
-
 	// When using this to add external items, items should only be added within [EXTERNAL_ID_MIN,
 	// EXTERNAL_ID_MAX]. Adding items outside that range or otherwise altering the menu is invalid
 	// and will cause issues.
 	HMENU GetNativeMenuForExternalItems();
 
-	HMENU GetNativeMenuForTesting() const;
-	UINT GetItemIdForTesting(int index) const;
-	std::optional<UINT> MaybeGetIdForKeyForTesting(const MenuItemKey &key) const;
-	std::wstring GetItemFullTextForTesting(UINT id) const;
-	HBITMAP GetItemBitmapForTesting(UINT id) const;
-	bool IsItemEnabledForTesting(UINT id) const;
-	bool IsItemCheckedForTesting(UINT id) const;
-	const MenuView *GetSubMenuViewForTesting(const MenuItemKey &key) const;
-	const MenuView *GetSubMenuViewForTesting(UINT id) const;
-	wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForTesting(UINT id,
-		MenuDropPosition position);
-	void OnPopupWillShowForTesting(UINT dpi);
-	void OnPopupClosedForTesting();
+protected:
+	// This is used to construct a new root menu. External clients should use PopupMenuView or
+	// WindowMenuView to construct a top-level menu.
+	MenuView(wil::unique_hmenu menu);
+
+	// Releases ownership of the current menu when ownership has been transferred to a window.
+	HMENU ReleaseMenu();
+
+	void OnNativePopupWillShowForDpi(HMENU menu, UINT dpi);
+	void OnNativePopupClosed(HMENU menu);
+
+	Item *GetItemInSubtree(UINT id);
+	const Item *GetItemInSubtree(UINT id) const;
+
+	MenuView *MaybeGetMenuViewForNativeMenu(HMENU menu);
+
+	ExternalMenuItemDelegate *MaybeGetExternalItemDelegate();
+	const ExternalMenuItemDelegate *MaybeGetExternalItemDelegate() const;
+
+	const HMENU m_menu;
 
 private:
-	friend class MenuController;
+	friend class MenuViewTestApi;
 
 	// Note that to avoid potential overlap between IDs generated here and existing accelerator IDs,
 	// the ID range here starts from outside the 16-bit range. That is, when WM_COMMAND is
@@ -172,10 +170,8 @@ private:
 
 	void OnPopupWillShowForDpi(UINT dpi);
 	void OnPopupClosed();
-	MenuView *MaybeGetMenuViewForNativeMenu(HMENU menu);
 	MenuView *MaybeGetMenuViewForItem(UINT id);
 	const MenuView *MaybeGetMenuViewForItem(UINT id) const;
-	std::optional<UINT> MaybeGetIdForKey(const MenuItemKey &key) const;
 
 	void ClearItemImages();
 	void UpdateDynamicPropertiesForAllItems();
@@ -184,19 +180,14 @@ private:
 	void SetItemImage(UINT id);
 	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
 	UINT GetCurrentDpi() const;
-	std::wstring GetExternalItemHelpText(UINT id) const;
-	void SelectExternalItem(UINT id);
-	static bool IsExternalItem(UINT id);
-	ExternalMenuItemDelegate *MaybeGetExternalItemDelegate();
-	const ExternalMenuItemDelegate *MaybeGetExternalItemDelegate() const;
-	Item *GetItem(int id);
-	const Item *GetItem(int id) const;
+	Item *GetItem(UINT id);
+	const Item *GetItem(UINT id) const;
 
-	std::optional<UINT> MaybeGetItemId(int index) const;
-	std::optional<UINT> MaybeGetItemAtPoint(const POINT &ptScreen) const;
+	// This will be set for a top-level context menu, but will be null for a window menu, since in
+	// the that case, the window owns the menu.
+	wil::unique_hmenu m_ownedMenu;
 
 	MenuView *const m_parent;
-	const HMENU m_menu;
 	ExternalMenuItemDelegate *m_externalItemDelegate = nullptr;
 
 	// This exists on every MenuView instance, but is only used on the root menu. That is, IDs are

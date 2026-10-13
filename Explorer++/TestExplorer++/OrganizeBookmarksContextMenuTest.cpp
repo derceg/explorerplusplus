@@ -11,10 +11,12 @@
 #include "Bookmarks/UI/OrganizeBookmarksContextMenuDelegate.h"
 #include "CopiedBookmark.h"
 #include "MainResource.h"
-#include "MenuTestHost.h"
+#include "MenuViewTestApi.h"
 #include "MenuViewTestHelper.h"
 #include "ResourceLoaderFake.h"
+#include "RootMenuViewTestApi.h"
 #include "SimulatedClipboardStore.h"
+#include "TestMenuView.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -95,41 +97,40 @@ protected:
 
 TEST_F(OrganizeBookmarksContextMenuTest, ItemStatesWithNoSelection)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuView, &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Cut, false);
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Copy,
-		false);
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Delete,
-		false);
+	EXPECT_FALSE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Cut));
+	EXPECT_FALSE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Copy));
+	EXPECT_FALSE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Delete));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, ItemStatesWithSelection)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate({ m_targetFolder->GetChildren()[0].get() });
-	auto menu = BuildContextMenu(menuView, &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Cut, true);
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Copy, true);
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Delete,
-		true);
+	EXPECT_TRUE(MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Cut));
+	EXPECT_TRUE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Copy));
+	EXPECT_TRUE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Delete));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithEmptyClipboard)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuView, &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
 	// There are no bookmarks on the clipboard, so it shouldn't be possible to paste.
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Paste,
-		false);
+	EXPECT_FALSE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Paste));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithNonEmptyClipboard)
@@ -137,25 +138,23 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteStateWithNonEmptyClipboard)
 	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { m_bookmarkToCopy },
 		ClipboardAction::Copy);
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuView, &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::Paste,
-		true);
+	EXPECT_TRUE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::Paste));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllDisabledState)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
 	delegate.SetCanSelectAllItems(false);
-	auto menu = BuildContextMenu(menuView, &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::SelectAll,
-		false);
+	EXPECT_FALSE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::SelectAll));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithNoChildItems)
@@ -163,66 +162,67 @@ TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithNoChildItems)
 	auto *emptyFolder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
 		std::make_unique<BookmarkItem>(std::nullopt, L"Empty folder", std::nullopt));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
 	delegate.SetCanSelectAllItems(true);
-	auto menu = BuildContextMenu(menuView, &delegate, emptyFolder);
+	auto menu = BuildContextMenu(&menuView, &delegate, emptyFolder);
 
 	// Although the delegate allows all items to be selected, there are no child items in the target
 	// folder, so there's nothing to select. Therefore, the select all menu item should remain
 	// disabled.
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::SelectAll,
-		false);
+	EXPECT_FALSE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::SelectAll));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithChildItems)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
 	delegate.SetCanSelectAllItems(true);
-	auto menu = BuildContextMenu(menuView, &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	MenuViewTestHelper::ExpectItemEnabled(menuView, OrganizeBookmarksContextMenu::Item::SelectAll,
-		true);
+	EXPECT_TRUE(
+		MenuViewTestApi::IsItemEnabled(&menuView, OrganizeBookmarksContextMenu::Item::SelectAll));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, NewFolderWithNoSelection)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
 	// There are no selected items, so the new folder should be added to the last position in the
 	// target folder.
 	EXPECT_CALL(delegate, CreateFolder(m_targetFolder, 2));
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::NewFolder, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::NewFolder, false,
+		false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, NewFolderWithSelection)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate({ m_targetFolder->GetChildren()[0].get() });
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
 	// In this case, the first item in the target folder is selected. So, the new folder should be
 	// added after that item.
 	EXPECT_CALL(delegate, CreateFolder(m_targetFolder, 1));
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::NewFolder, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::NewFolder, false,
+		false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, Cut)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 
 	auto *bookmark = m_targetFolder->GetChildren()[0].get();
 	CopiedBookmark copiedBookmark(*bookmark);
 	OrganizeBookmarksContextMenuDelegateFake delegate({ bookmark });
 
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::Cut, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::Cut, false,
+		false);
 	EXPECT_EQ(m_targetFolder->GetChildren().size(), 1u);
 
 	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
@@ -232,15 +232,16 @@ TEST_F(OrganizeBookmarksContextMenuTest, Cut)
 
 TEST_F(OrganizeBookmarksContextMenuTest, Copy)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 
 	auto *bookmark = m_targetFolder->GetChildren()[0].get();
 	CopiedBookmark copiedBookmark(*bookmark);
 	OrganizeBookmarksContextMenuDelegateFake delegate({ bookmark });
 
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::Copy, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::Copy, false,
+		false);
 
 	BookmarkClipboard bookmarkClipboard(&m_clipboardStore);
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
@@ -253,11 +254,12 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteWithNoSelection)
 	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { m_bookmarkToCopy },
 		ClipboardAction::Copy);
 
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::Paste, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::Paste, false,
+		false);
 	ASSERT_EQ(m_targetFolder->GetChildren().size(), 3u);
 	EXPECT_THAT(m_targetFolder->GetChildren()[2], Pointee(copiedBookmark));
 }
@@ -268,49 +270,53 @@ TEST_F(OrganizeBookmarksContextMenuTest, PasteWithSelection)
 	BookmarkHelper::CopyBookmarkItems(&m_clipboardStore, &m_bookmarkTree, { m_bookmarkToCopy },
 		ClipboardAction::Copy);
 
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate({ m_targetFolder->GetChildren()[0].get() });
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::Paste, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::Paste, false,
+		false);
 	ASSERT_EQ(m_targetFolder->GetChildren().size(), 3u);
 	EXPECT_THAT(m_targetFolder->GetChildren()[1], Pointee(copiedBookmark));
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAll)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
 	delegate.SetCanSelectAllItems(true);
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
 	EXPECT_CALL(delegate, SelectAllItems());
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::SelectAll, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::SelectAll, false,
+		false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectionAfterTargetFolderDestroyed)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
 	m_bookmarkTree.RemoveBookmarkItem(m_targetFolder);
 
 	// The target folder was removed, so this call should have no effect, but should still be safe.
 	EXPECT_CALL(delegate, CreateFolder).Times(0);
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::NewFolder, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::NewFolder, false,
+		false);
 }
 
 TEST_F(OrganizeBookmarksContextMenuTest, SelectionAfterParentFolderDestroyed)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;
-	auto menu = BuildContextMenu(menuHost.GetView(), &delegate);
+	auto menu = BuildContextMenu(&menuView, &delegate);
 
 	m_bookmarkTree.RemoveBookmarkItem(m_targetFolder->GetParent());
 
 	// In this case, the target folder was implicitly removed (by removing the parent folder), but
 	// this call should again be safe.
 	EXPECT_CALL(delegate, CreateFolder).Times(0);
-	menuHost.SelectItem(OrganizeBookmarksContextMenu::Item::NewFolder, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, OrganizeBookmarksContextMenu::Item::NewFolder, false,
+		false);
 }

@@ -173,7 +173,7 @@ void RemoveTrailingSeparators(HMENU menu)
 		auto res = GetMenuItemInfo(menu, i, true, &menuItemInfo);
 		CHECK(res);
 
-		if (menuItemInfo.fType != MFT_SEPARATOR)
+		if (WI_IsFlagClear(menuItemInfo.fType, MFT_SEPARATOR))
 		{
 			break;
 		}
@@ -209,14 +209,19 @@ std::wstring GetItemText(HMENU menu, UINT item, ItemLookup lookupType)
 
 // While it is possible to set the ID of a submenu item, GetMenuItemID() will explicitly return -1
 // in that case. This function, however, will call GetMenuItemInfo(), which will work even if the
-// item is a submenu item.
-UINT GetItemIdIncludingSubmenu(HMENU menu, int index)
+// item is a submenu item. Note that separators are explicitly excluded.
+std::optional<UINT> MaybeGetItemIdIncludingSubmenu(HMENU menu, int index)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_ID;
+	menuItemInfo.fMask = MIIM_ID | MIIM_FTYPE;
 	auto res = GetMenuItemInfo(menu, index, true, &menuItemInfo);
 	CHECK(res);
+
+	if (WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR))
+	{
+		return std::nullopt;
+	}
 
 	return menuItemInfo.wID;
 }
@@ -340,7 +345,7 @@ std::optional<UINT> MaybeGetItemAtPoint(HMENU menu, const POINT &ptScreen)
 	// the function isn't adhering to its documented properties in at least some cases.
 	if (item >= 0)
 	{
-		return GetItemIdIncludingSubmenu(menu, item);
+		return MaybeGetItemIdIncludingSubmenu(menu, item);
 	}
 
 	int count = GetMenuItemCount(menu);

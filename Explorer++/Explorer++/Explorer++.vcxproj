@@ -1222,17 +1222,17 @@
     <ClCompile Include="ListViewColumnsMenu.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
     <ClCompile Include="ListViewModel.cpp" />
-    <ClCompile Include="MainMenuHost.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="MassRenameHelper.cpp" />
     <ClCompile Include="MassRenameTokensMenu.cpp" />
-    <ClCompile Include="MenuController.cpp" />
     <ClCompile Include="MenuItemParams.cpp" />
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="PlatformContextImpl.cpp" />
+    <ClCompile Include="PopupMenuView.cpp" />
     <ClCompile Include="ResourceIconModel.cpp" />
+    <ClCompile Include="RootMenuView.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
     <ClCompile Include="SearchResultsItemContextMenu.cpp" />
     <ClCompile Include="SearchTabsListViewModel.cpp" />
@@ -1352,7 +1352,6 @@
     <ClCompile Include="NavigationHelper.cpp" />
     <ClCompile Include="OneShotTimer.cpp" />
     <ClCompile Include="OneShotTimerManager.cpp" />
-    <ClCompile Include="PopupMenuRunner.cpp" />
     <ClCompile Include="MainRebarRegistryStorage.cpp" />
     <ClCompile Include="ShellEnumeratorImpl.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
@@ -1522,6 +1521,7 @@
     <ClCompile Include="ViewsMenu.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="Win32ResourceLoader.cpp" />
+    <ClCompile Include="WindowMenuView.cpp" />
     <ClCompile Include="WindowOptionsPage.cpp" />
     <ClCompile Include="WindowRegistryStorage.cpp" />
     <ClCompile Include="WindowStorage.cpp" />
@@ -1589,13 +1589,11 @@
     <ClInclude Include="ListViewDelegate.h" />
     <ClInclude Include="ListViewItem.h" />
     <ClInclude Include="ListViewModel.h" />
-    <ClInclude Include="MainMenuHost.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MassRenameHelper.h" />
     <ClInclude Include="MassRenameTokensMenu.h" />
-    <ClInclude Include="MenuController.h" />
     <ClInclude Include="MenuItemCallbacks.h" />
     <ClInclude Include="MenuItemKey.h" />
     <ClInclude Include="MenuItemParams.h" />
@@ -1604,7 +1602,9 @@
     <ClInclude Include="PidlUpdater.h" />
     <ClInclude Include="PlatformContext.h" />
     <ClInclude Include="PlatformContextImpl.h" />
+    <ClInclude Include="PopupMenuView.h" />
     <ClInclude Include="ResourceIconModel.h" />
+    <ClInclude Include="RootMenuView.h" />
     <ClInclude Include="SearchResultsItemContextMenu.h" />
     <ClInclude Include="SearchTabsListViewModel.h" />
     <ClInclude Include="SelectionType.h" />
@@ -1745,7 +1745,6 @@
     <ClInclude Include="NavigationHelper.h" />
     <ClInclude Include="OneShotTimer.h" />
     <ClInclude Include="OneShotTimerManager.h" />
-    <ClInclude Include="PopupMenuRunner.h" />
     <ClInclude Include="MainRebarRegistryStorage.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellEnumeratorImpl.h" />
@@ -1893,6 +1892,7 @@
     <ClInclude Include="ViewsMenu.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="Win32ResourceLoader.h" />
+    <ClInclude Include="WindowMenuView.h" />
     <ClInclude Include="WindowOptionsPage.h" />
     <ClInclude Include="WindowRegistryStorage.h" />
     <ClInclude Include="WindowStorage.h" />

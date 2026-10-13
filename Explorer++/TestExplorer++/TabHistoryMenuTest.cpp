@@ -6,11 +6,13 @@
 #include "TabHistoryMenu.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "MenuTestHost.h"
+#include "MenuViewTestApi.h"
 #include "PidlTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellIconLoaderFake.h"
+#include "TestMenuView.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -31,14 +33,15 @@ protected:
 
 TEST_F(TabHistoryMenuTest, BackHistory)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	TabHistoryMenu menu(menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
-	ASSERT_EQ(menuView->GetNumItems(), 2);
-	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(0)), L"fake2");
-	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(1)), L"fake1");
+	ASSERT_EQ(menuView.GetNumItems(), 2);
+	EXPECT_EQ(MenuViewTestApi::GetItemFullText(&menuView, MenuViewTestApi::GetItemId(&menuView, 0)),
+		L"fake2");
+	EXPECT_EQ(MenuViewTestApi::GetItemFullText(&menuView, MenuViewTestApi::GetItemId(&menuView, 1)),
+		L"fake1");
 }
 
 TEST_F(TabHistoryMenuTest, ForwardHistory)
@@ -47,36 +50,37 @@ TEST_F(TabHistoryMenuTest, ForwardHistory)
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	TabHistoryMenu menu(menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
-	ASSERT_EQ(menuView->GetNumItems(), 2);
-	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(0)), L"fake2");
-	EXPECT_EQ(menuView->GetItemFullTextForTesting(menuView->GetItemIdForTesting(1)), L"fake3");
+	ASSERT_EQ(menuView.GetNumItems(), 2);
+	EXPECT_EQ(MenuViewTestApi::GetItemFullText(&menuView, MenuViewTestApi::GetItemId(&menuView, 0)),
+		L"fake2");
+	EXPECT_EQ(MenuViewTestApi::GetItemFullText(&menuView, MenuViewTestApi::GetItemId(&menuView, 1)),
+		L"fake3");
 }
 
 TEST_F(TabHistoryMenuTest, BackSelection)
 {
-	MenuTestHost menuHost;
-	TabHistoryMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	// Go back to fake2.
-	menuHost.SelectItemAtIndex(0, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 0, false, false);
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
 }
 
 TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 {
-	MenuTestHost menuHost;
-	TabHistoryMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	// Open fake2 in a new tab.
-	menuHost.MiddleClickItemAtIndex(0, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
 	// Since the item was opened in a new tab, the current index should remain unchanged.
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 2);
@@ -93,12 +97,12 @@ TEST_F(TabHistoryMenuTest, ForwardSelection)
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 
-	MenuTestHost menuHost;
-	TabHistoryMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go forward to fake3.
-	menuHost.SelectItemAtIndex(1, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 1, false, false);
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 2);
 }
@@ -109,12 +113,12 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 
-	MenuTestHost menuHost;
-	TabHistoryMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Open fake3 in a new tab.
-	menuHost.MiddleClickItemAtIndex(1, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 1, false, false);
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 0);
 
@@ -129,8 +133,8 @@ TEST_F(TabHistoryMenuTest, InvalidSelection)
 	// Go back to fake2.
 	m_tab->GetShellBrowser()->GetNavigationController()->GoBack();
 
-	MenuTestHost menuHost;
-	TabHistoryMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_shellIconLoader,
+	TestMenuView menuView;
+	TabHistoryMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go back to fake1.
@@ -139,7 +143,7 @@ TEST_F(TabHistoryMenuTest, InvalidSelection)
 	// This will erase the forward history (i.e. fake2 and fake3).
 	NavigateTab(m_tab, L"c:\\fake4");
 
-	menuHost.SelectItemAtIndex(0, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 0, false, false);
 
 	// There was no forward history entry to navigate to, so the current index should remain
 	// unchanged.

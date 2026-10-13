@@ -14,7 +14,7 @@
 #include "MouseEvent.h"
 #include "NoOpMenuHelpTextHost.h"
 #include "PlatformContext.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "TestHelper.h"
 #include "TreeView.h"
@@ -170,10 +170,10 @@ void BookmarkTreePresenter::OnSelectionChanged(TreeViewNode *selectedNode)
 
 void BookmarkTreePresenter::OnShowContextMenu(TreeViewNode *targetNode, const POINT &ptScreen)
 {
-	PopupMenuRunner popupRunner(m_view->GetHWND(), NoOpMenuHelpTextHost::GetInstance());
-	BookmarkTreeViewContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, this,
-		m_bookmarkTree, m_adapter->GetBookmarkForNode(targetNode)->GetWeakPtr(), m_resourceLoader);
-	popupRunner.Show(ptScreen);
+	PopupMenuView popupMenu(m_view->GetHWND(), NoOpMenuHelpTextHost::GetInstance());
+	BookmarkTreeViewContextMenu contextMenu(&popupMenu, m_acceleratorManager, this, m_bookmarkTree,
+		m_adapter->GetBookmarkForNode(targetNode)->GetWeakPtr(), m_resourceLoader);
+	popupMenu.Show(ptScreen);
 }
 
 void BookmarkTreePresenter::OnBeginDrag(TreeViewNode *targetNode)

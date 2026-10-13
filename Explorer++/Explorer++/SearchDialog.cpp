@@ -9,7 +9,7 @@
 #include "DialogConstants.h"
 #include "MainResource.h"
 #include "NoOpMenuHelpTextHost.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "SearchResultsItemContextMenu.h"
 #include "ShellBrowser/NavigateParams.h"
@@ -630,11 +630,10 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 							WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 						}
 
-						PopupMenuRunner popupRunner(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
-						SearchResultsItemContextMenu menu(popupRunner.GetView(),
-							m_acceleratorManager, parent, { child }, m_hDlg, nullptr, flags,
-							m_browserList, m_resourceLoader);
-						popupRunner.Show(ptCursor);
+						PopupMenuView popupMenu(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
+						SearchResultsItemContextMenu menu(&popupMenu, m_acceleratorManager, parent,
+							{ child }, m_hDlg, nullptr, flags, m_browserList, m_resourceLoader);
+						popupMenu.Show(ptCursor);
 					}
 				}
 			}

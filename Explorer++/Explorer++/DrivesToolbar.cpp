@@ -9,7 +9,7 @@
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "NavigationHelper.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "ShellItemContextMenu.h"
@@ -195,10 +195,10 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	PopupMenuRunner popupRunner(m_view->GetHWND(), m_browser);
-	ShellItemContextMenu menu(popupRunner.GetView(), m_acceleratorManager, parent, { child },
+	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
+	ShellItemContextMenu menu(&popupMenu, m_acceleratorManager, parent, { child },
 		m_view->GetHWND(), nullptr, flags, m_browser, m_resourceLoader);
-	popupRunner.Show(ptScreen);
+	popupMenu.Show(ptScreen);
 }
 
 void DrivesToolbar::OnWindowDestroyed()

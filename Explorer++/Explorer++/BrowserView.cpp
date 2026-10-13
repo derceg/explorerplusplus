@@ -206,6 +206,12 @@ void BrowserView::UpdateWindowText()
 	SetWindowText(m_hwnd, title.c_str());
 }
 
+void BrowserView::RedrawMenuBar()
+{
+	auto res = DrawMenuBar(m_hwnd);
+	CHECK(res);
+}
+
 // This is used for both Tab/Shift+Tab and F6/Shift+F6. While IsDialogMessage() could be used to
 // handle Tab/Shift+Tab, the key combinations in this case are synonyms for each other. Since
 // F6/Shift+F6 would need to be handled manually anyway, handling both with the same function

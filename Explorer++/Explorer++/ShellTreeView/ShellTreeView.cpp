@@ -25,7 +25,7 @@
 #include "LabelEditHandler.h"
 #include "MainResource.h"
 #include "PlatformContext.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigateParams.h"
@@ -1316,12 +1316,11 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	PopupMenuRunner popupRunner(m_hTreeView, m_browser);
-	ShellItemContextMenu menu(popupRunner.GetView(), m_appServices->GetAcceleratorManager(),
-		pidl.get(), { child.get() }, m_hTreeView, nullptr, flags, m_browser,
-		m_appServices->GetResourceLoader(),
+	PopupMenuView popupMenu(m_hTreeView, m_browser);
+	ShellItemContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), pidl.get(),
+		{ child.get() }, m_hTreeView, nullptr, flags, m_browser, m_appServices->GetResourceLoader(),
 		std::bind_front(&ShellTreeView::MaybeHandleShellMenuItem, this));
-	popupRunner.Show(finalPoint);
+	popupMenu.Show(finalPoint);
 
 	if (highlightTargetItem)
 	{

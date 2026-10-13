@@ -15,7 +15,7 @@
 #include "IconModel.h"
 #include "MainResource.h"
 #include "MenuView.h"
-#include "PopupMenuRunner.h"
+#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/ImageHelper.h"
@@ -165,10 +165,10 @@ void BookmarksMenu::OnBookmarkItemRightClicked(WeakPtr<BookmarkItem> bookmarkIte
 		return;
 	}
 
-	PopupMenuRunner popupRunner(m_parentWindow, m_browser);
-	BookmarkContextMenu contextMenu(popupRunner.GetView(), m_acceleratorManager, m_bookmarkTree,
+	PopupMenuView popupMenu(m_parentWindow, m_browser);
+	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem.Get() }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
-	popupRunner.Show(ptScreen);
+	popupMenu.Show(ptScreen);
 }
 
 MenuDragAction BookmarksMenu::OnBookmarkItemDragged(WeakPtr<BookmarkItem> bookmarkItem)

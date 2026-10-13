@@ -6,9 +6,10 @@
 #include "TabRestorerMenu.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "MenuTestHost.h"
 #include "MenuViewTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellIconLoaderFake.h"
+#include "TestMenuView.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -18,7 +19,7 @@ class TabRestorerMenuTest : public BrowserTestBase
 protected:
 	ShellIconLoaderFake m_shellIconLoader;
 
-	MenuTestHost m_menuHost;
+	TestMenuView m_menuView;
 };
 
 TEST_F(TabRestorerMenuTest, CheckItems)
@@ -36,10 +37,10 @@ TEST_F(TabRestorerMenuTest, CheckItems)
 	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
 	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId3)));
 
-	TabRestorerMenu menu(m_menuHost.GetView(), &m_acceleratorManager, &m_tabRestorer,
-		&m_shellIconLoader, &m_resourceLoader);
+	TabRestorerMenu menu(&m_menuView, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
+		&m_resourceLoader);
 
-	MenuViewTestHelper::CheckShellItemDetails(m_menuHost.GetView(), { pidl3, pidl2 });
+	MenuViewTestHelper::CheckShellItemDetails(&m_menuView, { pidl3, pidl2 });
 }
 
 TEST_F(TabRestorerMenuTest, Selection)
@@ -55,8 +56,8 @@ TEST_F(TabRestorerMenuTest, Selection)
 	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId3)));
 	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId4)));
 
-	TabRestorerMenu menu(m_menuHost.GetView(), &m_acceleratorManager, &m_tabRestorer,
-		&m_shellIconLoader, &m_resourceLoader);
+	TabRestorerMenu menu(&m_menuView, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
+		&m_resourceLoader);
 
 	// Tabs are listed by most recently closed first, so the menu should contain:
 	//
@@ -65,7 +66,7 @@ TEST_F(TabRestorerMenuTest, Selection)
 	// tab2
 	//
 	// and this call should select tab3.
-	m_menuHost.SelectItemAtIndex(1, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&m_menuView, 1, false, false);
 	EXPECT_EQ(tabContainer->GetNumTabs(), 2);
 
 	// tab3 was restored, so tab2 and tab4 should remain.
@@ -83,14 +84,14 @@ TEST_F(TabRestorerMenuTest, Selection)
 	// and this call should select tab2.
 	//
 	// Note that middle-clicking an item should have the same effect as left-clicking an item.
-	m_menuHost.MiddleClickItemAtIndex(1, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&m_menuView, 1, false, false);
 	EXPECT_EQ(tabContainer->GetNumTabs(), 3);
 
 	// tab2 was restored, so only tab4 should remain.
 	EXPECT_THAT(closedTabs, ElementsAre(Pointee(Field(&PreservedTab::id, tabId4))));
 
 	// This should restore tab4, leaving no tabs left to be restored.
-	m_menuHost.SelectItemAtIndex(0, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&m_menuView, 0, false, false);
 	EXPECT_EQ(tabContainer->GetNumTabs(), 4);
 
 	EXPECT_TRUE(closedTabs.empty());

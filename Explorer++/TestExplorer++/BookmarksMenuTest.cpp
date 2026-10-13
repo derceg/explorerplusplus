@@ -9,10 +9,12 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "IconFetcherFake.h"
-#include "MenuTestHost.h"
+#include "MenuViewTestApi.h"
 #include "MenuViewTestHelper.h"
 #include "PidlTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "TestMenuView.h"
 #include "../Helper/DragDropHelper.h"
 #include <gtest/gtest.h>
 
@@ -44,8 +46,8 @@ protected:
 			// The folder has no children, but the menu should still have a single item added
 			// (indicating that the menu is empty).
 			ASSERT_EQ(menuView->GetNumItems(), 1);
-			MenuViewTestHelper::ExpectItemEnabled(menuView, menuView->GetItemIdForTesting(0),
-				false);
+			EXPECT_FALSE(
+				MenuViewTestApi::IsItemEnabled(menuView, MenuViewTestApi::GetItemId(menuView, 0)));
 			return;
 		}
 
@@ -67,16 +69,16 @@ protected:
 		{
 			const auto *child = includedChildren[i];
 
-			UINT id = menuView->GetItemIdForTesting(i);
-			EXPECT_EQ(menuView->GetItemFullTextForTesting(id), child->GetName());
+			UINT id = MenuViewTestApi::GetItemId(menuView, i);
+			EXPECT_EQ(MenuViewTestApi::GetItemFullText(menuView, id), child->GetName());
 
 			if (child->IsBookmark())
 			{
-				EXPECT_EQ(menuView->GetItemHelpText(id), child->GetLocation());
+				EXPECT_EQ(MenuViewTestApi::GetItemHelpText(menuView, id), child->GetLocation());
 			}
 			else
 			{
-				VerifyMenuItems(menuView->GetSubMenuViewForTesting(id), child);
+				VerifyMenuItems(MenuViewTestApi::GetSubMenuView(menuView, id), child);
 			}
 		}
 	}
@@ -84,7 +86,7 @@ protected:
 	void SimulateDropOnMenuView(MenuView *menuView, UINT id, MenuDropPosition position,
 		const std::vector<PidlAbsolute> &items)
 	{
-		auto dropTarget = menuView->MaybeGetDropTargetForTesting(id, position);
+		auto dropTarget = MenuViewTestApi::MaybeGetDropTarget(menuView, id, position);
 		ASSERT_NE(dropTarget, nullptr);
 
 		wil::com_ptr_nothrow<IDataObject> dataObject;
@@ -128,11 +130,10 @@ TEST_F(BookmarksMenuTest, Items)
 	m_bookmarkTree.AddBookmarkItem(targetFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Empty folder", std::nullopt));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
-	VerifyMenuItems(menuView, targetFolder);
+	VerifyMenuItems(&menuView, targetFolder);
 }
 
 TEST_F(BookmarksMenuTest, ItemsWithIncludePredicate)
@@ -162,11 +163,10 @@ TEST_F(BookmarksMenuTest, ItemsWithIncludePredicate)
 		return bookmarkItem->IsBookmark();
 	};
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder, includePredicate);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder, includePredicate);
 
-	VerifyMenuItems(menuView, targetFolder, includePredicate);
+	VerifyMenuItems(&menuView, targetFolder, includePredicate);
 }
 
 TEST_F(BookmarksMenuTest, Selection)
@@ -179,15 +179,14 @@ TEST_F(BookmarksMenuTest, Selection)
 	m_bookmarkTree.AddBookmarkItem(targetFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"e:\\"));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
-	ASSERT_EQ(menuView->GetNumItems(), static_cast<int>(targetFolder->GetChildren().size()));
+	ASSERT_EQ(menuView.GetNumItems(), static_cast<int>(targetFolder->GetChildren().size()));
 
-	for (int i = 0; i < menuView->GetNumItems(); i++)
+	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		menuHost.SelectItemAtIndex(i, false, false);
+		RootMenuViewTestApi::SelectItemAtIndex(&menuView, i, false, false);
 		EXPECT_THAT(m_tab->GetShellBrowser()->GetDirectoryPath(),
 			StrCaseEq(targetFolder->GetChildAtIndex(i)->GetLocation()));
 	}
@@ -199,11 +198,10 @@ TEST_F(BookmarksMenuTest, MiddleClickBookmark)
 	m_bookmarkTree.AddBookmarkItem(targetFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\"));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
-	menuHost.MiddleClickItemAtIndex(0, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
@@ -223,11 +221,10 @@ TEST_F(BookmarksMenuTest, MiddleClickFolder)
 	m_bookmarkTree.AddBookmarkItem(subFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"e:\\"));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
-	menuHost.MiddleClickItemAtIndex(0, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
 	// Each of the bookmarks in the folder should have been opened in a new tab.
 	auto *tabContainer = m_browser->GetActiveTabContainer();
@@ -251,13 +248,12 @@ TEST_F(BookmarksMenuTest, DropAtIndex)
 	m_bookmarkTree.AddBookmarkItem(targetFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"e:\\"));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView, menuView->GetItemIdForTesting(1), MenuDropPosition::Before,
-		{ dropItem });
+	SimulateDropOnMenuView(&menuView, MenuViewTestApi::GetItemId(&menuView, 1),
+		MenuDropPosition::Before, { dropItem });
 
 	ASSERT_EQ(targetFolder->GetChildren().size(), 4u);
 
@@ -277,13 +273,12 @@ TEST_F(BookmarksMenuTest, DropOnFolder)
 	m_bookmarkTree.AddBookmarkItem(subFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Nested bookmark", L"d:\\"));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView, menuView->GetItemIdForTesting(1), MenuDropPosition::On,
-		{ dropItem });
+	SimulateDropOnMenuView(&menuView, MenuViewTestApi::GetItemId(&menuView, 1),
+		MenuDropPosition::On, { dropItem });
 
 	ASSERT_EQ(subFolder->GetChildren().size(), 2u);
 
@@ -298,15 +293,14 @@ TEST_F(BookmarksMenuTest, DropOnEmptyItem)
 {
 	auto *targetFolder = m_bookmarkTree.GetOtherBookmarksFolder();
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
 	// The target folder is empty, so only the "empty" menu item should be shown. This checks that
 	// dropping on that item results in the dropped bookmark being added to the parent.
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView, menuView->GetItemIdForTesting(0), MenuDropPosition::On,
-		{ dropItem });
+	SimulateDropOnMenuView(&menuView, MenuViewTestApi::GetItemId(&menuView, 0),
+		MenuDropPosition::On, { dropItem });
 
 	ASSERT_EQ(targetFolder->GetChildren().size(), 1u);
 
@@ -320,13 +314,12 @@ TEST_F(BookmarksMenuTest, DropAfterEmptyItem)
 {
 	auto *targetFolder = m_bookmarkTree.GetOtherBookmarksFolder();
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
 	PidlAbsolute dropItem = CreateSimplePidlForTest(L"c:\\dropped-folder");
-	SimulateDropOnMenuView(menuView, menuView->GetItemIdForTesting(0), MenuDropPosition::After,
-		{ dropItem });
+	SimulateDropOnMenuView(&menuView, MenuViewTestApi::GetItemId(&menuView, 0),
+		MenuDropPosition::After, { dropItem });
 
 	ASSERT_EQ(targetFolder->GetChildren().size(), 1u);
 
@@ -342,21 +335,20 @@ TEST_F(BookmarksMenuTest, ActionsAfterRemoval)
 	m_bookmarkTree.AddBookmarkItem(targetFolder,
 		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\"));
 
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
-	auto menu = BuildMenu(menuView, targetFolder);
+	TestMenuView menuView;
+	auto menu = BuildMenu(&menuView, targetFolder);
 
 	m_bookmarkTree.RemoveBookmarkItem(targetFolder->GetChildAtIndex(0));
 
 	// Selecting an item that has been removed should have no effect.
-	menuHost.SelectItemAtIndex(0, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 0, false, false);
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	EXPECT_THAT(m_tab->GetShellBrowser()->GetDirectoryPath(), StrCaseEq(L"c:\\initial\\folder"));
 
-	menuHost.MiddleClickItemAtIndex(0, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 	EXPECT_EQ(tabContainer->GetNumTabs(), 1);
 
-	auto dropTarget = menuView->MaybeGetDropTargetForTesting(menuView->GetItemIdForTesting(0),
-		MenuDropPosition::On);
+	auto dropTarget = MenuViewTestApi::MaybeGetDropTarget(&menuView,
+		MenuViewTestApi::GetItemId(&menuView, 0), MenuDropPosition::On);
 	EXPECT_EQ(dropTarget, nullptr);
 }

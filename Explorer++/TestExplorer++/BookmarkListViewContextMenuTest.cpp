@@ -8,8 +8,9 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkItemCreationDelegate.h"
 #include "MainResource.h"
-#include "MenuTestHost.h"
 #include "ResourceLoaderFake.h"
+#include "RootMenuViewTestApi.h"
+#include "TestMenuView.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -33,8 +34,8 @@ protected:
 	BookmarkListViewContextMenuTest() :
 		m_targetFolder(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt))),
-		m_contextMenu(m_menuHost.GetView(), &m_acceleratorManager, &m_delegate,
-			m_targetFolder->GetWeakPtr(), &m_resourceLoader)
+		m_contextMenu(&m_menuView, &m_acceleratorManager, &m_delegate, m_targetFolder->GetWeakPtr(),
+			&m_resourceLoader)
 	{
 		m_bookmarkTree.AddBookmarkItem(m_targetFolder,
 			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"C:\\"));
@@ -49,7 +50,7 @@ protected:
 
 	BookmarkItemCreationDelegateMock m_delegate;
 
-	MenuTestHost m_menuHost;
+	TestMenuView m_menuView;
 	BookmarkListViewContextMenu m_contextMenu;
 };
 
@@ -57,10 +58,12 @@ TEST_F(BookmarkListViewContextMenuTest, Selection)
 {
 	// The target folder has 2 bookmarks, so the new bookmark should be added after those.
 	EXPECT_CALL(m_delegate, CreateBookmark(m_targetFolder, 2));
-	m_menuHost.SelectItem(BookmarkListViewContextMenu::Item::NewBookmark, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, BookmarkListViewContextMenu::Item::NewBookmark,
+		false, false);
 
 	EXPECT_CALL(m_delegate, CreateFolder(m_targetFolder, 2));
-	m_menuHost.SelectItem(BookmarkListViewContextMenu::Item::NewFolder, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, BookmarkListViewContextMenu::Item::NewFolder,
+		false, false);
 }
 
 TEST_F(BookmarkListViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
@@ -68,5 +71,6 @@ TEST_F(BookmarkListViewContextMenuTest, SelectionAfterTargetFolderDestroyed)
 	m_bookmarkTree.RemoveBookmarkItem(m_targetFolder);
 
 	EXPECT_CALL(m_delegate, CreateBookmark(_, _)).Times(0);
-	m_menuHost.SelectItem(BookmarkListViewContextMenu::Item::NewBookmark, false, false);
+	RootMenuViewTestApi::SelectItem(&m_menuView, BookmarkListViewContextMenu::Item::NewBookmark,
+		false, false);
 }

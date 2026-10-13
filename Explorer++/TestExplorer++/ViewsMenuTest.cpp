@@ -6,9 +6,11 @@
 #include "ViewsMenu.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "MenuTestHost.h"
+#include "MenuViewTestApi.h"
 #include "MenuViewTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "TestMenuView.h"
 #include "ViewModeHelper.h"
 #include <gtest/gtest.h>
 
@@ -24,15 +26,15 @@ protected:
 		auto *shellBrowser = m_tab->GetShellBrowser();
 		shellBrowser->SetViewMode(viewMode);
 
-		MenuTestHost menuHost;
-		ViewsMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_resourceLoader);
+		TestMenuView menuView;
+		ViewsMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_resourceLoader);
 
-		auto *menuView = menuHost.GetView();
-		ASSERT_EQ(menuView->GetNumItems(), static_cast<int>(VIEW_MODES.size()));
+		ASSERT_EQ(menuView.GetNumItems(), static_cast<int>(VIEW_MODES.size()));
 
-		for (int i = 0; i < menuView->GetNumItems(); i++)
+		for (int i = 0; i < menuView.GetNumItems(); i++)
 		{
-			MenuViewTestHelper::ExpectItemChecked(menuView, menuView->GetItemIdForTesting(i),
+			EXPECT_EQ(
+				MenuViewTestApi::IsItemChecked(&menuView, MenuViewTestApi::GetItemId(&menuView, i)),
 				VIEW_MODES[i] == viewMode);
 		}
 	}
@@ -49,17 +51,16 @@ TEST_F(ViewsMenuTest, CheckState)
 
 TEST_F(ViewsMenuTest, Selection)
 {
-	MenuTestHost menuHost;
-	ViewsMenu menu(menuHost.GetView(), &m_acceleratorManager, m_browser, &m_resourceLoader);
+	TestMenuView menuView;
+	ViewsMenu menu(&menuView, &m_acceleratorManager, m_browser, &m_resourceLoader);
 
-	auto *menuView = menuHost.GetView();
-	ASSERT_EQ(menuView->GetNumItems(), static_cast<int>(VIEW_MODES.size()));
+	ASSERT_EQ(menuView.GetNumItems(), static_cast<int>(VIEW_MODES.size()));
 
 	auto *shellBrowser = m_tab->GetShellBrowser();
 
-	for (int i = 0; i < menuView->GetNumItems(); i++)
+	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		menuHost.SelectItemAtIndex(i, false, false);
+		RootMenuViewTestApi::SelectItemAtIndex(&menuView, i, false, false);
 		EXPECT_EQ(shellBrowser->GetViewMode(), VIEW_MODES[i]);
 	}
 }

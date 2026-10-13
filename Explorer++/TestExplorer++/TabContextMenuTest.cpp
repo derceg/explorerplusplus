@@ -7,10 +7,11 @@
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
 #include "MainResource.h"
-#include "MenuTestHost.h"
 #include "PidlTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "TestMenuView.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -54,11 +55,11 @@ TEST_F(TabContextMenuTest, DuplicateTab)
 	PidlAbsolute pidl;
 	auto *tab1 = m_browser->AddTab(L"c:\\users", {}, &pidl);
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab1->GetWeakPtr(),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::DuplicateTab, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::DuplicateTab, false, false);
 	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
 
 	const auto &tab2 = m_tabContainer->GetTabByIndex(1);
@@ -69,11 +70,12 @@ TEST_F(TabContextMenuTest, OpenParentInNewTab)
 {
 	auto *tab1 = m_browser->AddTab(L"c:\\windows\\system32");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab1->GetWeakPtr(),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::OpenParentInNewTab, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::OpenParentInNewTab, false,
+		false);
 	ASSERT_EQ(m_tabContainer->GetNumTabs(), 2);
 
 	const auto &tab2 = m_tabContainer->GetTabByIndex(1);
@@ -85,11 +87,11 @@ TEST_F(TabContextMenuTest, Refresh)
 	auto *tab = m_browser->AddTab(L"c:\\");
 	auto snapshot = TakeHistoryEntrySnapshot(tab);
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab->GetWeakPtr(),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::Refresh, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::Refresh, false, false);
 	VerifyTabRefreshed(snapshot);
 }
 
@@ -102,11 +104,11 @@ TEST_F(TabContextMenuTest, RefreshAll)
 	std::vector<HistoryEntrySnapshot> snapshots = { TakeHistoryEntrySnapshot(tab1),
 		TakeHistoryEntrySnapshot(tab2), TakeHistoryEntrySnapshot(tab3) };
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab1->GetWeakPtr(),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab1->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::RefreshAll, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::RefreshAll, false, false);
 
 	for (const auto &snapshot : snapshots)
 	{
@@ -118,15 +120,15 @@ TEST_F(TabContextMenuTest, LockTab)
 {
 	auto *tab = m_browser->AddTab(L"c:\\");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab->GetWeakPtr(),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::LockTab, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::LockTab, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::Locked);
 
 	// Selecting the item again should toggle the lock state.
-	menuHost.SelectItem(TabContextMenu::Item::LockTab, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::LockTab, false, false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::NotLocked);
 }
 
@@ -134,14 +136,16 @@ TEST_F(TabContextMenuTest, LockTabAndAddress)
 {
 	auto *tab = m_browser->AddTab(L"c:\\");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager, tab->GetWeakPtr(),
-		m_tabContainer, &m_tabEvents, &m_resourceLoader);
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager, tab->GetWeakPtr(), m_tabContainer,
+		&m_tabEvents, &m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::LockTabAndAddress, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::LockTabAndAddress, false,
+		false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::AddressLocked);
 
-	menuHost.SelectItem(TabContextMenu::Item::LockTabAndAddress, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::LockTabAndAddress, false,
+		false);
 	EXPECT_EQ(tab->GetLockState(), Tab::LockState::NotLocked);
 }
 
@@ -151,12 +155,12 @@ TEST_F(TabContextMenuTest, CloseTab)
 	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\");
 	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager,
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::CloseTab, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::CloseTab, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId3)));
 }
@@ -168,12 +172,12 @@ TEST_F(TabContextMenuTest, CloseOtherTabs)
 	m_browser->AddTab(L"e:\\");
 	m_browser->AddTab(L"f:\\");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager,
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::CloseOtherTabs, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::CloseOtherTabs, false, false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(Property(&Tab::GetId, tabId2)));
 }
 
@@ -184,12 +188,13 @@ TEST_F(TabContextMenuTest, CloseTabsToRight)
 	m_browser->AddTab(L"e:\\");
 	m_browser->AddTab(L"f:\\");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager,
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
-	menuHost.SelectItem(TabContextMenu::Item::CloseTabsToRight, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::CloseTabsToRight, false,
+		false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId2)));
 }
@@ -201,8 +206,8 @@ TEST_F(TabContextMenuTest, SelectionAfterTabClosed)
 	int tabId3 = m_browser->AddTabAndReturnId(L"e:\\");
 	int tabId4 = m_browser->AddTabAndReturnId(L"f:\\");
 
-	MenuTestHost menuHost;
-	TabContextMenu menu(menuHost.GetView(), &m_acceleratorManager,
+	TestMenuView menuView;
+	TabContextMenu menu(&menuView, &m_acceleratorManager,
 		m_tabContainer->GetTab(tabId2).GetWeakPtr(), m_tabContainer, &m_tabEvents,
 		&m_resourceLoader);
 
@@ -210,7 +215,8 @@ TEST_F(TabContextMenuTest, SelectionAfterTabClosed)
 
 	// The tab associated with the context menu was closed, so selecting a menu item should have no
 	// effect.
-	menuHost.SelectItem(TabContextMenu::Item::CloseTabsToRight, false, false);
+	RootMenuViewTestApi::SelectItem(&menuView, TabContextMenu::Item::CloseTabsToRight, false,
+		false);
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId3),
 			Property(&Tab::GetId, tabId4)));

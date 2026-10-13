@@ -3,10 +3,14 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "MenuController.h"
+#include "RootMenuView.h"
+#include "MenuHelpTextHostFake.h"
 #include "MenuView.h"
-#include "../Helper/MenuHelpTextHost.h"
+#include "MenuViewTestApi.h"
+#include "RootMenuViewTestApi.h"
+#include "TestMenuView.h"
 #include "../Helper/MenuHelper.h"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -19,50 +23,24 @@ MATCHER_P2(PointEq, x, y, "")
 	return arg.x == x && arg.y == y;
 }
 
-class MenuHelpTextHostFake : public MenuHelpTextHost
+class ExternalMenuItemDelegateMock : public ExternalMenuItemDelegate
 {
 public:
-	void NotifyTopLevelMenuShown() override
-	{
-	}
-
-	void NotifyTopLevelMenuClosed() override
-	{
-	}
-
-	void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) override
-	{
-		UNREFERENCED_PARAMETER(menu);
-		UNREFERENCED_PARAMETER(indexOrId);
-		UNREFERENCED_PARAMETER(flags);
-	}
-
-	boost::signals2::connection AddMenuHelpTextRequestObserver(
-		const MenuHelpTextRequestSignal::slot_type &observer) override
-	{
-		return m_menuHelpTextRequestSignal.connect(observer);
-	}
-
-	std::optional<std::wstring> TriggerHelpTextRequest(HMENU menu, UINT id)
-	{
-		return m_menuHelpTextRequestSignal(menu, id);
-	}
-
-private:
-	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
+	MOCK_METHOD(std::optional<LRESULT>, MaybeHandleMessage,
+		(UINT msg, WPARAM wParam, LPARAM lParam), (override));
+	MOCK_METHOD(std::optional<std::wstring>, MaybeGetExternalItemHelpText, (UINT id),
+		(const, override));
+	MOCK_METHOD(void, OnExternalItemSelected, (UINT id), (override));
 };
 
 }
 
-class MenuControllerTest : public Test
+class RootMenuViewTest : public Test
 {
 protected:
-	MenuControllerTest() :
+	RootMenuViewTest() :
 		m_ownerWindow(CreateOwnerWindow()),
-		m_ownedMenu(MenuHelper::CheckedCreatePopupMenu()),
-		m_view(m_ownedMenu.get()),
-		m_controller(&m_view, m_ownerWindow.get(), MenuController::MenuType::ContextMenu,
-			&m_menuHelpTextHost)
+		m_view(m_ownerWindow.get(), &m_menuHelpTextHost)
 	{
 	}
 
@@ -81,19 +59,17 @@ protected:
 		MENUGETOBJECTINFO info = {};
 		info.dwFlags = flags;
 		info.uPos = index;
-		info.hmenu = m_view.GetNativeMenuForTesting();
+		info.hmenu = MenuViewTestApi::GetNativeMenu(&m_view);
 		info.riid = &iid;
 		SendMessage(hwnd, WM_MENUGETOBJECT, 0, reinterpret_cast<LPARAM>(&info));
 	}
 
 	MenuHelpTextHostFake m_menuHelpTextHost;
 	wil::unique_hwnd m_ownerWindow;
-	wil::unique_hmenu m_ownedMenu;
-	MenuView m_view;
-	MenuController m_controller;
+	TestMenuView m_view;
 };
 
-TEST_F(MenuControllerTest, Selection)
+TEST_F(RootMenuViewTest, Selection)
 {
 	MockFunction<void()> selectedCallback1;
 	MockFunction<void()> selectedCallback2;
@@ -103,13 +79,13 @@ TEST_F(MenuControllerTest, Selection)
 		MenuItemParams(L"Item 2").SetSelectedCallback(selectedCallback2.AsStdFunction()));
 
 	EXPECT_CALL(selectedCallback1, Call());
-	m_controller.SelectItem(m_view.GetItemIdForTesting(0), false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&m_view, 0, false, false);
 
 	EXPECT_CALL(selectedCallback2, Call());
-	m_controller.SelectItem(m_view.GetItemIdForTesting(1), false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&m_view, 1, false, false);
 }
 
-TEST_F(MenuControllerTest, DisabledItemSelection)
+TEST_F(RootMenuViewTest, DisabledItemSelection)
 {
 	MockFunction<void()> selectedCallback;
 	m_view.AppendItem(MenuItemParams(L"Item 1")
@@ -118,10 +94,10 @@ TEST_F(MenuControllerTest, DisabledItemSelection)
 
 	// Selecting a disabled item should have no effect.
 	EXPECT_CALL(selectedCallback, Call()).Times(0);
-	m_controller.SelectItem(m_view.GetItemIdForTesting(0), false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&m_view, 0, false, false);
 }
 
-TEST_F(MenuControllerTest, SelectionWithSubmenus)
+TEST_F(RootMenuViewTest, SelectionWithSubmenus)
 {
 	MockFunction<void()> selectedCallback1;
 	m_view.AppendItem(
@@ -140,16 +116,42 @@ TEST_F(MenuControllerTest, SelectionWithSubmenus)
 		MenuItemParams(L"Item 3").SetSelectedCallback(selectedCallback3.AsStdFunction()));
 
 	EXPECT_CALL(selectedCallback1, Call());
-	m_controller.SelectItem(m_view.GetItemIdForTesting(0), false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&m_view, 0, false, false);
 
 	EXPECT_CALL(selectedCallback2, Call());
-	m_controller.SelectItem(subMenuView1->GetItemIdForTesting(0), false, false);
+	RootMenuViewTestApi::SelectItem(&m_view, MenuViewTestApi::GetItemId(subMenuView1, 0), false,
+		false);
 
 	EXPECT_CALL(selectedCallback3, Call());
-	m_controller.SelectItem(subMenuView2->GetItemIdForTesting(0), false, false);
+	RootMenuViewTestApi::SelectItem(&m_view, MenuViewTestApi::GetItemId(subMenuView2, 0), false,
+		false);
 }
 
-TEST_F(MenuControllerTest, MiddleClickSelection)
+TEST_F(RootMenuViewTest, ExternalItemSelection)
+{
+	ExternalMenuItemDelegateMock externalItemDelegate;
+	m_view.SetExternalItemDelegate(&externalItemDelegate);
+
+	HMENU menu = m_view.GetNativeMenuForExternalItems();
+
+	UINT idCounter = MenuView::EXTERNAL_ID_MIN;
+
+	UINT itemId1 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId1, L"External item 1");
+
+	UINT itemId2 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId2, L"External item 2");
+
+	InSequence seq;
+
+	EXPECT_CALL(externalItemDelegate, OnExternalItemSelected(itemId1));
+	EXPECT_CALL(externalItemDelegate, OnExternalItemSelected(itemId2));
+
+	RootMenuViewTestApi::SelectItem(&m_view, itemId1, false, false);
+	RootMenuViewTestApi::SelectItem(&m_view, itemId2, false, false);
+}
+
+TEST_F(RootMenuViewTest, MiddleClickSelection)
 {
 	MockFunction<void()> middleClickCallback1;
 	m_view.AppendItem(
@@ -162,13 +164,14 @@ TEST_F(MenuControllerTest, MiddleClickSelection)
 		MenuItemParams(L"Item 2").SetMiddleClickedCallback(middleClickCallback2.AsStdFunction()));
 
 	EXPECT_CALL(middleClickCallback1, Call());
-	m_controller.MiddleClickItem(m_view.GetItemIdForTesting(0), false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&m_view, 0, false, false);
 
 	EXPECT_CALL(middleClickCallback2, Call());
-	m_controller.MiddleClickItem(subMenuView->GetItemIdForTesting(0), true, true);
+	RootMenuViewTestApi::MiddleClickItem(&m_view, MenuViewTestApi::GetItemId(subMenuView, 0), true,
+		true);
 }
 
-TEST_F(MenuControllerTest, RightClick)
+TEST_F(RootMenuViewTest, RightClick)
 {
 	MockFunction<void(const POINT &ptScreen)> rightClickCallback1;
 	m_view.AppendItem(
@@ -181,66 +184,100 @@ TEST_F(MenuControllerTest, RightClick)
 		MenuItemParams(L"Item 2").SetRightClickedCallback(rightClickCallback2.AsStdFunction()));
 
 	EXPECT_CALL(rightClickCallback1, Call(PointEq(100, 200)));
-	m_controller.RightClickItem(m_view.GetItemIdForTesting(0), { 100, 200 });
+	RootMenuViewTestApi::RightClickItemAtIndex(&m_view, 0, { 100, 200 });
 
 	EXPECT_CALL(rightClickCallback2, Call(PointEq(50, 270)));
-	m_controller.RightClickItem(subMenuView->GetItemIdForTesting(0), { 50, 270 });
+	RootMenuViewTestApi::RightClickItem(&m_view, MenuViewTestApi::GetItemId(subMenuView, 0),
+		{ 50, 270 });
 }
 
-TEST_F(MenuControllerTest, HelpTextRequest)
+TEST_F(RootMenuViewTest, HelpTextRequest)
 {
 	std::wstring helpText = L"Help text";
 	m_view.AppendItem(MenuItemParams(L"Item").SetHelpText(helpText));
 
-	UINT itemId = m_view.GetItemIdForTesting(0);
+	UINT itemId = MenuViewTestApi::GetItemId(&m_view, 0);
 
 	// The menu isn't being shown, so no help text should be returned.
 	auto retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(m_view.GetNativeMenuForTesting(), itemId);
+		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
 
-	m_controller.NotifyMenuOpenedForTesting();
+	RootMenuViewTestApi::NotifyMenuOpened(&m_view);
 
 	// The menu is now being shown, so help text should be returned.
 	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(m_view.GetNativeMenuForTesting(), itemId);
+		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId);
 	EXPECT_EQ(retrievedHelpText, helpText);
 
-	m_controller.NotifyMenuClosedForTesting();
+	RootMenuViewTestApi::NotifyMenuClosed(&m_view);
 
 	// The menu has been closed, so, again, no help text should be returned.
 	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(m_view.GetNativeMenuForTesting(), itemId);
+		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
 }
 
-TEST_F(MenuControllerTest, SubMenuHelpTextRequest)
+TEST_F(RootMenuViewTest, SubMenuHelpTextRequest)
 {
 	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"SubMenu"));
 
 	std::wstring helpText = L"Help text";
 	subMenuView->AppendItem(MenuItemParams(L"SubMenu Item").SetHelpText(helpText));
 
-	UINT itemId = subMenuView->GetItemIdForTesting(0);
+	UINT itemId = MenuViewTestApi::GetItemId(subMenuView, 0);
 
-	auto retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
+	auto retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
+		MenuViewTestApi::GetNativeMenu(subMenuView), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
 
-	m_controller.NotifyMenuOpenedForTesting();
+	RootMenuViewTestApi::NotifyMenuOpened(&m_view);
 
-	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
+	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
+		MenuViewTestApi::GetNativeMenu(subMenuView), itemId);
 	EXPECT_EQ(retrievedHelpText, helpText);
 
-	m_controller.NotifyMenuClosedForTesting();
+	RootMenuViewTestApi::NotifyMenuClosed(&m_view);
 
-	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(subMenuView->GetNativeMenuForTesting(), itemId);
+	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
+		MenuViewTestApi::GetNativeMenu(subMenuView), itemId);
 	EXPECT_EQ(retrievedHelpText, std::nullopt);
 }
 
-TEST_F(MenuControllerTest, DropLocation)
+TEST_F(RootMenuViewTest, ExternalItemHelpText)
+{
+	ExternalMenuItemDelegateMock externalItemDelegate;
+	m_view.SetExternalItemDelegate(&externalItemDelegate);
+
+	HMENU menu = m_view.GetNativeMenuForExternalItems();
+
+	UINT idCounter = MenuView::EXTERNAL_ID_MIN;
+
+	UINT itemId1 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId1, L"External item 1");
+
+	UINT itemId2 = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId2, L"External item 2");
+
+	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId1))
+		.WillOnce(Return(std::wstring(L"Help for external item 1")));
+	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId2))
+		.WillOnce(Return(std::wstring(L"Help for external item 2")));
+
+	RootMenuViewTestApi::NotifyMenuOpened(&m_view);
+
+	auto retrievedHelpText =
+		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId1);
+	EXPECT_EQ(retrievedHelpText, L"Help for external item 1");
+
+	retrievedHelpText =
+		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId2);
+	EXPECT_EQ(retrievedHelpText, L"Help for external item 2");
+
+	RootMenuViewTestApi::NotifyMenuClosed(&m_view);
+}
+
+TEST_F(RootMenuViewTest, DropLocation)
 {
 	MockFunction<wil::com_ptr_nothrow<IDropTarget>(MenuDropPosition position)> dropTargetCallback1;
 	MockFunction<wil::com_ptr_nothrow<IDropTarget>(MenuDropPosition position)> dropTargetCallback2;

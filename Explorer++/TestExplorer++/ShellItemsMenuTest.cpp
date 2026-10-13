@@ -6,12 +6,14 @@
 #include "ShellItemsMenu.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "MenuTestHost.h"
+#include "MenuViewTestApi.h"
 #include "MenuViewTestHelper.h"
 #include "PidlTestHelper.h"
+#include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellIconLoaderFake.h"
+#include "TestMenuView.h"
 #include <gtest/gtest.h>
 
 class ShellItemsMenuTest : public BrowserTestBase
@@ -41,50 +43,48 @@ protected:
 
 TEST_F(ShellItemsMenuTest, CheckItems)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(menuHost.GetView(), &m_acceleratorManager, pidls, m_browser,
-		&m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
 
-	MenuViewTestHelper::CheckShellItemDetails(menuHost.GetView(), pidls);
+	MenuViewTestHelper::CheckShellItemDetails(&menuView, pidls);
 }
 
 TEST_F(ShellItemsMenuTest, CheckItemBitmapsAssigned)
 {
-	MenuTestHost menuHost;
-	auto *menuView = menuHost.GetView();
+	TestMenuView menuView;
 	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
 
-	menuView->OnPopupWillShowForTesting(USER_DEFAULT_SCREEN_DPI);
+	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
 
-	for (int i = 0; i < menuView->GetNumItems(); i++)
+	for (int i = 0; i < menuView.GetNumItems(); i++)
 	{
-		EXPECT_NE(menuView->GetItemBitmapForTesting(menuView->GetItemIdForTesting(i)), nullptr);
+		EXPECT_NE(
+			MenuViewTestApi::GetItemBitmap(&menuView, MenuViewTestApi::GetItemId(&menuView, i)),
+			nullptr);
 	}
 }
 
 TEST_F(ShellItemsMenuTest, RebuildMenu)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(menuHost.GetView(), &m_acceleratorManager, pidls, m_browser,
-		&m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
 
 	auto updatedPidls = BuildPidlCollection(5);
 	menu.RebuildMenu(updatedPidls);
 
-	MenuViewTestHelper::CheckShellItemDetails(menuHost.GetView(), updatedPidls);
+	MenuViewTestHelper::CheckShellItemDetails(&menuView, updatedPidls);
 }
 
 TEST_F(ShellItemsMenuTest, OpenOnClick)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	auto pidl = CreateSimplePidlForTest(L"c:\\users");
-	ShellItemsMenu menu(menuHost.GetView(), &m_acceleratorManager, { pidl }, m_browser,
-		&m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, { pidl }, m_browser, &m_shellIconLoader);
 
-	menuHost.SelectItemAtIndex(0, false, false);
+	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 0, false, false);
 
 	auto *navigationController = m_tab->GetShellBrowser()->GetNavigationController();
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
@@ -93,12 +93,11 @@ TEST_F(ShellItemsMenuTest, OpenOnClick)
 
 TEST_F(ShellItemsMenuTest, OpenOnMiddleClick)
 {
-	MenuTestHost menuHost;
+	TestMenuView menuView;
 	auto pidl = CreateSimplePidlForTest(L"c:\\users");
-	ShellItemsMenu menu(menuHost.GetView(), &m_acceleratorManager, { pidl }, m_browser,
-		&m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, { pidl }, m_browser, &m_shellIconLoader);
 
-	menuHost.MiddleClickItemAtIndex(0, false, false);
+	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
