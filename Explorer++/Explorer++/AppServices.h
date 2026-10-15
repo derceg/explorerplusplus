@@ -52,7 +52,7 @@ namespace Plugins
 {
 
 class PluginCommandManager;
-class PluginMenuManager;
+class PluginMenuItemsRegistry;
 
 }
 
@@ -165,9 +165,9 @@ public:
 	const Plugins::PluginCommandManager *GetPluginCommandManager() const;
 	void SetPluginCommandManager(Plugins::PluginCommandManager *pluginCommandManager);
 
-	Plugins::PluginMenuManager *GetPluginMenuManager();
-	const Plugins::PluginMenuManager *GetPluginMenuManager() const;
-	void SetPluginMenuManager(Plugins::PluginMenuManager *pluginMenuManager);
+	Plugins::PluginMenuItemsRegistry *GetPluginMenuItemsRegistry();
+	const Plugins::PluginMenuItemsRegistry *GetPluginMenuItemsRegistry() const;
+	void SetPluginMenuItemsRegistry(Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry);
 
 	ResourceLoader *GetResourceLoader();
 	const ResourceLoader *GetResourceLoader() const;
@@ -215,7 +215,7 @@ private:
 		DarkModeColorProvider *, DarkModeManager *, DirectoryWatcherFactory *, DriveModel *,
 		FeatureList *, FrequentLocationsModel *, HistoryModel *, ModelessDialogList *,
 		NavigationEvents *, PlatformContext *, Plugins::PluginCommandManager *,
-		Plugins::PluginMenuManager *, ResourceLoader *, Runtime *, ShellBrowserEvents *,
+		Plugins::PluginMenuItemsRegistry *, ResourceLoader *, Runtime *, ShellBrowserEvents *,
 		TabEvents *, TabList *, TabRestorer *, ThemeManager *>
 		m_services;
 };

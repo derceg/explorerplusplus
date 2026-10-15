@@ -30,7 +30,7 @@
 #include "NoOpThemeManager.h"
 #include "PlatformContextFake.h"
 #include "Plugins/PluginCommandManager.h"
-#include "Plugins/PluginMenuManager.h"
+#include "Plugins/PluginMenuItemsRegistry.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
@@ -102,7 +102,7 @@ protected:
 	DriveModel m_driveModel;
 
 	// Plugins
-	Plugins::PluginMenuManager m_pluginMenuManager;
+	Plugins::PluginMenuItemsRegistry m_pluginMenuItemsRegistry;
 	Plugins::PluginCommandManager m_pluginCommandManager;
 
 private:

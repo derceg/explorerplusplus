@@ -26,6 +26,7 @@
 #include "TabContainer.h"
 #include "TabRestorerMenu.h"
 #include "ToolbarOptionsMenu.h"
+#include "ToolsMenu.h"
 #include "ViewsMenu.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ProcessHelper.h"
@@ -55,7 +56,8 @@ void MainMenu::BuildMenu(BrowserWindow *browser, AppServices *appServices,
 	BuildActionsMenu();
 	BuildGoMenu(browser, appServices, shellIconLoader);
 	BuildBookmarksMenu(browser, appServices, iconFetcher);
-	BuildToolsMenu(appServices->GetFeatureList());
+	BuildToolsMenu(browser, appServices->GetFeatureList(),
+		appServices->GetPluginMenuItemsRegistry());
 	BuildWindowMenu();
 	BuildHelpMenu();
 }
@@ -334,21 +336,13 @@ void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServic
 		m_resourceLoader));
 }
 
-void MainMenu::BuildToolsMenu(const FeatureList *featureList)
+void MainMenu::BuildToolsMenu(BrowserWindow *browser, const FeatureList *featureList,
+	Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry)
 {
 	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_TOOLS_POPUP);
 
-	AppendItem(menuView, IDM_TOOLS_SEARCH, IDS_TOOLS_SEARCH);
-	AppendItem(menuView, IDM_TOOLS_CUSTOMIZECOLORS, IDS_TOOLS_CUSTOMIZECOLORS);
-
-	menuView->AppendSeparator();
-
-	if (featureList->IsEnabled(Feature::Plugins))
-	{
-		AppendItem(menuView, IDM_TOOLS_RUNSCRIPT, IDS_TOOLS_RUNSCRIPT);
-	}
-
-	AppendItem(menuView, IDM_TOOLS_OPTIONS, IDS_TOOLS_OPTIONS);
+	m_childMenus.push_back(std::make_unique<ToolsMenu>(menuView, m_acceleratorManager, browser,
+		featureList, pluginMenuItemsRegistry, m_resourceLoader));
 }
 
 void MainMenu::BuildWindowMenu()
@@ -493,15 +487,6 @@ std::optional<Icon> MainMenu::GetIconForCommand(WORD id)
 
 	case IDM_GO_UP:
 		return Icon::Up;
-
-	case IDM_TOOLS_SEARCH:
-		return Icon::Search;
-
-	case IDM_TOOLS_CUSTOMIZECOLORS:
-		return Icon::CustomizeColors;
-
-	case IDM_TOOLS_OPTIONS:
-		return Icon::Options;
 
 	case IDM_HELP_ONLINE_DOCUMENTATION:
 		return Icon::Help;
@@ -675,18 +660,6 @@ std::optional<UINT> MainMenu::MaybeGetHelpTextIdForCommand(WORD id)
 
 	case IDM_GO_UP:
 		return IDS_GO_UP_HELP_TEXT;
-
-	case IDM_TOOLS_SEARCH:
-		return IDS_TOOLS_SEARCH_HELP_TEXT;
-
-	case IDM_TOOLS_CUSTOMIZECOLORS:
-		return IDS_TOOLS_CUSTOMIZECOLORS_HELP_TEXT;
-
-	case IDM_TOOLS_RUNSCRIPT:
-		return IDS_TOOLS_RUNSCRIPT_HELP_TEXT;
-
-	case IDM_TOOLS_OPTIONS:
-		return IDS_TOOLS_OPTIONS_HELP_TEXT;
 
 	case IDM_WINDOW_SEARCH_TABS:
 		return IDS_WINDOW_SEARCH_TABS_HELP_TEXT;

@@ -345,19 +345,20 @@ void AppServices::SetPluginCommandManager(Plugins::PluginCommandManager *pluginC
 	Set(pluginCommandManager);
 }
 
-Plugins::PluginMenuManager *AppServices::GetPluginMenuManager()
+Plugins::PluginMenuItemsRegistry *AppServices::GetPluginMenuItemsRegistry()
 {
-	return Get<Plugins::PluginMenuManager>();
+	return Get<Plugins::PluginMenuItemsRegistry>();
 }
 
-const Plugins::PluginMenuManager *AppServices::GetPluginMenuManager() const
+const Plugins::PluginMenuItemsRegistry *AppServices::GetPluginMenuItemsRegistry() const
 {
-	return Get<Plugins::PluginMenuManager>();
+	return Get<Plugins::PluginMenuItemsRegistry>();
 }
 
-void AppServices::SetPluginMenuManager(Plugins::PluginMenuManager *pluginMenuManager)
+void AppServices::SetPluginMenuItemsRegistry(
+	Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry)
 {
-	Set(pluginMenuManager);
+	Set(pluginMenuItemsRegistry);
 }
 
 ResourceLoader *AppServices::GetResourceLoader()

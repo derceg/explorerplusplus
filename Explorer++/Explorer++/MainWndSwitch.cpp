@@ -27,7 +27,6 @@
 #include "MenuRanges.h"
 #include "ModelessDialogHelper.h"
 #include "Plugins/PluginCommandManager.h"
-#include "Plugins/PluginMenuManager.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
@@ -203,12 +202,7 @@ LRESULT Explorerplusplus::CommandHandler(HWND hwnd, HWND control, UINT id, UINT 
 LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id,
 	UINT notificationCode)
 {
-	if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)
-	{
-		m_appServices->GetPluginMenuManager()->OnMenuItemClicked(id);
-		return 0;
-	}
-	else if (notificationCode == 1 && id >= ACCELERATOR_PLUGIN_START_ID
+	if (notificationCode == 1 && id >= ACCELERATOR_PLUGIN_START_ID
 		&& id < ACCELERATOR_PLUGIN_END_ID)
 	{
 		m_appServices->GetPluginCommandManager()->onAcceleratorPressed(id);

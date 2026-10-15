@@ -26,6 +26,13 @@ class ResourceLoader;
 class ShellIconLoader;
 class TabRestorer;
 
+namespace Plugins
+{
+
+class PluginMenuItemsRegistry;
+
+}
+
 class MainMenu : public MenuBase
 {
 public:
@@ -53,7 +60,8 @@ private:
 		ShellIconLoader *shellIconLoader);
 	void BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
 		IconFetcher *iconFetcher);
-	void BuildToolsMenu(const FeatureList *featureList);
+	void BuildToolsMenu(BrowserWindow *browser, const FeatureList *featureList,
+		Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry);
 	void BuildWindowMenu();
 	void BuildHelpMenu();
 

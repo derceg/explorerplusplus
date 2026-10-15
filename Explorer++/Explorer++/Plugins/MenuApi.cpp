@@ -4,60 +4,36 @@
 
 #include "stdafx.h"
 #include "Plugins/MenuApi.h"
+#include "Plugins/PluginMenuItemsRegistry.h"
 #include <sol/sol.hpp>
 
-Plugins::MenuApi::MenuApi(PluginMenuManager *pluginMenuManager) :
-	m_pluginMenuManager(pluginMenuManager)
+Plugins::MenuApi::MenuApi(PluginMenuItemsRegistry *pluginMenuItemsRegistry) :
+	m_pluginMenuItemsRegistry(pluginMenuItemsRegistry)
 {
-	m_connections.emplace_back(m_pluginMenuManager->AddMenuClickedObserver(
-		std::bind_front(&Plugins::MenuApi::onMenuItemClicked, this)));
 }
 
 Plugins::MenuApi::~MenuApi()
 {
-	for (const auto &item : m_pluginMenuItems)
+	for (UINT id : m_menuItemIds)
 	{
-		m_pluginMenuManager->RemoveItemFromMainMenu(item.first);
+		m_pluginMenuItemsRegistry->RemoveMenuItem(id);
 	}
 }
 
-std::optional<int> Plugins::MenuApi::create(const std::wstring &text,
-	sol::protected_function callback)
+UINT Plugins::MenuApi::Create(const std::wstring &text, sol::protected_function callback)
 {
-	auto menuItemId = m_pluginMenuManager->AddItemToMainMenu(text);
-
-	if (!menuItemId)
-	{
-		return menuItemId;
-	}
-
-	m_pluginMenuItems.insert(std::make_pair(*menuItemId, callback));
-
-	return menuItemId;
+	UINT id = m_pluginMenuItemsRegistry->AddMenuItem(text, callback);
+	m_menuItemIds.insert(id);
+	return id;
 }
 
-void Plugins::MenuApi::remove(int menuItemId)
+void Plugins::MenuApi::Remove(UINT id)
 {
-	auto itr = m_pluginMenuItems.find(menuItemId);
-
-	if (itr == m_pluginMenuItems.end())
+	if (!m_menuItemIds.contains(id))
 	{
 		return;
 	}
 
-	m_pluginMenuManager->RemoveItemFromMainMenu(menuItemId);
-
-	m_pluginMenuItems.erase(itr);
-}
-
-void Plugins::MenuApi::onMenuItemClicked(int menuItemId)
-{
-	auto itr = m_pluginMenuItems.find(menuItemId);
-
-	if (itr == m_pluginMenuItems.end())
-	{
-		return;
-	}
-
-	itr->second();
+	m_pluginMenuItemsRegistry->RemoveMenuItem(id);
+	m_menuItemIds.erase(id);
 }

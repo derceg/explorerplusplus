@@ -7,7 +7,6 @@
 #include "AppServices.h"
 #include "Plugins/CommandApi/Events/CommandInvoked.h"
 #include "Plugins/MenuApi.h"
-#include "Plugins/PluginMenuManager.h"
 #include "Plugins/TabsApi/Events/TabCreated.h"
 #include "Plugins/TabsApi/Events/TabMoved.h"
 #include "Plugins/TabsApi/Events/TabRemoved.h"
@@ -21,7 +20,7 @@
 
 void BindTabsAPI(sol::state &state, TabEvents *tabEvents, BrowserList *browserList,
 	TabList *tabList, const Config *config);
-void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
+void BindMenuApi(sol::state &state, Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry);
 void BindCommandApi(int pluginId, sol::state &state,
 	Plugins::PluginCommandManager *pluginCommandManager);
 template <typename T>
@@ -36,7 +35,7 @@ void Plugins::BindAllApiMethods(int pluginId, sol::state &state, AppServices *ap
 {
 	BindTabsAPI(state, appServices->GetTabEvents(), appServices->GetBrowserList(),
 		appServices->GetTabList(), appServices->GetConfig());
-	BindMenuApi(state, appServices->GetPluginMenuManager());
+	BindMenuApi(state, appServices->GetPluginMenuItemsRegistry());
 	BindCommandApi(pluginId, state, appServices->GetPluginCommandManager());
 }
 
@@ -91,16 +90,16 @@ void BindTabsAPI(sol::state &state, TabEvents *tabEvents, BrowserList *browserLi
 	AddEnum<SortMode>(state, tabsMetaTable, "SortMode");
 }
 
-void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager)
+void BindMenuApi(sol::state &state, Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry)
 {
 	std::shared_ptr<Plugins::MenuApi> menuApi =
-		std::make_shared<Plugins::MenuApi>(pluginMenuManager);
+		std::make_shared<Plugins::MenuApi>(pluginMenuItemsRegistry);
 
 	sol::table menuTable = state.create_named_table("menu");
 	sol::table metaTable = MarkTableReadOnly(state, menuTable);
 
-	metaTable.set_function("create", &Plugins::MenuApi::create, menuApi);
-	metaTable.set_function("remove", &Plugins::MenuApi::remove, menuApi);
+	metaTable.set_function("create", &Plugins::MenuApi::Create, menuApi);
+	metaTable.set_function("remove", &Plugins::MenuApi::Remove, menuApi);
 }
 
 void BindCommandApi(int pluginId, sol::state &state,

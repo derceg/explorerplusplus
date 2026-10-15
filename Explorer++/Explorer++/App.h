@@ -29,7 +29,7 @@
 #include "PlatformContextImpl.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginManager.h"
-#include "Plugins/PluginMenuManager.h"
+#include "Plugins/PluginMenuItemsRegistry.h"
 #include "ProcessManager.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
@@ -134,7 +134,7 @@ private:
 	DriveModel m_driveModel;
 
 	// Plugins
-	Plugins::PluginMenuManager m_pluginMenuManager;
+	Plugins::PluginMenuItemsRegistry m_pluginMenuItemsRegistry;
 	Plugins::PluginCommandManager m_pluginCommandManager;
 	Plugins::PluginManager m_pluginManager;
 

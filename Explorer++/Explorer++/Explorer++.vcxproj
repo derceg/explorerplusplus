@@ -1230,6 +1230,8 @@
     <ClCompile Include="MenuItemParams.cpp" />
     <ClCompile Include="NoOpMenuHelpTextHost.cpp" />
     <ClCompile Include="PlatformContextImpl.cpp" />
+    <ClCompile Include="Plugins\PluginItemsMenu.cpp" />
+    <ClCompile Include="Plugins\PluginMenuItemsRegistry.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
     <ClCompile Include="ResourceIconModel.cpp" />
     <ClCompile Include="RootMenuView.cpp" />
@@ -1330,6 +1332,7 @@
     <ClCompile Include="TabList.cpp" />
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="ToolbarOptionsMenu.cpp" />
+    <ClCompile Include="ToolsMenu.cpp" />
     <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="TreeViewAdapter.cpp" />
     <ClCompile Include="TreeViewNode.cpp" />
@@ -1445,7 +1448,6 @@
     <ClCompile Include="OptionsDialog.cpp" />
     <ClCompile Include="Plugins\PluginCommandManager.cpp" />
     <ClCompile Include="Plugins\PluginManager.cpp" />
-    <ClCompile Include="Plugins\PluginMenuManager.cpp" />
     <ClCompile Include="FileProgressSink.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
     <ClCompile Include="ResourceHelper.cpp" />
@@ -1602,6 +1604,8 @@
     <ClInclude Include="PidlUpdater.h" />
     <ClInclude Include="PlatformContext.h" />
     <ClInclude Include="PlatformContextImpl.h" />
+    <ClInclude Include="Plugins\PluginItemsMenu.h" />
+    <ClInclude Include="Plugins\PluginMenuItemsRegistry.h" />
     <ClInclude Include="PopupMenuView.h" />
     <ClInclude Include="ResourceIconModel.h" />
     <ClInclude Include="RootMenuView.h" />
@@ -1716,6 +1720,7 @@
     <ClInclude Include="TestHelper.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="ToolbarOptionsMenu.h" />
+    <ClInclude Include="ToolsMenu.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="TreeViewAdapter.h" />
     <ClInclude Include="TreeViewDelegate.h" />
@@ -1838,7 +1843,6 @@
     <ClInclude Include="OptionsDialog.h" />
     <ClInclude Include="Plugins\PluginCommandManager.h" />
     <ClInclude Include="Plugins\PluginManager.h" />
-    <ClInclude Include="Plugins\PluginMenuManager.h" />
     <ClInclude Include="FileProgressSink.h" />
     <ClInclude Include="PreservedTab.h" />
     <ClInclude Include="RenameTabDialog.h" />

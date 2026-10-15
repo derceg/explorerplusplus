@@ -6,7 +6,5 @@
 
 // The start of each range here is inclusive, while the end is exclusive. That is, each range
 // represents [start, end).
-inline constexpr UINT MENU_PLUGIN_START_ID = 12000;
-inline constexpr UINT MENU_PLUGIN_END_ID = 13000;
 inline constexpr UINT ACCELERATOR_PLUGIN_START_ID = 13000;
 inline constexpr UINT ACCELERATOR_PLUGIN_END_ID = 14000;

@@ -124,9 +124,6 @@
     <ClCompile Include="Plugins\MenuApi.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="Plugins\PluginMenuManager.cpp">
-      <Filter>Plugins</Filter>
-    </ClCompile>
     <ClCompile Include="Plugins\Manifest.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -934,6 +931,15 @@
     <ClCompile Include="WindowMenuView.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="Plugins\PluginItemsMenu.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="Plugins\PluginMenuItemsRegistry.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolsMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1036,9 +1042,6 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="Plugins\MenuApi.h">
-      <Filter>Plugins</Filter>
-    </ClInclude>
-    <ClInclude Include="Plugins\PluginMenuManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="Plugins\Manifest.h">
@@ -2039,6 +2042,15 @@
     </ClInclude>
     <ClInclude Include="WindowMenuView.h">
       <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugins\PluginItemsMenu.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolsMenu.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugins\PluginMenuItemsRegistry.h">
+      <Filter>Plugins</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

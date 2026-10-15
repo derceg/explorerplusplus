@@ -4,30 +4,26 @@
 
 #pragma once
 
-#include "Plugins/PluginMenuManager.h"
-#include <boost/signals2.hpp>
 #include <sol/forward.hpp>
-#include <optional>
-#include <unordered_map>
+#include <unordered_set>
 
 namespace Plugins
 {
+
+class PluginMenuItemsRegistry;
+
 class MenuApi
 {
 public:
-	MenuApi(PluginMenuManager *pluginMenuManager);
+	MenuApi(PluginMenuItemsRegistry *pluginMenuItemsRegistry);
 	~MenuApi();
 
-	std::optional<int> create(const std::wstring &text, sol::protected_function callback);
-	void remove(int menuItemId);
+	UINT Create(const std::wstring &text, sol::protected_function callback);
+	void Remove(UINT id);
 
 private:
-	void onMenuItemClicked(int menuItemId);
-
-	PluginMenuManager *m_pluginMenuManager;
-
-	std::vector<boost::signals2::scoped_connection> m_connections;
-
-	std::unordered_map<int, sol::protected_function> m_pluginMenuItems;
+	PluginMenuItemsRegistry *const m_pluginMenuItemsRegistry;
+	std::unordered_set<UINT> m_menuItemIds;
 };
+
 }
