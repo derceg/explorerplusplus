@@ -68,6 +68,7 @@ private:
 	const MenuType m_menuType;
 	MenuHelpTextHost *const m_menuHelpTextHost;
 	std::unique_ptr<WindowSubclass> m_subclass;
+	bool m_isMenuOpen = false;
 	boost::signals2::scoped_connection m_helpTextConnection;
 	wil::com_ptr_nothrow<IDropTarget> m_dropTarget;
 };

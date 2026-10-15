@@ -72,6 +72,29 @@ LRESULT RootMenuView::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		break;
 
+	// DefWindowProc() will generate WM_CONTEXTMENU in response to WM_RBUTTONUP. That can then cause
+	// the following series of events:
+	//
+	// 1. A window receives WM_CONTEXTMENU and shows a context menu.
+	// 2. The user right-clicks the context menu.
+	// 3. In response, a WM_RBUTTONUP message is sent, which causes DefWindowProc() to generate
+	//    WM_CONTEXTMENU.
+	// 4. In response to the WM_CONTEXTMENU message, the window shows another context menu. This
+	//    process can continue repeatedly.
+	//
+	// Ultimately, this behavior isn't desirable. Therefore, the WM_RBUTTONUP message is consumed
+	// below.
+	//
+	// Note that unconditionally consuming the message when the menu is being shown should be safe,
+	// since if a right-click occurs outside of the menu, the menu will be dismissed as soon as the
+	// button goes down. That means the only way the subclass here can receive WM_RBUTTONUP while
+	// the menu is being shown is if the right-click occurs on the menu itself.
+	case WM_RBUTTONUP:
+		if (m_isMenuOpen)
+		{
+			return 0;
+		}
+
 	case WM_MENURBUTTONUP:
 		if (OnMenuRightButtonUp(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam)))
 		{
@@ -140,6 +163,8 @@ void RootMenuView::OnUninitMenuPopup(HMENU menu)
 
 void RootMenuView::OnMenuOpened()
 {
+	m_isMenuOpen = true;
+
 	m_helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
 		std::bind_front(&RootMenuView::OnHelpTextRequested, this));
 
@@ -152,6 +177,8 @@ void RootMenuView::OnMenuClosed()
 
 	m_dropTarget.reset();
 	m_helpTextConnection.disconnect();
+
+	m_isMenuOpen = false;
 }
 
 void RootMenuView::OnMenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
