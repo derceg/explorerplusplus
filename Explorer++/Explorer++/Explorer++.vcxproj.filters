@@ -946,6 +946,9 @@
     <ClCompile Include="ToolbarBase.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="MainToolbarOverflowMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -961,9 +964,6 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="Explorer++.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Explorer++_internal.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FilterDialog.h">
@@ -2063,6 +2063,9 @@
     </ClInclude>
     <ClInclude Include="ToolbarBase.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbarOverflowMenu.h">
+      <Filter>Menus\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

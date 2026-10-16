@@ -19,7 +19,6 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
-#include "Explorer++_internal.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
@@ -32,7 +31,6 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/EnumHelper.h"
-#include "../Helper/MenuHelper.h"
 #include <windowsx.h>
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;
@@ -639,179 +637,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		break;
 
 	case RBN_CHEVRONPUSHED:
-	{
-		NMREBARCHEVRON *pnmrc = nullptr;
-		HWND hToolbar = nullptr;
-		MENUITEMINFO mii;
-		TCHAR szText[512];
-		TBBUTTON tbButton;
-		RECT rcToolbar;
-		RECT rcButton;
-		RECT rcIntersect;
-		LRESULT lResult;
-		BOOL bIntersect;
-		int iMenu = 0;
-		int nButtons;
-		int i = 0;
-
-		pnmrc = (NMREBARCHEVRON *) lParam;
-
-		POINT ptMenu;
-		ptMenu.x = pnmrc->rc.left;
-		ptMenu.y = pnmrc->rc.bottom;
-		ClientToScreen(m_mainRebarView->GetHWND(), &ptMenu);
-
-		ToolbarBase *toolbar = nullptr;
-
-		if (pnmrc->wID == REBAR_BAND_ID_BOOKMARKS_TOOLBAR)
-		{
-			toolbar = m_bookmarksToolbar;
-		}
-		else if (pnmrc->wID == REBAR_BAND_ID_DRIVES_TOOLBAR)
-		{
-			toolbar = m_drivesToolbar;
-		}
-		else if (pnmrc->wID == REBAR_BAND_ID_APPLICATIONS_TOOLBAR)
-		{
-			toolbar = m_applicationToolbar;
-		}
-
-		if (toolbar)
-		{
-			toolbar->ShowOverflowMenu(ptMenu);
-			return 0;
-		}
-
-		auto menu = MenuHelper::CheckedCreatePopupMenu();
-
-		switch (pnmrc->wID)
-		{
-		case REBAR_BAND_ID_MAIN_TOOLBAR:
-			hToolbar = m_mainToolbar->GetHWND();
-			break;
-		}
-
-		nButtons = (int) SendMessage(hToolbar, TB_BUTTONCOUNT, 0, 0);
-
-		GetClientRect(hToolbar, &rcToolbar);
-
-		for (i = 0; i < nButtons; i++)
-		{
-			lResult = SendMessage(hToolbar, TB_GETITEMRECT, i, (LPARAM) &rcButton);
-
-			if (lResult)
-			{
-				bIntersect = IntersectRect(&rcIntersect, &rcToolbar, &rcButton);
-
-				if (!bIntersect || rcButton.right > rcToolbar.right)
-				{
-					SendMessage(hToolbar, TB_GETBUTTON, i, (LPARAM) &tbButton);
-
-					if (tbButton.fsStyle & BTNS_SEP)
-					{
-						mii.cbSize = sizeof(mii);
-						mii.fMask = MIIM_FTYPE;
-						mii.fType = MFT_SEPARATOR;
-						InsertMenuItem(menu.get(), i, TRUE, &mii);
-					}
-					else
-					{
-						if (IS_INTRESOURCE(tbButton.iString))
-						{
-							SendMessage(hToolbar, TB_GETSTRING,
-								MAKEWPARAM(std::size(szText), tbButton.iString), (LPARAM) szText);
-						}
-						else
-						{
-							StringCchCopy(szText, std::size(szText), (LPCWSTR) tbButton.iString);
-						}
-
-						HMENU hSubMenu = nullptr;
-						UINT fMask;
-
-						fMask = MIIM_ID | MIIM_STRING;
-						hSubMenu = nullptr;
-
-						switch (pnmrc->wID)
-						{
-						case REBAR_BAND_ID_MAIN_TOOLBAR:
-						{
-							auto mainToolbarButton =
-								magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
-							CHECK(mainToolbarButton);
-
-							switch (*mainToolbarButton)
-							{
-							case MainToolbarButton::Back:
-								hSubMenu = CreateRebarHistoryMenu(TRUE);
-								fMask |= MIIM_SUBMENU;
-								break;
-
-							case MainToolbarButton::Forward:
-								hSubMenu = CreateRebarHistoryMenu(FALSE);
-								fMask |= MIIM_SUBMENU;
-								break;
-
-							case MainToolbarButton::Views:
-								// TODO: Show views menu.
-								break;
-
-							default:
-								// Most main toolbar buttons don't show a popup menu, so there's
-								// nothing that needs to be done here.
-								break;
-							}
-						}
-						break;
-						}
-
-						mii.cbSize = sizeof(mii);
-						mii.fMask = fMask;
-						mii.wID = tbButton.idCommand;
-						mii.hSubMenu = hSubMenu;
-						mii.dwTypeData = szText;
-						InsertMenuItem(menu.get(), iMenu, TRUE, &mii);
-
-						/* TODO: Update the image
-						for this menu item. */
-					}
-					iMenu++;
-				}
-			}
-		}
-
-		UINT uFlags = TPM_LEFTALIGN | TPM_RETURNCMD;
-		int iCmd;
-
-		iCmd = TrackPopupMenu(menu.get(), uFlags, ptMenu.x, ptMenu.y, 0, m_mainRebarView->GetHWND(),
-			nullptr);
-
-		if (iCmd != 0)
-		{
-			/* We'll handle the back and forward buttons
-			in place, and send the rest of the messages
-			back to the main window. */
-			if ((iCmd >= ID_REBAR_MENU_BACK_START && iCmd <= ID_REBAR_MENU_BACK_END)
-				|| (iCmd >= ID_REBAR_MENU_FORWARD_START && iCmd <= ID_REBAR_MENU_FORWARD_END))
-			{
-				if (iCmd >= ID_REBAR_MENU_BACK_START && iCmd <= ID_REBAR_MENU_BACK_END)
-				{
-					iCmd = -(iCmd - ID_REBAR_MENU_BACK_START);
-				}
-				else
-				{
-					iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
-				}
-
-				OnGoToOffset(iCmd);
-			}
-			else
-			{
-				SendMessage(m_hwnd, WM_COMMAND, MAKEWPARAM(iCmd, 0), 0);
-			}
-		}
-	}
-	break;
+		OnRebarChevronPushed(reinterpret_cast<NMREBARCHEVRON *>(lParam));
+		return 0;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

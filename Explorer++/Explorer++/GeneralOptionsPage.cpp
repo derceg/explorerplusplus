@@ -7,7 +7,6 @@
 #include "AppController.h"
 #include "AppInfo.h"
 #include "Config.h"
-#include "Explorer++_internal.h"
 #include "LanguageHelper.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
@@ -404,11 +403,12 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 		switch (m_config->replaceExplorerMode)
 		{
 		case ReplaceExplorerMode::FileSystem:
-			res = RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+			res =
+				RemoveAsDefaultFileManagerFileSystem(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 			break;
 
 		case ReplaceExplorerMode::All:
-			res = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+			res = RemoveAsDefaultFileManagerAll(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 			break;
 
 		case ReplaceExplorerMode::None:
@@ -418,16 +418,17 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 	break;
 
 	case ReplaceExplorerMode::FileSystem:
-		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		res = SetAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME,
+		RemoveAsDefaultFileManagerFileSystem(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+		RemoveAsDefaultFileManagerAll(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+		res = SetAsDefaultFileManagerFileSystem(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME,
 			menuText.c_str());
 		break;
 
 	case ReplaceExplorerMode::All:
-		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		res = SetAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		RemoveAsDefaultFileManagerFileSystem(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+		RemoveAsDefaultFileManagerAll(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+		res = SetAsDefaultFileManagerAll(AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME,
+			menuText.c_str());
 		break;
 	}
 

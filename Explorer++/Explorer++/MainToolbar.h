@@ -7,6 +7,7 @@
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
+#include "Icon.h"
 #include "MainFontSetter.h"
 #include "MainToolbarStorage.h"
 #include "Tab.h"
@@ -14,10 +15,13 @@
 #include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
+#include <functional>
+#include <memory>
 #include <optional>
 #include <unordered_map>
 
 class AppServices;
+class MenuBase;
 class NavigationRequest;
 class ResourceLoader;
 class ShellBrowser;
@@ -26,6 +30,18 @@ class ShellIconLoader;
 class MainToolbar
 {
 public:
+	using ItemMenuFactory = std::function<std::unique_ptr<MenuBase>(MenuView *menuView)>;
+
+	struct OverflowItem
+	{
+		MainToolbarButton button;
+		std::wstring text;
+		std::optional<Icon> icon;
+		bool enabled = true;
+		bool checked = false;
+		ItemMenuFactory subMenuFactory;
+	};
+
 	static MainToolbar *Create(HWND parent,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons,
 		BrowserWindow *browser, AppServices *appServices, CoreInterface *coreInterface,
@@ -39,6 +55,7 @@ public:
 	MainToolbarStorage::MainToolbarButtons GetButtonsForStorage() const;
 
 	void StartCustomization();
+	void ShowOverflowMenu(const POINT &ptScreen);
 
 	// Signals
 	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
@@ -77,9 +94,10 @@ private:
 	void OnTBGetInfoTip(LPARAM lParam);
 	std::optional<std::wstring> MaybeGetCustomizedUpInfoTip();
 	LRESULT OnDropDown(const NMTOOLBAR *nmtb);
-	void ShowHistoryMenu(TabHistoryMenu::MenuType historyType, const POINT &ptScreen);
-	void ShowUpNavigationMenu(const POINT &ptScreen);
-	void ShowViewsMenu(const POINT &ptScreen);
+	ItemMenuFactory MaybeGetButtonMenuFactory(MainToolbarButton button) const;
+	ItemMenuFactory GetHistoryMenuFactory(TabHistoryMenu::MenuType historyType) const;
+	ItemMenuFactory GetUpNavigationMenuFactory() const;
+	ItemMenuFactory GetViewsMenuFactory() const;
 	POINT GetMenuPositionForButton(MainToolbarButton button);
 
 	void OnTabSelected(const Tab &tab);
@@ -98,6 +116,9 @@ private:
 	void OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown);
 
 	void OnFontOrDpiUpdated();
+
+	std::vector<OverflowItem> GetOverflowItems() const;
+	Icon GetIconForButton(MainToolbarButton button) const;
 
 	const HWND m_hwnd;
 	BrowserWindow *const m_browser;

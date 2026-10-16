@@ -8,8 +8,8 @@
 #include "BrowserCommandController.h"
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
-#include "Icon.h"
 #include "MainResource.h"
+#include "MainToolbarOverflowMenu.h"
 #include "NavigationHelper.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
@@ -680,30 +680,43 @@ LRESULT MainToolbar::OnDropDown(const NMTOOLBAR *nmtb)
 	CHECK(button);
 	auto menuPosition = GetMenuPositionForButton(*button);
 
-	switch (*button)
+	auto menuFactory = MaybeGetButtonMenuFactory(*button);
+
+	if (!menuFactory)
+	{
+		return TBDDRET_NODEFAULT;
+	}
+
+	PopupMenuView popupMenu(m_hwnd, m_browser);
+	auto menu = menuFactory(&popupMenu);
+	popupMenu.Show(menuPosition);
+
+	return TBDDRET_DEFAULT;
+}
+
+MainToolbar::ItemMenuFactory MainToolbar::MaybeGetButtonMenuFactory(MainToolbarButton button) const
+{
+	switch (button)
 	{
 	case MainToolbarButton::Back:
-		ShowHistoryMenu(TabHistoryMenu::MenuType::Back, menuPosition);
-		return TBDDRET_DEFAULT;
+		return GetHistoryMenuFactory(TabHistoryMenu::MenuType::Back);
 
 	case MainToolbarButton::Forward:
-		ShowHistoryMenu(TabHistoryMenu::MenuType::Forward, menuPosition);
-		return TBDDRET_DEFAULT;
+		return GetHistoryMenuFactory(TabHistoryMenu::MenuType::Forward);
 
 	case MainToolbarButton::Up:
-		ShowUpNavigationMenu(menuPosition);
-		return TBDDRET_DEFAULT;
+		return GetUpNavigationMenuFactory();
 
 	case MainToolbarButton::Views:
-		ShowViewsMenu(menuPosition);
-		return TBDDRET_DEFAULT;
+		return GetViewsMenuFactory();
 
 	default:
-		return TBDDRET_NODEFAULT;
+		return {};
 	}
 }
 
-void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType, const POINT &ptScreen)
+MainToolbar::ItemMenuFactory MainToolbar::GetHistoryMenuFactory(
+	TabHistoryMenu::MenuType historyType) const
 {
 	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
 	const auto *navigationController = shellBrowser->GetNavigationController();
@@ -712,28 +725,37 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType, const PO
 		|| (historyType == TabHistoryMenu::MenuType::Forward
 			&& !navigationController->CanGoForward()))
 	{
-		return;
+		return {};
 	}
 
-	PopupMenuView popupMenu(m_hwnd, m_browser);
-	TabHistoryMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), m_browser,
-		m_shellIconLoader, historyType);
-	popupMenu.Show(ptScreen);
+	return [this, historyType](MenuView *menuView)
+	{
+		return std::make_unique<TabHistoryMenu>(menuView, m_appServices->GetAcceleratorManager(),
+			m_browser, m_shellIconLoader, historyType);
+	};
 }
 
-void MainToolbar::ShowUpNavigationMenu(const POINT &ptScreen)
+MainToolbar::ItemMenuFactory MainToolbar::GetUpNavigationMenuFactory() const
 {
-	PopupMenuView popupMenu(m_hwnd, m_browser);
-	TabParentItemsMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), m_browser,
-		m_shellIconLoader);
-	popupMenu.Show(ptScreen);
+	if (!m_browser->GetActiveShellBrowser()->GetNavigationController()->CanGoUp())
+	{
+		return {};
+	}
+
+	return [this](MenuView *menuView)
+	{
+		return std::make_unique<TabParentItemsMenu>(menuView,
+			m_appServices->GetAcceleratorManager(), m_browser, m_shellIconLoader);
+	};
 }
 
-void MainToolbar::ShowViewsMenu(const POINT &ptScreen)
+MainToolbar::ItemMenuFactory MainToolbar::GetViewsMenuFactory() const
 {
-	PopupMenuView popupMenu(m_hwnd, m_browser);
-	ViewsMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), m_browser, m_resourceLoader);
-	popupMenu.Show(ptScreen);
+	return [this](MenuView *menuView)
+	{
+		return std::make_unique<ViewsMenu>(menuView, m_appServices->GetAcceleratorManager(),
+			m_browser, m_resourceLoader);
+	};
 }
 
 // Returns the position a menu should be anchored at for a particular toolbar button.
@@ -948,4 +970,76 @@ MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
 void MainToolbar::StartCustomization()
 {
 	SendMessage(m_hwnd, TB_CUSTOMIZE, 0, 0);
+}
+
+void MainToolbar::ShowOverflowMenu(const POINT &ptScreen)
+{
+	auto overflowItems = GetOverflowItems();
+
+	if (overflowItems.empty())
+	{
+		return;
+	}
+
+	PopupMenuView popupMenu(m_hwnd, m_browser);
+	MainToolbarOverflowMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), overflowItems,
+		m_browser, m_resourceLoader);
+	popupMenu.Show(ptScreen);
+}
+
+std::vector<MainToolbar::OverflowItem> MainToolbar::GetOverflowItems() const
+{
+	std::vector<OverflowItem> overflowItems;
+	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
+
+	RECT toolbarRect;
+	auto clientRectRes = GetClientRect(m_hwnd, &toolbarRect);
+	CHECK(clientRectRes);
+
+	for (int i = 0; i < numButtons; i++)
+	{
+		RECT buttonRect;
+		auto res = SendMessage(m_hwnd, TB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&buttonRect));
+		CHECK(res);
+
+		if (buttonRect.right <= toolbarRect.right)
+		{
+			continue;
+		}
+
+		TBBUTTON tbButton;
+		res = SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton));
+		CHECK(res);
+
+		OverflowItem overflowItem;
+
+		if (tbButton.idCommand == 0)
+		{
+			overflowItem.button = MainToolbarButton::Separator;
+		}
+		else
+		{
+			auto buttonType = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
+			CHECK(buttonType);
+
+			overflowItem.button = *buttonType;
+			overflowItem.text = GetToolbarButtonText(*buttonType);
+			overflowItem.icon = GetIconForButton(*buttonType);
+			overflowItem.enabled = WI_IsFlagSet(tbButton.fsState, TBSTATE_ENABLED);
+			overflowItem.checked = WI_IsFlagSet(tbButton.fsState, TBSTATE_CHECKED);
+			overflowItem.subMenuFactory = MaybeGetButtonMenuFactory(*buttonType);
+		}
+
+		overflowItems.push_back(overflowItem);
+	}
+
+	return overflowItems;
+}
+
+Icon MainToolbar::GetIconForButton(MainToolbarButton button) const
+{
+	auto itr = std::ranges::find_if(BUTTON_ICON_MAPPINGS,
+		[button](const auto &mapping) { return mapping.button == button; });
+	CHECK(itr != BUTTON_ICON_MAPPINGS.end());
+	return itr->icon;
 }

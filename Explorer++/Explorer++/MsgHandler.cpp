@@ -765,12 +765,6 @@ void Explorerplusplus::OnResolveLink()
 	}
 }
 
-void Explorerplusplus::OnGoToOffset(int offset)
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->GetNavigationController()->GoToOffset(offset);
-}
-
 void Explorerplusplus::OnSelectColumns()
 {
 	auto *selectColumnsDialog = SelectColumnsDialog::Create(m_resourceLoader, m_hwnd,

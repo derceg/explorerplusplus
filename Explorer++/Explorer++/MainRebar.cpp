@@ -14,7 +14,6 @@
 #include "Config.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
-#include "Explorer++_internal.h"
 #include "MainRebarStorage.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
@@ -173,10 +172,6 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 {
 	switch (msg)
 	{
-	case WM_INITMENU:
-		SendMessage(m_hwnd, WM_INITMENU, wParam, lParam);
-		break;
-
 	case WM_NOTIFY:
 		switch (((LPNMHDR) lParam)->code)
 		{
@@ -310,46 +305,34 @@ void Explorerplusplus::OnRebarToolbarSizeUpdated(HWND toolbar)
 	m_mainRebarView->UpdateBandSize(toolbar, size.cx, size.cy);
 }
 
-HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
+void Explorerplusplus::OnRebarChevronPushed(const NMREBARCHEVRON *chevronData)
 {
-	HMENU hSubMenu = nullptr;
-	std::vector<HistoryEntry *> history;
-	int iBase;
+	POINT ptScreen;
+	ptScreen.x = chevronData->rc.left;
+	ptScreen.y = chevronData->rc.bottom;
+	auto res = ClientToScreen(m_mainRebarView->GetHWND(), &ptScreen);
+	CHECK(res);
 
-	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-
-	if (bBack)
+	switch (chevronData->wID)
 	{
-		iBase = ID_REBAR_MENU_BACK_START;
-		history = tab.GetShellBrowserImpl()->GetNavigationController()->GetBackHistory();
+	case REBAR_BAND_ID_MAIN_TOOLBAR:
+		m_mainToolbar->ShowOverflowMenu(ptScreen);
+		break;
+
+	case REBAR_BAND_ID_BOOKMARKS_TOOLBAR:
+		m_bookmarksToolbar->ShowOverflowMenu(ptScreen);
+		break;
+
+	case REBAR_BAND_ID_DRIVES_TOOLBAR:
+		m_drivesToolbar->ShowOverflowMenu(ptScreen);
+		break;
+
+	case REBAR_BAND_ID_APPLICATIONS_TOOLBAR:
+		m_applicationToolbar->ShowOverflowMenu(ptScreen);
+		break;
+
+	default:
+		DCHECK(false);
+		break;
 	}
-	else
-	{
-		iBase = ID_REBAR_MENU_FORWARD_START;
-		history = tab.GetShellBrowserImpl()->GetNavigationController()->GetForwardHistory();
-	}
-
-	if (!history.empty())
-	{
-		int i = 0;
-
-		hSubMenu = CreateMenu();
-
-		for (auto *entry : history)
-		{
-			std::wstring displayName =
-				GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER);
-
-			MENUITEMINFO mii;
-			mii.cbSize = sizeof(mii);
-			mii.fMask = MIIM_ID | MIIM_STRING;
-			mii.wID = iBase + i + 1;
-			mii.dwTypeData = displayName.data();
-			InsertMenuItem(hSubMenu, i, TRUE, &mii);
-
-			i++;
-		}
-	}
-
-	return hSubMenu;
 }

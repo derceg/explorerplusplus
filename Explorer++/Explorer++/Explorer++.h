@@ -199,8 +199,6 @@ private:
 	void OnDestroyFiles();
 	void OnShowOptions();
 
-	void OnGoToOffset(int offset);
-
 	int HighlightSimilarFiles(HWND ListView) const;
 
 	/* Main toolbar-specific handlers. */
@@ -246,8 +244,8 @@ private:
 	void CreateApplicationToolbar();
 	void OnAddressBarSizeUpdated();
 	void OnRebarToolbarSizeUpdated(HWND toolbar);
-	HMENU CreateRebarHistoryMenu(BOOL bBack);
 	bool OnToolbarRightClick(const NMMOUSE *mouseInfo);
+	void OnRebarChevronPushed(const NMREBARCHEVRON *chevronData);
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);

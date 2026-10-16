@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "StartupCommandLineProcessor.h"
+#include "AppInfo.h"
 #include "ClipboardOperations.h"
 #include "CommandLine.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "PasteSymLinksClient.h"
 #include "ResourceHelper.h"
@@ -146,9 +146,9 @@ ReplaceExplorerResults UpdateReplaceExplorerSetting(
 	// Whether Explorer++ is being set as the default file manager, or being removed, the first step
 	// is always to remove any existing entries.
 	results.removedFileSystem = DefaultFileManager::RemoveAsDefaultFileManagerFileSystem(
-		SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-	results.removedAll =
-		DefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+		AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+	results.removedAll = DefaultFileManager::RemoveAsDefaultFileManagerAll(
+		AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 
 	switch (updatedReplaceMode)
 	{
@@ -158,12 +158,12 @@ ReplaceExplorerResults UpdateReplaceExplorerSetting(
 
 	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
 		results.setFileSystem = DefaultFileManager::SetAsDefaultFileManagerFileSystem(
-			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+			AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 		break;
 
 	case DefaultFileManager::ReplaceExplorerMode::All:
 		results.setAll = DefaultFileManager::SetAsDefaultFileManagerAll(
-			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+			AppInfo::SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 		break;
 	}
 

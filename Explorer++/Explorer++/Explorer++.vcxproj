@@ -1225,6 +1225,7 @@
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
+    <ClCompile Include="MainToolbarOverflowMenu.cpp" />
     <ClCompile Include="MassRenameHelper.cpp" />
     <ClCompile Include="MassRenameTokensMenu.cpp" />
     <ClCompile Include="MenuItemParams.cpp" />
@@ -1596,6 +1597,7 @@
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
+    <ClInclude Include="MainToolbarOverflowMenu.h" />
     <ClInclude Include="MassRenameHelper.h" />
     <ClInclude Include="MassRenameTokensMenu.h" />
     <ClInclude Include="MenuItemCallbacks.h" />
@@ -1821,7 +1823,6 @@
     <ClInclude Include="Plugins\Event.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++VersionInfo.h" />
-    <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="DriveWatcherImpl.h" />
     <ClInclude Include="HolderWindow.h" />
