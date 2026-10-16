@@ -520,9 +520,13 @@ void TabView::OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown)
 		return;
 	}
 
+	POINT ptScreen = pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
 	auto *tabItem = GetTabAtIndex(*index);
 	tabItem->OnDoubleClicked(
-		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+		{ ptScreen, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 }
 
 void TabView::OnMiddleButtonDown(const POINT &pt, UINT keysDown)
@@ -557,9 +561,13 @@ void TabView::OnMiddleButtonUp(const POINT &pt, UINT keysDown)
 		return;
 	}
 
+	POINT ptScreen = pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
 	auto *tabItem = GetTabAtIndex(*index);
 	tabItem->OnMiddleClicked(
-		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+		{ ptScreen, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 }
 
 void TabView::OnRightButtonUp(const POINT &pt, UINT keysDown)
@@ -571,9 +579,13 @@ void TabView::OnRightButtonUp(const POINT &pt, UINT keysDown)
 		return;
 	}
 
+	POINT ptScreen = pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
 	auto *tabItem = GetTabAtIndex(*index);
 	tabItem->OnRightClicked(
-		{ pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+		{ ptScreen, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 }
 
 void TabView::OnGetDispInfo(NMTTDISPINFO *dispInfo)

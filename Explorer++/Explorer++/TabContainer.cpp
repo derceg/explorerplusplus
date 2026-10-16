@@ -226,14 +226,10 @@ void TabContainer::OnTabMiddleClicked(Tab *tab, const MouseEvent &event)
 
 void TabContainer::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 {
-	POINT ptScreen = event.ptClient;
-	BOOL res = ClientToScreen(m_hwnd, &ptScreen);
-	CHECK(res);
-
 	PopupMenuView popupMenu(m_hwnd, m_browser);
 	TabContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), tab->GetWeakPtr(), this,
 		m_tabEvents, m_appServices->GetResourceLoader());
-	popupMenu.Show(ptScreen);
+	popupMenu.Show(event.ptScreen);
 }
 
 LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -11,8 +11,6 @@ class BookmarksToolbarView : public ToolbarView
 public:
 	static BookmarksToolbarView *Create(HWND parent, const Config *config);
 
-	void SetImageList(HIMAGELIST imageList);
-
 private:
 	BookmarksToolbarView(HWND parent, const Config *config);
 };

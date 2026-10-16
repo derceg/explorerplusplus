@@ -156,6 +156,11 @@ Bug fixes:
   appear on the bookmarks toolbar, if the toolbar was initially
   empty. The height of the toolbar is now updated when an item is
   added, which fixes this issue.
+- When reducing the width of the main window, an overflow button
+  can be shown for a toolbar window. Clicking that button then
+  shows a menu containing the hidden items. Previously, when that
+  menu was shown for the drives toolbar or application toolbar,
+  selecting an item would have no effect.
 - If the only bookmarks that appeared in the "Bookmarks" menu
   were under the "Other Bookmarks" folder, the menu wouldn't be
   built correctly.

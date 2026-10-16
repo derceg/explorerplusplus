@@ -79,11 +79,10 @@ ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
 	ApplicationExecutor *applicationExecutor, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
-	m_view(view),
+	ToolbarBase(view, browser, acceleratorManager),
 	m_model(model),
 	m_applicationExecutor(applicationExecutor),
 	m_browser(browser),
-	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader)
 {
 	Initialize();
@@ -105,11 +104,6 @@ void ApplicationToolbar::Initialize()
 
 	m_view->AddWindowDestroyedObserver(
 		std::bind_front(&ApplicationToolbar::OnWindowDestroyed, this));
-}
-
-ApplicationToolbarView *ApplicationToolbar::GetView() const
-{
-	return m_view;
 }
 
 void ApplicationToolbar::AddButtons()
@@ -162,13 +156,10 @@ void ApplicationToolbar::OnButtonClicked(const Application *application, const M
 
 void ApplicationToolbar::OnButtonRightClicked(Application *application, const MouseEvent &event)
 {
-	POINT ptScreen = event.ptClient;
-	ClientToScreen(m_view->GetHWND(), &ptScreen);
-
 	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
 	ApplicationContextMenu menu(&popupMenu, m_acceleratorManager, m_model, application,
 		m_applicationExecutor, m_browser, m_resourceLoader);
-	popupMenu.Show(ptScreen);
+	popupMenu.Show(event.ptScreen);
 }
 
 void ApplicationToolbar::OnWindowDestroyed()

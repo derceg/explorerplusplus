@@ -12,7 +12,7 @@
 #include <windowsx.h>
 
 ToolbarButton::ToolbarButton(MouseEventCallback clickedCallback) :
-	m_clickedCallback(clickedCallback)
+	m_clickedCallback(std::move(clickedCallback))
 {
 }
 
@@ -28,17 +28,17 @@ bool ToolbarButton::ShouldSuppressClick() const
 
 void ToolbarButton::SetRightClickedCallback(MouseEventCallback rightClickedCallback)
 {
-	m_rightClickedCallback = rightClickedCallback;
+	m_rightClickedCallback = std::move(rightClickedCallback);
 }
 
 void ToolbarButton::SetMiddleClickedCallback(MouseEventCallback middleClickedCallback)
 {
-	m_middleClickedCallback = middleClickedCallback;
+	m_middleClickedCallback = std::move(middleClickedCallback);
 }
 
 void ToolbarButton::SetDragStartedCallback(DragStartedCallback dragStartedCallback)
 {
-	m_dragStartedCallback = dragStartedCallback;
+	m_dragStartedCallback = std::move(dragStartedCallback);
 }
 
 void ToolbarButton::OnClicked(const MouseEvent &event)
@@ -95,9 +95,14 @@ void ToolbarButton::NotifyParentOfUpdate() const
 	}
 }
 
+WeakPtr<ToolbarButton> ToolbarButton::GetWeakPtr()
+{
+	return m_weakPtrFactory.GetWeakPtr();
+}
+
 ToolbarMenuButton::ToolbarMenuButton(MouseEventCallback clickedCallback) :
 	ToolbarButton(std::bind_front(&ToolbarMenuButton::OnMenuButtonClicked, this)),
-	m_clickedCallback(clickedCallback)
+	m_clickedCallback(std::move(clickedCallback))
 {
 }
 
@@ -142,30 +147,39 @@ ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Co
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ToolbarView::OnFontOrDpiUpdated, this));
 }
 
-void ToolbarView::SetupSmallShellImageList()
-{
-	HIMAGELIST smallShellImageList;
-	BOOL imageListResult = Shell_GetImageLists(nullptr, &smallShellImageList);
-
-	if (imageListResult)
-	{
-		int iconWidth;
-		int iconHeight;
-		ImageList_GetIconSize(smallShellImageList, &iconWidth, &iconHeight);
-		auto res = SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
-		DCHECK(res);
-
-		res =
-			SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallShellImageList));
-
-		// The image list should only be set a single time.
-		DCHECK(!res);
-	}
-}
-
 HWND ToolbarView::GetHWND() const
 {
 	return m_hwnd;
+}
+
+void ToolbarView::SetupSmallShellImageList()
+{
+	HIMAGELIST smallShellImageList;
+	auto res = Shell_GetImageLists(nullptr, &smallShellImageList);
+	CHECK(res);
+
+	SetImageList(smallShellImageList);
+}
+
+void ToolbarView::SetImageList(HIMAGELIST imageList)
+{
+	int iconWidth;
+	int iconHeight;
+	auto iconSizeRes = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
+	CHECK(iconSizeRes);
+
+	auto res = SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+	CHECK(res);
+
+	res = SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(imageList));
+
+	// The image list should only be set a single time.
+	CHECK(!res);
+}
+
+HIMAGELIST ToolbarView::MaybeGetImageList() const
+{
+	return reinterpret_cast<HIMAGELIST>(SendMessage(m_hwnd, TB_GETIMAGELIST, 0, 0));
 }
 
 void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
@@ -404,7 +418,11 @@ bool ToolbarView::OnClick(const NMMOUSE *mouseInfo)
 		return false;
 	}
 
-	button->OnClicked({ mouseInfo->pt, IsKeyDown(VK_SHIFT), IsKeyDown(VK_CONTROL) });
+	POINT ptScreen = mouseInfo->pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
+	button->OnClicked({ ptScreen, IsKeyDown(VK_SHIFT), IsKeyDown(VK_CONTROL) });
 
 	return true;
 }
@@ -418,8 +436,12 @@ bool ToolbarView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 		return false;
 	}
 
+	POINT ptScreen = *pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
 	button->OnMiddleClicked(
-		{ *pt, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
+		{ ptScreen, WI_IsFlagSet(keysDown, MK_SHIFT), WI_IsFlagSet(keysDown, MK_CONTROL) });
 
 	return true;
 }
@@ -434,7 +456,11 @@ bool ToolbarView::OnRightClick(const NMMOUSE *mouseInfo)
 	auto index = TransformCommandToIndex(static_cast<int>(mouseInfo->dwItemSpec));
 	auto button = GetButtonFromIndex(index);
 
-	button->OnRightClicked({ mouseInfo->pt, IsKeyDown(VK_SHIFT), IsKeyDown(VK_CONTROL) });
+	POINT ptScreen = mouseInfo->pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
+	button->OnRightClicked({ ptScreen, IsKeyDown(VK_SHIFT), IsKeyDown(VK_CONTROL) });
 
 	return true;
 }

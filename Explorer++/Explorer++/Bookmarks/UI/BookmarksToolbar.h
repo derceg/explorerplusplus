@@ -6,11 +6,11 @@
 
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "ToolbarBase.h"
 #include <boost/signals2.hpp>
 #include <memory>
 #include <vector>
 
-class AcceleratorManager;
 class BookmarkIconManager;
 class BookmarksToolbarView;
 class BookmarkTree;
@@ -20,7 +20,7 @@ struct MouseEvent;
 class PlatformContext;
 class ResourceLoader;
 
-class BookmarksToolbar : private BookmarkDropTargetWindow
+class BookmarksToolbar : public ToolbarBase, private BookmarkDropTargetWindow
 {
 public:
 	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browser,
@@ -32,9 +32,8 @@ public:
 	BookmarksToolbar &operator=(const BookmarksToolbar &) = delete;
 	BookmarksToolbar &operator=(BookmarksToolbar &&) = delete;
 
-	BookmarksToolbarView *GetView() const;
-
-	void ShowOverflowMenu(const POINT &ptScreen);
+	// ToolbarBase
+	void ShowOverflowMenu(const POINT &ptScreen) override;
 
 private:
 	// When an item is dragged over a folder on the bookmarks toolbar, the drop target should be set
@@ -79,9 +78,7 @@ private:
 
 	void RemoveDropHighlight();
 
-	BookmarksToolbarView *const m_view;
 	BrowserWindow *const m_browser;
-	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	BookmarkTree *const m_bookmarkTree;
 	PlatformContext *const m_platformContext;

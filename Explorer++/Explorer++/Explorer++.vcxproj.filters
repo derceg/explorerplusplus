@@ -290,7 +290,7 @@
       <Filter>ShellBrowser\Shell Integration</Filter>
     </ClCompile>
     <ClCompile Include="ToolbarView.cpp">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="DriveModel.cpp">
       <Filter>Drives Toolbar</Filter>
@@ -611,7 +611,7 @@
       <Filter>Frequent Locations\UI</Filter>
     </ClCompile>
     <ClCompile Include="RebarView.cpp">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="MainRebarView.cpp">
       <Filter>Main Rebar\UI\Views</Filter>
@@ -719,7 +719,7 @@
       <Filter>Clang-CL</Filter>
     </ClCompile>
     <ClCompile Include="TabView.cpp">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="MainTabView.cpp">
       <Filter>Tabs\UI\Views</Filter>
@@ -776,13 +776,13 @@
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="TreeView.cpp">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClCompile>
     <ClCompile Include="TreeViewNode.cpp">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClCompile>
     <ClCompile Include="TreeViewAdapter.cpp">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClCompile>
     <ClCompile Include="Bookmarks\UI\BookmarkTreeViewAdapter.cpp">
       <Filter>Bookmarks\UI</Filter>
@@ -803,13 +803,13 @@
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="ListView.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="ListViewModel.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="ListViewColumnModel.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="PlatformContextImpl.cpp">
       <Filter>Core</Filter>
@@ -869,7 +869,7 @@
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="ListViewColumnsMenu.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="SearchTabsListViewModel.cpp">
       <Filter>Dialogs\Search Tabs</Filter>
@@ -939,6 +939,12 @@
     </ClCompile>
     <ClCompile Include="ToolsMenu.cpp">
       <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarOverflowMenu.cpp">
+      <Filter>Menus\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarBase.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1237,7 +1243,7 @@
       <Filter>ShellBrowser\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="ToolbarView.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="DriveModel.h">
       <Filter>Drives Toolbar</Filter>
@@ -1624,7 +1630,7 @@
       <Filter>Frequent Locations\UI</Filter>
     </ClInclude>
     <ClInclude Include="RebarView.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MainRebarView.h">
       <Filter>Main Rebar\UI\Views</Filter>
@@ -1744,19 +1750,19 @@
       <Filter>Clang-CL</Filter>
     </ClInclude>
     <ClInclude Include="TabView.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MainTabView.h">
       <Filter>Tabs\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="TabViewDelegate.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MainTabViewImageListManager.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
     <ClInclude Include="MouseEvent.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="TabBacking.h">
       <Filter>Tabs\UI</Filter>
@@ -1819,13 +1825,13 @@
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="TreeViewAdapter.h">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClInclude>
     <ClInclude Include="TreeViewNode.h">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClInclude>
     <ClInclude Include="TreeView.h">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewNode.h">
       <Filter>Bookmarks\UI</Filter>
@@ -1834,25 +1840,25 @@
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="TreeViewDelegate.h">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkTreeViewContextMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="ListView.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="ListViewDelegate.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="ListViewModel.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="ListViewColumn.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="ListViewItem.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkColumn.h">
       <Filter>Bookmarks\UI</Filter>
@@ -1867,13 +1873,13 @@
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="ListViewColumnModel.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="InsertMarkPosition.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="ItemStateOp.h">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="PlatformContext.h">
       <Filter>Core</Filter>
@@ -1975,7 +1981,7 @@
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="ListViewColumnsMenu.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="SearchTabsListViewModel.h">
       <Filter>Dialogs\Search Tabs</Filter>
@@ -2051,6 +2057,12 @@
     </ClInclude>
     <ClInclude Include="Plugins\PluginMenuItemsRegistry.h">
       <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarOverflowMenu.h">
+      <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarBase.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2153,9 +2165,6 @@
     </Filter>
     <Filter Include="ShellBrowser\Shell Integration">
       <UniqueIdentifier>{5b4c01f6-2a4f-4423-9e67-b861a64bf5e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Views">
-      <UniqueIdentifier>{a5bb582e-2ab4-463c-b4e4-216257c0c29f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Application Toolbar\UI">
       <UniqueIdentifier>{d77733b3-5157-437b-bc26-cd28b368b052}</UniqueIdentifier>
@@ -2289,12 +2298,6 @@
     <Filter Include="Menus\UI\Views">
       <UniqueIdentifier>{68655611-30b7-4b1a-b7d3-24da8afb8b95}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Views\TreeView">
-      <UniqueIdentifier>{ab2d98af-8b57-452e-af03-fc0fa64f4ad3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Views\ListView">
-      <UniqueIdentifier>{ecab8bbc-283b-49fc-af94-27be3f54e391}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Directory Watching">
       <UniqueIdentifier>{f250fc00-1a66-44d8-a30a-9840ad247acd}</UniqueIdentifier>
     </Filter>
@@ -2318,6 +2321,18 @@
     </Filter>
     <Filter Include="Menus\UI\Shell Context Menu">
       <UniqueIdentifier>{02e0559d-0daa-460b-9b6d-1a71c140422e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{23e209f8-ae6a-4f63-bf21-58fe8aee71b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views">
+      <UniqueIdentifier>{a5bb582e-2ab4-463c-b4e4-216257c0c29f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\TreeView">
+      <UniqueIdentifier>{ab2d98af-8b57-452e-af03-fc0fa64f4ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\ListView">
+      <UniqueIdentifier>{ecab8bbc-283b-49fc-af94-27be3f54e391}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

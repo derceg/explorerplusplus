@@ -6,6 +6,8 @@
 
 #include "MainFontSetter.h"
 #include "MouseEvent.h"
+#include "../Helper/WeakPtr.h"
+#include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <chrono>
@@ -51,6 +53,8 @@ public:
 	void OnMiddleClicked(const MouseEvent &event);
 	void OnDragStarted();
 
+	WeakPtr<ToolbarButton> GetWeakPtr();
+
 protected:
 	void NotifyParentOfUpdate() const;
 
@@ -63,6 +67,8 @@ private:
 	DragStartedCallback m_dragStartedCallback;
 
 	bool m_checked = false;
+
+	WeakPtrFactory<ToolbarButton> m_weakPtrFactory{ this };
 };
 
 // Menu buttons could use the BTNS_DROPDOWN style and show the menu in response to TBN_DROPDOWN.
@@ -122,6 +128,10 @@ public:
 
 	HWND GetHWND() const;
 
+	void SetupSmallShellImageList();
+	void SetImageList(HIMAGELIST imageList);
+	HIMAGELIST MaybeGetImageList() const;
+
 	void AddButton(std::unique_ptr<ToolbarButton> button, size_t index);
 	void UpdateButton(const ToolbarButton *button);
 	void UpdateButton(size_t index);
@@ -147,8 +157,6 @@ public:
 protected:
 	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Config *config);
 	virtual ~ToolbarView() = default;
-
-	void SetupSmallShellImageList();
 
 	const HWND m_hwnd;
 

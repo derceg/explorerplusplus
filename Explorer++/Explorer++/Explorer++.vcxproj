@@ -1331,7 +1331,9 @@
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="TabList.cpp" />
     <ClCompile Include="TestHelper.cpp" />
+    <ClCompile Include="ToolbarBase.cpp" />
     <ClCompile Include="ToolbarOptionsMenu.cpp" />
+    <ClCompile Include="ToolbarOverflowMenu.cpp" />
     <ClCompile Include="ToolsMenu.cpp" />
     <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="TreeViewAdapter.cpp" />
@@ -1719,7 +1721,9 @@
     <ClInclude Include="TabList.h" />
     <ClInclude Include="TestHelper.h" />
     <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="ToolbarBase.h" />
     <ClInclude Include="ToolbarOptionsMenu.h" />
+    <ClInclude Include="ToolbarOverflowMenu.h" />
     <ClInclude Include="ToolsMenu.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="TreeViewAdapter.h" />

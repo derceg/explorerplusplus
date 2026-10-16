@@ -8,20 +8,20 @@
 
 struct MouseEvent
 {
-	MouseEvent(POINT ptClient, bool shiftKey, bool ctrlKey) :
-		ptClient(ptClient),
+	MouseEvent(POINT ptScreen, bool shiftKey, bool ctrlKey) :
+		ptScreen(ptScreen),
 		shiftKey(shiftKey),
 		ctrlKey(ctrlKey)
 	{
 	}
 
-	const POINT ptClient;
+	const POINT ptScreen;
 	const bool shiftKey;
 	const bool ctrlKey;
 
 	bool operator==(const MouseEvent &other) const
 	{
-		return ptClient.x == other.ptClient.x && ptClient.y == other.ptClient.y
+		return ptScreen.x == other.ptScreen.x && ptScreen.y == other.ptScreen.y
 			&& shiftKey == other.shiftKey && ctrlKey == other.ctrlKey;
 	}
 };

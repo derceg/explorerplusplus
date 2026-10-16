@@ -383,6 +383,7 @@
     <ClCompile Include="TabListTest.cpp" />
     <ClCompile Include="TabRestorerMenuTest.cpp" />
     <ClCompile Include="TabRestorerTest.cpp" />
+    <ClCompile Include="ToolbarOverflowMenuTest.cpp" />
     <ClCompile Include="TreeViewAdapterTest.cpp" />
     <ClCompile Include="TreeViewNodeFake.cpp" />
     <ClCompile Include="TreeViewTest.cpp" />

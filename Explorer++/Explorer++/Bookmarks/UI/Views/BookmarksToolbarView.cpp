@@ -18,16 +18,3 @@ BookmarksToolbarView::BookmarksToolbarView(HWND parent, const Config *config) :
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS, config)
 {
 }
-
-void BookmarksToolbarView::SetImageList(HIMAGELIST imageList)
-{
-	int iconWidth;
-	int iconHeight;
-	auto iconSizeRes = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
-	DCHECK(iconSizeRes);
-
-	auto res = SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
-	DCHECK(res);
-
-	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(imageList));
-}

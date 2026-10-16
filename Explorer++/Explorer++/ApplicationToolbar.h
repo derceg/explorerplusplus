@@ -5,13 +5,13 @@
 #pragma once
 
 #include "ApplicationDropper.h"
+#include "ToolbarBase.h"
 #include "ToolbarView.h"
 #include "../Helper/DropTargetWindow.h"
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <vector>
 
-class AcceleratorManager;
 class BrowserWindow;
 struct MouseEvent;
 class ResourceLoader;
@@ -24,7 +24,7 @@ class ApplicationExecutor;
 class ApplicationModel;
 class ApplicationToolbarView;
 
-class ApplicationToolbar : private DropTargetInternal
+class ApplicationToolbar : public ToolbarBase, private DropTargetInternal
 {
 public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
@@ -35,8 +35,6 @@ public:
 	ApplicationToolbar(ApplicationToolbar &&) = delete;
 	ApplicationToolbar &operator=(const ApplicationToolbar &) = delete;
 	ApplicationToolbar &operator=(ApplicationToolbar &&) = delete;
-
-	ApplicationToolbarView *GetView() const;
 
 	DWORD SimulateDropForTest(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect);
 
@@ -94,11 +92,9 @@ private:
 	void ResetDropState();
 	const DragData &GetDragData() const;
 
-	ApplicationToolbarView *m_view;
 	ApplicationModel *m_model;
 	ApplicationExecutor *const m_applicationExecutor;
 	BrowserWindow *const m_browser;
-	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

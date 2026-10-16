@@ -279,8 +279,12 @@ void TreeView::OnMiddleButtonUp(const POINT &pt)
 		return;
 	}
 
+	POINT ptScreen = pt;
+	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	CHECK(res);
+
 	m_delegate->OnNodeMiddleClicked(node,
-		{ pt, m_keyboardState->IsShiftDown(), m_keyboardState->IsCtrlDown() });
+		{ ptScreen, m_keyboardState->IsShiftDown(), m_keyboardState->IsCtrlDown() });
 }
 
 LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

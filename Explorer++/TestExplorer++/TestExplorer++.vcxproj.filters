@@ -437,7 +437,7 @@
       <Filter>Clang-CL</Filter>
     </ClCompile>
     <ClCompile Include="TabViewTest.cpp">
-      <Filter>Views</Filter>
+      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="ResourceIconModelTest.cpp">
       <Filter>Menus\UI</Filter>
@@ -467,7 +467,7 @@
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="TreeViewTest.cpp">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClCompile>
     <ClCompile Include="BookmarkListPresenterTest.cpp">
       <Filter>Bookmarks\UI</Filter>
@@ -476,13 +476,13 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ListViewTest.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="ListViewColumnModelTest.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="ListViewModelTest.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="SystemClockFake.cpp">
       <Filter>Helper\Platform</Filter>
@@ -491,13 +491,13 @@
       <Filter>Helper\Platform</Filter>
     </ClCompile>
     <ClCompile Include="ListViewColumnModelFake.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="ListViewItemFake.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="ListViewModelFake.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="AutoResetTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
@@ -506,10 +506,10 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="TreeViewAdapterTest.cpp">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClCompile>
     <ClCompile Include="TreeViewNodeFake.cpp">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClCompile>
     <ClCompile Include="ShellEntryTest.cpp">
       <Filter>Shell</Filter>
@@ -584,7 +584,7 @@
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="ListViewColumnsMenuTest.cpp">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClCompile>
     <ClCompile Include="SearchTabsListViewModelTest.cpp">
       <Filter>Dialogs\Search Tabs</Filter>
@@ -639,6 +639,9 @@
     </ClCompile>
     <ClCompile Include="MenuHelpTextHostFake.cpp">
       <Filter>Helper\Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarOverflowMenuTest.cpp">
+      <Filter>Menus\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -789,9 +792,6 @@
     <Filter Include="Clang-CL">
       <UniqueIdentifier>{dd72ce4c-26b4-4a92-9e8b-a5a3cb190423}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Views">
-      <UniqueIdentifier>{c4ba0c42-8d59-4d3b-a572-8a4ade71def9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Menus">
       <UniqueIdentifier>{bc743192-ac2f-46e9-baf3-b8bc445918bd}</UniqueIdentifier>
     </Filter>
@@ -800,12 +800,6 @@
     </Filter>
     <Filter Include="Menus\UI\Views">
       <UniqueIdentifier>{b80d11e6-4361-4b55-9b78-470549e95b2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Views\TreeView">
-      <UniqueIdentifier>{a854fac4-d195-46db-abea-988ded0af263}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Views\ListView">
-      <UniqueIdentifier>{8c10322e-e2b2-4218-817e-3c990a2e615d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Helper\Platform">
       <UniqueIdentifier>{19137768-f568-4c36-9bbb-2093f179d535}</UniqueIdentifier>
@@ -836,6 +830,18 @@
     </Filter>
     <Filter Include="Menus\UI\Shell Context Menu">
       <UniqueIdentifier>{5809d6c9-d80c-41b3-ad68-939f369c0547}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{2a4ad7c7-04b6-43ef-9588-7330fbc9948e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views">
+      <UniqueIdentifier>{c4ba0c42-8d59-4d3b-a572-8a4ade71def9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\TreeView">
+      <UniqueIdentifier>{a854fac4-d195-46db-abea-988ded0af263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\ListView">
+      <UniqueIdentifier>{8c10322e-e2b2-4218-817e-3c990a2e615d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -973,13 +979,13 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ListViewColumnModelFake.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="ListViewItemFake.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="ListViewModelFake.h">
-      <Filter>Views\ListView</Filter>
+      <Filter>UI\Views\ListView</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkTestHelper.h">
       <Filter>Bookmarks</Filter>
@@ -994,7 +1000,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TreeViewNodeFake.h">
-      <Filter>Views\TreeView</Filter>
+      <Filter>UI\Views\TreeView</Filter>
     </ClInclude>
     <ClInclude Include="ShellEnumeratorFake.h">
       <Filter>Shell</Filter>

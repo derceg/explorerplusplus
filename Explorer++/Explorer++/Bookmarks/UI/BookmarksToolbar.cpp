@@ -132,10 +132,9 @@ BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWi
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
+	ToolbarBase(view, browser, acceleratorManager),
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
-	m_view(view),
 	m_browser(browser),
-	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader),
 	m_bookmarkTree(bookmarkTree),
 	m_platformContext(platformContext)
@@ -300,18 +299,10 @@ void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
-	POINT ptScreen = event.ptClient;
-	ClientToScreen(m_view->GetHWND(), &ptScreen);
-
 	PopupMenuView popupMenu(m_browser->GetHWND(), m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_platformContext);
-	popupMenu.Show(ptScreen);
-}
-
-BookmarksToolbarView *BookmarksToolbar::GetView() const
-{
-	return m_view;
+	popupMenu.Show(event.ptScreen);
 }
 
 void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)

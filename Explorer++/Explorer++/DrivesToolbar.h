@@ -4,18 +4,18 @@
 
 #pragma once
 
+#include "ToolbarBase.h"
 #include <boost/signals2.hpp>
 #include <string>
 #include <vector>
 
-class AcceleratorManager;
 class BrowserWindow;
 class DriveModel;
 class DrivesToolbarView;
 struct MouseEvent;
 class ResourceLoader;
 
-class DrivesToolbar
+class DrivesToolbar : public ToolbarBase
 {
 public:
 	static DrivesToolbar *Create(DrivesToolbarView *view, DriveModel *driveModel,
@@ -26,8 +26,6 @@ public:
 	DrivesToolbar(DrivesToolbar &&) = delete;
 	DrivesToolbar &operator=(const DrivesToolbar &) = delete;
 	DrivesToolbar &operator=(DrivesToolbar &&) = delete;
-
-	DrivesToolbarView *GetView() const;
 
 private:
 	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browser,
@@ -47,14 +45,12 @@ private:
 	void OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event);
 	void OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event);
 
-	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient, bool showExtended);
+	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptScreen, bool showExtended);
 
 	void OnWindowDestroyed();
 
-	DrivesToolbarView *const m_view;
 	DriveModel *const m_driveModel;
 	BrowserWindow *const m_browser;
-	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

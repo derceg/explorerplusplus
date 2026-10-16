@@ -71,10 +71,9 @@ DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view, DriveModel *driveM
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
 	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader) :
-	m_view(view),
+	ToolbarBase(view, browser, acceleratorManager),
 	m_driveModel(driveModel),
 	m_browser(browser),
-	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader)
 {
 	Initialize();
@@ -94,11 +93,6 @@ void DrivesToolbar::Initialize()
 		std::bind_front(&DrivesToolbar::OnDriveRemoved, this)));
 
 	m_view->AddWindowDestroyedObserver(std::bind_front(&DrivesToolbar::OnWindowDestroyed, this));
-}
-
-DrivesToolbarView *DrivesToolbar::GetView() const
-{
-	return m_view;
 }
 
 void DrivesToolbar::AddDrives()
@@ -165,10 +159,10 @@ void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const M
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
-	ShowContextMenu(drivePath, event.ptClient, event.shiftKey);
+	ShowContextMenu(drivePath, event.ptScreen, event.shiftKey);
 }
 
-void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient,
+void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &ptScreen,
 	bool showExtended)
 {
 	PidlAbsolute fullPidl;
@@ -178,9 +172,6 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 	{
 		return;
 	}
-
-	POINT ptScreen = ptClient;
-	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
 	auto child = fullPidl.GetLastItem();
 
