@@ -226,6 +226,8 @@ void ToolbarView::UpdateButton(size_t index)
 	tbButtonInfo.pszText = text.data();
 	tbButtonInfo.fsState = GetToolbarButtonState(button);
 	SendMessage(m_hwnd, TB_SETBUTTONINFO, index, reinterpret_cast<LPARAM>(&tbButtonInfo));
+
+	m_toolbarSizeUpdatedSignal();
 }
 
 BYTE ToolbarView::GetToolbarButtonState(const ToolbarButton *button)
