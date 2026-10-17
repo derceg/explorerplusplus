@@ -29,7 +29,10 @@ public:
 		Starting,
 
 		// Indicates that the browser is in the main part of its lifecycle. That is, it has fully
-		// initialized and hasn't started closing.
+		// initialized and hasn't started closing. In this state, a standard set of assumptions hold
+		// (e.g. that there's at least one tab). Outside of this state, those assumptions don't
+		// necessarily hold, so clients that rely on them can use the lifecycle state to skip doing
+		// any work. Work outside of the Main state will typically be unnecessary anyway.
 		Main,
 
 		// Indicates that the browser will close (e.g. because the last tab was closed), but the
