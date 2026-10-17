@@ -127,6 +127,16 @@ HWND AddressBarView::GetHWND() const
 	return m_hwnd;
 }
 
+void AddressBarView::Focus()
+{
+	if (!IsWindowVisible(m_hwnd))
+	{
+		return;
+	}
+
+	SetFocus(m_hwnd);
+}
+
 std::wstring AddressBarView::GetText() const
 {
 	return GetWindowString(m_hwnd);
@@ -167,6 +177,17 @@ void AddressBarView::UpdateTextAndIcon(const std::optional<std::wstring> &option
 void AddressBarView::RevertText()
 {
 	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(m_currentText.c_str()));
+}
+
+void AddressBarView::ShowDropDown()
+{
+	if (!IsWindowVisible(m_hwnd))
+	{
+		return;
+	}
+
+	Focus();
+	SendMessage(m_hwnd, CB_SHOWDROPDOWN, true, 0);
 }
 
 HWND AddressBarView::GetEditControl() const

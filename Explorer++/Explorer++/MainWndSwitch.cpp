@@ -552,15 +552,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	case IDA_ADDRESSBAR:
 		if (m_config->showAddressBar.get())
 		{
-			SetFocus(m_addressBar->GetView()->GetHWND());
+			m_addressBar->GetView()->Focus();
 		}
 		break;
 
 	case IDA_COMBODROPDOWN:
 		if (m_config->showAddressBar.get())
 		{
-			SetFocus(m_addressBar->GetView()->GetHWND());
-			SendMessage(m_addressBar->GetView()->GetHWND(), CB_SHOWDROPDOWN, TRUE, 0);
+			m_addressBar->GetView()->ShowDropDown();
 		}
 		break;
 

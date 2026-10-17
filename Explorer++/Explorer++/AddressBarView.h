@@ -26,11 +26,13 @@ public:
 
 	void SetDelegate(AddressBarViewDelegate *delegate);
 	HWND GetHWND() const;
+	void Focus();
 	std::wstring GetText() const;
 	bool IsTextModified() const;
 	void SelectAllText();
 	void UpdateTextAndIcon(const std::optional<std::wstring> &optionalText, int iconIndex);
 	void RevertText();
+	void ShowDropDown();
 
 	AddressBarViewDelegate *GetDelegateForTesting();
 	void SetTextForTesting(const std::wstring &text);
