@@ -94,6 +94,7 @@ LRESULT RootMenuView::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		{
 			return 0;
 		}
+		break;
 
 	case WM_MENURBUTTONUP:
 		if (OnMenuRightButtonUp(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam)))
