@@ -242,7 +242,7 @@ LRESULT MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_NCDESTROY:
 		delete this;
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -489,7 +489,7 @@ void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 	UpdateToolbarButtonImageIndexes();
 	SendMessage(m_hwnd, TB_AUTOSIZE, 0, 0);
 
-	sizeUpdatedSignal.m_signal();
+	NotifySizeRequirementsChanged();
 }
 
 void MainToolbar::UpdateToolbarButtonImageIndexes()
@@ -594,6 +594,8 @@ void MainToolbar::OnTBReset()
 
 void MainToolbar::OnTBChange()
 {
+	NotifySizeRequirementsChanged();
+
 	UpdateConfigDependentButtonStates();
 }
 
@@ -778,6 +780,24 @@ HWND MainToolbar::GetHWND() const
 	return m_hwnd;
 }
 
+UINT MainToolbar::GetHeight() const
+{
+	SIZE size;
+	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	CHECK(res);
+
+	return size.cy;
+}
+
+std::optional<UINT> MainToolbar::MaybeGetIdealWidth() const
+{
+	SIZE size;
+	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	CHECK(res);
+
+	return size.cx;
+}
+
 // For some of the buttons on the toolbar, their state depends on an item from
 // the application configuration, rather than the properties of the current tab
 // or file selection.
@@ -931,7 +951,7 @@ void MainToolbar::OnFontOrDpiUpdated()
 {
 	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
 
-	sizeUpdatedSignal.m_signal();
+	NotifySizeRequirementsChanged();
 }
 
 MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
@@ -970,6 +990,16 @@ MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
 void MainToolbar::StartCustomization()
 {
 	SendMessage(m_hwnd, TB_CUSTOMIZE, 0, 0);
+}
+
+RebarBandView *MainToolbar::GetView()
+{
+	return this;
+}
+
+bool MainToolbar::CanShowOverflowMenu() const
+{
+	return true;
 }
 
 void MainToolbar::ShowOverflowMenu(const POINT &ptScreen)

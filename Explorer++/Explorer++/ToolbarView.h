@@ -6,6 +6,7 @@
 
 #include "MainFontSetter.h"
 #include "MouseEvent.h"
+#include "RebarBandView.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowSubclass.h"
@@ -100,11 +101,9 @@ private:
 
 // Designed to act as a base class for a toolbar control. Doesn't actually add any buttons on its
 // own.
-class ToolbarView
+class ToolbarView : public RebarBandView
 {
 public:
-	using ToolbarUpdatedSignal = boost::signals2::signal<void()>;
-	using ToolbarSizeChangedSignal = boost::signals2::signal<void()>;
 	using WindowDestroyedSignal = boost::signals2::signal<void()>;
 
 	struct DropLocation
@@ -126,7 +125,10 @@ public:
 	ToolbarView &operator=(const ToolbarView &) = delete;
 	ToolbarView &operator=(ToolbarView &&) = delete;
 
-	HWND GetHWND() const;
+	// RebarBandView
+	HWND GetHWND() const override;
+	UINT GetHeight() const override;
+	std::optional<UINT> MaybeGetIdealWidth() const override;
 
 	void SetupSmallShellImageList();
 	void SetImageList(HIMAGELIST imageList);
@@ -149,8 +151,6 @@ public:
 	size_t FindNextButtonIndex(const POINT &ptClient) const;
 	void SetHotItem(size_t index);
 
-	boost::signals2::connection AddToolbarSizeUpdatedObserver(
-		const ToolbarSizeChangedSignal::slot_type &observer);
 	boost::signals2::connection AddWindowDestroyedObserver(
 		const WindowDestroyedSignal::slot_type &observer);
 
@@ -199,6 +199,5 @@ private:
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
-	ToolbarSizeChangedSignal m_toolbarSizeUpdatedSignal;
 	WindowDestroyedSignal m_windowDestroyedSignal;
 };

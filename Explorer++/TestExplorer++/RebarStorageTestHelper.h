@@ -6,6 +6,6 @@
 
 #include <vector>
 
-struct RebarBandStorageInfo;
+struct RebarBandStorageData;
 
-std::vector<RebarBandStorageInfo> BuildMainRebarLoadSaveReference();
+std::vector<RebarBandStorageData> BuildRebarLoadSaveReference();

@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MainRebarXmlStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarXmlStorage.h"
+#include "RebarBandStorageData.h"
 #include "../Helper/XMLSettings.h"
 #include <optional>
 
@@ -17,7 +17,7 @@ const wchar_t SETTING_ID[] = L"id";
 const wchar_t SETTING_STYLE[] = L"Style";
 const wchar_t SETTING_LENGTH[] = L"Length";
 
-std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
+std::optional<RebarBandStorageData> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	HRESULT hr = parentNode->get_attributes(&attributeMap);
@@ -51,7 +51,7 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 		return std::nullopt;
 	}
 
-	RebarBandStorageInfo bandInfo;
+	RebarBandStorageData bandInfo;
 	bandInfo.id = id;
 	bandInfo.style = style;
 	bandInfo.length = length;
@@ -59,7 +59,7 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 }
 
 void SaveRebarBandInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *toolbarNode,
-	const RebarBandStorageInfo &bandInfo)
+	const RebarBandStorageData &bandInfo)
 {
 	XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode, SETTING_ID,
 		XMLSettings::EncodeIntValue(bandInfo.id));
@@ -71,19 +71,19 @@ void SaveRebarBandInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *toolbarNode
 
 }
 
-namespace MainRebarXmlStorage
+namespace RebarXmlStorage
 {
 
-std::vector<RebarBandStorageInfo> Load(IXMLDOMNode *mainRebarNode)
+std::vector<RebarBandStorageData> Load(IXMLDOMNode *rebarNode)
 {
-	return XMLSettings::ReadItemList<RebarBandStorageInfo>(mainRebarNode, TOOLBAR_NODE_NAME,
+	return XMLSettings::ReadItemList<RebarBandStorageData>(rebarNode, TOOLBAR_NODE_NAME,
 		LoadRebarBandInfo);
 }
 
-void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *mainRebarNode,
-	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rebarNode,
+	const std::vector<RebarBandStorageData> &rebarStorageInfo)
 {
-	XMLSettings::SaveItemList<RebarBandStorageInfo>(xmlDocument, mainRebarNode, rebarStorageInfo,
+	XMLSettings::SaveItemList<RebarBandStorageData>(xmlDocument, rebarNode, rebarStorageInfo,
 		TOOLBAR_NODE_NAME, SaveRebarBandInfo);
 }
 

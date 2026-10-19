@@ -13,7 +13,6 @@
 #include "LayoutDefaults.h"
 #include "Literals.h"
 #include "MainToolbarStorage.h"
-#include "RebarView.h"
 #include "ShellBrowser/ShellBrowserFactoryImpl.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
@@ -43,6 +42,7 @@ class DrivesToolbar;
 class FeatureList;
 class HolderWindow;
 class MainMenu;
+class MainRebar;
 class MainRebarView;
 class MainToolbar;
 class MenuBase;
@@ -50,7 +50,7 @@ class MenuView;
 class NavigationEvents;
 class NavigationRequest;
 class PlatformContext;
-struct RebarBandStorageInfo;
+struct RebarBandStorageData;
 class ResourceLoader;
 class Runtime;
 class ShellBrowserEvents;
@@ -128,11 +128,11 @@ private:
 
 	// Main rebar band IDs. These are used to load and save data, so the values shouldn't be
 	// changed.
-	static const UINT REBAR_BAND_ID_MAIN_TOOLBAR = 0;
-	static const UINT REBAR_BAND_ID_ADDRESS_BAR = 1;
-	static const UINT REBAR_BAND_ID_BOOKMARKS_TOOLBAR = 2;
-	static const UINT REBAR_BAND_ID_DRIVES_TOOLBAR = 3;
-	static const UINT REBAR_BAND_ID_APPLICATIONS_TOOLBAR = 4;
+	static constexpr UINT REBAR_BAND_ID_MAIN_TOOLBAR = 0;
+	static constexpr UINT REBAR_BAND_ID_ADDRESS_BAR = 1;
+	static constexpr UINT REBAR_BAND_ID_BOOKMARKS_TOOLBAR = 2;
+	static constexpr UINT REBAR_BAND_ID_DRIVES_TOOLBAR = 3;
+	static constexpr UINT REBAR_BAND_ID_APPLICATIONS_TOOLBAR = 4;
 
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
@@ -178,6 +178,7 @@ private:
 	void Initialize(const WindowStorageData &storageData);
 	void InitializeMainMenu();
 	void InitializeDisplayWindow();
+	void CreateFolderControls();
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
@@ -227,25 +228,13 @@ private:
 
 	// Main rebar
 	void CreateMainRebarAndChildren(const WindowStorageData &storageData);
-	std::vector<RebarView::Band> InitializeMainRebarBands(const WindowStorageData &storageData);
-	RebarView::Band InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
-	RebarView::Band InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
-	void UpdateMainRebarBandsFromLoadedInfo(std::vector<RebarView::Band> &mainRebarBands,
-		const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
-	void UpdateMainRebarBandFromLoadedInfo(RebarView::Band &band,
-		const std::vector<RebarBandStorageInfo> &rebarStorageInfo);
-	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void CreateFolderControls();
-	void CreateAddressBar();
+	void OnMainRebarHeightChanged();
 	void CreateMainToolbar(
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
+	void CreateAddressBar();
 	void CreateBookmarksToolbar();
 	void CreateDrivesToolbar();
 	void CreateApplicationToolbar();
-	void OnAddressBarSizeUpdated();
-	void OnRebarToolbarSizeUpdated(HWND toolbar);
-	bool OnToolbarRightClick(const NMMOUSE *mouseInfo);
-	void OnRebarChevronPushed(const NMREBARCHEVRON *chevronData);
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
@@ -286,18 +275,15 @@ private:
 	void FinishShutdown();
 
 	AppServices *const m_appServices;
-	const HINSTANCE m_resourceInstance;
 	Config *const m_config;
 	PlatformContext *const m_platformContext;
 	AcceleratorManager *const m_acceleratorManager;
-	FeatureList *const m_featureList;
 	BrowserList *const m_browserList;
 	TabEvents *const m_tabEvents;
 	ShellBrowserEvents *const m_shellBrowserEvents;
 	NavigationEvents *const m_navigationEvents;
 	const ResourceLoader *const m_resourceLoader;
 	HWND m_hwnd;
-
 	BrowserCommandController m_commandController;
 
 	/** Internal state. **/
@@ -312,7 +298,6 @@ private:
 #endif
 
 	BrowserView *m_view = nullptr;
-	AddressBar *m_addressBar = nullptr;
 	TabBacking *m_tabBacking = nullptr;
 	StatusBar *m_statusBar = nullptr;
 
@@ -345,11 +330,8 @@ private:
 
 	TaskbarTabManager m_taskbarTabManager;
 
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
+	std::unique_ptr<WindowSubclass> m_mainWindowSubclass;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-
-	/* Bookmarks. */
-	BookmarksToolbar *m_bookmarksToolbar;
 
 	// IconFetcher retrieves file icons in a background thread. A queue of requests is maintained
 	// and that queue is cleared when the instance is destroyed. However, any current request that's
@@ -372,13 +354,14 @@ private:
 
 	// Main rebar
 	MainRebarView *m_mainRebarView = nullptr;
-	std::vector<boost::signals2::scoped_connection> m_rebarConnections;
-
-	/* Toolbars. */
-	MainToolbar *m_mainToolbar;
+	MainRebar *m_mainRebar = nullptr;
+	MainToolbar *m_mainToolbar = nullptr;
+	AddressBar *m_addressBar = nullptr;
+	BookmarksToolbar *m_bookmarksToolbar;
 	DrivesToolbar *m_drivesToolbar = nullptr;
-	Applications::ApplicationExecutorImpl m_applicationExecutor;
 	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
+
+	Applications::ApplicationExecutorImpl m_applicationExecutor;
 
 	/* Display window folder sizes. */
 	std::list<DWFolderSize> m_DWFolderSizes;

@@ -6,7 +6,7 @@
 #include "BrowserCommands.h"
 #include "BrowserWindow.h"
 #include "BrowserWindowFactory.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
 #include "WindowStorage.h"
 
 namespace BrowserCommands

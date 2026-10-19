@@ -1223,6 +1223,7 @@
     <ClCompile Include="ListViewColumnModel.cpp" />
     <ClCompile Include="ListViewModel.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
     <ClCompile Include="MainToolbarOverflowMenu.cpp" />
@@ -1234,6 +1235,7 @@
     <ClCompile Include="Plugins\PluginItemsMenu.cpp" />
     <ClCompile Include="Plugins\PluginMenuItemsRegistry.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
+    <ClCompile Include="RebarBandView.cpp" />
     <ClCompile Include="ResourceIconModel.cpp" />
     <ClCompile Include="RootMenuView.cpp" />
     <ClCompile Include="ScopedBrowserCommandTarget.cpp" />
@@ -1353,12 +1355,12 @@
     <ClCompile Include="LabelEditHandler.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
     <ClCompile Include="FontHelper.cpp" />
-    <ClCompile Include="MainRebarXmlStorage.cpp" />
+    <ClCompile Include="RebarXmlStorage.cpp" />
     <ClCompile Include="MainToolbarStorage.cpp" />
     <ClCompile Include="NavigationHelper.cpp" />
     <ClCompile Include="OneShotTimer.cpp" />
     <ClCompile Include="OneShotTimerManager.cpp" />
-    <ClCompile Include="MainRebarRegistryStorage.cpp" />
+    <ClCompile Include="RebarRegistryStorage.cpp" />
     <ClCompile Include="ShellEnumeratorImpl.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
@@ -1439,7 +1441,6 @@
     <ClCompile Include="ServiceProvider.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Plugins\LuaPlugin.cpp" />
-    <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp" />
@@ -1595,6 +1596,7 @@
     <ClInclude Include="ListViewItem.h" />
     <ClInclude Include="ListViewModel.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="MainRebar.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
     <ClInclude Include="MainToolbarOverflowMenu.h" />
@@ -1611,6 +1613,9 @@
     <ClInclude Include="Plugins\PluginItemsMenu.h" />
     <ClInclude Include="Plugins\PluginMenuItemsRegistry.h" />
     <ClInclude Include="PopupMenuView.h" />
+    <ClInclude Include="RebarBand.h" />
+    <ClInclude Include="RebarBandView.h" />
+    <ClInclude Include="RebarViewDelegate.h" />
     <ClInclude Include="ResourceIconModel.h" />
     <ClInclude Include="RootMenuView.h" />
     <ClInclude Include="SearchResultsItemContextMenu.h" />
@@ -1750,13 +1755,13 @@
     <ClInclude Include="Literals.h" />
     <ClInclude Include="MainFontSetter.h" />
     <ClInclude Include="FontHelper.h" />
-    <ClInclude Include="MainRebarStorage.h" />
-    <ClInclude Include="MainRebarXmlStorage.h" />
+    <ClInclude Include="RebarBandStorageData.h" />
+    <ClInclude Include="RebarXmlStorage.h" />
     <ClInclude Include="MainToolbarStorage.h" />
     <ClInclude Include="NavigationHelper.h" />
     <ClInclude Include="OneShotTimer.h" />
     <ClInclude Include="OneShotTimerManager.h" />
-    <ClInclude Include="MainRebarRegistryStorage.h" />
+    <ClInclude Include="RebarRegistryStorage.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellEnumeratorImpl.h" />
     <ClInclude Include="ShellItemsMenu.h" />

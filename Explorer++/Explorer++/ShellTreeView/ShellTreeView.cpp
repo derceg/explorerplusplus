@@ -191,7 +191,7 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 	case WM_NCDESTROY:
 		delete this;
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

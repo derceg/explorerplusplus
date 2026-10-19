@@ -168,7 +168,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 	case WM_NCDESTROY:
 		delete this;
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -609,9 +609,6 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, UINT notification
 	return 1;
 }
 
-/*
- * WM_NOTIFY handler for the main window.
- */
 LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
@@ -620,24 +617,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	{
 	case LVN_KEYDOWN:
 		return OnListViewKeyDown(lParam);
-
-	case TBN_ENDADJUST:
-		if (GetLifecycleState() == LifecycleState::Main)
-		{
-			OnRebarToolbarSizeUpdated(reinterpret_cast<NMHDR *>(lParam)->hwndFrom);
-		}
-		break;
-
-	case RBN_HEIGHTCHANGE:
-		// This message can be dispatched within the middle of an existing layout operation (if the
-		// height of the rebar is updated). To avoid making re-entrant layout calls, the layout
-		// update will be scheduled, instead of being immediately invoked.
-		ScheduleUpdateLayout(m_weakPtrFactory.GetWeakPtr(), m_appServices->GetRuntime());
-		break;
-
-	case RBN_CHEVRONPUSHED:
-		OnRebarChevronPushed(reinterpret_cast<NMREBARCHEVRON *>(lParam));
-		return 0;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "WindowRegistryStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
 #include "RegistryStorageTestHelper.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"

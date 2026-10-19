@@ -153,7 +153,7 @@ LRESULT LabelEditHandler::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	case WM_NCDESTROY:
 		delete this;
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

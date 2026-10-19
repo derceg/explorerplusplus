@@ -66,7 +66,7 @@ LRESULT AddressBarView::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, L
 
 	case WM_NCDESTROY:
 		OnNcDestroy();
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -125,6 +125,15 @@ void AddressBarView::SetDelegate(AddressBarViewDelegate *delegate)
 HWND AddressBarView::GetHWND() const
 {
 	return m_hwnd;
+}
+
+UINT AddressBarView::GetHeight() const
+{
+	RECT rect;
+	auto res = GetWindowRect(m_hwnd, &rect);
+	CHECK(res);
+
+	return GetRectHeight(&rect);
 }
 
 void AddressBarView::Focus()
@@ -197,7 +206,7 @@ HWND AddressBarView::GetEditControl() const
 
 void AddressBarView::OnFontOrDpiUpdated()
 {
-	sizeUpdatedSignal.m_signal();
+	NotifySizeRequirementsChanged();
 }
 
 void AddressBarView::OnNcDestroy()

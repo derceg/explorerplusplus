@@ -133,9 +133,6 @@
     <ClCompile Include="Plugins\AcceleratorParser.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="MainRebar.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Plugins\PluginCommandManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -447,12 +444,6 @@
     </ClCompile>
     <ClCompile Include="HistoryModel.cpp">
       <Filter>History</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRebarRegistryStorage.cpp">
-      <Filter>Main Rebar</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRebarXmlStorage.cpp">
-      <Filter>Main Rebar</Filter>
     </ClCompile>
     <ClCompile Include="TabRegistryStorage.cpp">
       <Filter>Tabs</Filter>
@@ -949,6 +940,18 @@
     <ClCompile Include="MainToolbarOverflowMenu.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MainRebar.cpp">
+      <Filter>Main Rebar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarBandView.cpp">
+      <Filter>UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarRegistryStorage.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarXmlStorage.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1427,15 +1430,6 @@
     </ClInclude>
     <ClInclude Include="HistoryModel.h">
       <Filter>History</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRebarRegistryStorage.h">
-      <Filter>Main Rebar</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRebarStorage.h">
-      <Filter>Main Rebar</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRebarXmlStorage.h">
-      <Filter>Main Rebar</Filter>
     </ClInclude>
     <ClInclude Include="TabRegistryStorage.h">
       <Filter>Tabs</Filter>
@@ -2066,6 +2060,27 @@
     </ClInclude>
     <ClInclude Include="MainToolbarOverflowMenu.h">
       <Filter>Menus\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarBandView.h">
+      <Filter>UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRebar.h">
+      <Filter>Main Rebar\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarViewDelegate.h">
+      <Filter>UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarBand.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarBandStorageData.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarRegistryStorage.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarXmlStorage.h">
+      <Filter>Storage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

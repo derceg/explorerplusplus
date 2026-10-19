@@ -3,11 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MainRebarRegistryStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarRegistryStorage.h"
+#include "RebarBandStorageData.h"
 #include "../Helper/RegistrySettings.h"
-#include <wil/registry.h>
-#include <wil/resource.h>
 #include <optional>
 
 namespace
@@ -17,7 +15,7 @@ const wchar_t SETTING_ID[] = L"id";
 const wchar_t SETTING_STYLE[] = L"Style";
 const wchar_t SETTING_LENGTH[] = L"Length";
 
-std::optional<RebarBandStorageInfo> LoadRebarBandInfo(HKEY key)
+std::optional<RebarBandStorageData> LoadRebarBandInfo(HKEY key)
 {
 	UINT id;
 	LSTATUS result = RegistrySettings::Read32BitValueFromRegistry(key, SETTING_ID, id);
@@ -43,14 +41,14 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(HKEY key)
 		return std::nullopt;
 	}
 
-	RebarBandStorageInfo bandInfo;
+	RebarBandStorageData bandInfo;
 	bandInfo.id = id;
 	bandInfo.style = style;
 	bandInfo.length = length;
 	return bandInfo;
 }
 
-void SaveRebarBandInfo(HKEY key, const RebarBandStorageInfo &bandInfo)
+void SaveRebarBandInfo(HKEY key, const RebarBandStorageData &bandInfo)
 {
 	RegistrySettings::SaveDword(key, SETTING_ID, bandInfo.id);
 	RegistrySettings::SaveDword(key, SETTING_STYLE, bandInfo.style);
@@ -59,17 +57,17 @@ void SaveRebarBandInfo(HKEY key, const RebarBandStorageInfo &bandInfo)
 
 }
 
-namespace MainRebarRegistryStorage
+namespace RebarRegistryStorage
 {
 
-std::vector<RebarBandStorageInfo> Load(HKEY mainRebarKey)
+std::vector<RebarBandStorageData> Load(HKEY rebarKey)
 {
-	return RegistrySettings::ReadItemList<RebarBandStorageInfo>(mainRebarKey, LoadRebarBandInfo);
+	return RegistrySettings::ReadItemList<RebarBandStorageData>(rebarKey, LoadRebarBandInfo);
 }
 
-void Save(HKEY mainRebarKey, const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
+void Save(HKEY rebarKey, const std::vector<RebarBandStorageData> &rebarStorageInfo)
 {
-	RegistrySettings::SaveItemList<RebarBandStorageInfo>(mainRebarKey, rebarStorageInfo,
+	RegistrySettings::SaveItemList<RebarBandStorageData>(rebarKey, rebarStorageInfo,
 		SaveRebarBandInfo);
 }
 

@@ -251,11 +251,14 @@
     <ClCompile Include="ImageInteropTest.cpp" />
     <ClCompile Include="ImageOperationsTest.cpp" />
     <ClCompile Include="ListViewColumnsMenuTest.cpp" />
+    <ClCompile Include="MainRebarTest.cpp" />
     <ClCompile Include="ManageBookmarksViewsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
     <ClCompile Include="MenuHelpTextHostFake.cpp" />
     <ClCompile Include="MenuViewTestApi.cpp" />
+    <ClCompile Include="RebarViewTest.cpp" />
+    <ClCompile Include="RebarViewTestApi.cpp" />
     <ClCompile Include="RootMenuViewTest.cpp" />
     <ClCompile Include="MenuItemKeyTest.cpp" />
     <ClCompile Include="NoOpThemeManager.cpp" />
@@ -317,6 +320,7 @@
     <ClCompile Include="TabViewTest.cpp" />
     <ClCompile Include="TaskbarTabManagerTest.cpp" />
     <ClCompile Include="TestMenuView.cpp" />
+    <ClCompile Include="TestRebarBandView.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
@@ -396,9 +400,9 @@
     <ClCompile Include="TabHistoryMenuTest.cpp" />
     <ClCompile Include="ImageHelperTest.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MainRebarRegistryStorageTest.cpp" />
-    <ClCompile Include="MainRebarStorageTestHelper.cpp" />
-    <ClCompile Include="MainRebarXmlStorageTest.cpp" />
+    <ClCompile Include="RebarRegistryStorageTest.cpp" />
+    <ClCompile Include="RebarStorageTestHelper.cpp" />
+    <ClCompile Include="RebarXmlStorageTest.cpp" />
     <ClCompile Include="MainToolbarStorageTest.cpp" />
     <ClCompile Include="ResourceHelperTest.cpp" />
     <ClCompile Include="ServiceProviderTest.cpp" />
@@ -491,6 +495,7 @@
     <ClInclude Include="CopiedBookmark.h" />
     <ClInclude Include="DarkModeManagerFake.h" />
     <ClInclude Include="NoOpThemeManager.h" />
+    <ClInclude Include="RebarViewTestApi.h" />
     <ClInclude Include="RootMenuViewTestApi.h" />
     <ClInclude Include="ShellNameParserFake.h" />
     <ClInclude Include="SimulatedFileSystemWatcherFactory.h" />
@@ -523,7 +528,7 @@
     <ClInclude Include="GeneratorTestHelper.h" />
     <ClInclude Include="GTestHelper.h" />
     <ClInclude Include="ImageTestHelper.h" />
-    <ClInclude Include="MainRebarStorageTestHelper.h" />
+    <ClInclude Include="RebarStorageTestHelper.h" />
     <ClInclude Include="MessageLoop.h" />
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="NavigationRequestDelegateMock.h" />
@@ -541,6 +546,7 @@
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />
     <ClInclude Include="TestMenuView.h" />
+    <ClInclude Include="TestRebarBandView.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />

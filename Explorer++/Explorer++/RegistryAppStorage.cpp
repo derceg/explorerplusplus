@@ -11,7 +11,7 @@
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogStorageHelper.h"
 #include "FrequentLocationsRegistryStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
 #include "TabStorage.h"
 #include "WindowRegistryStorage.h"
 #include "WindowStorage.h"

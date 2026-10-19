@@ -10,9 +10,10 @@
 #include "Icon.h"
 #include "MainFontSetter.h"
 #include "MainToolbarStorage.h"
+#include "RebarBand.h"
+#include "RebarBandView.h"
 #include "Tab.h"
 #include "TabHistoryMenu.h"
-#include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 #include <functional>
@@ -27,7 +28,7 @@ class ResourceLoader;
 class ShellBrowser;
 class ShellIconLoader;
 
-class MainToolbar
+class MainToolbar : public RebarBand, public RebarBandView
 {
 public:
 	using ItemMenuFactory = std::function<std::unique_ptr<MenuBase>(MenuView *menuView)>;
@@ -47,7 +48,15 @@ public:
 		BrowserWindow *browser, AppServices *appServices, CoreInterface *coreInterface,
 		ShellIconLoader *shellIconLoader);
 
-	HWND GetHWND() const;
+	// RebarBand
+	RebarBandView *GetView() override;
+	bool CanShowOverflowMenu() const override;
+	void ShowOverflowMenu(const POINT &ptScreen) override;
+
+	// RebarBandView
+	HWND GetHWND() const override;
+	UINT GetHeight() const override;
+	std::optional<UINT> MaybeGetIdealWidth() const override;
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
@@ -55,10 +64,6 @@ public:
 	MainToolbarStorage::MainToolbarButtons GetButtonsForStorage() const;
 
 	void StartCustomization();
-	void ShowOverflowMenu(const POINT &ptScreen);
-
-	// Signals
-	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 
 private:
 	MainToolbar(HWND parent,

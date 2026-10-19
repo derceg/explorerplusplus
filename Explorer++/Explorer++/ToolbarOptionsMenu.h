@@ -22,7 +22,10 @@ public:
 		BookmarksToolbar,
 		DrivesToolbar,
 		ApplicationToolbar,
-		MainMenu
+		MainMenu,
+
+		// This is used only in tests.
+		Other
 	};
 
 	ToolbarOptionsMenu(MenuView *menuView, Source source, BrowserWindow *browser,

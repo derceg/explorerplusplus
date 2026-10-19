@@ -114,15 +114,6 @@
     <ClCompile Include="ShellBrowserFake.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="MainRebarRegistryStorageTest.cpp">
-      <Filter>Main Rebar</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRebarStorageTestHelper.cpp">
-      <Filter>Main Rebar</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRebarXmlStorageTest.cpp">
-      <Filter>Main Rebar</Filter>
-    </ClCompile>
     <ClCompile Include="TabRegistryStorageTest.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -643,6 +634,27 @@
     <ClCompile Include="ToolbarOverflowMenuTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
+    <ClCompile Include="RebarViewTest.cpp">
+      <Filter>UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRebarTest.cpp">
+      <Filter>Main Rebar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarRegistryStorageTest.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarStorageTestHelper.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarXmlStorageTest.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRebarBandView.cpp">
+      <Filter>UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarViewTestApi.cpp">
+      <Filter>UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -843,6 +855,9 @@
     <Filter Include="UI\Views\ListView">
       <UniqueIdentifier>{8c10322e-e2b2-4218-817e-3c990a2e615d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main Rebar\UI">
+      <UniqueIdentifier>{13f00741-1015-47cd-b869-b07ef7fae197}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -878,9 +893,6 @@
     </ClInclude>
     <ClInclude Include="ShellBrowserFake.h">
       <Filter>ShellBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRebarStorageTestHelper.h">
-      <Filter>Main Rebar</Filter>
     </ClInclude>
     <ClInclude Include="TabStorageTestHelper.h">
       <Filter>Tabs</Filter>
@@ -1061,6 +1073,15 @@
     </ClInclude>
     <ClInclude Include="RootMenuViewTestApi.h">
       <Filter>Menus\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarStorageTestHelper.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="TestRebarBandView.h">
+      <Filter>UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarViewTestApi.h">
+      <Filter>UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

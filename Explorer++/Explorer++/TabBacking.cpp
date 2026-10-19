@@ -120,7 +120,7 @@ LRESULT TabBacking::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_NCDESTROY:
 		OnNcDestroy();
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

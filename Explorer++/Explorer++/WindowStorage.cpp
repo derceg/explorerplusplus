@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "WindowStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
 #include "TabStorage.h"
 #include "../Helper/Helper.h"
 #include "../Helper/WindowHelper.h"

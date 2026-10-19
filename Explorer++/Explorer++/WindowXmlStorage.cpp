@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "WindowXmlStorage.h"
 #include "LayoutDefaults.h"
-#include "MainRebarStorage.h"
-#include "MainRebarXmlStorage.h"
+#include "RebarBandStorageData.h"
+#include "RebarXmlStorage.h"
 #include "Storage.h"
 #include "TabStorage.h"
 #include "TabXmlStorage.h"
@@ -76,7 +76,7 @@ std::vector<TabStorageData> LoadTabs(IXMLDOMNode *rootNode)
 	return TabXmlStorage::Load(tabsNode.get());
 }
 
-std::vector<RebarBandStorageInfo> LoadMainRebarInfo(IXMLDOMNode *rootNode)
+std::vector<RebarBandStorageData> LoadMainRebarInfo(IXMLDOMNode *rootNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
 	auto query = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
@@ -87,7 +87,7 @@ std::vector<RebarBandStorageInfo> LoadMainRebarInfo(IXMLDOMNode *rootNode)
 		return {};
 	}
 
-	return MainRebarXmlStorage::Load(mainRebarNode.get());
+	return RebarXmlStorage::Load(mainRebarNode.get());
 }
 
 std::optional<MainToolbarStorage::MainToolbarButtons> LoadMainToolbarButtons(
@@ -328,7 +328,7 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
 	}
 
-	std::vector<RebarBandStorageInfo> mainRebarInfo;
+	std::vector<RebarBandStorageData> mainRebarInfo;
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainRebarNode;
 	query = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
@@ -336,7 +336,7 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 
 	if (hr == S_OK)
 	{
-		mainRebarInfo = MainRebarXmlStorage::Load(mainRebarNode.get());
+		mainRebarInfo = RebarXmlStorage::Load(mainRebarNode.get());
 	}
 	else if (fallback)
 	{
@@ -449,7 +449,7 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 
 	if (hr == S_OK)
 	{
-		MainRebarXmlStorage::Save(xmlDocument, mainRebarNode.get(), window.mainRebarInfo);
+		RebarXmlStorage::Save(xmlDocument, mainRebarNode.get(), window.mainRebarInfo);
 
 		XMLSettings::AppendChildToParent(mainRebarNode.get(), windowNode.get());
 	}

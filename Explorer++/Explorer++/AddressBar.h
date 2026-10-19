@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "AddressBarView.h"
 #include "AddressBarViewDelegate.h"
 #include "BrowserCommandTarget.h"
+#include "RebarBand.h"
 #include "ScopedBrowserCommandTarget.h"
 #include "../Helper/Pidl.h"
 #include "../Helper/ScopedStopSource.h"
@@ -16,7 +18,6 @@
 #include <memory>
 #include <vector>
 
-class AddressBarView;
 class AsyncIconFetcher;
 class BrowserWindow;
 class NavigationEvents;
@@ -27,14 +28,15 @@ class ShellBrowserEvents;
 class Tab;
 class TabEvents;
 
-class AddressBar : private AddressBarViewDelegate, public BrowserCommandTarget
+class AddressBar : private AddressBarViewDelegate, public BrowserCommandTarget, public RebarBand
 {
 public:
 	static AddressBar *Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		const Runtime *runtime, AsyncIconFetcher *iconFetcher);
 
-	AddressBarView *GetView() const;
+	// RebarBand
+	AddressBarView *GetView() override;
 
 	// BrowserCommandTarget
 	bool IsCommandEnabled(int command) const override;

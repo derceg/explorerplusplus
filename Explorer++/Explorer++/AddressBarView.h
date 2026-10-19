@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MainFontSetter.h"
+#include "RebarBandView.h"
 #include "../Helper/SignalWrapper.h"
 #include <memory>
 #include <optional>
@@ -15,17 +16,17 @@ class AddressBarViewDelegate;
 struct Config;
 class WindowSubclass;
 
-class AddressBarView
+class AddressBarView : public RebarBandView
 {
 public:
-	// Signals
-	SignalWrapper<AddressBarView, void()> sizeUpdatedSignal;
-	SignalWrapper<AddressBarView, void()> windowDestroyedSignal;
-
 	static AddressBarView *Create(HWND parent, const Config *config);
 
 	void SetDelegate(AddressBarViewDelegate *delegate);
-	HWND GetHWND() const;
+
+	// RebarBandView
+	HWND GetHWND() const override;
+	UINT GetHeight() const override;
+
 	void Focus();
 	std::wstring GetText() const;
 	bool IsTextModified() const;
@@ -37,6 +38,9 @@ public:
 	AddressBarViewDelegate *GetDelegateForTesting();
 	void SetTextForTesting(const std::wstring &text);
 	void DestroyForTesting();
+
+	// Signals
+	SignalWrapper<AddressBarView, void()> windowDestroyedSignal;
 
 private:
 	AddressBarView(HWND parent, const Config *config);

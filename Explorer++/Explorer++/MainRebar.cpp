@@ -3,336 +3,153 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Explorer++.h"
-#include "AddressBar.h"
-#include "AddressBarView.h"
+#include "MainRebar.h"
 #include "AppServices.h"
-#include "ApplicationToolbar.h"
-#include "ApplicationToolbarView.h"
-#include "Bookmarks/UI/BookmarksToolbar.h"
-#include "Bookmarks/UI/Views/BookmarksToolbarView.h"
+#include "BrowserWindow.h"
 #include "Config.h"
-#include "DrivesToolbar.h"
-#include "DrivesToolbarView.h"
-#include "MainRebarStorage.h"
 #include "MainRebarView.h"
-#include "MainResource.h"
-#include "MainToolbar.h"
 #include "PopupMenuView.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
-#include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
-#include "ToolbarOptionsMenu.h"
-#include "../Helper/WindowHelper.h"
+#include "RebarBand.h"
+#include "RebarBandStorageData.h"
+#include <wil/common.h>
 
-void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &storageData)
+MainRebar *MainRebar::Create(MainRebarView *view,
+	const std::vector<BandDefinition> &bandDefinitions,
+	const std::vector<RebarBandStorageData> &storageData, BrowserWindow *browser,
+	AppServices *appServices)
 {
-	m_mainRebarView = MainRebarView::Create(m_hwnd);
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_mainRebarView->GetHWND(),
-		std::bind_front(&Explorerplusplus::RebarSubclass, this)));
-
-	auto bands = InitializeMainRebarBands(storageData);
-	m_mainRebarView->AddBands(bands);
-
-	m_mainRebarView->LockBands(m_config->lockToolbars.get());
-	m_rebarConnections.push_back(m_config->lockToolbars.addObserver(
-		std::bind_front(&RebarView::LockBands, m_mainRebarView)));
+	return new MainRebar(view, bandDefinitions, storageData, browser, appServices);
 }
 
-std::vector<RebarView::Band> Explorerplusplus::InitializeMainRebarBands(
-	const WindowStorageData &storageData)
+MainRebar::MainRebar(MainRebarView *view, const std::vector<BandDefinition> &bandDefinitions,
+	const std::vector<RebarBandStorageData> &storageData, BrowserWindow *browser,
+	AppServices *appServices) :
+	m_view(view),
+	m_browser(browser),
+	m_appServices(appServices)
 {
-	std::vector<RebarView::Band> mainRebarBands;
+	m_view->SetDelegate(this);
+	m_view->windowDestroyedSignal.AddObserver([this] { OnWindowDestroyed(); });
 
-	CreateMainToolbar(storageData.mainToolbarButtons);
-	auto band = InitializeToolbarBand(REBAR_BAND_ID_MAIN_TOOLBAR, m_mainToolbar->GetHWND(),
-		m_config->showMainToolbar.get());
-	mainRebarBands.push_back(band);
+	auto *config = m_appServices->GetConfig();
 
-	m_rebarConnections.push_back(m_config->showMainToolbar.addObserver(
-		std::bind_front(&RebarView::ShowBand, m_mainRebarView, m_mainToolbar->GetHWND())));
+	AddBands(bandDefinitions, storageData);
 
-	CreateAddressBar();
-	band = InitializeNonToolbarBand(REBAR_BAND_ID_ADDRESS_BAR, m_addressBar->GetView()->GetHWND(),
-		m_config->showAddressBar.get());
-	mainRebarBands.push_back(band);
-
-	m_rebarConnections.push_back(m_config->showAddressBar.addObserver(std::bind_front(
-		&RebarView::ShowBand, m_mainRebarView, m_addressBar->GetView()->GetHWND())));
-
-	CreateBookmarksToolbar();
-	band = InitializeToolbarBand(REBAR_BAND_ID_BOOKMARKS_TOOLBAR,
-		m_bookmarksToolbar->GetView()->GetHWND(), m_config->showBookmarksToolbar.get());
-	mainRebarBands.push_back(band);
-
-	m_rebarConnections.push_back(m_config->showBookmarksToolbar.addObserver(std::bind_front(
-		&RebarView::ShowBand, m_mainRebarView, m_bookmarksToolbar->GetView()->GetHWND())));
-
-	CreateDrivesToolbar();
-	band = InitializeToolbarBand(REBAR_BAND_ID_DRIVES_TOOLBAR,
-		m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar.get());
-	mainRebarBands.push_back(band);
-
-	m_rebarConnections.push_back(m_config->showDrivesToolbar.addObserver(std::bind_front(
-		&RebarView::ShowBand, m_mainRebarView, m_drivesToolbar->GetView()->GetHWND())));
-
-	CreateApplicationToolbar();
-	band = InitializeToolbarBand(REBAR_BAND_ID_APPLICATIONS_TOOLBAR,
-		m_applicationToolbar->GetView()->GetHWND(), m_config->showApplicationToolbar.get());
-	mainRebarBands.push_back(band);
-
-	m_rebarConnections.push_back(m_config->showApplicationToolbar.addObserver(std::bind_front(
-		&RebarView::ShowBand, m_mainRebarView, m_applicationToolbar->GetView()->GetHWND())));
-
-	UpdateMainRebarBandsFromLoadedInfo(mainRebarBands, storageData.mainRebarInfo);
-
-	return mainRebarBands;
+	m_view->LockBands(config->lockToolbars.get());
+	m_connections.push_back(
+		config->lockToolbars.addObserver(std::bind_front(&RebarView::LockBands, m_view)));
 }
 
-RebarView::Band Explorerplusplus::InitializeToolbarBand(UINT id, HWND toolbar, bool showBand)
+MainRebarView *MainRebar::GetView() const
 {
-	auto toolbarSize = static_cast<DWORD>(SendMessage(toolbar, TB_GETBUTTONSIZE, 0, 0));
-
-	SIZE size;
-	auto res = SendMessage(toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
-	DCHECK(res);
-
-	RebarView::Band band = {};
-	band.id = id;
-	band.child = toolbar;
-	band.height = HIWORD(toolbarSize);
-	band.newLine = true;
-	band.useChevron = true;
-	band.show = showBand;
-	band.idealLength = size.cx;
-	return band;
+	return m_view;
 }
 
-RebarView::Band Explorerplusplus::InitializeNonToolbarBand(UINT id, HWND child, bool showBand)
+void MainRebar::AddBands(const std::vector<BandDefinition> &bandDefinitions,
+	const std::vector<RebarBandStorageData> &storageData)
 {
-	RECT rect;
-	auto res = GetWindowRect(child, &rect);
-	DCHECK(res);
+	auto sortedBandDefinitions = SortBandsUsingStorageData(bandDefinitions, storageData);
 
-	RebarView::Band band = {};
-	band.id = id;
-	band.child = child;
-	band.height = GetRectHeight(&rect);
-	band.newLine = true;
-	band.useChevron = false;
-	band.show = showBand;
-	return band;
-}
-
-void Explorerplusplus::UpdateMainRebarBandsFromLoadedInfo(
-	std::vector<RebarView::Band> &mainRebarBands,
-	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
-{
-	auto getSortedBandIndex = [&mainRebarBands, &rebarStorageInfo](UINT bandId) -> size_t
+	for (const auto &bandDefinition : sortedBandDefinitions)
 	{
-		auto itr = std::find_if(rebarStorageInfo.begin(), rebarStorageInfo.end(),
-			[bandId](const auto &loadedBandInfo) { return loadedBandInfo.id == bandId; });
-
-		if (itr == rebarStorageInfo.end())
-		{
-			// Any band that doesn't appear in the loaded data will be placed at the end.
-			return mainRebarBands.size() - 1;
-		}
-
-		return itr - rebarStorageInfo.begin();
-	};
-
-	std::stable_sort(mainRebarBands.begin(), mainRebarBands.end(),
-		[getSortedBandIndex](const auto &band1, const auto &band2)
-		{ return getSortedBandIndex(band1.id) < getSortedBandIndex(band2.id); });
-
-	for (auto &band : mainRebarBands)
-	{
-		UpdateMainRebarBandFromLoadedInfo(band, rebarStorageInfo);
+		AddBand(bandDefinition, MaybeGetStorageDataForBand(bandDefinition.id, storageData));
 	}
 }
 
-void Explorerplusplus::UpdateMainRebarBandFromLoadedInfo(RebarView::Band &band,
-	const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
+void MainRebar::AddBand(const BandDefinition &bandDefinition,
+	const RebarBandStorageData *optStorageData)
 {
-	auto itr = std::find_if(rebarStorageInfo.begin(), rebarStorageInfo.end(),
-		[&band](const auto &loadedBandInfo) { return loadedBandInfo.id == band.id; });
+	auto [itr, didInsert] = m_idToBandDefinitionMap.insert({ bandDefinition.id, bandDefinition });
+	CHECK(didInsert);
 
-	if (itr == rebarStorageInfo.end())
+	auto *bandController = bandDefinition.bandController;
+	m_view->AddBand(bandDefinition.id, bandController->GetView(),
+		bandController->CanShowOverflowMenu() ? RebarView::OverflowMenuPolicy::Enabled
+											  : RebarView::OverflowMenuPolicy::Disabled);
+
+	m_view->ShowBand(bandDefinition.id, bandDefinition.visibilityOption->get());
+	m_connections.push_back(bandDefinition.visibilityOption->addObserver(
+		std::bind_front(&RebarView::ShowBand, m_view, bandDefinition.id)));
+
+	if (optStorageData)
+	{
+		m_view->SetBandWidth(bandDefinition.id, optStorageData->length);
+		m_view->SetBandOnNewLine(bandDefinition.id,
+			WI_IsFlagSet(optStorageData->style, RBBS_BREAK));
+	}
+}
+
+std::vector<MainRebar::BandDefinition> MainRebar::SortBandsUsingStorageData(
+	const std::vector<BandDefinition> &bandDefinitions,
+	const std::vector<RebarBandStorageData> &storageData)
+{
+	auto sortedBandDefinitions = bandDefinitions;
+
+	auto getSortedBandIndex = [&storageData](UINT bandId) -> size_t
+	{
+		auto itr = std::find_if(storageData.begin(), storageData.end(),
+			[bandId](const auto &bandStorageData) { return bandStorageData.id == bandId; });
+
+		if (itr == storageData.end())
+		{
+			// Any band that doesn't appear in the loaded data will be placed at the end.
+			return storageData.size();
+		}
+
+		return itr - storageData.begin();
+	};
+
+	std::ranges::stable_sort(sortedBandDefinitions,
+		[getSortedBandIndex](const auto &band1, const auto &band2)
+		{ return getSortedBandIndex(band1.id) < getSortedBandIndex(band2.id); });
+
+	return sortedBandDefinitions;
+}
+
+const RebarBandStorageData *MainRebar::MaybeGetStorageDataForBand(UINT bandId,
+	const std::vector<RebarBandStorageData> &storageData)
+{
+	auto itr = std::find_if(storageData.begin(), storageData.end(),
+		[bandId](const auto &bandStorageData) { return bandStorageData.id == bandId; });
+
+	if (itr == storageData.end())
+	{
+		return nullptr;
+	}
+
+	return &*itr;
+}
+
+void MainRebar::OnShowContextMenu(UINT bandId, const POINT &ptScreen)
+{
+	const auto &bandDefinition = GetDefinitionForBand(bandId);
+
+	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
+	ToolbarOptionsMenu menu(&popupMenu, bandDefinition.contextMenuSource, m_browser, m_appServices);
+	popupMenu.Show(ptScreen);
+}
+
+void MainRebar::OnShowOverflowMenu(UINT bandId, const POINT &ptScreen)
+{
+	const auto &bandDefinition = GetDefinitionForBand(bandId);
+	auto *controller = bandDefinition.bandController;
+
+	if (!controller->CanShowOverflowMenu())
 	{
 		return;
 	}
 
-	band.newLine = WI_IsFlagSet(itr->style, RBBS_BREAK);
-	band.length = itr->length;
+	controller->ShowOverflowMenu(ptScreen);
 }
 
-LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+const MainRebar::BandDefinition &MainRebar::GetDefinitionForBand(UINT bandId) const
 {
-	switch (msg)
-	{
-	case WM_NOTIFY:
-		switch (((LPNMHDR) lParam)->code)
-		{
-		case NM_RCLICK:
-			if (OnToolbarRightClick(reinterpret_cast<NMMOUSE *>(lParam)))
-			{
-				return TRUE;
-			}
-			break;
-		}
-		break;
-
-	case WM_DESTROY:
-		m_rebarConnections.clear();
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
+	auto itr = m_idToBandDefinitionMap.find(bandId);
+	CHECK(itr != m_idToBandDefinitionMap.end());
+	return itr->second;
 }
 
-bool Explorerplusplus::OnToolbarRightClick(const NMMOUSE *mouseInfo)
+void MainRebar::OnWindowDestroyed()
 {
-	if (mouseInfo->dwItemSpec != static_cast<DWORD_PTR>(-1))
-	{
-		return false;
-	}
-
-	ToolbarOptionsMenu::Source source = ToolbarOptionsMenu::Source::MainToolbar;
-
-	if (mouseInfo->hdr.hwndFrom == m_addressBar->GetView()->GetHWND())
-	{
-		source = ToolbarOptionsMenu::Source::AddressBar;
-	}
-	else if (mouseInfo->hdr.hwndFrom == m_mainToolbar->GetHWND())
-	{
-		source = ToolbarOptionsMenu::Source::MainToolbar;
-	}
-	else if (mouseInfo->hdr.hwndFrom == m_bookmarksToolbar->GetView()->GetHWND())
-	{
-		source = ToolbarOptionsMenu::Source::BookmarksToolbar;
-	}
-	else if (mouseInfo->hdr.hwndFrom == m_drivesToolbar->GetView()->GetHWND())
-	{
-		source = ToolbarOptionsMenu::Source::DrivesToolbar;
-	}
-	else if (mouseInfo->hdr.hwndFrom == m_applicationToolbar->GetView()->GetHWND())
-	{
-		source = ToolbarOptionsMenu::Source::ApplicationToolbar;
-	}
-	else
-	{
-		DCHECK(false);
-	}
-
-	POINT ptScreen = mouseInfo->pt;
-	ClientToScreen(mouseInfo->hdr.hwndFrom, &ptScreen);
-
-	PopupMenuView popupMenu(m_hwnd, this);
-	ToolbarOptionsMenu menu(&popupMenu, source, this, m_appServices);
-	popupMenu.Show(ptScreen);
-
-	return true;
-}
-
-void Explorerplusplus::CreateAddressBar()
-{
-	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), m_config);
-	addressBarView->sizeUpdatedSignal.AddObserver(
-		std::bind_front(&Explorerplusplus::OnAddressBarSizeUpdated, this));
-
-	m_addressBar = AddressBar::Create(addressBarView, this, m_tabEvents, m_shellBrowserEvents,
-		m_navigationEvents, m_appServices->GetRuntime(), m_appServices->GetAsyncIconFetcher());
-}
-
-void Explorerplusplus::OnAddressBarSizeUpdated()
-{
-	RECT rect;
-	GetWindowRect(m_addressBar->GetView()->GetHWND(), &rect);
-	m_mainRebarView->UpdateBandSize(m_addressBar->GetView()->GetHWND(), 0, GetRectHeight(&rect));
-}
-
-void Explorerplusplus::CreateMainToolbar(
-	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
-{
-	m_mainToolbar = MainToolbar::Create(m_mainRebarView->GetHWND(), initialButtons, this,
-		m_appServices, this, &m_shellIconLoader);
-	m_mainToolbar->sizeUpdatedSignal.AddObserver(
-		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));
-}
-
-void Explorerplusplus::CreateBookmarksToolbar()
-{
-	auto bookmarksToolbarView = BookmarksToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
-
-	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, m_acceleratorManager,
-		m_resourceLoader, &m_iconFetcher, m_appServices->GetBookmarkTree(), m_platformContext);
-	m_bookmarksToolbar->GetView()->AddToolbarSizeUpdatedObserver(
-		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
-			m_bookmarksToolbar->GetView()->GetHWND()));
-}
-
-void Explorerplusplus::CreateDrivesToolbar()
-{
-	auto drivesToolbarView = DrivesToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
-	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, m_appServices->GetDriveModel(), this,
-		m_acceleratorManager, m_resourceLoader);
-	m_drivesToolbar->GetView()->AddToolbarSizeUpdatedObserver(std::bind(
-		&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
-}
-
-void Explorerplusplus::CreateApplicationToolbar()
-{
-	auto applicationToolbarView =
-		Applications::ApplicationToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
-
-	m_applicationToolbar = Applications::ApplicationToolbar::Create(applicationToolbarView,
-		m_appServices->GetApplicationModel(), &m_applicationExecutor, this, m_acceleratorManager,
-		m_resourceLoader);
-	m_applicationToolbar->GetView()->AddToolbarSizeUpdatedObserver(
-		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
-			m_applicationToolbar->GetView()->GetHWND()));
-}
-
-void Explorerplusplus::OnRebarToolbarSizeUpdated(HWND toolbar)
-{
-	SIZE size;
-	[[maybe_unused]] auto res =
-		SendMessage(toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
-	assert(res);
-
-	m_mainRebarView->UpdateBandSize(toolbar, size.cx, size.cy);
-}
-
-void Explorerplusplus::OnRebarChevronPushed(const NMREBARCHEVRON *chevronData)
-{
-	POINT ptScreen;
-	ptScreen.x = chevronData->rc.left;
-	ptScreen.y = chevronData->rc.bottom;
-	auto res = ClientToScreen(m_mainRebarView->GetHWND(), &ptScreen);
-	CHECK(res);
-
-	switch (chevronData->wID)
-	{
-	case REBAR_BAND_ID_MAIN_TOOLBAR:
-		m_mainToolbar->ShowOverflowMenu(ptScreen);
-		break;
-
-	case REBAR_BAND_ID_BOOKMARKS_TOOLBAR:
-		m_bookmarksToolbar->ShowOverflowMenu(ptScreen);
-		break;
-
-	case REBAR_BAND_ID_DRIVES_TOOLBAR:
-		m_drivesToolbar->ShowOverflowMenu(ptScreen);
-		break;
-
-	case REBAR_BAND_ID_APPLICATIONS_TOOLBAR:
-		m_applicationToolbar->ShowOverflowMenu(ptScreen);
-		break;
-
-	default:
-		DCHECK(false);
-		break;
-	}
+	delete this;
 }

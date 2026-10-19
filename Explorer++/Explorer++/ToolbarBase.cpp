@@ -6,7 +6,6 @@
 #include "ToolbarBase.h"
 #include "PopupMenuView.h"
 #include "ToolbarOverflowMenu.h"
-#include "ToolbarView.h"
 #include <wil/com.h>
 #include <vector>
 
@@ -18,9 +17,14 @@ ToolbarBase::ToolbarBase(ToolbarView *view, MenuHelpTextHost *menuHelpTextHost,
 {
 }
 
-ToolbarView *ToolbarBase::GetView() const
+ToolbarView *ToolbarBase::GetView()
 {
 	return m_view;
+}
+
+bool ToolbarBase::CanShowOverflowMenu() const
+{
+	return true;
 }
 
 void ToolbarBase::ShowOverflowMenu(const POINT &ptScreen)

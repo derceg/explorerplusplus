@@ -241,7 +241,7 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 
 	case WM_NCDESTROY:
 		delete this;
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

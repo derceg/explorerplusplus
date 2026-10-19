@@ -109,7 +109,7 @@ LRESULT StatusBarView::StatusBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 
 	case WM_NCDESTROY:
 		OnNcDestroy();
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

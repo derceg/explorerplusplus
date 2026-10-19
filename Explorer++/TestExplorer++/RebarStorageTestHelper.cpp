@@ -3,12 +3,12 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "MainRebarStorageTestHelper.h"
-#include "MainRebarStorage.h"
+#include "RebarStorageTestHelper.h"
+#include "RebarBandStorageData.h"
 
-std::vector<RebarBandStorageInfo> BuildMainRebarLoadSaveReference()
+std::vector<RebarBandStorageData> BuildRebarLoadSaveReference()
 {
-	std::vector<RebarBandStorageInfo> referenceRebarStorageInfo;
+	std::vector<RebarBandStorageData> referenceRebarStorageInfo;
 	referenceRebarStorageInfo.emplace_back(1, 257, 0);
 	referenceRebarStorageInfo.emplace_back(2, 769, 26);
 	referenceRebarStorageInfo.emplace_back(0, 769, 621);

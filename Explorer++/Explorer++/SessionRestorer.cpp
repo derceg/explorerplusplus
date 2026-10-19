@@ -8,7 +8,7 @@
 #include "CommandLine.h"
 #include "Config.h"
 #include "FeatureList.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
 #include "ShellNameParser.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"

@@ -152,6 +152,24 @@ HWND ToolbarView::GetHWND() const
 	return m_hwnd;
 }
 
+UINT ToolbarView::GetHeight() const
+{
+	SIZE size;
+	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	CHECK(res);
+
+	return size.cy;
+}
+
+std::optional<UINT> ToolbarView::MaybeGetIdealWidth() const
+{
+	SIZE size;
+	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	CHECK(res);
+
+	return size.cx;
+}
+
 void ToolbarView::SetupSmallShellImageList()
 {
 	HIMAGELIST smallShellImageList;
@@ -201,7 +219,7 @@ void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
 	button->SetParent(this);
 	m_buttons.insert(m_buttons.begin() + index, std::move(button));
 
-	m_toolbarSizeUpdatedSignal();
+	NotifySizeRequirementsChanged();
 }
 
 void ToolbarView::UpdateButton(const ToolbarButton *button)
@@ -227,7 +245,7 @@ void ToolbarView::UpdateButton(size_t index)
 	tbButtonInfo.fsState = GetToolbarButtonState(button);
 	SendMessage(m_hwnd, TB_SETBUTTONINFO, index, reinterpret_cast<LPARAM>(&tbButtonInfo));
 
-	m_toolbarSizeUpdatedSignal();
+	NotifySizeRequirementsChanged();
 }
 
 BYTE ToolbarView::GetToolbarButtonState(const ToolbarButton *button)
@@ -251,7 +269,7 @@ void ToolbarView::RemoveButton(size_t index)
 
 	SendMessage(m_hwnd, TB_DELETEBUTTON, index, 0);
 
-	m_toolbarSizeUpdatedSignal();
+	NotifySizeRequirementsChanged();
 }
 
 const std::vector<std::unique_ptr<ToolbarButton>> &ToolbarView::GetButtons() const
@@ -301,7 +319,7 @@ LRESULT ToolbarView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_NCDESTROY:
 		OnNcDestroy();
-		return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -609,13 +627,7 @@ void ToolbarView::OnFontOrDpiUpdated()
 {
 	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
 
-	m_toolbarSizeUpdatedSignal();
-}
-
-boost::signals2::connection ToolbarView::AddToolbarSizeUpdatedObserver(
-	const ToolbarSizeChangedSignal::slot_type &observer)
-{
-	return m_toolbarSizeUpdatedSignal.connect(observer);
+	NotifySizeRequirementsChanged();
 }
 
 boost::signals2::connection ToolbarView::AddWindowDestroyedObserver(

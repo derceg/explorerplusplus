@@ -4,19 +4,23 @@
 
 #pragma once
 
+#include "RebarBand.h"
+#include "ToolbarView.h"
+
 class AcceleratorManager;
 class MenuHelpTextHost;
-class ToolbarView;
 
-class ToolbarBase
+class ToolbarBase : public RebarBand
 {
 public:
 	ToolbarBase(ToolbarView *view, MenuHelpTextHost *menuHelpTextHost,
 		const AcceleratorManager *acceleratorManager);
 	virtual ~ToolbarBase() = default;
 
-	ToolbarView *GetView() const;
-	virtual void ShowOverflowMenu(const POINT &ptScreen);
+	// RebarBand
+	ToolbarView *GetView() override;
+	bool CanShowOverflowMenu() const override;
+	void ShowOverflowMenu(const POINT &ptScreen) override;
 
 protected:
 	ToolbarView *const m_view;

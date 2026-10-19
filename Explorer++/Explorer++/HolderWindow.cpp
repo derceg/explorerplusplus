@@ -103,7 +103,8 @@ LRESULT CALLBACK HolderWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, L
 	case WM_NCDESTROY:
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
 		delete holderWindow;
-		return 0;
+		holderWindow = nullptr;
+		break;
 	}
 
 	if (holderWindow)

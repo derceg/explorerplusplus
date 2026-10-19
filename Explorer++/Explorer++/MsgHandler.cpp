@@ -207,7 +207,7 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 
 void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 {
-	if (m_featureList->IsEnabled(Feature::MultipleWindowsPerSession))
+	if (m_appServices->GetFeatureList()->IsEnabled(Feature::MultipleWindowsPerSession))
 	{
 		BrowserCommands::NewWindow(this, m_appServices->GetBrowserWindowFactory(),
 			{ { .pidl = pidlDirectory } });

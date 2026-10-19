@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
-#include "AddressBarView.h"
 #include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "NavigationHelper.h"
@@ -59,7 +58,7 @@ void AddressBar::Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrows
 		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 }
 
-AddressBarView *AddressBar::GetView() const
+AddressBarView *AddressBar::GetView()
 {
 	return m_view;
 }

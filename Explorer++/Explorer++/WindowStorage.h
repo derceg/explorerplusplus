@@ -9,7 +9,7 @@
 #include <optional>
 #include <vector>
 
-struct RebarBandStorageInfo;
+struct RebarBandStorageData;
 struct TabStorageData;
 
 // These values are used when loading and saving data and shouldn't be changed.
@@ -29,7 +29,7 @@ struct WindowStorageData
 	WindowShowState showState = WindowShowState::Normal;
 	std::vector<TabStorageData> tabs;
 	int selectedTab = 0;
-	std::vector<RebarBandStorageInfo> mainRebarInfo;
+	std::vector<RebarBandStorageData> mainRebarInfo;
 	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
 	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;

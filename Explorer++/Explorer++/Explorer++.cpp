@@ -4,18 +4,27 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AddressBar.h"
+#include "AddressBarView.h"
 #include "AppInfo.h"
 #include "AppServices.h"
+#include "ApplicationToolbar.h"
+#include "ApplicationToolbarView.h"
+#include "Bookmarks/UI/BookmarksToolbar.h"
+#include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserList.h"
 #include "BrowserView.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
+#include "DrivesToolbar.h"
+#include "DrivesToolbarView.h"
 #include "HolderWindow.h"
 #include "MainMenu.h"
-#include "MainRebarStorage.h"
+#include "MainRebar.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "RebarBandStorageData.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
@@ -41,11 +50,9 @@ Explorerplusplus *Explorerplusplus::Create(const WindowStorageData &storageData,
 Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServices *appServices,
 	HINSTANCE resourceInstance) :
 	m_appServices(appServices),
-	m_resourceInstance(resourceInstance),
 	m_config(appServices->GetConfig()),
 	m_platformContext(appServices->GetPlatformContext()),
 	m_acceleratorManager(appServices->GetAcceleratorManager()),
-	m_featureList(appServices->GetFeatureList()),
 	m_browserList(appServices->GetBrowserList()),
 	m_tabEvents(appServices->GetTabEvents()),
 	m_shellBrowserEvents(appServices->GetShellBrowserEvents()),
@@ -74,8 +81,8 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 
 	SetUpLayoutConfigListeners();
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
-		std::bind_front(&Explorerplusplus::WindowProcedure, this)));
+	m_mainWindowSubclass = std::make_unique<WindowSubclass>(m_hwnd,
+		std::bind_front(&Explorerplusplus::WindowProcedure, this));
 
 	Initialize(storageData);
 
@@ -201,6 +208,80 @@ void Explorerplusplus::InitializeMainMenu()
 	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly
 	// redrawn.
 	m_view->RedrawMenuBar();
+}
+
+void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &storageData)
+{
+	m_mainRebarView = MainRebarView::Create(m_hwnd);
+	m_connections.push_back(
+		m_mainRebarView->heightChangedSignal.AddObserver([this] { OnMainRebarHeightChanged(); }));
+
+	CreateMainToolbar(storageData.mainToolbarButtons);
+	CreateAddressBar();
+	CreateBookmarksToolbar();
+	CreateDrivesToolbar();
+	CreateApplicationToolbar();
+
+	std::vector<MainRebar::BandDefinition> bandDefinitions = {
+		{ REBAR_BAND_ID_MAIN_TOOLBAR, m_mainToolbar, &m_config->showMainToolbar,
+			ToolbarOptionsMenu::Source::MainToolbar },
+		{ REBAR_BAND_ID_ADDRESS_BAR, m_addressBar, &m_config->showAddressBar,
+			ToolbarOptionsMenu::Source::AddressBar },
+		{ REBAR_BAND_ID_BOOKMARKS_TOOLBAR, m_bookmarksToolbar, &m_config->showBookmarksToolbar,
+			ToolbarOptionsMenu::Source::BookmarksToolbar },
+		{ REBAR_BAND_ID_DRIVES_TOOLBAR, m_drivesToolbar, &m_config->showDrivesToolbar,
+			ToolbarOptionsMenu::Source::DrivesToolbar },
+		{ REBAR_BAND_ID_APPLICATIONS_TOOLBAR, m_applicationToolbar,
+			&m_config->showApplicationToolbar, ToolbarOptionsMenu::Source::ApplicationToolbar },
+	};
+
+	m_mainRebar = MainRebar::Create(m_mainRebarView, bandDefinitions, storageData.mainRebarInfo,
+		this, m_appServices);
+}
+
+void Explorerplusplus::OnMainRebarHeightChanged()
+{
+	// This notification can be dispatched within the middle of an existing layout operation (if the
+	// height of the rebar is updated). To avoid making re-entrant layout calls, the layout update
+	// will be scheduled, instead of being immediately invoked.
+	ScheduleUpdateLayout(m_weakPtrFactory.GetWeakPtr(), m_appServices->GetRuntime());
+}
+
+void Explorerplusplus::CreateMainToolbar(
+	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
+{
+	m_mainToolbar = MainToolbar::Create(m_mainRebarView->GetHWND(), initialButtons, this,
+		m_appServices, this, &m_shellIconLoader);
+}
+
+void Explorerplusplus::CreateAddressBar()
+{
+	auto *addressBarView = AddressBarView::Create(m_mainRebarView->GetHWND(), m_config);
+	m_addressBar = AddressBar::Create(addressBarView, this, m_tabEvents, m_shellBrowserEvents,
+		m_navigationEvents, m_appServices->GetRuntime(), m_appServices->GetAsyncIconFetcher());
+}
+
+void Explorerplusplus::CreateBookmarksToolbar()
+{
+	auto bookmarksToolbarView = BookmarksToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
+	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, m_acceleratorManager,
+		m_resourceLoader, &m_iconFetcher, m_appServices->GetBookmarkTree(), m_platformContext);
+}
+
+void Explorerplusplus::CreateDrivesToolbar()
+{
+	auto drivesToolbarView = DrivesToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
+	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, m_appServices->GetDriveModel(), this,
+		m_acceleratorManager, m_resourceLoader);
+}
+
+void Explorerplusplus::CreateApplicationToolbar()
+{
+	auto applicationToolbarView =
+		Applications::ApplicationToolbarView::Create(m_mainRebarView->GetHWND(), m_config);
+	m_applicationToolbar = Applications::ApplicationToolbar::Create(applicationToolbarView,
+		m_appServices->GetApplicationModel(), &m_applicationExecutor, this, m_acceleratorManager,
+		m_resourceLoader);
 }
 
 void Explorerplusplus::InitializeDisplayWindow()

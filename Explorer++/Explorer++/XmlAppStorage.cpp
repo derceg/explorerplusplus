@@ -11,7 +11,7 @@
 #include "DefaultColumnXmlStorage.h"
 #include "DialogStorageHelper.h"
 #include "FrequentLocationsXmlStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
 #include "WindowXmlStorage.h"

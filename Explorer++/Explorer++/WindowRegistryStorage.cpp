@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "WindowRegistryStorage.h"
 #include "LayoutDefaults.h"
-#include "MainRebarRegistryStorage.h"
-#include "MainRebarStorage.h"
+#include "RebarBandStorageData.h"
+#include "RebarRegistryStorage.h"
 #include "Storage.h"
 #include "TabRegistryStorage.h"
 #include "TabStorage.h"
@@ -46,7 +46,7 @@ std::vector<TabStorageData> LoadTabs(HKEY applicationKey)
 	return TabRegistryStorage::Load(tabsKey.get());
 }
 
-std::vector<RebarBandStorageInfo> LoadMainRebarInfo(HKEY applicationKey)
+std::vector<RebarBandStorageData> LoadMainRebarInfo(HKEY applicationKey)
 {
 	wil::unique_hkey mainRebarKey;
 	HRESULT hr = wil::reg::open_unique_key_nothrow(applicationKey, MAIN_REBAR_SUB_KEY_PATH,
@@ -57,7 +57,7 @@ std::vector<RebarBandStorageInfo> LoadMainRebarInfo(HKEY applicationKey)
 		return {};
 	}
 
-	return MainRebarRegistryStorage::Load(mainRebarKey.get());
+	return RebarRegistryStorage::Load(mainRebarKey.get());
 }
 
 std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
@@ -224,12 +224,12 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 			V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
 	}
 
-	std::vector<RebarBandStorageInfo> mainRebarInfo;
+	std::vector<RebarBandStorageData> mainRebarInfo;
 
 	if (wil::unique_hkey mainRebarKey; SUCCEEDED(wil::reg::open_unique_key_nothrow(windowKey,
 			MAIN_REBAR_SUB_KEY_PATH, mainRebarKey, wil::reg::key_access::read)))
 	{
-		mainRebarInfo = MainRebarRegistryStorage::Load(mainRebarKey.get());
+		mainRebarInfo = RebarRegistryStorage::Load(mainRebarKey.get());
 	}
 	else if (fallback)
 	{
@@ -314,7 +314,7 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 
 	if (SUCCEEDED(hr))
 	{
-		MainRebarRegistryStorage::Save(mainRebarKey.get(), window.mainRebarInfo);
+		RebarRegistryStorage::Save(mainRebarKey.get(), window.mainRebarInfo);
 	}
 
 	// When loading data, there might not be any buttons that are retrieved. However, when saving
