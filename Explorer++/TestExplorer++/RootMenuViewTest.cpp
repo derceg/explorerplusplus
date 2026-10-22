@@ -52,7 +52,13 @@ protected:
 		return hwnd;
 	}
 
-	void SendMenuGetObject(HWND hwnd, DWORD flags, UINT index)
+	void SendMenuCommand(MenuView *menuView, UINT index)
+	{
+		SendMessage(m_ownerWindow.get(), WM_MENUCOMMAND, index,
+			reinterpret_cast<LPARAM>(MenuViewTestApi::GetNativeMenu(menuView)));
+	}
+
+	void SendMenuGetObject(DWORD flags, UINT index)
 	{
 		IID iid = IID_IDropTarget;
 
@@ -61,7 +67,7 @@ protected:
 		info.uPos = index;
 		info.hmenu = MenuViewTestApi::GetNativeMenu(&m_view);
 		info.riid = &iid;
-		SendMessage(hwnd, WM_MENUGETOBJECT, 0, reinterpret_cast<LPARAM>(&info));
+		SendMessage(m_ownerWindow.get(), WM_MENUGETOBJECT, 0, reinterpret_cast<LPARAM>(&info));
 	}
 
 	MenuHelpTextHostFake m_menuHelpTextHost;
@@ -125,6 +131,22 @@ TEST_F(RootMenuViewTest, SelectionWithSubmenus)
 	EXPECT_CALL(selectedCallback3, Call());
 	RootMenuViewTestApi::SelectItem(&m_view, MenuViewTestApi::GetItemId(subMenuView2, 0), false,
 		false);
+}
+
+TEST_F(RootMenuViewTest, MenuCommandSelection)
+{
+	MockFunction<void()> selectedCallback1;
+	MockFunction<void()> selectedCallback2;
+	m_view.AppendItem(
+		MenuItemParams(L"Item 1").SetSelectedCallback(selectedCallback1.AsStdFunction()));
+	m_view.AppendItem(
+		MenuItemParams(L"Item 2").SetSelectedCallback(selectedCallback2.AsStdFunction()));
+
+	EXPECT_CALL(selectedCallback1, Call());
+	SendMenuCommand(&m_view, 0);
+
+	EXPECT_CALL(selectedCallback2, Call());
+	SendMenuCommand(&m_view, 1);
 }
 
 TEST_F(RootMenuViewTest, ExternalItemSelection)
@@ -292,14 +314,14 @@ TEST_F(RootMenuViewTest, DropLocation)
 	InSequence seq;
 
 	EXPECT_CALL(dropTargetCallback2, Call(MenuDropPosition::On));
-	SendMenuGetObject(m_ownerWindow.get(), 0, 1);
+	SendMenuGetObject(0, 1);
 
 	EXPECT_CALL(dropTargetCallback1, Call(MenuDropPosition::Before));
-	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 0);
+	SendMenuGetObject(MNGOF_TOPGAP, 0);
 
 	EXPECT_CALL(dropTargetCallback3, Call(MenuDropPosition::Before));
-	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 2);
+	SendMenuGetObject(MNGOF_TOPGAP, 2);
 
 	EXPECT_CALL(dropTargetCallback3, Call(MenuDropPosition::After));
-	SendMenuGetObject(m_ownerWindow.get(), MNGOF_TOPGAP, 3);
+	SendMenuGetObject(MNGOF_TOPGAP, 3);
 }
