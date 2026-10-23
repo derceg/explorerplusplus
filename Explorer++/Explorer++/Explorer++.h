@@ -60,7 +60,6 @@ class StatusBarView;
 class TabBacking;
 class TabContainer;
 class TabEvents;
-class WindowMenuView;
 class WindowSubclass;
 
 namespace Applications
@@ -307,7 +306,6 @@ private:
 	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	int m_displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
-	std::unique_ptr<WindowMenuView> m_mainMenuView;
 	std::unique_ptr<MainMenu> m_mainMenu;
 
 	int m_numTopLevelMenusActive = 0;

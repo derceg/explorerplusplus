@@ -17,6 +17,7 @@ class BookmarksToolbarView;
 struct Config;
 class DrivesToolbarView;
 class MainRebarView;
+class MenuView;
 class NavigationEvents;
 class NavigationRequest;
 class ResourceLoader;
@@ -46,6 +47,8 @@ public:
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		ThemeManager *themeManager, const ResourceLoader *resourceLoader);
 	~BrowserView();
+
+	MenuView *GetMainMenuView();
 
 	MainRebarView *GetMainRebarView();
 	AddressBarView *GetAddressBarView();
@@ -85,6 +88,8 @@ private:
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
+
+	std::unique_ptr<MenuView> m_mainMenuView;
 
 	// Main rebar
 	std::unique_ptr<MainRebarView> m_mainRebarView;

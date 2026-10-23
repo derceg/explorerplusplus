@@ -28,7 +28,6 @@
 #include "StatusBarView.h"
 #include "TabRestorer.h"
 #include "TabStorage.h"
-#include "WindowMenuView.h"
 #include "WindowStorage.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -194,8 +193,7 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 void Explorerplusplus::InitializeMainMenu()
 {
-	m_mainMenuView = std::make_unique<WindowMenuView>(m_hwnd, this);
-	m_mainMenu = std::make_unique<MainMenu>(m_mainMenuView.get(), this, m_appServices,
+	m_mainMenu = std::make_unique<MainMenu>(m_view->GetMainMenuView(), this, m_appServices,
 		&m_shellIconLoader, &m_iconFetcher, &m_fileActionHandler, this);
 
 	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly

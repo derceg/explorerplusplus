@@ -19,6 +19,7 @@
 #include "TabContainer.h"
 #include "TabEvents.h"
 #include "ThemeWindowTracker.h"
+#include "WindowMenuView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 
@@ -64,6 +65,8 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 	m_dropTargetWindow =
 		winrt::make_self<DropTargetWindow>(GetHWND(), static_cast<DropTargetInternal *>(this));
 
+	m_mainMenuView = std::make_unique<WindowMenuView>(GetHWND(), m_browser);
+
 	CreateMainRebarAndChildren();
 }
 
@@ -78,6 +81,11 @@ void BrowserView::CreateMainRebarAndChildren()
 	m_drivesToolbarView = std::make_unique<DrivesToolbarView>(m_mainRebarView->GetHWND(), m_config);
 	m_applicationToolbarView = std::make_unique<Applications::ApplicationToolbarView>(
 		m_mainRebarView->GetHWND(), m_config);
+}
+
+MenuView *BrowserView::GetMainMenuView()
+{
+	return m_mainMenuView.get();
 }
 
 MainRebarView *BrowserView::GetMainRebarView()
