@@ -2110,15 +2110,6 @@
     <None Include="res\Explorer++.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Filtering Applied.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\Folder Empty.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\No Preview Available.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="VersionConstants.h">
       <Filter>Core</Filter>
     </None>

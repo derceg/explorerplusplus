@@ -1919,9 +1919,6 @@
   <ItemGroup>
     <None Include="res\Display Window.ico" />
     <None Include="res\Explorer++.ico" />
-    <None Include="res\Filtering Applied.bmp" />
-    <None Include="res\Folder Empty.bmp" />
-    <None Include="res\No Preview Available.bmp" />
     <None Include="VersionConstants.h" />
   </ItemGroup>
   <ItemGroup>
