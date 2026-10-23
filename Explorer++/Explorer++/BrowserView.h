@@ -12,7 +12,10 @@
 #include <boost/signals2.hpp>
 #include <memory>
 
+class AddressBarView;
+class BookmarksToolbarView;
 struct Config;
+class DrivesToolbarView;
 class MainRebarView;
 class NavigationEvents;
 class NavigationRequest;
@@ -22,6 +25,13 @@ class ShellBrowserEvents;
 class TabEvents;
 class ThemeManager;
 class ThemeWindowTracker;
+
+namespace Applications
+{
+
+class ApplicationToolbarView;
+
+}
 
 class BrowserView : public ViewBase, private DropTargetInternal
 {
@@ -38,11 +48,17 @@ public:
 	~BrowserView();
 
 	MainRebarView *GetMainRebarView();
+	AddressBarView *GetAddressBarView();
+	BookmarksToolbarView *GetBookmarksToolbarView();
+	DrivesToolbarView *GetDrivesToolbarView();
+	Applications::ApplicationToolbarView *GetApplicationToolbarView();
 
 	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
 
 private:
+	void CreateMainRebarAndChildren();
+
 	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
@@ -70,5 +86,10 @@ private:
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 
+	// Main rebar
 	std::unique_ptr<MainRebarView> m_mainRebarView;
+	std::unique_ptr<AddressBarView> m_addressBarView;
+	std::unique_ptr<BookmarksToolbarView> m_bookmarksToolbarView;
+	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;
+	std::unique_ptr<Applications::ApplicationToolbarView> m_applicationToolbarView;
 };

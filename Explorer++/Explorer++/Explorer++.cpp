@@ -5,19 +5,15 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
-#include "AddressBarView.h"
 #include "AppInfo.h"
 #include "AppServices.h"
 #include "ApplicationToolbar.h"
-#include "ApplicationToolbarView.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
-#include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserList.h"
 #include "BrowserView.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
-#include "DrivesToolbarView.h"
 #include "HolderWindow.h"
 #include "MainMenu.h"
 #include "MainRebar.h"
@@ -253,36 +249,28 @@ void Explorerplusplus::CreateMainToolbar(
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBarView =
-		std::make_unique<AddressBarView>(m_view->GetMainRebarView()->GetHWND(), m_config);
-	m_addressBar = std::make_unique<AddressBar>(m_addressBarView.get(), this, m_tabEvents,
+	m_addressBar = std::make_unique<AddressBar>(m_view->GetAddressBarView(), this, m_tabEvents,
 		m_shellBrowserEvents, m_navigationEvents, m_appServices->GetRuntime(),
 		m_appServices->GetAsyncIconFetcher());
 }
 
 void Explorerplusplus::CreateBookmarksToolbar()
 {
-	m_bookmarksToolbarView =
-		std::make_unique<BookmarksToolbarView>(m_view->GetMainRebarView()->GetHWND(), m_config);
-	m_bookmarksToolbar =
-		std::make_unique<BookmarksToolbar>(m_bookmarksToolbarView.get(), this, m_acceleratorManager,
-			m_resourceLoader, &m_iconFetcher, m_appServices->GetBookmarkTree(), m_platformContext);
+	m_bookmarksToolbar = std::make_unique<BookmarksToolbar>(m_view->GetBookmarksToolbarView(), this,
+		m_acceleratorManager, m_resourceLoader, &m_iconFetcher, m_appServices->GetBookmarkTree(),
+		m_platformContext);
 }
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
-	m_drivesToolbarView =
-		std::make_unique<DrivesToolbarView>(m_view->GetMainRebarView()->GetHWND(), m_config);
-	m_drivesToolbar = std::make_unique<DrivesToolbar>(m_drivesToolbarView.get(),
+	m_drivesToolbar = std::make_unique<DrivesToolbar>(m_view->GetDrivesToolbarView(),
 		m_appServices->GetDriveModel(), this, m_acceleratorManager, m_resourceLoader);
 }
 
 void Explorerplusplus::CreateApplicationToolbar()
 {
-	m_applicationToolbarView = std::make_unique<Applications::ApplicationToolbarView>(
-		m_view->GetMainRebarView()->GetHWND(), m_config);
 	m_applicationToolbar = std::make_unique<Applications::ApplicationToolbar>(
-		m_applicationToolbarView.get(), m_appServices->GetApplicationModel(),
+		m_view->GetApplicationToolbarView(), m_appServices->GetApplicationModel(),
 		&m_applicationExecutor, this, m_acceleratorManager, m_resourceLoader);
 }
 

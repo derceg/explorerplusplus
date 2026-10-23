@@ -4,8 +4,12 @@
 
 #include "stdafx.h"
 #include "BrowserView.h"
+#include "AddressBarView.h"
 #include "AppInfo.h"
+#include "ApplicationToolbarView.h"
+#include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
+#include "DrivesToolbarView.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
@@ -60,14 +64,45 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 	m_dropTargetWindow =
 		winrt::make_self<DropTargetWindow>(GetHWND(), static_cast<DropTargetInternal *>(this));
 
-	m_mainRebarView = std::make_unique<MainRebarView>(GetHWND());
+	CreateMainRebarAndChildren();
 }
 
 BrowserView::~BrowserView() = default;
 
+void BrowserView::CreateMainRebarAndChildren()
+{
+	m_mainRebarView = std::make_unique<MainRebarView>(GetHWND());
+	m_addressBarView = std::make_unique<AddressBarView>(m_mainRebarView->GetHWND(), m_config);
+	m_bookmarksToolbarView =
+		std::make_unique<BookmarksToolbarView>(m_mainRebarView->GetHWND(), m_config);
+	m_drivesToolbarView = std::make_unique<DrivesToolbarView>(m_mainRebarView->GetHWND(), m_config);
+	m_applicationToolbarView = std::make_unique<Applications::ApplicationToolbarView>(
+		m_mainRebarView->GetHWND(), m_config);
+}
+
 MainRebarView *BrowserView::GetMainRebarView()
 {
 	return m_mainRebarView.get();
+}
+
+AddressBarView *BrowserView::GetAddressBarView()
+{
+	return m_addressBarView.get();
+}
+
+BookmarksToolbarView *BrowserView::GetBookmarksToolbarView()
+{
+	return m_bookmarksToolbarView.get();
+}
+
+DrivesToolbarView *BrowserView::GetDrivesToolbarView()
+{
+	return m_drivesToolbarView.get();
+}
+
+Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView()
+{
+	return m_applicationToolbarView.get();
 }
 
 void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)

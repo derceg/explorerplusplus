@@ -32,16 +32,13 @@
 
 class AcceleratorManager;
 class AddressBar;
-class AddressBarView;
 class AppServices;
 class BookmarksToolbar;
-class BookmarksToolbarView;
 class BrowserList;
 class BrowserView;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
-class DrivesToolbarView;
 class FeatureList;
 class HolderWindow;
 class MainMenu;
@@ -70,7 +67,6 @@ namespace Applications
 {
 
 class ApplicationToolbar;
-class ApplicationToolbarView;
 
 }
 
@@ -358,13 +354,9 @@ private:
 	// Main rebar
 	std::unique_ptr<MainRebar> m_mainRebar;
 	MainToolbar *m_mainToolbar = nullptr;
-	std::unique_ptr<AddressBarView> m_addressBarView;
 	std::unique_ptr<AddressBar> m_addressBar;
-	std::unique_ptr<BookmarksToolbarView> m_bookmarksToolbarView;
 	std::unique_ptr<BookmarksToolbar> m_bookmarksToolbar;
-	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;
 	std::unique_ptr<DrivesToolbar> m_drivesToolbar;
-	std::unique_ptr<Applications::ApplicationToolbarView> m_applicationToolbarView;
 	std::unique_ptr<Applications::ApplicationToolbar> m_applicationToolbar;
 
 	Applications::ApplicationExecutorImpl m_applicationExecutor;
