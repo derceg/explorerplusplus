@@ -56,7 +56,6 @@ class ShellBrowserEvents;
 class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
-class StatusBarView;
 class TabBacking;
 class TabContainer;
 class TabEvents;
@@ -299,7 +298,6 @@ private:
 
 	std::unique_ptr<BrowserView> m_view;
 	TabBacking *m_tabBacking = nullptr;
-	std::unique_ptr<StatusBarView> m_statusBarView;
 	std::unique_ptr<StatusBar> m_statusBar;
 
 	DisplayWindow *m_displayWindow = nullptr;

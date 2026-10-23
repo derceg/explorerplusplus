@@ -16,6 +16,7 @@
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "StatusBarView.h"
 #include "TabContainer.h"
 #include "TabEvents.h"
 #include "ThemeWindowTracker.h"
@@ -68,6 +69,8 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 	m_mainMenuView = std::make_unique<WindowMenuView>(GetHWND(), m_browser);
 
 	CreateMainRebarAndChildren();
+
+	m_statusBarView = std::make_unique<StatusBarView>(GetHWND(), m_config);
 }
 
 BrowserView::~BrowserView() = default;
@@ -111,6 +114,11 @@ DrivesToolbarView *BrowserView::GetDrivesToolbarView()
 Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView()
 {
 	return m_applicationToolbarView.get();
+}
+
+StatusBarView *BrowserView::GetStatusBarView()
+{
+	return m_statusBarView.get();
 }
 
 void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)

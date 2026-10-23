@@ -23,6 +23,7 @@ class NavigationRequest;
 class ResourceLoader;
 class ShellBrowser;
 class ShellBrowserEvents;
+class StatusBarView;
 class TabEvents;
 class ThemeManager;
 class ThemeWindowTracker;
@@ -55,6 +56,8 @@ public:
 	BookmarksToolbarView *GetBookmarksToolbarView();
 	DrivesToolbarView *GetDrivesToolbarView();
 	Applications::ApplicationToolbarView *GetApplicationToolbarView();
+
+	StatusBarView *GetStatusBarView();
 
 	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
@@ -97,4 +100,6 @@ private:
 	std::unique_ptr<BookmarksToolbarView> m_bookmarksToolbarView;
 	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;
 	std::unique_ptr<Applications::ApplicationToolbarView> m_applicationToolbarView;
+
+	std::unique_ptr<StatusBarView> m_statusBarView;
 };

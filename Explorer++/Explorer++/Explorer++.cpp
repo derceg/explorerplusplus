@@ -25,7 +25,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "StatusBar.h"
-#include "StatusBarView.h"
 #include "TabRestorer.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
@@ -165,9 +164,8 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 	InitializeMainMenu();
 
-	m_statusBarView = std::make_unique<StatusBarView>(m_hwnd, m_config);
-	m_statusBar = std::make_unique<StatusBar>(m_statusBarView.get(), this, m_config, m_tabEvents,
-		m_shellBrowserEvents, m_navigationEvents, m_resourceLoader);
+	m_statusBar = std::make_unique<StatusBar>(m_view->GetStatusBarView(), this, m_config,
+		m_tabEvents, m_shellBrowserEvents, m_navigationEvents, m_resourceLoader);
 
 	CreateMainRebarAndChildren(storageData);
 	InitializeDisplayWindow();
