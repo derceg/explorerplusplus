@@ -13,6 +13,7 @@
 #include <memory>
 
 struct Config;
+class MainRebarView;
 class NavigationEvents;
 class NavigationRequest;
 class ResourceLoader;
@@ -35,6 +36,8 @@ public:
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		ThemeManager *themeManager, const ResourceLoader *resourceLoader);
 	~BrowserView();
+
+	MainRebarView *GetMainRebarView();
 
 	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
@@ -66,4 +69,6 @@ private:
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
+
+	std::unique_ptr<MainRebarView> m_mainRebarView;
 };

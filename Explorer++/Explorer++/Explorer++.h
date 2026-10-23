@@ -46,7 +46,6 @@ class FeatureList;
 class HolderWindow;
 class MainMenu;
 class MainRebar;
-class MainRebarView;
 class MainToolbar;
 class MenuBase;
 class MenuView;
@@ -357,7 +356,6 @@ private:
 	ShellIconLoaderImpl m_shellIconLoader;
 
 	// Main rebar
-	std::unique_ptr<MainRebarView> m_mainRebarView;
 	std::unique_ptr<MainRebar> m_mainRebar;
 	MainToolbar *m_mainToolbar = nullptr;
 	std::unique_ptr<AddressBarView> m_addressBarView;

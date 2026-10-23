@@ -209,9 +209,9 @@ void Explorerplusplus::InitializeMainMenu()
 
 void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &storageData)
 {
-	m_mainRebarView = std::make_unique<MainRebarView>(m_hwnd);
+	auto *mainRebarView = m_view->GetMainRebarView();
 	m_connections.push_back(
-		m_mainRebarView->heightChangedSignal.AddObserver([this] { OnMainRebarHeightChanged(); }));
+		mainRebarView->heightChangedSignal.AddObserver([this] { OnMainRebarHeightChanged(); }));
 
 	CreateMainToolbar(storageData.mainToolbarButtons);
 	CreateAddressBar();
@@ -232,7 +232,7 @@ void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &stora
 			&m_config->showApplicationToolbar, ToolbarOptionsMenu::Source::ApplicationToolbar },
 	};
 
-	m_mainRebar = std::make_unique<MainRebar>(m_mainRebarView.get(), bandDefinitions,
+	m_mainRebar = std::make_unique<MainRebar>(mainRebarView, bandDefinitions,
 		storageData.mainRebarInfo, this, m_appServices);
 }
 
@@ -247,13 +247,14 @@ void Explorerplusplus::OnMainRebarHeightChanged()
 void Explorerplusplus::CreateMainToolbar(
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	m_mainToolbar = MainToolbar::Create(m_mainRebarView->GetHWND(), initialButtons, this,
+	m_mainToolbar = MainToolbar::Create(m_view->GetMainRebarView()->GetHWND(), initialButtons, this,
 		m_appServices, this, &m_shellIconLoader);
 }
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBarView = std::make_unique<AddressBarView>(m_mainRebarView->GetHWND(), m_config);
+	m_addressBarView =
+		std::make_unique<AddressBarView>(m_view->GetMainRebarView()->GetHWND(), m_config);
 	m_addressBar = std::make_unique<AddressBar>(m_addressBarView.get(), this, m_tabEvents,
 		m_shellBrowserEvents, m_navigationEvents, m_appServices->GetRuntime(),
 		m_appServices->GetAsyncIconFetcher());
@@ -262,7 +263,7 @@ void Explorerplusplus::CreateAddressBar()
 void Explorerplusplus::CreateBookmarksToolbar()
 {
 	m_bookmarksToolbarView =
-		std::make_unique<BookmarksToolbarView>(m_mainRebarView->GetHWND(), m_config);
+		std::make_unique<BookmarksToolbarView>(m_view->GetMainRebarView()->GetHWND(), m_config);
 	m_bookmarksToolbar =
 		std::make_unique<BookmarksToolbar>(m_bookmarksToolbarView.get(), this, m_acceleratorManager,
 			m_resourceLoader, &m_iconFetcher, m_appServices->GetBookmarkTree(), m_platformContext);
@@ -270,7 +271,8 @@ void Explorerplusplus::CreateBookmarksToolbar()
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
-	m_drivesToolbarView = std::make_unique<DrivesToolbarView>(m_mainRebarView->GetHWND(), m_config);
+	m_drivesToolbarView =
+		std::make_unique<DrivesToolbarView>(m_view->GetMainRebarView()->GetHWND(), m_config);
 	m_drivesToolbar = std::make_unique<DrivesToolbar>(m_drivesToolbarView.get(),
 		m_appServices->GetDriveModel(), this, m_acceleratorManager, m_resourceLoader);
 }
@@ -278,7 +280,7 @@ void Explorerplusplus::CreateDrivesToolbar()
 void Explorerplusplus::CreateApplicationToolbar()
 {
 	m_applicationToolbarView = std::make_unique<Applications::ApplicationToolbarView>(
-		m_mainRebarView->GetHWND(), m_config);
+		m_view->GetMainRebarView()->GetHWND(), m_config);
 	m_applicationToolbar = std::make_unique<Applications::ApplicationToolbar>(
 		m_applicationToolbarView.get(), m_appServices->GetApplicationModel(),
 		&m_applicationExecutor, this, m_acceleratorManager, m_resourceLoader);
@@ -343,7 +345,7 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		.showState = NativeShowStateToShowState(placement.showCmd),
 		.tabs = tabContainer->GetStorageData(),
 		.selectedTab = tabContainer->GetSelectedTabIndex(),
-		.mainRebarInfo = m_mainRebarView->GetStorageData(),
+		.mainRebarInfo = m_view->GetMainRebarView()->GetStorageData(),
 		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
 		.treeViewWidth = m_treeViewWidth,
 		.displayWindowWidth = m_displayWindowWidth,

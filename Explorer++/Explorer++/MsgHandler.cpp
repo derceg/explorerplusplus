@@ -7,6 +7,7 @@
 #include "AppServices.h"
 #include "BrowserCommands.h"
 #include "BrowserList.h"
+#include "BrowserView.h"
 #include "Config.h"
 #include "DarkModeManager.h"
 #include "DestroyFilesDialog.h"
@@ -304,8 +305,9 @@ void Explorerplusplus::UpdateLayout()
 	m_displayWindowHeight = std::max(m_displayWindowHeight,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
-	auto rebarHeight = m_mainRebarView->GetHeight();
-	SetWindowPos(m_mainRebarView->GetHWND(), nullptr, 0, 0, mainWindowWidth, rebarHeight,
+	auto *mainRebarView = m_view->GetMainRebarView();
+	auto rebarHeight = mainRebarView->GetHeight();
+	SetWindowPos(mainRebarView->GetHWND(), nullptr, 0, 0, mainWindowWidth, rebarHeight,
 		SWP_NOZORDER | SWP_NOMOVE);
 
 	int indentRebar = rebarHeight;

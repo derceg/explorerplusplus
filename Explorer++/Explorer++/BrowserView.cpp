@@ -6,6 +6,7 @@
 #include "BrowserView.h"
 #include "AppInfo.h"
 #include "Config.h"
+#include "MainRebarView.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
@@ -58,9 +59,16 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 	// registered.
 	m_dropTargetWindow =
 		winrt::make_self<DropTargetWindow>(GetHWND(), static_cast<DropTargetInternal *>(this));
+
+	m_mainRebarView = std::make_unique<MainRebarView>(GetHWND());
 }
 
 BrowserView::~BrowserView() = default;
+
+MainRebarView *BrowserView::GetMainRebarView()
+{
+	return m_mainRebarView.get();
+}
 
 void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
 {
