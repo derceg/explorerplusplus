@@ -13,15 +13,18 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "TabEvents.h"
+#include "ThemeWindowTracker.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 
 BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config,
 	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-	NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader) :
+	NavigationEvents *navigationEvents, ThemeManager *themeManager,
+	const ResourceLoader *resourceLoader) :
 	ViewBase(hwnd),
 	m_browser(browser),
 	m_config(config),
+	m_themeManager(themeManager),
 	m_resourceLoader(resourceLoader)
 {
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
@@ -57,10 +60,14 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 		winrt::make_self<DropTargetWindow>(GetHWND(), static_cast<DropTargetInternal *>(this));
 }
 
+BrowserView::~BrowserView() = default;
+
 void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
 {
 	if (updatedState == BrowserWindow::LifecycleState::Main)
 	{
+		m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(GetHWND(), m_themeManager);
+
 		UpdateWindowText();
 	}
 }

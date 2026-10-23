@@ -64,7 +64,6 @@ class StatusBarView;
 class TabBacking;
 class TabContainer;
 class TabEvents;
-class ThemeWindowTracker;
 class WindowMenuView;
 class WindowSubclass;
 
@@ -328,9 +327,6 @@ private:
 
 	/* Tabs. */
 	wil::unique_hbrush m_tabBarBackgroundBrush;
-
-	/* Theming. */
-	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 
 	HWND m_hActiveListView;
 	ShellBrowserImpl *m_pActiveShellBrowser;

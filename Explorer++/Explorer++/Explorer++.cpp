@@ -32,7 +32,6 @@
 #include "StatusBarView.h"
 #include "TabRestorer.h"
 #include "TabStorage.h"
-#include "ThemeWindowTracker.h"
 #include "WindowMenuView.h"
 #include "WindowStorage.h"
 #include "../Helper/MenuHelper.h"
@@ -165,8 +164,9 @@ void Explorerplusplus::SetUpLayoutConfigListeners()
 
 void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 {
-	m_view = std::make_unique<BrowserView>(m_hwnd, this, m_config, m_tabEvents,
-		m_shellBrowserEvents, m_navigationEvents, m_resourceLoader);
+	m_view =
+		std::make_unique<BrowserView>(m_hwnd, this, m_config, m_tabEvents, m_shellBrowserEvents,
+			m_navigationEvents, m_appServices->GetThemeManager(), m_resourceLoader);
 
 	InitializeMainMenu();
 
@@ -192,9 +192,6 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 	CreateInitialTabs(storageData);
 
 	SetFocus(m_hActiveListView);
-
-	m_themeWindowTracker =
-		std::make_unique<ThemeWindowTracker>(m_hwnd, m_appServices->GetThemeManager());
 
 	SetLifecycleState(LifecycleState::Main);
 }

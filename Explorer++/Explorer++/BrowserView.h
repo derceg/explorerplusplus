@@ -10,6 +10,7 @@
 #include "../Helper/DropTargetWindow.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <boost/signals2.hpp>
+#include <memory>
 
 struct Config;
 class NavigationEvents;
@@ -18,6 +19,8 @@ class ResourceLoader;
 class ShellBrowser;
 class ShellBrowserEvents;
 class TabEvents;
+class ThemeManager;
+class ThemeWindowTracker;
 
 class BrowserView : public ViewBase, private DropTargetInternal
 {
@@ -30,7 +33,8 @@ public:
 
 	BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		const ResourceLoader *resourceLoader);
+		ThemeManager *themeManager, const ResourceLoader *resourceLoader);
+	~BrowserView();
 
 	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
@@ -55,9 +59,11 @@ private:
 
 	BrowserWindow *const m_browser;
 	const Config *const m_config;
+	ThemeManager *const m_themeManager;
 	const ResourceLoader *const m_resourceLoader;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
+	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 };
