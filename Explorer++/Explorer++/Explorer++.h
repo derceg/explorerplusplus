@@ -32,13 +32,16 @@
 
 class AcceleratorManager;
 class AddressBar;
+class AddressBarView;
 class AppServices;
 class BookmarksToolbar;
+class BookmarksToolbarView;
 class BrowserList;
 class BrowserView;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
+class DrivesToolbarView;
 class FeatureList;
 class HolderWindow;
 class MainMenu;
@@ -57,6 +60,7 @@ class ShellBrowserEvents;
 class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
+class StatusBarView;
 class TabBacking;
 class TabContainer;
 class TabEvents;
@@ -66,7 +70,10 @@ class WindowSubclass;
 
 namespace Applications
 {
+
 class ApplicationToolbar;
+class ApplicationToolbarView;
+
 }
 
 class Explorerplusplus : public BrowserWindow, public CoreInterface
@@ -297,9 +304,10 @@ private:
 	bool m_performingLayout = false;
 #endif
 
-	BrowserView *m_view = nullptr;
+	std::unique_ptr<BrowserView> m_view;
 	TabBacking *m_tabBacking = nullptr;
-	StatusBar *m_statusBar = nullptr;
+	std::unique_ptr<StatusBarView> m_statusBarView;
+	std::unique_ptr<StatusBar> m_statusBar;
 
 	DisplayWindow *m_displayWindow = nullptr;
 	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
@@ -353,13 +361,17 @@ private:
 	ShellIconLoaderImpl m_shellIconLoader;
 
 	// Main rebar
-	MainRebarView *m_mainRebarView = nullptr;
-	MainRebar *m_mainRebar = nullptr;
+	std::unique_ptr<MainRebarView> m_mainRebarView;
+	std::unique_ptr<MainRebar> m_mainRebar;
 	MainToolbar *m_mainToolbar = nullptr;
-	AddressBar *m_addressBar = nullptr;
-	BookmarksToolbar *m_bookmarksToolbar;
-	DrivesToolbar *m_drivesToolbar = nullptr;
-	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
+	std::unique_ptr<AddressBarView> m_addressBarView;
+	std::unique_ptr<AddressBar> m_addressBar;
+	std::unique_ptr<BookmarksToolbarView> m_bookmarksToolbarView;
+	std::unique_ptr<BookmarksToolbar> m_bookmarksToolbar;
+	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;
+	std::unique_ptr<DrivesToolbar> m_drivesToolbar;
+	std::unique_ptr<Applications::ApplicationToolbarView> m_applicationToolbarView;
+	std::unique_ptr<Applications::ApplicationToolbar> m_applicationToolbar;
 
 	Applications::ApplicationExecutorImpl m_applicationExecutor;
 

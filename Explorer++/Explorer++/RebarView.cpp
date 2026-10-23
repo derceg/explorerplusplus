@@ -10,11 +10,11 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
 
-RebarView::RebarView(HWND parent, DWORD style) : m_hwnd(CreateRebar(parent, style))
+RebarView::RebarView(HWND parent, DWORD style) : ViewBase(CreateRebar(parent, style))
 {
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&RebarView::WndProc, this)));
-	m_windowSubclasses.push_back(
+	AddSubclass(
+		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&RebarView::WndProc, this)));
+	AddSubclass(
 		std::make_unique<WindowSubclass>(parent, std::bind_front(&RebarView::ParentWndProc, this)));
 }
 
@@ -26,11 +26,6 @@ HWND RebarView::CreateRebar(HWND parent, DWORD style)
 		nullptr, GetModuleHandle(nullptr), nullptr);
 	CHECK(hwnd);
 	return hwnd;
-}
-
-HWND RebarView::GetHWND() const
-{
-	return m_hwnd;
 }
 
 void RebarView::SetDelegate(RebarViewDelegate *delegate)
@@ -46,10 +41,6 @@ LRESULT RebarView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		OnShowContextMenu(reinterpret_cast<HWND>(wParam),
 			{ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 		return 0;
-
-	case WM_NCDESTROY:
-		OnNcDestroy();
-		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -72,7 +63,7 @@ void RebarView::OnShowContextMenu(HWND source, const POINT &ptScreen)
 	}
 
 	auto id =
-		(source == m_hwnd) ? MaybeGetBandIdAtPoint(finalPoint) : MaybeGetBandIdForWindow(source);
+		(source == GetHWND()) ? MaybeGetBandIdAtPoint(finalPoint) : MaybeGetBandIdForWindow(source);
 
 	if (!id)
 	{
@@ -87,7 +78,7 @@ LRESULT RebarView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 	switch (msg)
 	{
 	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == GetHWND())
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -116,7 +107,7 @@ void RebarView::OnChevronPushed(const NMREBARCHEVRON *chevronData)
 	POINT ptScreen;
 	ptScreen.x = chevronData->rc.left;
 	ptScreen.y = chevronData->rc.bottom;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	m_delegate->OnShowOverflowMenu(chevronData->wID, ptScreen);
@@ -124,7 +115,7 @@ void RebarView::OnChevronPushed(const NMREBARCHEVRON *chevronData)
 
 UINT RebarView::GetHeight() const
 {
-	return static_cast<UINT>(SendMessage(m_hwnd, RB_GETBARHEIGHT, 0, 0));
+	return static_cast<UINT>(SendMessage(GetHWND(), RB_GETBARHEIGHT, 0, 0));
 }
 
 void RebarView::AddBand(UINT id, RebarBandView *bandView, OverflowMenuPolicy overflowMenuPolicy)
@@ -156,7 +147,7 @@ void RebarView::AddBand(UINT id, RebarBandView *bandView, OverflowMenuPolicy ove
 		bandInfo.cxIdeal = *idealWidth;
 	}
 
-	auto res = SendMessage(m_hwnd, RB_INSERTBAND, static_cast<WPARAM>(-1),
+	auto res = SendMessage(GetHWND(), RB_INSERTBAND, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(&bandInfo));
 	CHECK(res);
 
@@ -191,7 +182,7 @@ void RebarView::OnBandSizeRequirementsChanged(UINT id, RebarBandView *bandView)
 
 void RebarView::ShowBand(UINT id, bool show)
 {
-	auto res = SendMessage(m_hwnd, RB_SHOWBAND, GetBandIndex(id), show);
+	auto res = SendMessage(GetHWND(), RB_SHOWBAND, GetBandIndex(id), show);
 	CHECK(res);
 }
 
@@ -262,11 +253,11 @@ std::optional<UINT> RebarView::MaybeGetBandIdAtPoint(const POINT &ptScreen) cons
 {
 	RBHITTESTINFO hitTest = {};
 	hitTest.pt = ptScreen;
-	auto res = ScreenToClient(m_hwnd, &hitTest.pt);
+	auto res = ScreenToClient(GetHWND(), &hitTest.pt);
 	CHECK(res);
 
 	int index =
-		static_cast<int>(SendMessage(m_hwnd, RB_HITTEST, 0, reinterpret_cast<LPARAM>(&hitTest)));
+		static_cast<int>(SendMessage(GetHWND(), RB_HITTEST, 0, reinterpret_cast<LPARAM>(&hitTest)));
 
 	if (index == -1)
 	{
@@ -316,7 +307,7 @@ std::vector<RebarBandStorageData> RebarView::GetStorageData() const
 
 int RebarView::GetNumBands() const
 {
-	return static_cast<int>(SendMessage(m_hwnd, RB_GETBANDCOUNT, 0, 0));
+	return static_cast<int>(SendMessage(GetHWND(), RB_GETBANDCOUNT, 0, 0));
 }
 
 UINT RebarView::GetBandStyles(UINT id) const
@@ -339,8 +330,8 @@ REBARBANDINFO RebarView::GetBandInfo(UINT id, UINT mask) const
 	REBARBANDINFO bandInfo = {};
 	bandInfo.cbSize = sizeof(bandInfo);
 	bandInfo.fMask = mask;
-	auto res =
-		SendMessage(m_hwnd, RB_GETBANDINFO, GetBandIndex(id), reinterpret_cast<LPARAM>(&bandInfo));
+	auto res = SendMessage(GetHWND(), RB_GETBANDINFO, GetBandIndex(id),
+		reinterpret_cast<LPARAM>(&bandInfo));
 	CHECK(res);
 
 	return bandInfo;
@@ -348,14 +339,14 @@ REBARBANDINFO RebarView::GetBandInfo(UINT id, UINT mask) const
 
 void RebarView::SetBandInfo(UINT id, const REBARBANDINFO &bandInfo)
 {
-	auto res =
-		SendMessage(m_hwnd, RB_SETBANDINFO, GetBandIndex(id), reinterpret_cast<LPARAM>(&bandInfo));
+	auto res = SendMessage(GetHWND(), RB_SETBANDINFO, GetBandIndex(id),
+		reinterpret_cast<LPARAM>(&bandInfo));
 	CHECK(res);
 }
 
 int RebarView::GetBandIndex(UINT id) const
 {
-	auto index = static_cast<int>(SendMessage(m_hwnd, RB_IDTOINDEX, id, 0));
+	auto index = static_cast<int>(SendMessage(GetHWND(), RB_IDTOINDEX, id, 0));
 	CHECK(index != -1);
 	return index;
 }
@@ -365,15 +356,8 @@ UINT RebarView::GetBandId(int index) const
 	REBARBANDINFO bandInfo = {};
 	bandInfo.cbSize = sizeof(bandInfo);
 	bandInfo.fMask = RBBIM_ID;
-	auto res = SendMessage(m_hwnd, RB_GETBANDINFO, index, reinterpret_cast<LPARAM>(&bandInfo));
+	auto res = SendMessage(GetHWND(), RB_GETBANDINFO, index, reinterpret_cast<LPARAM>(&bandInfo));
 	CHECK(res);
 
 	return bandInfo.wID;
-}
-
-void RebarView::OnNcDestroy()
-{
-	windowDestroyedSignal.m_signal();
-
-	delete this;
 }

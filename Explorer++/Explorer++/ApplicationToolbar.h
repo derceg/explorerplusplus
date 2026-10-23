@@ -27,7 +27,7 @@ class ApplicationToolbarView;
 class ApplicationToolbar : public ToolbarBase, private DropTargetInternal
 {
 public:
-	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
+	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
 		ApplicationExecutor *applicationExecutor, BrowserWindow *browser,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
@@ -63,10 +63,6 @@ private:
 		std::unique_ptr<ApplicationDropper> m_applicationDropper;
 	};
 
-	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
-		ApplicationExecutor *applicationExecutor, BrowserWindow *browser,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
-
 	void Initialize();
 
 	void AddButtons();
@@ -78,8 +74,6 @@ private:
 
 	void OnButtonClicked(const Application *application, const MouseEvent &event);
 	void OnButtonRightClicked(Application *application, const MouseEvent &event);
-
-	void OnWindowDestroyed();
 
 	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;

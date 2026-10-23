@@ -61,13 +61,6 @@ private:
 	std::wstring m_path;
 };
 
-DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view, DriveModel *driveModel,
-	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
-	const ResourceLoader *resourceLoader)
-{
-	return new DrivesToolbar(view, driveModel, browser, acceleratorManager, resourceLoader);
-}
-
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
 	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader) :
@@ -79,8 +72,6 @@ DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
 	Initialize();
 }
 
-DrivesToolbar::~DrivesToolbar() = default;
-
 void DrivesToolbar::Initialize()
 {
 	AddDrives();
@@ -91,8 +82,6 @@ void DrivesToolbar::Initialize()
 		std::bind_front(&DrivesToolbar::OnDriveUpdated, this)));
 	m_connections.push_back(m_driveModel->AddDriveRemovedObserver(
 		std::bind_front(&DrivesToolbar::OnDriveRemoved, this)));
-
-	m_view->AddWindowDestroyedObserver(std::bind_front(&DrivesToolbar::OnWindowDestroyed, this));
 }
 
 void DrivesToolbar::AddDrives()
@@ -190,9 +179,4 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 	ShellItemContextMenu menu(&popupMenu, m_acceleratorManager, parent, { child },
 		m_view->GetHWND(), nullptr, flags, m_browser, m_resourceLoader);
 	popupMenu.Show(ptScreen);
-}
-
-void DrivesToolbar::OnWindowDestroyed()
-{
-	delete this;
 }

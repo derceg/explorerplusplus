@@ -11,31 +11,26 @@
 #include "../Helper/WindowSubclass.h"
 #include <Shlwapi.h>
 
-AddressBarView *AddressBarView::Create(HWND parent, const Config *config)
-{
-	return new AddressBarView(parent, config);
-}
-
 AddressBarView::AddressBarView(HWND parent, const Config *config) :
-	m_hwnd(CreateAddressBar(parent)),
-	m_fontSetter(m_hwnd, config)
+	ViewBase(CreateAddressBar(parent)),
+	m_fontSetter(GetHWND(), config)
 {
 	HIMAGELIST smallIcons;
 	BOOL res = Shell_GetImageLists(nullptr, &smallIcons);
 	CHECK(res);
-	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
+	SendMessage(GetHWND(), CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
+	AddSubclass(std::make_unique<WindowSubclass>(GetHWND(),
 		std::bind_front(&AddressBarView::ComboBoxExSubclass, this)));
 
 	auto edit = GetEditControl();
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(edit,
+	AddSubclass(std::make_unique<WindowSubclass>(edit,
 		std::bind_front(&AddressBarView::EditSubclass, this)));
 
 	HRESULT hr = SHAutoComplete(edit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 	DCHECK(SUCCEEDED(hr));
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
+	AddSubclass(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&AddressBarView::ParentSubclass, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(
@@ -62,10 +57,6 @@ LRESULT AddressBarView::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, L
 	{
 	case WM_DPICHANGED_AFTERPARENT:
 		OnFontOrDpiUpdated();
-		break;
-
-	case WM_NCDESTROY:
-		OnNcDestroy();
 		break;
 	}
 
@@ -99,7 +90,7 @@ LRESULT AddressBarView::ParentSubclass(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	switch (uMsg)
 	{
 	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == GetHWND())
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -124,13 +115,13 @@ void AddressBarView::SetDelegate(AddressBarViewDelegate *delegate)
 
 HWND AddressBarView::GetHWND() const
 {
-	return m_hwnd;
+	return ViewBase::GetHWND();
 }
 
 UINT AddressBarView::GetHeight() const
 {
 	RECT rect;
-	auto res = GetWindowRect(m_hwnd, &rect);
+	auto res = GetWindowRect(GetHWND(), &rect);
 	CHECK(res);
 
 	return GetRectHeight(&rect);
@@ -138,17 +129,17 @@ UINT AddressBarView::GetHeight() const
 
 void AddressBarView::Focus()
 {
-	if (!IsWindowVisible(m_hwnd))
+	if (!IsWindowVisible(GetHWND()))
 	{
 		return;
 	}
 
-	SetFocus(m_hwnd);
+	SetFocus(GetHWND());
 }
 
 std::wstring AddressBarView::GetText() const
 {
-	return GetWindowString(m_hwnd);
+	return GetWindowString(GetHWND());
 }
 
 bool AddressBarView::IsTextModified() const
@@ -179,41 +170,34 @@ void AddressBarView::UpdateTextAndIcon(const std::optional<std::wstring> &option
 		m_currentText = *optionalText;
 	}
 
-	auto res = SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
+	auto res = SendMessage(GetHWND(), CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 	DCHECK(res);
 }
 
 void AddressBarView::RevertText()
 {
-	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(m_currentText.c_str()));
+	SendMessage(GetHWND(), WM_SETTEXT, 0, reinterpret_cast<LPARAM>(m_currentText.c_str()));
 }
 
 void AddressBarView::ShowDropDown()
 {
-	if (!IsWindowVisible(m_hwnd))
+	if (!IsWindowVisible(GetHWND()))
 	{
 		return;
 	}
 
 	Focus();
-	SendMessage(m_hwnd, CB_SHOWDROPDOWN, true, 0);
+	SendMessage(GetHWND(), CB_SHOWDROPDOWN, true, 0);
 }
 
 HWND AddressBarView::GetEditControl() const
 {
-	return reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
+	return reinterpret_cast<HWND>(SendMessage(GetHWND(), CBEM_GETEDITCONTROL, 0, 0));
 }
 
 void AddressBarView::OnFontOrDpiUpdated()
 {
 	NotifySizeRequirementsChanged();
-}
-
-void AddressBarView::OnNcDestroy()
-{
-	windowDestroyedSignal.m_signal();
-
-	delete this;
 }
 
 AddressBarViewDelegate *AddressBarView::GetDelegateForTesting()
@@ -225,13 +209,6 @@ AddressBarViewDelegate *AddressBarView::GetDelegateForTesting()
 void AddressBarView::SetTextForTesting(const std::wstring &text)
 {
 	CHECK(IsInTest());
-	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text.c_str()));
+	SendMessage(GetHWND(), WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text.c_str()));
 	SendMessage(GetEditControl(), EM_SETMODIFY, TRUE, 0);
-}
-
-void AddressBarView::DestroyForTesting()
-{
-	CHECK(IsInTest());
-	auto res = DestroyWindow(m_hwnd);
-	CHECK(res);
 }

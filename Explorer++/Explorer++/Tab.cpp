@@ -50,6 +50,8 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 	ApplyLockState(initialData.lockState, NotificationMode::DontNotify);
 }
 
+Tab::~Tab() = default;
+
 int Tab::GetId() const
 {
 	return m_id;

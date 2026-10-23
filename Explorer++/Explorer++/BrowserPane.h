@@ -4,16 +4,23 @@
 
 #pragma once
 
-class TabContainer;
+#include "MainTabView.h"
+#include "TabContainer.h"
+
+class AppServices;
+class BrowserWindow;
+class ShellBrowserFactory;
 
 // Each browser pane contains a set of tabs, with each tab showing a file listing.
 class BrowserPane
 {
 public:
-	BrowserPane(TabContainer *tabContainer);
+	BrowserPane(BrowserWindow *browser, HWND tabViewParent,
+		ShellBrowserFactory *shellBrowserFactory, AppServices *appServices);
 
-	TabContainer *GetTabContainer() const;
+	TabContainer *GetTabContainer();
 
 private:
-	TabContainer *m_tabContainer;
+	MainTabView m_tabView;
+	TabContainer m_tabContainer;
 };

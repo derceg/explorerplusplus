@@ -28,18 +28,13 @@ public:
 		ToolbarOptionsMenu::Source contextMenuSource;
 	};
 
-	static MainRebar *Create(MainRebarView *view,
-		const std::vector<BandDefinition> &bandDefinitions,
+	MainRebar(MainRebarView *view, const std::vector<BandDefinition> &bandDefinitions,
 		const std::vector<RebarBandStorageData> &storageData, BrowserWindow *browser,
 		AppServices *appServices);
 
 	MainRebarView *GetView() const;
 
 private:
-	MainRebar(MainRebarView *view, const std::vector<BandDefinition> &bandDefinitions,
-		const std::vector<RebarBandStorageData> &storageData, BrowserWindow *browser,
-		AppServices *appServices);
-
 	void AddBands(const std::vector<BandDefinition> &bandDefinitions,
 		const std::vector<RebarBandStorageData> &storageData);
 	void AddBand(const BandDefinition &bandDefinition, const RebarBandStorageData *optStorageData);
@@ -54,8 +49,6 @@ private:
 	void OnShowOverflowMenu(UINT bandId, const POINT &ptScreen) override;
 
 	const BandDefinition &GetDefinitionForBand(UINT bandId) const;
-
-	void OnWindowDestroyed();
 
 	MainRebarView *const m_view;
 	BrowserWindow *const m_browser;

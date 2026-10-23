@@ -68,14 +68,6 @@ private:
 	const Application *m_application;
 };
 
-ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
-	ApplicationModel *model, ApplicationExecutor *applicationExecutor, BrowserWindow *browser,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
-{
-	return new ApplicationToolbar(view, model, applicationExecutor, browser, acceleratorManager,
-		resourceLoader);
-}
-
 ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
 	ApplicationExecutor *applicationExecutor, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
@@ -101,9 +93,6 @@ void ApplicationToolbar::Initialize()
 
 	m_dropTargetWindow = winrt::make_self<DropTargetWindow>(m_view->GetHWND(),
 		static_cast<DropTargetInternal *>(this));
-
-	m_view->AddWindowDestroyedObserver(
-		std::bind_front(&ApplicationToolbar::OnWindowDestroyed, this));
 }
 
 void ApplicationToolbar::AddButtons()
@@ -160,11 +149,6 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	ApplicationContextMenu menu(&popupMenu, m_acceleratorManager, m_model, application,
 		m_applicationExecutor, m_browser, m_resourceLoader);
 	popupMenu.Show(event.ptScreen);
-}
-
-void ApplicationToolbar::OnWindowDestroyed()
-{
-	delete this;
 }
 
 // DropTargetInternal

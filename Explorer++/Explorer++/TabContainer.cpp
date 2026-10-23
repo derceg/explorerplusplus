@@ -176,12 +176,6 @@ private:
 
 }
 
-TabContainer *TabContainer::Create(MainTabView *view, BrowserWindow *browser,
-	ShellBrowserFactory *shellBrowserFactory, AppServices *appServices)
-{
-	return new TabContainer(view, browser, shellBrowserFactory, appServices);
-}
-
 TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 	ShellBrowserFactory *shellBrowserFactory, AppServices *appServices) :
 	ShellDropTargetWindow(view->GetHWND()),
@@ -200,8 +194,6 @@ TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 void TabContainer::Initialize(HWND parent)
 {
 	m_view->SetDelegate(this);
-	m_view->windowDestroyedSignal.AddObserver(
-		std::bind_front(&TabContainer::OnWindowDestroyed, this));
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&TabContainer::ParentWndProc, this)));
@@ -832,9 +824,4 @@ std::vector<TabStorageData> TabContainer::GetStorageData() const
 	}
 
 	return tabListStorageData;
-}
-
-void TabContainer::OnWindowDestroyed()
-{
-	delete this;
 }

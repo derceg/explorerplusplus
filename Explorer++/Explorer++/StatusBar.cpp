@@ -16,16 +16,7 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <wil/common.h>
-#include <wil/resource.h>
 #include <format>
-
-StatusBar *StatusBar::Create(StatusBarView *view, const BrowserWindow *browser,
-	const Config *config, TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-	NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader)
-{
-	return new StatusBar(view, browser, config, tabEvents, shellBrowserEvents, navigationEvents,
-		resourceLoader);
-}
 
 StatusBar::StatusBar(StatusBarView *view, const BrowserWindow *browser, const Config *config,
 	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
@@ -36,8 +27,6 @@ StatusBar::StatusBar(StatusBarView *view, const BrowserWindow *browser, const Co
 	m_resourceLoader(resourceLoader)
 {
 	SetStandardParts();
-
-	m_view->windowDestroyedSignal.AddObserver(std::bind_front(&StatusBar::OnWindowDestroyed, this));
 
 	m_connections.push_back(tabEvents->AddSelectedObserver(
 		std::bind_front(&StatusBar::OnTabSelected, this), TabEventScope::ForBrowser(*browser)));
@@ -254,9 +243,4 @@ std::wstring StatusBar::CreateDriveFreeSpaceString(const std::wstring &path)
 	return std::format(L"{} {} ({:.0Lf}%)", FormatSizeString(totalNumberOfFreeBytes.QuadPart),
 		m_resourceLoader->LoadString(IDS_GENERAL_FREE),
 		totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
-}
-
-void StatusBar::OnWindowDestroyed()
-{
-	delete this;
 }

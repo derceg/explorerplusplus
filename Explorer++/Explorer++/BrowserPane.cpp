@@ -4,12 +4,16 @@
 
 #include "stdafx.h"
 #include "BrowserPane.h"
+#include "AppServices.h"
 
-BrowserPane::BrowserPane(TabContainer *tabContainer) : m_tabContainer(tabContainer)
+BrowserPane::BrowserPane(BrowserWindow *browser, HWND tabViewParent,
+	ShellBrowserFactory *shellBrowserFactory, AppServices *appServices) :
+	m_tabView(tabViewParent, appServices->GetConfig(), appServices->GetResourceLoader()),
+	m_tabContainer(&m_tabView, browser, shellBrowserFactory, appServices)
 {
 }
 
-TabContainer *BrowserPane::GetTabContainer() const
+TabContainer *BrowserPane::GetTabContainer()
 {
-	return m_tabContainer;
+	return &m_tabContainer;
 }

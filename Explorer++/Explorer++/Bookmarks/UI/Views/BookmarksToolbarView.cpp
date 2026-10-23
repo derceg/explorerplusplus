@@ -4,12 +4,6 @@
 
 #include "stdafx.h"
 #include "BookmarksToolbarView.h"
-#include <glog/logging.h>
-
-BookmarksToolbarView *BookmarksToolbarView::Create(HWND parent, const Config *config)
-{
-	return new BookmarksToolbarView(parent, config);
-}
 
 BookmarksToolbarView::BookmarksToolbarView(HWND parent, const Config *config) :
 	ToolbarView(parent,

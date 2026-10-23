@@ -9,8 +9,5 @@
 class BookmarksToolbarView : public ToolbarView
 {
 public:
-	static BookmarksToolbarView *Create(HWND parent, const Config *config);
-
-private:
 	BookmarksToolbarView(HWND parent, const Config *config);
 };

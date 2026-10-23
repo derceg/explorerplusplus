@@ -31,7 +31,7 @@ class TabEvents;
 class AddressBar : private AddressBarViewDelegate, public BrowserCommandTarget, public RebarBand
 {
 public:
-	static AddressBar *Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
+	AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 		const Runtime *runtime, AsyncIconFetcher *iconFetcher);
 
@@ -52,11 +52,6 @@ private:
 		AlwaysFetch
 	};
 
-	AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
-		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		const Runtime *runtime, AsyncIconFetcher *iconFetcher);
-	~AddressBar() = default;
-
 	void Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 		NavigationEvents *navigationEvents);
 
@@ -74,7 +69,6 @@ private:
 		IconUpdateType iconUpdateType = IconUpdateType::FetchIfNotCached);
 	static concurrencpp::null_result RetrieveUpdatedIcon(WeakPtr<AddressBar> weakSelf,
 		PidlAbsolute pidl);
-	void OnWindowDestroyed();
 
 	AddressBarView *const m_view;
 	BrowserWindow *const m_browser;

@@ -21,10 +21,8 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	m_config(appServices->GetConfig()),
 	m_window(CreateBrowserWindow()),
 	m_shellBrowserFactory(this, appServices->GetNavigationEvents()),
-	m_tabContainer(
-		TabContainer::Create(MainTabView::Create(m_window.get(), appServices->GetConfig(),
-								 appServices->GetResourceLoader()),
-			this, &m_shellBrowserFactory, appServices))
+	m_tabView(m_window.get(), appServices->GetConfig(), appServices->GetResourceLoader()),
+	m_tabContainer(&m_tabView, this, &m_shellBrowserFactory, appServices)
 {
 	WINDOWPLACEMENT placement = {};
 	placement.length = sizeof(placement);
@@ -104,12 +102,12 @@ BrowserPane *BrowserWindowFake::GetActivePane() const
 
 TabContainer *BrowserWindowFake::GetActiveTabContainer()
 {
-	return m_tabContainer;
+	return &m_tabContainer;
 }
 
 const TabContainer *BrowserWindowFake::GetActiveTabContainer() const
 {
-	return m_tabContainer;
+	return &m_tabContainer;
 }
 
 void BrowserWindowFake::FocusActiveTab()

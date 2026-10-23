@@ -7,10 +7,9 @@
 #include "MainFontSetter.h"
 #include "MouseEvent.h"
 #include "RebarBandView.h"
+#include "ViewBase.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
-#include "../Helper/WindowSubclass.h"
-#include <boost/signals2.hpp>
 #include <chrono>
 #include <functional>
 #include <optional>
@@ -101,11 +100,9 @@ private:
 
 // Designed to act as a base class for a toolbar control. Doesn't actually add any buttons on its
 // own.
-class ToolbarView : public RebarBandView
+class ToolbarView : public ViewBase, public RebarBandView
 {
 public:
-	using WindowDestroyedSignal = boost::signals2::signal<void()>;
-
 	struct DropLocation
 	{
 		DropLocation(bool onItem, size_t index) : onItem(onItem), index(index)
@@ -119,6 +116,8 @@ public:
 		// item that's actually shown).
 		size_t index;
 	};
+
+	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Config *config);
 
 	ToolbarView(const ToolbarView &) = delete;
 	ToolbarView(ToolbarView &&) = delete;
@@ -151,15 +150,6 @@ public:
 	size_t FindNextButtonIndex(const POINT &ptClient) const;
 	void SetHotItem(size_t index);
 
-	boost::signals2::connection AddWindowDestroyedObserver(
-		const WindowDestroyedSignal::slot_type &observer);
-
-protected:
-	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Config *config);
-	virtual ~ToolbarView() = default;
-
-	const HWND m_hwnd;
-
 private:
 	BYTE GetToolbarButtonState(const ToolbarButton *button);
 
@@ -180,8 +170,6 @@ private:
 
 	void OnFontOrDpiUpdated();
 
-	void OnNcDestroy();
-
 	std::vector<std::unique_ptr<ToolbarButton>> m_buttons;
 
 	// Items are largely referred to by their indexes, but there are certain cases where the command
@@ -196,8 +184,4 @@ private:
 
 	// Drag and drop
 	std::optional<POINT> m_leftButtonDownPoint;
-
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
-
-	WindowDestroyedSignal m_windowDestroyedSignal;
 };

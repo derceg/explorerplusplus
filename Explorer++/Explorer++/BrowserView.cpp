@@ -15,27 +15,15 @@
 #include "TabEvents.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
-#include "../Helper/WindowSubclass.h"
-
-BrowserView *BrowserView::Create(HWND hwnd, BrowserWindow *browser, const Config *config,
-	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-	NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader)
-{
-	return new BrowserView(hwnd, browser, config, tabEvents, shellBrowserEvents, navigationEvents,
-		resourceLoader);
-}
 
 BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config,
 	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 	NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader) :
-	m_hwnd(hwnd),
+	ViewBase(hwnd),
 	m_browser(browser),
 	m_config(config),
 	m_resourceLoader(resourceLoader)
 {
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&BrowserView::WndProc, this)));
-
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
 		std::bind_front(&BrowserView::OnBrowserLifecycleStateChanged, this)));
 
@@ -66,19 +54,7 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 	// instead. That way, it will act as a fallback if there isn't a more specific child window
 	// registered.
 	m_dropTargetWindow =
-		winrt::make_self<DropTargetWindow>(m_hwnd, static_cast<DropTargetInternal *>(this));
-}
-
-LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_NCDESTROY:
-		OnNcDestroy();
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
+		winrt::make_self<DropTargetWindow>(GetHWND(), static_cast<DropTargetInternal *>(this));
 }
 
 void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
@@ -203,12 +179,12 @@ void BrowserView::UpdateWindowText()
 		title += L"]";
 	}
 
-	SetWindowText(m_hwnd, title.c_str());
+	SetWindowText(GetHWND(), title.c_str());
 }
 
 void BrowserView::RedrawMenuBar()
 {
-	auto res = DrawMenuBar(m_hwnd);
+	auto res = DrawMenuBar(GetHWND());
 	CHECK(res);
 }
 
@@ -226,17 +202,17 @@ void BrowserView::FocusNextWindow(FocusChangeDirection direction)
 	//
 	// GetNextDlgTabItem() may fail if the initial control is NULL or the parent window, so that
 	// situation is prevented here.
-	if (focus && IsChild(m_hwnd, focus))
+	if (focus && IsChild(GetHWND(), focus))
 	{
 		initialControl = focus;
 	}
 	else
 	{
-		initialControl = GetWindow(m_hwnd, GW_CHILD);
+		initialControl = GetWindow(GetHWND(), GW_CHILD);
 	}
 
 	HWND nextWindow =
-		GetNextDlgTabItem(m_hwnd, initialControl, direction == FocusChangeDirection::Previous);
+		GetNextDlgTabItem(GetHWND(), initialControl, direction == FocusChangeDirection::Previous);
 	DCHECK(nextWindow);
 
 	if (nextWindow)
@@ -279,9 +255,4 @@ DWORD BrowserView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD
 	UNREFERENCED_PARAMETER(effect);
 
 	return DROPEFFECT_NONE;
-}
-
-void BrowserView::OnNcDestroy()
-{
-	delete this;
 }

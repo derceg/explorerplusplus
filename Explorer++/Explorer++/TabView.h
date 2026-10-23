@@ -6,6 +6,7 @@
 
 #include "MainFontSetter.h"
 #include "MouseEvent.h"
+#include "ViewBase.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
 #include <CommCtrl.h>
@@ -16,7 +17,6 @@
 struct Config;
 class TabView;
 class TabViewDelegate;
-class WindowSubclass;
 
 // Represents an individual tab within the view.
 class TabViewItem
@@ -50,7 +50,7 @@ private:
 };
 
 // Designed to act as a base class for a tab control. Doesn't actually add any tabs on its own.
-class TabView : private boost::noncopyable
+class TabView : public ViewBase, private boost::noncopyable
 {
 public:
 	enum class ScrollDirection
@@ -59,7 +59,9 @@ public:
 		Right
 	};
 
-	HWND GetHWND() const;
+	TabView(HWND parent, DWORD style, const Config *config);
+	~TabView();
+
 	void SetDelegate(TabViewDelegate *delegate);
 
 	int AddTab(std::unique_ptr<TabViewItem> tabItem, int index);
@@ -77,11 +79,6 @@ public:
 
 	// Signals
 	SignalWrapper<TabView, void()> sizeUpdatedSignal;
-	SignalWrapper<TabView, void()> windowDestroyedSignal;
-
-protected:
-	TabView(HWND parent, DWORD style, const Config *config);
-	virtual ~TabView();
 
 private:
 	// When dragging a tab, the tab will typically be moved if the cursor moves outside the
@@ -169,14 +166,11 @@ private:
 	RECT GetTabRect(int index) const;
 	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &pt) const;
 	void OnFontUpdated();
-	void OnNcDestroy();
 
-	const HWND m_hwnd;
 	std::vector<std::unique_ptr<TabViewItem>> m_tabs;
 	TabViewDelegate *m_delegate = nullptr;
 	MainFontSetter m_fontSetter;
 	std::unique_ptr<MainFontSetter> m_tooltipFontSetter;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	// This will only be set after the left mouse button has gone down on a tab, but before a drag
 	// has been initiated.

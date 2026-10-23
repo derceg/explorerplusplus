@@ -12,6 +12,7 @@
 #include "../Helper/DragDropHelper.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
+#include <memory>
 
 using namespace Applications;
 using namespace testing;
@@ -21,20 +22,20 @@ class ApplicationToolbarTestBase : public BrowserTestBase
 protected:
 	ApplicationToolbarTestBase(std::vector<std::unique_ptr<Application>> initialApplications = {}) :
 		m_browser(AddBrowser()),
-		m_applicationToolbarView(ApplicationToolbarView::Create(m_browser->GetHWND(), &m_config))
+		m_applicationToolbarView(m_browser->GetHWND(), &m_config)
 	{
 		for (auto &application : initialApplications)
 		{
 			m_applicationModel.AddItem(std::move(application));
 		}
 
-		m_applicationToolbar = ApplicationToolbar::Create(m_applicationToolbarView,
+		m_applicationToolbar = std::make_unique<ApplicationToolbar>(&m_applicationToolbarView,
 			&m_applicationModel, &m_applicationExecutor, m_browser, nullptr, nullptr);
 	}
 
 	void VerifyToolbarButtons()
 	{
-		const auto &buttons = m_applicationToolbarView->GetButtons();
+		const auto &buttons = m_applicationToolbarView.GetButtons();
 		const auto &applications = m_applicationModel.GetItems();
 		ASSERT_EQ(buttons.size(), applications.size());
 
@@ -50,8 +51,8 @@ protected:
 	ApplicationExecutorMock m_applicationExecutor;
 
 	BrowserWindowFake *const m_browser;
-	ApplicationToolbarView *const m_applicationToolbarView;
-	ApplicationToolbar *m_applicationToolbar = nullptr;
+	ApplicationToolbarView m_applicationToolbarView;
+	std::unique_ptr<ApplicationToolbar> m_applicationToolbar;
 };
 
 class ApplicationToolbarTest : public ApplicationToolbarTestBase
@@ -115,7 +116,7 @@ TEST_F(ApplicationToolbarTest, OpenOnClick)
 		EXPECT_CALL(m_applicationExecutor, Execute(application.get(), std::wstring()));
 	}
 
-	for (const auto &button : m_applicationToolbarView->GetButtons())
+	for (const auto &button : m_applicationToolbarView.GetButtons())
 	{
 		button->OnClicked(MouseEvent{ { 0, 0 }, false, false });
 	}
@@ -153,7 +154,7 @@ TEST_F(ApplicationToolbarDropTest, DropShellItems)
 	auto dataObject = CreateDataObjectFromPaths(droppedItemPaths);
 
 	POINT dropPt = { 0, 0 };
-	ASSERT_TRUE(ClientToScreen(m_applicationToolbarView->GetHWND(), &dropPt));
+	ASSERT_TRUE(ClientToScreen(m_applicationToolbarView.GetHWND(), &dropPt));
 
 	auto effect = m_applicationToolbar->SimulateDropForTest(dataObject.get(), MK_LBUTTON, dropPt,
 		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK);

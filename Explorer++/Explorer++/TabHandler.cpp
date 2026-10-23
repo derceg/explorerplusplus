@@ -23,12 +23,12 @@ void Explorerplusplus::InitializeTabs()
 {
 	m_tabBacking = TabBacking::Create(m_hwnd, this, this, m_resourceLoader, m_config, m_tabEvents);
 
-	auto *mainTabView = MainTabView::Create(m_tabBacking->GetHWND(), m_config, m_resourceLoader);
-	m_connections.push_back(mainTabView->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); }));
+	m_browserPane = std::make_unique<BrowserPane>(this, m_tabBacking->GetHWND(),
+		&m_shellBrowserFactory, m_appServices);
 
-	auto *tabContainer =
-		TabContainer::Create(mainTabView, this, &m_shellBrowserFactory, m_appServices);
-	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
+	m_connections.push_back(
+		m_browserPane->GetTabContainer()->GetView()->sizeUpdatedSignal.AddObserver(
+			[this] { UpdateLayout(); }));
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
 		std::bind(&Explorerplusplus::MaybeUpdateTabBarVisibility, this)));

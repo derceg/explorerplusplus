@@ -23,7 +23,7 @@ class ResourceLoader;
 class BookmarksToolbar : public ToolbarBase, private BookmarkDropTargetWindow
 {
 public:
-	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browser,
+	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext);
 
@@ -48,10 +48,6 @@ private:
 	// main portion of the button.
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext);
-
 	void Initialize(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader);
 	void AddBookmarkItems();
 	void AddBookmarkItem(BookmarkItem *bookmarkItem, size_t index);
@@ -66,8 +62,6 @@ private:
 	void OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
 	void OnButtonMiddleClicked(const BookmarkItem *bookmarkItem, const MouseEvent &event);
 	void OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
-
-	void OnWindowDestroyed();
 
 	void OnButtonDragStarted(const BookmarkItem *bookmarkItem);
 

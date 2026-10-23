@@ -18,9 +18,8 @@ class ResourceLoader;
 class DrivesToolbar : public ToolbarBase
 {
 public:
-	static DrivesToolbar *Create(DrivesToolbarView *view, DriveModel *driveModel,
-		BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
-		const ResourceLoader *resourceLoader);
+	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browser,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
 	DrivesToolbar(DrivesToolbar &&) = delete;
@@ -28,10 +27,6 @@ public:
 	DrivesToolbar &operator=(DrivesToolbar &&) = delete;
 
 private:
-	DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel, BrowserWindow *browser,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
-	~DrivesToolbar();
-
 	void Initialize();
 
 	void AddDrives();
@@ -46,8 +41,6 @@ private:
 	void OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event);
 
 	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptScreen, bool showExtended);
-
-	void OnWindowDestroyed();
 
 	DriveModel *const m_driveModel;
 	BrowserWindow *const m_browser;

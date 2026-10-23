@@ -5,11 +5,6 @@
 #include "stdafx.h"
 #include "MainRebarView.h"
 
-MainRebarView *MainRebarView::Create(HWND parent)
-{
-	return new MainRebarView(parent);
-}
-
 MainRebarView::MainRebarView(HWND parent) :
 	RebarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | CCS_NODIVIDER

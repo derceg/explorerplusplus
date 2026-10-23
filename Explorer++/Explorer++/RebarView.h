@@ -4,19 +4,18 @@
 
 #pragma once
 
+#include "ViewBase.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
-#include <memory>
 #include <optional>
 #include <vector>
 
 struct RebarBandStorageData;
 class RebarBandView;
 class RebarViewDelegate;
-class WindowSubclass;
 
-class RebarView : private boost::noncopyable
+class RebarView : public ViewBase, private boost::noncopyable
 {
 public:
 	enum class OverflowMenuPolicy
@@ -25,7 +24,9 @@ public:
 		Enabled
 	};
 
-	HWND GetHWND() const;
+	RebarView(HWND parent, DWORD style);
+	~RebarView();
+
 	void SetDelegate(RebarViewDelegate *delegate);
 	UINT GetHeight() const;
 
@@ -39,11 +40,6 @@ public:
 
 	// Signals
 	SignalWrapper<RebarView, void()> heightChangedSignal;
-	SignalWrapper<RebarView, void()> windowDestroyedSignal;
-
-protected:
-	RebarView(HWND parent, DWORD style);
-	virtual ~RebarView();
 
 private:
 	friend class RebarViewTestApi;
@@ -68,11 +64,7 @@ private:
 	int GetBandIndex(UINT id) const;
 	UINT GetBandId(int index) const;
 
-	void OnNcDestroy();
-
-	const HWND m_hwnd;
 	RebarViewDelegate *m_delegate = nullptr;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	bool m_locked = false;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

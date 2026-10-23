@@ -8,24 +8,23 @@
 #include "ItemStateOp.h"
 #include "TreeViewDelegate.h"
 #include "TreeViewNode.h"
+#include "ViewBase.h"
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <vector>
 
 class KeyboardState;
 class LabelEditHandler;
 class TreeViewAdapter;
-class WindowSubclass;
 
 using RawTreeViewNodes = std::vector<TreeViewNode *>;
 using ConstRawTreeViewNodes = std::vector<const TreeViewNode *>;
 
-class TreeView
+class TreeView : public ViewBase
 {
 public:
 	using LabelEditHandlerFactory = std::function<LabelEditHandler *(HWND hwnd, bool itemIsFile)>;
@@ -51,7 +50,6 @@ public:
 		LabelEditHandlerFactory labelEditHandlerFactory);
 	~TreeView();
 
-	HWND GetHWND() const;
 	void SetAdapter(TreeViewAdapter *adapter);
 	void SetDelegate(TreeViewDelegate *delegate);
 
@@ -129,7 +127,6 @@ private:
 	TreeViewNode *GetNodeForHandle(HTREEITEM handle);
 	const TreeViewNode *GetNodeForHandle(HTREEITEM handle) const;
 
-	const HWND m_hwnd;
 	TreeViewAdapter *m_adapter = nullptr;
 	TreeViewDelegate m_noOpDelegate;
 	TreeViewDelegate *m_delegate = &m_noOpDelegate;
@@ -141,6 +138,5 @@ private:
 		m_handleToNodeMap;
 	std::optional<int> m_middleClickNodeId;
 	bool m_blockSelectionChangeEvent = false;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

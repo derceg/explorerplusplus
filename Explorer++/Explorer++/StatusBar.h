@@ -22,8 +22,8 @@ class TabEvents;
 class StatusBar
 {
 public:
-	static StatusBar *Create(StatusBarView *view, const BrowserWindow *browser,
-		const Config *config, TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
+	StatusBar(StatusBarView *view, const BrowserWindow *browser, const Config *config,
+		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 		NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader);
 
 	StatusBarView *GetView();
@@ -33,10 +33,6 @@ public:
 	void OnMenuSelect(HMENU menu, UINT itemId, UINT flags);
 
 private:
-	StatusBar(StatusBarView *view, const BrowserWindow *browser, const Config *config,
-		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-		NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader);
-
 	void SetStandardParts();
 
 	void OnTabSelected(const Tab &tab);
@@ -48,8 +44,6 @@ private:
 	void UpdateText(const Tab &tab);
 	void SetLoadingText(PCIDLIST_ABSOLUTE pidl);
 	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);
-
-	void OnWindowDestroyed();
 
 	StatusBarView *const m_view;
 	const BrowserWindow *const m_browser;

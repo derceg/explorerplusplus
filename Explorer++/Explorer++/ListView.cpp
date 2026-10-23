@@ -22,25 +22,20 @@
 ListView::ListView(HWND hwnd, const KeyboardState *keyboardState,
 	LabelEditHandlerFactory labelEditHandlerFactory, MenuHelpTextHost *menuHelpTextHost,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
-	m_hwnd(hwnd),
+	ViewBase(hwnd),
 	m_keyboardState(keyboardState),
 	m_labelEditHandlerFactory(labelEditHandlerFactory),
 	m_menuHelpTextHost(menuHelpTextHost),
 	m_acceleratorManager(acceleratorManager),
 	m_resourceLoader(resourceLoader)
 {
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&ListView::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
+	AddSubclass(
+		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&ListView::WndProc, this)));
+	AddSubclass(std::make_unique<WindowSubclass>(GetParent(GetHWND()),
 		std::bind_front(&ListView::ParentWndProc, this)));
 }
 
 ListView::~ListView() = default;
-
-HWND ListView::GetHWND() const
-{
-	return m_hwnd;
-}
 
 void ListView::SetModel(ListViewModel *model)
 {
@@ -82,14 +77,14 @@ void ListView::SetDelegate(ListViewDelegate *delegate)
 
 void ListView::AddExtendedStyles(DWORD styles)
 {
-	ListView_SetExtendedListViewStyleEx(m_hwnd, styles, styles);
+	ListView_SetExtendedListViewStyleEx(GetHWND(), styles, styles);
 }
 
 void ListView::SetupSmallShellImageList()
 {
 	// If the system image list is being used, LVS_SHAREIMAGELISTS should be set (otherwise the
 	// control will incorrectly free the image list on destruction).
-	CHECK(HasWindowStyles(m_hwnd, LVS_SHAREIMAGELISTS));
+	CHECK(HasWindowStyles(GetHWND(), LVS_SHAREIMAGELISTS));
 
 	HIMAGELIST smallShellImageList;
 	auto res = Shell_GetImageLists(nullptr, &smallShellImageList);
@@ -101,7 +96,7 @@ void ListView::SetupSmallShellImageList()
 void ListView::SetImageList(HIMAGELIST imageList, ImageListType imageListType)
 {
 	int type = (imageListType == ImageListType::NormalIcons) ? LVSIL_NORMAL : LVSIL_SMALL;
-	ListView_SetImageList(m_hwnd, imageList, type);
+	ListView_SetImageList(GetHWND(), imageList, type);
 }
 
 void ListView::AddColumns()
@@ -136,7 +131,7 @@ void ListView::AddColumn(ListViewColumnId columnId)
 	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
 	lvColumn.pszText = text.data();
 	lvColumn.cx = column.width;
-	int insertedIndex = ListView_InsertColumn(m_hwnd, index, &lvColumn);
+	int insertedIndex = ListView_InsertColumn(GetHWND(), index, &lvColumn);
 	CHECK_EQ(insertedIndex, index);
 
 	HDITEM hdItem = {};
@@ -170,7 +165,7 @@ void ListView::UpdateColumnOrdering()
 	auto res = Header_SetOrderArray(header, numColumns, ordering.data());
 	CHECK(res);
 
-	res = RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE);
+	res = RedrawWindow(GetHWND(), nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE);
 	CHECK(res);
 }
 
@@ -194,7 +189,7 @@ void ListView::AddItem(ListViewItem *item, int index)
 	lvItem.pszText = LPSTR_TEXTCALLBACK;
 	lvItem.iImage = I_IMAGECALLBACK;
 	lvItem.lParam = reinterpret_cast<LPARAM>(item);
-	int insertedIndex = ListView_InsertItem(m_hwnd, &lvItem);
+	int insertedIndex = ListView_InsertItem(GetHWND(), &lvItem);
 	CHECK_EQ(insertedIndex, index);
 }
 
@@ -224,7 +219,7 @@ void ListView::ResetItemImage(const ListViewItem *item)
 	lvItem.iItem = GetItemIndex(item);
 	lvItem.iSubItem = 0;
 	lvItem.iImage = I_IMAGECALLBACK;
-	auto res = ListView_SetItem(m_hwnd, &lvItem);
+	auto res = ListView_SetItem(GetHWND(), &lvItem);
 	CHECK(res);
 }
 
@@ -240,26 +235,26 @@ void ListView::ResetItemColumns(const ListViewItem *item)
 		lvItem.iItem = index;
 		lvItem.iSubItem = i;
 		lvItem.pszText = LPSTR_TEXTCALLBACK;
-		auto res = ListView_SetItem(m_hwnd, &lvItem);
+		auto res = ListView_SetItem(GetHWND(), &lvItem);
 		CHECK(res);
 	}
 }
 
 void ListView::RemoveItem(const ListViewItem *item)
 {
-	auto res = ListView_DeleteItem(m_hwnd, GetItemIndex(item));
+	auto res = ListView_DeleteItem(GetHWND(), GetItemIndex(item));
 	CHECK(res);
 }
 
 void ListView::RemoveAllItems()
 {
-	auto res = ListView_DeleteAllItems(m_hwnd);
+	auto res = ListView_DeleteAllItems(GetHWND());
 	CHECK(res);
 }
 
 void ListView::OnBatchUpdatesBegan()
 {
-	m_scopedRedrawDisabler = std::make_unique<ScopedRedrawDisabler>(m_hwnd);
+	m_scopedRedrawDisabler = std::make_unique<ScopedRedrawDisabler>(GetHWND());
 }
 
 void ListView::OnBatchUpdatesCompleted()
@@ -269,14 +264,14 @@ void ListView::OnBatchUpdatesCompleted()
 
 void ListView::SizeLastColumnToFill()
 {
-	if (!HasWindowStyles(m_hwnd, LVS_REPORT))
+	if (!HasWindowStyles(GetHWND(), LVS_REPORT))
 	{
 		return;
 	}
 
 	int numColumns = m_model->GetColumnModel()->GetNumVisibleColumns();
 	CHECK(numColumns > 0);
-	auto res = ListView_SetColumnWidth(m_hwnd, numColumns - 1, LVSCW_AUTOSIZE_USEHEADER);
+	auto res = ListView_SetColumnWidth(GetHWND(), numColumns - 1, LVSCW_AUTOSIZE_USEHEADER);
 	CHECK(res);
 }
 
@@ -285,7 +280,7 @@ std::vector<ListViewItem *> ListView::GetSelectedItems()
 	std::vector<ListViewItem *> items;
 	int index = -1;
 
-	while ((index = ListView_GetNextItem(m_hwnd, index, LVNI_SELECTED)) != -1)
+	while ((index = ListView_GetNextItem(GetHWND(), index, LVNI_SELECTED)) != -1)
 	{
 		items.push_back(GetItemAtIndex(index));
 	}
@@ -295,7 +290,7 @@ std::vector<ListViewItem *> ListView::GetSelectedItems()
 
 bool ListView::IsItemSelected(const ListViewItem *item) const
 {
-	UINT state = ListView_GetItemState(m_hwnd, GetItemIndex(item), LVIS_SELECTED);
+	UINT state = ListView_GetItemState(GetHWND(), GetItemIndex(item), LVIS_SELECTED);
 	return WI_IsFlagSet(state, LVIS_SELECTED);
 }
 
@@ -312,7 +307,7 @@ void ListView::SelectOnly(const ListViewItem *item)
 
 void ListView::SelectAllItems()
 {
-	if (HasWindowStyles(m_hwnd, LVS_SINGLESEL))
+	if (HasWindowStyles(GetHWND(), LVS_SINGLESEL))
 	{
 		return;
 	}
@@ -327,7 +322,7 @@ void ListView::DeselectAllItems()
 
 ListViewItem *ListView::MaybeGetFocusedItem()
 {
-	int index = ListView_GetNextItem(m_hwnd, -1, LVNI_FOCUSED);
+	int index = ListView_GetNextItem(GetHWND(), -1, LVNI_FOCUSED);
 
 	if (index == -1)
 	{
@@ -344,23 +339,23 @@ void ListView::FocusItem(const ListViewItem *item)
 
 void ListView::EnsureItemVisible(const ListViewItem *item)
 {
-	auto res = ListView_EnsureVisible(m_hwnd, GetItemIndex(item), false);
+	auto res = ListView_EnsureVisible(GetHWND(), GetItemIndex(item), false);
 	CHECK(res);
 }
 
 void ListView::StartRenamingItem(const ListViewItem *item)
 {
 	// For ListView_EditLabel() to succeed, the control needs to have focus.
-	SetFocus(m_hwnd);
+	SetFocus(GetHWND());
 
-	auto res = ListView_EditLabel(m_hwnd, GetItemIndex(item));
+	auto res = ListView_EditLabel(GetHWND(), GetItemIndex(item));
 	CHECK(res);
 }
 
 RECT ListView::GetItemRect(const ListViewItem *item) const
 {
 	RECT itemRect;
-	auto res = ListView_GetItemRect(m_hwnd, GetItemIndex(item), &itemRect, LVIR_BOUNDS);
+	auto res = ListView_GetItemRect(GetHWND(), GetItemIndex(item), &itemRect, LVIR_BOUNDS);
 	CHECK(res);
 	return itemRect;
 }
@@ -369,7 +364,7 @@ ListViewItem *ListView::MaybeGetItemAtPoint(const POINT &pt)
 {
 	LVHITTESTINFO hitTestInfo = {};
 	hitTestInfo.pt = pt;
-	int index = ListView_HitTest(m_hwnd, &hitTestInfo);
+	int index = ListView_HitTest(GetHWND(), &hitTestInfo);
 
 	if (index == -1)
 	{
@@ -381,7 +376,7 @@ ListViewItem *ListView::MaybeGetItemAtPoint(const POINT &pt)
 
 bool ListView::IsItemHighlighted(const ListViewItem *item) const
 {
-	UINT state = ListView_GetItemState(m_hwnd, GetItemIndex(item), LVIS_DROPHILITED);
+	UINT state = ListView_GetItemState(GetHWND(), GetItemIndex(item), LVIS_DROPHILITED);
 	return WI_IsFlagSet(state, LVIS_DROPHILITED);
 }
 
@@ -397,7 +392,7 @@ void ListView::UpdateItemState(const ListViewItem *item, UINT state, ItemStateOp
 
 void ListView::UpdateAllItemStates(UINT state, ItemStateOp stateOp)
 {
-	ScopedRedrawDisabler redrawDisabler(m_hwnd);
+	ScopedRedrawDisabler redrawDisabler(GetHWND());
 	ApplyItemStateUpdates(StateUpdateTarget::AllItems(), state, stateOp);
 }
 
@@ -410,7 +405,7 @@ void ListView::ApplyItemStateUpdates(const StateUpdateTarget &target, UINT state
 	LVITEM lvItem = {};
 	lvItem.stateMask = state;
 	lvItem.state = (stateOp == ItemStateOp::Set) ? state : 0;
-	auto res = SendMessage(m_hwnd, LVM_SETITEMSTATE, index, reinterpret_cast<LPARAM>(&lvItem));
+	auto res = SendMessage(GetHWND(), LVM_SETITEMSTATE, index, reinterpret_cast<LPARAM>(&lvItem));
 	CHECK(res);
 }
 
@@ -420,7 +415,7 @@ void ListView::ShowInsertMark(const ListViewItem *targetItem, InsertMarkPosition
 	insertMark.cbSize = sizeof(insertMark);
 	insertMark.dwFlags = (position == InsertMarkPosition::After) ? LVIM_AFTER : 0;
 	insertMark.iItem = GetItemIndex(targetItem);
-	auto res = ListView_SetInsertMark(m_hwnd, &insertMark);
+	auto res = ListView_SetInsertMark(GetHWND(), &insertMark);
 	CHECK(res);
 }
 
@@ -430,7 +425,7 @@ void ListView::RemoveInsertMark()
 	insertMark.cbSize = sizeof(insertMark);
 	insertMark.dwFlags = 0;
 	insertMark.iItem = -1;
-	auto res = ListView_SetInsertMark(m_hwnd, &insertMark);
+	auto res = ListView_SetInsertMark(GetHWND(), &insertMark);
 	CHECK(res);
 }
 
@@ -479,7 +474,7 @@ void ListView::OnColumnMoved(ListViewColumnId columnId, int newVisibleIndex)
 
 void ListView::RemoveColumn(ListViewColumnId columnId)
 {
-	auto res = ListView_DeleteColumn(m_hwnd, GetColumnIndex(columnId));
+	auto res = ListView_DeleteColumn(GetHWND(), GetColumnIndex(columnId));
 	CHECK(res);
 }
 
@@ -492,7 +487,7 @@ void ListView::OnSortOrderChanged()
 void ListView::SortItems()
 {
 	ListView_SortItems(
-		m_hwnd,
+		GetHWND(),
 		[](LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 		{
 			auto *listView = reinterpret_cast<ListView *>(lParamSort);
@@ -592,7 +587,7 @@ LRESULT ListView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_CONTEXTMENU:
-		if (reinterpret_cast<HWND>(wParam) == m_hwnd)
+		if (reinterpret_cast<HWND>(wParam) == GetHWND())
 		{
 			OnShowContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 			return 0;
@@ -654,7 +649,7 @@ void ListView::OnShowContextMenu(const POINT &ptScreen)
 		if (keyboardGenerated)
 		{
 			finalPoint = { 0, 0 };
-			ClientToScreen(m_hwnd, &finalPoint);
+			ClientToScreen(GetHWND(), &finalPoint);
 		}
 
 		m_delegate->OnShowBackgroundContextMenu(finalPoint);
@@ -666,7 +661,7 @@ void ListView::OnShowContextMenu(const POINT &ptScreen)
 			RECT itemRect = GetItemRect(*selectedItems.rbegin());
 
 			finalPoint = { itemRect.left, itemRect.bottom };
-			ClientToScreen(m_hwnd, &finalPoint);
+			ClientToScreen(GetHWND(), &finalPoint);
 		}
 
 		m_delegate->OnShowItemContextMenu(selectedItems, finalPoint);
@@ -682,7 +677,7 @@ void ListView::OnShowHeaderContextMenu(const POINT &ptScreen)
 		return;
 	}
 
-	PopupMenuView popupMenu(m_hwnd, m_menuHelpTextHost);
+	PopupMenuView popupMenu(GetHWND(), m_menuHelpTextHost);
 	ListViewColumnsMenu menu(&popupMenu, m_acceleratorManager, columnModel, m_resourceLoader);
 	popupMenu.Show(ptScreen);
 }
@@ -692,7 +687,7 @@ LRESULT ListView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	switch (msg)
 	{
 	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == GetHWND())
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -762,7 +757,7 @@ bool ListView::OnBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		return true;
 	}
 
-	HWND editControl = ListView_GetEditControl(m_hwnd);
+	HWND editControl = ListView_GetEditControl(GetHWND());
 	CHECK(editControl);
 	m_labelEditHandlerFactory(editControl, item->IsFile());
 
@@ -947,7 +942,7 @@ void ListView::OnHeaderEndDrag(const NMHEADER *changeInfo)
 ListView::ViewType ListView::GetViewType() const
 {
 	ViewType viewType;
-	auto nativeViewType = ListView_GetView(m_hwnd);
+	auto nativeViewType = ListView_GetView(GetHWND());
 
 	switch (nativeViewType)
 	{
@@ -1026,7 +1021,7 @@ const ListViewItem *ListView::GetItemAtIndex(int index) const
 	lvItem.mask = LVIF_PARAM;
 	lvItem.iItem = index;
 	lvItem.iSubItem = 0;
-	auto res = ListView_GetItem(m_hwnd, &lvItem);
+	auto res = ListView_GetItem(GetHWND(), &lvItem);
 	CHECK(res);
 	return reinterpret_cast<ListViewItem *>(lvItem.lParam);
 }
@@ -1036,14 +1031,14 @@ int ListView::GetItemIndex(const ListViewItem *item) const
 	LV_FINDINFO lvFind = {};
 	lvFind.flags = LVFI_PARAM;
 	lvFind.lParam = reinterpret_cast<LPARAM>(item);
-	int index = ListView_FindItem(m_hwnd, -1, &lvFind);
+	int index = ListView_FindItem(GetHWND(), -1, &lvFind);
 	CHECK_NE(index, -1);
 	return index;
 }
 
 HWND ListView::GetHeader() const
 {
-	HWND header = ListView_GetHeader(m_hwnd);
+	HWND header = ListView_GetHeader(GetHWND());
 	CHECK(header);
 	return header;
 }
@@ -1108,13 +1103,13 @@ const ListViewItem *ListView::GetItemAtIndexForTesting(int index) const
 std::wstring ListView::GetItemTextForTesting(int item, int subItem) const
 {
 	CHECK(IsInTest());
-	return ListViewHelper::GetItemText(m_hwnd, item, subItem);
+	return ListViewHelper::GetItemText(GetHWND(), item, subItem);
 }
 
 int ListView::GetItemCountForTesting() const
 {
 	CHECK(IsInTest());
-	return ListView_GetItemCount(m_hwnd);
+	return ListView_GetItemCount(GetHWND());
 }
 
 ListView::StateUpdateTarget ListView::StateUpdateTarget::AllItems()

@@ -48,6 +48,7 @@ public:
 		TabContainer *tabContainer, TabEvents *tabEvents);
 	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 		TabContainer *tabContainer, TabEvents *tabEvents, const InitialData &initialData);
+	~Tab();
 
 	int GetId() const;
 

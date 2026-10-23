@@ -67,30 +67,25 @@ void TabViewItem::NotifyParentOfUpdate() const
 }
 
 TabView::TabView(HWND parent, DWORD style, const Config *config) :
-	m_hwnd(CreateTabControl(parent, style)),
-	m_fontSetter(m_hwnd, config, GetDefaultSystemFontForDefaultDpi())
+	ViewBase(CreateTabControl(parent, style)),
+	m_fontSetter(GetHWND(), config, GetDefaultSystemFontForDefaultDpi())
 {
-	auto tooltipControl = TabCtrl_GetToolTips(m_hwnd);
+	auto tooltipControl = TabCtrl_GetToolTips(GetHWND());
 
 	if (tooltipControl)
 	{
 		m_tooltipFontSetter = std::make_unique<MainFontSetter>(tooltipControl, config);
 	}
 
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TabView::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
-		std::bind_front(&TabView::ParentWndProc, this)));
+	AddSubclass(
+		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&TabView::WndProc, this)));
+	AddSubclass(
+		std::make_unique<WindowSubclass>(parent, std::bind_front(&TabView::ParentWndProc, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&TabView::OnFontUpdated, this));
 }
 
 TabView::~TabView() = default;
-
-HWND TabView::GetHWND() const
-{
-	return m_hwnd;
-}
 
 void TabView::SetDelegate(TabViewDelegate *delegate)
 {
@@ -107,7 +102,7 @@ int TabView::AddTab(std::unique_ptr<TabViewItem> tabItem, int index)
 	tcItem.pszText = text.data();
 	tcItem.iImage = iconIndex ? *iconIndex : -1;
 	tcItem.lParam = reinterpret_cast<LPARAM>(tabItem.get());
-	int insertedIndex = TabCtrl_InsertItem(m_hwnd, index, &tcItem);
+	int insertedIndex = TabCtrl_InsertItem(GetHWND(), index, &tcItem);
 	CHECK_NE(insertedIndex, -1);
 
 	tabItem->SetParent(this);
@@ -129,7 +124,7 @@ void TabView::UpdateTab(const TabViewItem *tabItem)
 	tcItem.mask = TCIF_TEXT | TCIF_IMAGE;
 	tcItem.pszText = text.data();
 	tcItem.iImage = iconIndex ? *iconIndex : -1;
-	auto res = TabCtrl_SetItem(m_hwnd, index, &tcItem);
+	auto res = TabCtrl_SetItem(GetHWND(), index, &tcItem);
 	CHECK(res);
 
 	if (originalIconIndex && *originalIconIndex != iconIndex)
@@ -141,7 +136,7 @@ void TabView::UpdateTab(const TabViewItem *tabItem)
 int TabView::MoveTab(int fromIndex, int toIndex)
 {
 	CHECK(IsValidIndex(fromIndex));
-	int finalIndex = TabHelper::MoveItem(m_hwnd, fromIndex, toIndex);
+	int finalIndex = TabHelper::MoveItem(GetHWND(), fromIndex, toIndex);
 
 	if (finalIndex != fromIndex && m_delegate)
 	{
@@ -178,7 +173,7 @@ void TabView::RemoveTab(int index)
 
 	auto iconIndex = MaybeGetTabIconIndex(index);
 
-	auto res = TabCtrl_DeleteItem(m_hwnd, index);
+	auto res = TabCtrl_DeleteItem(GetHWND(), index);
 	CHECK(res);
 
 	if (iconIndex)
@@ -191,7 +186,7 @@ std::optional<int> TabView::MaybeGetTabIconIndex(int index) const
 {
 	TCITEM tcItem = {};
 	tcItem.mask = TCIF_IMAGE;
-	auto res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
+	auto res = TabCtrl_GetItem(GetHWND(), index, &tcItem);
 	CHECK(res);
 
 	if (tcItem.iImage == -1)
@@ -206,7 +201,7 @@ void TabView::MaybeRemoveIcon(int iconIndex)
 {
 	if (m_delegate && m_delegate->ShouldRemoveIcon(iconIndex))
 	{
-		TabCtrl_RemoveImage(m_hwnd, iconIndex);
+		TabCtrl_RemoveImage(GetHWND(), iconIndex);
 	}
 }
 
@@ -214,7 +209,7 @@ void TabView::SetImageList(HIMAGELIST imageList)
 {
 	// It only makes sense to set the image list once (i.e. there shouldn't be any previous image
 	// list set).
-	auto previousImageList = TabCtrl_SetImageList(m_hwnd, imageList);
+	auto previousImageList = TabCtrl_SetImageList(GetHWND(), imageList);
 	DCHECK(!previousImageList);
 }
 
@@ -222,7 +217,7 @@ TabViewItem *TabView::GetTabAtIndex(int index) const
 {
 	TCITEM tcItem = {};
 	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
+	BOOL res = TabCtrl_GetItem(GetHWND(), index, &tcItem);
 	CHECK(res) << "Tab lookup failed for tab at index " << index;
 	return reinterpret_cast<TabViewItem *>(tcItem.lParam);
 }
@@ -236,7 +231,7 @@ void TabView::SelectTabAtIndex(int index)
 		return;
 	}
 
-	int previousTab = TabCtrl_SetCurSel(m_hwnd, index);
+	int previousTab = TabCtrl_SetCurSel(GetHWND(), index);
 	CHECK_NE(previousTab, -1);
 
 	OnSelectionChanged();
@@ -251,7 +246,7 @@ int TabView::GetSelectedIndex() const
 
 std::optional<int> TabView::MaybeGetSelectedIndex() const
 {
-	int index = TabCtrl_GetCurSel(m_hwnd);
+	int index = TabCtrl_GetCurSel(GetHWND());
 
 	if (index == -1)
 	{
@@ -300,10 +295,6 @@ LRESULT TabView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONUP:
 		OnRightButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) }, static_cast<UINT>(wParam));
 		break;
-
-	case WM_NCDESTROY:
-		OnNcDestroy();
-		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -349,7 +340,7 @@ void TabView::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys)
 
 void TabView::Scroll(ScrollDirection direction)
 {
-	HWND upDownControl = FindWindowEx(m_hwnd, nullptr, UPDOWN_CLASS, nullptr);
+	HWND upDownControl = FindWindowEx(GetHWND(), nullptr, UPDOWN_CLASS, nullptr);
 
 	// It's valid for the control not to exist if all the tabs fit within the window.
 	if (!upDownControl)
@@ -387,7 +378,7 @@ void TabView::Scroll(ScrollDirection direction)
 		return;
 	}
 
-	SendMessage(m_hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
+	SendMessage(GetHWND(), WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
 }
 
 void TabView::OnLeftButtonDown(const POINT &pt)
@@ -399,7 +390,7 @@ void TabView::OnLeftButtonDown(const POINT &pt)
 		return;
 	}
 
-	SetCapture(m_hwnd);
+	SetCapture(GetHWND());
 
 	DCHECK(!m_leftButtonDownPoint);
 	m_leftButtonDownPoint = pt;
@@ -415,7 +406,7 @@ void TabView::OnMouseMove(const POINT &pt)
 	if (m_leftButtonDownPoint)
 	{
 		auto &dpiCompat = DpiCompatibility::GetInstance();
-		UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
+		UINT dpi = dpiCompat.GetDpiForWindow(GetHWND());
 
 		RECT rect = { m_leftButtonDownPoint->x, m_leftButtonDownPoint->y, m_leftButtonDownPoint->x,
 			m_leftButtonDownPoint->y };
@@ -474,7 +465,7 @@ void TabView::OnMouseMove(const POINT &pt)
 		m_tabDragState->anchor = TabDragAnchor::Left;
 	}
 
-	TabHelper::SwapItems(m_hwnd, draggedTabIndex, targetIndex);
+	TabHelper::SwapItems(GetHWND(), draggedTabIndex, targetIndex);
 
 	if (m_delegate)
 	{
@@ -503,7 +494,7 @@ TabView::TabDragBounds TabView::GetTabBoundsForDrag(int tabIndex, TabDragAnchor 
 
 void TabView::OnCaptureChanged(HWND target)
 {
-	if (target != m_hwnd)
+	if (target != GetHWND())
 	{
 		m_leftButtonDownPoint.reset();
 		m_tabDragState.reset();
@@ -521,7 +512,7 @@ void TabView::OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown)
 	}
 
 	POINT ptScreen = pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	auto *tabItem = GetTabAtIndex(*index);
@@ -540,7 +531,7 @@ void TabView::OnMiddleButtonDown(const POINT &pt, UINT keysDown)
 		return;
 	}
 
-	SetCapture(m_hwnd);
+	SetCapture(GetHWND());
 
 	m_middleClickItemIndex = *index;
 }
@@ -562,7 +553,7 @@ void TabView::OnMiddleButtonUp(const POINT &pt, UINT keysDown)
 	}
 
 	POINT ptScreen = pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	auto *tabItem = GetTabAtIndex(*index);
@@ -580,7 +571,7 @@ void TabView::OnRightButtonUp(const POINT &pt, UINT keysDown)
 	}
 
 	POINT ptScreen = pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	auto *tabItem = GetTabAtIndex(*index);
@@ -590,7 +581,7 @@ void TabView::OnRightButtonUp(const POINT &pt, UINT keysDown)
 
 void TabView::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 {
-	HWND toolTipControl = TabCtrl_GetToolTips(m_hwnd);
+	HWND toolTipControl = TabCtrl_GetToolTips(GetHWND());
 
 	if (!toolTipControl || dispInfo->hdr.hwndFrom != toolTipControl)
 	{
@@ -626,7 +617,7 @@ int TabView::GetNumTabs() const
 RECT TabView::GetTabRect(int index) const
 {
 	RECT tabRect;
-	auto res = TabCtrl_GetItemRect(m_hwnd, index, &tabRect);
+	auto res = TabCtrl_GetItemRect(GetHWND(), index, &tabRect);
 	CHECK(res);
 	return tabRect;
 }
@@ -635,7 +626,7 @@ std::optional<int> TabView::MaybeGetIndexOfTabAtPoint(const POINT &pt) const
 {
 	TCHITTESTINFO hitTestInfo = {};
 	hitTestInfo.pt = pt;
-	int index = TabCtrl_HitTest(m_hwnd, &hitTestInfo);
+	int index = TabCtrl_HitTest(GetHWND(), &hitTestInfo);
 
 	if (index < 0)
 	{
@@ -648,11 +639,4 @@ std::optional<int> TabView::MaybeGetIndexOfTabAtPoint(const POINT &pt) const
 void TabView::OnFontUpdated()
 {
 	sizeUpdatedSignal.m_signal();
-}
-
-void TabView::OnNcDestroy()
-{
-	windowDestroyedSignal.m_signal();
-
-	delete this;
 }

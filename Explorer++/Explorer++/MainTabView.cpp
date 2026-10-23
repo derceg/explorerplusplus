@@ -7,12 +7,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include <CommCtrl.h>
 
-MainTabView *MainTabView::Create(HWND parent, const Config *config,
-	const ResourceLoader *resourceLoader)
-{
-	return new MainTabView(parent, config, resourceLoader);
-}
-
 MainTabView::MainTabView(HWND parent, const Config *config, const ResourceLoader *resourceLoader) :
 	TabView(parent,
 		WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE | TCS_TOOLTIPS | WS_CLIPSIBLINGS

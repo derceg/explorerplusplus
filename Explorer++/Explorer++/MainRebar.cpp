@@ -13,14 +13,6 @@
 #include "RebarBandStorageData.h"
 #include <wil/common.h>
 
-MainRebar *MainRebar::Create(MainRebarView *view,
-	const std::vector<BandDefinition> &bandDefinitions,
-	const std::vector<RebarBandStorageData> &storageData, BrowserWindow *browser,
-	AppServices *appServices)
-{
-	return new MainRebar(view, bandDefinitions, storageData, browser, appServices);
-}
-
 MainRebar::MainRebar(MainRebarView *view, const std::vector<BandDefinition> &bandDefinitions,
 	const std::vector<RebarBandStorageData> &storageData, BrowserWindow *browser,
 	AppServices *appServices) :
@@ -29,7 +21,6 @@ MainRebar::MainRebar(MainRebarView *view, const std::vector<BandDefinition> &ban
 	m_appServices(appServices)
 {
 	m_view->SetDelegate(this);
-	m_view->windowDestroyedSignal.AddObserver([this] { OnWindowDestroyed(); });
 
 	auto *config = m_appServices->GetConfig();
 
@@ -147,9 +138,4 @@ const MainRebar::BandDefinition &MainRebar::GetDefinitionForBand(UINT bandId) co
 	auto itr = m_idToBandDefinitionMap.find(bandId);
 	CHECK(itr != m_idToBandDefinitionMap.end());
 	return itr->second;
-}
-
-void MainRebar::OnWindowDestroyed()
-{
-	delete this;
 }

@@ -6,6 +6,7 @@
 
 #include "BrowserWindow.h"
 #include "Tab.h"
+#include "ViewBase.h"
 #include "../Helper/DropTargetWindow.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <boost/signals2.hpp>
@@ -17,9 +18,8 @@ class ResourceLoader;
 class ShellBrowser;
 class ShellBrowserEvents;
 class TabEvents;
-class WindowSubclass;
 
-class BrowserView : private DropTargetInternal
+class BrowserView : public ViewBase, private DropTargetInternal
 {
 public:
 	enum class FocusChangeDirection
@@ -28,21 +28,14 @@ public:
 		Next
 	};
 
-	static BrowserView *Create(HWND hwnd, BrowserWindow *browser, const Config *config,
-		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-		NavigationEvents *navigationEvents, const ResourceLoader *resourceLoader);
+	BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config, TabEvents *tabEvents,
+		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
+		const ResourceLoader *resourceLoader);
 
 	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
 
 private:
-	BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config, TabEvents *tabEvents,
-		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		const ResourceLoader *resourceLoader);
-	~BrowserView() = default;
-
-	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
@@ -60,14 +53,10 @@ private:
 	void DragLeave() override;
 	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
-	void OnNcDestroy();
-
-	const HWND m_hwnd;
 	BrowserWindow *const m_browser;
 	const Config *const m_config;
 	const ResourceLoader *const m_resourceLoader;
 
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;

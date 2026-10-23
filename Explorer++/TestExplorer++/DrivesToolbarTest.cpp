@@ -11,6 +11,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
+#include <memory>
 
 using namespace testing;
 
@@ -19,19 +20,19 @@ class DrivesToolbarTest : public BrowserTestBase
 protected:
 	DrivesToolbarTest() :
 		m_browser(AddBrowser()),
-		m_drivesToolbarView(DrivesToolbarView::Create(m_browser->GetHWND(), &m_config))
+		m_drivesToolbarView(m_browser->GetHWND(), &m_config)
 	{
 		m_driveWatcher.AddDrive(L"C:\\");
 		m_driveWatcher.AddDrive(L"F:\\");
 		m_driveWatcher.AddDrive(L"H:\\");
 
-		m_drivesToolbar = DrivesToolbar::Create(m_drivesToolbarView, &m_driveModel, m_browser,
-			&m_acceleratorManager, &m_resourceLoader);
+		m_drivesToolbar = std::make_unique<DrivesToolbar>(&m_drivesToolbarView, &m_driveModel,
+			m_browser, &m_acceleratorManager, &m_resourceLoader);
 	}
 
 	void VerifyToolbarButtons()
 	{
-		const auto &buttons = m_drivesToolbarView->GetButtons();
+		const auto &buttons = m_drivesToolbarView.GetButtons();
 		const auto &drives = m_driveModel.GetDrives();
 		ASSERT_EQ(buttons.size(), drives.size());
 
@@ -43,8 +44,8 @@ protected:
 	}
 
 	BrowserWindowFake *const m_browser;
-	DrivesToolbarView *const m_drivesToolbarView;
-	DrivesToolbar *m_drivesToolbar = nullptr;
+	DrivesToolbarView m_drivesToolbarView;
+	std::unique_ptr<DrivesToolbar> m_drivesToolbar;
 };
 
 TEST_F(DrivesToolbarTest, InitialDrives)
@@ -73,7 +74,7 @@ TEST_F(DrivesToolbarTest, OpenOnClick)
 {
 	auto *tab = m_browser->AddTab(L"c:\\original\\path");
 
-	const auto &buttons = m_drivesToolbarView->GetButtons();
+	const auto &buttons = m_drivesToolbarView.GetButtons();
 	const auto &drives = m_driveModel.GetDrives();
 	ASSERT_EQ(buttons.size(), drives.size());
 
@@ -87,7 +88,7 @@ TEST_F(DrivesToolbarTest, OpenOnClick)
 
 TEST_F(DrivesToolbarTest, OpenOnMiddleClick)
 {
-	const auto &buttons = m_drivesToolbarView->GetButtons();
+	const auto &buttons = m_drivesToolbarView.GetButtons();
 	const auto &drives = m_driveModel.GetDrives();
 	ASSERT_EQ(buttons.size(), drives.size());
 

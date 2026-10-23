@@ -1524,6 +1524,7 @@
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="VersionHelper.cpp" />
+    <ClCompile Include="ViewBase.cpp" />
     <ClCompile Include="ViewsMenu.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="Win32ResourceLoader.cpp" />
@@ -1902,6 +1903,7 @@
     <ClInclude Include="Version.h" />
     <ClInclude Include="VersionHelper.h" />
     <ClInclude Include="LayoutDefaults.h" />
+    <ClInclude Include="ViewBase.h" />
     <ClInclude Include="ViewModeHelper.h" />
     <ClInclude Include="ViewsMenu.h" />
     <ClInclude Include="WildcardSelectDialog.h" />

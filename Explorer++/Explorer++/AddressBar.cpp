@@ -18,14 +18,6 @@
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 
-AddressBar *AddressBar::Create(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
-	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-	const Runtime *runtime, AsyncIconFetcher *iconFetcher)
-{
-	return new AddressBar(view, browser, tabEvents, shellBrowserEvents, navigationEvents, runtime,
-		iconFetcher);
-}
-
 AddressBar::AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
 	const Runtime *runtime, AsyncIconFetcher *iconFetcher) :
@@ -43,8 +35,6 @@ void AddressBar::Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrows
 	NavigationEvents *navigationEvents)
 {
 	m_view->SetDelegate(this);
-	m_view->windowDestroyedSignal.AddObserver(
-		std::bind_front(&AddressBar::OnWindowDestroyed, this));
 
 	m_connections.push_back(tabEvents->AddSelectedObserver(
 		std::bind_front(&AddressBar::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
@@ -225,9 +215,4 @@ bool AddressBar::IsCommandEnabled(int command) const
 void AddressBar::ExecuteCommand(int command)
 {
 	UNREFERENCED_PARAMETER(command);
-}
-
-void AddressBar::OnWindowDestroyed()
-{
-	delete this;
 }

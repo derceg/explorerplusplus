@@ -121,14 +121,6 @@ private:
 	BookmarkIconManager *m_bookmarkIconManager;
 };
 
-BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browser,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext)
-{
-	return new BookmarksToolbar(view, browser, acceleratorManager, resourceLoader, iconFetcher,
-		bookmarkTree, platformContext);
-}
-
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
@@ -163,8 +155,6 @@ void BookmarksToolbar::Initialize(IconFetcher *iconFetcher, const ResourceLoader
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemPreRemoval, this)));
-
-	m_view->AddWindowDestroyedObserver(std::bind_front(&BookmarksToolbar::OnWindowDestroyed, this));
 }
 
 void BookmarksToolbar::AddBookmarkItems()
@@ -319,11 +309,6 @@ void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 		m_bookmarkTree->GetBookmarksToolbarFolder(), m_bookmarkIconManager.get(), m_browser,
 		m_view->GetHWND(), m_platformContext, m_resourceLoader, includePredicate);
 	popupMenu.Show(ptScreen);
-}
-
-void BookmarksToolbar::OnWindowDestroyed()
-{
-	delete this;
 }
 
 void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)

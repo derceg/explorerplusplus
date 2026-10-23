@@ -83,12 +83,12 @@ protected:
 
 TEST_F(MainRebarTest, StorageData)
 {
-	auto *mainRebarView = MainRebarView::Create(m_browser->GetHWND());
+	MainRebarView mainRebarView(m_browser->GetHWND());
 
-	RebarBandTestData band1(mainRebarView->GetHWND());
-	RebarBandTestData band2(mainRebarView->GetHWND());
-	RebarBandTestData band3(mainRebarView->GetHWND());
-	RebarBandTestData band4(mainRebarView->GetHWND());
+	RebarBandTestData band1(mainRebarView.GetHWND());
+	RebarBandTestData band2(mainRebarView.GetHWND());
+	RebarBandTestData band3(mainRebarView.GetHWND());
+	RebarBandTestData band4(mainRebarView.GetHWND());
 
 	std::vector<MainRebar::BandDefinition> bandDefinitions =
 		CreateDefinitionsForBands({ &band1, &band2, &band3, &band4 });
@@ -100,24 +100,24 @@ TEST_F(MainRebarTest, StorageData)
 		{ band3.id, 0, 0 },
 	};
 
-	MainRebar::Create(mainRebarView, bandDefinitions, storageInfo, m_browser, &m_appServices);
+	MainRebar mainRebar(&mainRebarView, bandDefinitions, storageInfo, m_browser, &m_appServices);
 
-	EXPECT_EQ(mainRebarView->GetStorageData(), storageInfo);
+	EXPECT_EQ(mainRebarView.GetStorageData(), storageInfo);
 }
 
 TEST_F(MainRebarTest, ShowState)
 {
-	auto *mainRebarView = MainRebarView::Create(m_browser->GetHWND());
+	MainRebarView mainRebarView(m_browser->GetHWND());
 
-	RebarBandTestData band1(mainRebarView->GetHWND(), InitialShowState::Hide);
-	RebarBandTestData band2(mainRebarView->GetHWND(), InitialShowState::Show);
+	RebarBandTestData band1(mainRebarView.GetHWND(), InitialShowState::Hide);
+	RebarBandTestData band2(mainRebarView.GetHWND(), InitialShowState::Show);
 
 	std::vector<MainRebar::BandDefinition> bandDefinitions =
 		CreateDefinitionsForBands({ &band1, &band2 });
 
-	MainRebar::Create(mainRebarView, bandDefinitions, {}, m_browser, &m_appServices);
+	MainRebar mainRebar(&mainRebarView, bandDefinitions, {}, m_browser, &m_appServices);
 
-	RebarViewTestApi testApi(mainRebarView);
+	RebarViewTestApi testApi(&mainRebarView);
 	EXPECT_FALSE(testApi.IsBandShown(band1.id));
 	EXPECT_TRUE(testApi.IsBandShown(band2.id));
 
@@ -134,10 +134,10 @@ TEST_F(MainRebarTest, LockToolbars)
 {
 	m_config.lockToolbars = true;
 
-	auto *mainRebarView = MainRebarView::Create(m_browser->GetHWND());
-	MainRebar::Create(mainRebarView, {}, {}, m_browser, &m_appServices);
+	MainRebarView mainRebarView(m_browser->GetHWND());
+	MainRebar mainRebar(&mainRebarView, {}, {}, m_browser, &m_appServices);
 
-	RebarViewTestApi testApi(mainRebarView);
+	RebarViewTestApi testApi(&mainRebarView);
 	EXPECT_TRUE(testApi.AreBandsLocked());
 
 	m_config.lockToolbars = false;

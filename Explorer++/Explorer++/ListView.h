@@ -8,6 +8,7 @@
 #include "ItemStateOp.h"
 #include "ListViewColumn.h"
 #include "ListViewDelegate.h"
+#include "ViewBase.h"
 #include "../Helper/SortDirection.h"
 #include <boost/signals2.hpp>
 #include <functional>
@@ -24,9 +25,8 @@ class ListViewModel;
 class MenuHelpTextHost;
 class ResourceLoader;
 class ScopedRedrawDisabler;
-class WindowSubclass;
 
-class ListView
+class ListView : public ViewBase
 {
 public:
 	using LabelEditHandlerFactory = std::function<LabelEditHandler *(HWND hwnd, bool itemIsFile)>;
@@ -49,8 +49,6 @@ public:
 		LabelEditHandlerFactory labelEditHandlerFactory, MenuHelpTextHost *menuHelpTextHost,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 	~ListView();
-
-	HWND GetHWND() const;
 
 	void SetModel(ListViewModel *model);
 	void SetDelegate(ListViewDelegate *delegate);
@@ -173,7 +171,6 @@ private:
 	int GetItemIndex(const ListViewItem *item) const;
 	HWND GetHeader() const;
 
-	const HWND m_hwnd;
 	ListViewModel *m_model = nullptr;
 	ListViewDelegate m_noOpDelegate;
 	ListViewDelegate *m_delegate = &m_noOpDelegate;
@@ -184,6 +181,5 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	std::unique_ptr<ScopedRedrawDisabler> m_scopedRedrawDisabler;
 	std::optional<ListViewColumnId> m_previousSortColumnId;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

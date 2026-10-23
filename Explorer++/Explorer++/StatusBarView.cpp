@@ -9,18 +9,13 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 
-StatusBarView *StatusBarView::Create(HWND parent, const Config *config)
-{
-	return new StatusBarView(parent, config);
-}
-
 StatusBarView::StatusBarView(HWND parent, const Config *config) :
-	m_hwnd(CreateStatusBar(parent,
+	ViewBase(CreateStatusBar(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | WS_CLIPCHILDREN)),
-	m_fontSetter(m_hwnd, config),
+	m_fontSetter(GetHWND(), config),
 	m_parts({ 100 })
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_hwnd,
+	AddSubclass(std::make_unique<WindowSubclass>(GetHWND(),
 		std::bind_front(&StatusBarView::StatusBarSubclass, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(
@@ -37,9 +32,9 @@ StatusBarView::StatusBarView(HWND parent, const Config *config) :
 
 void StatusBarView::UpdateMinHeight()
 {
-	auto hdc = wil::GetDC(m_hwnd);
+	auto hdc = wil::GetDC(GetHWND());
 
-	auto font = reinterpret_cast<HFONT>(SendMessage(m_hwnd, WM_GETFONT, 0, 0));
+	auto font = reinterpret_cast<HFONT>(SendMessage(GetHWND(), WM_GETFONT, 0, 0));
 	wil::unique_select_object selectFont;
 
 	if (font)
@@ -47,7 +42,7 @@ void StatusBarView::UpdateMinHeight()
 		selectFont = wil::SelectObject(hdc.get(), font);
 	}
 
-	wil::unique_htheme theme(OpenThemeData(m_hwnd, L"Status"));
+	wil::unique_htheme theme(OpenThemeData(GetHWND(), L"Status"));
 	DCHECK(theme);
 
 	TEXTMETRIC textMetrics;
@@ -74,15 +69,10 @@ void StatusBarView::UpdateMinHeight()
 	//
 	// That shouldn't really be a problem, though, since the control will simply be a bit larger
 	// than necessary.
-	SendMessage(m_hwnd, SB_SETMINHEIGHT, textMetrics.tmHeight, 0);
+	SendMessage(GetHWND(), SB_SETMINHEIGHT, textMetrics.tmHeight, 0);
 
 	// As per the documentation for SB_SETMINHEIGHT, this will redraw the window.
-	SendMessage(m_hwnd, WM_SIZE, 0, 0);
-}
-
-HWND StatusBarView::GetHWND() const
-{
-	return m_hwnd;
+	SendMessage(GetHWND(), WM_SIZE, 0, 0);
 }
 
 void StatusBarView::SetParts(const std::vector<int> &parts)
@@ -95,7 +85,8 @@ void StatusBarView::SetParts(const std::vector<int> &parts)
 
 void StatusBarView::SetPartText(int partIndex, const std::wstring &text)
 {
-	auto res = SendMessage(m_hwnd, SB_SETTEXT, partIndex, reinterpret_cast<LPARAM>(text.c_str()));
+	auto res =
+		SendMessage(GetHWND(), SB_SETTEXT, partIndex, reinterpret_cast<LPARAM>(text.c_str()));
 	DCHECK(res);
 }
 
@@ -105,10 +96,6 @@ LRESULT StatusBarView::StatusBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPA
 	{
 	case WM_SIZE:
 		UpdateControlParts();
-		break;
-
-	case WM_NCDESTROY:
-		OnNcDestroy();
 		break;
 	}
 
@@ -145,7 +132,7 @@ bool StatusBarView::VerifyParts(const std::vector<int> &parts)
 void StatusBarView::UpdateControlParts()
 {
 	RECT clientRect;
-	BOOL res = GetClientRect(m_hwnd, &clientRect);
+	BOOL res = GetClientRect(GetHWND(), &clientRect);
 	CHECK(res);
 
 	int width = GetRectWidth(&clientRect);
@@ -164,14 +151,7 @@ void StatusBarView::UpdateControlParts()
 		}
 	}
 
-	auto setPartsRes = SendMessage(m_hwnd, SB_SETPARTS, m_parts.size(),
+	auto setPartsRes = SendMessage(GetHWND(), SB_SETPARTS, m_parts.size(),
 		reinterpret_cast<LPARAM>(partWidths.data()));
 	DCHECK(setPartsRes);
-}
-
-void StatusBarView::OnNcDestroy()
-{
-	windowDestroyedSignal.m_signal();
-
-	delete this;
 }

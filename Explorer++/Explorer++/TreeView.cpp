@@ -15,22 +15,17 @@
 
 TreeView::TreeView(HWND hwnd, const KeyboardState *keyboardState,
 	LabelEditHandlerFactory labelEditHandlerFactory) :
-	m_hwnd(hwnd),
+	ViewBase(hwnd),
 	m_keyboardState(keyboardState),
 	m_labelEditHandlerFactory(labelEditHandlerFactory)
 {
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&TreeView::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
+	AddSubclass(
+		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&TreeView::WndProc, this)));
+	AddSubclass(std::make_unique<WindowSubclass>(GetParent(GetHWND()),
 		std::bind_front(&TreeView::ParentWndProc, this)));
 }
 
 TreeView::~TreeView() = default;
-
-HWND TreeView::GetHWND() const
-{
-	return m_hwnd;
-}
 
 void TreeView::SetAdapter(TreeViewAdapter *adapter)
 {
@@ -57,7 +52,7 @@ void TreeView::SetDelegate(TreeViewDelegate *delegate)
 
 void TreeView::AddExtendedStyles(DWORD styles)
 {
-	TreeView_SetExtendedStyle(m_hwnd, styles, styles);
+	TreeView_SetExtendedStyle(GetHWND(), styles, styles);
 }
 
 void TreeView::AddNodeRecursive(TreeViewNode *node)
@@ -94,7 +89,7 @@ void TreeView::AddNode(TreeViewNode *node)
 	TVINSERTSTRUCT tvInsertData = {};
 	tvInsertData.hParent = parentHandle;
 	tvInsertData.hInsertAfter = insertAfterHandle;
-	auto handle = TreeView_InsertItem(m_hwnd, &tvInsertData);
+	auto handle = TreeView_InsertItem(GetHWND(), &tvInsertData);
 	CHECK(handle);
 
 	auto [itr, didInsert] = m_handleToNodeMap.insert({ handle, node });
@@ -121,11 +116,11 @@ void TreeView::AddNode(TreeViewNode *node)
 		tvParentItem.mask = TVIF_CHILDREN;
 		tvParentItem.hItem = parentHandle;
 		tvParentItem.cChildren = 1;
-		auto res = TreeView_SetItem(m_hwnd, &tvParentItem);
+		auto res = TreeView_SetItem(GetHWND(), &tvParentItem);
 		CHECK(res);
 	}
 
-	if (!TreeView_GetSelection(m_hwnd))
+	if (!TreeView_GetSelection(GetHWND()))
 	{
 		// There should always be a selected node. If there isn't, then this is the first node being
 		// added and it should be selected.
@@ -155,7 +150,7 @@ void TreeView::RefreshNode(TreeViewNode *node)
 		tvItem.cChildren = I_CHILDRENCALLBACK;
 	}
 
-	auto res = TreeView_SetItem(m_hwnd, &tvItem);
+	auto res = TreeView_SetItem(GetHWND(), &tvItem);
 	CHECK(res);
 }
 
@@ -191,9 +186,9 @@ void TreeView::RemoveNode(TreeViewNode *node)
 	// node may not match the parent in the view, and if the node was removed, the node won't have a
 	// parent node.
 	auto handle = GetHandleForNode(node);
-	auto parentHandle = TreeView_GetParent(m_hwnd, handle);
+	auto parentHandle = TreeView_GetParent(GetHWND(), handle);
 
-	auto res = TreeView_DeleteItem(m_hwnd, handle);
+	auto res = TreeView_DeleteItem(GetHWND(), handle);
 	CHECK(res);
 
 	for (auto *currentNode : node->GetNodesDepthFirst())
@@ -202,7 +197,7 @@ void TreeView::RemoveNode(TreeViewNode *node)
 		CHECK_EQ(numErased, 1u);
 	}
 
-	if (parentHandle && !TreeView_GetChild(m_hwnd, parentHandle))
+	if (parentHandle && !TreeView_GetChild(GetHWND(), parentHandle))
 	{
 		// Note that passing I_CHILDRENCALLBACK here will reset the expansion state of the item
 		// (i.e. TVIS_EXPANDED and TVIS_EXPANDEDONCE will be reset).
@@ -210,14 +205,14 @@ void TreeView::RemoveNode(TreeViewNode *node)
 		tvItem.mask = TVIF_CHILDREN;
 		tvItem.hItem = parentHandle;
 		tvItem.cChildren = I_CHILDRENCALLBACK;
-		res = TreeView_SetItem(m_hwnd, &tvItem);
+		res = TreeView_SetItem(GetHWND(), &tvItem);
 		CHECK(res);
 	}
 }
 
 void TreeView::RemoveAllNodes()
 {
-	auto res = TreeView_DeleteAllItems(m_hwnd);
+	auto res = TreeView_DeleteAllItems(GetHWND());
 	CHECK(res);
 }
 
@@ -243,7 +238,7 @@ LRESULT TreeView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void TreeView::OnCaptureChanged(HWND target)
 {
-	if (target != m_hwnd)
+	if (target != GetHWND())
 	{
 		m_middleClickNodeId.reset();
 	}
@@ -258,7 +253,7 @@ void TreeView::OnMiddleButtonDown(const POINT &pt)
 		return;
 	}
 
-	SetCapture(m_hwnd);
+	SetCapture(GetHWND());
 
 	m_middleClickNodeId = node->GetId();
 }
@@ -280,7 +275,7 @@ void TreeView::OnMiddleButtonUp(const POINT &pt)
 	}
 
 	POINT ptScreen = pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	m_delegate->OnNodeMiddleClicked(node,
@@ -292,7 +287,7 @@ LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	switch (msg)
 	{
 	case WM_CONTEXTMENU:
-		if (reinterpret_cast<HWND>(wParam) == m_hwnd)
+		if (reinterpret_cast<HWND>(wParam) == GetHWND())
 		{
 			OnShowContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 			return 0;
@@ -300,7 +295,7 @@ LRESULT TreeView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		break;
 
 	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == GetHWND())
 		{
 			switch (reinterpret_cast<NMHDR *>(lParam)->code)
 			{
@@ -352,7 +347,7 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 		auto textRect = GetNodeRect(selectedNode, NodeRectType::Text);
 
 		ptScreenFinal = { textRect.left, textRect.top + (textRect.bottom - textRect.top) / 2 };
-		ClientToScreen(m_hwnd, &ptScreenFinal);
+		ClientToScreen(GetHWND(), &ptScreenFinal);
 
 		targetNode = selectedNode;
 	}
@@ -361,7 +356,7 @@ void TreeView::OnShowContextMenu(const POINT &ptScreen)
 		ptScreenFinal = ptScreen;
 
 		POINT ptClient = ptScreen;
-		ScreenToClient(m_hwnd, &ptClient);
+		ScreenToClient(GetHWND(), &ptClient);
 
 		targetNode = MaybeGetNodeAtPoint(ptClient, HitTestScope::IconOrText);
 
@@ -563,7 +558,7 @@ void TreeView::SetImageList(wil::unique_himagelist imageList)
 {
 	// Changing the image list after it's been set isn't supported, so it's expected that the image
 	// list will only be set once.
-	auto previousImageList = TreeView_SetImageList(m_hwnd, imageList.get(), TVSIL_NORMAL);
+	auto previousImageList = TreeView_SetImageList(GetHWND(), imageList.get(), TVSIL_NORMAL);
 	CHECK(!previousImageList);
 
 	m_imageList = std::move(imageList);
@@ -576,14 +571,14 @@ TreeViewNode *TreeView::GetSelectedNode()
 
 const TreeViewNode *TreeView::GetSelectedNode() const
 {
-	auto selectedHandle = TreeView_GetSelection(m_hwnd);
+	auto selectedHandle = TreeView_GetSelection(GetHWND());
 	CHECK(selectedHandle);
 	return GetNodeForHandle(selectedHandle);
 }
 
 void TreeView::SelectNode(const TreeViewNode *node)
 {
-	auto res = TreeView_SelectItem(m_hwnd, GetHandleForNode(node));
+	auto res = TreeView_SelectItem(GetHWND(), GetHandleForNode(node));
 	CHECK(res);
 }
 
@@ -595,14 +590,14 @@ void TreeView::StartRenamingNode(const TreeViewNode *node)
 	}
 
 	auto handle = GetHandleForNode(node);
-	TreeView_EnsureVisible(m_hwnd, handle);
-	auto res = TreeView_EditLabel(m_hwnd, handle);
+	TreeView_EnsureVisible(GetHWND(), handle);
+	auto res = TreeView_EditLabel(GetHWND(), handle);
 	CHECK(res);
 }
 
 void TreeView::CancelRenaming()
 {
-	TreeView_EndEditLabelNow(m_hwnd, true);
+	TreeView_EndEditLabelNow(GetHWND(), true);
 }
 
 bool TreeView::IsNodeExpandable(const TreeViewNode *node) const
@@ -612,7 +607,7 @@ bool TreeView::IsNodeExpandable(const TreeViewNode *node) const
 
 bool TreeView::IsNodeExpanded(const TreeViewNode *node) const
 {
-	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_EXPANDED);
+	UINT state = TreeView_GetItemState(GetHWND(), GetHandleForNode(node), TVIS_EXPANDED);
 	return WI_IsFlagSet(state, TVIS_EXPANDED);
 }
 
@@ -627,7 +622,7 @@ void TreeView::ExpandNode(TreeViewNode *node)
 		return;
 	}
 
-	auto res = TreeView_Expand(m_hwnd, GetHandleForNode(node), TVE_EXPAND);
+	auto res = TreeView_Expand(GetHWND(), GetHandleForNode(node), TVE_EXPAND);
 
 	// Expanding the node can fail if the node doesn't add any children when expanded.
 	CHECK(node->GetChildren().empty() || res);
@@ -644,7 +639,7 @@ void TreeView::CollapseNode(TreeViewNode *node)
 	// be sent. Therefore, the adapter will be manually notified.
 	m_adapter->OnNodeCollapsing(node);
 
-	auto res = TreeView_Expand(m_hwnd, GetHandleForNode(node), TVE_COLLAPSE);
+	auto res = TreeView_Expand(GetHWND(), GetHandleForNode(node), TVE_COLLAPSE);
 
 	// Collapsing the node can fail if the node removes all of its children when collapsed.
 	CHECK(node->GetChildren().empty() || res);
@@ -653,7 +648,7 @@ void TreeView::CollapseNode(TreeViewNode *node)
 RECT TreeView::GetNodeRect(const TreeViewNode *node, NodeRectType rectType) const
 {
 	RECT nodeRect;
-	auto res = TreeView_GetItemRect(m_hwnd, GetHandleForNode(node), &nodeRect,
+	auto res = TreeView_GetItemRect(GetHWND(), GetHandleForNode(node), &nodeRect,
 		rectType == NodeRectType::Text ? true : false);
 	CHECK(res);
 	return nodeRect;
@@ -663,7 +658,7 @@ TreeViewNode *TreeView::MaybeGetNodeAtPoint(const POINT &pt, HitTestScope scope)
 {
 	TVHITTESTINFO hitTestInfo = {};
 	hitTestInfo.pt = pt;
-	auto handle = TreeView_HitTest(m_hwnd, &hitTestInfo);
+	auto handle = TreeView_HitTest(GetHWND(), &hitTestInfo);
 
 	if (!handle)
 	{
@@ -682,8 +677,8 @@ TreeViewNode *TreeView::MaybeGetNextVisibleNode(const POINT &pt)
 {
 	HTREEITEM handle = nullptr;
 
-	for (handle = TreeView_GetFirstVisible(m_hwnd); handle != nullptr;
-		handle = TreeView_GetNextVisible(m_hwnd, handle))
+	for (handle = TreeView_GetFirstVisible(GetHWND()); handle != nullptr;
+		handle = TreeView_GetNextVisible(GetHWND(), handle))
 	{
 		auto rect = GetNodeRect(GetNodeForHandle(handle), NodeRectType::EntireLine);
 
@@ -703,7 +698,7 @@ TreeViewNode *TreeView::MaybeGetNextVisibleNode(const POINT &pt)
 
 bool TreeView::IsNodeHighlighted(const TreeViewNode *node) const
 {
-	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_DROPHILITED);
+	UINT state = TreeView_GetItemState(GetHWND(), GetHandleForNode(node), TVIS_DROPHILITED);
 	return WI_IsFlagSet(state, TVIS_DROPHILITED);
 }
 
@@ -719,20 +714,20 @@ void TreeView::UpdateNodeState(const TreeViewNode *node, UINT state, ItemStateOp
 	tvItem.hItem = GetHandleForNode(node);
 	tvItem.stateMask = state;
 	tvItem.state = (stateOp == ItemStateOp::Set) ? state : 0;
-	auto res = TreeView_SetItem(m_hwnd, &tvItem);
+	auto res = TreeView_SetItem(GetHWND(), &tvItem);
 	CHECK(res);
 }
 
 void TreeView::ShowInsertMark(const TreeViewNode *targetNode, InsertMarkPosition position)
 {
-	auto res = TreeView_SetInsertMark(m_hwnd, GetHandleForNode(targetNode),
+	auto res = TreeView_SetInsertMark(GetHWND(), GetHandleForNode(targetNode),
 		position == InsertMarkPosition::After);
 	CHECK(res);
 }
 
 void TreeView::RemoveInsertMark()
 {
-	auto res = TreeView_SetInsertMark(m_hwnd, nullptr, false);
+	auto res = TreeView_SetInsertMark(GetHWND(), nullptr, false);
 	CHECK(res);
 }
 
@@ -760,7 +755,7 @@ RawTreeViewNodes TreeView::GetExpandedNodes()
 
 HWND TreeView::GetEditControl() const
 {
-	HWND editControl = TreeView_GetEditControl(m_hwnd);
+	HWND editControl = TreeView_GetEditControl(GetHWND());
 	CHECK(editControl);
 	return editControl;
 }
@@ -789,7 +784,7 @@ ConstRawTreeViewNodes TreeView::GetAllNodesDepthFirstForTesting() const
 	CHECK(IsInTest());
 
 	ConstRawTreeViewNodes nodes;
-	GetAllNodesDepthFirstForTesting(TreeView_GetRoot(m_hwnd), nodes);
+	GetAllNodesDepthFirstForTesting(TreeView_GetRoot(GetHWND()), nodes);
 	return nodes;
 }
 
@@ -797,11 +792,11 @@ void TreeView::GetAllNodesDepthFirstForTesting(HTREEITEM firstSiblingHandle,
 	ConstRawTreeViewNodes &nodes) const
 {
 	for (auto siblingHandle = firstSiblingHandle; siblingHandle != nullptr;
-		siblingHandle = TreeView_GetNextSibling(m_hwnd, siblingHandle))
+		siblingHandle = TreeView_GetNextSibling(GetHWND(), siblingHandle))
 	{
 		nodes.push_back(GetNodeForHandle(siblingHandle));
 
-		if (auto childHandle = TreeView_GetChild(m_hwnd, siblingHandle))
+		if (auto childHandle = TreeView_GetChild(GetHWND(), siblingHandle))
 		{
 			GetAllNodesDepthFirstForTesting(childHandle, nodes);
 		}
@@ -819,7 +814,7 @@ std::wstring TreeView::GetNodeTextForTesting(const TreeViewNode *node) const
 	tvItem.hItem = GetHandleForNode(node);
 	tvItem.pszText = text;
 	tvItem.cchTextMax = std::size(text);
-	auto res = TreeView_GetItem(m_hwnd, &tvItem);
+	auto res = TreeView_GetItem(GetHWND(), &tvItem);
 	CHECK(res);
 
 	return text;
@@ -835,7 +830,7 @@ bool TreeView::IsNodeGhostedForTesting(const TreeViewNode *node) const
 {
 	CHECK(IsInTest());
 
-	UINT state = TreeView_GetItemState(m_hwnd, GetHandleForNode(node), TVIS_CUT);
+	UINT state = TreeView_GetItemState(GetHWND(), GetHandleForNode(node), TVIS_CUT);
 	return WI_IsFlagSet(state, TVIS_CUT);
 }
 
@@ -846,7 +841,7 @@ bool TreeView::IsExpanderShownForTesting(const TreeViewNode *node) const
 	TVITEM tvItem = {};
 	tvItem.mask = TVIF_HANDLE | TVIF_CHILDREN;
 	tvItem.hItem = GetHandleForNode(node);
-	auto res = TreeView_GetItem(m_hwnd, &tvItem);
+	auto res = TreeView_GetItem(GetHWND(), &tvItem);
 	CHECK(res);
 	return tvItem.cChildren != 0;
 }

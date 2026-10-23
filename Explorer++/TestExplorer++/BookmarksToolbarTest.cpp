@@ -13,13 +13,14 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include <boost/range/combine.hpp>
 #include <gtest/gtest.h>
+#include <memory>
 
 class BookmarksToolbarTest : public BrowserTestBase
 {
 protected:
 	BookmarksToolbarTest() :
 		m_browser(AddBrowser()),
-		m_bookmarksToolbarView(BookmarksToolbarView::Create(m_browser->GetHWND(), &m_config))
+		m_bookmarksToolbarView(m_browser->GetHWND(), &m_config)
 	{
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
@@ -28,14 +29,14 @@ protected:
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
 
-		m_bookmarksToolbar =
-			BookmarksToolbar::Create(m_bookmarksToolbarView, m_browser, &m_acceleratorManager,
-				&m_resourceLoader, &m_iconFetcher, &m_bookmarkTree, &m_platformContext);
+		m_bookmarksToolbar = std::make_unique<BookmarksToolbar>(&m_bookmarksToolbarView, m_browser,
+			&m_acceleratorManager, &m_resourceLoader, &m_iconFetcher, &m_bookmarkTree,
+			&m_platformContext);
 	}
 
 	void VerifyToolbarButtons()
 	{
-		const auto &buttons = m_bookmarksToolbarView->GetButtons();
+		const auto &buttons = m_bookmarksToolbarView.GetButtons();
 		const auto &bookmarks = m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren();
 		ASSERT_EQ(buttons.size(), bookmarks.size());
 
@@ -52,8 +53,8 @@ protected:
 	IconFetcherFake m_iconFetcher;
 
 	BrowserWindowFake *const m_browser;
-	BookmarksToolbarView *const m_bookmarksToolbarView;
-	BookmarksToolbar *m_bookmarksToolbar = nullptr;
+	BookmarksToolbarView m_bookmarksToolbarView;
+	std::unique_ptr<BookmarksToolbar> m_bookmarksToolbar;
 };
 
 TEST_F(BookmarksToolbarTest, InitialBookmarks)
@@ -119,7 +120,7 @@ TEST_F(BookmarksToolbarTest, OpenBookmarkOnClick)
 {
 	auto *tab = m_browser->AddTab(L"c:\\original\\path");
 
-	const auto &buttons = m_bookmarksToolbarView->GetButtons();
+	const auto &buttons = m_bookmarksToolbarView.GetButtons();
 	const auto &bookmarks = m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren();
 	ASSERT_EQ(buttons.size(), bookmarks.size());
 

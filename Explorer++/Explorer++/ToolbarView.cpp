@@ -7,6 +7,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
+#include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
 #include <wil/common.h>
 #include <windowsx.h>
@@ -127,21 +128,21 @@ bool ToolbarMenuButton::ShouldSuppressClick() const
 }
 
 ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Config *config) :
-	m_hwnd(CreateToolbar(parent, style, extendedStyle)),
-	m_fontSetter(m_hwnd, config)
+	ViewBase(CreateToolbar(parent, style, extendedStyle)),
+	m_fontSetter(GetHWND(), config)
 {
-	auto tooltipControl = reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0));
+	auto tooltipControl = reinterpret_cast<HWND>(SendMessage(GetHWND(), TB_GETTOOLTIPS, 0, 0));
 
 	if (tooltipControl)
 	{
 		m_tooltipFontSetter = std::make_unique<MainFontSetter>(tooltipControl, config);
 	}
 
-	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
+	SendMessage(GetHWND(), TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&ToolbarView::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(GetParent(m_hwnd),
+	AddSubclass(
+		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&ToolbarView::WndProc, this)));
+	AddSubclass(std::make_unique<WindowSubclass>(parent,
 		std::bind_front(&ToolbarView::ParentWndProc, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ToolbarView::OnFontOrDpiUpdated, this));
@@ -149,13 +150,13 @@ ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Co
 
 HWND ToolbarView::GetHWND() const
 {
-	return m_hwnd;
+	return ViewBase::GetHWND();
 }
 
 UINT ToolbarView::GetHeight() const
 {
 	SIZE size;
-	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	auto res = SendMessage(GetHWND(), TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
 	CHECK(res);
 
 	return size.cy;
@@ -164,7 +165,7 @@ UINT ToolbarView::GetHeight() const
 std::optional<UINT> ToolbarView::MaybeGetIdealWidth() const
 {
 	SIZE size;
-	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	auto res = SendMessage(GetHWND(), TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
 	CHECK(res);
 
 	return size.cx;
@@ -186,10 +187,10 @@ void ToolbarView::SetImageList(HIMAGELIST imageList)
 	auto iconSizeRes = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
 	CHECK(iconSizeRes);
 
-	auto res = SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+	auto res = SendMessage(GetHWND(), TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 	CHECK(res);
 
-	res = SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(imageList));
+	res = SendMessage(GetHWND(), TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(imageList));
 
 	// The image list should only be set a single time.
 	CHECK(!res);
@@ -197,7 +198,7 @@ void ToolbarView::SetImageList(HIMAGELIST imageList)
 
 HIMAGELIST ToolbarView::MaybeGetImageList() const
 {
-	return reinterpret_cast<HIMAGELIST>(SendMessage(m_hwnd, TB_GETIMAGELIST, 0, 0));
+	return reinterpret_cast<HIMAGELIST>(SendMessage(GetHWND(), TB_GETIMAGELIST, 0, 0));
 }
 
 void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
@@ -212,7 +213,7 @@ void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
 	tbButton.fsState = GetToolbarButtonState(button.get());
 	tbButton.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
 	tbButton.iString = reinterpret_cast<INT_PTR>(text.c_str());
-	SendMessage(m_hwnd, TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&tbButton));
+	SendMessage(GetHWND(), TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&tbButton));
 
 	++m_idCounter;
 
@@ -243,7 +244,7 @@ void ToolbarView::UpdateButton(size_t index)
 	tbButtonInfo.iImage = button->GetImageIndex() ? *button->GetImageIndex() : I_IMAGENONE;
 	tbButtonInfo.pszText = text.data();
 	tbButtonInfo.fsState = GetToolbarButtonState(button);
-	SendMessage(m_hwnd, TB_SETBUTTONINFO, index, reinterpret_cast<LPARAM>(&tbButtonInfo));
+	SendMessage(GetHWND(), TB_SETBUTTONINFO, index, reinterpret_cast<LPARAM>(&tbButtonInfo));
 
 	NotifySizeRequirementsChanged();
 }
@@ -267,7 +268,7 @@ void ToolbarView::RemoveButton(size_t index)
 	auto itr = m_buttons.begin() + index;
 	m_buttons.erase(itr);
 
-	SendMessage(m_hwnd, TB_DELETEBUTTON, index, 0);
+	SendMessage(GetHWND(), TB_DELETEBUTTON, index, 0);
 
 	NotifySizeRequirementsChanged();
 }
@@ -316,10 +317,6 @@ LRESULT ToolbarView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DPICHANGED_AFTERPARENT:
 		OnFontOrDpiUpdated();
 		break;
-
-	case WM_NCDESTROY:
-		OnNcDestroy();
-		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -330,7 +327,7 @@ LRESULT ToolbarView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 	switch (msg)
 	{
 	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == GetHWND())
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -398,7 +395,7 @@ void ToolbarView::OnMouseMove(int keys, const POINT &pt)
 	}
 
 	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
+	UINT dpi = dpiCompat.GetDpiForWindow(GetHWND());
 
 	RECT rect = { m_leftButtonDownPoint->x, m_leftButtonDownPoint->y, m_leftButtonDownPoint->x,
 		m_leftButtonDownPoint->y };
@@ -439,7 +436,7 @@ bool ToolbarView::OnClick(const NMMOUSE *mouseInfo)
 	}
 
 	POINT ptScreen = mouseInfo->pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	button->OnClicked({ ptScreen, IsKeyDown(VK_SHIFT), IsKeyDown(VK_CONTROL) });
@@ -457,7 +454,7 @@ bool ToolbarView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 	}
 
 	POINT ptScreen = *pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	button->OnMiddleClicked(
@@ -477,7 +474,7 @@ bool ToolbarView::OnRightClick(const NMMOUSE *mouseInfo)
 	auto button = GetButtonFromIndex(index);
 
 	POINT ptScreen = mouseInfo->pt;
-	auto res = ClientToScreen(m_hwnd, &ptScreen);
+	auto res = ClientToScreen(GetHWND(), &ptScreen);
 	CHECK(res);
 
 	button->OnRightClicked({ ptScreen, IsKeyDown(VK_SHIFT), IsKeyDown(VK_CONTROL) });
@@ -509,7 +506,7 @@ ToolbarButton *ToolbarView::MaybeGetButtonAtPoint(const POINT &pt)
 
 std::optional<size_t> ToolbarView::MaybeGetIndexOfButtonAtPoint(const POINT &pt)
 {
-	auto index = SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt));
+	auto index = SendMessage(GetHWND(), TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt));
 
 	if (index < 0)
 	{
@@ -521,7 +518,7 @@ std::optional<size_t> ToolbarView::MaybeGetIndexOfButtonAtPoint(const POINT &pt)
 
 size_t ToolbarView::TransformCommandToIndex(int command)
 {
-	auto index = SendMessage(m_hwnd, TB_COMMANDTOINDEX, command, 0);
+	auto index = SendMessage(GetHWND(), TB_COMMANDTOINDEX, command, 0);
 	CHECK_NE(index, -1) << "Invalid command";
 	return index;
 }
@@ -536,7 +533,7 @@ ToolbarButton *ToolbarView::GetButtonFromIndex(size_t index)
 ToolbarView::DropLocation ToolbarView::GetDropLocation(const POINT &ptScreen)
 {
 	POINT ptClient = ptScreen;
-	BOOL res = ScreenToClient(m_hwnd, &ptClient);
+	BOOL res = ScreenToClient(GetHWND(), &ptClient);
 
 	// ScreenToClient can likely only fail if the window parameter is invalid, which should never be
 	// the case here.
@@ -568,20 +565,20 @@ void ToolbarView::ShowInsertMark(size_t index)
 	TBINSERTMARK insertMark;
 	insertMark.iButton = static_cast<int>(finalIndex);
 	insertMark.dwFlags = flags;
-	SendMessage(m_hwnd, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&insertMark));
+	SendMessage(GetHWND(), TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&insertMark));
 }
 
 void ToolbarView::RemoveInsertMark()
 {
 	TBINSERTMARK insertMark;
 	insertMark.iButton = -1;
-	SendMessage(m_hwnd, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&insertMark));
+	SendMessage(GetHWND(), TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&insertMark));
 }
 
 bool ToolbarView::IsButtonVisible(size_t index) const
 {
 	RECT toolbarRect;
-	GetClientRect(m_hwnd, &toolbarRect);
+	GetClientRect(GetHWND(), &toolbarRect);
 
 	RECT buttonRect = GetButtonRect(index);
 
@@ -591,7 +588,7 @@ bool ToolbarView::IsButtonVisible(size_t index) const
 RECT ToolbarView::GetButtonRect(size_t index) const
 {
 	RECT buttonRect;
-	auto res = SendMessage(m_hwnd, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&buttonRect));
+	auto res = SendMessage(GetHWND(), TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&buttonRect));
 	CHECK(res) << "Button not found";
 	return buttonRect;
 }
@@ -620,25 +617,12 @@ size_t ToolbarView::FindNextButtonIndex(const POINT &ptClient) const
 
 void ToolbarView::SetHotItem(size_t index)
 {
-	SendMessage(m_hwnd, TB_SETHOTITEM, index, 0);
+	SendMessage(GetHWND(), TB_SETHOTITEM, index, 0);
 }
 
 void ToolbarView::OnFontOrDpiUpdated()
 {
-	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
+	RefreshToolbarAfterFontOrDpiChange(GetHWND());
 
 	NotifySizeRequirementsChanged();
-}
-
-boost::signals2::connection ToolbarView::AddWindowDestroyedObserver(
-	const WindowDestroyedSignal::slot_type &observer)
-{
-	return m_windowDestroyedSignal.connect(observer);
-}
-
-void ToolbarView::OnNcDestroy()
-{
-	m_windowDestroyedSignal();
-
-	delete this;
 }

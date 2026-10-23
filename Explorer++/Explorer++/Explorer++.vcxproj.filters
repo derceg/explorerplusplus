@@ -952,6 +952,9 @@
     <ClCompile Include="RebarXmlStorage.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
+    <ClCompile Include="ViewBase.cpp">
+      <Filter>UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2081,6 +2084,9 @@
     </ClInclude>
     <ClInclude Include="RebarXmlStorage.h">
       <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewBase.h">
+      <Filter>UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

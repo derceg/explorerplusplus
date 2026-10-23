@@ -12,6 +12,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include <gtest/gtest.h>
+#include <memory>
 
 using namespace testing;
 
@@ -20,24 +21,15 @@ class AddressBarTest : public BrowserTestBase
 protected:
 	AddressBarTest() :
 		m_browser(AddBrowser()),
-		m_addressBarView(AddressBarView::Create(m_browser->GetHWND(), &m_config)),
-		m_addressBar(AddressBar::Create(m_addressBarView, m_browser, &m_tabEvents,
+		m_addressBarView(std::make_unique<AddressBarView>(m_browser->GetHWND(), &m_config)),
+		m_addressBar(std::make_unique<AddressBar>(m_addressBarView.get(), m_browser, &m_tabEvents,
 			&m_shellBrowserEvents, &m_navigationEvents, &m_runtime, &m_iconFetcher))
 	{
 	}
 
-	void DestroyAddressBar()
-	{
-		// The lifetime of the AddressBar instance is tied to the lifetime of the view. So, this
-		// will destroy both instances.
-		m_addressBarView->DestroyForTesting();
-		m_addressBarView = nullptr;
-		m_addressBar = nullptr;
-	}
-
 	BrowserWindowFake *const m_browser;
-	AddressBarView *m_addressBarView = nullptr;
-	AddressBar *m_addressBar = nullptr;
+	std::unique_ptr<AddressBarView> m_addressBarView;
+	std::unique_ptr<AddressBar> m_addressBar;
 };
 
 TEST_F(AddressBarTest, DisplayUpdateAfterNavigation)
@@ -108,12 +100,12 @@ TEST_F(AddressBarTest, RevertTextOnEscape)
 TEST_F(AddressBarTest, ActiveTargetOnFocus)
 {
 	auto *commandTargetManager = m_browser->GetCommandTargetManager();
-	EXPECT_NE(commandTargetManager->GetCurrentTarget(), m_addressBar);
+	EXPECT_NE(commandTargetManager->GetCurrentTarget(), m_addressBar.get());
 
 	// When the address bar receives focus, it should mark itself as the active target.
 	auto *delegate = m_addressBarView->GetDelegateForTesting();
 	delegate->OnFocused();
-	EXPECT_EQ(commandTargetManager->GetCurrentTarget(), m_addressBar);
+	EXPECT_EQ(commandTargetManager->GetCurrentTarget(), m_addressBar.get());
 }
 
 TEST_F(AddressBarTest, IconRetrievalAfterDestruction)
@@ -122,7 +114,8 @@ TEST_F(AddressBarTest, IconRetrievalAfterDestruction)
 	m_browser->AddTab(L"c:\\");
 	EXPECT_TRUE(m_iconFetcher.HasPendingRequests());
 
-	DestroyAddressBar();
+	m_addressBar.reset();
+	m_addressBarView.reset();
 
 	// This will cause the pending icon retrieval task(s) to return. This should be safe, even
 	// though the address bar has been destroyed.

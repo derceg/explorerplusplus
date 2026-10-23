@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BrowserWindow.h"
+#include "MainTabView.h"
 #include "ShellBrowserFactoryFake.h"
 #include "TabContainer.h"
 #include "../Helper/Pidl.h"
@@ -72,5 +73,7 @@ private:
 	wil::unique_hwnd m_window;
 
 	ShellBrowserFactoryFake m_shellBrowserFactory;
-	TabContainer *const m_tabContainer;
+
+	MainTabView m_tabView;
+	TabContainer m_tabContainer;
 };

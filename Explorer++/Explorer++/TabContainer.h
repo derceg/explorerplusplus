@@ -49,7 +49,7 @@ public:
 		Next
 	};
 
-	static TabContainer *Create(MainTabView *view, BrowserWindow *browser,
+	TabContainer(MainTabView *view, BrowserWindow *browser,
 		ShellBrowserFactory *shellBrowserFactory, AppServices *appServices);
 
 	MainTabView *GetView();
@@ -116,9 +116,6 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainer(MainTabView *view, BrowserWindow *browser,
-		ShellBrowserFactory *shellBrowserFactory, AppServices *appServices);
-
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
@@ -153,8 +150,6 @@ private:
 	void ScrollTabControlForDrop(const POINT &pt);
 	void OnDropSwitchTabTimer();
 	void OnDropScrollTimer();
-
-	void OnWindowDestroyed();
 
 	MainTabView *const m_view;
 	BrowserWindow *const m_browser;

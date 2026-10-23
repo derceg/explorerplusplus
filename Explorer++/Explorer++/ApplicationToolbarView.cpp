@@ -8,11 +8,6 @@
 namespace Applications
 {
 
-ApplicationToolbarView *ApplicationToolbarView::Create(HWND parent, const Config *config)
-{
-	return new ApplicationToolbarView(parent, config);
-}
-
 ApplicationToolbarView::ApplicationToolbarView(HWND parent, const Config *config) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
