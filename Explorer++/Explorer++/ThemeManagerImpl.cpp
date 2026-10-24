@@ -3,10 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-// clang-format off
 #include "ThemeManagerImpl.h"
-// clang-format on
-#include "Explorer++.h"
+#include "BrowserView.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
 #include "SystemFontHelper.h"
@@ -131,7 +129,7 @@ void ThemeManagerImpl::ApplyThemeToWindow(HWND hwnd)
 		return;
 	}
 
-	if (lstrcmp(className, Explorerplusplus::WINDOW_CLASS_NAME) == 0)
+	if (lstrcmp(className, BrowserView::WINDOW_CLASS_NAME) == 0)
 	{
 		ApplyThemeToMainWindow(hwnd, enableDarkMode);
 	}

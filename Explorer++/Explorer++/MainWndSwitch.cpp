@@ -564,11 +564,11 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		break;
 
 	case IDA_PREVIOUSWINDOW:
-		m_view->FocusNextWindow(BrowserView::FocusChangeDirection::Previous);
+		m_view.FocusNextWindow(BrowserView::FocusChangeDirection::Previous);
 		break;
 
 	case IDA_NEXTWINDOW:
-		m_view->FocusNextWindow(BrowserView::FocusChangeDirection::Next);
+		m_view.FocusNextWindow(BrowserView::FocusChangeDirection::Next);
 		break;
 
 	case IDA_DUPLICATE_TAB:

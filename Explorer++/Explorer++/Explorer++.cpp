@@ -51,7 +51,9 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 	m_shellBrowserEvents(appServices->GetShellBrowserEvents()),
 	m_navigationEvents(appServices->GetNavigationEvents()),
 	m_resourceLoader(appServices->GetResourceLoader()),
-	m_hwnd(CreateMainWindow(storageData)),
+	m_view(this, storageData.bounds, m_config, m_tabEvents, m_shellBrowserEvents,
+		m_navigationEvents, m_appServices->GetThemeManager(), m_resourceLoader),
+	m_hwnd(m_view.GetHWND()),
 	m_commandController(this, appServices),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_shellBrowserFactory(this, appServices, resourceInstance, &m_fileActionHandler),
@@ -94,56 +96,6 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 
 Explorerplusplus::~Explorerplusplus() = default;
 
-HWND Explorerplusplus::CreateMainWindow(const WindowStorageData &storageData)
-{
-	static bool mainWindowClassRegistered = false;
-
-	if (!mainWindowClassRegistered)
-	{
-		auto res = RegisterMainWindowClass(GetModuleHandle(nullptr));
-		CHECK(res);
-
-		mainWindowClassRegistered = true;
-	}
-
-	HWND hwnd = CreateWindow(WINDOW_CLASS_NAME, AppInfo::NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, GetModuleHandle(nullptr),
-		nullptr);
-	CHECK(hwnd);
-
-	WINDOWPLACEMENT placement = {};
-	placement.length = sizeof(placement);
-	BOOL res = GetWindowPlacement(hwnd, &placement);
-	CHECK(res);
-
-	placement.showCmd = SW_HIDE;
-	placement.rcNormalPosition = storageData.bounds;
-	res = SetWindowPlacement(hwnd, &placement);
-	CHECK(res);
-
-	return hwnd;
-}
-
-ATOM Explorerplusplus::RegisterMainWindowClass(HINSTANCE instance)
-{
-	WNDCLASSEX windowClass = {};
-	windowClass.cbSize = sizeof(windowClass);
-	windowClass.style = 0;
-	windowClass.lpfnWndProc = DefWindowProc;
-	windowClass.cbClsExtra = 0;
-	windowClass.cbWndExtra = 0;
-	windowClass.hInstance = instance;
-	windowClass.hIcon = static_cast<HICON>(LoadImage(instance, MAKEINTRESOURCE(IDI_MAIN),
-		IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR));
-	windowClass.hIconSm = static_cast<HICON>(LoadImage(instance, MAKEINTRESOURCE(IDI_MAIN),
-		IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
-	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	windowClass.hbrBackground = nullptr;
-	windowClass.lpszMenuName = nullptr;
-	windowClass.lpszClassName = WINDOW_CLASS_NAME;
-	return RegisterClassEx(&windowClass);
-}
-
 void Explorerplusplus::SetUpLayoutConfigListeners()
 {
 	m_connections.push_back(
@@ -158,13 +110,9 @@ void Explorerplusplus::SetUpLayoutConfigListeners()
 
 void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 {
-	m_view =
-		std::make_unique<BrowserView>(m_hwnd, this, m_config, m_tabEvents, m_shellBrowserEvents,
-			m_navigationEvents, m_appServices->GetThemeManager(), m_resourceLoader);
-
 	InitializeMainMenu();
 
-	m_statusBar = std::make_unique<StatusBar>(m_view->GetStatusBarView(), this, m_config,
+	m_statusBar = std::make_unique<StatusBar>(m_view.GetStatusBarView(), this, m_config,
 		m_tabEvents, m_shellBrowserEvents, m_navigationEvents, m_resourceLoader);
 
 	CreateMainRebarAndChildren(storageData);
@@ -191,17 +139,17 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 void Explorerplusplus::InitializeMainMenu()
 {
-	m_mainMenu = std::make_unique<MainMenu>(m_view->GetMainMenuView(), this, m_appServices,
+	m_mainMenu = std::make_unique<MainMenu>(m_view.GetMainMenuView(), this, m_appServices,
 		&m_shellIconLoader, &m_iconFetcher, &m_fileActionHandler, this);
 
 	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly
 	// redrawn.
-	m_view->RedrawMenuBar();
+	m_view.RedrawMenuBar();
 }
 
 void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &storageData)
 {
-	auto *mainRebarView = m_view->GetMainRebarView();
+	auto *mainRebarView = m_view.GetMainRebarView();
 	m_connections.push_back(
 		mainRebarView->heightChangedSignal.AddObserver([this] { OnMainRebarHeightChanged(); }));
 
@@ -239,34 +187,34 @@ void Explorerplusplus::OnMainRebarHeightChanged()
 void Explorerplusplus::CreateMainToolbar(
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	m_mainToolbar = MainToolbar::Create(m_view->GetMainRebarView()->GetHWND(), initialButtons, this,
+	m_mainToolbar = MainToolbar::Create(m_view.GetMainRebarView()->GetHWND(), initialButtons, this,
 		m_appServices, this, &m_shellIconLoader);
 }
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBar = std::make_unique<AddressBar>(m_view->GetAddressBarView(), this, m_tabEvents,
+	m_addressBar = std::make_unique<AddressBar>(m_view.GetAddressBarView(), this, m_tabEvents,
 		m_shellBrowserEvents, m_navigationEvents, m_appServices->GetRuntime(),
 		m_appServices->GetAsyncIconFetcher());
 }
 
 void Explorerplusplus::CreateBookmarksToolbar()
 {
-	m_bookmarksToolbar = std::make_unique<BookmarksToolbar>(m_view->GetBookmarksToolbarView(), this,
+	m_bookmarksToolbar = std::make_unique<BookmarksToolbar>(m_view.GetBookmarksToolbarView(), this,
 		m_acceleratorManager, m_resourceLoader, &m_iconFetcher, m_appServices->GetBookmarkTree(),
 		m_platformContext);
 }
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
-	m_drivesToolbar = std::make_unique<DrivesToolbar>(m_view->GetDrivesToolbarView(),
+	m_drivesToolbar = std::make_unique<DrivesToolbar>(m_view.GetDrivesToolbarView(),
 		m_appServices->GetDriveModel(), this, m_acceleratorManager, m_resourceLoader);
 }
 
 void Explorerplusplus::CreateApplicationToolbar()
 {
 	m_applicationToolbar = std::make_unique<Applications::ApplicationToolbar>(
-		m_view->GetApplicationToolbarView(), m_appServices->GetApplicationModel(),
+		m_view.GetApplicationToolbarView(), m_appServices->GetApplicationModel(),
 		&m_applicationExecutor, this, m_acceleratorManager, m_resourceLoader);
 }
 
@@ -329,7 +277,7 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		.showState = NativeShowStateToShowState(placement.showCmd),
 		.tabs = tabContainer->GetStorageData(),
 		.selectedTab = tabContainer->GetSelectedTabIndex(),
-		.mainRebarInfo = m_view->GetMainRebarView()->GetStorageData(),
+		.mainRebarInfo = m_view.GetMainRebarView()->GetStorageData(),
 		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
 		.treeViewWidth = m_treeViewWidth,
 		.displayWindowWidth = m_displayWindowWidth,

@@ -24,11 +24,11 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 
-BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config,
+BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, const Config *config,
 	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 	NavigationEvents *navigationEvents, ThemeManager *themeManager,
 	const ResourceLoader *resourceLoader) :
-	ViewBase(hwnd),
+	ViewBase(CreateBrowserWindow(bounds)),
 	m_browser(browser),
 	m_config(config),
 	m_themeManager(themeManager),
@@ -75,6 +75,56 @@ BrowserView::BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config
 
 BrowserView::~BrowserView() = default;
 
+HWND BrowserView::CreateBrowserWindow(const RECT &bounds)
+{
+	static bool browserWindowClassRegistered = false;
+
+	if (!browserWindowClassRegistered)
+	{
+		auto res = RegisterBrowserWindowClass(GetModuleHandle(nullptr));
+		CHECK(res);
+
+		browserWindowClassRegistered = true;
+	}
+
+	HWND hwnd = CreateWindow(WINDOW_CLASS_NAME, AppInfo::NAME, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, GetModuleHandle(nullptr),
+		nullptr);
+	CHECK(hwnd);
+
+	WINDOWPLACEMENT placement = {};
+	placement.length = sizeof(placement);
+	BOOL res = GetWindowPlacement(hwnd, &placement);
+	CHECK(res);
+
+	placement.showCmd = SW_HIDE;
+	placement.rcNormalPosition = bounds;
+	res = SetWindowPlacement(hwnd, &placement);
+	CHECK(res);
+
+	return hwnd;
+}
+
+ATOM BrowserView::RegisterBrowserWindowClass(HINSTANCE instance)
+{
+	WNDCLASSEX windowClass = {};
+	windowClass.cbSize = sizeof(windowClass);
+	windowClass.style = 0;
+	windowClass.lpfnWndProc = DefWindowProc;
+	windowClass.cbClsExtra = 0;
+	windowClass.cbWndExtra = 0;
+	windowClass.hInstance = instance;
+	windowClass.hIcon = static_cast<HICON>(LoadImage(instance, MAKEINTRESOURCE(IDI_MAIN),
+		IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR));
+	windowClass.hIconSm = static_cast<HICON>(LoadImage(instance, MAKEINTRESOURCE(IDI_MAIN),
+		IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
+	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	windowClass.hbrBackground = nullptr;
+	windowClass.lpszMenuName = nullptr;
+	windowClass.lpszClassName = WINDOW_CLASS_NAME;
+	return RegisterClassEx(&windowClass);
+}
+
 void BrowserView::CreateMainRebarAndChildren()
 {
 	m_mainRebarView = std::make_unique<MainRebarView>(GetHWND());
@@ -86,37 +136,37 @@ void BrowserView::CreateMainRebarAndChildren()
 		m_mainRebarView->GetHWND(), m_config);
 }
 
-MenuView *BrowserView::GetMainMenuView()
+MenuView *BrowserView::GetMainMenuView() const
 {
 	return m_mainMenuView.get();
 }
 
-MainRebarView *BrowserView::GetMainRebarView()
+MainRebarView *BrowserView::GetMainRebarView() const
 {
 	return m_mainRebarView.get();
 }
 
-AddressBarView *BrowserView::GetAddressBarView()
+AddressBarView *BrowserView::GetAddressBarView() const
 {
 	return m_addressBarView.get();
 }
 
-BookmarksToolbarView *BrowserView::GetBookmarksToolbarView()
+BookmarksToolbarView *BrowserView::GetBookmarksToolbarView() const
 {
 	return m_bookmarksToolbarView.get();
 }
 
-DrivesToolbarView *BrowserView::GetDrivesToolbarView()
+DrivesToolbarView *BrowserView::GetDrivesToolbarView() const
 {
 	return m_drivesToolbarView.get();
 }
 
-Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView()
+Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView() const
 {
 	return m_applicationToolbarView.get();
 }
 
-StatusBarView *BrowserView::GetStatusBarView()
+StatusBarView *BrowserView::GetStatusBarView() const
 {
 	return m_statusBarView.get();
 }

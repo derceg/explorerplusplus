@@ -305,7 +305,7 @@ void Explorerplusplus::UpdateLayout()
 	m_displayWindowHeight = std::max(m_displayWindowHeight,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
 
-	auto *mainRebarView = m_view->GetMainRebarView();
+	auto *mainRebarView = m_view.GetMainRebarView();
 	auto rebarHeight = mainRebarView->GetHeight();
 	SetWindowPos(mainRebarView->GetHWND(), nullptr, 0, 0, mainWindowWidth, rebarHeight,
 		SWP_NOZORDER | SWP_NOMOVE);

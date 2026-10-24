@@ -38,31 +38,37 @@ class ApplicationToolbarView;
 class BrowserView : public ViewBase, private DropTargetInternal
 {
 public:
+	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
+
 	enum class FocusChangeDirection
 	{
 		Previous,
 		Next
 	};
 
-	BrowserView(HWND hwnd, BrowserWindow *browser, const Config *config, TabEvents *tabEvents,
-		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		ThemeManager *themeManager, const ResourceLoader *resourceLoader);
+	BrowserView(BrowserWindow *browser, const RECT &bounds, const Config *config,
+		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
+		NavigationEvents *navigationEvents, ThemeManager *themeManager,
+		const ResourceLoader *resourceLoader);
 	~BrowserView();
 
-	MenuView *GetMainMenuView();
+	MenuView *GetMainMenuView() const;
 
-	MainRebarView *GetMainRebarView();
-	AddressBarView *GetAddressBarView();
-	BookmarksToolbarView *GetBookmarksToolbarView();
-	DrivesToolbarView *GetDrivesToolbarView();
-	Applications::ApplicationToolbarView *GetApplicationToolbarView();
+	MainRebarView *GetMainRebarView() const;
+	AddressBarView *GetAddressBarView() const;
+	BookmarksToolbarView *GetBookmarksToolbarView() const;
+	DrivesToolbarView *GetDrivesToolbarView() const;
+	Applications::ApplicationToolbarView *GetApplicationToolbarView() const;
 
-	StatusBarView *GetStatusBarView();
+	StatusBarView *GetStatusBarView() const;
 
 	void RedrawMenuBar();
 	void FocusNextWindow(FocusChangeDirection direction);
 
 private:
+	static HWND CreateBrowserWindow(const RECT &bounds);
+	static ATOM RegisterBrowserWindowClass(HINSTANCE instance);
+
 	void CreateMainRebarAndChildren();
 
 	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);

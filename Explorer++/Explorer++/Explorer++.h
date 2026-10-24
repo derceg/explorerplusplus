@@ -7,6 +7,7 @@
 #include "ApplicationExecutorImpl.h"
 #include "BrowserCommandController.h"
 #include "BrowserPane.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "IconFetcherImpl.h"
@@ -35,7 +36,6 @@ class AddressBar;
 class AppServices;
 class BookmarksToolbar;
 class BrowserList;
-class BrowserView;
 struct Config;
 class DisplayWindow;
 class DrivesToolbar;
@@ -71,8 +71,6 @@ class ApplicationToolbar;
 class Explorerplusplus : public BrowserWindow, public CoreInterface
 {
 public:
-	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
-
 	static Explorerplusplus *Create(const WindowStorageData &storageData, AppServices *appServices,
 		HINSTANCE resourceInstance);
 
@@ -161,9 +159,6 @@ private:
 	Explorerplusplus(const WindowStorageData &storageData, AppServices *appServices,
 		HINSTANCE resourceInstance);
 	~Explorerplusplus();
-
-	static HWND CreateMainWindow(const WindowStorageData &storageData);
-	static ATOM RegisterMainWindowClass(HINSTANCE instance);
 
 	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -282,6 +277,7 @@ private:
 	ShellBrowserEvents *const m_shellBrowserEvents;
 	NavigationEvents *const m_navigationEvents;
 	const ResourceLoader *const m_resourceLoader;
+	BrowserView m_view;
 	HWND m_hwnd;
 	BrowserCommandController m_commandController;
 
@@ -296,7 +292,6 @@ private:
 	bool m_performingLayout = false;
 #endif
 
-	std::unique_ptr<BrowserView> m_view;
 	TabBacking *m_tabBacking = nullptr;
 	std::unique_ptr<StatusBar> m_statusBar;
 
