@@ -115,8 +115,6 @@ public:
 		const MenuHelpTextRequestSignal::slot_type &observer) override;
 
 private:
-	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
-
 	static const int DISPLAY_WINDOW_MINIMUM_WIDTH = 70_px;
 	static const int DISPLAY_WINDOW_MINIMUM_HEIGHT = 70_px;
 

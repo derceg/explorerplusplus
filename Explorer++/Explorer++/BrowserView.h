@@ -67,6 +67,8 @@ public:
 	void FocusNextWindow(FocusChangeDirection direction);
 
 private:
+	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
+
 	static HWND CreateBrowserWindow(const RECT &bounds);
 	static ATOM RegisterBrowserWindowClass(HINSTANCE instance);
 
