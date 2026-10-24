@@ -23,12 +23,14 @@
 #include "WindowMenuView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 
 BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, const Config *config,
 	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
 	NavigationEvents *navigationEvents, ThemeManager *themeManager,
 	const ResourceLoader *resourceLoader) :
 	ViewBase(CreateBrowserWindow(bounds)),
+	m_subclass(GetHWND(), std::bind_front(&BrowserView::WndProc, this)),
 	m_browser(browser),
 	m_config(config),
 	m_themeManager(themeManager),
@@ -169,6 +171,25 @@ Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView() c
 StatusBarView *BrowserView::GetStatusBarView() const
 {
 	return m_statusBarView.get();
+}
+
+LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_DPICHANGED:
+		OnDpiChanged(reinterpret_cast<RECT *>(lParam));
+		return 0;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void BrowserView::OnDpiChanged(const RECT *updatedWindowRect)
+{
+	SetWindowPos(GetHWND(), nullptr, updatedWindowRect->left, updatedWindowRect->top,
+		GetRectWidth(updatedWindowRect), GetRectHeight(updatedWindowRect),
+		SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)

@@ -9,6 +9,7 @@
 #include "ViewBase.h"
 #include "../Helper/DropTargetWindow.h"
 #include "../Helper/WinRTBaseWrapper.h"
+#include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <memory>
 
@@ -71,6 +72,9 @@ private:
 
 	void CreateMainRebarAndChildren();
 
+	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnDpiChanged(const RECT *updatedWindowRect);
+
 	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnNavigationCommitted(const NavigationRequest *request);
 	void OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser);
@@ -88,11 +92,11 @@ private:
 	void DragLeave() override;
 	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
+	const WindowSubclass m_subclass;
 	BrowserWindow *const m_browser;
 	const Config *const m_config;
 	ThemeManager *const m_themeManager;
 	const ResourceLoader *const m_resourceLoader;
-
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;

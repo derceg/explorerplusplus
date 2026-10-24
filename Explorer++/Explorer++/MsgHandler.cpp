@@ -468,13 +468,6 @@ void Explorerplusplus::UpdateLayout()
 		GetRectHeight(&statusBarRect), statusBarShowFlags);
 }
 
-void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
-{
-	SetWindowPos(m_hwnd, nullptr, updatedWindowRect->left, updatedWindowRect->top,
-		GetRectWidth(updatedWindowRect), GetRectHeight(updatedWindowRect),
-		SWP_NOZORDER | SWP_NOACTIVATE);
-}
-
 std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hdc);
