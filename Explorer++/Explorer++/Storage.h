@@ -25,7 +25,9 @@ inline const wchar_t CONFIG_FILE_FILENAME[] = L"config.xml";
 inline const wchar_t CONFIG_FILE_ROOT_NODE_NAME[] = L"ExplorerPlusPlus";
 inline const wchar_t CONFIG_FILE_SETTINGS_NODE_NAME[] = L"Settings";
 inline const wchar_t CONFIG_FILE_ENV_VAR_NAME[] = L"EXPLORERPP_CONFIG";
+inline const wchar_t FREQUENT_LOCATIONS_FILE_FILENAME[] = L"frequent_locations.xml";
 
 std::wstring GetConfigFilePath();
+std::wstring GetFrequentLocationsFilePath();
 
 }
