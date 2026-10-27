@@ -9,5 +9,5 @@
 class DrivesToolbarView : public ToolbarView
 {
 public:
-	DrivesToolbarView(HWND parent, const Config *config);
+	DrivesToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost, const Config *config);
 };

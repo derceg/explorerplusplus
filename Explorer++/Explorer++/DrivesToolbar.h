@@ -42,6 +42,7 @@ private:
 
 	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptScreen, bool showExtended);
 
+	DrivesToolbarView *const m_view;
 	DriveModel *const m_driveModel;
 	BrowserWindow *const m_browser;
 	const ResourceLoader *const m_resourceLoader;

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MainToolbarStorage.h"
+#include "MainToolbarLayout.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/bimap.hpp>
@@ -15,40 +16,40 @@
 namespace
 {
 
-using ToolbarButtonMapping = boost::bimap<MainToolbarButton, std::wstring>;
+using ToolbarButtonMapping = boost::bimap<MainToolbarButtonId, std::wstring>;
 
 // This matches the ID value used for a separator by TB_SAVERESTORE.
 const DWORD REGISTRY_SEPARATOR_STORAGE_ID = static_cast<DWORD>(-1);
 
 const ToolbarButtonMapping::value_type g_xmlButtonMappingValues[] = {
-	{ MainToolbarButton::Back, L"Back" },
-	{ MainToolbarButton::Forward, L"Forward" },
-	{ MainToolbarButton::Up, L"Up" },
-	{ MainToolbarButton::Folders, L"Folders" },
-	{ MainToolbarButton::CopyTo, L"Copy To" },
-	{ MainToolbarButton::MoveTo, L"Move To" },
-	{ MainToolbarButton::NewFolder, L"New Folder" },
-	{ MainToolbarButton::Copy, L"Copy" },
-	{ MainToolbarButton::Cut, L"Cut" },
-	{ MainToolbarButton::Paste, L"Paste" },
-	{ MainToolbarButton::Delete, L"Delete" },
-	{ MainToolbarButton::Views, L"Views" },
-	{ MainToolbarButton::Search, L"Search" },
-	{ MainToolbarButton::Properties, L"Properties" },
-	{ MainToolbarButton::Refresh, L"Refresh" },
-	{ MainToolbarButton::AddBookmark, L"Bookmark the current tab" },
-	{ MainToolbarButton::NewTab, L"Create a new tab" },
-	{ MainToolbarButton::OpenCommandPrompt, L"Open Command Prompt" },
-	{ MainToolbarButton::Bookmarks, L"Organize Bookmarks" },
-	{ MainToolbarButton::DeletePermanently, L"Delete Permanently" },
-	{ MainToolbarButton::SplitFile, L"Split File" },
-	{ MainToolbarButton::MergeFiles, L"Merge Files" },
-	{ MainToolbarButton::CloseTab, L"Close Tab" },
+	{ MainToolbarButtonId::Back, L"Back" },
+	{ MainToolbarButtonId::Forward, L"Forward" },
+	{ MainToolbarButtonId::Up, L"Up" },
+	{ MainToolbarButtonId::Folders, L"Folders" },
+	{ MainToolbarButtonId::CopyTo, L"Copy To" },
+	{ MainToolbarButtonId::MoveTo, L"Move To" },
+	{ MainToolbarButtonId::NewFolder, L"New Folder" },
+	{ MainToolbarButtonId::Copy, L"Copy" },
+	{ MainToolbarButtonId::Cut, L"Cut" },
+	{ MainToolbarButtonId::Paste, L"Paste" },
+	{ MainToolbarButtonId::Delete, L"Delete" },
+	{ MainToolbarButtonId::Views, L"Views" },
+	{ MainToolbarButtonId::Search, L"Search" },
+	{ MainToolbarButtonId::Properties, L"Properties" },
+	{ MainToolbarButtonId::Refresh, L"Refresh" },
+	{ MainToolbarButtonId::AddBookmark, L"Bookmark the current tab" },
+	{ MainToolbarButtonId::NewTab, L"Create a new tab" },
+	{ MainToolbarButtonId::OpenCommandPrompt, L"Open Command Prompt" },
+	{ MainToolbarButtonId::Bookmarks, L"Organize Bookmarks" },
+	{ MainToolbarButtonId::DeletePermanently, L"Delete Permanently" },
+	{ MainToolbarButtonId::SplitFile, L"Split File" },
+	{ MainToolbarButtonId::MergeFiles, L"Merge Files" },
+	{ MainToolbarButtonId::CloseTab, L"Close Tab" },
 
-	{ MainToolbarButton::Separator, L"Separator" },
+	{ MainToolbarButtonId::Separator, L"Separator" },
 };
 
-static_assert(std::size(g_xmlButtonMappingValues) == magic_enum::enum_count<MainToolbarButton>());
+static_assert(std::size(g_xmlButtonMappingValues) == magic_enum::enum_count<MainToolbarButtonId>());
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather than button strings,
 // but changing that would at least break forward compatibility.
@@ -62,31 +63,7 @@ constexpr WCHAR XM_BUTTON_ATTRIBUTE_TEMPLATE[] = L"Button{}";
 namespace MainToolbarStorage
 {
 
-MainToolbarButtons::MainToolbarButtons(const std::vector<MainToolbarButton> &buttons)
-{
-	for (auto button : buttons)
-	{
-		AddButton(button);
-	}
-}
-
-void MainToolbarButtons::AddButton(MainToolbarButton button)
-{
-	if ((button != MainToolbarButton::Separator)
-		&& (std::find(m_buttons.begin(), m_buttons.end(), button) != m_buttons.end()))
-	{
-		return;
-	}
-
-	m_buttons.push_back(button);
-}
-
-const std::vector<MainToolbarButton> &MainToolbarButtons::GetButtons() const
-{
-	return m_buttons;
-}
-
-std::optional<MainToolbarButtons> LoadFromRegistry(HKEY parentKey, const std::wstring &valueName)
+std::optional<MainToolbarLayout> LoadFromRegistry(HKEY parentKey, const std::wstring &valueName)
 {
 	std::vector<DWORD> buttonsData;
 	auto res = RegistrySettings::ReadVectorFromBinaryValue(parentKey, valueName, buttonsData);
@@ -96,49 +73,48 @@ std::optional<MainToolbarButtons> LoadFromRegistry(HKEY parentKey, const std::ws
 		return std::nullopt;
 	}
 
-	MainToolbarButtons buttons;
+	MainToolbarLayout layout;
 
 	for (auto &loadedButtonType : buttonsData)
 	{
 		if (loadedButtonType == REGISTRY_SEPARATOR_STORAGE_ID)
 		{
-			buttons.AddButton(MainToolbarButton::Separator);
+			layout.AddButton(MainToolbarButtonId::Separator);
 		}
 		else
 		{
-			auto buttonType = magic_enum::enum_cast<MainToolbarButton>(loadedButtonType);
+			auto buttonType = magic_enum::enum_cast<MainToolbarButtonId>(loadedButtonType);
 
 			if (!buttonType)
 			{
 				continue;
 			}
 
-			buttons.AddButton(*buttonType);
+			layout.AddButton(*buttonType);
 		}
 	}
 
-	return buttons;
+	return layout;
 }
 
-void SaveToRegistry(HKEY parentKey, const std::wstring &valueName,
-	const MainToolbarButtons &buttons)
+void SaveToRegistry(HKEY parentKey, const std::wstring &valueName, const MainToolbarLayout &layout)
 {
 	// Data is saved here in the same format as TB_SAVERESTORE. That is, as a set of DWORDs, with
 	// each DWORD containing the ID for the button at that index.
 	std::vector<DWORD> buttonsData;
-	buttonsData.reserve(buttons.GetButtons().size());
+	buttonsData.reserve(layout.GetButtons().size());
 
-	std::ranges::transform(buttons.GetButtons(), std::back_inserter(buttonsData),
-		[](MainToolbarButton buttonType)
+	std::ranges::transform(layout.GetButtons(), std::back_inserter(buttonsData),
+		[](MainToolbarButtonId buttonType)
 		{
-			return (buttonType == MainToolbarButton::Separator) ? REGISTRY_SEPARATOR_STORAGE_ID
-																: static_cast<DWORD>(buttonType);
+			return (buttonType == MainToolbarButtonId::Separator) ? REGISTRY_SEPARATOR_STORAGE_ID
+																  : static_cast<DWORD>(buttonType);
 		});
 
 	RegistrySettings::SaveVectorToBinaryValue(parentKey, valueName, buttonsData);
 }
 
-std::optional<MainToolbarButtons> LoadFromXml(IXMLDOMNode *toolbarNode)
+std::optional<MainToolbarLayout> LoadFromXml(IXMLDOMNode *toolbarNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	HRESULT hr = toolbarNode->get_attributes(&attributeMap);
@@ -148,7 +124,7 @@ std::optional<MainToolbarButtons> LoadFromXml(IXMLDOMNode *toolbarNode)
 		return std::nullopt;
 	}
 
-	MainToolbarButtons buttons;
+	MainToolbarLayout layout;
 
 	for (int index = 0;; index++)
 	{
@@ -169,18 +145,18 @@ std::optional<MainToolbarButtons> LoadFromXml(IXMLDOMNode *toolbarNode)
 			continue;
 		}
 
-		buttons.AddButton(itr->second);
+		layout.AddButton(itr->second);
 	}
 
-	return buttons;
+	return layout;
 }
 
 void SaveToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *toolbarNode,
-	const MainToolbarButtons &buttons)
+	const MainToolbarLayout &layout)
 {
 	int index = 0;
 
-	for (auto button : buttons.GetButtons())
+	for (auto button : layout.GetButtons())
 	{
 		auto buttonAttributeName = std::format(XM_BUTTON_ATTRIBUTE_TEMPLATE, index);
 		auto buttonName = XML_BUTTON_NAME_MAPPINGS.left.at(button);

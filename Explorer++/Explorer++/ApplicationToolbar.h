@@ -6,7 +6,7 @@
 
 #include "ApplicationDropper.h"
 #include "ToolbarBase.h"
-#include "ToolbarView.h"
+#include "ToolbarViewBase.h"
 #include "../Helper/DropTargetWindow.h"
 #include <boost/signals2.hpp>
 #include <wil/com.h>
@@ -81,11 +81,12 @@ private:
 	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
 	ApplicationDropper::DropTarget DropLocationToTarget(
-		const ToolbarView::DropLocation &dropLocation);
+		const ToolbarViewBase::DropLocation &dropLocation);
 	DWORD OnDragOver(POINT pt);
 	void ResetDropState();
 	const DragData &GetDragData() const;
 
+	ApplicationToolbarView *const m_view;
 	ApplicationModel *m_model;
 	ApplicationExecutor *const m_applicationExecutor;
 	BrowserWindow *const m_browser;

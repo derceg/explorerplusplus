@@ -1211,6 +1211,7 @@
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
+    <ClCompile Include="CustomizableToolbarView.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="DarkModeManager.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
@@ -1226,7 +1227,8 @@
     <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainTabView.cpp" />
     <ClCompile Include="MainTabViewImageListManager.cpp" />
-    <ClCompile Include="MainToolbarOverflowMenu.cpp" />
+    <ClCompile Include="MainToolbarLayout.cpp" />
+    <ClCompile Include="MainToolbarView.cpp" />
     <ClCompile Include="MassRenameHelper.cpp" />
     <ClCompile Include="MassRenameTokensMenu.cpp" />
     <ClCompile Include="MenuItemParams.cpp" />
@@ -1337,6 +1339,7 @@
     <ClCompile Include="ToolbarBase.cpp" />
     <ClCompile Include="ToolbarOptionsMenu.cpp" />
     <ClCompile Include="ToolbarOverflowMenu.cpp" />
+    <ClCompile Include="ToolbarView.cpp" />
     <ClCompile Include="ToolsMenu.cpp" />
     <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="TreeViewAdapter.cpp" />
@@ -1382,7 +1385,7 @@
     <ClCompile Include="Theme.cpp" />
     <ClCompile Include="ThemeWindowTracker.cpp" />
     <ClCompile Include="ToolbarHelper.cpp" />
-    <ClCompile Include="ToolbarView.cpp" />
+    <ClCompile Include="ToolbarViewBase.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="DarkModeManagerImpl.cpp" />
     <ClCompile Include="FolderView.cpp" />
@@ -1576,6 +1579,7 @@
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="ConfigRegistryStorage.h" />
     <ClInclude Include="ConfigXmlStorage.h" />
+    <ClInclude Include="CustomizableToolbarView.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="DarkModeManager.h" />
     <ClInclude Include="DialogHelper.h" />
@@ -1600,7 +1604,8 @@
     <ClInclude Include="MainRebar.h" />
     <ClInclude Include="MainTabView.h" />
     <ClInclude Include="MainTabViewImageListManager.h" />
-    <ClInclude Include="MainToolbarOverflowMenu.h" />
+    <ClInclude Include="MainToolbarLayout.h" />
+    <ClInclude Include="MainToolbarView.h" />
     <ClInclude Include="MassRenameHelper.h" />
     <ClInclude Include="MassRenameTokensMenu.h" />
     <ClInclude Include="MenuItemCallbacks.h" />
@@ -1732,6 +1737,7 @@
     <ClInclude Include="ToolbarBase.h" />
     <ClInclude Include="ToolbarOptionsMenu.h" />
     <ClInclude Include="ToolbarOverflowMenu.h" />
+    <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="ToolsMenu.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="TreeViewAdapter.h" />
@@ -1789,7 +1795,7 @@
     <ClInclude Include="Theme.h" />
     <ClInclude Include="ThemeWindowTracker.h" />
     <ClInclude Include="ToolbarHelper.h" />
-    <ClInclude Include="ToolbarView.h" />
+    <ClInclude Include="ToolbarViewBase.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="DarkModeManagerImpl.h" />
     <ClInclude Include="FolderView.h" />
@@ -1820,7 +1826,6 @@
     <ClInclude Include="CoreInterface.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DefaultColumns.h" />
-    <ClInclude Include="DefaultToolbarButtons.h" />
     <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="DialogConstants.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
@@ -1896,7 +1901,7 @@
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarTabManager.h" />
     <ClInclude Include="ThirdPartyCreditsDialog.h" />
-    <ClInclude Include="MainToolbarButtons.h" />
+    <ClInclude Include="MainToolbarButtonId.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ValueWrapper.h" />

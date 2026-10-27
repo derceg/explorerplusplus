@@ -246,12 +246,15 @@
     <ClCompile Include="BrowserWindowTest.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
+    <ClCompile Include="CustomizableToolbarViewTest.cpp" />
     <ClCompile Include="D2DHelperTest.cpp" />
     <ClCompile Include="DarkModeManagerFake.cpp" />
     <ClCompile Include="ImageInteropTest.cpp" />
     <ClCompile Include="ImageOperationsTest.cpp" />
     <ClCompile Include="ListViewColumnsMenuTest.cpp" />
     <ClCompile Include="MainRebarTest.cpp" />
+    <ClCompile Include="MainToolbarLayoutTest.cpp" />
+    <ClCompile Include="MainToolbarTest.cpp" />
     <ClCompile Include="ManageBookmarksViewsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
     <ClCompile Include="MassRenameTokensMenuTest.cpp" />
@@ -321,6 +324,7 @@
     <ClCompile Include="TaskbarTabManagerTest.cpp" />
     <ClCompile Include="TestMenuView.cpp" />
     <ClCompile Include="TestRebarBandView.cpp" />
+    <ClCompile Include="TestToolbarButton.cpp" />
     <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
@@ -551,6 +555,7 @@
     <ClInclude Include="ResourceTestHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />
     <ClInclude Include="TabStorageTestHelper.h" />
+    <ClInclude Include="TestToolbarButton.h" />
     <ClInclude Include="TreeViewNodeFake.h" />
     <ClInclude Include="WindowStorageTestHelper.h" />
     <ClInclude Include="XmlStorageTestHelper.h" />

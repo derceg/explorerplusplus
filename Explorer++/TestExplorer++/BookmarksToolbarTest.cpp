@@ -20,7 +20,7 @@ class BookmarksToolbarTest : public BrowserTestBase
 protected:
 	BookmarksToolbarTest() :
 		m_browser(AddBrowser()),
-		m_bookmarksToolbarView(m_browser->GetHWND(), &m_config)
+		m_bookmarksToolbarView(m_browser->GetHWND(), m_browser, &m_config)
 	{
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
@@ -36,13 +36,16 @@ protected:
 
 	void VerifyToolbarButtons()
 	{
-		const auto &buttons = m_bookmarksToolbarView.GetButtons();
+		auto toolbarItems = m_bookmarksToolbarView.GetItems();
 		const auto &bookmarks = m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren();
-		ASSERT_EQ(buttons.size(), bookmarks.size());
+		ASSERT_EQ(toolbarItems.size(), bookmarks.size());
 
 		// TODO: This should use std::views::zip once C++23 support is available.
-		for (const auto &[button, bookmark] : boost::combine(buttons, bookmarks))
+		for (const auto &[toolbarItem, bookmark] : boost::combine(toolbarItems, bookmarks))
 		{
+			ASSERT_TRUE(toolbarItem.IsButton());
+
+			auto *button = toolbarItem.GetButton();
 			EXPECT_EQ(button->GetText(), bookmark->GetName());
 			EXPECT_EQ(button->GetTooltipText(),
 				bookmark->IsBookmark() ? bookmark->GetName() + L"\n" + bookmark->GetLocation()
@@ -120,18 +123,21 @@ TEST_F(BookmarksToolbarTest, OpenBookmarkOnClick)
 {
 	auto *tab = m_browser->AddTab(L"c:\\original\\path");
 
-	const auto &buttons = m_bookmarksToolbarView.GetButtons();
+	auto toolbarItems = m_bookmarksToolbarView.GetItems();
 	const auto &bookmarks = m_bookmarkTree.GetBookmarksToolbarFolder()->GetChildren();
-	ASSERT_EQ(buttons.size(), bookmarks.size());
+	ASSERT_EQ(toolbarItems.size(), bookmarks.size());
 
 	// TODO: This should use std::views::zip once C++23 support is available.
-	for (const auto &[button, bookmark] : boost::combine(buttons, bookmarks))
+	for (const auto &[toolbarItem, bookmark] : boost::combine(toolbarItems, bookmarks))
 	{
 		if (bookmark->IsFolder())
 		{
 			continue;
 		}
 
+		ASSERT_TRUE(toolbarItem.IsButton());
+
+		auto *button = toolbarItem.GetButton();
 		button->OnClicked(MouseEvent{ { 0, 0 }, false, false });
 
 		auto *currentEntry = tab->GetShellBrowser()->GetNavigationController()->GetCurrentEntry();

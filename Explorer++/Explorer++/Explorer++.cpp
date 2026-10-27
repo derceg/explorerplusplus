@@ -20,6 +20,7 @@
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "MainToolbarView.h"
 #include "RebarBandStorageData.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -153,14 +154,14 @@ void Explorerplusplus::CreateMainRebarAndChildren(const WindowStorageData &stora
 	m_connections.push_back(
 		mainRebarView->heightChangedSignal.AddObserver([this] { OnMainRebarHeightChanged(); }));
 
-	CreateMainToolbar(storageData.mainToolbarButtons);
+	CreateMainToolbar(storageData.mainToolbarLayout);
 	CreateAddressBar();
 	CreateBookmarksToolbar();
 	CreateDrivesToolbar();
 	CreateApplicationToolbar();
 
 	std::vector<MainRebar::BandDefinition> bandDefinitions = {
-		{ REBAR_BAND_ID_MAIN_TOOLBAR, m_mainToolbar, &m_config->showMainToolbar,
+		{ REBAR_BAND_ID_MAIN_TOOLBAR, m_mainToolbar.get(), &m_config->showMainToolbar,
 			ToolbarOptionsMenu::Source::MainToolbar },
 		{ REBAR_BAND_ID_ADDRESS_BAR, m_addressBar.get(), &m_config->showAddressBar,
 			ToolbarOptionsMenu::Source::AddressBar },
@@ -184,10 +185,9 @@ void Explorerplusplus::OnMainRebarHeightChanged()
 	ScheduleUpdateLayout(m_weakPtrFactory.GetWeakPtr(), m_appServices->GetRuntime());
 }
 
-void Explorerplusplus::CreateMainToolbar(
-	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
+void Explorerplusplus::CreateMainToolbar(const std::optional<MainToolbarLayout> &initialLayout)
 {
-	m_mainToolbar = MainToolbar::Create(m_view.GetMainRebarView()->GetHWND(), initialButtons, this,
+	m_mainToolbar = std::make_unique<MainToolbar>(m_view.GetMainToolbarView(), initialLayout, this,
 		m_appServices, this, &m_shellIconLoader);
 }
 
@@ -278,7 +278,7 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		.tabs = tabContainer->GetStorageData(),
 		.selectedTab = tabContainer->GetSelectedTabIndex(),
 		.mainRebarInfo = m_view.GetMainRebarView()->GetStorageData(),
-		.mainToolbarButtons = m_mainToolbar->GetButtonsForStorage(),
+		.mainToolbarLayout = m_mainToolbar->GetLayoutForStorage(),
 		.treeViewWidth = m_treeViewWidth,
 		.displayWindowWidth = m_displayWindowWidth,
 		.displayWindowHeight = m_displayWindowHeight };
@@ -402,7 +402,7 @@ const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 
 void Explorerplusplus::StartMainToolbarCustomization()
 {
-	m_mainToolbar->StartCustomization();
+	m_view.GetMainToolbarView()->StartCustomization();
 }
 
 void Explorerplusplus::NotifyTopLevelMenuShown()

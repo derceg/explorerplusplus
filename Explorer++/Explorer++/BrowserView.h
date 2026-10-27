@@ -18,6 +18,7 @@ class BookmarksToolbarView;
 struct Config;
 class DrivesToolbarView;
 class MainRebarView;
+class MainToolbarView;
 class MenuView;
 class NavigationEvents;
 class NavigationRequest;
@@ -56,6 +57,7 @@ public:
 	MenuView *GetMainMenuView() const;
 
 	MainRebarView *GetMainRebarView() const;
+	MainToolbarView *GetMainToolbarView() const;
 	AddressBarView *GetAddressBarView() const;
 	BookmarksToolbarView *GetBookmarksToolbarView() const;
 	DrivesToolbarView *GetDrivesToolbarView() const;
@@ -108,6 +110,7 @@ private:
 
 	// Main rebar
 	std::unique_ptr<MainRebarView> m_mainRebarView;
+	std::unique_ptr<MainToolbarView> m_mainToolbarView;
 	std::unique_ptr<AddressBarView> m_addressBarView;
 	std::unique_ptr<BookmarksToolbarView> m_bookmarksToolbarView;
 	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;

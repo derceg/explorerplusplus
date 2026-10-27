@@ -427,9 +427,6 @@
     <ClCompile Include="ClangCLLibs.cpp">
       <Filter>Clang-CL</Filter>
     </ClCompile>
-    <ClCompile Include="TabViewTest.cpp">
-      <Filter>UI\Views</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceIconModelTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
@@ -634,9 +631,6 @@
     <ClCompile Include="ToolbarOverflowMenuTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
-    <ClCompile Include="RebarViewTest.cpp">
-      <Filter>UI\Views</Filter>
-    </ClCompile>
     <ClCompile Include="MainRebarTest.cpp">
       <Filter>Main Rebar\UI</Filter>
     </ClCompile>
@@ -649,11 +643,29 @@
     <ClCompile Include="RebarXmlStorageTest.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
-    <ClCompile Include="TestRebarBandView.cpp">
-      <Filter>UI\Views</Filter>
+    <ClCompile Include="MainToolbarLayoutTest.cpp">
+      <Filter>Main Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="MainToolbarTest.cpp">
+      <Filter>Main Toolbar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarViewTest.cpp">
+      <Filter>UI\Views\Rebar</Filter>
     </ClCompile>
     <ClCompile Include="RebarViewTestApi.cpp">
-      <Filter>UI\Views</Filter>
+      <Filter>UI\Views\Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRebarBandView.cpp">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="TabViewTest.cpp">
+      <Filter>UI\Views\TabView</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomizableToolbarViewTest.cpp">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="TestToolbarButton.cpp">
+      <Filter>UI\Views\Toolbar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -857,6 +869,18 @@
     </Filter>
     <Filter Include="Main Rebar\UI">
       <UniqueIdentifier>{13f00741-1015-47cd-b869-b07ef7fae197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Toolbar\UI">
+      <UniqueIdentifier>{ef7b27fc-c014-40b1-8de4-695ebc830403}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\Rebar">
+      <UniqueIdentifier>{9ba1db94-2c2e-4c93-b151-1f94900dcd97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\TabView">
+      <UniqueIdentifier>{2cf10cb5-4336-4cfb-913a-68e1824efd33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\Toolbar">
+      <UniqueIdentifier>{1dc6fab9-9245-4750-8026-55b1c9a4b047}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1077,11 +1101,14 @@
     <ClInclude Include="RebarStorageTestHelper.h">
       <Filter>Storage</Filter>
     </ClInclude>
-    <ClInclude Include="TestRebarBandView.h">
-      <Filter>UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="RebarViewTestApi.h">
-      <Filter>UI\Views</Filter>
+      <Filter>UI\Views\Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="TestRebarBandView.h">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="TestToolbarButton.h">
+      <Filter>UI\Views\Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

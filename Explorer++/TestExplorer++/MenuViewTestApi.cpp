@@ -6,11 +6,19 @@
 #include "MenuViewTestApi.h"
 #include "MenuView.h"
 #include "../Helper/MenuHelper.h"
+#include <wil/common.h>
 #include <ranges>
 
 HMENU MenuViewTestApi::GetNativeMenu(const MenuView *menuView)
 {
 	return menuView->m_menu;
+}
+
+bool MenuViewTestApi::IsItemASeparator(const MenuView *menuView, int index)
+{
+	UINT typeFlags =
+		MenuHelper::GetItemTypeFlags(menuView->m_menu, index, MenuHelper::ItemLookup::ByPosition);
+	return WI_IsFlagSet(typeFlags, MFT_SEPARATOR);
 }
 
 UINT MenuViewTestApi::GetItemId(const MenuView *menuView, int index)

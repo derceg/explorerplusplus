@@ -9,15 +9,15 @@
 #include <wil/com.h>
 #include <vector>
 
-ToolbarBase::ToolbarBase(ToolbarView *view, MenuHelpTextHost *menuHelpTextHost,
+ToolbarBase::ToolbarBase(ToolbarViewBase *view, MenuHelpTextHost *menuHelpTextHost,
 	const AcceleratorManager *acceleratorManager) :
-	m_view(view),
 	m_acceleratorManager(acceleratorManager),
+	m_view(view),
 	m_menuHelpTextHost(menuHelpTextHost)
 {
 }
 
-ToolbarView *ToolbarBase::GetView()
+ToolbarViewBase *ToolbarBase::GetView()
 {
 	return m_view;
 }
@@ -29,22 +29,12 @@ bool ToolbarBase::CanShowOverflowMenu() const
 
 void ToolbarBase::ShowOverflowMenu(const POINT &ptScreen)
 {
-	std::vector<WeakPtr<ToolbarButton>> overflowButtons;
-	auto numButtons = m_view->GetButtons().size();
+	auto overflowItems = m_view->GetOverflowItems();
 
-	for (size_t i = 0; i < numButtons; i++)
+	if (overflowItems.empty())
 	{
-		if (m_view->IsButtonVisible(i))
-		{
-			continue;
-		}
-
-		auto *button = m_view->GetButton(i);
-		overflowButtons.push_back(button->GetWeakPtr());
-	}
-
-	if (overflowButtons.empty())
-	{
+		// Shouldn't be attempting to show the overflow menu when there are no overflow items.
+		DCHECK(false);
 		return;
 	}
 
@@ -58,6 +48,6 @@ void ToolbarBase::ShowOverflowMenu(const POINT &ptScreen)
 	}
 
 	PopupMenuView popupMenu(m_view->GetHWND(), m_menuHelpTextHost);
-	ToolbarOverflowMenu menu(&popupMenu, m_acceleratorManager, overflowButtons, imageList);
+	ToolbarOverflowMenu menu(&popupMenu, m_acceleratorManager, overflowItems, imageList);
 	popupMenu.Show(ptScreen);
 }

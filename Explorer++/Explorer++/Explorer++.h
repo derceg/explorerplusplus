@@ -13,7 +13,6 @@
 #include "IconFetcherImpl.h"
 #include "LayoutDefaults.h"
 #include "Literals.h"
-#include "MainToolbarStorage.h"
 #include "ShellBrowser/ShellBrowserFactoryImpl.h"
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
@@ -44,6 +43,7 @@ class HolderWindow;
 class MainMenu;
 class MainRebar;
 class MainToolbar;
+class MainToolbarLayout;
 class MenuBase;
 class MenuView;
 class NavigationEvents;
@@ -220,8 +220,7 @@ private:
 	// Main rebar
 	void CreateMainRebarAndChildren(const WindowStorageData &storageData);
 	void OnMainRebarHeightChanged();
-	void CreateMainToolbar(
-		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
+	void CreateMainToolbar(const std::optional<MainToolbarLayout> &initialLayout);
 	void CreateAddressBar();
 	void CreateBookmarksToolbar();
 	void CreateDrivesToolbar();
@@ -341,7 +340,7 @@ private:
 
 	// Main rebar
 	std::unique_ptr<MainRebar> m_mainRebar;
-	MainToolbar *m_mainToolbar = nullptr;
+	std::unique_ptr<MainToolbar> m_mainToolbar;
 	std::unique_ptr<AddressBar> m_addressBar;
 	std::unique_ptr<BookmarksToolbar> m_bookmarksToolbar;
 	std::unique_ptr<DrivesToolbar> m_drivesToolbar;

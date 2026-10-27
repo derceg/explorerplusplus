@@ -31,29 +31,67 @@ private:
 }
 
 ToolbarOverflowMenu::ToolbarOverflowMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager,
-	const std::vector<WeakPtr<ToolbarButton>> &overflowButtons,
+	const AcceleratorManager *acceleratorManager, const std::vector<ToolbarItem> &overflowItems,
 	const wil::com_ptr_nothrow<IImageList> &imageList) :
 	MenuBase(menuView, acceleratorManager)
 {
-	BuildMenu(overflowButtons, imageList);
+	BuildMenu(overflowItems, imageList);
 }
 
-void ToolbarOverflowMenu::BuildMenu(const std::vector<WeakPtr<ToolbarButton>> &overflowButtons,
+void ToolbarOverflowMenu::BuildMenu(const std::vector<ToolbarItem> &overflowItems,
 	const wil::com_ptr_nothrow<IImageList> &imageList)
 {
-	for (const auto &button : overflowButtons)
+	for (const auto &item : overflowItems)
 	{
-		std::unique_ptr<IconModel> iconModel;
-
-		if (imageList)
+		if (item.IsButton())
 		{
-			iconModel = std::make_unique<ToolbarButtonIconModel>(button, imageList);
+			AddButtonToMenu(item.GetButton()->GetWeakPtr(), imageList);
 		}
+		else
+		{
+			m_rootMenuView->AppendSeparator();
+		}
+	}
+}
 
+void ToolbarOverflowMenu::AddButtonToMenu(WeakPtr<ToolbarButton> button,
+	const wil::com_ptr_nothrow<IImageList> &imageList)
+{
+	std::unique_ptr<IconModel> iconModel;
+
+	if (imageList)
+	{
+		iconModel = std::make_unique<ToolbarButtonIconModel>(button, imageList);
+	}
+
+	// If the toolbar button is a dropdown, it means it displays a menu. Therefore, the button will
+	// be translated into a submenu item.
+	if (button->IsDropDownButton())
+	{
+		auto menuFactory = button->MaybeGetMenuFactory();
+		bool hasMenuFactory = !!menuFactory;
+
+		auto *subMenuView = m_rootMenuView->AppendSubMenu(SubMenuItemParams(button->GetText())
+				.SetIconModel(std::move(iconModel))
+				.SetEnabledCallback([button, hasMenuFactory]
+					{ return button && button->IsEnabled() && hasMenuFactory; })
+				.SetMiddleClickedCallback(
+					std::bind_front(&ToolbarOverflowMenu::OnItemMiddleClicked, button))
+				.SetRightClickedCallback(
+					std::bind_front(&ToolbarOverflowMenu::OnItemRightClicked, button)));
+
+		if (hasMenuFactory)
+		{
+			m_childMenus.push_back(menuFactory(subMenuView));
+		}
+	}
+	else
+	{
 		m_rootMenuView->AppendItem(MenuItemParams(button->GetText())
 				.SetIconModel(std::move(iconModel))
 				.SetHelpText(button->GetTooltipText())
+				.SetEnabledCallback([button] { return button && button->IsEnabled(); })
+				.SetCheckedCallback([button] { return button && button->IsChecked(); })
 				.SetSelectedCallback(std::bind_front(&ToolbarOverflowMenu::OnItemSelected, button))
 				.SetMiddleClickedCallback(
 					std::bind_front(&ToolbarOverflowMenu::OnItemMiddleClicked, button))

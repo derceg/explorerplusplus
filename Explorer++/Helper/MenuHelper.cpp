@@ -139,17 +139,12 @@ void RemoveDuplicateSeparators(HMENU menu)
 
 	for (int i = count - 1; i >= 0; i--)
 	{
-		MENUITEMINFO menuItemInfo = {};
-		menuItemInfo.cbSize = sizeof(menuItemInfo);
-		menuItemInfo.fMask = MIIM_FTYPE;
-		auto res = GetMenuItemInfo(menu, i, true, &menuItemInfo);
-		CHECK(res);
-
-		bool currentItemSeparator = WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR);
+		UINT typeFlags = GetItemTypeFlags(menu, i, ItemLookup::ByPosition);
+		bool currentItemSeparator = WI_IsFlagSet(typeFlags, MFT_SEPARATOR);
 
 		if (previousItemSeparator && currentItemSeparator)
 		{
-			res = DeleteMenu(menu, i, MF_BYPOSITION);
+			auto res = DeleteMenu(menu, i, MF_BYPOSITION);
 			CHECK(res);
 		}
 		else
@@ -167,18 +162,14 @@ void RemoveTrailingSeparators(HMENU menu)
 
 	for (int i = count - 1; i >= 0; i--)
 	{
-		MENUITEMINFO menuItemInfo = {};
-		menuItemInfo.cbSize = sizeof(menuItemInfo);
-		menuItemInfo.fMask = MIIM_FTYPE;
-		auto res = GetMenuItemInfo(menu, i, true, &menuItemInfo);
-		CHECK(res);
+		UINT typeFlags = GetItemTypeFlags(menu, i, ItemLookup::ByPosition);
 
-		if (WI_IsFlagClear(menuItemInfo.fType, MFT_SEPARATOR))
+		if (WI_IsFlagClear(typeFlags, MFT_SEPARATOR))
 		{
 			break;
 		}
 
-		res = DeleteMenu(menu, i, MF_BYPOSITION);
+		auto res = DeleteMenu(menu, i, MF_BYPOSITION);
 		CHECK(res);
 	}
 }

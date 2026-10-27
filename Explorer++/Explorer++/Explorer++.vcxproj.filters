@@ -103,9 +103,6 @@
     <ClCompile Include="ShellBrowser\ColumnDataRetrieval.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="MainToolbar.cpp">
-      <Filter>Main Toolbar</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\ViewModes.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -285,9 +282,6 @@
     </ClCompile>
     <ClCompile Include="ShellBrowser\DocumentServiceProvider.cpp">
       <Filter>ShellBrowser\Shell Integration</Filter>
-    </ClCompile>
-    <ClCompile Include="ToolbarView.cpp">
-      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="DriveModel.cpp">
       <Filter>Drives Toolbar</Filter>
@@ -601,9 +595,6 @@
     <ClCompile Include="FrequentLocationsMenu.cpp">
       <Filter>Frequent Locations\UI</Filter>
     </ClCompile>
-    <ClCompile Include="RebarView.cpp">
-      <Filter>UI\Views</Filter>
-    </ClCompile>
     <ClCompile Include="MainRebarView.cpp">
       <Filter>Main Rebar\UI\Views</Filter>
     </ClCompile>
@@ -708,9 +699,6 @@
     </ClCompile>
     <ClCompile Include="ClangCLLibs.cpp">
       <Filter>Clang-CL</Filter>
-    </ClCompile>
-    <ClCompile Include="TabView.cpp">
-      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="MainTabView.cpp">
       <Filter>Tabs\UI\Views</Filter>
@@ -937,14 +925,8 @@
     <ClCompile Include="ToolbarBase.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="MainToolbarOverflowMenu.cpp">
-      <Filter>Menus\UI</Filter>
-    </ClCompile>
     <ClCompile Include="MainRebar.cpp">
       <Filter>Main Rebar\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="RebarBandView.cpp">
-      <Filter>UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="RebarRegistryStorage.cpp">
       <Filter>Storage</Filter>
@@ -954,6 +936,33 @@
     </ClCompile>
     <ClCompile Include="ViewBase.cpp">
       <Filter>UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MainToolbarView.cpp">
+      <Filter>Main Toolbar\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="MainToolbar.cpp">
+      <Filter>Main Toolbar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarViewBase.cpp">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomizableToolbarView.cpp">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarView.cpp">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarBandView.cpp">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="RebarView.cpp">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="TabView.cpp">
+      <Filter>UI\Views\TabView</Filter>
+    </ClCompile>
+    <ClCompile Include="MainToolbarLayout.cpp">
+      <Filter>Main Toolbar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1032,13 +1041,7 @@
     <ClInclude Include="ShellBrowser\ItemData.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="MainToolbar.h">
-      <Filter>Main Toolbar</Filter>
-    </ClInclude>
-    <ClInclude Include="DefaultToolbarButtons.h">
-      <Filter>Main Toolbar</Filter>
-    </ClInclude>
-    <ClInclude Include="MainToolbarButtons.h">
+    <ClInclude Include="MainToolbarButtonId.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
     <ClInclude Include="ScriptingDialog.h">
@@ -1247,9 +1250,6 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\DocumentServiceProvider.h">
       <Filter>ShellBrowser\Shell Integration</Filter>
-    </ClInclude>
-    <ClInclude Include="ToolbarView.h">
-      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="DriveModel.h">
       <Filter>Drives Toolbar</Filter>
@@ -1626,9 +1626,6 @@
     <ClInclude Include="FrequentLocationsMenu.h">
       <Filter>Frequent Locations\UI</Filter>
     </ClInclude>
-    <ClInclude Include="RebarView.h">
-      <Filter>UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="MainRebarView.h">
       <Filter>Main Rebar\UI\Views</Filter>
     </ClInclude>
@@ -1746,14 +1743,8 @@
     <ClInclude Include="ClangCLLibs.h">
       <Filter>Clang-CL</Filter>
     </ClInclude>
-    <ClInclude Include="TabView.h">
-      <Filter>UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="MainTabView.h">
       <Filter>Tabs\UI\Views</Filter>
-    </ClInclude>
-    <ClInclude Include="TabViewDelegate.h">
-      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="MainTabViewImageListManager.h">
       <Filter>Tabs\UI</Filter>
@@ -2061,17 +2052,8 @@
     <ClInclude Include="ToolbarBase.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="MainToolbarOverflowMenu.h">
-      <Filter>Menus\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="RebarBandView.h">
-      <Filter>UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="MainRebar.h">
       <Filter>Main Rebar\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="RebarViewDelegate.h">
-      <Filter>UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="RebarBand.h">
       <Filter>UI</Filter>
@@ -2087,6 +2069,39 @@
     </ClInclude>
     <ClInclude Include="ViewBase.h">
       <Filter>UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbarView.h">
+      <Filter>Main Toolbar\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbar.h">
+      <Filter>Main Toolbar\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarViewBase.h">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarView.h">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomizableToolbarView.h">
+      <Filter>UI\Views\Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarBandView.h">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarView.h">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="RebarViewDelegate.h">
+      <Filter>UI\Views\Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="TabView.h">
+      <Filter>UI\Views\TabView</Filter>
+    </ClInclude>
+    <ClInclude Include="TabViewDelegate.h">
+      <Filter>UI\Views\TabView</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbarLayout.h">
+      <Filter>Main Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2348,6 +2363,21 @@
     </Filter>
     <Filter Include="UI\Views\ListView">
       <UniqueIdentifier>{ecab8bbc-283b-49fc-af94-27be3f54e391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Toolbar\UI">
+      <UniqueIdentifier>{af6ed3dd-b4b8-4e40-b765-f417773e7bf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Toolbar\UI\Views">
+      <UniqueIdentifier>{a7a655bc-7ff3-4040-a1c8-28bbec620b1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\Toolbar">
+      <UniqueIdentifier>{4b34cd4f-de76-4c72-b08e-7a104283c1be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\Rebar">
+      <UniqueIdentifier>{0936b137-3e77-4366-bb4d-fffd2476c6f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Views\TabView">
+      <UniqueIdentifier>{02f99069-7a88-457b-b124-5c5da09d9324}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

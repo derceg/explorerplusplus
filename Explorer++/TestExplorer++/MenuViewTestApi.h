@@ -16,6 +16,7 @@ class MenuViewTestApi
 public:
 	static HMENU GetNativeMenu(const MenuView *menuView);
 
+	static bool IsItemASeparator(const MenuView *menuView, int index);
 	static UINT GetItemId(const MenuView *menuView, int index);
 	static std::optional<UINT> MaybeGetIdForKey(const MenuView *menuView, const MenuItemKey &key);
 	static std::wstring GetItemFullText(const MenuView *menuView, UINT id);

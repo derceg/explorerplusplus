@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "WindowRegistryStorage.h"
 #include "LayoutDefaults.h"
+#include "MainToolbarStorage.h"
 #include "RebarBandStorageData.h"
 #include "RebarRegistryStorage.h"
 #include "Storage.h"
@@ -90,7 +91,7 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 
 	auto mainRebarInfo = LoadMainRebarInfo(applicationKey);
 
-	auto mainToolbarButtons =
+	auto mainToolbarLayout =
 		MainToolbarStorage::LoadFromRegistry(settingsKey, SETTING_MAIN_TOOLBAR_BUTTONS);
 
 	return WindowStorageData{ .bounds = placement.rcNormalPosition,
@@ -98,7 +99,7 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 		.tabs = tabs,
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
-		.mainToolbarButtons = mainToolbarButtons,
+		.mainToolbarLayout = mainToolbarLayout,
 		.treeViewWidth = treeViewWidth,
 		.displayWindowWidth = displayWindowWidth,
 		.displayWindowHeight = displayWindowHeight };
@@ -236,12 +237,12 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		mainRebarInfo = V1::LoadMainRebarInfo(applicationKey);
 	}
 
-	auto mainToolbarButtons =
+	auto mainToolbarLayout =
 		MainToolbarStorage::LoadFromRegistry(windowKey, SETTING_MAIN_TOOLBAR_BUTTONS);
 
-	if (!mainToolbarButtons && settingsKey)
+	if (!mainToolbarLayout && settingsKey)
 	{
-		mainToolbarButtons = MainToolbarStorage::LoadFromRegistry(settingsKey.get(),
+		mainToolbarLayout = MainToolbarStorage::LoadFromRegistry(settingsKey.get(),
 			V1::SETTING_MAIN_TOOLBAR_BUTTONS);
 	}
 
@@ -250,7 +251,7 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		.tabs = tabs,
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
-		.mainToolbarButtons = mainToolbarButtons,
+		.mainToolbarLayout = mainToolbarLayout,
 		.treeViewWidth = treeViewWidth,
 		.displayWindowWidth = displayWindowWidth,
 		.displayWindowHeight = displayWindowHeight };
@@ -319,9 +320,9 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 
 	// When loading data, there might not be any buttons that are retrieved. However, when saving
 	// data, there should always be a list of buttons provided (even if the list is empty).
-	CHECK(window.mainToolbarButtons);
+	CHECK(window.mainToolbarLayout);
 	MainToolbarStorage::SaveToRegistry(windowKey, SETTING_MAIN_TOOLBAR_BUTTONS,
-		*window.mainToolbarButtons);
+		*window.mainToolbarLayout);
 }
 
 void Save(HKEY windowsKey, const std::vector<WindowStorageData> &windows)

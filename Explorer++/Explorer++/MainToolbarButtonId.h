@@ -6,8 +6,10 @@
 
 #include <magic_enum/magic_enum.hpp>
 
-// Note that these values are used to save the toolbar state and should not be changed.
-enum class MainToolbarButton
+// These values are used to save the toolbar state and shouldn't be changed. Note that the values
+// here don't correspond to the toolbar button IDs. That is, the toolbar button IDs are independent
+// and these values are used exclusively for saving and loading the toolbar state.
+enum class MainToolbarButtonId
 {
 	Separator = 45001,
 	Back = 45002,
@@ -36,7 +38,7 @@ enum class MainToolbarButton
 };
 
 template <>
-struct magic_enum::customize::enum_range<MainToolbarButton>
+struct magic_enum::customize::enum_range<MainToolbarButtonId>
 {
 	static constexpr int min = 45001;
 	static constexpr int max = 45025;

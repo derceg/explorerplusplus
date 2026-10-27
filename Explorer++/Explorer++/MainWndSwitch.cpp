@@ -22,7 +22,7 @@
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "MainToolbarButtons.h"
+#include "MainToolbarButtonId.h"
 #include "MenuRanges.h"
 #include "ModelessDialogHelper.h"
 #include "Plugins/PluginCommandManager.h"
@@ -158,7 +158,8 @@ LRESULT Explorerplusplus::CommandHandler(HWND hwnd, HWND control, UINT id, UINT 
 	if (control
 		&& ((m_drivesToolbar && control == m_drivesToolbar->GetView()->GetHWND())
 			|| (m_applicationToolbar && control == m_applicationToolbar->GetView()->GetHWND())
-			|| (m_bookmarksToolbar && control == m_bookmarksToolbar->GetView()->GetHWND())))
+			|| (m_bookmarksToolbar && control == m_bookmarksToolbar->GetView()->GetHWND())
+			|| (m_mainToolbar && control == m_mainToolbar->GetView()->GetHWND())))
 	{
 		return 1;
 	}
@@ -187,12 +188,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	switch (id)
 	{
-	case ToUnderlying(MainToolbarButton::NewTab):
+	case ToUnderlying(MainToolbarButtonId::NewTab):
 	case IDM_FILE_NEWTAB:
 		OnNewTab();
 		break;
 
-	case ToUnderlying(MainToolbarButton::CloseTab):
+	case ToUnderlying(MainToolbarButtonId::CloseTab):
 	case IDM_FILE_CLOSETAB:
 		m_commandController.ExecuteCommand(IDM_FILE_CLOSETAB);
 		break;
@@ -209,7 +210,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id);
 		break;
 
-	case ToUnderlying(MainToolbarButton::OpenCommandPrompt):
+	case ToUnderlying(MainToolbarButtonId::OpenCommandPrompt):
 	case IDM_FILE_OPENCOMMANDPROMPT:
 		m_commandController.ExecuteCommand(IDM_FILE_OPENCOMMANDPROMPT);
 		break;
@@ -232,12 +233,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Delete):
+	case ToUnderlying(MainToolbarButtonId::Delete):
 	case IDM_FILE_DELETE:
 		m_commandController.ExecuteCommand(IDM_FILE_DELETE);
 		break;
 
-	case ToUnderlying(MainToolbarButton::DeletePermanently):
+	case ToUnderlying(MainToolbarButtonId::DeletePermanently):
 	case IDM_FILE_DELETEPERMANENTLY:
 		m_commandController.ExecuteCommand(IDM_FILE_DELETEPERMANENTLY);
 		break;
@@ -246,7 +247,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Properties):
+	case ToUnderlying(MainToolbarButtonId::Properties):
 	case IDM_FILE_PROPERTIES:
 		m_commandController.ExecuteCommand(IDM_FILE_PROPERTIES);
 		break;
@@ -259,17 +260,17 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_fileActionHandler.Undo();
 		break;
 
-	case ToUnderlying(MainToolbarButton::Cut):
+	case ToUnderlying(MainToolbarButtonId::Cut):
 	case IDM_EDIT_CUT:
 		m_commandController.ExecuteCommand(IDM_EDIT_CUT);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Copy):
+	case ToUnderlying(MainToolbarButtonId::Copy):
 	case IDM_EDIT_COPY:
 		m_commandController.ExecuteCommand(IDM_EDIT_COPY);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Paste):
+	case ToUnderlying(MainToolbarButtonId::Paste):
 	case IDM_EDIT_PASTE:
 		OnPaste();
 		break;
@@ -286,12 +287,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		GetActiveShellBrowserImpl()->PasteSymLinks();
 		break;
 
-	case ToUnderlying(MainToolbarButton::MoveTo):
+	case ToUnderlying(MainToolbarButtonId::MoveTo):
 	case IDM_EDIT_MOVETOFOLDER:
 		m_commandController.ExecuteCommand(IDM_EDIT_MOVETOFOLDER);
 		break;
 
-	case ToUnderlying(MainToolbarButton::CopyTo):
+	case ToUnderlying(MainToolbarButtonId::CopyTo):
 	case IDM_EDIT_COPYTOFOLDER:
 		m_commandController.ExecuteCommand(IDM_EDIT_COPYTOFOLDER);
 		break;
@@ -324,7 +325,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Folders):
+	case ToUnderlying(MainToolbarButtonId::Folders):
 	case IDM_VIEW_FOLDERS:
 		m_commandController.ExecuteCommand(IDM_VIEW_FOLDERS);
 		break;
@@ -350,7 +351,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		OnShowHiddenFiles();
 		break;
 
-	case ToUnderlying(MainToolbarButton::Refresh):
+	case ToUnderlying(MainToolbarButtonId::Refresh):
 	case IDM_VIEW_REFRESH:
 		m_commandController.ExecuteCommand(IDM_VIEW_REFRESH);
 		break;
@@ -431,17 +432,17 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	}
 	break;
 
-	case ToUnderlying(MainToolbarButton::NewFolder):
+	case ToUnderlying(MainToolbarButtonId::NewFolder):
 	case IDM_ACTIONS_NEWFOLDER:
 		m_commandController.ExecuteCommand(IDM_ACTIONS_NEWFOLDER);
 		break;
 
-	case ToUnderlying(MainToolbarButton::SplitFile):
+	case ToUnderlying(MainToolbarButtonId::SplitFile):
 	case IDM_ACTIONS_SPLITFILE:
 		m_commandController.ExecuteCommand(IDM_ACTIONS_SPLITFILE);
 		break;
 
-	case ToUnderlying(MainToolbarButton::MergeFiles):
+	case ToUnderlying(MainToolbarButtonId::MergeFiles):
 	case IDM_ACTIONS_MERGEFILES:
 		m_commandController.ExecuteCommand(IDM_ACTIONS_MERGEFILES);
 		break;
@@ -450,17 +451,17 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		OnDestroyFiles();
 		break;
 
-	case ToUnderlying(MainToolbarButton::Back):
+	case ToUnderlying(MainToolbarButtonId::Back):
 	case IDM_GO_BACK:
 		m_commandController.ExecuteCommand(IDM_GO_BACK, DetermineOpenDisposition(false));
 		break;
 
-	case ToUnderlying(MainToolbarButton::Forward):
+	case ToUnderlying(MainToolbarButtonId::Forward):
 	case IDM_GO_FORWARD:
 		m_commandController.ExecuteCommand(IDM_GO_FORWARD, DetermineOpenDisposition(false));
 		break;
 
-	case ToUnderlying(MainToolbarButton::Up):
+	case ToUnderlying(MainToolbarButtonId::Up):
 	case IDM_GO_UP:
 		m_commandController.ExecuteCommand(IDM_GO_UP, DetermineOpenDisposition(false));
 		break;
@@ -481,7 +482,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id, DetermineOpenDisposition(false));
 		break;
 
-	case ToUnderlying(MainToolbarButton::AddBookmark):
+	case ToUnderlying(MainToolbarButtonId::AddBookmark):
 	case IDM_BOOKMARKS_BOOKMARK_THIS_TAB:
 		BookmarkHelper::AddBookmarkItem(m_appServices->GetBookmarkTree(),
 			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, hwnd, this, m_acceleratorManager,
@@ -492,7 +493,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Bookmarks):
+	case ToUnderlying(MainToolbarButtonId::Bookmarks):
 	case IDM_BOOKMARKS_MANAGE_BOOKMARKS:
 		CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(),
 			L"ManageBookmarksDialog",
@@ -504,7 +505,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 			});
 		break;
 
-	case ToUnderlying(MainToolbarButton::Search):
+	case ToUnderlying(MainToolbarButtonId::Search):
 	case IDM_TOOLS_SEARCH:
 		m_commandController.ExecuteCommand(IDM_TOOLS_SEARCH);
 		break;
@@ -564,7 +565,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 		m_commandController.ExecuteCommand(id);
 		break;
 
-	case ToUnderlying(MainToolbarButton::Views):
+	case ToUnderlying(MainToolbarButtonId::Views):
 		OnToolbarViews();
 		break;
 	}

@@ -20,7 +20,7 @@ class DrivesToolbarTest : public BrowserTestBase
 protected:
 	DrivesToolbarTest() :
 		m_browser(AddBrowser()),
-		m_drivesToolbarView(m_browser->GetHWND(), &m_config)
+		m_drivesToolbarView(m_browser->GetHWND(), m_browser, &m_config)
 	{
 		m_driveWatcher.AddDrive(L"C:\\");
 		m_driveWatcher.AddDrive(L"F:\\");
@@ -32,13 +32,16 @@ protected:
 
 	void VerifyToolbarButtons()
 	{
-		const auto &buttons = m_drivesToolbarView.GetButtons();
+		auto toolbarItems = m_drivesToolbarView.GetItems();
 		const auto &drives = m_driveModel.GetDrives();
-		ASSERT_EQ(buttons.size(), drives.size());
+		ASSERT_EQ(toolbarItems.size(), drives.size());
 
 		// TODO: This should use std::views::zip once C++23 support is available.
-		for (const auto &[button, drive] : boost::combine(buttons, drives))
+		for (const auto &[toolbarItem, drive] : boost::combine(toolbarItems, drives))
 		{
+			ASSERT_TRUE(toolbarItem.IsButton());
+
+			auto *button = toolbarItem.GetButton();
 			EXPECT_EQ(button->GetText(), drive.substr(0, 1));
 		}
 	}
@@ -74,13 +77,16 @@ TEST_F(DrivesToolbarTest, OpenOnClick)
 {
 	auto *tab = m_browser->AddTab(L"c:\\original\\path");
 
-	const auto &buttons = m_drivesToolbarView.GetButtons();
+	auto toolbarItems = m_drivesToolbarView.GetItems();
 	const auto &drives = m_driveModel.GetDrives();
-	ASSERT_EQ(buttons.size(), drives.size());
+	ASSERT_EQ(toolbarItems.size(), drives.size());
 
 	// TODO: This should use std::views::zip once C++23 support is available.
-	for (const auto &[button, drive] : boost::combine(buttons, drives))
+	for (const auto &[toolbarItem, drive] : boost::combine(toolbarItems, drives))
 	{
+		ASSERT_TRUE(toolbarItem.IsButton());
+
+		auto *button = toolbarItem.GetButton();
 		button->OnClicked(MouseEvent{ { 0, 0 }, false, false });
 		EXPECT_EQ(tab->GetShellBrowser()->GetDirectory(), CreateSimplePidlForTest(drive));
 	}
@@ -88,16 +94,19 @@ TEST_F(DrivesToolbarTest, OpenOnClick)
 
 TEST_F(DrivesToolbarTest, OpenOnMiddleClick)
 {
-	const auto &buttons = m_drivesToolbarView.GetButtons();
+	auto toolbarItems = m_drivesToolbarView.GetItems();
 	const auto &drives = m_driveModel.GetDrives();
-	ASSERT_EQ(buttons.size(), drives.size());
+	ASSERT_EQ(toolbarItems.size(), drives.size());
 
 	auto *tabContainer = m_browser->GetActiveTabContainer();
 	int numTabs = tabContainer->GetNumTabs();
 
 	// TODO: This should use std::views::zip once C++23 support is available.
-	for (const auto &[button, drive] : boost::combine(buttons, drives))
+	for (const auto &[toolbarItem, drive] : boost::combine(toolbarItems, drives))
 	{
+		ASSERT_TRUE(toolbarItem.IsButton());
+
+		auto *button = toolbarItem.GetButton();
 		button->OnMiddleClicked(MouseEvent{ { 0, 0 }, false, false });
 
 		numTabs++;

@@ -7,28 +7,26 @@
 #include "AppServices.h"
 #include "BrowserCommandController.h"
 #include "Config.h"
-#include "DefaultToolbarButtons.h"
 #include "MainResource.h"
-#include "MainToolbarOverflowMenu.h"
+#include "MainToolbarLayout.h"
+#include "MainToolbarView.h"
 #include "NavigationHelper.h"
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabEvents.h"
+#include "TabHistoryMenu.h"
 #include "TabParentItemsMenu.h"
+#include "TestHelper.h"
 #include "ViewsMenu.h"
 #include "../Helper/ClipboardWatcher.h"
-#include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/EnumHelper.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <magic_enum/magic_enum.hpp>
-#include <windowsx.h>
 #include <algorithm>
 
 namespace
@@ -37,51 +35,76 @@ namespace
 const int TOOLBAR_IMAGE_SIZE_SMALL = 16;
 const int TOOLBAR_IMAGE_SIZE_LARGE = 24;
 
+constexpr MainToolbarButtonId DEFAULT_TOOLBAR_BUTTONS[] = {
+	MainToolbarButtonId::Back,
+	MainToolbarButtonId::Forward,
+	MainToolbarButtonId::Up,
+	MainToolbarButtonId::Separator,
+	MainToolbarButtonId::Folders,
+	MainToolbarButtonId::Separator,
+	MainToolbarButtonId::Cut,
+	MainToolbarButtonId::Copy,
+	MainToolbarButtonId::Paste,
+	MainToolbarButtonId::Delete,
+	MainToolbarButtonId::DeletePermanently,
+	MainToolbarButtonId::Properties,
+	MainToolbarButtonId::Search,
+	MainToolbarButtonId::Separator,
+	MainToolbarButtonId::NewFolder,
+	MainToolbarButtonId::CopyTo,
+	MainToolbarButtonId::MoveTo,
+	MainToolbarButtonId::Separator,
+	MainToolbarButtonId::Views,
+	MainToolbarButtonId::OpenCommandPrompt,
+	MainToolbarButtonId::Refresh,
+	MainToolbarButtonId::Separator,
+	MainToolbarButtonId::AddBookmark,
+	MainToolbarButtonId::Bookmarks,
+};
+
 struct ButtonIconMapping
 {
-	MainToolbarButton button;
+	MainToolbarButtonId button;
 	Icon icon;
 };
 
 constexpr auto BUTTON_ICON_MAPPINGS = std::to_array<ButtonIconMapping>({
-	{ MainToolbarButton::Back, Icon::Back },
-	{ MainToolbarButton::Forward, Icon::Forward },
-	{ MainToolbarButton::Up, Icon::Up },
-	{ MainToolbarButton::Folders, Icon::FolderTree },
-	{ MainToolbarButton::CopyTo, Icon::CopyTo },
-	{ MainToolbarButton::MoveTo, Icon::MoveTo },
-	{ MainToolbarButton::NewFolder, Icon::NewFolder },
-	{ MainToolbarButton::Copy, Icon::Copy },
-	{ MainToolbarButton::Cut, Icon::Cut },
-	{ MainToolbarButton::Paste, Icon::Paste },
-	{ MainToolbarButton::Delete, Icon::Delete },
-	{ MainToolbarButton::Views, Icon::Views },
-	{ MainToolbarButton::Search, Icon::Search },
-	{ MainToolbarButton::Properties, Icon::Properties },
-	{ MainToolbarButton::Refresh, Icon::Refresh },
-	{ MainToolbarButton::AddBookmark, Icon::AddBookmark },
-	{ MainToolbarButton::NewTab, Icon::NewTab },
-	{ MainToolbarButton::OpenCommandPrompt, Icon::CommandLine },
-	{ MainToolbarButton::Bookmarks, Icon::Bookmarks },
-	{ MainToolbarButton::DeletePermanently, Icon::DeletePermanently },
-	{ MainToolbarButton::SplitFile, Icon::SplitFiles },
-	{ MainToolbarButton::MergeFiles, Icon::MergeFiles },
-	{ MainToolbarButton::CloseTab, Icon::CloseTab },
+	{ MainToolbarButtonId::Back, Icon::Back },
+	{ MainToolbarButtonId::Forward, Icon::Forward },
+	{ MainToolbarButtonId::Up, Icon::Up },
+	{ MainToolbarButtonId::Folders, Icon::FolderTree },
+	{ MainToolbarButtonId::CopyTo, Icon::CopyTo },
+	{ MainToolbarButtonId::MoveTo, Icon::MoveTo },
+	{ MainToolbarButtonId::NewFolder, Icon::NewFolder },
+	{ MainToolbarButtonId::Copy, Icon::Copy },
+	{ MainToolbarButtonId::Cut, Icon::Cut },
+	{ MainToolbarButtonId::Paste, Icon::Paste },
+	{ MainToolbarButtonId::Delete, Icon::Delete },
+	{ MainToolbarButtonId::Views, Icon::Views },
+	{ MainToolbarButtonId::Search, Icon::Search },
+	{ MainToolbarButtonId::Properties, Icon::Properties },
+	{ MainToolbarButtonId::Refresh, Icon::Refresh },
+	{ MainToolbarButtonId::AddBookmark, Icon::AddBookmark },
+	{ MainToolbarButtonId::NewTab, Icon::NewTab },
+	{ MainToolbarButtonId::OpenCommandPrompt, Icon::CommandLine },
+	{ MainToolbarButtonId::Bookmarks, Icon::Bookmarks },
+	{ MainToolbarButtonId::DeletePermanently, Icon::DeletePermanently },
+	{ MainToolbarButtonId::SplitFile, Icon::SplitFiles },
+	{ MainToolbarButtonId::MergeFiles, Icon::MergeFiles },
+	{ MainToolbarButtonId::CloseTab, Icon::CloseTab },
 });
 
-// There should be an icon for each button. Note that the MainToolbarButton enum contains one
+// There should be an icon for each button. Note that the MainToolbarButtonId enum contains one
 // additional item - for the separator.
-static_assert(BUTTON_ICON_MAPPINGS.size() == (magic_enum::enum_count<MainToolbarButton>() - 1));
+static_assert(BUTTON_ICON_MAPPINGS.size() == (magic_enum::enum_count<MainToolbarButtonId>() - 1));
 
 constexpr bool VerifyButtonIconMappings(std::span<const ButtonIconMapping> mappings)
 {
-	// Each button should appear once.
-	for (const auto &mapping : mappings)
+	for (auto buttonId : magic_enum::enum_values<MainToolbarButtonId>())
 	{
-		auto numMatches = std::ranges::count_if(mappings, [&mapping](const auto &currentMapping)
-			{ return currentMapping.button == mapping.button; });
+		auto expectedCount = (buttonId == MainToolbarButtonId::Separator) ? 0 : 1;
 
-		if (numMatches > 1)
+		if (std::ranges::count(mappings, buttonId, &ButtonIconMapping::button) != expectedCount)
 		{
 			return false;
 		}
@@ -92,74 +115,323 @@ constexpr bool VerifyButtonIconMappings(std::span<const ButtonIconMapping> mappi
 
 static_assert(VerifyButtonIconMappings(BUTTON_ICON_MAPPINGS));
 
-}
+std::wstring GetButtonText(MainToolbarButtonId buttonId, const ResourceLoader *resourceLoader);
 
-MainToolbar *MainToolbar::Create(HWND parent,
-	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons,
-	BrowserWindow *browser, AppServices *appServices, CoreInterface *coreInterface,
-	ShellIconLoader *shellIconLoader)
+class MainToolbarButton : public ToolbarButton
 {
-	return new MainToolbar(parent, initialButtons, browser, appServices, coreInterface,
-		shellIconLoader);
+public:
+	MainToolbarButton(MainToolbarButtonId buttonId, int imageIndex, BrowserWindow *browser,
+		const ResourceLoader *resourceLoader) :
+		ToolbarButton(std::bind(&MainToolbarButton::OnClicked, this)),
+		m_buttonId(buttonId),
+		m_browser(browser),
+		m_resourceLoader(resourceLoader),
+		m_imageIndex(imageIndex)
+	{
+	}
+
+	std::wstring GetText() const override
+	{
+		return GetButtonText(m_buttonId, m_resourceLoader);
+	}
+
+	bool ShouldShowText() const override
+	{
+		// By default, main toolbar buttons will only display an icon.
+		return false;
+	}
+
+	std::wstring GetTooltipText() const override
+	{
+		// This will result in the button text being shown as the tooltip.
+		return {};
+	}
+
+	std::optional<int> GetImageIndex() const override
+	{
+		return m_imageIndex;
+	}
+
+	bool IsEnabled() const override
+	{
+		return m_enabled;
+	}
+
+	void SetEnabled(bool enabled)
+	{
+		if (enabled == m_enabled)
+		{
+			return;
+		}
+
+		m_enabled = enabled;
+
+		NotifyParentOfUpdate();
+	}
+
+protected:
+	const MainToolbarButtonId m_buttonId;
+	BrowserWindow *const m_browser;
+	const ResourceLoader *const m_resourceLoader;
+
+private:
+	void OnClicked()
+	{
+		SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(ToUnderlying(m_buttonId), 0), 0);
+	}
+
+	bool m_enabled = true;
+	const int m_imageIndex;
+};
+
+class MainToolbarHistoryButton : public MainToolbarButton
+{
+public:
+	enum HistoryType
+	{
+		Back,
+		Forward
+	};
+
+	MainToolbarHistoryButton(HistoryType historyType, int imageIndex, BrowserWindow *browser,
+		const AcceleratorManager *acceleratorManager, ShellIconLoader *shellIconLoader,
+		const ResourceLoader *resourceLoader) :
+		MainToolbarButton(historyType == HistoryType::Back ? MainToolbarButtonId::Back
+														   : MainToolbarButtonId::Forward,
+			imageIndex, browser, resourceLoader),
+		m_historyType(historyType),
+		m_acceleratorManager(acceleratorManager),
+		m_shellIconLoader(shellIconLoader)
+	{
+		SetMiddleClickedCallback(std::bind_front(&MainToolbarHistoryButton::OnMiddleClicked, this));
+	}
+
+	std::wstring GetTooltipText() const override
+	{
+		const auto *shellBrowser = m_browser->GetActiveShellBrowser();
+		auto *entry = shellBrowser->GetNavigationController()->GetEntry(
+			m_historyType == HistoryType::Back ? -1 : 1);
+
+		if (!entry)
+		{
+			return {};
+		}
+
+		std::wstring infoTipTemplate = m_resourceLoader->LoadString(
+			m_historyType == HistoryType::Back ? IDS_MAIN_TOOLBAR_BACK : IDS_MAIN_TOOLBAR_FORWARD);
+		return fmt::format(fmt::runtime(infoTipTemplate),
+			fmt::arg(L"folder_name",
+				GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
+	}
+
+	bool IsDropDownButton() const override
+	{
+		return true;
+	}
+
+	MenuFactory MaybeGetMenuFactory() const override
+	{
+		const auto *shellBrowser = m_browser->GetActiveShellBrowser();
+		const auto *navigationController = shellBrowser->GetNavigationController();
+
+		if ((m_historyType == HistoryType::Back && !navigationController->CanGoBack())
+			|| (m_historyType == HistoryType::Forward && !navigationController->CanGoForward()))
+		{
+			return {};
+		}
+
+		return [this, historyType = m_historyType](MenuView *menuView)
+		{
+			return std::make_unique<TabHistoryMenu>(menuView, m_acceleratorManager, m_browser,
+				m_shellIconLoader,
+				historyType == HistoryType::Back ? TabHistoryMenu::MenuType::Back
+												 : TabHistoryMenu::MenuType::Forward);
+		};
+	}
+
+private:
+	void OnMiddleClicked(const MouseEvent &event)
+	{
+		int command;
+
+		if (m_historyType == HistoryType::Back)
+		{
+			command = IDM_GO_BACK;
+		}
+		else
+		{
+			command = IDM_GO_FORWARD;
+		}
+
+		auto disposition = DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey);
+		m_browser->GetCommandController()->ExecuteCommand(command, disposition);
+	}
+
+	const HistoryType m_historyType;
+	const AcceleratorManager *const m_acceleratorManager;
+	ShellIconLoader *const m_shellIconLoader;
+};
+
+class MainToolbarUpButton : public MainToolbarButton
+{
+public:
+	MainToolbarUpButton(int imageIndex, BrowserWindow *browser,
+		const AcceleratorManager *acceleratorManager, ShellIconLoader *shellIconLoader,
+		const ResourceLoader *resourceLoader) :
+		MainToolbarButton(MainToolbarButtonId::Up, imageIndex, browser, resourceLoader),
+		m_acceleratorManager(acceleratorManager),
+		m_shellIconLoader(shellIconLoader)
+	{
+		SetMiddleClickedCallback(std::bind_front(&MainToolbarUpButton::OnMiddleClicked, this));
+	}
+
+	// If there's a parent folder to navigate up to, a customized infotip will be generated that
+	// contains the name of the folder.
+	std::wstring GetTooltipText() const override
+	{
+		const auto *shellBrowser = m_browser->GetActiveShellBrowser();
+		const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
+
+		unique_pidl_absolute parentPidl;
+		HRESULT hr =
+			GetVirtualParentPath(currentEntry->GetPidl().Raw(), wil::out_param(parentPidl));
+
+		if (FAILED(hr))
+		{
+			return {};
+		}
+
+		std::wstring parentName;
+		hr = GetDisplayName(parentPidl.get(), SHGDN_NORMAL, parentName);
+
+		if (FAILED(hr))
+		{
+			return {};
+		}
+
+		std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
+		std::wstring infoTip =
+			fmt::format(fmt::runtime(infoTipTemplate), fmt::arg(L"folder_name", parentName));
+
+		return infoTip;
+	}
+
+	bool IsDropDownButton() const override
+	{
+		return true;
+	}
+
+	MenuFactory MaybeGetMenuFactory() const override
+	{
+		if (!m_browser->GetActiveShellBrowser()->GetNavigationController()->CanGoUp())
+		{
+			return {};
+		}
+
+		return [this](MenuView *menuView)
+		{
+			return std::make_unique<TabParentItemsMenu>(menuView, m_acceleratorManager, m_browser,
+				m_shellIconLoader);
+		};
+	}
+
+private:
+	void OnMiddleClicked(const MouseEvent &event)
+	{
+		auto disposition = DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey);
+		m_browser->GetCommandController()->ExecuteCommand(IDM_GO_UP, disposition);
+	}
+
+	const AcceleratorManager *const m_acceleratorManager;
+	ShellIconLoader *const m_shellIconLoader;
+};
+
+class MainToolbarFoldersButton : public MainToolbarButton
+{
+public:
+	MainToolbarFoldersButton(int imageIndex, BrowserWindow *browser, const Config *config,
+		const ResourceLoader *resourceLoader) :
+		MainToolbarButton(MainToolbarButtonId::Folders, imageIndex, browser, resourceLoader),
+		m_config(config)
+	{
+		m_connections.push_back(m_config->showFolders.addObserver(
+			std::bind(&MainToolbarFoldersButton::OnShowFoldersUpdated, this)));
+	}
+
+	bool ShouldShowText() const override
+	{
+		return true;
+	}
+
+	bool IsChecked() const override
+	{
+		return m_config->showFolders.get();
+	}
+
+private:
+	void OnShowFoldersUpdated()
+	{
+		NotifyParentOfUpdate();
+	}
+
+	const Config *const m_config;
+	std::vector<boost::signals2::scoped_connection> m_connections;
+};
+
+class MainToolbarViewsButton : public MainToolbarButton
+{
+public:
+	MainToolbarViewsButton(int imageIndex, BrowserWindow *browser,
+		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
+		MainToolbarButton(MainToolbarButtonId::Views, imageIndex, browser, resourceLoader),
+		m_acceleratorManager(acceleratorManager)
+	{
+	}
+
+	bool IsDropDownButton() const override
+	{
+		return true;
+	}
+
+	MenuFactory MaybeGetMenuFactory() const override
+	{
+		return [this](MenuView *menuView)
+		{
+			return std::make_unique<ViewsMenu>(menuView, m_acceleratorManager, m_browser,
+				m_resourceLoader);
+		};
+	}
+
+private:
+	const AcceleratorManager *const m_acceleratorManager;
+};
+
 }
 
-MainToolbar::MainToolbar(HWND parent,
-	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons,
-	BrowserWindow *browser, AppServices *appServices, CoreInterface *coreInterface,
-	ShellIconLoader *shellIconLoader) :
-	m_hwnd(CreateMainToolbar(parent)),
+MainToolbar::MainToolbar(MainToolbarView *view,
+	const std::optional<MainToolbarLayout> &initialLayout, BrowserWindow *browser,
+	AppServices *appServices, CoreInterface *coreInterface, ShellIconLoader *shellIconLoader) :
+	ToolbarBase(view, browser, appServices->GetAcceleratorManager()),
+	m_view(view),
 	m_browser(browser),
 	m_appServices(appServices),
 	m_coreInterface(coreInterface),
 	m_shellIconLoader(shellIconLoader),
 	m_config(appServices->GetConfig()),
-	m_resourceLoader(appServices->GetResourceLoader()),
-	m_fontSetter(m_hwnd, appServices->GetConfig()),
-	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
-		appServices->GetConfig())
+	m_resourceLoader(appServices->GetResourceLoader())
 {
-	Initialize(parent, initialButtons);
+	Initialize(initialLayout);
 }
 
-HWND MainToolbar::CreateMainToolbar(HWND parent)
+void MainToolbar::Initialize(const std::optional<MainToolbarLayout> &initialLayout)
 {
-	return CreateToolbar(parent,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
-			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE | CCS_ADJUSTABLE,
-		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER
-			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
-}
+	CreateImageLists();
+	SetToolbarImageList();
 
-void MainToolbar::Initialize(HWND parent,
-	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
-{
-	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
-
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-
-	int dpiScaledSizeSmall = MulDiv(TOOLBAR_IMAGE_SIZE_SMALL, dpi, USER_DEFAULT_SCREEN_DPI);
-	int dpiScaledSizeLarge = MulDiv(TOOLBAR_IMAGE_SIZE_LARGE, dpi, USER_DEFAULT_SCREEN_DPI);
-
-	m_imageListSmall.reset(
-		ImageList_Create(dpiScaledSizeSmall, dpiScaledSizeSmall, ILC_COLOR32 | ILC_MASK, 0,
-			static_cast<int>(magic_enum::enum_count<MainToolbarButton>() - 1)));
-	m_imageListLarge.reset(
-		ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge, ILC_COLOR32 | ILC_MASK, 0,
-			static_cast<int>(magic_enum::enum_count<MainToolbarButton>() - 1)));
-
-	m_toolbarImageMapSmall =
-		SetUpToolbarImageList(m_imageListSmall.get(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
-	m_toolbarImageMapLarge =
-		SetUpToolbarImageList(m_imageListLarge.get(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
-
-	SetTooolbarImageList();
-	AddButtonsToToolbar(initialButtons ? initialButtons->GetButtons() : GetDefaultButtons());
-	UpdateConfigDependentButtonStates();
-
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclass>(m_hwnd, std::bind_front(&MainToolbar::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
-		std::bind_front(&MainToolbar::ParentWndProc, this)));
+	InitializeAvailableButtons();
+	m_view->SetDefaultItems(ToToolbarItems(GetDefaultButtons()));
+	m_view->SetItems(
+		ToToolbarItems(initialLayout ? initialLayout->GetButtons() : GetDefaultButtons()));
 
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
 		std::bind_front(&MainToolbar::OnBrowserLifecycleStateChanged, this)));
@@ -175,757 +447,152 @@ void MainToolbar::Initialize(HWND parent,
 		std::bind_front(&MainToolbar::OnBrowserCommandTargetChanged, this)));
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
-	m_connections.push_back(m_config->showFolders.addObserver(
-		std::bind_front(&MainToolbar::OnShowFoldersUpdated, this)));
 
 	m_connections.push_back(m_appServices->GetClipboardWatcher()->AddClipboardUpdatedObserver(
 		std::bind_front(&MainToolbar::OnClipboardUpdate, this)));
-
-	m_fontSetter.fontUpdatedSignal.AddObserver(
-		std::bind_front(&MainToolbar::OnFontOrDpiUpdated, this));
 }
 
-void MainToolbar::SetTooolbarImageList()
+void MainToolbar::CreateImageLists()
 {
-	HIMAGELIST himl;
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_view->GetHWND());
 
-	if (m_config->useLargeToolbarIcons.get())
-	{
-		himl = m_imageListLarge.get();
-	}
-	else
-	{
-		himl = m_imageListSmall.get();
-	}
+	int dpiScaledSizeSmall = MulDiv(TOOLBAR_IMAGE_SIZE_SMALL, dpi, USER_DEFAULT_SCREEN_DPI);
+	int dpiScaledSizeLarge = MulDiv(TOOLBAR_IMAGE_SIZE_LARGE, dpi, USER_DEFAULT_SCREEN_DPI);
 
-	int cx;
-	int cy;
-	ImageList_GetIconSize(himl, &cx, &cy);
+	int numImages = static_cast<int>(magic_enum::enum_count<MainToolbarButtonId>() - 1);
 
-	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(himl));
-	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
-}
-
-std::unordered_map<MainToolbarButton, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList,
-	int iconSize, UINT dpi)
-{
-	std::unordered_map<MainToolbarButton, int> imageListMappings;
+	m_imageListSmall.reset(ImageList_Create(dpiScaledSizeSmall, dpiScaledSizeSmall,
+		ILC_COLOR32 | ILC_MASK, numImages, 0));
+	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
+		ILC_COLOR32 | ILC_MASK, numImages, 0));
 
 	for (const auto &mapping : BUTTON_ICON_MAPPINGS)
 	{
-		wil::unique_hbitmap bitmap =
-			m_resourceLoader->LoadBitmapFromPNGForDpi(mapping.icon, iconSize, iconSize, dpi);
+		wil::unique_hbitmap smallBitmap = m_resourceLoader->LoadBitmapFromPNGForDpi(mapping.icon,
+			TOOLBAR_IMAGE_SIZE_SMALL, TOOLBAR_IMAGE_SIZE_SMALL, dpi);
+		int smallImageIndex = ImageList_Add(m_imageListSmall.get(), smallBitmap.get(), nullptr);
+		CHECK(smallImageIndex != -1);
 
-		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
+		wil::unique_hbitmap largeBitmap = m_resourceLoader->LoadBitmapFromPNGForDpi(mapping.icon,
+			TOOLBAR_IMAGE_SIZE_LARGE, TOOLBAR_IMAGE_SIZE_LARGE, dpi);
+		int largeImageIndex = ImageList_Add(m_imageListLarge.get(), largeBitmap.get(), nullptr);
+		CHECK(largeImageIndex != -1);
 
-		if (imagePosition == -1)
+		// When the config option to use large toolbar icons is toggled, the image list assigned to
+		// the toolbar control will be changed. The image indexes for the buttons won't be updated,
+		// so it's important that the image indexes are the same for both the small/large image
+		// lists. That should be the case, since the image lists are created with the same set of
+		// images.
+		CHECK(largeImageIndex == smallImageIndex);
+
+		m_idToImageIndexMap.insert({ mapping.button, smallImageIndex });
+	}
+}
+
+void MainToolbar::SetToolbarImageList()
+{
+	HIMAGELIST imageList;
+
+	if (m_config->useLargeToolbarIcons.get())
+	{
+		imageList = m_imageListLarge.get();
+	}
+	else
+	{
+		imageList = m_imageListSmall.get();
+	}
+
+	m_view->SetImageList(imageList);
+}
+
+void MainToolbar::InitializeAvailableButtons()
+{
+	std::vector<std::unique_ptr<ToolbarButton>> buttons;
+
+	for (auto buttonId : magic_enum::enum_values<MainToolbarButtonId>())
+	{
+		if (buttonId == MainToolbarButtonId::Separator)
 		{
 			continue;
 		}
 
-		imageListMappings.insert({ mapping.button, imagePosition });
+		auto button = CreateButtonForId(buttonId);
+		m_idToButtonMap.insert({ buttonId, button.get() });
+
+		buttons.push_back(std::move(button));
 	}
 
-	return imageListMappings;
+	m_view->InitializeAvailableButtons(std::move(buttons));
 }
 
-LRESULT MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+std::unique_ptr<ToolbarButton> MainToolbar::CreateButtonForId(MainToolbarButtonId buttonId)
 {
-	switch (msg)
+	auto itr = m_idToImageIndexMap.find(buttonId);
+	CHECK(itr != m_idToImageIndexMap.end());
+	int imageIndex = itr->second;
+
+	switch (buttonId)
 	{
-		HANDLE_MSG(hwnd, WM_MBUTTONDOWN, OnMButtonDown);
-		HANDLE_MSG(hwnd, WM_MBUTTONUP, OnMButtonUp);
+	// MainToolbarButtonId::Separator is a valid ID, but there shouldn't be an attempt to create a
+	// button using this ID, as separators and buttons are managed separately. That is, the
+	// available set of buttons includes only buttons and separators are added via an independent
+	// mechanism, not via ToolbarButton.
+	case MainToolbarButtonId::Separator:
+		CHECK(false);
+		return nullptr;
 
-	case WM_DPICHANGED_AFTERPARENT:
-		OnFontOrDpiUpdated();
-		break;
+	case MainToolbarButtonId::Back:
+		return std::make_unique<MainToolbarHistoryButton>(
+			MainToolbarHistoryButton::HistoryType::Back, imageIndex, m_browser,
+			m_appServices->GetAcceleratorManager(), m_shellIconLoader, m_resourceLoader);
 
-	case WM_NCDESTROY:
-		delete this;
-		break;
+	case MainToolbarButtonId::Forward:
+		return std::make_unique<MainToolbarHistoryButton>(
+			MainToolbarHistoryButton::HistoryType::Forward, imageIndex, m_browser,
+			m_appServices->GetAcceleratorManager(), m_shellIconLoader, m_resourceLoader);
+
+	case MainToolbarButtonId::Up:
+		return std::make_unique<MainToolbarUpButton>(imageIndex, m_browser,
+			m_appServices->GetAcceleratorManager(), m_shellIconLoader, m_resourceLoader);
+
+	case MainToolbarButtonId::Folders:
+		return std::make_unique<MainToolbarFoldersButton>(imageIndex, m_browser, m_config,
+			m_resourceLoader);
+
+	case MainToolbarButtonId::Views:
+		return std::make_unique<MainToolbarViewsButton>(imageIndex, m_browser,
+			m_appServices->GetAcceleratorManager(), m_resourceLoader);
+
+	default:
+		return std::make_unique<MainToolbarButton>(buttonId, imageIndex, m_browser,
+			m_resourceLoader);
 	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+std::vector<ToolbarItem> MainToolbar::ToToolbarItems(
+	const std::vector<MainToolbarButtonId> &buttonIds)
 {
-	switch (uMsg)
+	std::vector<ToolbarItem> items;
+
+	for (auto buttonId : buttonIds)
 	{
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
+		if (buttonId == MainToolbarButtonId::Separator)
 		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case TBN_QUERYINSERT:
-				return OnTBQueryInsert();
-
-			case TBN_QUERYDELETE:
-				return OnTBQueryDelete();
-
-			case TBN_GETBUTTONINFO:
-				return OnTBGetButtonInfo(lParam);
-
-			case TBN_RESTORE:
-				return OnTBRestore();
-
-			case TBN_GETINFOTIP:
-				OnTBGetInfoTip(lParam);
-				break;
-
-			case TBN_RESET:
-				OnTBReset();
-				break;
-
-			case TBN_TOOLBARCHANGE:
-				OnTBChange();
-				break;
-
-			case TBN_DROPDOWN:
-				return OnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
-
-			case TBN_INITCUSTOMIZE:
-				return TBNRF_HIDEHELP;
-			}
+			items.push_back(ToolbarItem::Separator());
 		}
-		break;
+		else
+		{
+			auto *button = GetButtonForId(buttonId);
+			items.push_back(ToolbarItem::Button(button));
+		}
 	}
 
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+	return items;
 }
 
-std::vector<MainToolbarButton> MainToolbar::GetDefaultButtons() const
+std::vector<MainToolbarButtonId> MainToolbar::GetDefaultButtons() const
 {
 	return { std::begin(DEFAULT_TOOLBAR_BUTTONS), std::end(DEFAULT_TOOLBAR_BUTTONS) };
-}
-
-void MainToolbar::AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons)
-{
-	for (auto button : buttons)
-	{
-		AddButtonToToolbar(button);
-	}
-}
-
-void MainToolbar::AddButtonToToolbar(MainToolbarButton button)
-{
-	if (button != MainToolbarButton::Separator
-		&& SendMessage(m_hwnd, TB_COMMANDTOINDEX, ToUnderlying(button), 0) != -1)
-	{
-		DCHECK(false) << "Toolbar button already exists";
-		return;
-	}
-
-	TBBUTTON tbButton = GetToolbarButtonDetails(button);
-	auto buttonText = GetToolbarButtonText(button);
-	tbButton.iString = reinterpret_cast<INT_PTR>(buttonText.c_str());
-	SendMessage(m_hwnd, TB_ADDBUTTONS, 1, reinterpret_cast<LPARAM>(&tbButton));
-}
-
-// Returns the button details, excluding the button text, since the TBBUTTON struct only includes
-// space for a pointer to the text, which would create potential lifetime issues.
-TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
-{
-	TBBUTTON tbButton = {};
-
-	if (button == MainToolbarButton::Separator)
-	{
-		tbButton.iBitmap = 0;
-		tbButton.idCommand = 0;
-		tbButton.fsState = TBSTATE_ENABLED;
-		tbButton.fsStyle = BTNS_SEP;
-		tbButton.dwData = 0;
-		tbButton.iString = 0;
-	}
-	else
-	{
-		/* Standard style that all toolbar buttons will have. */
-		BYTE standardStyle = BTNS_AUTOSIZE;
-
-		int imagePosition;
-
-		if (m_config->useLargeToolbarIcons.get())
-		{
-			imagePosition = m_toolbarImageMapLarge.at(button);
-		}
-		else
-		{
-			imagePosition = m_toolbarImageMapSmall.at(button);
-		}
-
-		tbButton.iBitmap = imagePosition;
-		tbButton.idCommand = ToUnderlying(button);
-		tbButton.fsState = TBSTATE_ENABLED;
-		tbButton.fsStyle = standardStyle | LookupToolbarButtonExtraStyles(button);
-		tbButton.dwData = 0;
-		tbButton.iString = 0;
-	}
-
-	return tbButton;
-}
-
-std::wstring MainToolbar::GetToolbarButtonText(MainToolbarButton button) const
-{
-	return m_resourceLoader->LoadString(LookupToolbarButtonTextID(button));
-}
-
-BYTE MainToolbar::LookupToolbarButtonExtraStyles(MainToolbarButton button) const
-{
-	switch (button)
-	{
-	case MainToolbarButton::Back:
-		return BTNS_DROPDOWN;
-
-	case MainToolbarButton::Forward:
-		return BTNS_DROPDOWN;
-
-	case MainToolbarButton::Up:
-		return BTNS_DROPDOWN;
-
-	case MainToolbarButton::Folders:
-		return BTNS_SHOWTEXT | BTNS_CHECK;
-
-	case MainToolbarButton::Views:
-		return BTNS_DROPDOWN;
-
-	default:
-		return 0;
-	}
-}
-
-int MainToolbar::LookupToolbarButtonTextID(MainToolbarButton button) const
-{
-	switch (button)
-	{
-	case MainToolbarButton::Separator:
-		return IDS_SEPARATOR;
-
-	case MainToolbarButton::Back:
-		return IDS_TOOLBAR_BACK;
-
-	case MainToolbarButton::Forward:
-		return IDS_TOOLBAR_FORWARD;
-
-	case MainToolbarButton::Up:
-		return IDS_TOOLBAR_UP;
-
-	case MainToolbarButton::Folders:
-		return IDS_TOOLBAR_FOLDERS;
-
-	case MainToolbarButton::CopyTo:
-		return IDS_TOOLBAR_COPYTO;
-
-	case MainToolbarButton::MoveTo:
-		return IDS_TOOLBAR_MOVETO;
-
-	case MainToolbarButton::NewFolder:
-		return IDS_TOOLBAR_NEWFOLDER;
-
-	case MainToolbarButton::Copy:
-		return IDS_TOOLBAR_COPY;
-
-	case MainToolbarButton::Cut:
-		return IDS_TOOLBAR_CUT;
-
-	case MainToolbarButton::Paste:
-		return IDS_TOOLBAR_PASTE;
-
-	case MainToolbarButton::Delete:
-		return IDS_TOOLBAR_DELETE;
-
-	case MainToolbarButton::DeletePermanently:
-		return IDS_TOOLBAR_DELETEPERMANENTLY;
-
-	case MainToolbarButton::Views:
-		return IDS_TOOLBAR_VIEWS;
-
-	case MainToolbarButton::Search:
-		return IDS_TOOLBAR_SEARCH;
-
-	case MainToolbarButton::Properties:
-		return IDS_TOOLBAR_PROPERTIES;
-
-	case MainToolbarButton::Refresh:
-		return IDS_TOOLBAR_REFRESH;
-
-	case MainToolbarButton::AddBookmark:
-		return IDS_TOOLBAR_ADDBOOKMARK;
-
-	case MainToolbarButton::Bookmarks:
-		return IDS_TOOLBAR_MANAGEBOOKMARKS;
-
-	case MainToolbarButton::NewTab:
-		return IDS_TOOLBAR_NEWTAB;
-
-	case MainToolbarButton::OpenCommandPrompt:
-		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
-
-	case MainToolbarButton::SplitFile:
-		return IDS_TOOLBAR_SPLIT_FILE;
-
-	case MainToolbarButton::MergeFiles:
-		return IDS_TOOLBAR_MERGE_FILES;
-
-	case MainToolbarButton::CloseTab:
-		return IDS_TOOLBAR_CLOSE_TAB;
-	}
-
-	return 0;
-}
-
-void MainToolbar::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
-{
-	if (updatedState == BrowserWindow::LifecycleState::Main)
-	{
-		UpdateToolbarButtonStates();
-	}
-}
-
-void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
-{
-	UNREFERENCED_PARAMETER(newValue);
-
-	SetTooolbarImageList();
-	UpdateToolbarButtonImageIndexes();
-	SendMessage(m_hwnd, TB_AUTOSIZE, 0, 0);
-
-	NotifySizeRequirementsChanged();
-}
-
-void MainToolbar::UpdateToolbarButtonImageIndexes()
-{
-	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < numButtons; i++)
-	{
-		TBBUTTON tbButton;
-		BOOL res = static_cast<BOOL>(
-			SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
-
-		if (!res)
-		{
-			continue;
-		}
-
-		if (tbButton.idCommand == 0)
-		{
-			// Separator.
-			continue;
-		}
-
-		auto button = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
-		CHECK(button);
-
-		int imagePosition;
-
-		if (m_config->useLargeToolbarIcons.get())
-		{
-			imagePosition = m_toolbarImageMapLarge.at(*button);
-		}
-		else
-		{
-			imagePosition = m_toolbarImageMapSmall.at(*button);
-		}
-
-		SendMessage(m_hwnd, TB_CHANGEBITMAP, 0, imagePosition);
-	}
-}
-
-void MainToolbar::OnShowFoldersUpdated(bool showFolders)
-{
-	SendMessage(m_hwnd, TB_CHECKBUTTON, ToUnderlying(MainToolbarButton::Folders), showFolders);
-}
-
-BOOL MainToolbar::OnTBQueryInsert()
-{
-	return TRUE;
-}
-
-BOOL MainToolbar::OnTBQueryDelete()
-{
-	/* All buttons can be deleted. */
-	return TRUE;
-}
-
-BOOL MainToolbar::OnTBRestore()
-{
-	return 0;
-}
-
-BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
-{
-	auto *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
-
-	if ((pnmtb->iItem >= 0)
-		&& (static_cast<std::size_t>(pnmtb->iItem)
-			< (magic_enum::enum_count<MainToolbarButton>() - 1)))
-	{
-		// Note that the separator (which is the first item in the enumeration) is skipped.
-		assert(magic_enum::enum_values<MainToolbarButton>()[0] == MainToolbarButton::Separator);
-		MainToolbarButton button = magic_enum::enum_values<MainToolbarButton>()[pnmtb->iItem + 1];
-		pnmtb->tbButton = GetToolbarButtonDetails(button);
-
-		auto buttonText = GetToolbarButtonText(button);
-		StringCchCopy(pnmtb->pszText, pnmtb->cchText, buttonText.c_str());
-
-		pnmtb->tbButton.iString = reinterpret_cast<INT_PTR>(pnmtb->pszText);
-
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
-}
-
-void MainToolbar::OnTBReset()
-{
-	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = numButtons - 1; i >= 0; i--)
-	{
-		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
-	}
-
-	AddButtonsToToolbar(GetDefaultButtons());
-	UpdateConfigDependentButtonStates();
-	UpdateToolbarButtonStates();
-}
-
-void MainToolbar::OnTBChange()
-{
-	NotifySizeRequirementsChanged();
-
-	UpdateConfigDependentButtonStates();
-}
-
-void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
-{
-	auto *ptbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
-
-	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, L"");
-
-	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
-	auto button = magic_enum::enum_cast<MainToolbarButton>(ptbgit->iItem);
-	CHECK(button);
-
-	if (button == MainToolbarButton::Back)
-	{
-		auto entry = shellBrowser->GetNavigationController()->GetEntry(-1);
-
-		if (entry)
-		{
-			std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_BACK);
-			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
-				fmt::arg(L"folder_name",
-					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
-			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
-		}
-	}
-	else if (button == MainToolbarButton::Forward)
-	{
-		auto entry = shellBrowser->GetNavigationController()->GetEntry(1);
-
-		if (entry)
-		{
-			std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_FORWARD);
-			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
-				fmt::arg(L"folder_name",
-					GetDisplayNameWithFallback(entry->GetPidl().Raw(), SHGDN_INFOLDER)));
-			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
-		}
-	}
-	else if (button == MainToolbarButton::Up)
-	{
-		auto customizedInfoTip = MaybeGetCustomizedUpInfoTip();
-
-		if (customizedInfoTip)
-		{
-			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, customizedInfoTip->c_str());
-		}
-	}
-}
-
-// If there's a parent folder to navigate up to, a customized infotip will be generated that
-// contains the name of the folder.
-std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
-{
-	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
-	const auto *currentEntry = shellBrowser->GetNavigationController()->GetCurrentEntry();
-
-	unique_pidl_absolute parentPidl;
-	HRESULT hr = GetVirtualParentPath(currentEntry->GetPidl().Raw(), wil::out_param(parentPidl));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	std::wstring parentName;
-	hr = GetDisplayName(parentPidl.get(), SHGDN_NORMAL, parentName);
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	std::wstring infoTipTemplate = m_resourceLoader->LoadString(IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
-	std::wstring infoTip =
-		fmt::format(fmt::runtime(infoTipTemplate), fmt::arg(L"folder_name", parentName));
-
-	return infoTip;
-}
-
-LRESULT MainToolbar::OnDropDown(const NMTOOLBAR *nmtb)
-{
-	auto button = magic_enum::enum_cast<MainToolbarButton>(nmtb->iItem);
-	CHECK(button);
-	auto menuPosition = GetMenuPositionForButton(*button);
-
-	auto menuFactory = MaybeGetButtonMenuFactory(*button);
-
-	if (!menuFactory)
-	{
-		return TBDDRET_NODEFAULT;
-	}
-
-	PopupMenuView popupMenu(m_hwnd, m_browser);
-	auto menu = menuFactory(&popupMenu);
-	popupMenu.Show(menuPosition);
-
-	return TBDDRET_DEFAULT;
-}
-
-MainToolbar::ItemMenuFactory MainToolbar::MaybeGetButtonMenuFactory(MainToolbarButton button) const
-{
-	switch (button)
-	{
-	case MainToolbarButton::Back:
-		return GetHistoryMenuFactory(TabHistoryMenu::MenuType::Back);
-
-	case MainToolbarButton::Forward:
-		return GetHistoryMenuFactory(TabHistoryMenu::MenuType::Forward);
-
-	case MainToolbarButton::Up:
-		return GetUpNavigationMenuFactory();
-
-	case MainToolbarButton::Views:
-		return GetViewsMenuFactory();
-
-	default:
-		return {};
-	}
-}
-
-MainToolbar::ItemMenuFactory MainToolbar::GetHistoryMenuFactory(
-	TabHistoryMenu::MenuType historyType) const
-{
-	const auto *shellBrowser = m_browser->GetActiveShellBrowser();
-	const auto *navigationController = shellBrowser->GetNavigationController();
-
-	if ((historyType == TabHistoryMenu::MenuType::Back && !navigationController->CanGoBack())
-		|| (historyType == TabHistoryMenu::MenuType::Forward
-			&& !navigationController->CanGoForward()))
-	{
-		return {};
-	}
-
-	return [this, historyType](MenuView *menuView)
-	{
-		return std::make_unique<TabHistoryMenu>(menuView, m_appServices->GetAcceleratorManager(),
-			m_browser, m_shellIconLoader, historyType);
-	};
-}
-
-MainToolbar::ItemMenuFactory MainToolbar::GetUpNavigationMenuFactory() const
-{
-	if (!m_browser->GetActiveShellBrowser()->GetNavigationController()->CanGoUp())
-	{
-		return {};
-	}
-
-	return [this](MenuView *menuView)
-	{
-		return std::make_unique<TabParentItemsMenu>(menuView,
-			m_appServices->GetAcceleratorManager(), m_browser, m_shellIconLoader);
-	};
-}
-
-MainToolbar::ItemMenuFactory MainToolbar::GetViewsMenuFactory() const
-{
-	return [this](MenuView *menuView)
-	{
-		return std::make_unique<ViewsMenu>(menuView, m_appServices->GetAcceleratorManager(),
-			m_browser, m_resourceLoader);
-	};
-}
-
-// Returns the position a menu should be anchored at for a particular toolbar button.
-POINT MainToolbar::GetMenuPositionForButton(MainToolbarButton button)
-{
-	RECT rcButton;
-	auto res =
-		SendMessage(m_hwnd, TB_GETRECT, ToUnderlying(button), reinterpret_cast<LPARAM>(&rcButton));
-	CHECK(res);
-
-	POINT pt = { rcButton.left, rcButton.bottom };
-	res = ClientToScreen(m_hwnd, &pt);
-	CHECK(res);
-
-	return pt;
-}
-
-HWND MainToolbar::GetHWND() const
-{
-	return m_hwnd;
-}
-
-UINT MainToolbar::GetHeight() const
-{
-	SIZE size;
-	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
-	CHECK(res);
-
-	return size.cy;
-}
-
-std::optional<UINT> MainToolbar::MaybeGetIdealWidth() const
-{
-	SIZE size;
-	auto res = SendMessage(m_hwnd, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
-	CHECK(res);
-
-	return size.cx;
-}
-
-// For some of the buttons on the toolbar, their state depends on an item from
-// the application configuration, rather than the properties of the current tab
-// or file selection.
-void MainToolbar::UpdateConfigDependentButtonStates()
-{
-	SendMessage(m_hwnd, TB_CHECKBUTTON, ToUnderlying(MainToolbarButton::Folders),
-		m_config->showFolders.get());
-}
-
-void MainToolbar::UpdateToolbarButtonStates()
-{
-	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
-	{
-		return;
-	}
-
-	auto *browserController = m_browser->GetCommandController();
-
-	EnableButton(MainToolbarButton::Back, browserController->IsCommandEnabled(IDM_GO_BACK));
-	EnableButton(MainToolbarButton::Forward, browserController->IsCommandEnabled(IDM_GO_FORWARD));
-	EnableButton(MainToolbarButton::Up, browserController->IsCommandEnabled(IDM_GO_UP));
-	EnableButton(MainToolbarButton::Cut, browserController->IsCommandEnabled(IDM_EDIT_CUT));
-	EnableButton(MainToolbarButton::Copy, browserController->IsCommandEnabled(IDM_EDIT_COPY));
-	EnableButton(MainToolbarButton::MoveTo,
-		browserController->IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
-	EnableButton(MainToolbarButton::CopyTo,
-		browserController->IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
-	EnableButton(MainToolbarButton::Paste, m_coreInterface->CanPaste(PasteType::Normal));
-	EnableButton(MainToolbarButton::Properties,
-		browserController->IsCommandEnabled(IDM_FILE_PROPERTIES));
-	EnableButton(MainToolbarButton::Delete, browserController->IsCommandEnabled(IDM_FILE_DELETE));
-	EnableButton(MainToolbarButton::DeletePermanently,
-		browserController->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
-	EnableButton(MainToolbarButton::SplitFile,
-		browserController->IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
-	EnableButton(MainToolbarButton::MergeFiles,
-		browserController->IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
-	EnableButton(MainToolbarButton::OpenCommandPrompt,
-		browserController->IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
-	EnableButton(MainToolbarButton::NewFolder,
-		browserController->IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
-}
-
-void MainToolbar::EnableButton(MainToolbarButton button, bool enable)
-{
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToUnderlying(button), enable);
-}
-
-void MainToolbar::OnClipboardUpdate()
-{
-	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
-	{
-		return;
-	}
-
-	EnableButton(MainToolbarButton::Paste, m_coreInterface->CanPaste(PasteType::Normal));
-}
-
-void MainToolbar::OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(doubleClick);
-	UNREFERENCED_PARAMETER(keysDown);
-
-	POINT pt = { x, y };
-	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
-
-	if (index >= 0)
-	{
-		m_middleButtonItem = index;
-	}
-	else
-	{
-		m_middleButtonItem.reset();
-	}
-}
-
-void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-
-	POINT pt = { x, y };
-	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
-
-	if (index < 0 || !m_middleButtonItem || index != *m_middleButtonItem)
-	{
-		return;
-	}
-
-	TBBUTTON tbButton;
-	BOOL res = static_cast<BOOL>(
-		SendMessage(m_hwnd, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
-
-	if (!res)
-	{
-		return;
-	}
-
-	if (tbButton.idCommand == 0)
-	{
-		// Separator.
-		return;
-	}
-
-	auto disposition = DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
-		WI_IsFlagSet(keysDown, MK_SHIFT));
-	auto *commandController = m_browser->GetCommandController();
-	auto button = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
-	CHECK(button);
-
-	switch (*button)
-	{
-	case MainToolbarButton::Back:
-		commandController->ExecuteCommand(IDM_GO_BACK, disposition);
-		break;
-
-	case MainToolbarButton::Forward:
-		commandController->ExecuteCommand(IDM_GO_FORWARD, disposition);
-		break;
-
-	case MainToolbarButton::Up:
-		commandController->ExecuteCommand(IDM_GO_UP, disposition);
-		break;
-
-	default:
-		// By default, nothing needs to happen.
-		break;
-	}
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)
@@ -947,129 +614,220 @@ void MainToolbar::OnBrowserCommandTargetChanged()
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnFontOrDpiUpdated()
+void MainToolbar::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
 {
-	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
-
-	NotifySizeRequirementsChanged();
-}
-
-MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
-{
-	MainToolbarStorage::MainToolbarButtons buttons;
-	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < numButtons; i++)
+	if (updatedState == BrowserWindow::LifecycleState::Main)
 	{
-		TBBUTTON tbButton;
-		BOOL res = static_cast<BOOL>(
-			SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
-
-		if (!res)
-		{
-			DCHECK(false);
-			continue;
-		}
-
-		if (tbButton.idCommand == 0)
-		{
-			buttons.AddButton(MainToolbarButton::Separator);
-		}
-		else
-		{
-			auto buttonType = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
-			CHECK(buttonType);
-
-			buttons.AddButton(*buttonType);
-		}
+		UpdateToolbarButtonStates();
 	}
-
-	return buttons;
 }
 
-void MainToolbar::StartCustomization()
+void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 {
-	SendMessage(m_hwnd, TB_CUSTOMIZE, 0, 0);
+	UNREFERENCED_PARAMETER(newValue);
+
+	SetToolbarImageList();
 }
 
-RebarBandView *MainToolbar::GetView()
+void MainToolbar::UpdateToolbarButtonStates()
 {
-	return this;
-}
-
-bool MainToolbar::CanShowOverflowMenu() const
-{
-	return true;
-}
-
-void MainToolbar::ShowOverflowMenu(const POINT &ptScreen)
-{
-	auto overflowItems = GetOverflowItems();
-
-	if (overflowItems.empty())
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
 		return;
 	}
 
-	PopupMenuView popupMenu(m_hwnd, m_browser);
-	MainToolbarOverflowMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), overflowItems,
-		m_browser, m_resourceLoader);
-	popupMenu.Show(ptScreen);
+	auto *browserController = m_browser->GetCommandController();
+
+	EnableButton(MainToolbarButtonId::Back, browserController->IsCommandEnabled(IDM_GO_BACK));
+	EnableButton(MainToolbarButtonId::Forward, browserController->IsCommandEnabled(IDM_GO_FORWARD));
+	EnableButton(MainToolbarButtonId::Up, browserController->IsCommandEnabled(IDM_GO_UP));
+	EnableButton(MainToolbarButtonId::Cut, browserController->IsCommandEnabled(IDM_EDIT_CUT));
+	EnableButton(MainToolbarButtonId::Copy, browserController->IsCommandEnabled(IDM_EDIT_COPY));
+	EnableButton(MainToolbarButtonId::MoveTo,
+		browserController->IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
+	EnableButton(MainToolbarButtonId::CopyTo,
+		browserController->IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
+	EnableButton(MainToolbarButtonId::Paste, m_coreInterface->CanPaste(PasteType::Normal));
+	EnableButton(MainToolbarButtonId::Properties,
+		browserController->IsCommandEnabled(IDM_FILE_PROPERTIES));
+	EnableButton(MainToolbarButtonId::Delete, browserController->IsCommandEnabled(IDM_FILE_DELETE));
+	EnableButton(MainToolbarButtonId::DeletePermanently,
+		browserController->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
+	EnableButton(MainToolbarButtonId::SplitFile,
+		browserController->IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
+	EnableButton(MainToolbarButtonId::MergeFiles,
+		browserController->IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
+	EnableButton(MainToolbarButtonId::OpenCommandPrompt,
+		browserController->IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
+	EnableButton(MainToolbarButtonId::NewFolder,
+		browserController->IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
 }
 
-std::vector<MainToolbar::OverflowItem> MainToolbar::GetOverflowItems() const
+void MainToolbar::OnClipboardUpdate()
 {
-	std::vector<OverflowItem> overflowItems;
-	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	RECT toolbarRect;
-	auto clientRectRes = GetClientRect(m_hwnd, &toolbarRect);
-	CHECK(clientRectRes);
-
-	for (int i = 0; i < numButtons; i++)
+	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
-		RECT buttonRect;
-		auto res = SendMessage(m_hwnd, TB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&buttonRect));
-		CHECK(res);
+		return;
+	}
 
-		if (buttonRect.right <= toolbarRect.right)
+	EnableButton(MainToolbarButtonId::Paste, m_coreInterface->CanPaste(PasteType::Normal));
+}
+
+void MainToolbar::EnableButton(MainToolbarButtonId buttonId, bool enable)
+{
+	auto *button = static_cast<MainToolbarButton *>(GetButtonForId(buttonId));
+	button->SetEnabled(enable);
+}
+
+MainToolbarLayout MainToolbar::GetLayoutForStorage() const
+{
+	MainToolbarLayout layout;
+
+	for (const auto &item : m_view->GetItems())
+	{
+		if (item.IsButton())
 		{
-			continue;
-		}
-
-		TBBUTTON tbButton;
-		res = SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton));
-		CHECK(res);
-
-		OverflowItem overflowItem;
-
-		if (tbButton.idCommand == 0)
-		{
-			overflowItem.button = MainToolbarButton::Separator;
+			layout.AddButton(GetIdForButton(item.GetButton()));
 		}
 		else
 		{
-			auto buttonType = magic_enum::enum_cast<MainToolbarButton>(tbButton.idCommand);
-			CHECK(buttonType);
-
-			overflowItem.button = *buttonType;
-			overflowItem.text = GetToolbarButtonText(*buttonType);
-			overflowItem.icon = GetIconForButton(*buttonType);
-			overflowItem.enabled = WI_IsFlagSet(tbButton.fsState, TBSTATE_ENABLED);
-			overflowItem.checked = WI_IsFlagSet(tbButton.fsState, TBSTATE_CHECKED);
-			overflowItem.subMenuFactory = MaybeGetButtonMenuFactory(*buttonType);
+			layout.AddButton(MainToolbarButtonId::Separator);
 		}
-
-		overflowItems.push_back(overflowItem);
 	}
 
-	return overflowItems;
+	return layout;
 }
 
-Icon MainToolbar::GetIconForButton(MainToolbarButton button) const
+ToolbarButton *MainToolbar::GetButtonForId(MainToolbarButtonId buttonId) const
 {
-	auto itr = std::ranges::find_if(BUTTON_ICON_MAPPINGS,
-		[button](const auto &mapping) { return mapping.button == button; });
-	CHECK(itr != BUTTON_ICON_MAPPINGS.end());
-	return itr->icon;
+	auto itr = m_idToButtonMap.left.find(buttonId);
+	CHECK(itr != m_idToButtonMap.left.end());
+	return itr->second;
+}
+
+MainToolbarButtonId MainToolbar::GetIdForButton(ToolbarButton *button) const
+{
+	auto itr = m_idToButtonMap.right.find(button);
+	CHECK(itr != m_idToButtonMap.right.end());
+	return itr->second;
+}
+
+ToolbarButton *MainToolbar::GetButtonForIdForTesting(MainToolbarButtonId buttonId) const
+{
+	CHECK(IsInTest());
+	return GetButtonForId(buttonId);
+}
+
+namespace
+{
+
+std::wstring GetButtonText(MainToolbarButtonId buttonId, const ResourceLoader *resourceLoader)
+{
+	std::optional<UINT> stringId;
+
+	switch (buttonId)
+	{
+	case MainToolbarButtonId::Separator:
+		// A separator has no text and there shouldn't be any attempt to retrieve the text in this
+		// case.
+		CHECK(false);
+		break;
+
+	case MainToolbarButtonId::Back:
+		stringId = IDS_TOOLBAR_BACK;
+		break;
+
+	case MainToolbarButtonId::Forward:
+		stringId = IDS_TOOLBAR_FORWARD;
+		break;
+
+	case MainToolbarButtonId::Up:
+		stringId = IDS_TOOLBAR_UP;
+		break;
+
+	case MainToolbarButtonId::Folders:
+		stringId = IDS_TOOLBAR_FOLDERS;
+		break;
+
+	case MainToolbarButtonId::CopyTo:
+		stringId = IDS_TOOLBAR_COPYTO;
+		break;
+
+	case MainToolbarButtonId::MoveTo:
+		stringId = IDS_TOOLBAR_MOVETO;
+		break;
+
+	case MainToolbarButtonId::NewFolder:
+		stringId = IDS_TOOLBAR_NEWFOLDER;
+		break;
+
+	case MainToolbarButtonId::Copy:
+		stringId = IDS_TOOLBAR_COPY;
+		break;
+
+	case MainToolbarButtonId::Cut:
+		stringId = IDS_TOOLBAR_CUT;
+		break;
+
+	case MainToolbarButtonId::Paste:
+		stringId = IDS_TOOLBAR_PASTE;
+		break;
+
+	case MainToolbarButtonId::Delete:
+		stringId = IDS_TOOLBAR_DELETE;
+		break;
+
+	case MainToolbarButtonId::DeletePermanently:
+		stringId = IDS_TOOLBAR_DELETEPERMANENTLY;
+		break;
+
+	case MainToolbarButtonId::Views:
+		stringId = IDS_TOOLBAR_VIEWS;
+		break;
+
+	case MainToolbarButtonId::Search:
+		stringId = IDS_TOOLBAR_SEARCH;
+		break;
+
+	case MainToolbarButtonId::Properties:
+		stringId = IDS_TOOLBAR_PROPERTIES;
+		break;
+
+	case MainToolbarButtonId::Refresh:
+		stringId = IDS_TOOLBAR_REFRESH;
+		break;
+
+	case MainToolbarButtonId::AddBookmark:
+		stringId = IDS_TOOLBAR_ADDBOOKMARK;
+		break;
+
+	case MainToolbarButtonId::Bookmarks:
+		stringId = IDS_TOOLBAR_MANAGEBOOKMARKS;
+		break;
+
+	case MainToolbarButtonId::NewTab:
+		stringId = IDS_TOOLBAR_NEWTAB;
+		break;
+
+	case MainToolbarButtonId::OpenCommandPrompt:
+		stringId = IDS_TOOLBAR_OPENCOMMANDPROMPT;
+		break;
+
+	case MainToolbarButtonId::SplitFile:
+		stringId = IDS_TOOLBAR_SPLIT_FILE;
+		break;
+
+	case MainToolbarButtonId::MergeFiles:
+		stringId = IDS_TOOLBAR_MERGE_FILES;
+		break;
+
+	case MainToolbarButtonId::CloseTab:
+		stringId = IDS_TOOLBAR_CLOSE_TAB;
+		break;
+	}
+
+	CHECK(stringId);
+	return resourceLoader->LoadString(*stringId);
+}
+
 }

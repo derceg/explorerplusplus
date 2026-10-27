@@ -27,10 +27,10 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 				{ 1, 769, 212 },
 				{ 0, 768, 391 },
 			},
-			.mainToolbarButtons = MainToolbarStorage::MainToolbarButtons({
-				MainToolbarButton::Back,
-				MainToolbarButton::Forward,
-				MainToolbarButton::Delete,
+			.mainToolbarLayout = MainToolbarLayout({
+				MainToolbarButtonId::Back,
+				MainToolbarButtonId::Forward,
+				MainToolbarButtonId::Delete,
 			}),
 			.treeViewWidth = 430,
 			.displayWindowWidth = 610,
@@ -48,10 +48,10 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 			.mainRebarInfo = {
 				{ 0, 769, 110 },
 			},
-			.mainToolbarButtons = MainToolbarStorage::MainToolbarButtons({
-				MainToolbarButton::Refresh,
-				MainToolbarButton::Separator,
-				MainToolbarButton::NewTab,
+			.mainToolbarLayout = MainToolbarLayout({
+				MainToolbarButtonId::Refresh,
+				MainToolbarButtonId::Separator,
+				MainToolbarButtonId::NewTab,
 			}),
 			.treeViewWidth = 57,
 			.displayWindowWidth = 176,
@@ -68,9 +68,9 @@ std::vector<WindowStorageData> BuildV2ReferenceWindows(TestStorageType storageTy
 			.mainRebarInfo = {
 				{ 0, 769, 1846 },
 			},
-			.mainToolbarButtons = MainToolbarStorage::MainToolbarButtons({
-				MainToolbarButton::Search,
-				MainToolbarButton::CloseTab,
+			.mainToolbarLayout = MainToolbarLayout({
+				MainToolbarButtonId::Search,
+				MainToolbarButtonId::CloseTab,
 			}),
 			.treeViewWidth = 844,
 			.displayWindowWidth = 140,
@@ -95,9 +95,9 @@ WindowStorageData BuildV2FallbackReferenceWindow(TestStorageType storageType)
 			{ 0, 768, 712 },
 			{ 1, 768, 1834 },
 		},
-		.mainToolbarButtons = MainToolbarStorage::MainToolbarButtons({
-			MainToolbarButton::MergeFiles,
-			MainToolbarButton::OpenCommandPrompt,
+		.mainToolbarLayout = MainToolbarLayout({
+			MainToolbarButtonId::MergeFiles,
+			MainToolbarButtonId::OpenCommandPrompt,
 		}),
 		.treeViewWidth = 117,
 		.displayWindowWidth = 66,
@@ -119,10 +119,10 @@ WindowStorageData BuildV1ReferenceWindow(TestStorageType storageType)
 			{ 0, 768, 652 },
 			{ 1, 769, 839 },
 		},
-		.mainToolbarButtons = MainToolbarStorage::MainToolbarButtons({
-			MainToolbarButton::CopyTo,
-			MainToolbarButton::MoveTo,
-			MainToolbarButton::Up,
+		.mainToolbarLayout = MainToolbarLayout({
+			MainToolbarButtonId::CopyTo,
+			MainToolbarButtonId::MoveTo,
+			MainToolbarButtonId::Up,
 		}),
 		.treeViewWidth = 1014,
 		.displayWindowWidth = 212,

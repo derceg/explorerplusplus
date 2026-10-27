@@ -22,7 +22,7 @@ class ApplicationToolbarTestBase : public BrowserTestBase
 protected:
 	ApplicationToolbarTestBase(std::vector<std::unique_ptr<Application>> initialApplications = {}) :
 		m_browser(AddBrowser()),
-		m_applicationToolbarView(m_browser->GetHWND(), &m_config)
+		m_applicationToolbarView(m_browser->GetHWND(), m_browser, &m_config)
 	{
 		for (auto &application : initialApplications)
 		{
@@ -35,13 +35,16 @@ protected:
 
 	void VerifyToolbarButtons()
 	{
-		const auto &buttons = m_applicationToolbarView.GetButtons();
+		auto toolbarItems = m_applicationToolbarView.GetItems();
 		const auto &applications = m_applicationModel.GetItems();
-		ASSERT_EQ(buttons.size(), applications.size());
+		ASSERT_EQ(toolbarItems.size(), applications.size());
 
 		// TODO: This should use std::views::zip once C++23 support is available.
-		for (const auto &[button, application] : boost::combine(buttons, applications))
+		for (const auto &[toolbarItem, application] : boost::combine(toolbarItems, applications))
 		{
+			ASSERT_TRUE(toolbarItem.IsButton());
+
+			auto *button = toolbarItem.GetButton();
 			std::wstring expectedName =
 				application->GetShowNameOnToolbar() ? application->GetName() : L"";
 			EXPECT_EQ(button->GetText(), expectedName);
@@ -116,8 +119,11 @@ TEST_F(ApplicationToolbarTest, OpenOnClick)
 		EXPECT_CALL(m_applicationExecutor, Execute(application.get(), std::wstring()));
 	}
 
-	for (const auto &button : m_applicationToolbarView.GetButtons())
+	for (const auto &toolbarItem : m_applicationToolbarView.GetItems())
 	{
+		ASSERT_TRUE(toolbarItem.IsButton());
+
+		auto *button = toolbarItem.GetButton();
 		button->OnClicked(MouseEvent{ { 0, 0 }, false, false });
 	}
 }

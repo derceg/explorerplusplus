@@ -26,6 +26,7 @@ public:
 	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext);
+	~BookmarksToolbar();
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
 	BookmarksToolbar(BookmarksToolbar &&) = delete;
@@ -72,6 +73,7 @@ private:
 
 	void RemoveDropHighlight();
 
+	BookmarksToolbarView *const m_view;
 	BrowserWindow *const m_browser;
 	const ResourceLoader *const m_resourceLoader;
 	BookmarkTree *const m_bookmarkTree;

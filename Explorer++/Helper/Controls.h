@@ -23,9 +23,6 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path);
 /* Dialog. */
 BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck);
 
-/* Toolbar. */
-void RefreshToolbarAfterFontOrDpiChange(HWND toolbar);
-
 SIZE GetCheckboxSize(HWND hwnd);
 SIZE GetRadioButtonSize(HWND hwnd);
 SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int defaultHeight);

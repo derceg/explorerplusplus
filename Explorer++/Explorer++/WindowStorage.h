@@ -5,7 +5,7 @@
 #pragma once
 
 #include "LayoutDefaults.h"
-#include "MainToolbarStorage.h"
+#include "MainToolbarLayout.h"
 #include <optional>
 #include <vector>
 
@@ -30,7 +30,7 @@ struct WindowStorageData
 	std::vector<TabStorageData> tabs;
 	int selectedTab = 0;
 	std::vector<RebarBandStorageData> mainRebarInfo;
-	std::optional<MainToolbarStorage::MainToolbarButtons> mainToolbarButtons;
+	std::optional<MainToolbarLayout> mainToolbarLayout;
 	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;

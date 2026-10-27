@@ -116,9 +116,26 @@ public:
 		return m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem);
 	}
 
+	bool IsChecked() const override
+	{
+		return m_dragHighlighted || ToolbarMenuButton::IsChecked();
+	}
+
+	void SetDragHighlighted(bool dragHighlighted)
+	{
+		if (m_dragHighlighted == dragHighlighted)
+		{
+			return;
+		}
+
+		m_dragHighlighted = dragHighlighted;
+		NotifyParentOfUpdate();
+	}
+
 private:
 	const BookmarkItem *m_bookmarkItem;
 	BookmarkIconManager *m_bookmarkIconManager;
+	bool m_dragHighlighted = false;
 };
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
@@ -126,6 +143,7 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
 	ToolbarBase(view, browser, acceleratorManager),
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
+	m_view(view),
 	m_browser(browser),
 	m_resourceLoader(resourceLoader),
 	m_bookmarkTree(bookmarkTree),
@@ -133,6 +151,8 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 {
 	Initialize(iconFetcher, resourceLoader);
 }
+
+BookmarksToolbar::~BookmarksToolbar() = default;
 
 void BookmarksToolbar::Initialize(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader)
 {
@@ -218,11 +238,13 @@ void BookmarksToolbar::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 
 	if (bookmarkItem.IsBookmark() && propertyType == BookmarkItem::PropertyType::Location)
 	{
-		auto button = static_cast<BookmarksToolbarBookmarkButton *>(m_view->GetButton(index));
+		auto *button =
+			dynamic_cast<BookmarksToolbarBookmarkButton *>(m_view->GetButtonAtIndex(index));
+		CHECK(button);
 		button->InvalidateCachedIcon();
 	}
 
-	m_view->UpdateButton(index);
+	m_view->UpdateButton(m_view->GetButtonAtIndex(index));
 }
 
 void BookmarksToolbar::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,
@@ -230,7 +252,7 @@ void BookmarksToolbar::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,
 {
 	if (oldParent == m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
-		m_view->RemoveButton(oldIndex);
+		m_view->RemoveButton(m_view->GetButtonAtIndex(oldIndex));
 	}
 
 	if (newParent == m_bookmarkTree->GetBookmarksToolbarFolder())
@@ -247,7 +269,7 @@ void BookmarksToolbar::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
 	}
 
 	auto index = bookmarkItem.GetParent()->GetChildIndex(&bookmarkItem);
-	m_view->RemoveButton(index);
+	m_view->RemoveButton(m_view->GetButtonAtIndex(index));
 }
 
 void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
@@ -268,7 +290,7 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 	}
 
 	auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
-	RECT buttonRect = m_view->GetButtonRect(index);
+	RECT buttonRect = m_view->GetButtonRect(m_view->GetButtonAtIndex(index));
 
 	POINT pt = { buttonRect.left, buttonRect.bottom };
 	ClientToScreen(m_view->GetHWND(), &pt);
@@ -301,7 +323,7 @@ void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 	{
 		// Only items that aren't visible need to be displayed in the overflow menu.
 		auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
-		return !m_view->IsButtonVisible(index);
+		return !m_view->IsButtonVisible(m_view->GetButtonAtIndex(index));
 	};
 
 	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
@@ -334,7 +356,8 @@ void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)
 	// the wrong button, or no button at all (a default empty image would be used instead).
 	// Setting the hot item here ensures the correct button is shown in the drag image in both of
 	// those cases.
-	m_view->SetHotItem(bookmarkItem->GetParent()->GetChildIndex(bookmarkItem));
+	auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+	m_view->SetHotItem(m_view->GetButtonAtIndex(index));
 
 	// The toolbar control has built-in handling for the DI_GETDRAGIMAGE message, so it will
 	// generate the appropriate image, based on the hot item and current cursor position (the offset
@@ -354,7 +377,7 @@ BookmarkDropTargetWindow::DropLocation BookmarksToolbar::GetDropLocation(const P
 
 	if (index)
 	{
-		RECT buttonRect = m_view->GetButtonRect(*index);
+		RECT buttonRect = m_view->GetButtonRect(m_view->GetButtonAtIndex(*index));
 
 		auto bookmarkItem =
 			m_bookmarkTree->GetBookmarksToolbarFolder()->GetChildren().at(*index).get();
@@ -413,8 +436,10 @@ void BookmarksToolbar::UpdateUiForDropLocation(const DropLocation &dropLocation)
 		auto selectedButtonIndex =
 			dropLocation.parentFolder->GetParent()->GetChildIndex(dropLocation.parentFolder);
 
-		auto button = m_view->GetButton(selectedButtonIndex);
-		button->SetChecked(true);
+		auto *button = dynamic_cast<BookmarksToolbarFolderButton *>(
+			m_view->GetButtonAtIndex(selectedButtonIndex));
+		CHECK(button);
+		button->SetDragHighlighted(true);
 
 		m_dropTargetFolder = dropLocation.parentFolder;
 	}
@@ -432,8 +457,10 @@ void BookmarksToolbar::RemoveDropHighlight()
 	{
 		auto index = m_dropTargetFolder->GetParent()->GetChildIndex(m_dropTargetFolder);
 
-		auto button = m_view->GetButton(index);
-		button->SetChecked(false);
+		auto *button =
+			dynamic_cast<BookmarksToolbarFolderButton *>(m_view->GetButtonAtIndex(index));
+		CHECK(button);
+		button->SetDragHighlighted(false);
 
 		m_dropTargetFolder = nullptr;
 	}

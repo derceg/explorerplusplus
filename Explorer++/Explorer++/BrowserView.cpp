@@ -12,6 +12,7 @@
 #include "DrivesToolbarView.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
+#include "MainToolbarView.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
@@ -130,12 +131,15 @@ ATOM BrowserView::RegisterBrowserWindowClass(HINSTANCE instance)
 void BrowserView::CreateMainRebarAndChildren()
 {
 	m_mainRebarView = std::make_unique<MainRebarView>(GetHWND());
+	m_mainToolbarView =
+		std::make_unique<MainToolbarView>(m_mainRebarView->GetHWND(), m_browser, m_config);
 	m_addressBarView = std::make_unique<AddressBarView>(m_mainRebarView->GetHWND(), m_config);
 	m_bookmarksToolbarView =
-		std::make_unique<BookmarksToolbarView>(m_mainRebarView->GetHWND(), m_config);
-	m_drivesToolbarView = std::make_unique<DrivesToolbarView>(m_mainRebarView->GetHWND(), m_config);
+		std::make_unique<BookmarksToolbarView>(m_mainRebarView->GetHWND(), m_browser, m_config);
+	m_drivesToolbarView =
+		std::make_unique<DrivesToolbarView>(m_mainRebarView->GetHWND(), m_browser, m_config);
 	m_applicationToolbarView = std::make_unique<Applications::ApplicationToolbarView>(
-		m_mainRebarView->GetHWND(), m_config);
+		m_mainRebarView->GetHWND(), m_browser, m_config);
 }
 
 MenuView *BrowserView::GetMainMenuView() const
@@ -146,6 +150,11 @@ MenuView *BrowserView::GetMainMenuView() const
 MainRebarView *BrowserView::GetMainRebarView() const
 {
 	return m_mainRebarView.get();
+}
+
+MainToolbarView *BrowserView::GetMainToolbarView() const
+{
+	return m_mainToolbarView.get();
 }
 
 AddressBarView *BrowserView::GetAddressBarView() const

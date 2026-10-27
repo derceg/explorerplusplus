@@ -65,6 +65,7 @@ DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
 	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
 	const ResourceLoader *resourceLoader) :
 	ToolbarBase(view, browser, acceleratorManager),
+	m_view(view),
 	m_driveModel(driveModel),
 	m_browser(browser),
 	m_resourceLoader(resourceLoader)
@@ -124,14 +125,14 @@ void DrivesToolbar::OnDriveUpdated(const std::wstring &path)
 		return;
 	}
 
-	m_view->UpdateButton(*index);
+	m_view->UpdateButton(m_view->GetButtonAtIndex(*index));
 }
 
 void DrivesToolbar::OnDriveRemoved(const std::wstring &path, size_t oldIndex)
 {
 	UNREFERENCED_PARAMETER(path);
 
-	m_view->RemoveButton(oldIndex);
+	m_view->RemoveButton(m_view->GetButtonAtIndex(oldIndex));
 }
 
 void DrivesToolbar::OnButtonClicked(const std::wstring &drivePath, const MouseEvent &event)

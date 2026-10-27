@@ -5,11 +5,12 @@
 #include "stdafx.h"
 #include "DrivesToolbarView.h"
 
-DrivesToolbarView::DrivesToolbarView(HWND parent, const Config *config) :
+DrivesToolbarView::DrivesToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost,
+	const Config *config) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
 			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
-		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS, config)
+		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS, menuHelpTextHost, config)
 {
 	SetupSmallShellImageList();
 }

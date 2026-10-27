@@ -72,6 +72,7 @@ ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, Application
 	ApplicationExecutor *applicationExecutor, BrowserWindow *browser,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	ToolbarBase(view, browser, acceleratorManager),
+	m_view(view),
 	m_model(model),
 	m_applicationExecutor(applicationExecutor),
 	m_browser(browser),
@@ -126,14 +127,14 @@ void ApplicationToolbar::OnApplicationUpdated(Application *application)
 	// The ApplicationToolbarButton class holds a pointer to the associated Application (so there's
 	// no need to update it). Only the view needs to be updated.
 	auto index = m_model->GetItemIndex(application);
-	m_view->UpdateButton(index);
+	m_view->UpdateButton(m_view->GetButtonAtIndex(index));
 }
 
 void ApplicationToolbar::OnApplicationRemoved(const Application *application, size_t oldIndex)
 {
 	UNREFERENCED_PARAMETER(application);
 
-	m_view->RemoveButton(oldIndex);
+	m_view->RemoveButton(m_view->GetButtonAtIndex(oldIndex));
 }
 
 void ApplicationToolbar::OnButtonClicked(const Application *application, const MouseEvent &event)
@@ -193,7 +194,7 @@ DWORD ApplicationToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt
 }
 
 ApplicationDropper::DropTarget ApplicationToolbar::DropLocationToTarget(
-	const ToolbarView::DropLocation &dropLocation)
+	const ToolbarViewBase::DropLocation &dropLocation)
 {
 	if (dropLocation.onItem)
 	{

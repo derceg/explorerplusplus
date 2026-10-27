@@ -4,7 +4,8 @@
 
 #include "pch.h"
 #include "MainToolbarStorage.h"
-#include "MainToolbarButtons.h"
+#include "MainToolbarButtonId.h"
+#include "MainToolbarLayout.h"
 #include "RegistryStorageTestHelper.h"
 #include "ResourceTestHelper.h"
 #include "XmlStorageTestHelper.h"
@@ -17,47 +18,39 @@ using namespace testing;
 namespace
 {
 
-MainToolbarStorage::MainToolbarButtons BuildMainToolbarLoadSaveReference()
+MainToolbarLayout BuildMainToolbarLoadSaveReference()
 {
-	return MainToolbarStorage::MainToolbarButtons({ MainToolbarButton::Folders,
-		MainToolbarButton::Separator, MainToolbarButton::Up, MainToolbarButton::Back,
-		MainToolbarButton::Forward, MainToolbarButton::Separator, MainToolbarButton::Search,
-		MainToolbarButton::Separator, MainToolbarButton::Paste, MainToolbarButton::Delete,
-		MainToolbarButton::Copy, MainToolbarButton::Cut, MainToolbarButton::DeletePermanently,
-		MainToolbarButton::Separator, MainToolbarButton::NewFolder, MainToolbarButton::CopyTo,
-		MainToolbarButton::MoveTo, MainToolbarButton::Separator,
-		MainToolbarButton::OpenCommandPrompt, MainToolbarButton::Refresh,
-		MainToolbarButton::Separator, MainToolbarButton::AddBookmark, MainToolbarButton::Separator,
-		MainToolbarButton::NewTab, MainToolbarButton::MergeFiles, MainToolbarButton::Separator,
-		MainToolbarButton::CloseTab });
+	return MainToolbarLayout({
+		MainToolbarButtonId::Folders,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::Up,
+		MainToolbarButtonId::Back,
+		MainToolbarButtonId::Forward,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::Search,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::Paste,
+		MainToolbarButtonId::Delete,
+		MainToolbarButtonId::Copy,
+		MainToolbarButtonId::Cut,
+		MainToolbarButtonId::DeletePermanently,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::NewFolder,
+		MainToolbarButtonId::CopyTo,
+		MainToolbarButtonId::MoveTo,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::OpenCommandPrompt,
+		MainToolbarButtonId::Refresh,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::AddBookmark,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::NewTab,
+		MainToolbarButtonId::MergeFiles,
+		MainToolbarButtonId::Separator,
+		MainToolbarButtonId::CloseTab,
+	});
 }
 
-}
-
-TEST(MainToolbarButtonsTest, DuplicateButtons)
-{
-	MainToolbarStorage::MainToolbarButtons buttons;
-	buttons.AddButton(MainToolbarButton::Up);
-	buttons.AddButton(MainToolbarButton::OpenCommandPrompt);
-	EXPECT_EQ(buttons.GetButtons().size(), 2U);
-
-	// It shouldn't be possible to add a standard button more than once, so this call should have no
-	// effect.
-	buttons.AddButton(MainToolbarButton::Up);
-	EXPECT_EQ(buttons.GetButtons().size(), 2U);
-}
-
-TEST(MainToolbarButtonsTest, DuplicateSeparators)
-{
-	MainToolbarStorage::MainToolbarButtons buttons;
-	buttons.AddButton(MainToolbarButton::Properties);
-	buttons.AddButton(MainToolbarButton::Separator);
-	buttons.AddButton(MainToolbarButton::Refresh);
-	EXPECT_EQ(buttons.GetButtons().size(), 3U);
-
-	// Unlike standard buttons, it should be possible for separators to appear multiple times.
-	buttons.AddButton(MainToolbarButton::Separator);
-	EXPECT_EQ(buttons.GetButtons().size(), 4U);
 }
 
 class MainToolbarRegistryStorageTest : public RegistryStorageTest

@@ -12,7 +12,7 @@ namespace Applications
 class ApplicationToolbarView : public ToolbarView
 {
 public:
-	ApplicationToolbarView(HWND parent, const Config *config);
+	ApplicationToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost, const Config *config);
 };
 
 }
