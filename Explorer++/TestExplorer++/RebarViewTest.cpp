@@ -13,25 +13,6 @@
 
 using namespace testing;
 
-namespace
-{
-
-class TestRebarView : public RebarView
-{
-public:
-	static TestRebarView *Create(HWND parent)
-	{
-		return new TestRebarView(parent);
-	}
-
-private:
-	TestRebarView(HWND parent) : RebarView(parent, WS_CHILD)
-	{
-	}
-};
-
-}
-
 class RebarViewTest : public Test
 {
 protected:
@@ -41,12 +22,12 @@ protected:
 			GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_parentWindow, nullptr);
 
-		m_view = TestRebarView::Create(m_parentWindow.get());
-		m_testApi = std::make_unique<RebarViewTestApi>(m_view);
+		m_view = std::make_unique<RebarView>(m_parentWindow.get(), WS_CHILD);
+		m_testApi = std::make_unique<RebarViewTestApi>(m_view.get());
 	}
 
 	wil::unique_hwnd m_parentWindow;
-	TestRebarView *m_view = nullptr;
+	std::unique_ptr<RebarView> m_view;
 	std::unique_ptr<RebarViewTestApi> m_testApi;
 };
 

@@ -43,20 +43,6 @@ private:
 	const std::wstring m_title;
 };
 
-class TestTabView : public TabView
-{
-public:
-	static TestTabView *Create(HWND parent, const Config *config)
-	{
-		return new TestTabView(parent, config);
-	}
-
-private:
-	TestTabView(HWND parent, const Config *config) : TabView(parent, WS_CHILD, config)
-	{
-	}
-};
-
 }
 
 class TabViewTest : public Test
@@ -68,7 +54,7 @@ protected:
 			GetModuleHandle(nullptr), nullptr));
 		ASSERT_NE(m_parentWindow, nullptr);
 
-		m_view = TestTabView::Create(m_parentWindow.get(), &m_config);
+		m_view = std::make_unique<TabView>(m_parentWindow.get(), WS_CHILD, &m_config);
 	}
 
 	std::vector<std::wstring> GetTabTitles() const
@@ -101,7 +87,7 @@ protected:
 	Config m_config;
 
 	wil::unique_hwnd m_parentWindow;
-	TestTabView *m_view = nullptr;
+	std::unique_ptr<TabView> m_view;
 };
 
 TEST_F(TabViewTest, AddTab)
