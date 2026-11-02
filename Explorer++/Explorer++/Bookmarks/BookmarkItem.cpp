@@ -18,15 +18,14 @@ std::unique_ptr<BookmarkItem> BookmarkItem::MaybeCreateFromSerializedData(
 
 	if (data.type == Type::Bookmark)
 	{
-		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, utf8StrToWstr(data.name),
-			utf8StrToWstr(data.location));
+		auto bookmark =
+			std::make_unique<BookmarkItem>(utf8StrToWstr(data.name), utf8StrToWstr(data.location));
 		bookmark->m_originalGuid = utf8StrToWstr(data.guid);
 		return bookmark;
 	}
 	else
 	{
-		auto bookmarkFolder =
-			std::make_unique<BookmarkItem>(std::nullopt, utf8StrToWstr(data.name), std::nullopt);
+		auto bookmarkFolder = std::make_unique<BookmarkItem>(utf8StrToWstr(data.name));
 		bookmarkFolder->m_originalGuid = utf8StrToWstr(data.guid);
 
 		for (const auto &child : data.children)
@@ -61,12 +60,29 @@ BookmarkItem::SerializedData BookmarkItem::ToSerializedData() const
 	};
 }
 
-BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
-	std::optional<std::wstring> location) :
-	m_type(location ? Type::Bookmark : Type::Folder),
-	m_guid(guid ? *guid : CreateGUID()),
+BookmarkItem::BookmarkItem(std::wstring_view name) :
+	BookmarkItem(FixedGuidTag{}, CreateGUID(), name)
+{
+}
+
+BookmarkItem::BookmarkItem(FixedGuidTag, std::wstring_view guid, std::wstring_view name) :
+	m_type(Type::Folder),
+	m_guid(guid),
+	m_name(name)
+{
+}
+
+BookmarkItem::BookmarkItem(std::wstring_view name, std::wstring_view location) :
+	BookmarkItem(FixedGuidTag{}, CreateGUID(), name, location)
+{
+}
+
+BookmarkItem::BookmarkItem(FixedGuidTag, std::wstring_view guid, std::wstring_view name,
+	std::wstring_view location) :
+	m_type(Type::Bookmark),
+	m_guid(guid),
 	m_name(name),
-	m_location(location ? *location : std::wstring())
+	m_location(location)
 {
 }
 

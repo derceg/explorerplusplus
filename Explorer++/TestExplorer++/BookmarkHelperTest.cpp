@@ -23,7 +23,7 @@ TEST_F(BookmarkHelperTest, AddBrowserTabsToBookmarkFolder)
 	browser->AddTab(L"z:\\folder");
 
 	auto *parentFolder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Parent folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Parent folder"));
 	BookmarkHelper::AddBrowserTabsToBookmarkFolder(&m_bookmarkTree, browser, parentFolder);
 
 	const auto &bookmarks = parentFolder->GetChildren();

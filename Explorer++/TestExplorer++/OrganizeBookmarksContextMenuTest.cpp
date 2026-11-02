@@ -64,17 +64,17 @@ protected:
 	{
 		auto *parentFolder =
 			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-				std::make_unique<BookmarkItem>(std::nullopt, L"Parent folder", std::nullopt), 0);
+				std::make_unique<BookmarkItem>(L"Parent folder"), 0);
 
 		m_targetFolder = m_bookmarkTree.AddBookmarkItem(parentFolder,
-			std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt), 0);
+			std::make_unique<BookmarkItem>(L"Target folder"), 0);
 		m_bookmarkTree.AddBookmarkItem(m_targetFolder,
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\"), 0);
+			std::make_unique<BookmarkItem>(L"Bookmark 1", L"c:\\"), 0);
 		m_bookmarkTree.AddBookmarkItem(m_targetFolder,
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\"), 1);
+			std::make_unique<BookmarkItem>(L"Bookmark 2", L"d:\\"), 1);
 
 		m_bookmarkToCopy = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"e:\\"), 0);
+			std::make_unique<BookmarkItem>(L"Bookmark 3", L"e:\\"), 0);
 	}
 
 	std::unique_ptr<OrganizeBookmarksContextMenu> BuildContextMenu(MenuView *menuView,
@@ -160,7 +160,7 @@ TEST_F(OrganizeBookmarksContextMenuTest, SelectAllDisabledState)
 TEST_F(OrganizeBookmarksContextMenuTest, SelectAllEnabledStateWithNoChildItems)
 {
 	auto *emptyFolder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Empty folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Empty folder"));
 
 	TestMenuView menuView;
 	OrganizeBookmarksContextMenuDelegateFake delegate;

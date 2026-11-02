@@ -20,6 +20,10 @@ using BookmarkItems = std::vector<std::unique_ptr<BookmarkItem>>;
 class BookmarkItem : private boost::noncopyable
 {
 public:
+	struct FixedGuidTag
+	{
+	};
+
 	enum class Type
 	{
 		Folder = 0,
@@ -46,8 +50,18 @@ public:
 	static std::unique_ptr<BookmarkItem> MaybeCreateFromSerializedData(const SerializedData &data);
 	SerializedData ToSerializedData() const;
 
-	BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
-		std::optional<std::wstring> location);
+	// Constructs a bookmark folder.
+	BookmarkItem(std::wstring_view name);
+
+	// Constructs a bookmark folder, with the provided GUID.
+	BookmarkItem(FixedGuidTag, std::wstring_view guid, std::wstring_view name);
+
+	// Constructs a bookmark.
+	BookmarkItem(std::wstring_view name, std::wstring_view location);
+
+	// Constructs a bookmark, with the provided GUID.
+	BookmarkItem(FixedGuidTag, std::wstring_view guid, std::wstring_view name,
+		std::wstring_view location);
 
 	bool IsFolder() const;
 	bool IsBookmark() const;

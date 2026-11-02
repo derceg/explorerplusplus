@@ -262,5 +262,5 @@ std::unique_ptr<BookmarkItem> BookmarkDropper::MaybeBuildBookmarkItemFromShellIt
 		return nullptr;
 	}
 
-	return std::make_unique<BookmarkItem>(std::nullopt, displayName.get(), parsingPath.get());
+	return std::make_unique<BookmarkItem>(displayName.get(), parsingPath.get());
 }

@@ -187,8 +187,8 @@ void BookmarkListPresenter::CreateBookmark(BookmarkItem *parentFolder, size_t in
 void BookmarkListPresenter::CreateFolder(BookmarkItem *parentFolder, size_t index)
 {
 	const auto *bookmarkFolder = m_bookmarkTree->AddBookmarkItem(parentFolder,
-		std::make_unique<BookmarkItem>(std::nullopt,
-			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt),
+		std::make_unique<BookmarkItem>(
+			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER)),
 		index);
 
 	if (parentFolder != m_currentBookmarkFolder)

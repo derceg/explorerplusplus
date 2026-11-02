@@ -167,17 +167,27 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key)
 	std::wstring name;
 	RegistrySettings::ReadString(key, _T("Name"), name);
 
-	std::optional<std::wstring> locationOptional;
+	std::unique_ptr<BookmarkItem> bookmarkItem;
 
 	if (type == static_cast<int>(BookmarkItem::Type::Bookmark))
 	{
 		std::wstring location;
 		RegistrySettings::ReadString(key, _T("Location"), location);
 
-		locationOptional = location;
+		bookmarkItem =
+			std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, guid, name, location);
 	}
+	else
+	{
+		bookmarkItem = std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, guid, name);
 
-	auto bookmarkItem = std::make_unique<BookmarkItem>(guid, name, locationOptional);
+		auto children = LoadBookmarkChildren(key);
+
+		for (auto &child : children)
+		{
+			bookmarkItem->AddChild(std::move(child));
+		}
+	}
 
 	FILETIME dateCreated;
 	RegistrySettings::ReadDateTime(key, _T("DateCreated"), dateCreated);
@@ -186,16 +196,6 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key)
 	FILETIME dateModified;
 	RegistrySettings::ReadDateTime(key, _T("DateModified"), dateModified);
 	bookmarkItem->SetDateModified(dateModified);
-
-	if (type == static_cast<int>(BookmarkItem::Type::Folder))
-	{
-		auto children = LoadBookmarkChildren(key);
-
-		for (auto &child : children)
-		{
-			bookmarkItem->AddChild(std::move(child));
-		}
-	}
 
 	return bookmarkItem;
 }
@@ -341,20 +341,18 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkT
 
 	showOnToolbarOutput = showOnToolbar;
 
-	std::optional<std::wstring> locationOptional;
+	std::unique_ptr<BookmarkItem> bookmarkItem;
 
 	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Bookmark))
 	{
 		std::wstring location;
 		RegistrySettings::ReadString(key, _T("Location"), location);
 
-		locationOptional = location;
+		bookmarkItem = std::make_unique<BookmarkItem>(name, location);
 	}
-
-	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, name, locationOptional);
-
-	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Folder))
+	else
 	{
+		bookmarkItem = std::make_unique<BookmarkItem>(name);
 		LoadBookmarkChildren(key, bookmarkTree, bookmarkItem.get());
 	}
 

@@ -227,8 +227,8 @@ void BookmarkTreePresenter::CreateFolder()
 void BookmarkTreePresenter::CreateFolder(BookmarkItem *parentFolder, size_t index)
 {
 	auto *addedFolder = m_bookmarkTree->AddBookmarkItem(parentFolder,
-		std::make_unique<BookmarkItem>(std::nullopt,
-			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt),
+		std::make_unique<BookmarkItem>(
+			m_resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER)),
 		index);
 
 	auto *node = m_adapter->GetNodeForBookmark(addedFolder);

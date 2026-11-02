@@ -176,17 +176,27 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode)
 	std::wstring name;
 	XMLSettings::GetStringFromMap(attributeMap.get(), L"ItemName", name);
 
-	std::optional<std::wstring> locationOptional;
+	std::unique_ptr<BookmarkItem> bookmarkItem;
 
 	if (type == static_cast<int>(BookmarkItem::Type::Bookmark))
 	{
 		std::wstring location;
 		XMLSettings::GetStringFromMap(attributeMap.get(), L"Location", location);
 
-		locationOptional = location;
+		bookmarkItem =
+			std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, guid, name, location);
 	}
+	else
+	{
+		bookmarkItem = std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, guid, name);
 
-	auto bookmarkItem = std::make_unique<BookmarkItem>(guid, name, locationOptional);
+		auto children = LoadBookmarkChildren(parentNode);
+
+		for (auto &child : children)
+		{
+			bookmarkItem->AddChild(std::move(child));
+		}
+	}
 
 	FILETIME dateCreated;
 	XMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
@@ -195,16 +205,6 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode)
 	FILETIME dateModified;
 	XMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
 	bookmarkItem->SetDateModified(dateModified);
-
-	if (type == static_cast<int>(BookmarkItem::Type::Folder))
-	{
-		auto children = LoadBookmarkChildren(parentNode);
-
-		for (auto &child : children)
-		{
-			bookmarkItem->AddChild(std::move(child));
-		}
-	}
 
 	return bookmarkItem;
 }
@@ -345,20 +345,19 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, Bookmark
 
 	showOnToolbarOutput = XMLSettings::DecodeBoolValue(showOnToolbar.c_str());
 
-	std::optional<std::wstring> locationOptional;
+	std::unique_ptr<BookmarkItem> bookmarkItem;
 
 	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Bookmark))
 	{
 		std::wstring location;
 		XMLSettings::GetStringFromMap(attributeMap.get(), L"Location", location);
 
-		locationOptional = location;
+		bookmarkItem = std::make_unique<BookmarkItem>(name, location);
 	}
-
-	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, name, locationOptional);
-
-	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Folder))
+	else
 	{
+		bookmarkItem = std::make_unique<BookmarkItem>(name);
+
 		wil::com_ptr_nothrow<IXMLDOMNode> bookmarksNode;
 		auto queryString = wil::make_bstr_nothrow(L"./Bookmarks");
 		HRESULT hr = parentNode->selectSingleNode(queryString.get(), &bookmarksNode);

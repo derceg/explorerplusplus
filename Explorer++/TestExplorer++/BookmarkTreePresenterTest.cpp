@@ -98,18 +98,14 @@ private:
 TEST_F(BookmarkTreePresenterTest, InitialItems)
 {
 	auto *folder1 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(folder1,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(folder1,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\"));
-	m_bookmarkTree.AddBookmarkItem(folder1,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 1"));
+	m_bookmarkTree.AddBookmarkItem(folder1, std::make_unique<BookmarkItem>(L"Folder 2"));
+	m_bookmarkTree.AddBookmarkItem(folder1, std::make_unique<BookmarkItem>(L"Bookmark 1", L"c:\\"));
+	m_bookmarkTree.AddBookmarkItem(folder1, std::make_unique<BookmarkItem>(L"Folder 3"));
 
 	auto *folder4 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 4", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(folder4,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\"));
+		std::make_unique<BookmarkItem>(L"Folder 4"));
+	m_bookmarkTree.AddBookmarkItem(folder4, std::make_unique<BookmarkItem>(L"Bookmark 2", L"d:\\"));
 
 	auto presenter = BuildPresenter();
 	VerifyViewItems(presenter.get());
@@ -118,12 +114,11 @@ TEST_F(BookmarkTreePresenterTest, InitialItems)
 TEST_F(BookmarkTreePresenterTest, InitialExpansionState)
 {
 	auto *folder1 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(folder1,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 1"));
+	m_bookmarkTree.AddBookmarkItem(folder1, std::make_unique<BookmarkItem>(L"Folder 2"));
 
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 3"));
 
 	std::vector<BookmarkItem *> bookmarksToExpand = { folder1,
 		m_bookmarkTree.GetBookmarksToolbarFolder() };
@@ -153,7 +148,7 @@ TEST_F(BookmarkTreePresenterTest, InitialSelectedItem)
 TEST_F(BookmarkTreePresenterTest, SelectedFolder)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 
@@ -170,12 +165,11 @@ TEST_F(BookmarkTreePresenterTest, SelectedFolder)
 TEST_F(BookmarkTreePresenterTest, CreateFolder)
 {
 	auto *folder1 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 1"));
 
 	auto *folder2 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(folder2,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 2"));
+	m_bookmarkTree.AddBookmarkItem(folder2, std::make_unique<BookmarkItem>(L"Folder 3"));
 
 	auto presenter = BuildPresenter();
 
@@ -206,31 +200,27 @@ TEST_F(BookmarkTreePresenterTest, AddFolder)
 	auto presenter = BuildPresenter();
 
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"New folder", std::nullopt), 0);
+		std::make_unique<BookmarkItem>(L"New folder"), 0);
 	VerifyViewItems(presenter.get());
 }
 
 TEST_F(BookmarkTreePresenterTest, AddFolderAtIndex)
 {
 	auto *targetFolder = m_bookmarkTree.GetOtherBookmarksFolder();
-	m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+	m_bookmarkTree.AddBookmarkItem(targetFolder, std::make_unique<BookmarkItem>(L"Folder 1"));
+	m_bookmarkTree.AddBookmarkItem(targetFolder, std::make_unique<BookmarkItem>(L"Folder 2"));
+	m_bookmarkTree.AddBookmarkItem(targetFolder, std::make_unique<BookmarkItem>(L"Folder 3"));
 
 	auto presenter = BuildPresenter();
 
-	m_bookmarkTree.AddBookmarkItem(targetFolder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"New folder", std::nullopt), 2);
+	m_bookmarkTree.AddBookmarkItem(targetFolder, std::make_unique<BookmarkItem>(L"New folder"), 2);
 	VerifyViewItems(presenter.get());
 }
 
 TEST_F(BookmarkTreePresenterTest, UpdateFolder)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 
@@ -241,7 +231,7 @@ TEST_F(BookmarkTreePresenterTest, UpdateFolder)
 TEST_F(BookmarkTreePresenterTest, MoveFolder)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 
@@ -252,11 +242,11 @@ TEST_F(BookmarkTreePresenterTest, MoveFolder)
 TEST_F(BookmarkTreePresenterTest, MoveFolderToSameParent)
 {
 	auto *folder1 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 1"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 2"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 3"));
 
 	auto presenter = BuildPresenter();
 
@@ -267,13 +257,13 @@ TEST_F(BookmarkTreePresenterTest, MoveFolderToSameParent)
 TEST_F(BookmarkTreePresenterTest, MoveFolderToSameParentNoIndexChange)
 {
 	auto *folder1 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 1"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\"));
+		std::make_unique<BookmarkItem>(L"Bookmark 1", L"c:\\"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\"));
+		std::make_unique<BookmarkItem>(L"Bookmark 2", L"d:\\"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 2"));
 
 	auto presenter = BuildPresenter();
 
@@ -285,7 +275,7 @@ TEST_F(BookmarkTreePresenterTest, MoveFolderToSameParentNoIndexChange)
 TEST_F(BookmarkTreePresenterTest, RemoveFolder)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 
@@ -296,11 +286,10 @@ TEST_F(BookmarkTreePresenterTest, RemoveFolder)
 TEST_F(BookmarkTreePresenterTest, PasteWithNestedFolder)
 {
 	auto *folder1 = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
-	auto *folder2 = m_bookmarkTree.AddBookmarkItem(folder1,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
-	m_bookmarkTree.AddBookmarkItem(folder2,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 1"));
+	auto *folder2 =
+		m_bookmarkTree.AddBookmarkItem(folder1, std::make_unique<BookmarkItem>(L"Folder 2"));
+	m_bookmarkTree.AddBookmarkItem(folder2, std::make_unique<BookmarkItem>(L"Folder 3"));
 
 	auto presenter = BuildPresenter();
 
@@ -314,11 +303,11 @@ TEST_F(BookmarkTreePresenterTest, PasteWithNestedFolder)
 TEST_F(BookmarkTreePresenterTest, OnNodeMiddleClicked)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 	auto *bookmark1 = m_bookmarkTree.AddBookmarkItem(folder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\"));
+		std::make_unique<BookmarkItem>(L"Bookmark 1", L"c:\\"));
 	auto *bookmark2 = m_bookmarkTree.AddBookmarkItem(folder,
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\"));
+		std::make_unique<BookmarkItem>(L"Bookmark 2", L"d:\\"));
 
 	auto presenter = BuildPresenter();
 
@@ -341,7 +330,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeMiddleClicked)
 TEST_F(BookmarkTreePresenterTest, OnNodeRenamed)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 
@@ -355,7 +344,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeRenamed)
 TEST_F(BookmarkTreePresenterTest, OnNodeRemoved)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 
@@ -370,7 +359,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeRemoved)
 TEST_F(BookmarkTreePresenterTest, OnNodeCopied)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	CopiedBookmark copiedBookmark(*folder);
 
@@ -388,7 +377,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeCopied)
 TEST_F(BookmarkTreePresenterTest, OnNodeCut)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	CopiedBookmark copiedBookmark(*folder);
 
@@ -407,7 +396,7 @@ TEST_F(BookmarkTreePresenterTest, OnNodeCut)
 TEST_F(BookmarkTreePresenterTest, OnPaste)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	CopiedBookmark copiedBookmark(*folder);
 	BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(), &m_bookmarkTree,
@@ -425,7 +414,7 @@ TEST_F(BookmarkTreePresenterTest, OnPaste)
 TEST_F(BookmarkTreePresenterTest, SelectionChangedSignal)
 {
 	auto *folder = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 
 	auto presenter = BuildPresenter();
 

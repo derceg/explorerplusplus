@@ -14,7 +14,7 @@ TEST(BookmarkClipboardTest, BookmarkReadWrite)
 
 	for (int i = 0; i < 10; i++)
 	{
-		auto currentBookmark = std::make_unique<BookmarkItem>(std::nullopt,
+		auto currentBookmark = std::make_unique<BookmarkItem>(
 			L"Test bookmark " + std::to_wstring(i), L"C:\\Folder " + std::to_wstring(i));
 		bookmarkItems.push_back(std::move(currentBookmark));
 	}

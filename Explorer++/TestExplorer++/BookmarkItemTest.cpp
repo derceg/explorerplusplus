@@ -10,12 +10,12 @@ using namespace testing;
 
 TEST(BookmarkItemTest, CreateAndUpdate)
 {
-	BookmarkItem bookmarkFolder(std::nullopt, L"Test folder", std::nullopt);
+	BookmarkItem bookmarkFolder(L"Test folder");
 
 	EXPECT_TRUE(bookmarkFolder.IsFolder());
 	EXPECT_EQ(bookmarkFolder.GetName(), L"Test folder");
 
-	BookmarkItem bookmark(std::nullopt, L"Test bookmark", L"C:\\");
+	BookmarkItem bookmark(L"Test bookmark", L"C:\\");
 
 	EXPECT_TRUE(bookmark.IsBookmark());
 	EXPECT_NE(bookmark.GetGUID(), bookmarkFolder.GetGUID());
@@ -31,8 +31,8 @@ TEST(BookmarkItemTest, CreateAndUpdate)
 
 TEST(BookmarkItemTest, AddRemoveChildren)
 {
-	BookmarkItem parentFolder(std::nullopt, L"Test folder", std::nullopt);
-	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test child bookmark", L"C:\\");
+	BookmarkItem parentFolder(L"Test folder");
+	auto bookmark = std::make_unique<BookmarkItem>(L"Test child bookmark", L"C:\\");
 	auto rawBookmark = bookmark.get();
 
 	parentFolder.AddChild(std::move(bookmark));
@@ -44,7 +44,7 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	EXPECT_EQ(rawBookmark->GetParent(), &parentFolder);
 
-	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test child folder", std::nullopt);
+	auto folder = std::make_unique<BookmarkItem>(L"Test child folder");
 	auto rawFolder = folder.get();
 
 	parentFolder.AddChild(std::move(folder));
@@ -75,17 +75,14 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 TEST(BookmarkItemTest, VisitRecursively)
 {
-	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt);
-	auto *childFolder = folder->AddChild(
-		std::make_unique<BookmarkItem>(std::nullopt, L"Child folder", std::nullopt));
-	auto *bookmark1 =
-		childFolder->AddChild(std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"C:\\"));
-	auto *grandchildFolder = childFolder->AddChild(
-		std::make_unique<BookmarkItem>(std::nullopt, L"Grandchild folder", std::nullopt));
-	auto *bookmark2 = grandchildFolder->AddChild(
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"D:\\"));
-	auto *bookmark3 =
-		folder->AddChild(std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"E:\\"));
+	auto folder = std::make_unique<BookmarkItem>(L"Folder");
+	auto *childFolder = folder->AddChild(std::make_unique<BookmarkItem>(L"Child folder"));
+	auto *bookmark1 = childFolder->AddChild(std::make_unique<BookmarkItem>(L"Bookmark 1", L"C:\\"));
+	auto *grandchildFolder =
+		childFolder->AddChild(std::make_unique<BookmarkItem>(L"Grandchild folder"));
+	auto *bookmark2 =
+		grandchildFolder->AddChild(std::make_unique<BookmarkItem>(L"Bookmark 2", L"D:\\"));
+	auto *bookmark3 = folder->AddChild(std::make_unique<BookmarkItem>(L"Bookmark 3", L"E:\\"));
 
 	std::vector<BookmarkItem *> items;
 	folder->VisitRecursively([&items](BookmarkItem *currentItem) { items.push_back(currentItem); });

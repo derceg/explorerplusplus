@@ -78,9 +78,9 @@ void AddBrowserTabsToBookmarkFolder(BookmarkTree *bookmarkTree, BrowserWindow *b
 	for (const auto *tab : browser->GetActiveTabContainer()->GetAllTabsInOrder())
 	{
 		const auto &pidl = tab->GetShellBrowser()->GetDirectory();
-		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt,
-			GetDisplayNameWithFallback(pidl.Raw(), SHGDN_INFOLDER),
-			GetDisplayNameWithFallback(pidl.Raw(), SHGDN_FORPARSING));
+		auto bookmark =
+			std::make_unique<BookmarkItem>(GetDisplayNameWithFallback(pidl.Raw(), SHGDN_INFOLDER),
+				GetDisplayNameWithFallback(pidl.Raw(), SHGDN_FORPARSING));
 
 		bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(bookmark));
 	}
@@ -108,12 +108,12 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 			location = GetDisplayNameWithFallback(directory.Raw(), SHGDN_FORPARSING);
 		}
 
-		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, name, location);
+		bookmarkItem = std::make_unique<BookmarkItem>(name, location);
 	}
 	else
 	{
-		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
+		bookmarkItem = std::make_unique<BookmarkItem>(
+			resourceLoader->LoadString(IDS_BOOKMARKS_NEWBOOKMARKFOLDER));
 	}
 
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();

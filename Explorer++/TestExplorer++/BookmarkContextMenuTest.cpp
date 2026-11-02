@@ -37,8 +37,7 @@ class BookmarkContextMenuSingleBookmarkTest : public BookmarkContextMenuTestBase
 protected:
 	BookmarkContextMenuSingleBookmarkTest() :
 		m_bookmark(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\bookmarked\\folder"),
-			0))
+			std::make_unique<BookmarkItem>(L"Bookmark", L"c:\\bookmarked\\folder"), 0))
 	{
 	}
 
@@ -120,7 +119,7 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, Paste)
 	// the test to fail. Copying the bookmark first ensures that the paste item will be enabled when
 	// the menu is built.
 	auto *bookmark = m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"f:\\"), 0);
+		std::make_unique<BookmarkItem>(L"Bookmark", L"f:\\"), 0);
 	CopiedBookmark copiedBookmark(*bookmark);
 	ASSERT_TRUE(BookmarkHelper::CopyBookmarkItems(m_platformContext.GetClipboardStore(),
 		&m_bookmarkTree, { bookmark }, ClipboardAction::Copy));
@@ -152,16 +151,15 @@ class BookmarkContextMenuMultipleBookmarksTest : public BookmarkContextMenuTestB
 protected:
 	BookmarkContextMenuMultipleBookmarksTest()
 	{
-		m_bookmarkItems.push_back(m_bookmarkTree.AddBookmarkItem(
-			m_bookmarkTree.GetBookmarksToolbarFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"c:\\bookmarked\\folder"),
-			0));
 		m_bookmarkItems.push_back(
 			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-				std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"d:\\projects"), 1));
+				std::make_unique<BookmarkItem>(L"Bookmark 1", L"c:\\bookmarked\\folder"), 0));
 		m_bookmarkItems.push_back(
 			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-				std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 3", L"e:\\documents"), 2));
+				std::make_unique<BookmarkItem>(L"Bookmark 2", L"d:\\projects"), 1));
+		m_bookmarkItems.push_back(
+			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
+				std::make_unique<BookmarkItem>(L"Bookmark 3", L"e:\\documents"), 2));
 	}
 
 	std::unique_ptr<BookmarkContextMenu> BuildContextMenu(MenuView *menuView)

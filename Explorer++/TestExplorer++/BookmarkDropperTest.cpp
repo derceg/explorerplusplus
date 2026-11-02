@@ -20,23 +20,20 @@ class BookmarkDropperBookmarkItemTest : public Test
 protected:
 	BookmarkDropperBookmarkItemTest()
 	{
-		auto grandparentFolder =
-			std::make_unique<BookmarkItem>(std::nullopt, L"Test grandparent folder", std::nullopt);
+		auto grandparentFolder = std::make_unique<BookmarkItem>(L"Test grandparent folder");
 		m_rawGrandparentFolder = grandparentFolder.get();
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
 			std::move(grandparentFolder), 0);
 
-		auto parentFolder =
-			std::make_unique<BookmarkItem>(std::nullopt, L"Test parent folder", std::nullopt);
+		auto parentFolder = std::make_unique<BookmarkItem>(L"Test parent folder");
 		m_rawParentFolder = parentFolder.get();
 		m_bookmarkTree.AddBookmarkItem(m_rawGrandparentFolder, std::move(parentFolder), 0);
 
-		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
+		auto bookmark = std::make_unique<BookmarkItem>(L"Test bookmark", L"C:\\");
 		m_rawBookmark = bookmark.get();
 		m_bookmarkTree.AddBookmarkItem(m_rawParentFolder, std::move(bookmark), 0);
 
-		auto secondTopLevelFolder =
-			std::make_unique<BookmarkItem>(std::nullopt, L"Second top-level folder", std::nullopt);
+		auto secondTopLevelFolder = std::make_unique<BookmarkItem>(L"Second top-level folder");
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
 			std::move(secondTopLevelFolder), 1);
 

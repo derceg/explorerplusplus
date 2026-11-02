@@ -23,11 +23,11 @@ protected:
 		m_bookmarksToolbarView(m_browser->GetHWND(), m_browser, &m_config)
 	{
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Folder 1", std::nullopt));
+			std::make_unique<BookmarkItem>(L"Folder 1"));
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"c:\\path\\to\\folder"));
+			std::make_unique<BookmarkItem>(L"Bookmark", L"c:\\path\\to\\folder"));
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Folder 2", std::nullopt));
+			std::make_unique<BookmarkItem>(L"Folder 2"));
 
 		m_bookmarksToolbar = std::make_unique<BookmarksToolbar>(&m_bookmarksToolbarView, m_browser,
 			&m_acceleratorManager, &m_resourceLoader, &m_iconFetcher, &m_bookmarkTree,
@@ -68,15 +68,15 @@ TEST_F(BookmarksToolbarTest, InitialBookmarks)
 TEST_F(BookmarksToolbarTest, AddBookmarks)
 {
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder 3", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder 3"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Windows", L"c:\\windows"));
+		std::make_unique<BookmarkItem>(L"Windows", L"c:\\windows"));
 
 	// These items are being created in a different folder, so shouldn't be added to the toolbar.
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Folder", std::nullopt));
+		std::make_unique<BookmarkItem>(L"Folder"));
 	m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetOtherBookmarksFolder(),
-		std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark", L"d:\\"));
+		std::make_unique<BookmarkItem>(L"Bookmark", L"d:\\"));
 
 	VerifyToolbarButtons();
 }

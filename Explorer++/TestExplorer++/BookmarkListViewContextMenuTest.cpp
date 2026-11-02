@@ -33,14 +33,14 @@ class BookmarkListViewContextMenuTest : public Test
 protected:
 	BookmarkListViewContextMenuTest() :
 		m_targetFolder(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
-			std::make_unique<BookmarkItem>(std::nullopt, L"Target folder", std::nullopt))),
+			std::make_unique<BookmarkItem>(L"Target folder"))),
 		m_contextMenu(&m_menuView, &m_acceleratorManager, &m_delegate, m_targetFolder->GetWeakPtr(),
 			&m_resourceLoader)
 	{
 		m_bookmarkTree.AddBookmarkItem(m_targetFolder,
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 1", L"C:\\"));
+			std::make_unique<BookmarkItem>(L"Bookmark 1", L"C:\\"));
 		m_bookmarkTree.AddBookmarkItem(m_targetFolder,
-			std::make_unique<BookmarkItem>(std::nullopt, L"Bookmark 2", L"D:\\"));
+			std::make_unique<BookmarkItem>(L"Bookmark 2", L"D:\\"));
 	}
 
 	BookmarkTree m_bookmarkTree;
