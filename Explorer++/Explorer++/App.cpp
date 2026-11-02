@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "App.h"
 #include "AppInfo.h"
+#include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
@@ -145,7 +146,6 @@ void App::SetUpSession()
 		return;
 	}
 
-	SetUpLanguageResourceInstance();
 	SetUpAppServices();
 	SetupJumpListTasks(m_resourceLoader.get());
 	InitializePlugins();
@@ -172,14 +172,20 @@ void App::LoadSettings(std::vector<WindowStorageData> &windows)
 			Storage::OperationType::Load);
 	}
 
+	if (appStorage)
+	{
+		appStorage->LoadConfig(m_config);
+	}
+
+	OnConfigLoaded();
+
 	if (!appStorage)
 	{
 		return;
 	}
 
-	appStorage->LoadConfig(m_config);
 	windows = appStorage->LoadWindows();
-	appStorage->LoadBookmarks(&m_bookmarkTree);
+	appStorage->LoadBookmarks(m_bookmarkTree.get());
 	appStorage->LoadColorRules(m_colorRuleModel.get());
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
@@ -225,7 +231,7 @@ void App::SaveSettings()
 
 	appStorage->SaveConfig(m_config);
 	appStorage->SaveWindows(windows);
-	appStorage->SaveBookmarks(&m_bookmarkTree);
+	appStorage->SaveBookmarks(m_bookmarkTree.get());
 	appStorage->SaveColorRules(m_colorRuleModel.get());
 	appStorage->SaveApplications(&m_applicationModel);
 	appStorage->SaveDialogStates();
@@ -233,6 +239,13 @@ void App::SaveSettings()
 	appStorage->SaveFrequentLocations(&m_frequentLocationsModel);
 
 	appStorage->Commit();
+}
+
+void App::OnConfigLoaded()
+{
+	SetUpLanguageResourceInstance();
+
+	m_bookmarkTree = std::make_unique<BookmarkTree>(m_resourceLoader.get());
 }
 
 void App::SetUpLanguageResourceInstance()
@@ -278,7 +291,7 @@ void App::SetUpAppServices()
 	m_appServices.SetAppController(this);
 	m_appServices.SetApplicationModel(&m_applicationModel);
 	m_appServices.SetAsyncIconFetcher(&m_iconFetcher);
-	m_appServices.SetBookmarkTree(&m_bookmarkTree);
+	m_appServices.SetBookmarkTree(m_bookmarkTree.get());
 	m_appServices.SetBrowserList(&m_browserList);
 	m_appServices.SetBrowserWindowFactory(m_browserWindowFactory.get());
 	m_appServices.SetCachedIcons(&m_cachedIcons);

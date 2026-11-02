@@ -16,8 +16,9 @@
 BrowserTestBase::BrowserTestBase() :
 	m_runtime(BuildRuntimeForTest()),
 	m_directoryWatcherFactory(&m_fileSystem),
-	m_cachedIcons(10),
 	m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr),
+	m_cachedIcons(10),
+	m_bookmarkTree(&m_resourceLoader),
 	m_tabList(&m_tabEvents),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
 	m_frequentLocationsModel(m_platformContext.GetSystemClock()),

@@ -5,21 +5,18 @@
 #include "stdafx.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceLoader.h"
 #include <glog/logging.h>
 
-BookmarkTree::BookmarkTree() :
+BookmarkTree::BookmarkTree(const ResourceLoader *resourceLoder) :
 	m_root(BookmarkItem::FixedGuidTag{}, ROOT_FOLDER_GUID,
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS)),
-	m_bookmarksToolbar(m_root.AddChild(
-		std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, TOOLBAR_FOLDER_GUID,
-			ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSTOOLBAR)))),
-	m_bookmarksMenu(m_root.AddChild(
-		std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, MENU_FOLDER_GUID,
-			ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU)))),
-	m_otherBookmarks(m_root.AddChild(
-		std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{}, OTHER_FOLDER_GUID,
-			ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS))))
+		resourceLoder->LoadString(IDS_BOOKMARKS_ALLBOOKMARKS)),
+	m_bookmarksToolbar(m_root.AddChild(std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{},
+		TOOLBAR_FOLDER_GUID, resourceLoder->LoadString(IDS_BOOKMARKS_BOOKMARKSTOOLBAR)))),
+	m_bookmarksMenu(m_root.AddChild(std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{},
+		MENU_FOLDER_GUID, resourceLoder->LoadString(IDS_BOOKMARKS_BOOKMARKSMENU)))),
+	m_otherBookmarks(m_root.AddChild(std::make_unique<BookmarkItem>(BookmarkItem::FixedGuidTag{},
+		OTHER_FOLDER_GUID, resourceLoder->LoadString(IDS_BOOKMARKS_OTHER_BOOKMARKS))))
 {
 	AddIdsRecursive(&m_root);
 }

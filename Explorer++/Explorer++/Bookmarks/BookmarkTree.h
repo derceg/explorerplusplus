@@ -10,10 +10,12 @@
 #include <string>
 #include <unordered_map>
 
+class ResourceLoader;
+
 class BookmarkTree
 {
 public:
-	BookmarkTree();
+	BookmarkTree(const ResourceLoader *resourceLoder);
 
 	BookmarkItem *GetRoot();
 	BookmarkItem *GetBookmarksToolbarFolder();

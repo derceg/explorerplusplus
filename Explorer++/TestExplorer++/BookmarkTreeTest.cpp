@@ -6,6 +6,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BookmarkTreeHelper.h"
 #include "GTestHelper.h"
+#include "ResourceLoaderFake.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -16,6 +17,12 @@ using namespace testing;
 class BookmarkTreeTest : public Test
 {
 protected:
+	BookmarkTreeTest() : m_bookmarkTree(&m_resourceLoader)
+	{
+	}
+
+	ResourceLoaderFake m_resourceLoader;
+
 	BookmarkTree m_bookmarkTree;
 };
 
@@ -210,7 +217,7 @@ TEST_F(BookmarkTreeDeathTest, RemoveItemNotInTree)
 class BookmarkTreeObserverTest : public Test
 {
 protected:
-	BookmarkTreeObserverTest()
+	BookmarkTreeObserverTest() : m_bookmarkTree(&m_resourceLoader)
 	{
 		auto folder = std::make_unique<BookmarkItem>(L"Test folder");
 		m_rawFolder = folder.get();
@@ -221,6 +228,8 @@ protected:
 		m_rawBookmark = bookmark.get();
 		m_bookmarkTree.AddBookmarkItem(m_rawFolder, std::move(bookmark), 0);
 	}
+
+	ResourceLoaderFake m_resourceLoader;
 
 	BookmarkTree m_bookmarkTree;
 	BookmarkTreeObserver m_observer;

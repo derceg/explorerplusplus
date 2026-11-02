@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "DragDropTestHelper.h"
+#include "ResourceLoaderFake.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>
@@ -18,7 +19,7 @@ using namespace testing;
 class BookmarkDropperBookmarkItemTest : public Test
 {
 protected:
-	BookmarkDropperBookmarkItemTest()
+	BookmarkDropperBookmarkItemTest() : m_bookmarkTree(&m_resourceLoader)
 	{
 		auto grandparentFolder = std::make_unique<BookmarkItem>(L"Test grandparent folder");
 		m_rawGrandparentFolder = grandparentFolder.get();
@@ -42,6 +43,8 @@ protected:
 		m_dropper =
 			std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_MOVE, &m_bookmarkTree);
 	}
+
+	ResourceLoaderFake m_resourceLoader;
 
 	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<BookmarkDropper> m_dropper;
@@ -124,6 +127,10 @@ TEST_F(BookmarkDropperBookmarkItemTest, DropWhenBlocked)
 class BookmarkDropperShellItemTest : public TestWithParam<ShellItemType>
 {
 protected:
+	BookmarkDropperShellItemTest() : m_bookmarkTree(&m_resourceLoader)
+	{
+	}
+
 	void SetUp() override
 	{
 		m_itemName = L"item";
@@ -131,6 +138,8 @@ protected:
 
 		CreateShellDataObject(m_itemPath, GetParam(), m_dataObject);
 	}
+
+	ResourceLoaderFake m_resourceLoader;
 
 	BookmarkTree m_bookmarkTree;
 	wil::com_ptr_nothrow<IDataObject> m_dataObject;
@@ -182,12 +191,18 @@ INSTANTIATE_TEST_SUITE_P(FileAndFolder, BookmarkDropperShellItemTest,
 class BookmarkDropperInvalidDataTest : public Test
 {
 protected:
+	BookmarkDropperInvalidDataTest() : m_bookmarkTree(&m_resourceLoader)
+	{
+	}
+
 	void SetUp() override
 	{
 		CreateTextDataObject(L"Test", m_dataObject);
 		m_dropper =
 			std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
 	}
+
+	ResourceLoaderFake m_resourceLoader;
 
 	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<BookmarkDropper> m_dropper;

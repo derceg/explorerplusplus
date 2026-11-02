@@ -60,7 +60,7 @@ private:
 class OrganizeBookmarksContextMenuTest : public Test
 {
 protected:
-	OrganizeBookmarksContextMenuTest()
+	OrganizeBookmarksContextMenuTest() : m_bookmarkTree(&m_resourceLoader)
 	{
 		auto *parentFolder =
 			m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),

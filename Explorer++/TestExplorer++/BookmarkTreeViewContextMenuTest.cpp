@@ -31,6 +31,7 @@ class BookmarkTreeViewContextMenuTest : public Test
 {
 protected:
 	BookmarkTreeViewContextMenuTest() :
+		m_bookmarkTree(&m_resourceLoader),
 		m_targetFolder(m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(L"Target folder"), 0)),
 		m_contextMenu(&m_menuView, &m_acceleratorManager, &m_delegate, &m_bookmarkTree,
@@ -38,10 +39,11 @@ protected:
 	{
 	}
 
+	ResourceLoaderFake m_resourceLoader;
+	AcceleratorManager m_acceleratorManager;
+
 	BookmarkTree m_bookmarkTree;
 	BookmarkItem *m_targetFolder = nullptr;
-	AcceleratorManager m_acceleratorManager;
-	ResourceLoaderFake m_resourceLoader;
 
 	BookmarkTreeViewContextMenuDelegateMock m_delegate;
 

@@ -9,7 +9,6 @@
 #include "AppServices.h"
 #include "ApplicationModel.h"
 #include "AsyncIconFetcherImpl.h"
-#include "Bookmarks/BookmarkTree.h"
 #include "BrowserList.h"
 #include "BrowserWindowFactoryImpl.h"
 #include "CommandLine.h"
@@ -48,6 +47,7 @@
 #include <memory>
 #include <vector>
 
+class BookmarkTree;
 class ColorRuleModel;
 class ResourceLoader;
 struct WindowStorageData;
@@ -73,6 +73,7 @@ private:
 	void SetUpSession();
 	void LoadSettings(std::vector<WindowStorageData> &windows);
 	void SaveSettings();
+	void OnConfigLoaded();
 	void SetUpLanguageResourceInstance();
 	void SetUpAppServices();
 	void InitializePlugins();
@@ -113,7 +114,7 @@ private:
 	BrowserList m_browserList;
 	std::unique_ptr<BrowserWindowFactoryImpl> m_browserWindowFactory;
 	ModelessDialogList m_modelessDialogList;
-	BookmarkTree m_bookmarkTree;
+	std::unique_ptr<BookmarkTree> m_bookmarkTree;
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
 	std::unique_ptr<ResourceLoader> m_resourceLoader;

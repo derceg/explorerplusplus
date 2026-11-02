@@ -74,18 +74,18 @@ protected:
 
 	FeatureList m_featureList;
 	Config m_config;
+	Win32ResourceLoader m_resourceLoader;
 	AcceleratorManager m_acceleratorManager;
 	ModelessDialogList m_modelessDialogList;
 	DarkModeManagerFake m_darkModeManager;
 	DarkModeColorProvider m_darkModeColorProvider;
 	NoOpThemeManager m_themeManager;
-	BookmarkTree m_bookmarkTree;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherFake m_iconFetcher;
-	Win32ResourceLoader m_resourceLoader;
+
+	BookmarkTree m_bookmarkTree;
 	ColorRuleModel m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
-
 	TabEvents m_tabEvents;
 	ShellBrowserEvents m_shellBrowserEvents;
 	NavigationEvents m_navigationEvents;
