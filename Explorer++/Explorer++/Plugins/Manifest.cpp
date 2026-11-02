@@ -107,7 +107,7 @@ std::optional<Plugins::Manifest> Plugins::parseManifest(const std::filesystem::p
 		auto manifest = json.get<Manifest>();
 		return manifest;
 	}
-	catch (nlohmann::json::exception &)
+	catch (const nlohmann::json::exception &)
 	{
 		/* TODO: Ideally, the error details would be returned to the
 		caller. */

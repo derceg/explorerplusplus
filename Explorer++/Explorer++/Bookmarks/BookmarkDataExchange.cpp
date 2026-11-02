@@ -8,8 +8,14 @@
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/memory.hpp>
+#include <nlohmann/json.hpp>
+
+namespace
+{
+
+constexpr int BOOKMARK_DATA_EXCHANGE_VERSION = 1;
+
+}
 
 FORMATETC BookmarkDataExchange::GetFormatEtc()
 {
@@ -19,7 +25,7 @@ FORMATETC BookmarkDataExchange::GetFormatEtc()
 }
 
 winrt::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
-	const OwnedRefBookmarkItems &bookmarkItems)
+	const RawBookmarkItems &bookmarkItems)
 {
 	FORMATETC formatEtc = GetFormatEtc();
 
@@ -34,45 +40,51 @@ winrt::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
 	return dataObject;
 }
 
-std::string BookmarkDataExchange::SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems)
+std::string BookmarkDataExchange::SerializeBookmarkItems(const RawBookmarkItems &bookmarkItems)
 {
-	std::vector<std::string> serializedBookmarkItems;
+	nlohmann::json root = { { "version", BOOKMARK_DATA_EXCHANGE_VERSION },
+		{ "items", nlohmann::json::array() } };
 
-	for (auto &bookmarkItem : bookmarkItems)
+	for (const auto *bookmarkItem : bookmarkItems)
 	{
-		std::stringstream stringstream;
-		cereal::BinaryOutputArchive outputArchive(stringstream);
-
-		outputArchive(bookmarkItem.get());
-
-		serializedBookmarkItems.push_back(stringstream.str());
+		root["items"].push_back(bookmarkItem->ToSerializedData());
 	}
 
-	std::stringstream mainStringstream;
-	cereal::BinaryOutputArchive mainOutputArchive(mainStringstream);
-
-	mainOutputArchive(serializedBookmarkItems);
-
-	return mainStringstream.str();
+	return root.dump();
 }
 
 BookmarkItems BookmarkDataExchange::DeserializeBookmarkItems(const std::string &data)
 {
-	std::stringstream mainStringstream(data);
-	cereal::BinaryInputArchive mainInputArchive(mainStringstream);
+	std::vector<BookmarkItem::SerializedData> serializedItems;
 
-	std::vector<std::string> serializedBookmarkItems;
-	mainInputArchive(serializedBookmarkItems);
+	try
+	{
+		const auto root = nlohmann::json::parse(data);
+
+		auto version = root.at("version").get<int>();
+
+		if (version != BOOKMARK_DATA_EXCHANGE_VERSION)
+		{
+			return {};
+		}
+
+		serializedItems = root.at("items").get<std::vector<BookmarkItem::SerializedData>>();
+	}
+	catch (const nlohmann::json::exception &)
+	{
+		return {};
+	}
 
 	BookmarkItems bookmarkItems;
 
-	for (auto &serializedBookmarkItem : serializedBookmarkItems)
+	for (const auto &serializedItem : serializedItems)
 	{
-		std::stringstream stringstream(serializedBookmarkItem);
-		cereal::BinaryInputArchive inputArchive(stringstream);
+		auto bookmarkItem = BookmarkItem::MaybeCreateFromSerializedData(serializedItem);
 
-		std::unique_ptr<BookmarkItem> bookmarkItem;
-		inputArchive(bookmarkItem);
+		if (!bookmarkItem)
+		{
+			continue;
+		}
 
 		bookmarkItems.push_back(std::move(bookmarkItem));
 	}

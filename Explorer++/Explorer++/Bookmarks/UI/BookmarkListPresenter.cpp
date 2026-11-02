@@ -315,19 +315,11 @@ const BookmarkColumnModel *BookmarkListPresenter::GetColumnModel() const
 
 void BookmarkListPresenter::OnBeginDrag(const std::vector<ListViewItem *> &items)
 {
-	auto rawBookmarkItems = GetBookmarksForItems(items);
+	auto bookmarkItems = GetBookmarksForItems(items);
 
-	if (rawBookmarkItems.empty())
+	if (bookmarkItems.empty())
 	{
 		return;
-	}
-
-	OwnedRefBookmarkItems bookmarkItems;
-
-	for (auto &rawBookmarkItem : rawBookmarkItems)
-	{
-		auto &ownedPtr = rawBookmarkItem->GetParent()->GetChildOwnedPtr(rawBookmarkItem);
-		bookmarkItems.push_back(ownedPtr);
 	}
 
 	auto dataObject = BookmarkDataExchange::CreateDataObject(bookmarkItems);

@@ -40,9 +40,7 @@ protected:
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
 			std::move(secondTopLevelFolder), 1);
 
-		auto &ownedPtr =
-			m_rawGrandparentFolder->GetParent()->GetChildOwnedPtr(m_rawGrandparentFolder);
-		m_dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+		m_dataObject = BookmarkDataExchange::CreateDataObject({ m_rawGrandparentFolder });
 
 		m_dropper =
 			std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_MOVE, &m_bookmarkTree);

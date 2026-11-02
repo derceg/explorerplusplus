@@ -64,7 +64,7 @@ private:
 	void OnButtonMiddleClicked(const BookmarkItem *bookmarkItem, const MouseEvent &event);
 	void OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
 
-	void OnButtonDragStarted(const BookmarkItem *bookmarkItem);
+	void OnButtonDragStarted(BookmarkItem *bookmarkItem);
 
 	// BookmarkDropTargetWindow
 	DropLocation GetDropLocation(const POINT &pt) override;

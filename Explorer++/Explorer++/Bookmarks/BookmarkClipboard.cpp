@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/BookmarkClipboard.h"
+#include "Bookmarks/BookmarkDataExchange.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Clipboard.h"
 #include <boost/algorithm/string/join.hpp>
@@ -32,20 +33,20 @@ BookmarkItems BookmarkClipboard::ReadBookmarks()
 	return BookmarkDataExchange::DeserializeBookmarkItems(*data);
 }
 
-bool BookmarkClipboard::WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems)
+bool BookmarkClipboard::WriteBookmarks(const RawBookmarkItems &bookmarkItems)
 {
 	BulkClipboardWriter clipboardWriter(m_clipboardStore);
 	std::vector<std::wstring> lines;
 
 	for (const auto &bookmarkItem : bookmarkItems)
 	{
-		if (bookmarkItem.get()->IsFolder())
+		if (bookmarkItem->IsFolder())
 		{
-			lines.push_back(bookmarkItem.get()->GetName());
+			lines.push_back(bookmarkItem->GetName());
 		}
 		else
 		{
-			lines.push_back(bookmarkItem.get()->GetLocation());
+			lines.push_back(bookmarkItem->GetLocation());
 		}
 	}
 

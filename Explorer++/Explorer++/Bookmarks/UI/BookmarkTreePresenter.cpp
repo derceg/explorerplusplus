@@ -186,9 +186,7 @@ void BookmarkTreePresenter::OnBeginDrag(TreeViewNode *targetNode)
 	}
 
 	auto dropSource = winrt::make_self<DropSourceImpl>();
-
-	auto &ownedPtr = bookmarkFolder->GetParent()->GetChildOwnedPtr(bookmarkFolder);
-	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ bookmarkFolder });
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,

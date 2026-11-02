@@ -240,16 +240,8 @@ void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 bool CopyBookmarkItems(ClipboardStore *clipboardStore, BookmarkTree *bookmarkTree,
 	const RawBookmarkItems &bookmarkItems, ClipboardAction action)
 {
-	OwnedRefBookmarkItems ownedBookmarkItems;
-
-	for (auto bookmarkItem : bookmarkItems)
-	{
-		auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-		ownedBookmarkItems.push_back(ownedPtr);
-	}
-
 	BookmarkClipboard bookmarkClipboard(clipboardStore);
-	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
+	bool res = bookmarkClipboard.WriteBookmarks(bookmarkItems);
 
 	if (action == ClipboardAction::Cut && res)
 	{

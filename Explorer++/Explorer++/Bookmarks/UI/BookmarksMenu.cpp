@@ -178,9 +178,7 @@ MenuDragAction BookmarksMenu::OnBookmarkItemDragged(WeakPtr<BookmarkItem> bookma
 		return MenuDragAction::ContinueMenu;
 	}
 
-	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem.Get());
-	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
-
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ bookmarkItem.Get() });
 	auto dropSource = winrt::make_self<DropSourceImpl>();
 
 	DWORD effect = DROPEFFECT_NONE;

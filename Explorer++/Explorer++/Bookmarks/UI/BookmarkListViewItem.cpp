@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "Config.h"
+#include "../Helper/Helper.h"
 
 BookmarkListViewItem::BookmarkListViewItem(BookmarkItem *bookmarkItem,
 	const BookmarkTree *bookmarkTree, BookmarkIconManager *bookmarkIconManager,

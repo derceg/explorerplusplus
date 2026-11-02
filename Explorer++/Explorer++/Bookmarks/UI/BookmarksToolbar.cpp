@@ -333,12 +333,10 @@ void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 	popupMenu.Show(ptScreen);
 }
 
-void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)
+void BookmarksToolbar::OnButtonDragStarted(BookmarkItem *bookmarkItem)
 {
 	auto dropSource = winrt::make_self<DropSourceImpl>();
-
-	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ bookmarkItem });
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,

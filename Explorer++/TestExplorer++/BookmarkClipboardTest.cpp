@@ -11,7 +11,6 @@
 TEST(BookmarkClipboardTest, BookmarkReadWrite)
 {
 	BookmarkItems bookmarkItems;
-	OwnedRefBookmarkItems ownedBookmarkItems;
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -20,23 +19,19 @@ TEST(BookmarkClipboardTest, BookmarkReadWrite)
 		bookmarkItems.push_back(std::move(currentBookmark));
 	}
 
-	// Inserting the bookmark items into the vector above may result in the
-	// vector being resized and existing references being invalidated.
-	// Therefore, only retrieve references after the vector has been completely
-	// constructed.
-	for (auto &bookmarkItem : bookmarkItems)
+	RawBookmarkItems rawBookmarkItems;
+
+	for (const auto &bookmarkItem : bookmarkItems)
 	{
-		ownedBookmarkItems.push_back(bookmarkItem);
+		rawBookmarkItems.push_back(bookmarkItem.get());
 	}
 
 	SimulatedClipboardStore clipboardStore;
 	BookmarkClipboard bookmarkClipboard(&clipboardStore);
-	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
-
+	bool res = bookmarkClipboard.WriteBookmarks(rawBookmarkItems);
 	ASSERT_TRUE(res);
 
 	auto clipboardItems = bookmarkClipboard.ReadBookmarks();
-
 	ASSERT_EQ(clipboardItems.size(), bookmarkItems.size());
 
 	int i = 0;
