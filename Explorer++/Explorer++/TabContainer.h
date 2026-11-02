@@ -12,7 +12,6 @@
 #include "TabView.h"
 #include "TabViewDelegate.h"
 #include "../Helper/ShellDropTargetWindow.h"
-#include "../Helper/WindowSubclass.h"
 #include <functional>
 #include <optional>
 #include <unordered_map>
@@ -116,17 +115,11 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	void Initialize(HWND parent);
-
 	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
 	void OnTabDoubleClicked(Tab *tab, const MouseEvent &event);
 	void OnTabMiddleClicked(Tab *tab, const MouseEvent &event);
 	void OnTabRightClicked(Tab *tab, const MouseEvent &event);
-
-	void ShowBackgroundContextMenu(const POINT &ptClient);
 
 	void OnTabSelected(const Tab &tab);
 
@@ -159,7 +152,6 @@ private:
 	OneShotTimerManager m_timerManager;
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
 	const Config *const m_config;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;

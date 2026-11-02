@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "MainTabView.h"
+#include "TabBacking.h"
 #include "TabContainer.h"
 
 class AppServices;
+class BrowserPaneView;
 class BrowserWindow;
 class ShellBrowserFactory;
 
@@ -15,12 +16,12 @@ class ShellBrowserFactory;
 class BrowserPane
 {
 public:
-	BrowserPane(BrowserWindow *browser, HWND tabViewParent,
+	BrowserPane(BrowserPaneView *view, BrowserWindow *browser,
 		ShellBrowserFactory *shellBrowserFactory, AppServices *appServices);
 
 	TabContainer *GetTabContainer();
 
 private:
-	MainTabView m_tabView;
 	TabContainer m_tabContainer;
+	TabBacking m_tabBacking;
 };

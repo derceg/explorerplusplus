@@ -118,7 +118,7 @@ HWND AddressBarView::GetHWND() const
 	return ViewBase::GetHWND();
 }
 
-UINT AddressBarView::GetHeight() const
+int AddressBarView::GetHeight() const
 {
 	RECT rect;
 	auto res = GetWindowRect(GetHWND(), &rect);

@@ -14,19 +14,18 @@
 #include <memory>
 
 class AddressBarView;
+class AppServices;
 class BookmarksToolbarView;
+class BrowserPaneView;
 struct Config;
 class DrivesToolbarView;
 class MainRebarView;
 class MainToolbarView;
 class MenuView;
-class NavigationEvents;
 class NavigationRequest;
 class ResourceLoader;
 class ShellBrowser;
-class ShellBrowserEvents;
 class StatusBarView;
-class TabEvents;
 class ThemeManager;
 class ThemeWindowTracker;
 
@@ -48,10 +47,7 @@ public:
 		Next
 	};
 
-	BrowserView(BrowserWindow *browser, const RECT &bounds, const Config *config,
-		TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-		NavigationEvents *navigationEvents, ThemeManager *themeManager,
-		const ResourceLoader *resourceLoader);
+	BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices *appServices);
 	~BrowserView();
 
 	MenuView *GetMainMenuView() const;
@@ -62,6 +58,8 @@ public:
 	BookmarksToolbarView *GetBookmarksToolbarView() const;
 	DrivesToolbarView *GetDrivesToolbarView() const;
 	Applications::ApplicationToolbarView *GetApplicationToolbarView() const;
+
+	BrowserPaneView *GetBrowserPaneView() const;
 
 	StatusBarView *GetStatusBarView() const;
 
@@ -115,6 +113,8 @@ private:
 	std::unique_ptr<BookmarksToolbarView> m_bookmarksToolbarView;
 	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;
 	std::unique_ptr<Applications::ApplicationToolbarView> m_applicationToolbarView;
+
+	std::unique_ptr<BrowserPaneView> m_browserPaneView;
 
 	std::unique_ptr<StatusBarView> m_statusBarView;
 };

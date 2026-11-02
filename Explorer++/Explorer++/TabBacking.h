@@ -4,50 +4,28 @@
 
 #pragma once
 
-#include "BrowserWindow.h"
-#include "Tab.h"
-#include <boost/signals2.hpp>
-#include <wil/resource.h>
-#include <memory>
-#include <vector>
+#include "TabBackingToolbar.h"
+#include "TabBackingViewDelegate.h"
 
-struct Config;
-class CoreInterface;
-class MainFontSetter;
-class ResourceLoader;
-class TabEvents;
-class WindowSubclass;
+class AppServices;
+class BrowserWindow;
+class TabBackingView;
+class TabContainer;
 
-class TabBacking
+class TabBacking : private TabBackingViewDelegate
 {
 public:
-	static TabBacking *Create(HWND parent, BrowserWindow *browser, CoreInterface *coreInterface,
-		const ResourceLoader *resourceLoader, const Config *config, TabEvents *tabEvents);
-
-	HWND GetHWND() const;
+	TabBacking(TabBackingView *view, BrowserWindow *browser, TabContainer *tabContainer,
+		AppServices *appServices);
 
 private:
-	static constexpr int CLOSE_BUTTON_ID = 1;
+	// TabBackingViewDelegate
+	void OnDoubleClicked() override;
+	void OnShowContextMenu(const POINT &ptScreen) override;
 
-	TabBacking(HWND parent, BrowserWindow *browser, CoreInterface *coreInterface,
-		const ResourceLoader *resourceLoader, const Config *config, TabEvents *tabEvents);
-
-	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
-	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
-	void UpdateToolbar();
-
-	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void OnCommand(WPARAM wParam, LPARAM lParam);
-	void OnCloseButtonClicked();
-	void UpdateLayout();
-	void OnNcDestroy();
-
-	const HWND m_hwnd;
+	TabBackingView *const m_view;
 	BrowserWindow *const m_browser;
-	CoreInterface *const m_coreInterface;
-	HWND m_toolbar = nullptr;
-	wil::unique_himagelist m_toolbarImageList;
-	std::unique_ptr<MainFontSetter> m_toolbarTooltipFontSetter;
-	std::vector<boost::signals2::scoped_connection> m_connections;
-	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
+	TabContainer *const m_tabContainer;
+	AppServices *const m_appServices;
+	TabBackingToolbar m_toolbar;
 };

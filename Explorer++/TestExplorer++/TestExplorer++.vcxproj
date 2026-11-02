@@ -243,6 +243,7 @@
     <ClCompile Include="BrowserTestBase.cpp" />
     <ClCompile Include="BrowserWindowFactoryFake.cpp" />
     <ClCompile Include="BrowserWindowFake.cpp" />
+    <ClCompile Include="BrowserWindowFakeView.cpp" />
     <ClCompile Include="BrowserWindowTest.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
@@ -318,6 +319,7 @@
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="ShellBrowserTest.cpp" />
     <ClCompile Include="SortGroupMenuTest.cpp" />
+    <ClCompile Include="TabBackingToolbarTest.cpp" />
     <ClCompile Include="TabContainerTest.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
@@ -492,6 +494,7 @@
     <ClInclude Include="BrowserTestBase.h" />
     <ClInclude Include="BrowserWindowFactoryFake.h" />
     <ClInclude Include="BrowserWindowFake.h" />
+    <ClInclude Include="BrowserWindowFakeView.h" />
     <ClInclude Include="BrowserWindowMock.h" />
     <ClInclude Include="MenuHelpTextHostFake.h" />
     <ClInclude Include="MenuViewTestApi.h" />

@@ -706,9 +706,6 @@
     <ClCompile Include="MainTabViewImageListManager.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TabBacking.cpp">
-      <Filter>Tabs\UI</Filter>
-    </ClCompile>
     <ClCompile Include="MenuView.cpp">
       <Filter>Menus\UI\Views</Filter>
     </ClCompile>
@@ -963,6 +960,21 @@
     </ClCompile>
     <ClCompile Include="MainToolbarLayout.cpp">
       <Filter>Main Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBacking.cpp">
+      <Filter>Tab Backing\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBackingToolbarView.cpp">
+      <Filter>Tab Backing\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBackingToolbar.cpp">
+      <Filter>Tab Backing\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBackingView.cpp">
+      <Filter>Tab Backing\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserPaneView.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1752,9 +1764,6 @@
     <ClInclude Include="MouseEvent.h">
       <Filter>UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="TabBacking.h">
-      <Filter>Tabs\UI</Filter>
-    </ClInclude>
     <ClInclude Include="MenuView.h">
       <Filter>Menus\UI\Views</Filter>
     </ClInclude>
@@ -2103,6 +2112,24 @@
     <ClInclude Include="MainToolbarLayout.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
+    <ClInclude Include="TabBackingToolbarView.h">
+      <Filter>Tab Backing\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBackingView.h">
+      <Filter>Tab Backing\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBacking.h">
+      <Filter>Tab Backing\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBackingToolbar.h">
+      <Filter>Tab Backing\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserPaneView.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBackingViewDelegate.h">
+      <Filter>Tab Backing\UI\Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2378,6 +2405,15 @@
     </Filter>
     <Filter Include="UI\Views\TabView">
       <UniqueIdentifier>{02f99069-7a88-457b-b124-5c5da09d9324}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tab Backing">
+      <UniqueIdentifier>{e4cefa10-7398-4db7-a960-31ed966e3a13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tab Backing\UI">
+      <UniqueIdentifier>{64db9ddf-37c9-4ef8-bf89-b65ef2e49350}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tab Backing\UI\Views">
+      <UniqueIdentifier>{4b1b9db9-1807-46f7-9418-8c9e24f509e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

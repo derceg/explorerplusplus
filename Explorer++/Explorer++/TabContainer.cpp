@@ -19,7 +19,6 @@
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserFactory.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainerBackgroundContextMenu.h"
 #include "TabContextMenu.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
@@ -188,15 +187,7 @@ TabContainer::TabContainer(MainTabView *view, BrowserWindow *browser,
 	m_config(appServices->GetConfig()),
 	m_iPreviousTabSelectionId(-1)
 {
-	Initialize(GetParent(m_view->GetHWND()));
-}
-
-void TabContainer::Initialize(HWND parent)
-{
 	m_view->SetDelegate(this);
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(parent,
-		std::bind_front(&TabContainer::ParentWndProc, this)));
 }
 
 void TabContainer::OnTabDoubleClicked(Tab *tab, const MouseEvent &event)
@@ -222,38 +213,6 @@ void TabContainer::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 	TabContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), tab->GetWeakPtr(), this,
 		m_tabEvents, m_appServices->GetResourceLoader());
 	popupMenu.Show(event.ptScreen);
-}
-
-LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_LBUTTONDBLCLK:
-		CreateNewTabInDefaultDirectory({ .selected = true });
-		break;
-
-	case WM_RBUTTONUP:
-	{
-		POINT ptClient;
-		POINTSTOPOINT(ptClient, MAKEPOINTS(lParam));
-		ShowBackgroundContextMenu(ptClient);
-	}
-	break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
-}
-
-void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
-{
-	POINT ptScreen = ptClient;
-	ClientToScreen(m_hwnd, &ptScreen);
-
-	PopupMenuView popupMenu(m_hwnd, m_browser);
-	TabContainerBackgroundContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), this,
-		m_appServices->GetTabRestorer(), m_appServices->GetBookmarkTree(), m_browser,
-		m_appServices->GetResourceLoader(), m_appServices->GetPlatformContext());
-	popupMenu.Show(ptScreen);
 }
 
 void TabContainer::OnTabSelected(const Tab &tab)

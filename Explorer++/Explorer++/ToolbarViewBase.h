@@ -40,7 +40,7 @@ public:
 
 	virtual std::wstring GetText() const = 0;
 	virtual bool ShouldShowText() const;
-	virtual std::wstring GetTooltipText() const = 0;
+	virtual std::wstring GetTooltipText() const;
 	virtual std::optional<int> GetImageIndex() const = 0;
 	virtual bool IsDropDownButton() const;
 
@@ -160,8 +160,8 @@ public:
 
 	// RebarBandView
 	HWND GetHWND() const override;
-	UINT GetHeight() const override;
-	std::optional<UINT> MaybeGetIdealWidth() const override;
+	int GetHeight() const override;
+	std::optional<int> MaybeGetIdealWidth() const override;
 
 	void SetupSmallShellImageList();
 	void SetImageList(HIMAGELIST imageList);

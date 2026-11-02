@@ -6,8 +6,10 @@
 #include "BrowserView.h"
 #include "AddressBarView.h"
 #include "AppInfo.h"
+#include "AppServices.h"
 #include "ApplicationToolbarView.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
+#include "BrowserPaneView.h"
 #include "Config.h"
 #include "DrivesToolbarView.h"
 #include "MainRebarView.h"
@@ -26,28 +28,26 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 
-BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, const Config *config,
-	TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-	NavigationEvents *navigationEvents, ThemeManager *themeManager,
-	const ResourceLoader *resourceLoader) :
+BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices *appServices) :
 	ViewBase(CreateBrowserWindow(bounds)),
 	m_subclass(GetHWND(), std::bind_front(&BrowserView::WndProc, this)),
 	m_browser(browser),
-	m_config(config),
-	m_themeManager(themeManager),
-	m_resourceLoader(resourceLoader)
+	m_config(appServices->GetConfig()),
+	m_themeManager(appServices->GetThemeManager()),
+	m_resourceLoader(appServices->GetResourceLoader())
 {
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
 		std::bind_front(&BrowserView::OnBrowserLifecycleStateChanged, this)));
 
-	m_connections.push_back(tabEvents->AddSelectedObserver(
+	m_connections.push_back(appServices->GetTabEvents()->AddSelectedObserver(
 		std::bind_front(&BrowserView::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
 
-	m_connections.push_back(shellBrowserEvents->AddDirectoryPropertiesChangedObserver(
-		std::bind_front(&BrowserView::OnDirectoryPropertiesChanged, this),
-		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
+	m_connections.push_back(
+		appServices->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
+			std::bind_front(&BrowserView::OnDirectoryPropertiesChanged, this),
+			NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
-	m_connections.push_back(navigationEvents->AddCommittedObserver(
+	m_connections.push_back(appServices->GetNavigationEvents()->AddCommittedObserver(
 		std::bind_front(&BrowserView::OnNavigationCommitted, this),
 		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
@@ -72,6 +72,10 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, const Confi
 	m_mainMenuView = std::make_unique<WindowMenuView>(GetHWND(), m_browser);
 
 	CreateMainRebarAndChildren();
+
+	m_browserPaneView =
+		std::make_unique<BrowserPaneView>(this, m_browser, appServices->GetDarkModeManager(),
+			appServices->GetDarkModeColorProvider(), m_config, m_resourceLoader);
 
 	m_statusBarView = std::make_unique<StatusBarView>(GetHWND(), m_config);
 }
@@ -175,6 +179,11 @@ DrivesToolbarView *BrowserView::GetDrivesToolbarView() const
 Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView() const
 {
 	return m_applicationToolbarView.get();
+}
+
+BrowserPaneView *BrowserView::GetBrowserPaneView() const
+{
+	return m_browserPaneView.get();
 }
 
 StatusBarView *BrowserView::GetStatusBarView() const

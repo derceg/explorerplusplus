@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "RebarBandView.h"
 
-std::optional<UINT> RebarBandView::MaybeGetIdealWidth() const
+std::optional<int> RebarBandView::MaybeGetIdealWidth() const
 {
 	return std::nullopt;
 }

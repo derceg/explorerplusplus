@@ -129,14 +129,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		OnSize(static_cast<UINT>(wParam));
 		return 0;
 
-	case WM_CTLCOLORSTATIC:
-		if (auto res =
-				OnCtlColorStatic(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
-		{
-			return *res;
-		}
-		break;
-
 	case WM_ENDSESSION:
 		if (wParam)
 		{

@@ -13,14 +13,14 @@ public:
 
 	// RebarBandView
 	HWND GetHWND() const override;
-	UINT GetHeight() const override;
-	std::optional<UINT> MaybeGetIdealWidth() const override;
+	int GetHeight() const override;
+	std::optional<int> MaybeGetIdealWidth() const override;
 
-	void SetHeight(UINT height);
-	void SetIdealWidth(UINT idealWidth);
+	void SetHeight(int height);
+	void SetIdealWidth(int idealWidth);
 
 private:
 	const HWND m_hwnd;
-	UINT m_height = 100;
-	std::optional<UINT> m_idealWidth;
+	int m_height = 100;
+	std::optional<int> m_idealWidth;
 };

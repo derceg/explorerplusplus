@@ -5,11 +5,11 @@
 #pragma once
 
 #include "BrowserWindow.h"
+#include "BrowserWindowFakeView.h"
 #include "MainTabView.h"
 #include "ShellBrowserFactoryFake.h"
 #include "TabContainer.h"
 #include "../Helper/Pidl.h"
-#include <wil/resource.h>
 
 class AppServices;
 struct Config;
@@ -19,6 +19,8 @@ class BrowserWindowFake : public BrowserWindow
 {
 public:
 	BrowserWindowFake(const WindowStorageData &storageData, AppServices *appServices);
+
+	BrowserWindowFakeView *GetView();
 
 	// BrowserWindow
 	HWND GetHWND() const override;
@@ -63,14 +65,8 @@ public:
 	Tab *AddTab(const PidlAbsolute &pidl, const TabSettings &tabSettings = {});
 
 private:
-	static constexpr wchar_t CLASS_NAME[] = L"TestExplorer++BrowserWindowClass";
-
-	static wil::unique_hwnd CreateBrowserWindow();
-	static void RegisterBrowserWindowClass();
-
+	BrowserWindowFakeView m_view;
 	const Config *const m_config;
-
-	wil::unique_hwnd m_window;
 
 	ShellBrowserFactoryFake m_shellBrowserFactory;
 

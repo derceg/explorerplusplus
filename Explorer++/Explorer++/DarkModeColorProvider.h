@@ -22,6 +22,7 @@ public:
 	COLORREF GetToolbarCheckedBackgroundColor() const override;
 	COLORREF GetBorderColor() const override;
 	COLORREF GetComboBoxExBackgroundColor() const override;
+	COLORREF GetTabBarBackgroundColor() const override;
 	COLORREF GetTabBackgroundColor() const override;
 
 	HBRUSH GetBackgroundBrush() const override;
@@ -29,6 +30,7 @@ public:
 	HBRUSH GetHotItemBackgroundBrush() const override;
 	HBRUSH GetBorderBrush() const override;
 	HBRUSH GetComboBoxExBackgroundBrush() const override;
+	HBRUSH GetTabBarBackgroundBrush() const override;
 	HBRUSH GetTabBackgroundBrush() const override;
 
 private:
@@ -49,6 +51,7 @@ private:
 	// This is the same background color as used in the Explorer address bar.
 	static constexpr COLORREF COMBO_BOX_EX_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	static constexpr COLORREF TAB_BAR_BACKGROUND_COLOR = RGB(25, 25, 25);
 	static constexpr COLORREF TAB_BACKGROUND_COLOR = RGB(38, 38, 38);
 
 	const wil::unique_hbrush m_backgroundBrush;
@@ -56,5 +59,6 @@ private:
 	const wil::unique_hbrush m_hotItemBackgroundBrush;
 	const wil::unique_hbrush m_borderBrush;
 	const wil::unique_hbrush m_comboBoxExBackgroundBrush;
+	const wil::unique_hbrush m_tabBarBackgroundBrush;
 	const wil::unique_hbrush m_tabBackgroundBrush;
 };

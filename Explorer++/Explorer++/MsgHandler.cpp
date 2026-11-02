@@ -7,6 +7,7 @@
 #include "AppServices.h"
 #include "BrowserCommands.h"
 #include "BrowserList.h"
+#include "BrowserPaneView.h"
 #include "BrowserView.h"
 #include "Config.h"
 #include "DarkModeManager.h"
@@ -28,6 +29,7 @@
 #include "StatusBar.h"
 #include "StatusBarView.h"
 #include "TabBacking.h"
+#include "TabBackingView.h"
 #include "TabContainer.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
@@ -383,8 +385,8 @@ void Explorerplusplus::UpdateLayout()
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
-	SetWindowPos(m_tabBacking->GetHWND(), nullptr, tabBackingLeft, tabTop, tabBackingWidth,
-		tabWindowHeight, showFlags);
+	SetWindowPos(m_view.GetBrowserPaneView()->GetTabBackingView()->GetHWND(), nullptr,
+		tabBackingLeft, tabTop, tabBackingWidth, tabWindowHeight, showFlags);
 
 	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0, tabBackingWidth - 25,
 		tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
@@ -466,23 +468,6 @@ void Explorerplusplus::UpdateLayout()
 	SetWindowPos(m_statusBar->GetView()->GetHWND(), nullptr, 0,
 		mainWindowHeight - GetRectHeight(&statusBarRect), mainWindowWidth,
 		GetRectHeight(&statusBarRect), statusBarShowFlags);
-}
-
-std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
-{
-	UNREFERENCED_PARAMETER(hdc);
-
-	if (hwnd == m_tabBacking->GetHWND())
-	{
-		if (!m_appServices->GetDarkModeManager()->IsDarkModeEnabled())
-		{
-			return std::nullopt;
-		}
-
-		return reinterpret_cast<INT_PTR>(m_tabBarBackgroundBrush.get());
-	}
-
-	return std::nullopt;
 }
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)

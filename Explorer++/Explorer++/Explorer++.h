@@ -24,7 +24,6 @@
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
 #include <concurrencpp/concurrencpp.h>
-#include <wil/resource.h>
 #include <optional>
 
 /* Sent when a folder size calculation has finished. */
@@ -56,7 +55,6 @@ class ShellBrowserEvents;
 class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
-class TabBacking;
 class TabContainer;
 class TabEvents;
 class WindowSubclass;
@@ -132,8 +130,6 @@ private:
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
 
-	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
-
 	struct DWFolderSizeCompletion
 	{
 		ULARGE_INTEGER liFolderSize;
@@ -179,7 +175,6 @@ private:
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
 		Runtime *runtime);
 	void UpdateLayout();
-	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryContentsChanged(const ShellBrowser *shellBrowser);
 
@@ -289,7 +284,6 @@ private:
 	bool m_performingLayout = false;
 #endif
 
-	TabBacking *m_tabBacking = nullptr;
 	std::unique_ptr<StatusBar> m_statusBar;
 
 	DisplayWindow *m_displayWindow = nullptr;
@@ -307,9 +301,6 @@ private:
 	int m_treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 
 	std::unique_ptr<BrowserPane> m_browserPane;
-
-	/* Tabs. */
-	wil::unique_hbrush m_tabBarBackgroundBrush;
 
 	HWND m_hActiveListView;
 	ShellBrowserImpl *m_pActiveShellBrowser;

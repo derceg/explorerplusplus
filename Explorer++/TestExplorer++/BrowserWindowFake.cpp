@@ -18,22 +18,12 @@
 
 BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	AppServices *appServices) :
+	m_view(storageData.bounds),
 	m_config(appServices->GetConfig()),
-	m_window(CreateBrowserWindow()),
 	m_shellBrowserFactory(this, appServices->GetNavigationEvents()),
-	m_tabView(m_window.get(), appServices->GetConfig(), appServices->GetResourceLoader()),
+	m_tabView(m_view.GetHWND(), appServices->GetConfig(), appServices->GetResourceLoader()),
 	m_tabContainer(&m_tabView, this, &m_shellBrowserFactory, appServices)
 {
-	WINDOWPLACEMENT placement = {};
-	placement.length = sizeof(placement);
-	BOOL res = GetWindowPlacement(m_window.get(), &placement);
-	CHECK(res);
-
-	placement.showCmd = SW_HIDE;
-	placement.rcNormalPosition = storageData.bounds;
-	res = SetWindowPlacement(m_window.get(), &placement);
-	CHECK(res);
-
 	for (const auto &tab : storageData.tabs)
 	{
 		if (tab.pidl.HasValue())
@@ -54,40 +44,14 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	}
 }
 
-wil::unique_hwnd BrowserWindowFake::CreateBrowserWindow()
+BrowserWindowFakeView *BrowserWindowFake::GetView()
 {
-	static bool classRegistered = false;
-
-	if (!classRegistered)
-	{
-		RegisterBrowserWindowClass();
-
-		classRegistered = true;
-	}
-
-	wil::unique_hwnd hwnd(CreateWindow(CLASS_NAME, L"", WS_OVERLAPPEDWINDOW | WS_DISABLED,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr,
-		GetModuleHandle(nullptr), nullptr));
-	CHECK(hwnd);
-
-	return hwnd;
-}
-
-void BrowserWindowFake::RegisterBrowserWindowClass()
-{
-	WNDCLASS windowClass = {};
-	windowClass.lpfnWndProc = DefWindowProc;
-	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	windowClass.lpszClassName = CLASS_NAME;
-	windowClass.hInstance = GetModuleHandle(nullptr);
-	windowClass.style = 0;
-	auto atom = RegisterClass(&windowClass);
-	CHECK(atom);
+	return &m_view;
 }
 
 HWND BrowserWindowFake::GetHWND() const
 {
-	return m_window.get();
+	return m_view.GetHWND();
 }
 
 BrowserCommandController *BrowserWindowFake::GetCommandController()
@@ -242,7 +206,7 @@ WindowStorageData BrowserWindowFake::GetStorageData() const
 {
 	WINDOWPLACEMENT placement = {};
 	placement.length = sizeof(placement);
-	BOOL res = GetWindowPlacement(m_window.get(), &placement);
+	BOOL res = GetWindowPlacement(m_view.GetHWND(), &placement);
 	CHECK(res);
 
 	const auto *tabContainer = GetActiveTabContainer();
@@ -302,12 +266,12 @@ void BrowserWindowFake::SetWorkspaceBounds(const RECT &bounds)
 {
 	WINDOWPLACEMENT placement = {};
 	placement.length = sizeof(placement);
-	BOOL res = GetWindowPlacement(m_window.get(), &placement);
+	BOOL res = GetWindowPlacement(m_view.GetHWND(), &placement);
 	CHECK(res);
 
 	placement.showCmd = SW_HIDE;
 	placement.rcNormalPosition = bounds;
-	res = SetWindowPlacement(m_window.get(), &placement);
+	res = SetWindowPlacement(m_view.GetHWND(), &placement);
 	CHECK(res);
 }
 

@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+#include "ToolbarViewBase.h"
 #include "MenuBase.h"
 #include "PopupMenuView.h"
-#include "ToolbarView.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
@@ -28,6 +28,12 @@ void ToolbarButton::SetParent(ToolbarViewBase *parent)
 bool ToolbarButton::ShouldShowText() const
 {
 	return true;
+}
+
+std::wstring ToolbarButton::GetTooltipText() const
+{
+	// This will result in the button text being shown as the tooltip.
+	return {};
 }
 
 bool ToolbarButton::IsDropDownButton() const
@@ -209,7 +215,7 @@ HWND ToolbarViewBase::GetHWND() const
 	return ViewBase::GetHWND();
 }
 
-UINT ToolbarViewBase::GetHeight() const
+int ToolbarViewBase::GetHeight() const
 {
 	SIZE size;
 	auto res = SendMessage(GetHWND(), TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
@@ -218,7 +224,7 @@ UINT ToolbarViewBase::GetHeight() const
 	return size.cy;
 }
 
-std::optional<UINT> ToolbarViewBase::MaybeGetIdealWidth() const
+std::optional<int> ToolbarViewBase::MaybeGetIdealWidth() const
 {
 	SIZE size;
 	auto res = SendMessage(GetHWND(), TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));

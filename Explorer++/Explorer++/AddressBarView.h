@@ -22,7 +22,7 @@ public:
 
 	// RebarBandView
 	HWND GetHWND() const override;
-	UINT GetHeight() const override;
+	int GetHeight() const override;
 
 	void Focus();
 	std::wstring GetText() const;

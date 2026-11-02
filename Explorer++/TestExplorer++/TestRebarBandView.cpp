@@ -17,24 +17,24 @@ HWND TestRebarBandView::GetHWND() const
 	return m_hwnd;
 }
 
-UINT TestRebarBandView::GetHeight() const
+int TestRebarBandView::GetHeight() const
 {
 	return m_height;
 }
 
-std::optional<UINT> TestRebarBandView::MaybeGetIdealWidth() const
+std::optional<int> TestRebarBandView::MaybeGetIdealWidth() const
 {
 	return m_idealWidth;
 }
 
-void TestRebarBandView::SetHeight(UINT height)
+void TestRebarBandView::SetHeight(int height)
 {
 	m_height = height;
 
 	NotifySizeRequirementsChanged();
 }
 
-void TestRebarBandView::SetIdealWidth(UINT idealWidth)
+void TestRebarBandView::SetIdealWidth(int idealWidth)
 {
 	m_idealWidth = idealWidth;
 

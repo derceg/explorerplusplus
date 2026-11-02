@@ -141,12 +141,6 @@ public:
 		return false;
 	}
 
-	std::wstring GetTooltipText() const override
-	{
-		// This will result in the button text being shown as the tooltip.
-		return {};
-	}
-
 	std::optional<int> GetImageIndex() const override
 	{
 		return m_imageIndex;

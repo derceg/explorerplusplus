@@ -38,6 +38,9 @@ public:
 
 	virtual COLORREF GetComboBoxExBackgroundColor() const = 0;
 
+	// The color of the background behind the tab control.
+	virtual COLORREF GetTabBarBackgroundColor() const = 0;
+
 	// The background color of each non-selected tab in a tab control.
 	virtual COLORREF GetTabBackgroundColor() const = 0;
 
@@ -46,5 +49,6 @@ public:
 	virtual HBRUSH GetHotItemBackgroundBrush() const = 0;
 	virtual HBRUSH GetBorderBrush() const = 0;
 	virtual HBRUSH GetComboBoxExBackgroundBrush() const = 0;
+	virtual HBRUSH GetTabBarBackgroundBrush() const = 0;
 	virtual HBRUSH GetTabBackgroundBrush() const = 0;
 };

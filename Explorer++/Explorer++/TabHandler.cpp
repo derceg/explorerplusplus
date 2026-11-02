@@ -19,9 +19,7 @@
 
 void Explorerplusplus::InitializeTabs()
 {
-	m_tabBacking = TabBacking::Create(m_hwnd, this, this, m_resourceLoader, m_config, m_tabEvents);
-
-	m_browserPane = std::make_unique<BrowserPane>(this, m_tabBacking->GetHWND(),
+	m_browserPane = std::make_unique<BrowserPane>(m_view.GetBrowserPaneView(), this,
 		&m_shellBrowserFactory, m_appServices);
 
 	m_connections.push_back(

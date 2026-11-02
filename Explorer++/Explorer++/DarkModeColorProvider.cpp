@@ -11,6 +11,7 @@ DarkModeColorProvider::DarkModeColorProvider() :
 	m_hotItemBackgroundBrush(CreateSolidBrush(HOT_ITEM_BACKGROUND_COLOR)),
 	m_borderBrush(CreateSolidBrush(BORDER_COLOR)),
 	m_comboBoxExBackgroundBrush(CreateSolidBrush(COMBO_BOX_EX_BACKGROUND_COLOR)),
+	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_BACKGROUND_COLOR)),
 	m_tabBackgroundBrush(CreateSolidBrush(TAB_BACKGROUND_COLOR))
 {
 }
@@ -65,6 +66,11 @@ COLORREF DarkModeColorProvider::GetComboBoxExBackgroundColor() const
 	return COMBO_BOX_EX_BACKGROUND_COLOR;
 }
 
+COLORREF DarkModeColorProvider::GetTabBarBackgroundColor() const
+{
+	return TAB_BAR_BACKGROUND_COLOR;
+}
+
 COLORREF DarkModeColorProvider::GetTabBackgroundColor() const
 {
 	return TAB_BACKGROUND_COLOR;
@@ -93,6 +99,11 @@ HBRUSH DarkModeColorProvider::GetBorderBrush() const
 HBRUSH DarkModeColorProvider::GetComboBoxExBackgroundBrush() const
 {
 	return m_comboBoxExBackgroundBrush.get();
+}
+
+HBRUSH DarkModeColorProvider::GetTabBarBackgroundBrush() const
+{
+	return m_tabBarBackgroundBrush.get();
 }
 
 HBRUSH DarkModeColorProvider::GetTabBackgroundBrush() const

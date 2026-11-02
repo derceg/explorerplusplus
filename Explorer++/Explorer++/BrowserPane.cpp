@@ -5,11 +5,12 @@
 #include "stdafx.h"
 #include "BrowserPane.h"
 #include "AppServices.h"
+#include "BrowserPaneView.h"
 
-BrowserPane::BrowserPane(BrowserWindow *browser, HWND tabViewParent,
+BrowserPane::BrowserPane(BrowserPaneView *view, BrowserWindow *browser,
 	ShellBrowserFactory *shellBrowserFactory, AppServices *appServices) :
-	m_tabView(tabViewParent, appServices->GetConfig(), appServices->GetResourceLoader()),
-	m_tabContainer(&m_tabView, browser, shellBrowserFactory, appServices)
+	m_tabContainer(view->GetTabView(), browser, shellBrowserFactory, appServices),
+	m_tabBacking(view->GetTabBackingView(), browser, &m_tabContainer, appServices)
 {
 }
 
