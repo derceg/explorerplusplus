@@ -170,6 +170,9 @@ private:
 	void Initialize(const WindowStorageData &storageData);
 	void InitializeMainMenu();
 	void InitializeDisplayWindow();
+	void InitializeTabObservers();
+	void OnTabPreRemoval(const Tab &tab, int index);
+	void OnTabRemoved(const Tab &tab);
 	void CreateFolderControls();
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
@@ -205,10 +208,6 @@ private:
 	void MaybeUpdateTabBarVisibility();
 	void OnTabCreated(const Tab &tab);
 	void OnTabSelected(const Tab &tab);
-	void OnTabPreRemoval(const Tab &tab, int index);
-	void OnTabRemoved(const Tab &tab);
-	static concurrencpp::null_result ScheduleFinishShutdown(WeakPtr<Explorerplusplus> self,
-		Runtime *runtime);
 	void ShowTabBar();
 	void HideTabBar();
 	void CreateInitialTabs(const WindowStorageData &storageData);
@@ -262,6 +261,8 @@ private:
 
 	bool ConfirmClose();
 	void BeginShutdown();
+	static concurrencpp::null_result ScheduleFinishShutdown(WeakPtr<Explorerplusplus> self,
+		Runtime *runtime);
 	void FinishShutdown();
 
 	AppServices *const m_appServices;

@@ -14,6 +14,7 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
+#include "EventScope.h"
 #include "HolderWindow.h"
 #include "MainMenu.h"
 #include "MainRebar.h"
@@ -23,9 +24,11 @@
 #include "MainToolbarView.h"
 #include "RebarBandStorageData.h"
 #include "ResourceLoader.h"
+#include "Runtime.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "StatusBar.h"
+#include "TabEvents.h"
 #include "TabRestorer.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
@@ -118,6 +121,7 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 	CreateMainRebarAndChildren(storageData);
 	InitializeDisplayWindow();
+	InitializeTabObservers();
 	InitializeTabs();
 	CreateFolderControls();
 
@@ -222,6 +226,41 @@ void Explorerplusplus::InitializeDisplayWindow()
 {
 	m_displayWindow = DisplayWindow::Create(m_hwnd, DisplayWindow::Mode::Normal, this, m_config,
 		m_acceleratorManager, m_resourceLoader);
+}
+
+void Explorerplusplus::InitializeTabObservers()
+{
+	m_connections.push_back(m_tabEvents->AddPreRemovalObserver(
+		std::bind_front(&Explorerplusplus::OnTabPreRemoval, this), TabEventScope::ForBrowser(*this),
+		boost::signals2::at_back));
+	m_connections.push_back(m_tabEvents->AddRemovedObserver(
+		std::bind_front(&Explorerplusplus::OnTabRemoved, this), TabEventScope::ForBrowser(*this)));
+}
+
+void Explorerplusplus::OnTabPreRemoval(const Tab &tab, int index)
+{
+	UNREFERENCED_PARAMETER(index);
+
+	// It's only necessary to begin shutdown if it hasn't already started. Shutdown will be started
+	// elsewhere if the user explicitly closes the window. So, it's only necessary to shutdown here
+	// if the user implicitly closes the window by closing the last tab.
+	if (tab.GetTabContainer()->GetNumTabs() == 1 && GetLifecycleState() == LifecycleState::Main)
+	{
+		BeginShutdown();
+	}
+}
+
+void Explorerplusplus::OnTabRemoved(const Tab &tab)
+{
+	if (tab.GetTabContainer()->GetNumTabs() == 0)
+	{
+		// The last tab has been closed, so the window should be closed as well. However, it's not
+		// possible to close the window within this listener. Firstly, because there could be other
+		// listeners that run after this one. Secondly, because the Tab object relies on items that
+		// are owned by this class, so destroying this class (by destroying the window) needs to be
+		// done only after the listeners have all finished running.
+		ScheduleFinishShutdown(m_weakPtrFactory.GetWeakPtr(), m_appServices->GetRuntime());
+	}
 }
 
 void Explorerplusplus::CreateFolderControls()
@@ -359,6 +398,19 @@ void Explorerplusplus::BeginShutdown()
 	// Past this point, the remaining tabs will be closed, which can cause other UI updates. There's
 	// no need for that to be shown, however, since the window will be destroyed shortly afterwards.
 	ShowWindow(m_hwnd, SW_HIDE);
+}
+
+concurrencpp::null_result Explorerplusplus::ScheduleFinishShutdown(WeakPtr<Explorerplusplus> self,
+	Runtime *runtime)
+{
+	co_await concurrencpp::resume_on(runtime->GetUiThreadExecutor());
+
+	if (!self)
+	{
+		co_return;
+	}
+
+	self->FinishShutdown();
 }
 
 void Explorerplusplus::FinishShutdown()
