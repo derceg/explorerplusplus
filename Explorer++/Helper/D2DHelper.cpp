@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "D2DHelper.h"
 #include "GraphicsFactories.h"
+#include "ScopedDCState.h"
 #include "WindowHelper.h"
 #include <wil/resource.h>
 #include <wil/result_macros.h>
@@ -12,32 +13,6 @@
 
 namespace
 {
-
-class ScopedDCState
-{
-public:
-	ScopedDCState(HDC hdc) : m_hdc(hdc), m_savedDc(SaveDC(hdc))
-	{
-	}
-
-	bool IsValid() const
-	{
-		return m_savedDc != 0;
-	}
-
-	~ScopedDCState()
-	{
-		if (m_savedDc != 0)
-		{
-			auto res = RestoreDC(m_hdc, m_savedDc);
-			DCHECK(res);
-		}
-	}
-
-private:
-	const HDC m_hdc;
-	const int m_savedDc;
-};
 
 class ScopedShowWindowForPrint
 {

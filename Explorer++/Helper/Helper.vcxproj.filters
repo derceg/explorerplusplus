@@ -205,6 +205,12 @@
     <ClCompile Include="IconSize.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="LayoutHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedDCState.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -473,6 +479,12 @@
     </ClInclude>
     <ClInclude Include="EnumHelper.h">
       <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedDCState.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -397,9 +397,6 @@
     <ClCompile Include="StorageTest.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
-    <ClCompile Include="ThemedTabControlPainterTest.cpp">
-      <Filter>Theming</Filter>
-    </ClCompile>
     <ClCompile Include="ScopedBrowserCommandTargetTest.cpp">
       <Filter>Browser\Command Handling</Filter>
     </ClCompile>
@@ -667,11 +664,12 @@
     <ClCompile Include="TestToolbarButton.cpp">
       <Filter>UI\Views\Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="TabBackingToolbarTest.cpp">
-      <Filter>Tab Backing\UI</Filter>
-    </ClCompile>
     <ClCompile Include="BrowserWindowFakeView.cpp">
       <Filter>Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlTestHelper.cpp" />
+    <ClCompile Include="TabViewTestApi.cpp">
+      <Filter>UI\Views\TabView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -810,9 +808,6 @@
     <Filter Include="Dialogs\Search Tabs">
       <UniqueIdentifier>{1501dbc5-1f4f-4886-8321-953dff50c846}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Theming">
-      <UniqueIdentifier>{350e0f47-a121-4eb0-8b5d-55c3357b04af}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Browser">
       <UniqueIdentifier>{ee9d159a-6a61-4653-a5d5-8de9051c6c72}</UniqueIdentifier>
     </Filter>
@@ -887,12 +882,6 @@
     </Filter>
     <Filter Include="UI\Views\Toolbar">
       <UniqueIdentifier>{1dc6fab9-9245-4750-8026-55b1c9a4b047}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tab Backing">
-      <UniqueIdentifier>{7bf41541-43e8-4145-9642-db42ea47f076}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tab Backing\UI">
-      <UniqueIdentifier>{7f6738a3-0eeb-41ea-a759-2f4d9d9b717f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1124,6 +1113,10 @@
     </ClInclude>
     <ClInclude Include="BrowserWindowFakeView.h">
       <Filter>Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlTestHelper.h" />
+    <ClInclude Include="TabViewTestApi.h">
+      <Filter>UI\Views\TabView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

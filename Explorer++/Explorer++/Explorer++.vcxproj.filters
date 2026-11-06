@@ -679,9 +679,6 @@
     <ClCompile Include="DarkModeColorProvider.cpp">
       <Filter>Theming</Filter>
     </ClCompile>
-    <ClCompile Include="ThemedTabControlPainter.cpp">
-      <Filter>Theming</Filter>
-    </ClCompile>
     <ClCompile Include="BrowserWindow.cpp">
       <Filter>Browser</Filter>
     </ClCompile>
@@ -964,17 +961,14 @@
     <ClCompile Include="TabBacking.cpp">
       <Filter>Tab Backing\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TabBackingToolbarView.cpp">
-      <Filter>Tab Backing\UI\Views</Filter>
-    </ClCompile>
-    <ClCompile Include="TabBackingToolbar.cpp">
-      <Filter>Tab Backing\UI</Filter>
-    </ClCompile>
     <ClCompile Include="TabBackingView.cpp">
       <Filter>Tab Backing\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="BrowserPaneView.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LightModeColorProvider.cpp">
+      <Filter>Theming</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1728,9 +1722,6 @@
     <ClInclude Include="DarkModeColorProvider.h">
       <Filter>Theming</Filter>
     </ClInclude>
-    <ClInclude Include="ThemedTabControlPainter.h">
-      <Filter>Theming</Filter>
-    </ClInclude>
     <ClInclude Include="BrowserCommandTarget.h">
       <Filter>Browser\Command Handling</Filter>
     </ClInclude>
@@ -2112,16 +2103,10 @@
     <ClInclude Include="MainToolbarLayout.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="TabBackingToolbarView.h">
-      <Filter>Tab Backing\UI\Views</Filter>
-    </ClInclude>
     <ClInclude Include="TabBackingView.h">
       <Filter>Tab Backing\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="TabBacking.h">
-      <Filter>Tab Backing\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="TabBackingToolbar.h">
       <Filter>Tab Backing\UI</Filter>
     </ClInclude>
     <ClInclude Include="BrowserPaneView.h">
@@ -2129,6 +2114,9 @@
     </ClInclude>
     <ClInclude Include="TabBackingViewDelegate.h">
       <Filter>Tab Backing\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="LightModeColorProvider.h">
+      <Filter>Theming</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

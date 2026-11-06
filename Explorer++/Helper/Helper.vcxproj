@@ -802,9 +802,11 @@
     <ClCompile Include="ImageInterop.cpp" />
     <ClCompile Include="ImageOperations.cpp" />
     <ClCompile Include="KeyboardStateImpl.cpp" />
+    <ClCompile Include="LayoutHelper.cpp" />
     <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="PidlHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
+    <ClCompile Include="ScopedDCState.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
     <ClCompile Include="ScopedStopSource.cpp" />
     <ClCompile Include="SystemClipboardStore.cpp" />
@@ -898,6 +900,7 @@
     <ClInclude Include="IconSize.h" />
     <ClInclude Include="ImageInterop.h" />
     <ClInclude Include="ImageOperations.h" />
+    <ClInclude Include="LayoutHelper.h" />
     <ClInclude Include="PassKey.h" />
     <ClInclude Include="PidlHelper.h" />
     <ClInclude Include="RemoveMode.h" />
@@ -915,6 +918,7 @@
     <ClInclude Include="MenuHelpTextHost.h" />
     <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
+    <ClInclude Include="ScopedDCState.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />
     <ClInclude Include="ScopedStopSource.h" />
     <ClInclude Include="SignalHelper.h" />

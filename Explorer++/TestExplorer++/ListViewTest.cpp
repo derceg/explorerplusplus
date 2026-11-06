@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "ListView.h"
 #include "AcceleratorManager.h"
+#include "ControlTestHelper.h"
 #include "GeneratorTestHelper.h"
 #include "KeyboardStateFake.h"
 #include "LabelEditHandler.h"
@@ -81,12 +82,6 @@ protected:
 
 		POINT pt = { rect.left + GetRectWidth(&rect) / 2, rect.top + GetRectHeight(&rect) / 2 };
 		SimulateClick(header, pt);
-	}
-
-	static void SimulateClick(HWND hwnd, const POINT &ptClient)
-	{
-		SendMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(ptClient.x, ptClient.y));
-		SendMessage(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(ptClient.x, ptClient.y));
 	}
 
 	AcceleratorManager m_acceleratorManager;

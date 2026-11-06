@@ -285,6 +285,21 @@ void AppServices::SetHistoryModel(HistoryModel *historyModel)
 	Set(historyModel);
 }
 
+LightModeColorProvider *AppServices::GetLightModeColorProvider()
+{
+	return Get<LightModeColorProvider>();
+}
+
+const LightModeColorProvider *AppServices::GetLightModeColorProvider() const
+{
+	return Get<LightModeColorProvider>();
+}
+
+void AppServices::SetLightModeColorProvider(LightModeColorProvider *lightModeColorProvider)
+{
+	Set(lightModeColorProvider);
+}
+
 ModelessDialogList *AppServices::GetModelessDialogList()
 {
 	return Get<ModelessDialogList>();

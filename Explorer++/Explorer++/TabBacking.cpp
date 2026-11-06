@@ -16,9 +16,7 @@ TabBacking::TabBacking(TabBackingView *view, BrowserWindow *browser, TabContaine
 	m_view(view),
 	m_browser(browser),
 	m_tabContainer(tabContainer),
-	m_appServices(appServices),
-	m_toolbar(view->GetToolbarView(), browser, tabContainer, appServices->GetTabEvents(),
-		appServices->GetAcceleratorManager(), appServices->GetResourceLoader())
+	m_appServices(appServices)
 {
 	m_view->SetDelegate(this);
 }

@@ -24,6 +24,7 @@
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
+#include "LightModeColorProvider.h"
 #include "ModelessDialogList.h"
 #include "PlatformContextImpl.h"
 #include "Plugins/PluginCommandManager.h"
@@ -108,6 +109,7 @@ private:
 	DirectoryWatcherFactoryImpl m_directoryWatcherFactory;
 	DarkModeManagerImpl m_darkModeManager;
 	DarkModeColorProvider m_darkModeColorProvider;
+	LightModeColorProvider m_lightModeColorProvider;
 	ThemeManagerImpl m_themeManager;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherImpl m_iconFetcher;

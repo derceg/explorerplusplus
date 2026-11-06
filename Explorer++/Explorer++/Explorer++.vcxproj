@@ -1220,6 +1220,7 @@
     <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="JumpListHelper.cpp" />
+    <ClCompile Include="LightModeColorProvider.cpp" />
     <ClCompile Include="ListView.cpp" />
     <ClCompile Include="ListViewColumnsMenu.cpp" />
     <ClCompile Include="ListViewColumnModel.cpp" />
@@ -1258,12 +1259,9 @@
     <ClCompile Include="StockIconModel.cpp" />
     <ClCompile Include="SubMenuItemParams.cpp" />
     <ClCompile Include="TabBacking.cpp" />
-    <ClCompile Include="TabBackingToolbar.cpp" />
-    <ClCompile Include="TabBackingToolbarView.cpp" />
     <ClCompile Include="TabBackingView.cpp" />
     <ClCompile Include="TabContextMenu.cpp" />
     <ClCompile Include="TabView.cpp" />
-    <ClCompile Include="ThemedTabControlPainter.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
     <ClCompile Include="AppearanceOptionsPage.cpp" />
@@ -1598,6 +1596,7 @@
     <ClInclude Include="InsertMarkPosition.h" />
     <ClInclude Include="ItemStateOp.h" />
     <ClInclude Include="JumpListHelper.h" />
+    <ClInclude Include="LightModeColorProvider.h" />
     <ClInclude Include="ListView.h" />
     <ClInclude Include="ListViewColumn.h" />
     <ClInclude Include="ListViewColumnsMenu.h" />
@@ -1648,14 +1647,11 @@
     <ClInclude Include="SortGroupMenu.h" />
     <ClInclude Include="StockIconModel.h" />
     <ClInclude Include="SubMenuItemParams.h" />
-    <ClInclude Include="TabBackingToolbar.h" />
-    <ClInclude Include="TabBackingToolbarView.h" />
     <ClInclude Include="TabBackingView.h" />
     <ClInclude Include="TabBackingViewDelegate.h" />
     <ClInclude Include="TabContextMenu.h" />
     <ClInclude Include="TabView.h" />
     <ClInclude Include="TabViewDelegate.h" />
-    <ClInclude Include="ThemedTabControlPainter.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />
     <ClInclude Include="AppearanceOptionsPage.h" />

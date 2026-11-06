@@ -246,6 +246,7 @@
     <ClCompile Include="BrowserWindowFakeView.cpp" />
     <ClCompile Include="BrowserWindowTest.cpp" />
     <ClCompile Include="ClangCLLibs.cpp" />
+    <ClCompile Include="ControlTestHelper.cpp" />
     <ClCompile Include="CopiedBookmark.cpp" />
     <ClCompile Include="CustomizableToolbarViewTest.cpp" />
     <ClCompile Include="D2DHelperTest.cpp" />
@@ -319,15 +320,14 @@
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="ShellBrowserTest.cpp" />
     <ClCompile Include="SortGroupMenuTest.cpp" />
-    <ClCompile Include="TabBackingToolbarTest.cpp" />
     <ClCompile Include="TabContainerTest.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
+    <ClCompile Include="TabViewTestApi.cpp" />
     <ClCompile Include="TaskbarTabManagerTest.cpp" />
     <ClCompile Include="TestMenuView.cpp" />
     <ClCompile Include="TestRebarBandView.cpp" />
     <ClCompile Include="TestToolbarButton.cpp" />
-    <ClCompile Include="ThemedTabControlPainterTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
     <ClCompile Include="DefaultColumnRegistryStorageTest.cpp" />
@@ -496,6 +496,7 @@
     <ClInclude Include="BrowserWindowFake.h" />
     <ClInclude Include="BrowserWindowFakeView.h" />
     <ClInclude Include="BrowserWindowMock.h" />
+    <ClInclude Include="ControlTestHelper.h" />
     <ClInclude Include="MenuHelpTextHostFake.h" />
     <ClInclude Include="MenuViewTestApi.h" />
     <ClInclude Include="NoOpClipboardWatcher.h" />
@@ -552,6 +553,7 @@
     <ClInclude Include="SimulatedClipboardStore.h" />
     <ClInclude Include="StartupFoldersStorageTestHelper.h" />
     <ClInclude Include="StorageTestHelper.h" />
+    <ClInclude Include="TabViewTestApi.h" />
     <ClInclude Include="TestMenuView.h" />
     <ClInclude Include="TestRebarBandView.h" />
     <ClInclude Include="TestResources.h" />

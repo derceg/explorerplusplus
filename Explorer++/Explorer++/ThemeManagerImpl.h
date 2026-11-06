@@ -80,7 +80,6 @@ private:
 	DarkModeManager *const m_darkModeManager;
 	const DarkModeColorProvider *const m_darkModeColorProvider;
 	std::unordered_set<HWND> m_trackedTopLevelWindows;
-	std::unordered_map<HWND, int> m_hotTabMap;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 };

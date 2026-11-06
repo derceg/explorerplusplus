@@ -73,9 +73,9 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 
 	CreateMainRebarAndChildren();
 
-	m_browserPaneView =
-		std::make_unique<BrowserPaneView>(this, m_browser, appServices->GetDarkModeManager(),
-			appServices->GetDarkModeColorProvider(), m_config, m_resourceLoader);
+	m_browserPaneView = std::make_unique<BrowserPaneView>(this, appServices->GetDarkModeManager(),
+		appServices->GetDarkModeColorProvider(), appServices->GetLightModeColorProvider(), m_config,
+		m_resourceLoader);
 
 	m_statusBarView = std::make_unique<StatusBarView>(GetHWND(), m_config);
 }

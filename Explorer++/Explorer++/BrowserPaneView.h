@@ -10,16 +10,17 @@
 struct Config;
 class DarkModeColorProvider;
 class DarkModeManager;
-class MenuHelpTextHost;
+class LightModeColorProvider;
 class ResourceLoader;
 class ViewBase;
 
 class BrowserPaneView
 {
 public:
-	BrowserPaneView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
-		const DarkModeManager *darkModeManager, const DarkModeColorProvider *darkModeColorProvider,
-		const Config *config, const ResourceLoader *resourceLoader);
+	BrowserPaneView(ViewBase *parent, const DarkModeManager *darkModeManager,
+		const DarkModeColorProvider *darkModeColorProvider,
+		const LightModeColorProvider *lightModeColorProvider, const Config *config,
+		const ResourceLoader *resourceLoader);
 
 	TabBackingView *GetTabBackingView();
 	MainTabView *GetTabView();

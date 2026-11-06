@@ -8,9 +8,7 @@
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
 #include "SystemFontHelper.h"
-#include "ThemedTabControlPainter.h"
 #include "../Helper/Controls.h"
-#include "../Helper/DoubleBufferedPaint.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -1058,49 +1056,6 @@ LRESULT ThemeManagerImpl::TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 {
 	switch (msg)
 	{
-	case WM_ERASEBKGND:
-		return 1;
-
-	case WM_PAINT:
-	{
-		DoubleBufferedPaint doubleBufferedPaint(hwnd);
-		HDC memDC = doubleBufferedPaint.GetMemoryDC();
-		RECT paintRect = doubleBufferedPaint.GetPaintRect();
-
-		ThemedTabControlPainter painter(hwnd, m_darkModeColorProvider);
-
-		if (auto itr = m_hotTabMap.find(hwnd); itr != m_hotTabMap.end())
-		{
-			painter.SetHotItem(itr->second);
-		}
-
-		painter.Paint(memDC, paintRect);
-	}
-		return 0;
-
-	case WM_MOUSEMOVE:
-	{
-		POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-
-		TCHITTESTINFO hitTestInfo = {};
-		hitTestInfo.pt = pt;
-		int index = TabCtrl_HitTest(hwnd, &hitTestInfo);
-
-		if (index != -1)
-		{
-			m_hotTabMap.insert_or_assign(hwnd, index);
-		}
-		else
-		{
-			m_hotTabMap.erase(hwnd);
-		}
-	}
-	break;
-
-	case WM_MOUSELEAVE:
-		m_hotTabMap.erase(hwnd);
-		break;
-
 	case WM_PARENTNOTIFY:
 		switch (LOWORD(wParam))
 		{
@@ -1111,10 +1066,6 @@ LRESULT ThemeManagerImpl::TabControlSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 			ApplyThemeToWindowAndChildren(child);
 			break;
 		}
-		break;
-
-	case WM_DESTROY:
-		m_hotTabMap.erase(hwnd);
 		break;
 	}
 

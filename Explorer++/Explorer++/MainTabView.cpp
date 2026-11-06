@@ -7,11 +7,14 @@
 #include "../Helper/DpiCompatibility.h"
 #include <CommCtrl.h>
 
-MainTabView::MainTabView(HWND parent, const Config *config, const ResourceLoader *resourceLoader) :
+MainTabView::MainTabView(HWND parent, const DarkModeManager *darkModeManager,
+	const DarkModeColorProvider *darkModeColorProvider,
+	const LightModeColorProvider *lightModeColorProvider, const Config *config,
+	const ResourceLoader *resourceLoader) :
 	TabView(parent,
-		WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE | TCS_TOOLTIPS | WS_CLIPSIBLINGS
+		WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE | TCS_TOOLTIPS | WS_CLIPSIBLINGS
 			| WS_CLIPCHILDREN,
-		config),
+		darkModeManager, darkModeColorProvider, lightModeColorProvider, config, resourceLoader),
 	m_imageListManager(resourceLoader, DpiCompatibility::GetInstance().GetDpiForWindow(GetHWND()))
 {
 	SetImageList(m_imageListManager.GetImageList());

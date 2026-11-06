@@ -6,10 +6,12 @@
 #include "TabContainer.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
+#include "ControlTestHelper.h"
 #include "MainTabView.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "TabViewTestApi.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -480,6 +482,19 @@ TEST_F(TabContainerTest, CloseTabWhenLocked)
 	EXPECT_FALSE(m_tabContainer->CloseTab(m_tabContainer->GetTab(tabId2)));
 	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(),
 		ElementsAre(Property(&Tab::GetId, tabId1), Property(&Tab::GetId, tabId2)));
+}
+
+TEST_F(TabContainerTest, CloseButtonClick)
+{
+	int tabId1 = m_browser->AddTabAndReturnId(L"c:\\");
+	m_browser->AddTab(L"d:\\");
+
+	auto *view = m_tabContainer->GetView();
+	TabViewTestApi testApi(view);
+
+	auto layout = testApi.GetTabContentLayout(1);
+	SimulateClick(view->GetHWND(), { layout.closeButton.left, layout.closeButton.top });
+	EXPECT_THAT(m_tabContainer->GetAllTabsInOrder(), ElementsAre(Property(&Tab::GetId, tabId1)));
 }
 
 TEST_F(TabContainerTest, GetAllTabs)

@@ -7,21 +7,15 @@
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
 #include "TabBackingViewDelegate.h"
-#include "../Helper/DpiCompatibility.h"
-#include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <memory>
 
-TabBackingView::TabBackingView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
-	const DarkModeManager *darkModeManager, const DarkModeColorProvider *darkModeColorProvider,
-	const Config *config) :
+TabBackingView::TabBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
+	const DarkModeColorProvider *darkModeColorProvider) :
 	ViewBase(CreateBacking(parent)),
-	m_toolbarView(this, menuHelpTextHost, config),
 	m_darkModeManager(darkModeManager),
 	m_darkModeColorProvider(darkModeColorProvider)
 {
-	m_toolbarView.AddSizeRequirementsChangedObserver([this] { UpdateLayout(); });
-
 	AddSubclass(std::make_unique<WindowSubclass>(GetHWND(),
 		std::bind_front(&TabBackingView::WndProc, this)));
 }
@@ -60,11 +54,6 @@ void TabBackingView::SetDelegate(TabBackingViewDelegate *delegate)
 	m_delegate = delegate;
 }
 
-TabBackingToolbarView *TabBackingView::GetToolbarView()
-{
-	return &m_toolbarView;
-}
-
 LRESULT TabBackingView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -87,10 +76,6 @@ LRESULT TabBackingView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	case WM_PRINTCLIENT:
 		OnPrintClient(reinterpret_cast<HDC>(wParam));
 		return 0;
-
-	case WM_SIZE:
-		UpdateLayout();
-		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -152,23 +137,4 @@ void TabBackingView::PerformPaint(const PAINTSTRUCT &ps)
 
 	auto res = FillRect(ps.hdc, &ps.rcPaint, backgroundBrush);
 	DCHECK(res);
-}
-
-void TabBackingView::UpdateLayout()
-{
-	RECT backingRect;
-	auto res = GetClientRect(GetHWND(), &backingRect);
-	CHECK(res);
-
-	auto toolbarWidth = m_toolbarView.MaybeGetIdealWidth();
-	CHECK(toolbarWidth);
-
-	auto toolbarHeight = m_toolbarView.GetHeight();
-
-	res = SetWindowPos(m_toolbarView.GetHWND(), nullptr,
-		GetRectWidth(&backingRect) - *toolbarWidth
-			- DpiCompatibility::GetInstance().ScaleValue(m_toolbarView.GetHWND(), TOOLBAR_X_OFFSET),
-		(GetRectHeight(&backingRect) - toolbarHeight) / 2, *toolbarWidth, toolbarHeight,
-		SWP_NOZORDER);
-	CHECK(res);
 }

@@ -10,7 +10,6 @@
 #include "BrowserPaneView.h"
 #include "BrowserView.h"
 #include "Config.h"
-#include "DarkModeManager.h"
 #include "DestroyFilesDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "FeatureList.h"
@@ -388,7 +387,7 @@ void Explorerplusplus::UpdateLayout()
 	SetWindowPos(m_view.GetBrowserPaneView()->GetTabBackingView()->GetHWND(), nullptr,
 		tabBackingLeft, tabTop, tabBackingWidth, tabWindowHeight, showFlags);
 
-	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0, tabBackingWidth - 25,
+	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0, tabBackingWidth,
 		tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	int holderTop;

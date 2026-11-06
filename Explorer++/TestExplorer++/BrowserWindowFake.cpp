@@ -21,7 +21,9 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	m_view(storageData.bounds),
 	m_config(appServices->GetConfig()),
 	m_shellBrowserFactory(this, appServices->GetNavigationEvents()),
-	m_tabView(m_view.GetHWND(), appServices->GetConfig(), appServices->GetResourceLoader()),
+	m_tabView(m_view.GetHWND(), appServices->GetDarkModeManager(),
+		appServices->GetDarkModeColorProvider(), appServices->GetLightModeColorProvider(), appServices->GetConfig(),
+		appServices->GetResourceLoader()),
 	m_tabContainer(&m_tabView, this, &m_shellBrowserFactory, appServices)
 {
 	for (const auto &tab : storageData.tabs)

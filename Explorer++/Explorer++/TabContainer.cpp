@@ -366,6 +366,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	tabItem->SetMiddleClickedCallback(
 		std::bind_front(&TabContainer::OnTabMiddleClicked, this, &tab));
 	tabItem->SetRightClickedCallback(std::bind_front(&TabContainer::OnTabRightClicked, this, &tab));
+	tabItem->SetClosedCallback([this, &tab] { CloseTab(tab); });
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing

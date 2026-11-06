@@ -9,12 +9,18 @@
 #include "ViewBase.h"
 #include "../Helper/SignalWrapper.h"
 #include <boost/core/noncopyable.hpp>
+#include <wil/resource.h>
 #include <CommCtrl.h>
 #include <memory>
 #include <optional>
 #include <vector>
 
+class ColorProvider;
 struct Config;
+class DarkModeColorProvider;
+class DarkModeManager;
+class LightModeColorProvider;
+class ResourceLoader;
 class TabView;
 class TabViewDelegate;
 
@@ -22,6 +28,8 @@ class TabViewDelegate;
 class TabViewItem
 {
 public:
+	using ClosedCallback = std::function<void()>;
+
 	virtual ~TabViewItem() = default;
 
 	void SetParent(TabView *parent);
@@ -33,10 +41,12 @@ public:
 	void SetDoubleClickedCallback(MouseEventCallback doubleClickedCallback);
 	void SetMiddleClickedCallback(MouseEventCallback middleClickedCallback);
 	void SetRightClickedCallback(MouseEventCallback rightClickedCallback);
+	void SetClosedCallback(ClosedCallback closedCallback);
 
 	void OnDoubleClicked(const MouseEvent &event);
 	void OnMiddleClicked(const MouseEvent &event);
 	void OnRightClicked(const MouseEvent &event);
+	void OnClosed();
 
 protected:
 	void NotifyParentOfUpdate() const;
@@ -47,6 +57,7 @@ private:
 	MouseEventCallback m_doubleClickedCallback;
 	MouseEventCallback m_middleClickedCallback;
 	MouseEventCallback m_rightClickedCallback;
+	ClosedCallback m_closedCallback;
 };
 
 // Designed to act as a base class for a tab control. Doesn't actually add any tabs on its own.
@@ -59,7 +70,10 @@ public:
 		Right
 	};
 
-	TabView(HWND parent, DWORD style, const Config *config);
+	TabView(HWND parent, DWORD style, const DarkModeManager *darkModeManager,
+		const DarkModeColorProvider *darkModeColorProvider,
+		const LightModeColorProvider *lightModeColorProvider, const Config *config,
+		const ResourceLoader *resourceLoader);
 	~TabView();
 
 	void SetDelegate(TabViewDelegate *delegate);
@@ -81,6 +95,8 @@ public:
 	SignalWrapper<TabView, void()> sizeUpdatedSignal;
 
 private:
+	friend class TabViewTestApi;
+
 	// When dragging a tab, the tab will typically be moved if the cursor moves outside the
 	// left/right edges of the tab.
 	//
@@ -144,6 +160,27 @@ private:
 		TabDragAnchor anchor;
 	};
 
+	struct TabContentLayout
+	{
+		RECT icon;
+		RECT text;
+		RECT closeButton;
+	};
+
+	enum class TabPart
+	{
+		Body,
+		CloseButton
+	};
+
+	struct HotItemDetails
+	{
+		int index;
+		TabPart part;
+
+		bool operator==(const HotItemDetails &) const = default;
+	};
+
 	int GetIndexOfTabItem(const TabViewItem *tabItem) const;
 	std::optional<int> MaybeGetTabIconIndex(int index) const;
 	void MaybeRemoveIcon(int iconIndex);
@@ -151,15 +188,26 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys);
-	void OnLeftButtonDown(const POINT &pt);
-	void OnLeftButtonUp();
+	bool OnLeftButtonDown(const POINT &pt);
+	void OnLeftButtonUp(const POINT &pt);
+	void MaybeHandleCloseClick(const POINT &pt);
 	void OnMouseMove(const POINT &pt);
+	void UpdateHotItemDetails(const POINT &pt);
+	void MaybeStartTabDrag(const POINT &pt);
+	void UpdateTabDrag(const POINT &pt);
 	TabDragBounds GetTabBoundsForDrag(int tabIndex, TabDragAnchor anchor) const;
 	void OnCaptureChanged(HWND target);
 	void OnLeftButtonDoubleClick(const POINT &pt, UINT keysDown);
 	void OnMiddleButtonDown(const POINT &pt, UINT keysDown);
 	void OnMiddleButtonUp(const POINT &pt, UINT keysDown);
 	void OnRightButtonUp(const POINT &pt, UINT keysDown);
+	void UpdateDpiDependentResources();
+	void OnPaint();
+	void Paint(HDC hdc, const RECT &paintRect);
+	void DrawTab(HDC hdc, int index);
+	TabContentLayout GetTabContentLayout(int index) const;
+	RECT GetTabRectForPainting(int index) const;
+	const ColorProvider *GetCurrentColorProvider() const;
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 	void OnSelectionChanged();
 	bool IsValidIndex(int index) const;
@@ -167,14 +215,26 @@ private:
 	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &pt) const;
 	void OnFontUpdated();
 
+	const DarkModeManager *const m_darkModeManager;
+	const DarkModeColorProvider *const m_darkModeColorProvider;
+	const LightModeColorProvider *const m_lightModeColorProvider;
+	const ResourceLoader *const m_resourceLoader;
 	std::vector<std::unique_ptr<TabViewItem>> m_tabs;
 	TabViewDelegate *m_delegate = nullptr;
 	MainFontSetter m_fontSetter;
 	std::unique_ptr<MainFontSetter> m_tooltipFontSetter;
+	wil::unique_himagelist m_closeIconImageList;
+	int m_closeIconImageIndex;
+	int m_horizontalPadding;
 
 	// This will only be set after the left mouse button has gone down on a tab, but before a drag
 	// has been initiated.
 	std::optional<POINT> m_leftButtonDownPoint;
+
+	// This will be set after the left mouse button has gone down on a close button, but before the
+	// button has gone up. It will be used to detect whether a click starts and finishes on the same
+	// button.
+	std::optional<int> m_pressedCloseButtonIndex;
 
 	// A value will only be assigned here whilst a tab is being dragged.
 	std::optional<TabDragState> m_tabDragState;
@@ -182,4 +242,6 @@ private:
 	// This will only be set in between the point where the middle mouse button is pressed and the
 	// point where the button is released.
 	std::optional<int> m_middleClickItemIndex;
+
+	std::optional<HotItemDetails> m_hotItemDetails;
 };

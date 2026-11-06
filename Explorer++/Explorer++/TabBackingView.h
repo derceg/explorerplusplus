@@ -4,24 +4,19 @@
 
 #pragma once
 
-#include "TabBackingToolbarView.h"
 #include "ViewBase.h"
 
-struct Config;
 class DarkModeColorProvider;
 class DarkModeManager;
-class MenuHelpTextHost;
 class TabBackingViewDelegate;
 
 class TabBackingView : public ViewBase
 {
 public:
-	TabBackingView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
-		const DarkModeManager *darkModeManager, const DarkModeColorProvider *darkModeColorProvider,
-		const Config *config);
+	TabBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
+		const DarkModeColorProvider *darkModeColorProvider);
 
 	void SetDelegate(TabBackingViewDelegate *delegate);
-	TabBackingToolbarView *GetToolbarView();
 
 private:
 	static constexpr wchar_t CLASS_NAME[] = L"Explorer++TabBackingWindowClass";
@@ -38,9 +33,7 @@ private:
 	void OnPaint();
 	void OnPrintClient(HDC hdc);
 	void PerformPaint(const PAINTSTRUCT &ps);
-	void UpdateLayout();
 
-	TabBackingToolbarView m_toolbarView;
 	const DarkModeManager *const m_darkModeManager;
 	const DarkModeColorProvider *const m_darkModeColorProvider;
 	TabBackingViewDelegate *m_delegate = nullptr;

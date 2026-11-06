@@ -24,6 +24,7 @@
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
+#include "LightModeColorProvider.h"
 #include "ModelessDialogList.h"
 #include "NoOpClipboardWatcher.h"
 #include "NoOpThemeManager.h"
@@ -79,6 +80,7 @@ protected:
 	ModelessDialogList m_modelessDialogList;
 	DarkModeManagerFake m_darkModeManager;
 	DarkModeColorProvider m_darkModeColorProvider;
+	LightModeColorProvider m_lightModeColorProvider;
 	NoOpThemeManager m_themeManager;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherFake m_iconFetcher;

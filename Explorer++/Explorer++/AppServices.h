@@ -23,6 +23,7 @@ class DriveModel;
 class FeatureList;
 class FrequentLocationsModel;
 class HistoryModel;
+class LightModeColorProvider;
 class ModelessDialogList;
 class NavigationEvents;
 class PlatformContext;
@@ -149,6 +150,10 @@ public:
 	const HistoryModel *GetHistoryModel() const;
 	void SetHistoryModel(HistoryModel *historyModel);
 
+	LightModeColorProvider *GetLightModeColorProvider();
+	const LightModeColorProvider *GetLightModeColorProvider() const;
+	void SetLightModeColorProvider(LightModeColorProvider *lightModeColorProvider);
+
 	ModelessDialogList *GetModelessDialogList();
 	const ModelessDialogList *GetModelessDialogList() const;
 	void SetModelessDialogList(ModelessDialogList *modelessDialogList);
@@ -213,9 +218,9 @@ private:
 		AsyncIconFetcher *, BookmarkTree *, BrowserList *, BrowserWindowFactory *, CachedIcons *,
 		ClipboardWatcher *, ColorRuleModel *, const CommandLine::Settings *, Config *,
 		DarkModeColorProvider *, DarkModeManager *, DirectoryWatcherFactory *, DriveModel *,
-		FeatureList *, FrequentLocationsModel *, HistoryModel *, ModelessDialogList *,
-		NavigationEvents *, PlatformContext *, Plugins::PluginCommandManager *,
-		Plugins::PluginMenuItemsRegistry *, ResourceLoader *, Runtime *, ShellBrowserEvents *,
-		TabEvents *, TabList *, TabRestorer *, ThemeManager *>
+		FeatureList *, FrequentLocationsModel *, HistoryModel *, LightModeColorProvider *,
+		ModelessDialogList *, NavigationEvents *, PlatformContext *,
+		Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *, ResourceLoader *,
+		Runtime *, ShellBrowserEvents *, TabEvents *, TabList *, TabRestorer *, ThemeManager *>
 		m_services;
 };

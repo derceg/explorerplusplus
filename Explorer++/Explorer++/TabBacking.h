@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "TabBackingToolbar.h"
 #include "TabBackingViewDelegate.h"
 
 class AppServices;
@@ -27,5 +26,4 @@ private:
 	BrowserWindow *const m_browser;
 	TabContainer *const m_tabContainer;
 	AppServices *const m_appServices;
-	TabBackingToolbar m_toolbar;
 };

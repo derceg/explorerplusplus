@@ -25,6 +25,7 @@ New features:
   Tools > Options > On Startup > Open a set of folders, and then
   adding folders to the associated list. When Explorer++ starts,
   each of the folders that have been added will be opened.
+- Close buttons are now shown on each tab.
 - The way in which command line paths are handled has been
   updated. The change means that relative paths like ".." should
   now be correctly handled and a wider range of paths should be
