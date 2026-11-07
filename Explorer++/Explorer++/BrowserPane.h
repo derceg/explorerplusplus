@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "TabBacking.h"
-#include "TabContainer.h"
+#include "TabBar.h"
+#include "TabBarBacking.h"
 
 class AppServices;
 class BrowserPaneView;
@@ -19,9 +19,9 @@ public:
 	BrowserPane(BrowserPaneView *view, BrowserWindow *browser,
 		ShellBrowserFactory *shellBrowserFactory, AppServices *appServices);
 
-	TabContainer *GetTabContainer();
+	TabBar *GetTabBar();
 
 private:
-	TabContainer m_tabContainer;
-	TabBacking m_tabBacking;
+	TabBar m_tabBar;
+	TabBarBacking m_tabBarBacking;
 };

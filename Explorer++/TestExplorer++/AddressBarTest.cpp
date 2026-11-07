@@ -63,7 +63,7 @@ TEST_F(AddressBarTest, DisplayUpdateAfterTabSwitch)
 	m_browser->AddTab(path2);
 
 	EXPECT_THAT(m_addressBarView->GetText(), StrCaseEq(path1));
-	m_browser->GetActiveTabContainer()->SelectTabAtIndex(1);
+	m_browser->GetActiveTabBar()->SelectTabAtIndex(1);
 	EXPECT_THAT(m_addressBarView->GetText(), StrCaseEq(path2));
 }
 

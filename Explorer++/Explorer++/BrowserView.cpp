@@ -20,7 +20,7 @@
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "StatusBarView.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabEvents.h"
 #include "ThemeWindowTracker.h"
 #include "WindowMenuView.h"
@@ -289,7 +289,7 @@ void BrowserView::UpdateWindowText()
 		return;
 	}
 
-	const Tab &tab = m_browser->GetActiveTabContainer()->GetSelectedTab();
+	const Tab &tab = m_browser->GetActiveTabBar()->GetSelectedTab();
 	const auto &pidl = tab.GetShellBrowser()->GetDirectory();
 
 	std::wstring folderDisplayName;

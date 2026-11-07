@@ -81,10 +81,10 @@ TEST_F(SearchTabsListViewModelTest, DefaultSortOrder)
 	auto *tab2 = browser->AddTab(L"d:\\");
 	auto *tab3 = browser->AddTab(L"e:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	tabContainer->SelectTab(*tab1);
-	tabContainer->SelectTab(*tab3);
-	tabContainer->SelectTab(*tab2);
+	auto *tabBar = browser->GetActiveTabBar();
+	tabBar->SelectTab(*tab1);
+	tabBar->SelectTab(*tab3);
+	tabBar->SelectTab(*tab2);
 
 	EXPECT_THAT(GetTabsForItems(), ElementsAre(tab2, tab3, tab1));
 }

@@ -3,13 +3,13 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MainTabViewImageListManager.h"
+#include "TabBarViewImageListManager.h"
 #include "Icon.h"
 #include "ResourceLoader.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-MainTabViewImageListManager::MainTabViewImageListManager(const ResourceLoader *resourceLoader,
+TabBarViewImageListManager::TabBarViewImageListManager(const ResourceLoader *resourceLoader,
 	UINT dpi)
 {
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
@@ -30,12 +30,12 @@ MainTabViewImageListManager::MainTabViewImageListManager(const ResourceLoader *r
 		m_defaultFolderIconSystemImageListIndex);
 }
 
-HIMAGELIST MainTabViewImageListManager::GetImageList() const
+HIMAGELIST TabBarViewImageListManager::GetImageList() const
 {
 	return m_imageList.get();
 }
 
-int MainTabViewImageListManager::AddIconFromSystemImageList(int systemIconIndex)
+int TabBarViewImageListManager::AddIconFromSystemImageList(int systemIconIndex)
 {
 	if (systemIconIndex == m_defaultFolderIconSystemImageListIndex)
 	{
@@ -46,17 +46,17 @@ int MainTabViewImageListManager::AddIconFromSystemImageList(int systemIconIndex)
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
 }
 
-bool MainTabViewImageListManager::IsDefaultIcon(int iconIndex) const
+bool TabBarViewImageListManager::IsDefaultIcon(int iconIndex) const
 {
 	return iconIndex == m_lockIconIndex || iconIndex == m_defaultFolderIconIndex;
 }
 
-int MainTabViewImageListManager::GetLockIconIndex() const
+int TabBarViewImageListManager::GetLockIconIndex() const
 {
 	return m_lockIconIndex;
 }
 
-int MainTabViewImageListManager::GetDefaultFolderIconIndex() const
+int TabBarViewImageListManager::GetDefaultFolderIconIndex() const
 {
 	return m_defaultFolderIconIndex;
 }

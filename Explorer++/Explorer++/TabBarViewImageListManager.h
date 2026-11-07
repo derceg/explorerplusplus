@@ -21,10 +21,10 @@ class ResourceLoader;
 // and allows system image list icons to be added on demand.
 //
 // This class manages that custom image list.
-class MainTabViewImageListManager
+class TabBarViewImageListManager
 {
 public:
-	MainTabViewImageListManager(const ResourceLoader *resourceLoader, UINT dpi);
+	TabBarViewImageListManager(const ResourceLoader *resourceLoader, UINT dpi);
 
 	HIMAGELIST GetImageList() const;
 	int AddIconFromSystemImageList(int systemIconIndex);

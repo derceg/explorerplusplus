@@ -8,15 +8,15 @@
 
 class DarkModeColorProvider;
 class DarkModeManager;
-class TabBackingViewDelegate;
+class TabBarBackingViewDelegate;
 
-class TabBackingView : public ViewBase
+class TabBarBackingView : public ViewBase
 {
 public:
-	TabBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
+	TabBarBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
 		const DarkModeColorProvider *darkModeColorProvider);
 
-	void SetDelegate(TabBackingViewDelegate *delegate);
+	void SetDelegate(TabBarBackingViewDelegate *delegate);
 
 private:
 	static constexpr wchar_t CLASS_NAME[] = L"Explorer++TabBackingWindowClass";
@@ -36,5 +36,5 @@ private:
 
 	const DarkModeManager *const m_darkModeManager;
 	const DarkModeColorProvider *const m_darkModeColorProvider;
-	TabBackingViewDelegate *m_delegate = nullptr;
+	TabBarBackingViewDelegate *m_delegate = nullptr;
 };

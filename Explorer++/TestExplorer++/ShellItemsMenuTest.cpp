@@ -99,9 +99,9 @@ TEST_F(ShellItemsMenuTest, OpenOnMiddleClick)
 
 	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
 
-	auto &tab2 = tabContainer->GetTabByIndex(1);
+	auto &tab2 = tabBar->GetTabByIndex(1);
 	EXPECT_EQ(tab2.GetShellBrowser()->GetDirectory(), pidl);
 }

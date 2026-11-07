@@ -88,7 +88,7 @@ TEST_F(EventScopeShellBrowserTest, ActiveShellBrowserScope)
 	EXPECT_FALSE(scope.DoesEventSourceMatch(*m_tab3->GetShellBrowser()));
 
 	// m_tab2 is now the active tab in m_browser1, so only it should match.
-	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
+	m_browser1->GetActiveTabBar()->SelectTabAtIndex(1);
 	EXPECT_FALSE(scope.DoesEventSourceMatch(*m_tab1->GetShellBrowser()));
 	EXPECT_TRUE(scope.DoesEventSourceMatch(*m_tab2->GetShellBrowser()));
 	EXPECT_FALSE(scope.DoesEventSourceMatch(*m_tab3->GetShellBrowser()));

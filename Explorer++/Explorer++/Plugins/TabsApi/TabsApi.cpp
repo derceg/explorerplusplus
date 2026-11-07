@@ -13,7 +13,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/SortModes.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabList.h"
 #include <magic_enum/magic_enum.hpp>
 #include <sol/sol.hpp>
@@ -137,7 +137,7 @@ int Plugins::TabsApi::Create(sol::table createProperties)
 	}
 
 	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
-	auto &newTab = targetBrowser->GetActiveTabContainer()->CreateNewTab(navigateParams, tabSettings,
+	auto &newTab = targetBrowser->GetActiveTabBar()->CreateNewTab(navigateParams, tabSettings,
 		&folderSettings);
 
 	return newTab.GetId();
@@ -158,7 +158,7 @@ void Plugins::TabsApi::ExtractTabPropertiesForCreation(sol::table createProperti
 	if (index)
 	{
 		int finalIndex = *index;
-		int numTabs = targetBrowser->GetActiveTabContainer()->GetNumTabs();
+		int numTabs = targetBrowser->GetActiveTabBar()->GetNumTabs();
 
 		if (finalIndex < 0)
 		{
@@ -324,7 +324,7 @@ void Plugins::TabsApi::Update(int tabId, sol::table properties)
 
 	if (active && *active)
 	{
-		tabInternal->GetTabContainer()->SelectTab(*tabInternal);
+		tabInternal->GetTabBar()->SelectTab(*tabInternal);
 	}
 }
 
@@ -349,14 +349,14 @@ int Plugins::TabsApi::Move(int tabId, int newIndex)
 		return -1;
 	}
 
-	auto *tabContainer = tabInternal->GetTabContainer();
+	auto *tabBar = tabInternal->GetTabBar();
 
 	if (newIndex < 0)
 	{
-		newIndex = tabContainer->GetNumTabs();
+		newIndex = tabBar->GetNumTabs();
 	}
 
-	return tabContainer->MoveTab(*tabInternal, newIndex);
+	return tabBar->MoveTab(*tabInternal, newIndex);
 }
 
 bool Plugins::TabsApi::Close(int tabId)
@@ -368,5 +368,5 @@ bool Plugins::TabsApi::Close(int tabId)
 		return false;
 	}
 
-	return tabInternal->GetTabContainer()->CloseTab(*tabInternal);
+	return tabInternal->GetTabBar()->CloseTab(*tabInternal);
 }

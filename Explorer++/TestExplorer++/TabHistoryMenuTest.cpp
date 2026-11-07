@@ -85,9 +85,9 @@ TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 	// Since the item was opened in a new tab, the current index should remain unchanged.
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 2);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(L"c:\\fake2"));
 }
 
@@ -122,9 +122,9 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 0);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(L"c:\\fake3"));
 }
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "MainTabView.h"
-#include "TabBackingView.h"
+#include "TabBarBackingView.h"
+#include "TabBarView.h"
 
 struct Config;
 class DarkModeColorProvider;
@@ -22,10 +22,10 @@ public:
 		const LightModeColorProvider *lightModeColorProvider, const Config *config,
 		const ResourceLoader *resourceLoader);
 
-	TabBackingView *GetTabBackingView();
-	MainTabView *GetTabView();
+	TabBarBackingView *GetTabBarBackingView();
+	TabBarView *GetTabBarView();
 
 private:
-	TabBackingView m_tabBackingView;
-	MainTabView m_tabView;
+	TabBarBackingView m_tabBarBackingView;
+	TabBarView m_tabBarView;
 };

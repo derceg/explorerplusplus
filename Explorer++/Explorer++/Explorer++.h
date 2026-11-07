@@ -55,7 +55,7 @@ class ShellBrowserEvents;
 class ShellBrowserImpl;
 class ShellTreeView;
 class StatusBar;
-class TabContainer;
+class TabBar;
 class TabEvents;
 class WindowSubclass;
 
@@ -76,8 +76,8 @@ public:
 	HWND GetHWND() const override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
-	TabContainer *GetActiveTabContainer() override;
-	const TabContainer *GetActiveTabContainer() const override;
+	TabBar *GetActiveTabBar() override;
+	const TabBar *GetActiveTabBar() const override;
 	void FocusActiveTab() override;
 	Tab *CreateTabFromPreservedTab(const PreservedTab *tab) override;
 	using BrowserWindow::OpenDefaultItem;
@@ -247,7 +247,7 @@ private:
 
 	/* CoreInterface methods. */
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
-	TabContainer *GetTabContainer() const override;
+	TabBar *GetTabBar() const override;
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
 		LPVOID pData);

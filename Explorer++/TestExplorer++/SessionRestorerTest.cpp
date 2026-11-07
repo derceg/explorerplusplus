@@ -28,8 +28,8 @@ protected:
 	static void VerifyTabs(BrowserWindow *browser,
 		const std::vector<std::wstring> &expectedTabDirectories)
 	{
-		auto *tabContainer = browser->GetActiveTabContainer();
-		auto tabs = tabContainer->GetAllTabsInOrder();
+		auto *tabBar = browser->GetActiveTabBar();
+		auto tabs = tabBar->GetAllTabsInOrder();
 		ASSERT_EQ(tabs.size(), expectedTabDirectories.size());
 
 		// TODO: This should use std::views::zip once C++23 support is available.
@@ -61,7 +61,7 @@ TEST_F(SessionRestorerTest, RestorePrevious)
 		auto *tab3 = browser->AddTab(L"g:\\");
 		tab3->SetLockState(Tab::LockState::AddressLocked);
 
-		browser->GetActiveTabContainer()->SelectTab(*tab2);
+		browser->GetActiveTabBar()->SelectTab(*tab2);
 
 		windowStorageData = browser->GetStorageData();
 

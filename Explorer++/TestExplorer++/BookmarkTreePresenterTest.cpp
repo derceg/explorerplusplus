@@ -14,7 +14,7 @@
 #include "LabelEditHandler.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TreeView.h"
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/combine.hpp>
@@ -314,15 +314,15 @@ TEST_F(BookmarkTreePresenterTest, OnNodeMiddleClicked)
 	auto *delegate = presenter->GetDelegateForTesting();
 	auto *adaptor = presenter->GetAdaptorForTesting();
 	delegate->OnNodeMiddleClicked(adaptor->GetNodeForBookmark(folder), { { 0, 0 }, false, false });
-	ASSERT_EQ(m_browser->GetActiveTabContainer()->GetNumTabs(), 3);
+	ASSERT_EQ(m_browser->GetActiveTabBar()->GetNumTabs(), 3);
 
 	// Middle-clicking a bookmark folder should result in each of the child bookmarks being opened
 	// in new tabs.
-	const auto &tab1 = m_browser->GetActiveTabContainer()->GetTabByIndex(1);
+	const auto &tab1 = m_browser->GetActiveTabBar()->GetTabByIndex(1);
 	EXPECT_EQ(tab1.GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(bookmark1->GetLocation()));
 
-	const auto &tab2 = m_browser->GetActiveTabContainer()->GetTabByIndex(2);
+	const auto &tab2 = m_browser->GetActiveTabBar()->GetTabByIndex(2);
 	EXPECT_EQ(tab2.GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(bookmark2->GetLocation()));
 }

@@ -72,10 +72,10 @@ TEST_F(BookmarkContextMenuSingleBookmarkTest, OpenInNewTab)
 	RootMenuViewTestApi::SelectItem(&menuView, BookmarkContextMenu::Item::OpenInNewTab, false,
 		false);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
 
-	const auto &tab = tabContainer->GetTabByIndex(1);
+	const auto &tab = tabBar->GetTabByIndex(1);
 	EXPECT_EQ(tab.GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(m_bookmark->GetLocation()));
 }
@@ -179,13 +179,13 @@ TEST_F(BookmarkContextMenuMultipleBookmarksTest, OpenAll)
 
 	RootMenuViewTestApi::SelectItem(&menuView, BookmarkContextMenu::Item::OpenAll, false, false);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
+	auto *tabBar = m_browser->GetActiveTabBar();
 	int numBookmarks = static_cast<int>(m_bookmarkItems.size());
-	ASSERT_EQ(tabContainer->GetNumTabs(), numBookmarks + 1);
+	ASSERT_EQ(tabBar->GetNumTabs(), numBookmarks + 1);
 
 	for (int i = 0; i < numBookmarks; i++)
 	{
-		const auto &tab = tabContainer->GetTabByIndex(i + 1);
+		const auto &tab = tabBar->GetTabByIndex(i + 1);
 		EXPECT_EQ(tab.GetShellBrowser()->GetDirectory(),
 			CreateSimplePidlForTest(m_bookmarkItems[i]->GetLocation()));
 	}

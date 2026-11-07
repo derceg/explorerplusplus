@@ -201,9 +201,9 @@ TEST_F(BookmarksMenuTest, MiddleClickBookmark)
 
 	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_THAT(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectoryPath(),
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_THAT(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectoryPath(),
 		StrCaseEq(targetFolder->GetChildAtIndex(0)->GetLocation()));
 }
 
@@ -225,13 +225,13 @@ TEST_F(BookmarksMenuTest, MiddleClickFolder)
 	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 
 	// Each of the bookmarks in the folder should have been opened in a new tab.
-	auto *tabContainer = m_browser->GetActiveTabContainer();
+	auto *tabBar = m_browser->GetActiveTabBar();
 	int numChildren = static_cast<int>(subFolder->GetChildren().size());
-	ASSERT_EQ(tabContainer->GetNumTabs(), numChildren + 1);
+	ASSERT_EQ(tabBar->GetNumTabs(), numChildren + 1);
 
 	for (int i = 0; i < numChildren; i++)
 	{
-		EXPECT_THAT(tabContainer->GetTabByIndex(i + 1).GetShellBrowser()->GetDirectoryPath(),
+		EXPECT_THAT(tabBar->GetTabByIndex(i + 1).GetShellBrowser()->GetDirectoryPath(),
 			StrCaseEq(subFolder->GetChildAtIndex(i)->GetLocation()));
 	}
 }
@@ -340,11 +340,11 @@ TEST_F(BookmarksMenuTest, ActionsAfterRemoval)
 
 	// Selecting an item that has been removed should have no effect.
 	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 0, false, false);
-	auto *tabContainer = m_browser->GetActiveTabContainer();
+	auto *tabBar = m_browser->GetActiveTabBar();
 	EXPECT_THAT(m_tab->GetShellBrowser()->GetDirectoryPath(), StrCaseEq(L"c:\\initial\\folder"));
 
 	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
-	EXPECT_EQ(tabContainer->GetNumTabs(), 1);
+	EXPECT_EQ(tabBar->GetNumTabs(), 1);
 
 	auto dropTarget = MenuViewTestApi::MaybeGetDropTarget(&menuView,
 		MenuViewTestApi::GetItemId(&menuView, 0), MenuDropPosition::On);

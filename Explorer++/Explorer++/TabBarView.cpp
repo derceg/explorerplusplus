@@ -3,11 +3,11 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MainTabView.h"
+#include "TabBarView.h"
 #include "../Helper/DpiCompatibility.h"
 #include <CommCtrl.h>
 
-MainTabView::MainTabView(HWND parent, const DarkModeManager *darkModeManager,
+TabBarView::TabBarView(HWND parent, const DarkModeManager *darkModeManager,
 	const DarkModeColorProvider *darkModeColorProvider,
 	const LightModeColorProvider *lightModeColorProvider, const Config *config,
 	const ResourceLoader *resourceLoader) :
@@ -20,7 +20,7 @@ MainTabView::MainTabView(HWND parent, const DarkModeManager *darkModeManager,
 	SetImageList(m_imageListManager.GetImageList());
 }
 
-MainTabViewImageListManager *MainTabView::GetImageListManager()
+TabBarViewImageListManager *TabBarView::GetImageListManager()
 {
 	return &m_imageListManager;
 }

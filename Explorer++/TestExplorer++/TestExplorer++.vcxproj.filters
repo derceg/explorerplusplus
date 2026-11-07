@@ -433,7 +433,7 @@
     <ClCompile Include="TabHistoryMenuTest.cpp">
       <Filter>Menus\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainerTest.cpp">
+    <ClCompile Include="TabBarTest.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
     <ClCompile Include="TabContextMenuTest.cpp">

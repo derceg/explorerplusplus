@@ -27,9 +27,9 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "StatusBar.h"
 #include "StatusBarView.h"
-#include "TabBacking.h"
-#include "TabBackingView.h"
-#include "TabContainer.h"
+#include "TabBarBacking.h"
+#include "TabBarBackingView.h"
+#include "TabBar.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/PidlHelper.h"
@@ -177,7 +177,7 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	{
 	case OpenFolderDisposition::CurrentTab:
 	{
-		Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		Tab &tab = GetActivePane()->GetTabBar()->GetSelectedTab();
 		auto navigateParams = NavigateParams::Normal(pidlItem);
 		tab.GetShellBrowserImpl()->GetNavigationController()->Navigate(navigateParams);
 	}
@@ -186,14 +186,14 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::BackgroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams);
+		GetActivePane()->GetTabBar()->CreateNewTab(navigateParams);
 	}
 	break;
 
 	case OpenFolderDisposition::ForegroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, { .selected = true });
+		GetActivePane()->GetTabBar()->CreateNewTab(navigateParams, { .selected = true });
 	}
 	break;
 
@@ -340,7 +340,7 @@ void Explorerplusplus::UpdateLayout()
 	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
 	// height of the tab control above the display area.
 	RECT displayRect = { 0, 0, 0, 0 };
-	TabCtrl_AdjustRect(GetActivePane()->GetTabContainer()->GetHWND(), true, &displayRect);
+	TabCtrl_AdjustRect(GetActivePane()->GetTabBar()->GetHWND(), true, &displayRect);
 	int tabWindowHeight = std::abs(displayRect.top);
 
 	indentTop = indentRebar;
@@ -384,10 +384,10 @@ void Explorerplusplus::UpdateLayout()
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
-	SetWindowPos(m_view.GetBrowserPaneView()->GetTabBackingView()->GetHWND(), nullptr,
+	SetWindowPos(m_view.GetBrowserPaneView()->GetTabBarBackingView()->GetHWND(), nullptr,
 		tabBackingLeft, tabTop, tabBackingWidth, tabWindowHeight, showFlags);
 
-	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0, tabBackingWidth,
+	SetWindowPos(GetActivePane()->GetTabBar()->GetHWND(), nullptr, 0, 0, tabBackingWidth,
 		tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	int holderTop;
@@ -436,11 +436,11 @@ void Explorerplusplus::UpdateLayout()
 
 	/* <---- ALL listview windows ----> */
 
-	for (auto &tab : GetActivePane()->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : GetActivePane()->GetTabBar()->GetAllTabs() | boost::adaptors::map_values)
 	{
 		showFlags = SWP_NOZORDER;
 
-		if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
+		if (GetActivePane()->GetTabBar()->IsTabSelected(*tab))
 		{
 			showFlags |= SWP_SHOWWINDOW;
 		}
@@ -486,7 +486,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 /* Cycle through the current views. */
 void Explorerplusplus::OnToolbarViews()
 {
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->CycleViewMode(true);
 }
 
@@ -622,21 +622,21 @@ ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowserImpl() const
 	return m_pActiveShellBrowser;
 }
 
-TabContainer *Explorerplusplus::GetTabContainer() const
+TabBar *Explorerplusplus::GetTabBar() const
 {
-	return GetActivePane()->GetTabContainer();
+	return GetActivePane()->GetTabBar();
 }
 
 void Explorerplusplus::OnShowHiddenFiles()
 {
-	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	Tab &tab = GetActivePane()->GetTabBar()->GetSelectedTab();
 	tab.GetShellBrowserImpl()->SetShowHidden(!tab.GetShellBrowserImpl()->GetShowHidden());
 	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
 }
 
 void Explorerplusplus::FocusActiveTab()
 {
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
 	SetFocus(selectedTab.GetShellBrowserImpl()->GetListView());
 }
 
@@ -716,7 +716,7 @@ void Explorerplusplus::OnResolveLink()
 			PathRemoveFileSpec(szPath);
 
 			Tab &newTab =
-				GetActivePane()->GetTabContainer()->CreateNewTab(szPath, { .selected = true });
+				GetActivePane()->GetTabBar()->CreateNewTab(szPath, { .selected = true });
 
 			if (newTab.GetShellBrowser()->GetDirectoryPath() == szPath)
 			{
@@ -747,6 +747,6 @@ void Explorerplusplus::OnResolveLink()
 void Explorerplusplus::OnSelectColumns()
 {
 	auto *selectColumnsDialog = SelectColumnsDialog::Create(m_resourceLoader, m_hwnd,
-		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl());
+		GetActivePane()->GetTabBar()->GetSelectedTab().GetShellBrowserImpl());
 	selectColumnsDialog->ShowModalDialog();
 }

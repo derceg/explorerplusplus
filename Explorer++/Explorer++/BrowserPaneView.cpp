@@ -9,18 +9,18 @@ BrowserPaneView::BrowserPaneView(ViewBase *parent, const DarkModeManager *darkMo
 	const DarkModeColorProvider *darkModeColorProvider,
 	const LightModeColorProvider *lightModeColorProvider, const Config *config,
 	const ResourceLoader *resourceLoader) :
-	m_tabBackingView(parent, darkModeManager, darkModeColorProvider),
-	m_tabView(m_tabBackingView.GetHWND(), darkModeManager, darkModeColorProvider,
+	m_tabBarBackingView(parent, darkModeManager, darkModeColorProvider),
+	m_tabBarView(m_tabBarBackingView.GetHWND(), darkModeManager, darkModeColorProvider,
 		lightModeColorProvider, config, resourceLoader)
 {
 }
 
-TabBackingView *BrowserPaneView::GetTabBackingView()
+TabBarBackingView *BrowserPaneView::GetTabBarBackingView()
 {
-	return &m_tabBackingView;
+	return &m_tabBarBackingView;
 }
 
-MainTabView *BrowserPaneView::GetTabView()
+TabBarView *BrowserPaneView::GetTabBarView()
 {
-	return &m_tabView;
+	return &m_tabBarView;
 }

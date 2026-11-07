@@ -13,7 +13,7 @@
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 #include <glog/logging.h>
@@ -240,7 +240,7 @@ void SearchTabsDialog::OnOk()
 void SearchTabsDialog::SelectTabForItem(ListViewItem *item)
 {
 	const auto *tab = m_listViewModel->GetTabForItem(item);
-	tab->GetTabContainer()->SelectTab(*tab);
+	tab->GetTabBar()->SelectTab(*tab);
 }
 
 void SearchTabsDialog::OnCancel()

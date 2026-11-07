@@ -28,7 +28,7 @@
 #include "Plugins/PluginCommandManager.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "../Helper/Controls.h"
 #include "../Helper/EnumHelper.h"
 #include <windowsx.h>
@@ -53,7 +53,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	case WM_TIMER:
 		if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
 		{
-			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+			Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
 
 			UpdateDisplayWindow(selectedTab);
 			m_mainToolbar->UpdateToolbarButtonStates();
@@ -84,7 +84,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		{
 			if (itr->uId == pDWFolderSizeCompletion->uId)
 			{
-				if (itr->iTabId == GetActivePane()->GetTabContainer()->GetSelectedTab().GetId())
+				if (itr->iTabId == GetActivePane()->GetTabBar()->GetSelectedTab().GetId())
 				{
 					bValid = itr->bValid;
 				}

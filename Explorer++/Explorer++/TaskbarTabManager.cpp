@@ -14,7 +14,7 @@
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabEvents.h"
 #include "TestHelper.h"
 #include "../Helper/D2DHelper.h"
@@ -185,13 +185,13 @@ void TaskbarTabManager::SetUpThumbnails()
 
 	m_taskbarList = taskbarList;
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
+	auto *tabBar = m_browser->GetActiveTabBar();
 
-	for (const auto *tab : tabContainer->GetAllTabsInOrder())
+	for (const auto *tab : tabBar->GetAllTabsInOrder())
 	{
 		CreateTabProxy(*tab);
 
-		if (tabContainer->IsTabSelected(*tab))
+		if (tabBar->IsTabSelected(*tab))
 		{
 			OnTabSelectionChanged(*tab);
 		}
@@ -258,14 +258,14 @@ void TaskbarTabManager::OnTabMoved(const Tab &tab, int fromIndex, int toIndex)
 {
 	UNREFERENCED_PARAMETER(fromIndex);
 
-	const auto *tabContainer = m_browser->GetActiveTabContainer();
-	int numTabs = tabContainer->GetNumTabs();
+	const auto *tabBar = m_browser->GetActiveTabBar();
+	int numTabs = tabBar->GetNumTabs();
 
 	HWND nextTabProxyWindow = nullptr;
 
 	if (toIndex < (numTabs - 1))
 	{
-		const Tab &nextTab = tabContainer->GetTabByIndex(toIndex + 1);
+		const Tab &nextTab = tabBar->GetTabByIndex(toIndex + 1);
 		auto *nextTabProxy = GetProxyForTab(&nextTab);
 		nextTabProxyWindow = nextTabProxy->GetWindow();
 	}
@@ -422,7 +422,7 @@ LRESULT TaskbarTabManager::TaskbarTabProxy::WndProc(HWND hwnd, UINT msg, WPARAM 
 		if (LOWORD(wParam) != WA_INACTIVE)
 		{
 			m_browser->Activate();
-			m_tab->GetTabContainer()->SelectTab(*m_tab);
+			m_tab->GetTabBar()->SelectTab(*m_tab);
 		}
 		return 0;
 
@@ -435,7 +435,7 @@ LRESULT TaskbarTabManager::TaskbarTabProxy::WndProc(HWND hwnd, UINT msg, WPARAM 
 		return 0;
 
 	case WM_CLOSE:
-		m_tab->GetTabContainer()->CloseTab(*m_tab);
+		m_tab->GetTabBar()->CloseTab(*m_tab);
 		return 0;
 	}
 

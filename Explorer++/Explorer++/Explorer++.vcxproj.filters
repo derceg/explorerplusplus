@@ -697,10 +697,10 @@
     <ClCompile Include="ClangCLLibs.cpp">
       <Filter>Clang-CL</Filter>
     </ClCompile>
-    <ClCompile Include="MainTabView.cpp">
+    <ClCompile Include="TabBarView.cpp">
       <Filter>Tabs\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="MainTabViewImageListManager.cpp">
+    <ClCompile Include="TabBarViewImageListManager.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
     <ClCompile Include="MenuView.cpp">
@@ -736,10 +736,10 @@
     <ClCompile Include="ShellBrowser\ShellBrowserFactoryImpl.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainer.cpp">
+    <ClCompile Include="TabBar.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TabContainerBackgroundContextMenu.cpp">
+    <ClCompile Include="TabBarBackgroundContextMenu.cpp">
       <Filter>Tabs\UI</Filter>
     </ClCompile>
     <ClCompile Include="DialogHelper.cpp">
@@ -958,10 +958,10 @@
     <ClCompile Include="MainToolbarLayout.cpp">
       <Filter>Main Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="TabBacking.cpp">
+    <ClCompile Include="TabBarBacking.cpp">
       <Filter>Tab Backing\UI</Filter>
     </ClCompile>
-    <ClCompile Include="TabBackingView.cpp">
+    <ClCompile Include="TabBarBackingView.cpp">
       <Filter>Tab Backing\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="BrowserPaneView.cpp">
@@ -1746,10 +1746,10 @@
     <ClInclude Include="ClangCLLibs.h">
       <Filter>Clang-CL</Filter>
     </ClInclude>
-    <ClInclude Include="MainTabView.h">
+    <ClInclude Include="TabBarView.h">
       <Filter>Tabs\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="MainTabViewImageListManager.h">
+    <ClInclude Include="TabBarViewImageListManager.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
     <ClInclude Include="MouseEvent.h">
@@ -1797,10 +1797,10 @@
     <ClInclude Include="ShellBrowser\ShellBrowserFactoryImpl.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="TabContainer.h">
+    <ClInclude Include="TabBar.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
-    <ClInclude Include="TabContainerBackgroundContextMenu.h">
+    <ClInclude Include="TabBarBackgroundContextMenu.h">
       <Filter>Tabs\UI</Filter>
     </ClInclude>
     <ClInclude Include="DialogHelper.h">
@@ -2103,16 +2103,16 @@
     <ClInclude Include="MainToolbarLayout.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="TabBackingView.h">
+    <ClInclude Include="TabBarBackingView.h">
       <Filter>Tab Backing\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="TabBacking.h">
+    <ClInclude Include="TabBarBacking.h">
       <Filter>Tab Backing\UI</Filter>
     </ClInclude>
     <ClInclude Include="BrowserPaneView.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="TabBackingViewDelegate.h">
+    <ClInclude Include="TabBarBackingViewDelegate.h">
       <Filter>Tab Backing\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="LightModeColorProvider.h">

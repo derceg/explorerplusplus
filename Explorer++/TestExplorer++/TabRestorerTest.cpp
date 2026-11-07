@@ -30,9 +30,9 @@ TEST_F(TabRestorerTest, GetTabs)
 	int tabId2 = browser->AddTabAndReturnId(L"d:\\");
 	browser->AddTab(L"e:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId1)));
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId1)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
 
 	// tab2 was closed most recently, so its entry should appear first.
 	const auto &closedTabs = m_tabRestorer.GetClosedTabs();
@@ -59,16 +59,16 @@ TEST_F(TabRestorerTest, RestoreLastTab)
 	browser->AddTab(L"d:\\");
 	browser->AddTab(L"e:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTabByIndex(1)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTabByIndex(1)));
 
 	auto *restoredTab = m_tabRestorer.RestoreLastTab();
 	ASSERT_NE(restoredTab, nullptr);
 
 	// The tab should be restored to its original index. It should also be selected.
 	ASSERT_EQ(restoredTab->GetBrowser(), browser);
-	EXPECT_EQ(tabContainer->GetTabIndex(*restoredTab), 1);
-	EXPECT_TRUE(tabContainer->IsTabSelected(*restoredTab));
+	EXPECT_EQ(tabBar->GetTabIndex(*restoredTab), 1);
+	EXPECT_TRUE(tabBar->IsTabSelected(*restoredTab));
 	EXPECT_EQ(restoredTab->GetShellBrowser()->GetDirectory(), CreateSimplePidlForTest(L"d:\\"));
 }
 
@@ -89,8 +89,8 @@ TEST_F(TabRestorerTest, RestoreLastTabIntoDifferentBrowser)
 	// The tab was restored into a different browser, so it should be added to the end, rather than
 	// its original index.
 	ASSERT_EQ(restoredTab->GetBrowser(), browser2);
-	EXPECT_EQ(browser2->GetActiveTabContainer()->GetTabIndex(*restoredTab), 1);
-	EXPECT_TRUE(browser2->GetActiveTabContainer()->IsTabSelected(*restoredTab));
+	EXPECT_EQ(browser2->GetActiveTabBar()->GetTabIndex(*restoredTab), 1);
+	EXPECT_TRUE(browser2->GetActiveTabBar()->IsTabSelected(*restoredTab));
 	EXPECT_EQ(restoredTab->GetShellBrowser()->GetDirectory(), CreateSimplePidlForTest(L"c:\\"));
 }
 
@@ -100,8 +100,8 @@ TEST_F(TabRestorerTest, RestoreWithoutBrowser)
 	browser->AddTab(L"c:\\");
 	browser->AddTab(L"d:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTabByIndex(1)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTabByIndex(1)));
 
 	RemoveBrowser(browser);
 	browser = nullptr;
@@ -117,15 +117,15 @@ TEST_F(TabRestorerTest, RestoreTabById)
 	browser->AddTab(L"c:\\");
 	int tabId2 = browser->AddTabAndReturnId(L"d:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
 
 	auto *restoredTab = m_tabRestorer.RestoreTabById(tabId2);
 	ASSERT_NE(restoredTab, nullptr);
 
 	ASSERT_EQ(restoredTab->GetBrowser(), browser);
-	EXPECT_EQ(tabContainer->GetTabIndex(*restoredTab), 1);
-	EXPECT_TRUE(tabContainer->IsTabSelected(*restoredTab));
+	EXPECT_EQ(tabBar->GetTabIndex(*restoredTab), 1);
+	EXPECT_TRUE(tabBar->IsTabSelected(*restoredTab));
 	EXPECT_EQ(restoredTab->GetShellBrowser()->GetDirectory(), CreateSimplePidlForTest(L"d:\\"));
 }
 
@@ -139,8 +139,8 @@ TEST_F(TabRestorerTest, RestoreTabWithHistory)
 	NavigateTab(tab2, L"e:\\");
 	tab2->GetShellBrowser()->GetNavigationController()->GoBack();
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(*tab2));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(*tab2));
 	tab2 = nullptr;
 
 	auto *restoredTab = m_tabRestorer.RestoreLastTab();
@@ -163,12 +163,12 @@ TEST_F(TabRestorerTest, RestoreTabWithCustomName)
 	browser->AddTab(L"c:\\");
 	int tabId2 = browser->AddTabAndReturnId(L"d:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
+	auto *tabBar = browser->GetActiveTabBar();
 
 	std::wstring customName = L"CustomName";
-	tabContainer->GetTab(tabId2).SetCustomName(customName);
+	tabBar->GetTab(tabId2).SetCustomName(customName);
 
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
 
 	auto *restoredTab = m_tabRestorer.RestoreTabById(tabId2);
 	ASSERT_NE(restoredTab, nullptr);
@@ -183,13 +183,13 @@ TEST_F(TabRestorerTest, RestoreTabWithColumns)
 	browser->AddTab(L"c:\\");
 	int tabId2 = browser->AddTabAndReturnId(L"d:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
+	auto *tabBar = browser->GetActiveTabBar();
 
 	FolderColumns folderColumns;
 	folderColumns.realFolderColumns = { { ColumnType::Name, TRUE, 100 } };
-	tabContainer->GetTab(tabId2).GetShellBrowser()->SetAllColumnSets(folderColumns);
+	tabBar->GetTab(tabId2).GetShellBrowser()->SetAllColumnSets(folderColumns);
 
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
 
 	auto *restoredTab = m_tabRestorer.RestoreTabById(tabId2);
 	ASSERT_NE(restoredTab, nullptr);
@@ -203,8 +203,8 @@ TEST_F(TabRestorerTest, StateDuringRestore)
 	browser->AddTab(L"c:\\");
 	int tabId2 = browser->AddTabAndReturnId(L"d:\\");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
 
 	MockFunction<void(Tab & tab)> callback;
 	EXPECT_CALL(callback, Call(_))
@@ -251,11 +251,11 @@ TEST_F(TabRestorerTest, ItemsChangedSignal)
 		EXPECT_CALL(callback, Call());
 	}
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
 	check.Call(1);
 
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId3)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId3)));
 	check.Call(2);
 
 	EXPECT_NE(m_tabRestorer.RestoreTabById(tabId3), nullptr);

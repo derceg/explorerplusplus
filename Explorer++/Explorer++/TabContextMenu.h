@@ -9,7 +9,7 @@
 
 class ResourceLoader;
 class Tab;
-class TabContainer;
+class TabBar;
 class TabEvents;
 
 class TabContextMenu : public MenuBase
@@ -31,7 +31,7 @@ public:
 	};
 
 	TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		WeakPtr<Tab> tab, TabContainer *tabContainer, TabEvents *tabEvents,
+		WeakPtr<Tab> tab, TabBar *tabBar, TabEvents *tabEvents,
 		const ResourceLoader *resourceLoader);
 
 private:
@@ -49,7 +49,7 @@ private:
 	void OnCloseTabsToRight();
 
 	WeakPtr<Tab> m_tab;
-	TabContainer *const m_tabContainer;
+	TabBar *const m_tabBar;
 	TabEvents *const m_tabEvents;
 	const ResourceLoader *const m_resourceLoader;
 };

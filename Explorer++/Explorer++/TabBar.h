@@ -19,11 +19,11 @@
 class AppServices;
 class BrowserWindow;
 struct Config;
-class MainTabView;
 struct NavigateParams;
 class NavigationRequest;
 struct PreservedTab;
 class ShellBrowserFactory;
+class TabBarView;
 
 // Used when creating a tab.
 struct TabSettings
@@ -37,7 +37,7 @@ struct TabSettings
 	bool operator==(const TabSettings &) const = default;
 };
 
-class TabContainer : public ShellDropTargetWindow<int>, private TabViewDelegate
+class TabBar : public ShellDropTargetWindow<int>, private TabViewDelegate
 {
 public:
 	// When selecting an adjacent tab, indicates whether the previous or next tab should be
@@ -48,10 +48,10 @@ public:
 		Next
 	};
 
-	TabContainer(MainTabView *view, BrowserWindow *browser,
-		ShellBrowserFactory *shellBrowserFactory, AppServices *appServices);
+	TabBar(TabBarView *view, BrowserWindow *browser, ShellBrowserFactory *shellBrowserFactory,
+		AppServices *appServices);
 
-	MainTabView *GetView();
+	TabBarView *GetView();
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -144,7 +144,7 @@ private:
 	void OnDropSwitchTabTimer();
 	void OnDropScrollTimer();
 
-	MainTabView *const m_view;
+	TabBarView *const m_view;
 	BrowserWindow *const m_browser;
 	ShellBrowserFactory *const m_shellBrowserFactory;
 	AppServices *const m_appServices;

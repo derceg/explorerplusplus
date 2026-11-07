@@ -320,7 +320,7 @@
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="ShellBrowserTest.cpp" />
     <ClCompile Include="SortGroupMenuTest.cpp" />
-    <ClCompile Include="TabContainerTest.cpp" />
+    <ClCompile Include="TabBarTest.cpp" />
     <ClCompile Include="TabContextMenuTest.cpp" />
     <ClCompile Include="TabViewTest.cpp" />
     <ClCompile Include="TabViewTestApi.cpp" />

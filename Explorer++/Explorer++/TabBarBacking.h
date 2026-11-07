@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include "TabBackingViewDelegate.h"
+#include "TabBarBackingViewDelegate.h"
 
 class AppServices;
 class BrowserWindow;
-class TabBackingView;
-class TabContainer;
+class TabBar;
+class TabBarBackingView;
 
-class TabBacking : private TabBackingViewDelegate
+class TabBarBacking : private TabBarBackingViewDelegate
 {
 public:
-	TabBacking(TabBackingView *view, BrowserWindow *browser, TabContainer *tabContainer,
+	TabBarBacking(TabBarBackingView *view, BrowserWindow *browser, TabBar *tabBar,
 		AppServices *appServices);
 
 private:
@@ -22,8 +22,8 @@ private:
 	void OnDoubleClicked() override;
 	void OnShowContextMenu(const POINT &ptScreen) override;
 
-	TabBackingView *const m_view;
+	TabBarBackingView *const m_view;
 	BrowserWindow *const m_browser;
-	TabContainer *const m_tabContainer;
+	TabBar *const m_tabBar;
 	AppServices *const m_appServices;
 };

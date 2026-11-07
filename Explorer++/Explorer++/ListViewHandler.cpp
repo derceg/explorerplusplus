@@ -16,7 +16,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "ViewModeHelper.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/ClipboardStore.h"
@@ -61,7 +61,7 @@ void Explorerplusplus::OnListViewPaste()
 		return;
 	}
 
-	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
 	const auto &directory = selectedTab.GetShellBrowser()->GetDirectory();
 
 	if (CanShellPasteDataObject(directory.Raw(), clipboardObject.get(), PasteType::Normal))

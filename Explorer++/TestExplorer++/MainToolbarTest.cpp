@@ -21,7 +21,7 @@ public:
 		return nullptr;
 	}
 
-	TabContainer *GetTabContainer() const override
+	TabBar *GetTabBar() const override
 	{
 		return nullptr;
 	}

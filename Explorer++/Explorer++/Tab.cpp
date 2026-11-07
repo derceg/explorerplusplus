@@ -11,9 +11,9 @@
 #include "TabEvents.h"
 #include "TabStorage.h"
 
-Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
-	TabContainer *tabContainer, TabEvents *tabEvents) :
-	Tab(std::move(shellBrowser), browser, tabContainer, tabEvents, {})
+Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabBar *tabBar,
+	TabEvents *tabEvents) :
+	Tab(std::move(shellBrowser), browser, tabBar, tabEvents, {})
 {
 }
 
@@ -33,13 +33,13 @@ Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
 // If the ShellBrowser interface expands to cover all the necessary functionality, or
 // ShellBrowserImpl is simplified enough to make it usable in tests, the casting here can be
 // removed.
-Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
-	TabContainer *tabContainer, TabEvents *tabEvents, const InitialData &initialData) :
+Tab::Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabBar *tabBar,
+	TabEvents *tabEvents, const InitialData &initialData) :
 	m_id(idCounter++),
 	m_shellBrowser(std::move(shellBrowser)),
 	m_shellBrowserImpl(dynamic_cast<ShellBrowserImpl *>(m_shellBrowser.get())),
 	m_browser(browser),
-	m_tabContainer(tabContainer),
+	m_tabBar(tabBar),
 	m_tabEvents(tabEvents),
 	m_useCustomName(initialData.useCustomName),
 	m_customName(initialData.customName),
@@ -72,9 +72,9 @@ BrowserWindow *Tab::GetBrowser() const
 	return m_browser;
 }
 
-TabContainer *Tab::GetTabContainer() const
+TabBar *Tab::GetTabBar() const
 {
-	return m_tabContainer;
+	return m_tabBar;
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

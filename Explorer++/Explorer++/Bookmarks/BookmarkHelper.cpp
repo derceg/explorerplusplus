@@ -12,7 +12,7 @@
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <glog/logging.h>
@@ -75,7 +75,7 @@ void AddBrowserTabsToBookmarkFolder(BookmarkTree *bookmarkTree, BrowserWindow *b
 {
 	DCHECK(bookmarkFolder->IsFolder());
 
-	for (const auto *tab : browser->GetActiveTabContainer()->GetAllTabsInOrder())
+	for (const auto *tab : browser->GetActiveTabBar()->GetAllTabsInOrder())
 	{
 		const auto &pidl = tab->GetShellBrowser()->GetDirectory();
 		auto bookmark =

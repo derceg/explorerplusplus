@@ -24,7 +24,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SystemFontHelper.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabRestorer.h"
 #include "UpdateCheckDialog.h"
 #include "../Helper/ClipboardHelper.h"
@@ -76,8 +76,8 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	switch (command)
 	{
 	case IDM_FILE_CLOSETAB:
-		return m_browser->GetActiveTabContainer()->CanCloseTab(
-			m_browser->GetActiveTabContainer()->GetSelectedTab());
+		return m_browser->GetActiveTabBar()->CanCloseTab(
+			m_browser->GetActiveTabBar()->GetSelectedTab());
 
 	case IDM_FILE_SAVEDIRECTORYLISTING:
 		return GetActiveShellBrowser()->CanSaveDirectoryListing();
@@ -400,13 +400,11 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		break;
 
 	case IDA_SELECT_PREVIOUS_TAB:
-		m_browser->GetActiveTabContainer()->SelectAdjacentTab(
-			TabContainer::SelectionDirection::Previous);
+		m_browser->GetActiveTabBar()->SelectAdjacentTab(TabBar::SelectionDirection::Previous);
 		break;
 
 	case IDA_SELECT_NEXT_TAB:
-		m_browser->GetActiveTabContainer()->SelectAdjacentTab(
-			TabContainer::SelectionDirection::Next);
+		m_browser->GetActiveTabBar()->SelectAdjacentTab(TabBar::SelectionDirection::Next);
 		break;
 
 	case IDA_DUPLICATE_TAB:
@@ -467,8 +465,8 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 
 void BrowserCommandController::OnCloseTab()
 {
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->CloseTab(tabContainer->GetSelectedTab());
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->CloseTab(tabBar->GetSelectedTab());
 }
 
 void BrowserCommandController::StartCommandPrompt(LaunchProcessFlags flags)
@@ -725,14 +723,14 @@ void BrowserCommandController::OnAbout()
 
 void BrowserCommandController::OnDuplicateTab()
 {
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->DuplicateTab(tabContainer->GetSelectedTab());
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->DuplicateTab(tabBar->GetSelectedTab());
 }
 
 void BrowserCommandController::OnSelectTabAtIndex(int index)
 {
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	int numTabs = tabContainer->GetNumTabs();
+	auto *tabBar = m_browser->GetActiveTabBar();
+	int numTabs = tabBar->GetNumTabs();
 	int selectionIndex;
 
 	if (index < numTabs)
@@ -744,14 +742,14 @@ void BrowserCommandController::OnSelectTabAtIndex(int index)
 		selectionIndex = numTabs - 1;
 	}
 
-	tabContainer->SelectTabAtIndex(selectionIndex);
+	tabBar->SelectTabAtIndex(selectionIndex);
 }
 
 void BrowserCommandController::OnSelectLastTab()
 {
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	int numTabs = tabContainer->GetNumTabs();
-	tabContainer->SelectTabAtIndex(numTabs - 1);
+	auto *tabBar = m_browser->GetActiveTabBar();
+	int numTabs = tabBar->GetNumTabs();
+	tabBar->SelectTabAtIndex(numTabs - 1);
 }
 
 ShellBrowser *BrowserCommandController::GetActiveShellBrowser()

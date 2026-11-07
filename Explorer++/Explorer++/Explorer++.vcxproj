@@ -1227,8 +1227,8 @@
     <ClCompile Include="ListViewModel.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainRebar.cpp" />
-    <ClCompile Include="MainTabView.cpp" />
-    <ClCompile Include="MainTabViewImageListManager.cpp" />
+    <ClCompile Include="TabBarView.cpp" />
+    <ClCompile Include="TabBarViewImageListManager.cpp" />
     <ClCompile Include="MainToolbarLayout.cpp" />
     <ClCompile Include="MainToolbarView.cpp" />
     <ClCompile Include="MassRenameHelper.cpp" />
@@ -1258,8 +1258,8 @@
     <ClCompile Include="SortGroupMenu.cpp" />
     <ClCompile Include="StockIconModel.cpp" />
     <ClCompile Include="SubMenuItemParams.cpp" />
-    <ClCompile Include="TabBacking.cpp" />
-    <ClCompile Include="TabBackingView.cpp" />
+    <ClCompile Include="TabBarBacking.cpp" />
+    <ClCompile Include="TabBarBackingView.cpp" />
     <ClCompile Include="TabContextMenu.cpp" />
     <ClCompile Include="TabView.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
@@ -1353,7 +1353,7 @@
     <ClCompile Include="PasteSymLinksServer.cpp" />
     <ClCompile Include="ShellIconLoaderImpl.cpp" />
     <ClCompile Include="ShellIconModel.cpp" />
-    <ClCompile Include="TabContainerBackgroundContextMenu.cpp" />
+    <ClCompile Include="TabBarBackgroundContextMenu.cpp" />
     <ClCompile Include="TabHistoryMenu.cpp" />
     <ClCompile Include="HistoryModel.cpp" />
     <ClCompile Include="IconFetcherImpl.cpp" />
@@ -1513,7 +1513,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release-Clang|ARM64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="Tab.cpp" />
-    <ClCompile Include="TabContainer.cpp" />
+    <ClCompile Include="TabBar.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabMoved.cpp" />
@@ -1606,8 +1606,8 @@
     <ClInclude Include="ListViewModel.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MainRebar.h" />
-    <ClInclude Include="MainTabView.h" />
-    <ClInclude Include="MainTabViewImageListManager.h" />
+    <ClInclude Include="TabBarView.h" />
+    <ClInclude Include="TabBarViewImageListManager.h" />
     <ClInclude Include="MainToolbarLayout.h" />
     <ClInclude Include="MainToolbarView.h" />
     <ClInclude Include="MassRenameHelper.h" />
@@ -1647,8 +1647,8 @@
     <ClInclude Include="SortGroupMenu.h" />
     <ClInclude Include="StockIconModel.h" />
     <ClInclude Include="SubMenuItemParams.h" />
-    <ClInclude Include="TabBackingView.h" />
-    <ClInclude Include="TabBackingViewDelegate.h" />
+    <ClInclude Include="TabBarBackingView.h" />
+    <ClInclude Include="TabBarBackingViewDelegate.h" />
     <ClInclude Include="TabContextMenu.h" />
     <ClInclude Include="TabView.h" />
     <ClInclude Include="TabViewDelegate.h" />
@@ -1758,7 +1758,7 @@
     <ClInclude Include="ShellIconLoader.h" />
     <ClInclude Include="ShellIconLoaderImpl.h" />
     <ClInclude Include="ShellIconModel.h" />
-    <ClInclude Include="TabContainerBackgroundContextMenu.h" />
+    <ClInclude Include="TabBarBackgroundContextMenu.h" />
     <ClInclude Include="TabHistoryMenu.h" />
     <ClInclude Include="HistoryModel.h" />
     <ClInclude Include="IconFetcher.h" />
@@ -1894,8 +1894,8 @@
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />
-    <ClInclude Include="TabBacking.h" />
-    <ClInclude Include="TabContainer.h" />
+    <ClInclude Include="TabBarBacking.h" />
+    <ClInclude Include="TabBar.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabMoved.h" />
     <ClInclude Include="Plugins\TabsApi\TabProperties.h" />

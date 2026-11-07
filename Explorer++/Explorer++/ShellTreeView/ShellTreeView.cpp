@@ -34,7 +34,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellItemContextMenu.h"
 #include "ShellTreeNode.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabEvents.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardStore.h"
@@ -1655,7 +1655,7 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 
 ShellBrowserImpl *ShellTreeView::GetSelectedShellBrowser() const
 {
-	return m_browser->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowserImpl();
+	return m_browser->GetActivePane()->GetTabBar()->GetSelectedTab().GetShellBrowserImpl();
 }
 
 void ShellTreeView::CutCopiedItemManager::SetCopiedItem(IDataObject *clipboardDataObject)

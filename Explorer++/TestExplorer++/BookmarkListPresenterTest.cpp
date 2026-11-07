@@ -360,10 +360,10 @@ TEST_F(BookmarkListPresenterTest, OnBookmarkActivated)
 	auto *delegate = presenter->GetDelegateForTesting();
 	auto *model = presenter->GetModelForTesting();
 	delegate->OnItemsActivated({ model->GetItemForBookmark(bookmark) });
-	ASSERT_EQ(m_browser->GetActiveTabContainer()->GetNumTabs(), 2);
+	ASSERT_EQ(m_browser->GetActiveTabBar()->GetNumTabs(), 2);
 
 	// Activating a bookmark should result in the bookmark being opened in a new tab.
-	const auto &tab = m_browser->GetActiveTabContainer()->GetTabByIndex(1);
+	const auto &tab = m_browser->GetActiveTabBar()->GetTabByIndex(1);
 	EXPECT_EQ(tab.GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(bookmark->GetLocation()));
 }
@@ -385,15 +385,15 @@ TEST_F(BookmarkListPresenterTest, OnMultipleItemsActivated)
 	auto *model = presenter->GetModelForTesting();
 	delegate->OnItemsActivated(
 		{ model->GetItemForBookmark(folder), model->GetItemForBookmark(bookmark2) });
-	ASSERT_EQ(m_browser->GetActiveTabContainer()->GetNumTabs(), 3);
+	ASSERT_EQ(m_browser->GetActiveTabBar()->GetNumTabs(), 3);
 
 	// Each of the activated items should be opened. That is, the bookmark contained within the
 	// activated folder should be opened in one tab and the second bookmark in another tab.
-	const auto &tab1 = m_browser->GetActiveTabContainer()->GetTabByIndex(1);
+	const auto &tab1 = m_browser->GetActiveTabBar()->GetTabByIndex(1);
 	EXPECT_EQ(tab1.GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(bookmark1->GetLocation()));
 
-	const auto &tab2 = m_browser->GetActiveTabContainer()->GetTabByIndex(2);
+	const auto &tab2 = m_browser->GetActiveTabBar()->GetTabByIndex(2);
 	EXPECT_EQ(tab2.GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(bookmark2->GetLocation()));
 }

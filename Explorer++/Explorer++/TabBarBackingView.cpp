@@ -3,24 +3,24 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabBackingView.h"
+#include "TabBarBackingView.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
-#include "TabBackingViewDelegate.h"
+#include "TabBarBackingViewDelegate.h"
 #include "../Helper/WindowSubclass.h"
 #include <memory>
 
-TabBackingView::TabBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
+TabBarBackingView::TabBarBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
 	const DarkModeColorProvider *darkModeColorProvider) :
 	ViewBase(CreateBacking(parent)),
 	m_darkModeManager(darkModeManager),
 	m_darkModeColorProvider(darkModeColorProvider)
 {
 	AddSubclass(std::make_unique<WindowSubclass>(GetHWND(),
-		std::bind_front(&TabBackingView::WndProc, this)));
+		std::bind_front(&TabBarBackingView::WndProc, this)));
 }
 
-HWND TabBackingView::CreateBacking(ViewBase *parent)
+HWND TabBarBackingView::CreateBacking(ViewBase *parent)
 {
 	static bool classRegistered = false;
 
@@ -38,7 +38,7 @@ HWND TabBackingView::CreateBacking(ViewBase *parent)
 	return hwnd;
 }
 
-ATOM TabBackingView::RegisterBackingClass()
+ATOM TabBarBackingView::RegisterBackingClass()
 {
 	WNDCLASS windowClass = {};
 	windowClass.lpfnWndProc = DefWindowProc;
@@ -49,12 +49,12 @@ ATOM TabBackingView::RegisterBackingClass()
 	return RegisterClass(&windowClass);
 }
 
-void TabBackingView::SetDelegate(TabBackingViewDelegate *delegate)
+void TabBarBackingView::SetDelegate(TabBarBackingViewDelegate *delegate)
 {
 	m_delegate = delegate;
 }
 
-LRESULT TabBackingView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT TabBarBackingView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -81,7 +81,7 @@ LRESULT TabBackingView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void TabBackingView::OnDoubleClick()
+void TabBarBackingView::OnDoubleClick()
 {
 	if (!m_delegate)
 	{
@@ -91,7 +91,7 @@ void TabBackingView::OnDoubleClick()
 	m_delegate->OnDoubleClicked();
 }
 
-void TabBackingView::OnRButtonUp(const POINT &ptClient)
+void TabBarBackingView::OnRButtonUp(const POINT &ptClient)
 {
 	if (!m_delegate)
 	{
@@ -105,7 +105,7 @@ void TabBackingView::OnRButtonUp(const POINT &ptClient)
 	m_delegate->OnShowContextMenu(ptScreen);
 }
 
-void TabBackingView::OnPaint()
+void TabBarBackingView::OnPaint()
 {
 	PAINTSTRUCT ps;
 	BeginPaint(GetHWND(), &ps);
@@ -113,7 +113,7 @@ void TabBackingView::OnPaint()
 	EndPaint(GetHWND(), &ps);
 }
 
-void TabBackingView::OnPrintClient(HDC hdc)
+void TabBarBackingView::OnPrintClient(HDC hdc)
 {
 	PAINTSTRUCT ps = {};
 	ps.hdc = hdc;
@@ -122,7 +122,7 @@ void TabBackingView::OnPrintClient(HDC hdc)
 	PerformPaint(ps);
 }
 
-void TabBackingView::PerformPaint(const PAINTSTRUCT &ps)
+void TabBarBackingView::PerformPaint(const PAINTSTRUCT &ps)
 {
 	HBRUSH backgroundBrush;
 

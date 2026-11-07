@@ -4,10 +4,10 @@
 
 #pragma once
 
-class TabBackingViewDelegate
+class TabBarBackingViewDelegate
 {
 public:
-	virtual ~TabBackingViewDelegate() = default;
+	virtual ~TabBarBackingViewDelegate() = default;
 
 	virtual void OnDoubleClicked() = 0;
 	virtual void OnShowContextMenu(const POINT &ptScreen) = 0;

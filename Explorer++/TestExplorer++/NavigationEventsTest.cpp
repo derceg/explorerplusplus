@@ -183,8 +183,8 @@ TEST_F(NavigationEventsTest, SignalsFilteredByActiveShellBrowser)
 {
 	InSequence seq;
 
-	m_browser1->GetActiveTabContainer()->SelectTabAtIndex(1);
-	m_browser2->GetActiveTabContainer()->SelectTabAtIndex(0);
+	m_browser1->GetActiveTabBar()->SelectTabAtIndex(1);
+	m_browser2->GetActiveTabBar()->SelectTabAtIndex(0);
 
 	m_navigationEvents.AddStartedObserver(m_startedCallback.AsStdFunction(),
 		NavigationEventScope::ForActiveShellBrowser(*m_browser1));

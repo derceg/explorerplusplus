@@ -11,7 +11,7 @@
 class BrowserWindow;
 class ShellBrowser;
 class ShellBrowserImpl;
-class TabContainer;
+class TabBar;
 class TabEvents;
 struct TabStorageData;
 
@@ -44,10 +44,10 @@ public:
 		LockState lockState = LockState::NotLocked;
 	};
 
-	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
-		TabContainer *tabContainer, TabEvents *tabEvents);
-	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser,
-		TabContainer *tabContainer, TabEvents *tabEvents, const InitialData &initialData);
+	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabBar *tabBar,
+		TabEvents *tabEvents);
+	Tab(std::unique_ptr<ShellBrowser> shellBrowser, BrowserWindow *browser, TabBar *tabBar,
+		TabEvents *tabEvents, const InitialData &initialData);
 	~Tab();
 
 	int GetId() const;
@@ -56,7 +56,7 @@ public:
 	ShellBrowserImpl *GetShellBrowserImpl() const;
 
 	BrowserWindow *GetBrowser() const;
-	TabContainer *GetTabContainer() const;
+	TabBar *GetTabBar() const;
 
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
@@ -96,7 +96,7 @@ private:
 	ShellBrowserImpl *const m_shellBrowserImpl;
 
 	BrowserWindow *const m_browser;
-	TabContainer *const m_tabContainer;
+	TabBar *const m_tabBar;
 	TabEvents *const m_tabEvents;
 
 	bool m_useCustomName;

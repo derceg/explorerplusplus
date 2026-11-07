@@ -242,7 +242,7 @@ void Explorerplusplus::OnTabPreRemoval(const Tab &tab, int index)
 	// It's only necessary to begin shutdown if it hasn't already started. Shutdown will be started
 	// elsewhere if the user explicitly closes the window. So, it's only necessary to shutdown here
 	// if the user implicitly closes the window by closing the last tab.
-	if (tab.GetTabContainer()->GetNumTabs() == 1 && GetLifecycleState() == LifecycleState::Main)
+	if (tab.GetTabBar()->GetNumTabs() == 1 && GetLifecycleState() == LifecycleState::Main)
 	{
 		BeginShutdown();
 	}
@@ -250,7 +250,7 @@ void Explorerplusplus::OnTabPreRemoval(const Tab &tab, int index)
 
 void Explorerplusplus::OnTabRemoved(const Tab &tab)
 {
-	if (tab.GetTabContainer()->GetNumTabs() == 0)
+	if (tab.GetTabBar()->GetNumTabs() == 0)
 	{
 		// The last tab has been closed, so the window should be closed as well. However, it's not
 		// possible to close the window within this listener. Firstly, because there could be other
@@ -293,7 +293,7 @@ void Explorerplusplus::OnTreeViewHolderResized(int newWidth)
 
 Tab *Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	return &GetActivePane()->GetTabContainer()->CreateNewTab(*tab);
+	return &GetActivePane()->GetTabBar()->CreateNewTab(*tab);
 }
 
 HWND Explorerplusplus::GetHWND() const
@@ -308,12 +308,12 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 	BOOL res = GetWindowPlacement(m_hwnd, &placement);
 	CHECK(res);
 
-	const auto *tabContainer = GetActivePane()->GetTabContainer();
+	const auto *tabBar = GetActivePane()->GetTabBar();
 
 	return { .bounds = placement.rcNormalPosition,
 		.showState = NativeShowStateToShowState(placement.showCmd),
-		.tabs = tabContainer->GetStorageData(),
-		.selectedTab = tabContainer->GetSelectedTabIndex(),
+		.tabs = tabBar->GetStorageData(),
+		.selectedTab = tabBar->GetSelectedTabIndex(),
 		.mainRebarInfo = m_view.GetMainRebarView()->GetStorageData(),
 		.mainToolbarLayout = m_mainToolbar->GetLayoutForStorage(),
 		.treeViewWidth = m_treeViewWidth,
@@ -348,7 +348,7 @@ bool Explorerplusplus::ConfirmClose()
 		return true;
 	}
 
-	auto numTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
+	auto numTabs = GetActivePane()->GetTabBar()->GetNumTabs();
 
 	if (numTabs == 1)
 	{
@@ -379,7 +379,7 @@ void Explorerplusplus::Close()
 	BeginShutdown();
 
 	// When the last tab is closed, the window will be destroyed.
-	GetActiveTabContainer()->CloseAllTabs();
+	GetActiveTabBar()->CloseAllTabs();
 }
 
 void Explorerplusplus::BeginShutdown()
@@ -430,24 +430,24 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 	return m_browserPane.get();
 }
 
-TabContainer *Explorerplusplus::GetActiveTabContainer()
+TabBar *Explorerplusplus::GetActiveTabBar()
 {
-	return GetActivePane()->GetTabContainer();
+	return GetActivePane()->GetTabBar();
 }
 
-const TabContainer *Explorerplusplus::GetActiveTabContainer() const
+const TabBar *Explorerplusplus::GetActiveTabBar() const
 {
-	return GetActivePane()->GetTabContainer();
+	return GetActivePane()->GetTabBar();
 }
 
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 {
-	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	return GetActivePane()->GetTabBar()->GetSelectedTab().GetShellBrowser();
 }
 
 const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
-	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	return GetActivePane()->GetTabBar()->GetSelectedTab().GetShellBrowser();
 }
 
 void Explorerplusplus::StartMainToolbarCustomization()

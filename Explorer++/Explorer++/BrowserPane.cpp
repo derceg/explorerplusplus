@@ -9,12 +9,12 @@
 
 BrowserPane::BrowserPane(BrowserPaneView *view, BrowserWindow *browser,
 	ShellBrowserFactory *shellBrowserFactory, AppServices *appServices) :
-	m_tabContainer(view->GetTabView(), browser, shellBrowserFactory, appServices),
-	m_tabBacking(view->GetTabBackingView(), browser, &m_tabContainer, appServices)
+	m_tabBar(view->GetTabBarView(), browser, shellBrowserFactory, appServices),
+	m_tabBarBacking(view->GetTabBarBackingView(), browser, &m_tabBar, appServices)
 {
 }
 
-TabContainer *BrowserPane::GetTabContainer()
+TabBar *BrowserPane::GetTabBar()
 {
-	return &m_tabContainer;
+	return &m_tabBar;
 }

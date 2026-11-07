@@ -14,16 +14,15 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabEvents.h"
 #include <ranges>
 
 TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	WeakPtr<Tab> tab, TabContainer *tabContainer, TabEvents *tabEvents,
-	const ResourceLoader *resourceLoader) :
+	WeakPtr<Tab> tab, TabBar *tabBar, TabEvents *tabEvents, const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_tab(tab),
-	m_tabContainer(tabContainer),
+	m_tabBar(tabBar),
 	m_tabEvents(tabEvents),
 	m_resourceLoader(resourceLoader)
 {
@@ -40,7 +39,7 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_NEW_TAB_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_NEWTAB))
 			.SetSelectedCallback(
-				[this] { m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true }); }));
+				[this] { m_tabBar->CreateNewTabInDefaultDirectory({ .selected = true }); }));
 
 	m_rootMenuView->AppendItem(
 		MenuItemParams(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_DUPLICATE_TAB))
@@ -108,7 +107,7 @@ void TabContextMenu::BuildMenu(const ResourceLoader *resourceLoader)
 				resourceLoader))
 			.SetHelpText(resourceLoader->LoadString(IDS_TAB_CONTEXT_MENU_CLOSE_TAB_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_CLOSETAB))
-			.SetEnabledCallback([this] { return m_tab->GetTabContainer()->CanCloseTab(*m_tab); })
+			.SetEnabledCallback([this] { return m_tab->GetTabBar()->CanCloseTab(*m_tab); })
 			.SetSelectedCallback([this] { OnCloseTab(); }));
 
 	m_rootMenuView->AppendItem(
@@ -134,7 +133,7 @@ void TabContextMenu::OnDuplicateTab()
 		return;
 	}
 
-	m_tabContainer->DuplicateTab(*m_tab);
+	m_tabBar->DuplicateTab(*m_tab);
 }
 
 void TabContextMenu::OnOpenParentInNewTab()
@@ -152,7 +151,7 @@ void TabContextMenu::OnOpenParentInNewTab()
 	if (SUCCEEDED(hr))
 	{
 		auto navigateParams = NavigateParams::Normal(pidlParent.get());
-		m_tabContainer->CreateNewTab(navigateParams, { .selected = true });
+		m_tabBar->CreateNewTab(navigateParams, { .selected = true });
 	}
 }
 
@@ -168,7 +167,7 @@ void TabContextMenu::OnRefresh()
 
 void TabContextMenu::OnRefreshAllTabs()
 {
-	for (auto &tab : m_tabContainer->GetAllTabs() | std::views::values)
+	for (auto &tab : m_tabBar->GetAllTabs() | std::views::values)
 	{
 		tab->GetShellBrowser()->GetNavigationController()->Refresh();
 	}
@@ -227,7 +226,7 @@ void TabContextMenu::OnCloseTab()
 		return;
 	}
 
-	m_tabContainer->CloseTab(*m_tab);
+	m_tabBar->CloseTab(*m_tab);
 }
 
 void TabContextMenu::OnCloseOtherTabs()
@@ -237,15 +236,15 @@ void TabContextMenu::OnCloseOtherTabs()
 		return;
 	}
 
-	int index = m_tabContainer->GetTabIndex(*m_tab);
-	int numTabs = m_tabContainer->GetNumTabs();
+	int index = m_tabBar->GetTabIndex(*m_tab);
+	int numTabs = m_tabBar->GetNumTabs();
 
 	for (int i = numTabs - 1; i >= 0; i--)
 	{
 		if (i != index)
 		{
-			const Tab &currentTab = m_tabContainer->GetTabByIndex(i);
-			m_tabContainer->CloseTab(currentTab);
+			const Tab &currentTab = m_tabBar->GetTabByIndex(i);
+			m_tabBar->CloseTab(currentTab);
 		}
 	}
 }
@@ -257,12 +256,12 @@ void TabContextMenu::OnCloseTabsToRight()
 		return;
 	}
 
-	int index = m_tabContainer->GetTabIndex(*m_tab);
-	int numTabs = m_tabContainer->GetNumTabs();
+	int index = m_tabBar->GetTabIndex(*m_tab);
+	int numTabs = m_tabBar->GetNumTabs();
 
 	for (int i = numTabs - 1; i > index; i--)
 	{
-		const Tab &currentTab = m_tabContainer->GetTabByIndex(i);
-		m_tabContainer->CloseTab(currentTab);
+		const Tab &currentTab = m_tabBar->GetTabByIndex(i);
+		m_tabBar->CloseTab(currentTab);
 	}
 }

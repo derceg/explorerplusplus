@@ -11,7 +11,7 @@
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "../Helper/SortDirection.h"
 
 SortGroupMenu::SortGroupMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
@@ -241,7 +241,7 @@ void SortGroupMenu::OnSortDirectionSelected(SortDirection sortDirection)
 void SortGroupMenu::OnSelectColumns()
 {
 	auto *selectColumnsDialog = SelectColumnsDialog::Create(m_resourceLoader, m_browser->GetHWND(),
-		m_browser->GetActiveTabContainer()->GetSelectedTab().GetShellBrowserImpl());
+		m_browser->GetActiveTabBar()->GetSelectedTab().GetShellBrowserImpl());
 	selectColumnsDialog->ShowModalDialog();
 }
 

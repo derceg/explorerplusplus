@@ -6,9 +6,9 @@
 
 #include "BrowserWindow.h"
 #include "BrowserWindowFakeView.h"
-#include "MainTabView.h"
 #include "ShellBrowserFactoryFake.h"
-#include "TabContainer.h"
+#include "TabBar.h"
+#include "TabBarView.h"
 #include "../Helper/Pidl.h"
 
 class AppServices;
@@ -26,8 +26,8 @@ public:
 	HWND GetHWND() const override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
-	TabContainer *GetActiveTabContainer() override;
-	const TabContainer *GetActiveTabContainer() const override;
+	TabBar *GetActiveTabBar() override;
+	const TabBar *GetActiveTabBar() const override;
 	void FocusActiveTab() override;
 	Tab *CreateTabFromPreservedTab(const PreservedTab *tab) override;
 	void OpenDefaultItem(OpenFolderDisposition openFolderDisposition) override;
@@ -70,6 +70,6 @@ private:
 
 	ShellBrowserFactoryFake m_shellBrowserFactory;
 
-	MainTabView m_tabView;
-	TabContainer m_tabContainer;
+	TabBarView m_tabBarView;
+	TabBar m_tabBar;
 };

@@ -86,7 +86,7 @@ TEST_F(SearchTabsModelTest, TabSelectionTriggersUpdatedSignal)
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
 
 	EXPECT_CALL(callback, Call());
-	browser->GetActiveTabContainer()->SelectTabAtIndex(1);
+	browser->GetActiveTabBar()->SelectTabAtIndex(1);
 }
 
 TEST_F(SearchTabsModelTest, TabUpdateTriggersUpdatedSignal)
@@ -121,7 +121,7 @@ TEST_F(SearchTabsModelTest, TabMoveTriggersUpdatedSignal)
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
 
 	EXPECT_CALL(callback, Call());
-	browser->GetActiveTabContainer()->MoveTab(*tab1, 1);
+	browser->GetActiveTabBar()->MoveTab(*tab1, 1);
 }
 
 TEST_F(SearchTabsModelTest, TabRemovalTriggersUpdatedSignal)
@@ -134,7 +134,7 @@ TEST_F(SearchTabsModelTest, TabRemovalTriggersUpdatedSignal)
 	m_model.updatedSignal.AddObserver(callback.AsStdFunction());
 
 	EXPECT_CALL(callback, Call());
-	browser->GetActiveTabContainer()->CloseTab(browser->GetActiveTabContainer()->GetTab(tabId2));
+	browser->GetActiveTabBar()->CloseTab(browser->GetActiveTabBar()->GetTab(tabId2));
 }
 
 TEST_F(SearchTabsModelTest, DirectoryPropertiesChangedTriggersUpdatedSignal)

@@ -33,9 +33,9 @@ TEST_F(TabRestorerMenuTest, CheckItems)
 	PidlAbsolute pidl3;
 	int tabId3 = browser->AddTabAndReturnId(L"c:\\path3", {}, &pidl3);
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId3)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId3)));
 
 	TabRestorerMenu menu(&m_menuView, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
 		&m_resourceLoader);
@@ -51,10 +51,10 @@ TEST_F(TabRestorerMenuTest, Selection)
 	int tabId3 = browser->AddTabAndReturnId(L"c:\\path3");
 	int tabId4 = browser->AddTabAndReturnId(L"c:\\path4");
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId2)));
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId3)));
-	EXPECT_TRUE(tabContainer->CloseTab(tabContainer->GetTab(tabId4)));
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId2)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId3)));
+	EXPECT_TRUE(tabBar->CloseTab(tabBar->GetTab(tabId4)));
 
 	TabRestorerMenu menu(&m_menuView, &m_acceleratorManager, &m_tabRestorer, &m_shellIconLoader,
 		&m_resourceLoader);
@@ -67,7 +67,7 @@ TEST_F(TabRestorerMenuTest, Selection)
 	//
 	// and this call should select tab3.
 	RootMenuViewTestApi::SelectItemAtIndex(&m_menuView, 1, false, false);
-	EXPECT_EQ(tabContainer->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetNumTabs(), 2);
 
 	// tab3 was restored, so tab2 and tab4 should remain.
 	const auto &closedTabs = m_tabRestorer.GetClosedTabs();
@@ -85,14 +85,14 @@ TEST_F(TabRestorerMenuTest, Selection)
 	//
 	// Note that middle-clicking an item should have the same effect as left-clicking an item.
 	RootMenuViewTestApi::MiddleClickItemAtIndex(&m_menuView, 1, false, false);
-	EXPECT_EQ(tabContainer->GetNumTabs(), 3);
+	EXPECT_EQ(tabBar->GetNumTabs(), 3);
 
 	// tab2 was restored, so only tab4 should remain.
 	EXPECT_THAT(closedTabs, ElementsAre(Pointee(Field(&PreservedTab::id, tabId4))));
 
 	// This should restore tab4, leaving no tabs left to be restored.
 	RootMenuViewTestApi::SelectItemAtIndex(&m_menuView, 0, false, false);
-	EXPECT_EQ(tabContainer->GetNumTabs(), 4);
+	EXPECT_EQ(tabBar->GetNumTabs(), 4);
 
 	EXPECT_TRUE(closedTabs.empty());
 }

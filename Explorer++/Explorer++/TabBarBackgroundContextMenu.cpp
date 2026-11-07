@@ -3,21 +3,21 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabContainerBackgroundContextMenu.h"
+#include "TabBarBackgroundContextMenu.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceLoader.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabRestorer.h"
 
-TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
-	TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, BrowserWindow *browser,
-	const ResourceLoader *resourceLoader, PlatformContext *platformContext) :
+TabBarBackgroundContextMenu::TabBarBackgroundContextMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, TabBar *tabBar, TabRestorer *tabRestorer,
+	BookmarkTree *bookmarkTree, BrowserWindow *browser, const ResourceLoader *resourceLoader,
+	PlatformContext *platformContext) :
 	MenuBase(menuView, acceleratorManager),
-	m_tabContainer(tabContainer),
+	m_tabBar(tabBar),
 	m_tabRestorer(tabRestorer),
 	m_bookmarkTree(bookmarkTree),
 	m_browser(browser),
@@ -27,13 +27,13 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 	BuildMenu();
 }
 
-void TabContainerBackgroundContextMenu::BuildMenu()
+void TabBarBackgroundContextMenu::BuildMenu()
 {
 	m_rootMenuView->AppendItem(
 		MenuItemParams(m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_FILE_NEWTAB))
 			.SetSelectedCallback(
-				[this] { m_tabContainer->CreateNewTabInDefaultDirectory({ .selected = true }); }));
+				[this] { m_tabBar->CreateNewTabInDefaultDirectory({ .selected = true }); }));
 
 	m_rootMenuView->AppendItem(
 		MenuItemParams(m_resourceLoader->LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB))

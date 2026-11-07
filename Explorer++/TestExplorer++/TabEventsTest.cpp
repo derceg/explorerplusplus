@@ -65,7 +65,7 @@ TEST_F(TabEventsTest, SelectedSignal)
 	m_tabEvents.AddSelectedObserver(tabSelectedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(tabSelectedCallback, Call(Ref(*tab2)));
 
-	m_browser1->GetActiveTabContainer()->SelectTab(*tab2);
+	m_browser1->GetActiveTabBar()->SelectTab(*tab2);
 }
 
 TEST_F(TabEventsTest, MovedSignal)
@@ -77,7 +77,7 @@ TEST_F(TabEventsTest, MovedSignal)
 	m_tabEvents.AddMovedObserver(tabMovedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(tabMovedCallback, Call(Ref(*tab1), 0, 1));
 
-	m_browser1->GetActiveTabContainer()->MoveTab(*tab1, 1);
+	m_browser1->GetActiveTabBar()->MoveTab(*tab1, 1);
 }
 
 TEST_F(TabEventsTest, PreRemovalSignal)
@@ -90,7 +90,7 @@ TEST_F(TabEventsTest, PreRemovalSignal)
 		TabEventScope::Global());
 	EXPECT_CALL(tabPreRemovalCallback, Call(Ref(*tab2), 1));
 
-	m_browser1->GetActiveTabContainer()->CloseTab(*tab2);
+	m_browser1->GetActiveTabBar()->CloseTab(*tab2);
 }
 
 TEST_F(TabEventsTest, RemovedSignal)
@@ -103,7 +103,7 @@ TEST_F(TabEventsTest, RemovedSignal)
 	m_tabEvents.AddRemovedObserver(tabRemovedCallback.AsStdFunction(), TabEventScope::Global());
 	EXPECT_CALL(tabRemovedCallback, Call(Ref(*tab1)));
 
-	m_browser1->GetActiveTabContainer()->CloseTab(*tab1);
+	m_browser1->GetActiveTabBar()->CloseTab(*tab1);
 }
 
 TEST_F(TabEventsTest, SignalsFilteredByBrowser)

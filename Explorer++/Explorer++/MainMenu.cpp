@@ -23,7 +23,7 @@
 #include "ShellIconModel.h"
 #include "SortGroupMenu.h"
 #include "StockIconModel.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "TabRestorerMenu.h"
 #include "ToolbarOptionsMenu.h"
 #include "ToolsMenu.h"
@@ -717,7 +717,7 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 		return [this]
 		{
 			auto *shellBrowser =
-				m_browser->GetActiveTabContainer()->GetSelectedTab().GetShellBrowserImpl();
+				m_browser->GetActiveTabBar()->GetSelectedTab().GetShellBrowserImpl();
 
 			return shellBrowser->GetNumSelected() > 0
 				&& (shellBrowser->GetViewMode() == ViewMode::Details);
@@ -754,7 +754,7 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 	case IDM_ACTIONS_DESTROYFILES:
 		return [this]
 		{
-			return m_browser->GetActiveTabContainer()
+			return m_browser->GetActiveTabBar()
 					   ->GetSelectedTab()
 					   .GetShellBrowserImpl()
 					   ->GetNumSelected()

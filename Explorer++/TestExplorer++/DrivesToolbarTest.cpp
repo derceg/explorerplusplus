@@ -98,8 +98,8 @@ TEST_F(DrivesToolbarTest, OpenOnMiddleClick)
 	const auto &drives = m_driveModel.GetDrives();
 	ASSERT_EQ(toolbarItems.size(), drives.size());
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	int numTabs = tabContainer->GetNumTabs();
+	auto *tabBar = m_browser->GetActiveTabBar();
+	int numTabs = tabBar->GetNumTabs();
 
 	// TODO: This should use std::views::zip once C++23 support is available.
 	for (const auto &[toolbarItem, drive] : boost::combine(toolbarItems, drives))
@@ -110,8 +110,8 @@ TEST_F(DrivesToolbarTest, OpenOnMiddleClick)
 		button->OnMiddleClicked(MouseEvent{ { 0, 0 }, false, false });
 
 		numTabs++;
-		ASSERT_EQ(tabContainer->GetNumTabs(), numTabs);
-		EXPECT_EQ(tabContainer->GetTabByIndex(numTabs - 1).GetShellBrowser()->GetDirectory(),
+		ASSERT_EQ(tabBar->GetNumTabs(), numTabs);
+		EXPECT_EQ(tabBar->GetTabByIndex(numTabs - 1).GetShellBrowser()->GetDirectory(),
 			CreateSimplePidlForTest(drive));
 	}
 }

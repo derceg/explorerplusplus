@@ -64,7 +64,7 @@ TEST_F(TabListTest, Add)
 
 TEST_F(TabListTest, Remove)
 {
-	m_browser1->GetActiveTabContainer()->CloseTab(*m_tab1);
+	m_browser1->GetActiveTabBar()->CloseTab(*m_tab1);
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAll()), UnorderedElementsAre(m_tab2, m_tab3));
 
 	RemoveBrowser(m_browser2);
@@ -90,10 +90,10 @@ TEST_F(TabListTest, GetTabLastActivationPoint)
 {
 	VerifyActivationPointOrdering({ m_tab3, m_tab1, m_tab2 });
 
-	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab2);
+	m_browser1->GetActiveTabBar()->SelectTab(*m_tab2);
 	VerifyActivationPointOrdering({ m_tab2, m_tab3, m_tab1 });
 
-	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab1);
+	m_browser1->GetActiveTabBar()->SelectTab(*m_tab1);
 	VerifyActivationPointOrdering({ m_tab1, m_tab2, m_tab3 });
 }
 
@@ -102,11 +102,11 @@ TEST_F(TabListTest, GetAllByLastActivation)
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActivation()),
 		ElementsAre(m_tab3, m_tab1, m_tab2));
 
-	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab2);
+	m_browser1->GetActiveTabBar()->SelectTab(*m_tab2);
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActivation()),
 		ElementsAre(m_tab2, m_tab3, m_tab1));
 
-	m_browser1->GetActiveTabContainer()->SelectTab(*m_tab1);
+	m_browser1->GetActiveTabBar()->SelectTab(*m_tab1);
 	EXPECT_THAT(GeneratorToVector(m_tabList.GetAllByLastActivation()),
 		ElementsAre(m_tab1, m_tab2, m_tab3));
 }

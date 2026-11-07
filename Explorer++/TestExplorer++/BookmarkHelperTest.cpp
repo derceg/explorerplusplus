@@ -27,7 +27,7 @@ TEST_F(BookmarkHelperTest, AddBrowserTabsToBookmarkFolder)
 	BookmarkHelper::AddBrowserTabsToBookmarkFolder(&m_bookmarkTree, browser, parentFolder);
 
 	const auto &bookmarks = parentFolder->GetChildren();
-	const auto tabs = browser->GetActiveTabContainer()->GetAllTabsInOrder();
+	const auto tabs = browser->GetActiveTabBar()->GetAllTabsInOrder();
 	ASSERT_EQ(bookmarks.size(), tabs.size());
 
 	// TODO: This should use std::views::zip once C++23 support is available.

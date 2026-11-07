@@ -16,7 +16,7 @@ class BrowserPane;
 struct PreservedTab;
 class ShellBrowser;
 class Tab;
-class TabContainer;
+class TabBar;
 struct WindowStorageData;
 
 // Each browser window contains one or more browser panes, with each pane containing a set of tabs.
@@ -62,8 +62,8 @@ public:
 	virtual BrowserCommandController *GetCommandController() = 0;
 
 	virtual BrowserPane *GetActivePane() const = 0;
-	virtual TabContainer *GetActiveTabContainer() = 0;
-	virtual const TabContainer *GetActiveTabContainer() const = 0;
+	virtual TabBar *GetActiveTabBar() = 0;
+	virtual const TabBar *GetActiveTabBar() const = 0;
 	virtual void FocusActiveTab() = 0;
 	virtual Tab *CreateTabFromPreservedTab(const PreservedTab *tab) = 0;
 

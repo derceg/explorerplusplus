@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/FolderSettings.h"
-#include "TabContainer.h"
+#include "TabBar.h"
 #include "../Helper/Pidl.h"
 #include <vector>
 

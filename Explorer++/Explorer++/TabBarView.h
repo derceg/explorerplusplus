@@ -4,19 +4,19 @@
 
 #pragma once
 
-#include "MainTabViewImageListManager.h"
+#include "TabBarViewImageListManager.h"
 #include "TabView.h"
 
-class MainTabView : public TabView
+class TabBarView : public TabView
 {
 public:
-	MainTabView(HWND parent, const DarkModeManager *darkModeManager,
+	TabBarView(HWND parent, const DarkModeManager *darkModeManager,
 		const DarkModeColorProvider *darkModeColorProvider,
 		const LightModeColorProvider *lightModeColorProvider, const Config *config,
 		const ResourceLoader *resourceLoader);
 
-	MainTabViewImageListManager *GetImageListManager();
+	TabBarViewImageListManager *GetImageListManager();
 
 private:
-	MainTabViewImageListManager m_imageListManager;
+	TabBarViewImageListManager m_imageListManager;
 };

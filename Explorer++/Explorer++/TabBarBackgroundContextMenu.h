@@ -11,21 +11,21 @@ class BrowserWindow;
 class MenuView;
 class PlatformContext;
 class ResourceLoader;
-class TabContainer;
+class TabBar;
 class TabRestorer;
 
-class TabContainerBackgroundContextMenu : public MenuBase
+class TabBarBackgroundContextMenu : public MenuBase
 {
 public:
-	TabContainerBackgroundContextMenu(MenuView *menuView,
-		const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
-		TabRestorer *tabRestorer, BookmarkTree *bookmarkTree, BrowserWindow *browser,
-		const ResourceLoader *resourceLoader, PlatformContext *platformContext);
+	TabBarBackgroundContextMenu(MenuView *menuView,
+		const AcceleratorManager *acceleratorManager, TabBar *tabBar, TabRestorer *tabRestorer,
+		BookmarkTree *bookmarkTree, BrowserWindow *browser, const ResourceLoader *resourceLoader,
+		PlatformContext *platformContext);
 
 private:
 	void BuildMenu();
 
-	TabContainer *const m_tabContainer;
+	TabBar *const m_tabBar;
 	TabRestorer *const m_tabRestorer;
 	BookmarkTree *const m_bookmarkTree;
 	BrowserWindow *const m_browser;

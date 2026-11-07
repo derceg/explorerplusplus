@@ -6,12 +6,12 @@
 #include "BrowserWindowFake.h"
 #include "AppServices.h"
 #include "Config.h"
-#include "MainTabView.h"
 #include "PidlTestHelper.h"
 #include "RebarBandStorageData.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "Tab.h"
+#include "TabBarView.h"
 #include "TabEvents.h"
 #include "TabStorage.h"
 #include "WindowStorage.h"
@@ -21,10 +21,10 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	m_view(storageData.bounds),
 	m_config(appServices->GetConfig()),
 	m_shellBrowserFactory(this, appServices->GetNavigationEvents()),
-	m_tabView(m_view.GetHWND(), appServices->GetDarkModeManager(),
-		appServices->GetDarkModeColorProvider(), appServices->GetLightModeColorProvider(), appServices->GetConfig(),
-		appServices->GetResourceLoader()),
-	m_tabContainer(&m_tabView, this, &m_shellBrowserFactory, appServices)
+	m_tabBarView(m_view.GetHWND(), appServices->GetDarkModeManager(),
+		appServices->GetDarkModeColorProvider(), appServices->GetLightModeColorProvider(),
+		appServices->GetConfig(), appServices->GetResourceLoader()),
+	m_tabBar(&m_tabBarView, this, &m_shellBrowserFactory, appServices)
 {
 	for (const auto &tab : storageData.tabs)
 	{
@@ -38,11 +38,11 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 		}
 	}
 
-	auto *tabContainer = GetActiveTabContainer();
+	auto *tabBar = GetActiveTabBar();
 
-	if (storageData.selectedTab >= 0 && storageData.selectedTab < tabContainer->GetNumTabs())
+	if (storageData.selectedTab >= 0 && storageData.selectedTab < tabBar->GetNumTabs())
 	{
-		tabContainer->SelectTabAtIndex(storageData.selectedTab);
+		tabBar->SelectTabAtIndex(storageData.selectedTab);
 	}
 }
 
@@ -66,14 +66,14 @@ BrowserPane *BrowserWindowFake::GetActivePane() const
 	return nullptr;
 }
 
-TabContainer *BrowserWindowFake::GetActiveTabContainer()
+TabBar *BrowserWindowFake::GetActiveTabBar()
 {
-	return &m_tabContainer;
+	return &m_tabBar;
 }
 
-const TabContainer *BrowserWindowFake::GetActiveTabContainer() const
+const TabBar *BrowserWindowFake::GetActiveTabBar() const
 {
-	return &m_tabContainer;
+	return &m_tabBar;
 }
 
 void BrowserWindowFake::FocusActiveTab()
@@ -82,7 +82,7 @@ void BrowserWindowFake::FocusActiveTab()
 
 Tab *BrowserWindowFake::CreateTabFromPreservedTab(const PreservedTab *tab)
 {
-	return &GetActiveTabContainer()->CreateNewTab(*tab);
+	return &GetActiveTabBar()->CreateNewTab(*tab);
 }
 
 void BrowserWindowFake::OpenDefaultItem(OpenFolderDisposition openFolderDisposition)
@@ -147,14 +147,14 @@ void BrowserWindowFake::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::BackgroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		GetActiveTabContainer()->CreateNewTab(navigateParams);
+		GetActiveTabBar()->CreateNewTab(navigateParams);
 	}
 	break;
 
 	case OpenFolderDisposition::ForegroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		GetActiveTabContainer()->CreateNewTab(navigateParams, { .selected = true });
+		GetActiveTabBar()->CreateNewTab(navigateParams, { .selected = true });
 	}
 	break;
 
@@ -184,12 +184,12 @@ void BrowserWindowFake::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstr
 
 ShellBrowser *BrowserWindowFake::GetActiveShellBrowser()
 {
-	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
+	return GetActiveTabBar()->GetSelectedTab().GetShellBrowser();
 }
 
 const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
 {
-	return GetActiveTabContainer()->GetSelectedTab().GetShellBrowser();
+	return GetActiveTabBar()->GetSelectedTab().GetShellBrowser();
 }
 
 void BrowserWindowFake::StartMainToolbarCustomization()
@@ -211,12 +211,12 @@ WindowStorageData BrowserWindowFake::GetStorageData() const
 	BOOL res = GetWindowPlacement(m_view.GetHWND(), &placement);
 	CHECK(res);
 
-	const auto *tabContainer = GetActiveTabContainer();
+	const auto *tabBar = GetActiveTabBar();
 
 	return { .bounds = placement.rcNormalPosition,
 		.showState = NativeShowStateToShowState(placement.showCmd),
-		.tabs = tabContainer->GetStorageData(),
-		.selectedTab = tabContainer->GetSelectedTabIndex() };
+		.tabs = tabBar->GetStorageData(),
+		.selectedTab = tabBar->GetSelectedTabIndex() };
 }
 
 bool BrowserWindowFake::IsActive() const
@@ -238,7 +238,7 @@ void BrowserWindowFake::Close()
 
 void BrowserWindowFake::NotifyBrowserClosing()
 {
-	GetActiveTabContainer()->CloseAllTabs();
+	GetActiveTabBar()->CloseAllTabs();
 }
 
 void BrowserWindowFake::NotifyTopLevelMenuShown()
@@ -295,6 +295,6 @@ Tab *BrowserWindowFake::AddTab(const std::wstring &path, const TabSettings &tabS
 Tab *BrowserWindowFake::AddTab(const PidlAbsolute &pidl, const TabSettings &tabSettings)
 {
 	auto navigateParams = NavigateParams::Normal(pidl.Raw());
-	auto &tab = GetActiveTabContainer()->CreateNewTab(navigateParams, tabSettings);
+	auto &tab = GetActiveTabBar()->CreateNewTab(navigateParams, tabSettings);
 	return &tab;
 }

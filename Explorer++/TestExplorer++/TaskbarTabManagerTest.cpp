@@ -316,8 +316,8 @@ TEST_F(TaskbarTabManagerTest, TabCreation)
 	m_browser->AddTab(L"d:\\");
 	m_browser->AddTab(L"e:\\");
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabContainer->GetAllTabsInOrder()));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabBar->GetAllTabsInOrder()));
 }
 
 TEST_F(TaskbarTabManagerTest, TabRemoval)
@@ -326,9 +326,9 @@ TEST_F(TaskbarTabManagerTest, TabRemoval)
 	auto *tab2 = m_browser->AddTab(L"d:\\");
 	m_browser->AddTab(L"e:\\");
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->CloseTab(*tab2);
-	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabContainer->GetAllTabsInOrder()));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->CloseTab(*tab2);
+	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabBar->GetAllTabsInOrder()));
 }
 
 TEST_F(TaskbarTabManagerTest, TabActivation)
@@ -337,13 +337,13 @@ TEST_F(TaskbarTabManagerTest, TabActivation)
 	auto *tab2 = m_browser->AddTab(L"d:\\");
 	auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->SelectTab(*tab2);
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->SelectTab(*tab2);
 	auto *activeTab = m_taskbarTabManager->GetTabForProxyWindowForTesting(
 		m_taskbarList->GetActiveTabForWindow(m_browser->GetHWND()));
 	EXPECT_EQ(activeTab, tab2);
 
-	tabContainer->SelectTab(*tab3);
+	tabBar->SelectTab(*tab3);
 	activeTab = m_taskbarTabManager->GetTabForProxyWindowForTesting(
 		m_taskbarList->GetActiveTabForWindow(m_browser->GetHWND()));
 	EXPECT_EQ(activeTab, tab3);
@@ -355,12 +355,12 @@ TEST_F(TaskbarTabManagerTest, TabMove)
 	m_browser->AddTab(L"d:\\");
 	auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->MoveTab(*tab1, 2);
-	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabContainer->GetAllTabsInOrder()));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->MoveTab(*tab1, 2);
+	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabBar->GetAllTabsInOrder()));
 
-	tabContainer->MoveTab(*tab3, 0);
-	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabContainer->GetAllTabsInOrder()));
+	tabBar->MoveTab(*tab3, 0);
+	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabBar->GetAllTabsInOrder()));
 }
 
 TEST_F(TaskbarTabManagerTest, ProxyWindowTitle)
@@ -387,8 +387,8 @@ TEST_F(TaskbarTabManagerTest, ActivationHandling)
 	ASSERT_EQ(proxyWindows.size(), 2u);
 
 	SendMessage(proxyWindows[1], WM_ACTIVATE, MAKEWPARAM(WA_ACTIVE, 0), 0);
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	EXPECT_TRUE(tabContainer->IsTabSelected(*tab2));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	EXPECT_TRUE(tabBar->IsTabSelected(*tab2));
 }
 
 TEST_F(TaskbarTabManagerTest, CloseTabHandling)
@@ -401,7 +401,7 @@ TEST_F(TaskbarTabManagerTest, CloseTabHandling)
 	ASSERT_EQ(proxyWindows.size(), 3u);
 
 	SendMessage(proxyWindows[1], WM_CLOSE, 0, 0);
-	EXPECT_THAT(m_browser->GetActiveTabContainer()->GetAllTabsInOrder(), ElementsAre(tab1, tab3));
+	EXPECT_THAT(m_browser->GetActiveTabBar()->GetAllTabsInOrder(), ElementsAre(tab1, tab3));
 }
 
 TEST_F(TaskbarTabManagerTest, TabsReAddedAfterReEnabling)
@@ -414,8 +414,8 @@ TEST_F(TaskbarTabManagerTest, TabsReAddedAfterReEnabling)
 	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetHWND()));
 
 	m_config.showTaskbarThumbnails = true;
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabContainer->GetAllTabsInOrder()));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabBar->GetAllTabsInOrder()));
 }
 
 TEST_F(TaskbarTabManagerTest, TabsClearedOnDestruction)
@@ -455,6 +455,6 @@ TEST_F(TaskbarTabManagerDelayedTaskbarButtonTest, TabsCreatedBeforeTaskbarButton
 	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetHWND()));
 
 	SendTaskbarButtonCreatedMessage();
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabContainer->GetAllTabsInOrder()));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	EXPECT_THAT(GetTabsForProxyWindows(), Pointwise(Eq(), tabBar->GetAllTabsInOrder()));
 }

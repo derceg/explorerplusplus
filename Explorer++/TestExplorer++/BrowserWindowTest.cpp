@@ -25,10 +25,10 @@ TEST_F(BrowserWindowTest, InitializeWithStorageData)
 	storageData.selectedTab = 2;
 
 	auto *browser = AddBrowser({ storageData });
-	auto *tabContainer = browser->GetActiveTabContainer();
-	EXPECT_EQ(tabContainer->GetSelectedTabIndex(), storageData.selectedTab);
+	auto *tabBar = browser->GetActiveTabBar();
+	EXPECT_EQ(tabBar->GetSelectedTabIndex(), storageData.selectedTab);
 
-	auto tabs = tabContainer->GetAllTabsInOrder();
+	auto tabs = tabBar->GetAllTabsInOrder();
 	ASSERT_EQ(tabs.size(), storageData.tabs.size());
 
 	// TODO: This should use std::views::zip once C++23 support is available.
@@ -69,13 +69,13 @@ TEST_F(BrowserWindowTest, GetStorageData)
 	auto *tab3 = browser->AddTab(L"g:\\");
 	tab3->SetLockState(Tab::LockState::AddressLocked);
 
-	auto *tabContainer = browser->GetActiveTabContainer();
-	tabContainer->SelectTab(*tab2);
+	auto *tabBar = browser->GetActiveTabBar();
+	tabBar->SelectTab(*tab2);
 
 	auto storageData = browser->GetStorageData();
-	EXPECT_EQ(storageData.selectedTab, tabContainer->GetSelectedTabIndex());
+	EXPECT_EQ(storageData.selectedTab, tabBar->GetSelectedTabIndex());
 
-	auto tabs = tabContainer->GetAllTabsInOrder();
+	auto tabs = tabBar->GetAllTabsInOrder();
 	ASSERT_EQ(storageData.tabs.size(), tabs.size());
 
 	// TODO: This should use std::views::zip once C++23 support is available.

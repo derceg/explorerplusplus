@@ -36,12 +36,12 @@ TEST_F(BrowserCommandControllerTest, CloseTab)
 {
 	int tabId2 = m_browser->AddTabAndReturnId(L"c:\\");
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->SelectTab(tabContainer->GetTab(tabId2));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->SelectTab(tabBar->GetTab(tabId2));
 
 	m_commandController.ExecuteCommand(IDM_FILE_CLOSETAB);
-	EXPECT_EQ(tabContainer->GetNumTabs(), 1);
-	EXPECT_EQ(tabContainer->MaybeGetTab(tabId2), nullptr);
+	EXPECT_EQ(tabBar->GetNumTabs(), 1);
+	EXPECT_EQ(tabBar->MaybeGetTab(tabId2), nullptr);
 }
 
 TEST_F(BrowserCommandControllerTest, NewWindow)
@@ -162,9 +162,9 @@ TEST_F(BrowserCommandControllerTest, BackInNewTab)
 	// folder.
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 1);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(m_originalPath));
 }
 
@@ -188,9 +188,9 @@ TEST_F(BrowserCommandControllerTest, ForwardInNewTab)
 	m_commandController.ExecuteCommand(IDM_GO_FORWARD, OpenFolderDisposition::ForegroundTab);
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetCurrentIndex(), 0);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(path));
 }
 
@@ -215,9 +215,9 @@ TEST_F(BrowserCommandControllerTest, UpInNewTab)
 	m_commandController.ExecuteCommand(IDM_GO_UP, OpenFolderDisposition::ForegroundTab);
 	EXPECT_EQ(m_tab->GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(), 2);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
+	auto *tabBar = m_browser->GetActiveTabBar();
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectory(),
 		CreateSimplePidlForTest(L"c:\\windows"));
 }
 
@@ -226,11 +226,11 @@ TEST_F(BrowserCommandControllerTest, SelectAdjacentTab)
 	m_browser->AddTab(L"c:\\");
 
 	m_commandController.ExecuteCommand(IDA_SELECT_NEXT_TAB);
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	EXPECT_EQ(tabContainer->GetSelectedTabIndex(), 1);
+	auto *tabBar = m_browser->GetActiveTabBar();
+	EXPECT_EQ(tabBar->GetSelectedTabIndex(), 1);
 
 	m_commandController.ExecuteCommand(IDA_SELECT_PREVIOUS_TAB);
-	EXPECT_EQ(tabContainer->GetSelectedTabIndex(), 0);
+	EXPECT_EQ(tabBar->GetSelectedTabIndex(), 0);
 }
 
 TEST_F(BrowserCommandControllerTest, DuplicateTab)
@@ -238,13 +238,13 @@ TEST_F(BrowserCommandControllerTest, DuplicateTab)
 	PidlAbsolute pidl;
 	int tabId2 = m_browser->AddTabAndReturnId(L"d:\\project", {}, &pidl);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->SelectTab(tabContainer->GetTab(tabId2));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->SelectTab(tabBar->GetTab(tabId2));
 
 	m_commandController.ExecuteCommand(IDA_DUPLICATE_TAB);
-	ASSERT_EQ(tabContainer->GetNumTabs(), 3);
+	ASSERT_EQ(tabBar->GetNumTabs(), 3);
 
-	const auto &duplicatedTab = tabContainer->GetTabByIndex(2);
+	const auto &duplicatedTab = tabBar->GetTabByIndex(2);
 	EXPECT_NE(duplicatedTab.GetId(), tabId2);
 	EXPECT_EQ(duplicatedTab.GetShellBrowser()->GetDirectory(), pidl);
 }
@@ -260,7 +260,7 @@ TEST_F(BrowserCommandControllerTest, SelectTabAtIndex)
 	m_browser->AddTab(L"c:\\");
 
 	m_commandController.ExecuteCommand(IDA_SELECT_TAB_4);
-	EXPECT_EQ(m_browser->GetActiveTabContainer()->GetSelectedTabIndex(), 3);
+	EXPECT_EQ(m_browser->GetActiveTabBar()->GetSelectedTabIndex(), 3);
 }
 
 TEST_F(BrowserCommandControllerTest, SelectTabAtIndexPastEnd)
@@ -269,7 +269,7 @@ TEST_F(BrowserCommandControllerTest, SelectTabAtIndexPastEnd)
 
 	// Attempting to select a tab past the last tab should result in the last tab being selected.
 	m_commandController.ExecuteCommand(IDA_SELECT_TAB_7);
-	EXPECT_EQ(m_browser->GetActiveTabContainer()->GetSelectedTabIndex(), 1);
+	EXPECT_EQ(m_browser->GetActiveTabBar()->GetSelectedTabIndex(), 1);
 }
 
 TEST_F(BrowserCommandControllerTest, SelectLastTab)
@@ -279,7 +279,7 @@ TEST_F(BrowserCommandControllerTest, SelectLastTab)
 	m_browser->AddTab(L"c:\\");
 
 	m_commandController.ExecuteCommand(IDA_SELECT_LAST_TAB);
-	EXPECT_EQ(m_browser->GetActiveTabContainer()->GetSelectedTabIndex(), 3);
+	EXPECT_EQ(m_browser->GetActiveTabBar()->GetSelectedTabIndex(), 3);
 }
 
 TEST_F(BrowserCommandControllerTest, RestoreLastTab)
@@ -287,10 +287,10 @@ TEST_F(BrowserCommandControllerTest, RestoreLastTab)
 	auto pidl = CreateSimplePidlForTest(L"c:\\path\\to\\folder");
 	m_browser->AddTab(pidl);
 
-	auto *tabContainer = m_browser->GetActiveTabContainer();
-	tabContainer->CloseTab(tabContainer->GetTabByIndex(1));
+	auto *tabBar = m_browser->GetActiveTabBar();
+	tabBar->CloseTab(tabBar->GetTabByIndex(1));
 
 	m_commandController.ExecuteCommand(IDA_RESTORE_LAST_TAB);
-	ASSERT_EQ(tabContainer->GetNumTabs(), 2);
-	EXPECT_EQ(tabContainer->GetTabByIndex(1).GetShellBrowser()->GetDirectory(), pidl);
+	ASSERT_EQ(tabBar->GetNumTabs(), 2);
+	EXPECT_EQ(tabBar->GetTabByIndex(1).GetShellBrowser()->GetDirectory(), pidl);
 }
