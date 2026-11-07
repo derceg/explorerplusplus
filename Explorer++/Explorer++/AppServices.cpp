@@ -180,21 +180,6 @@ void AppServices::SetConfig(Config *config)
 	Set(config);
 }
 
-DarkModeColorProvider *AppServices::GetDarkModeColorProvider()
-{
-	return Get<DarkModeColorProvider>();
-}
-
-const DarkModeColorProvider *AppServices::GetDarkModeColorProvider() const
-{
-	return Get<DarkModeColorProvider>();
-}
-
-void AppServices::SetDarkModeColorProvider(DarkModeColorProvider *darkModeColorProvider)
-{
-	Set(darkModeColorProvider);
-}
-
 DarkModeManager *AppServices::GetDarkModeManager()
 {
 	return Get<DarkModeManager>();
@@ -283,21 +268,6 @@ const HistoryModel *AppServices::GetHistoryModel() const
 void AppServices::SetHistoryModel(HistoryModel *historyModel)
 {
 	Set(historyModel);
-}
-
-LightModeColorProvider *AppServices::GetLightModeColorProvider()
-{
-	return Get<LightModeColorProvider>();
-}
-
-const LightModeColorProvider *AppServices::GetLightModeColorProvider() const
-{
-	return Get<LightModeColorProvider>();
-}
-
-void AppServices::SetLightModeColorProvider(LightModeColorProvider *lightModeColorProvider)
-{
-	Set(lightModeColorProvider);
 }
 
 ModelessDialogList *AppServices::GetModelessDialogList()
@@ -479,6 +449,21 @@ const ThemeManager *AppServices::GetThemeManager() const
 void AppServices::SetThemeManager(ThemeManager *themeManager)
 {
 	Set(themeManager);
+}
+
+WindowThemeManager *AppServices::GetWindowThemeManager()
+{
+	return Get<WindowThemeManager>();
+}
+
+const WindowThemeManager *AppServices::GetWindowThemeManager() const
+{
+	return Get<WindowThemeManager>();
+}
+
+void AppServices::SetWindowThemeManager(WindowThemeManager *windowThemeManager)
+{
+	Set(windowThemeManager);
 }
 
 void AppServices::CheckFullyInitialized() const

@@ -6,15 +6,13 @@
 
 #include "ViewBase.h"
 
-class DarkModeColorProvider;
-class DarkModeManager;
 class TabBarBackingViewDelegate;
+class ThemeManager;
 
 class TabBarBackingView : public ViewBase
 {
 public:
-	TabBarBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
-		const DarkModeColorProvider *darkModeColorProvider);
+	TabBarBackingView(ViewBase *parent, const ThemeManager *themeManager);
 
 	void SetDelegate(TabBarBackingViewDelegate *delegate);
 
@@ -34,7 +32,6 @@ private:
 	void OnPrintClient(HDC hdc);
 	void PerformPaint(const PAINTSTRUCT &ps);
 
-	const DarkModeManager *const m_darkModeManager;
-	const DarkModeColorProvider *const m_darkModeColorProvider;
+	const ThemeManager *const m_themeManager;
 	TabBarBackingViewDelegate *m_delegate = nullptr;
 };

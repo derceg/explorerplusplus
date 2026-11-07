@@ -4,12 +4,22 @@
 
 #pragma once
 
+#include "DarkModeColorProvider.h"
+#include "LightModeColorProvider.h"
+
+class DarkModeManager;
+
 class ThemeManager
 {
 public:
-	virtual ~ThemeManager() = default;
+	ThemeManager(const DarkModeManager *darkModeManager);
 
-	virtual void TrackTopLevelWindow(HWND hwnd) = 0;
-	virtual void UntrackTopLevelWindow(HWND hwnd) = 0;
-	virtual void ApplyThemeToWindowAndChildren(HWND hwnd) = 0;
+	const ColorProvider *GetCurrentColorProvider() const;
+	const DarkModeColorProvider *GetDarkModeColorProvider() const;
+
+private:
+	const DarkModeManager *const m_darkModeManager;
+
+	DarkModeColorProvider m_darkModeColorProvider;
+	LightModeColorProvider m_lightModeColorProvider;
 };

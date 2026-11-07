@@ -10,15 +10,15 @@
 #include <memory>
 
 class DarkModeManager;
-class ThemeManager;
 class ThemeWindowTracker;
+class WindowThemeManager;
 
 // Loads a resource, using the Windows API resource functions.
 class Win32ResourceLoader : public ResourceLoader
 {
 public:
 	Win32ResourceLoader(HINSTANCE resourceInstance, IconSet iconSet,
-		const DarkModeManager *darkModeManager, ThemeManager *themeManager);
+		const DarkModeManager *darkModeManager, WindowThemeManager *windowThemeManager);
 
 	std::wstring LoadString(UINT stringId) const override;
 	std::optional<std::wstring> MaybeLoadString(UINT stringId) const override;
@@ -45,18 +45,18 @@ private:
 	{
 	public:
 		static ThemedDialogWrapper *Create(DialogProc originalDialogProc,
-			ThemeManager *themeManager);
+			WindowThemeManager *windowThemeManager);
 
 		static INT_PTR CALLBACK ThemedDialogProcStub(HWND dialog, UINT msg, WPARAM wParam,
 			LPARAM lParam);
 
 	private:
-		ThemedDialogWrapper(DialogProc originalDialogProc, ThemeManager *themeManager);
+		ThemedDialogWrapper(DialogProc originalDialogProc, WindowThemeManager *windowThemeManager);
 
 		INT_PTR ThemedDialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam);
 
 		const DialogProc m_originalDialogProc;
-		ThemeManager *const m_themeManager;
+		WindowThemeManager *const m_windowThemeManager;
 		std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 	};
 
@@ -70,5 +70,5 @@ private:
 	const HINSTANCE m_resourceInstance;
 	const IconSet m_iconSet;
 	const DarkModeManager *const m_darkModeManager;
-	ThemeManager *const m_themeManager;
+	WindowThemeManager *const m_windowThemeManager;
 };

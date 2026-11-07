@@ -4,17 +4,17 @@
 
 #pragma once
 
-class ThemeManager;
+class WindowThemeManager;
 
-// This class automatically tracks/untracks a window with the ThemeManager class. It should only be
-// used with top-level windows (e.g. the main window or a dialog).
+// This class automatically tracks/untracks a window with the WindowThemeManager class. It should
+// only be used with top-level windows (e.g. the main window or a dialog).
 class ThemeWindowTracker
 {
 public:
-	ThemeWindowTracker(HWND hwnd, ThemeManager *themeManager);
+	ThemeWindowTracker(HWND hwnd, WindowThemeManager *windowThemeManager);
 	~ThemeWindowTracker();
 
 private:
 	const HWND m_hwnd;
-	ThemeManager *const m_themeManager;
+	WindowThemeManager *const m_windowThemeManager;
 };

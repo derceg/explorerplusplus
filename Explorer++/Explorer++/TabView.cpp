@@ -4,14 +4,12 @@
 
 #include "stdafx.h"
 #include "TabView.h"
-#include "DarkModeColorProvider.h"
-#include "DarkModeManager.h"
 #include "Icon.h"
-#include "LightModeColorProvider.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "SystemFontHelper.h"
 #include "TabViewDelegate.h"
+#include "ThemeManager.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DoubleBufferedPaint.h"
 #include "../Helper/DpiCompatibility.h"
@@ -88,14 +86,10 @@ void TabViewItem::NotifyParentOfUpdate() const
 	}
 }
 
-TabView::TabView(HWND parent, DWORD style, const DarkModeManager *darkModeManager,
-	const DarkModeColorProvider *darkModeColorProvider,
-	const LightModeColorProvider *lightModeColorProvider, const Config *config,
+TabView::TabView(HWND parent, DWORD style, const ThemeManager *themeManager, const Config *config,
 	const ResourceLoader *resourceLoader) :
 	ViewBase(CreateTabControl(parent, style)),
-	m_darkModeManager(darkModeManager),
-	m_darkModeColorProvider(darkModeColorProvider),
-	m_lightModeColorProvider(lightModeColorProvider),
+	m_themeManager(themeManager),
 	m_resourceLoader(resourceLoader),
 	m_fontSetter(GetHWND(), config, GetDefaultSystemFontForDefaultDpi())
 {
@@ -754,9 +748,7 @@ void TabView::UpdateDpiDependentResources()
 void TabView::OnPaint()
 {
 	DoubleBufferedPaint doubleBufferedPaint(GetHWND());
-	HDC memDC = doubleBufferedPaint.GetMemoryDC();
-	RECT paintRect = doubleBufferedPaint.GetPaintRect();
-	Paint(memDC, paintRect);
+	Paint(doubleBufferedPaint.GetMemoryDC(), doubleBufferedPaint.GetPaintRect());
 }
 
 void TabView::Paint(HDC hdc, const RECT &paintRect)
@@ -778,15 +770,16 @@ void TabView::Paint(HDC hdc, const RECT &paintRect)
 	auto res = GetClientRect(GetHWND(), &clientRect);
 	DCHECK(res);
 
+	auto *colorProvider = m_themeManager->GetCurrentColorProvider();
+
 	RECT bottomBorderRect = { clientRect.left, clientRect.bottom - 2, clientRect.right,
 		clientRect.bottom - 1 };
-	int frameRes = FrameRect(hdc, &bottomBorderRect, GetCurrentColorProvider()->GetBorderBrush());
+	int frameRes = FrameRect(hdc, &bottomBorderRect, colorProvider->GetBorderBrush());
 	DCHECK_NE(frameRes, 0);
 
 	RECT bottomEdgeRect = { clientRect.left, clientRect.bottom - 1, clientRect.right,
 		clientRect.bottom };
-	frameRes = FrameRect(hdc, &bottomEdgeRect,
-		GetCurrentColorProvider()->GetSelectedItemBackgroundBrush());
+	frameRes = FrameRect(hdc, &bottomEdgeRect, colorProvider->GetSelectedItemBackgroundBrush());
 	DCHECK_NE(frameRes, 0);
 
 	int modeRes = SetBkMode(hdc, TRANSPARENT);
@@ -845,7 +838,7 @@ void TabView::DrawTab(HDC hdc, int index)
 		backgroundRect.bottom += 1;
 	}
 
-	auto *colorProvider = GetCurrentColorProvider();
+	auto *colorProvider = m_themeManager->GetCurrentColorProvider();
 
 	auto backgroundBrush = isSelected ? colorProvider->GetSelectedItemBackgroundBrush()
 		: isHot                       ? colorProvider->GetHotItemBackgroundBrush()
@@ -973,18 +966,6 @@ RECT TabView::GetTabRectForPainting(int index) const
 	}
 
 	return itemRect;
-}
-
-const ColorProvider *TabView::GetCurrentColorProvider() const
-{
-	if (m_darkModeManager->IsDarkModeEnabled())
-	{
-		return m_darkModeColorProvider;
-	}
-	else
-	{
-		return m_lightModeColorProvider;
-	}
 }
 
 void TabView::OnGetDispInfo(NMTTDISPINFO *dispInfo)

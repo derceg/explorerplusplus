@@ -17,12 +17,10 @@
 
 class ColorProvider;
 struct Config;
-class DarkModeColorProvider;
-class DarkModeManager;
-class LightModeColorProvider;
 class ResourceLoader;
 class TabView;
 class TabViewDelegate;
+class ThemeManager;
 
 // Represents an individual tab within the view.
 class TabViewItem
@@ -70,9 +68,7 @@ public:
 		Right
 	};
 
-	TabView(HWND parent, DWORD style, const DarkModeManager *darkModeManager,
-		const DarkModeColorProvider *darkModeColorProvider,
-		const LightModeColorProvider *lightModeColorProvider, const Config *config,
+	TabView(HWND parent, DWORD style, const ThemeManager *themeManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 	~TabView();
 
@@ -207,7 +203,6 @@ private:
 	void DrawTab(HDC hdc, int index);
 	TabContentLayout GetTabContentLayout(int index) const;
 	RECT GetTabRectForPainting(int index) const;
-	const ColorProvider *GetCurrentColorProvider() const;
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 	void OnSelectionChanged();
 	bool IsValidIndex(int index) const;
@@ -215,9 +210,7 @@ private:
 	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &pt) const;
 	void OnFontUpdated();
 
-	const DarkModeManager *const m_darkModeManager;
-	const DarkModeColorProvider *const m_darkModeColorProvider;
-	const LightModeColorProvider *const m_lightModeColorProvider;
+	const ThemeManager *const m_themeManager;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<std::unique_ptr<TabViewItem>> m_tabs;
 	TabViewDelegate *m_delegate = nullptr;

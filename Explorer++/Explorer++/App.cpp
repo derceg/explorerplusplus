@@ -50,7 +50,8 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_directoryWatcherFactory(&m_config, &m_shellWatcherManager, m_runtime.GetUiThreadExecutor()),
 	m_darkModeManager(&m_eventWindow, &m_config),
-	m_themeManager(&m_darkModeManager, &m_darkModeColorProvider),
+	m_themeManager(&m_darkModeManager),
+	m_windowThemeManager(&m_darkModeManager, m_themeManager.GetDarkModeColorProvider()),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_iconFetcher(&m_runtime, &m_cachedIcons),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
@@ -280,7 +281,7 @@ void App::SetUpLanguageResourceInstance()
 	}
 
 	m_resourceLoader = std::make_unique<Win32ResourceLoader>(resourceInstance, m_config.iconSet,
-		&m_darkModeManager, &m_themeManager);
+		&m_darkModeManager, &m_windowThemeManager);
 	m_browserWindowFactory =
 		std::make_unique<BrowserWindowFactoryImpl>(&m_appServices, resourceInstance);
 }
@@ -299,14 +300,12 @@ void App::SetUpAppServices()
 	m_appServices.SetColorRuleModel(m_colorRuleModel.get());
 	m_appServices.SetCommandLineSettings(m_commandLineSettings);
 	m_appServices.SetConfig(&m_config);
-	m_appServices.SetDarkModeColorProvider(&m_darkModeColorProvider);
 	m_appServices.SetDarkModeManager(&m_darkModeManager);
 	m_appServices.SetDirectoryWatcherFactory(&m_directoryWatcherFactory);
 	m_appServices.SetDriveModel(&m_driveModel);
 	m_appServices.SetFeatureList(&m_featureList);
 	m_appServices.SetFrequentLocationsModel(&m_frequentLocationsModel);
 	m_appServices.SetHistoryModel(&m_historyModel);
-	m_appServices.SetLightModeColorProvider(&m_lightModeColorProvider);
 	m_appServices.SetModelessDialogList(&m_modelessDialogList);
 	m_appServices.SetNavigationEvents(&m_navigationEvents);
 	m_appServices.SetPlatformContext(&m_platformContext);
@@ -319,6 +318,7 @@ void App::SetUpAppServices()
 	m_appServices.SetTabList(&m_tabList);
 	m_appServices.SetTabRestorer(&m_tabRestorer);
 	m_appServices.SetThemeManager(&m_themeManager);
+	m_appServices.SetWindowThemeManager(&m_windowThemeManager);
 	m_appServices.CheckFullyInitialized();
 }
 

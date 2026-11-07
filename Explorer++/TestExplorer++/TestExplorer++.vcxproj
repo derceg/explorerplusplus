@@ -266,7 +266,7 @@
     <ClCompile Include="RebarViewTestApi.cpp" />
     <ClCompile Include="RootMenuViewTest.cpp" />
     <ClCompile Include="MenuItemKeyTest.cpp" />
-    <ClCompile Include="NoOpThemeManager.cpp" />
+    <ClCompile Include="NoOpWindowThemeManager.cpp" />
     <ClCompile Include="PidlHelperTest.cpp" />
     <ClCompile Include="RootMenuViewTestApi.cpp" />
     <ClCompile Include="SearchTabsListViewModelTest.cpp" />
@@ -502,7 +502,7 @@
     <ClInclude Include="NoOpClipboardWatcher.h" />
     <ClInclude Include="CopiedBookmark.h" />
     <ClInclude Include="DarkModeManagerFake.h" />
-    <ClInclude Include="NoOpThemeManager.h" />
+    <ClInclude Include="NoOpWindowThemeManager.h" />
     <ClInclude Include="RebarViewTestApi.h" />
     <ClInclude Include="RootMenuViewTestApi.h" />
     <ClInclude Include="ShellNameParserFake.h" />

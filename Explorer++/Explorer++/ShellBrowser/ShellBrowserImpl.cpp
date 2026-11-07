@@ -31,10 +31,10 @@
 #include "ShellNavigationController.h"
 #include "SortModes.h"
 #include "SplitFileDialog.h"
-#include "ThemeManager.h"
 #include "ViewModeHelper.h"
 #include "ViewModes.h"
 #include "WildcardSelectDialog.h"
+#include "WindowThemeManager.h"
 #include "../Helper/ClipboardStore.h"
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/Controls.h"
@@ -223,7 +223,7 @@ void ShellBrowserImpl::InitializeListView()
 	m_connections.push_back(m_config->globalFolderSettings.oneClickActivateHoverTime.addObserver(
 		std::bind_front(&ShellBrowserImpl::OnOneClickActivateHoverTimeUpdated, this)));
 
-	m_appServices->GetThemeManager()->ApplyThemeToWindowAndChildren(m_listView);
+	m_appServices->GetWindowThemeManager()->ApplyThemeToWindowAndChildren(m_listView);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclass>(m_listView,
 		std::bind_front(&ShellBrowserImpl::ListViewProc, this)));

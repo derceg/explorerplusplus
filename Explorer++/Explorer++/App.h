@@ -13,7 +13,6 @@
 #include "BrowserWindowFactoryImpl.h"
 #include "CommandLine.h"
 #include "Config.h"
-#include "DarkModeColorProvider.h"
 #include "DarkModeManagerImpl.h"
 #include "DirectoryWatcherFactoryImpl.h"
 #include "DriveModel.h"
@@ -24,7 +23,6 @@
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
-#include "LightModeColorProvider.h"
 #include "ModelessDialogList.h"
 #include "PlatformContextImpl.h"
 #include "Plugins/PluginCommandManager.h"
@@ -39,7 +37,8 @@
 #include "TabEvents.h"
 #include "TabList.h"
 #include "TabRestorer.h"
-#include "ThemeManagerImpl.h"
+#include "ThemeManager.h"
+#include "WindowThemeManagerImpl.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardWatcherImpl.h"
 #include "../Helper/UniqueResources.h"
@@ -108,9 +107,8 @@ private:
 	ShellNameParserImpl m_shellNameParser;
 	DirectoryWatcherFactoryImpl m_directoryWatcherFactory;
 	DarkModeManagerImpl m_darkModeManager;
-	DarkModeColorProvider m_darkModeColorProvider;
-	LightModeColorProvider m_lightModeColorProvider;
-	ThemeManagerImpl m_themeManager;
+	ThemeManager m_themeManager;
+	WindowThemeManagerImpl m_windowThemeManager;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherImpl m_iconFetcher;
 	BrowserList m_browserList;

@@ -8,7 +8,7 @@
 #include "DarkModeManager.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "ThemeManager.h"
+#include "WindowThemeManager.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
@@ -21,11 +21,11 @@
 
 StartupOptionsPage::StartupOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
 	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
-	DarkModeManager *darkModeManager, ThemeManager *themeManager) :
+	DarkModeManager *darkModeManager, WindowThemeManager *windowThemeManager) :
 	OptionsPage(IDD_OPTIONS_STARTUP, IDS_OPTIONS_STARTUP_TITLE, parent, resourceLoader, config,
 		settingChangedCallback, tooltipWindow),
 	m_darkModeManager(darkModeManager),
-	m_themeManager(themeManager),
+	m_windowThemeManager(windowThemeManager),
 	m_listViewDisabledBackgroundBrush(
 		CreateSolidBrush(LISTVIEW_DARK_MODE_DISABLED_BACKGROUND_COLOR))
 {
@@ -135,7 +135,7 @@ void StartupOptionsPage::OnDarkModeStatusChanged()
 	// colors used to draw the control may not be updated properly. For example, if dark mode is
 	// disabled and the LVS_EX_TRANSPARENTBKGND style is then removed, the control will continue to
 	// use the original background color (sourced from the parent) until the theme is re-applied.
-	m_themeManager->ApplyThemeToWindowAndChildren(
+	m_windowThemeManager->ApplyThemeToWindowAndChildren(
 		GetDlgItem(GetDialog(), IDC_STARTUP_CUSTOM_FOLDERS_LIST));
 }
 

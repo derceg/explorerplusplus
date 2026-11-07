@@ -13,7 +13,7 @@
 #include "DestroyFilesDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "FeatureList.h"
-#include "HolderWindow.h"
+#include "FoldersPaneView.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "ModelessDialogHelper.h"
@@ -27,9 +27,9 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "StatusBar.h"
 #include "StatusBarView.h"
+#include "TabBar.h"
 #include "TabBarBacking.h"
 #include "TabBarBackingView.h"
-#include "TabBar.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/PidlHelper.h"
@@ -299,7 +299,7 @@ void Explorerplusplus::UpdateLayout()
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
 	m_treeViewWidth = std::clamp(m_treeViewWidth,
-		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
+		dpiCompatibility.ScaleValue(m_view.GetFoldersPaneView()->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
 	m_displayWindowWidth = std::max(m_displayWindowWidth,
 		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_WIDTH));
@@ -390,31 +390,32 @@ void Explorerplusplus::UpdateLayout()
 	SetWindowPos(GetActivePane()->GetTabBar()->GetHWND(), nullptr, 0, 0, tabBackingWidth,
 		tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
-	int holderTop;
+	int foldersPaneTop;
 
 	if (m_config->extendTabControl.get() && !m_config->showTabBarAtBottom.get())
 	{
-		holderTop = indentTop;
+		foldersPaneTop = indentTop;
 	}
 	else
 	{
-		holderTop = indentRebar;
+		foldersPaneTop = indentRebar;
 	}
 
-	/* <---- Holder window + child windows ----> */
+	/* <---- Folders pane + child windows ----> */
 
-	int holderHeight;
+	int foldersPaneHeight;
 
 	if (m_config->extendTabControl.get() && m_config->showTabBarAtBottom.get() && m_bShowTabBar)
 	{
-		holderHeight = mainWindowHeight - indentBottom - holderTop - tabWindowHeight;
+		foldersPaneHeight = mainWindowHeight - indentBottom - foldersPaneTop - tabWindowHeight;
 	}
 	else
 	{
-		holderHeight = mainWindowHeight - indentBottom - holderTop;
+		foldersPaneHeight = mainWindowHeight - indentBottom - foldersPaneTop;
 	}
 
-	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, holderTop, m_treeViewWidth, holderHeight,
+	SetWindowPos(m_view.GetFoldersPaneView()->GetHWND(), nullptr, 0, foldersPaneTop,
+		m_treeViewWidth, foldersPaneHeight,
 		(m_config->showFolders.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER);
 
 	/* <---- Display window ----> */
@@ -467,6 +468,9 @@ void Explorerplusplus::UpdateLayout()
 	SetWindowPos(m_statusBar->GetView()->GetHWND(), nullptr, 0,
 		mainWindowHeight - GetRectHeight(&statusBarRect), mainWindowWidth,
 		GetRectHeight(&statusBarRect), statusBarShowFlags);
+
+	auto res = RedrawWindow(m_hwnd, nullptr, nullptr, RDW_ALLCHILDREN | RDW_UPDATENOW);
+	CHECK(res);
 }
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
@@ -689,7 +693,7 @@ void Explorerplusplus::OnShowOptions()
 		{
 			return OptionsDialog::Create(m_resourceLoader, m_hwnd,
 				m_appServices->GetAppController(), m_config, m_appServices->GetDarkModeManager(),
-				m_appServices->GetThemeManager(), this);
+				m_appServices->GetWindowThemeManager(), this);
 		});
 }
 
@@ -715,8 +719,7 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, std::size(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			Tab &newTab =
-				GetActivePane()->GetTabBar()->CreateNewTab(szPath, { .selected = true });
+			Tab &newTab = GetActivePane()->GetTabBar()->CreateNewTab(szPath, { .selected = true });
 
 			if (newTab.GetShellBrowser()->GetDirectoryPath() == szPath)
 			{

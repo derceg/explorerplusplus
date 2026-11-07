@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ThemeManager.h"
+#include "WindowThemeManager.h"
 #include <boost/signals2.hpp>
 #include <commctrl.h>
 #include <unordered_map>
@@ -17,10 +17,10 @@ class WindowSubclass;
 
 // Based on
 // https://github.com/TortoiseGit/TortoiseGit/blob/2419d47129410d0aa371929d674bf21122c0b581/src/Utils/Theme.cpp.
-class ThemeManagerImpl : public ThemeManager
+class WindowThemeManagerImpl : public WindowThemeManager
 {
 public:
-	ThemeManagerImpl(DarkModeManager *darkModeManager,
+	WindowThemeManagerImpl(DarkModeManager *darkModeManager,
 		const DarkModeColorProvider *darkModeColorProvider);
 
 	// This will theme a top-level window, plus all of its nested children. Once a window is

@@ -4,17 +4,14 @@
 
 #include "stdafx.h"
 #include "TabBarBackingView.h"
-#include "DarkModeColorProvider.h"
-#include "DarkModeManager.h"
 #include "TabBarBackingViewDelegate.h"
+#include "ThemeManager.h"
 #include "../Helper/WindowSubclass.h"
 #include <memory>
 
-TabBarBackingView::TabBarBackingView(ViewBase *parent, const DarkModeManager *darkModeManager,
-	const DarkModeColorProvider *darkModeColorProvider) :
+TabBarBackingView::TabBarBackingView(ViewBase *parent, const ThemeManager *themeManager) :
 	ViewBase(CreateBacking(parent)),
-	m_darkModeManager(darkModeManager),
-	m_darkModeColorProvider(darkModeColorProvider)
+	m_themeManager(themeManager)
 {
 	AddSubclass(std::make_unique<WindowSubclass>(GetHWND(),
 		std::bind_front(&TabBarBackingView::WndProc, this)));
@@ -124,17 +121,7 @@ void TabBarBackingView::OnPrintClient(HDC hdc)
 
 void TabBarBackingView::PerformPaint(const PAINTSTRUCT &ps)
 {
-	HBRUSH backgroundBrush;
-
-	if (m_darkModeManager->IsDarkModeEnabled())
-	{
-		backgroundBrush = m_darkModeColorProvider->GetTabBarBackgroundBrush();
-	}
-	else
-	{
-		backgroundBrush = GetSysColorBrush(COLOR_BTNFACE);
-	}
-
-	auto res = FillRect(ps.hdc, &ps.rcPaint, backgroundBrush);
+	auto res = FillRect(ps.hdc, &ps.rcPaint,
+		m_themeManager->GetCurrentColorProvider()->GetTabBarBackgroundBrush());
 	DCHECK(res);
 }

@@ -10,9 +10,7 @@
 class TabBarView : public TabView
 {
 public:
-	TabBarView(HWND parent, const DarkModeManager *darkModeManager,
-		const DarkModeColorProvider *darkModeColorProvider,
-		const LightModeColorProvider *lightModeColorProvider, const Config *config,
+	TabBarView(HWND parent, const ThemeManager *themeManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 
 	TabBarViewImageListManager *GetImageListManager();

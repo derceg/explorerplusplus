@@ -6,11 +6,10 @@
 #include "TabView.h"
 #include "Config.h"
 #include "ControlTestHelper.h"
-#include "DarkModeColorProvider.h"
 #include "DarkModeManagerFake.h"
 #include "ImageTestHelper.h"
-#include "LightModeColorProvider.h"
 #include "TabViewTestApi.h"
+#include "ThemeManager.h"
 #include "Win32ResourceLoader.h"
 #include "../Helper/GdiplusHelper.h"
 #include "../Helper/ImageHelper.h"
@@ -61,7 +60,9 @@ private:
 class TabViewTest : public Test
 {
 protected:
-	TabViewTest() : m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr)
+	TabViewTest() :
+		m_themeManager(&m_darkModeManager),
+		m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr)
 	{
 	}
 
@@ -72,8 +73,8 @@ protected:
 		ASSERT_NE(m_parentWindow, nullptr);
 
 		m_view = std::make_unique<TabView>(m_parentWindow.get(),
-			WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE, &m_darkModeManager,
-			&m_darkModeColorProvider, &m_lightModeColorProvider, &m_config, &m_resourceLoader);
+			WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE, &m_themeManager, &m_config,
+			&m_resourceLoader);
 		m_testApi = std::make_unique<TabViewTestApi>(m_view.get());
 	}
 
@@ -126,8 +127,7 @@ protected:
 
 	Config m_config;
 	DarkModeManagerFake m_darkModeManager;
-	DarkModeColorProvider m_darkModeColorProvider;
-	LightModeColorProvider m_lightModeColorProvider;
+	ThemeManager m_themeManager;
 	Win32ResourceLoader m_resourceLoader;
 
 	wil::unique_hwnd m_parentWindow;

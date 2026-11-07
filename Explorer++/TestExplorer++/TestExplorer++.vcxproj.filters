@@ -553,7 +553,7 @@
     <ClCompile Include="AsyncIconFetcherFake.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="NoOpThemeManager.cpp">
+    <ClCompile Include="NoOpWindowThemeManager.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
     <ClCompile Include="BookmarkHelperTest.cpp">
@@ -1081,7 +1081,7 @@
     <ClInclude Include="AsyncIconFetcherFake.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="NoOpThemeManager.h">
+    <ClInclude Include="NoOpWindowThemeManager.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="ShellNameParserFake.h">

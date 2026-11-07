@@ -5,13 +5,10 @@
 #include "stdafx.h"
 #include "BrowserPaneView.h"
 
-BrowserPaneView::BrowserPaneView(ViewBase *parent, const DarkModeManager *darkModeManager,
-	const DarkModeColorProvider *darkModeColorProvider,
-	const LightModeColorProvider *lightModeColorProvider, const Config *config,
-	const ResourceLoader *resourceLoader) :
-	m_tabBarBackingView(parent, darkModeManager, darkModeColorProvider),
-	m_tabBarView(m_tabBarBackingView.GetHWND(), darkModeManager, darkModeColorProvider,
-		lightModeColorProvider, config, resourceLoader)
+BrowserPaneView::BrowserPaneView(ViewBase *parent, const ThemeManager *themeManager,
+	const Config *config, const ResourceLoader *resourceLoader) :
+	m_tabBarBackingView(parent, themeManager),
+	m_tabBarView(m_tabBarBackingView.GetHWND(), themeManager, config, resourceLoader)
 {
 }
 

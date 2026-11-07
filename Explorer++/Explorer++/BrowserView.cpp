@@ -12,6 +12,7 @@
 #include "BrowserPaneView.h"
 #include "Config.h"
 #include "DrivesToolbarView.h"
+#include "FoldersPaneView.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbarView.h"
@@ -33,7 +34,7 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 	m_subclass(GetHWND(), std::bind_front(&BrowserView::WndProc, this)),
 	m_browser(browser),
 	m_config(appServices->GetConfig()),
-	m_themeManager(appServices->GetThemeManager()),
+	m_windowThemeManager(appServices->GetWindowThemeManager()),
 	m_resourceLoader(appServices->GetResourceLoader())
 {
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
@@ -73,9 +74,11 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 
 	CreateMainRebarAndChildren();
 
-	m_browserPaneView = std::make_unique<BrowserPaneView>(this, appServices->GetDarkModeManager(),
-		appServices->GetDarkModeColorProvider(), appServices->GetLightModeColorProvider(), m_config,
-		m_resourceLoader);
+	m_foldersPaneView = std::make_unique<FoldersPaneView>(this, m_browser,
+		appServices->GetThemeManager(), m_config, m_resourceLoader);
+
+	m_browserPaneView = std::make_unique<BrowserPaneView>(this, appServices->GetThemeManager(),
+		m_config, m_resourceLoader);
 
 	m_statusBarView = std::make_unique<StatusBarView>(GetHWND(), m_config);
 }
@@ -181,6 +184,11 @@ Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView() c
 	return m_applicationToolbarView.get();
 }
 
+FoldersPaneView *BrowserView::GetFoldersPaneView() const
+{
+	return m_foldersPaneView.get();
+}
+
 BrowserPaneView *BrowserView::GetBrowserPaneView() const
 {
 	return m_browserPaneView.get();
@@ -234,7 +242,8 @@ void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState u
 {
 	if (updatedState == BrowserWindow::LifecycleState::Main)
 	{
-		m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(GetHWND(), m_themeManager);
+		m_themeWindowTracker =
+			std::make_unique<ThemeWindowTracker>(GetHWND(), m_windowThemeManager);
 
 		UpdateWindowText();
 	}

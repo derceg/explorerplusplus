@@ -15,7 +15,8 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "EventScope.h"
-#include "HolderWindow.h"
+#include "FoldersPane.h"
+#include "FoldersPaneView.h"
 #include "MainMenu.h"
 #include "MainRebar.h"
 #include "MainRebarView.h"
@@ -263,28 +264,19 @@ void Explorerplusplus::OnTabRemoved(const Tab &tab)
 
 void Explorerplusplus::CreateFolderControls()
 {
-	UINT holderStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	auto *foldersPaneView = m_view.GetFoldersPaneView();
+	foldersPaneView->SetResizedCallback(
+		std::bind_front(&Explorerplusplus::OnFoldersPaneResized, this));
 
-	if (m_config->showFolders.get())
-	{
-		holderStyle |= WS_VISIBLE;
-	}
+	m_foldersPane = std::make_unique<FoldersPane>(foldersPaneView, m_config, this,
+		m_acceleratorManager, m_resourceLoader);
 
-	m_treeViewHolder = HolderWindow::Create(m_hwnd,
-		m_resourceLoader->LoadString(IDS_FOLDERS_WINDOW_TEXT), holderStyle,
-		m_resourceLoader->LoadString(IDS_HIDE_FOLDERS_PANE), m_config, m_resourceLoader,
-		m_appServices->GetDarkModeManager(), m_appServices->GetDarkModeColorProvider());
-	m_treeViewHolder->SetCloseButtonClickedCallback(
-		[this]() { m_config->showFolders = !m_config->showFolders.get(); });
-	m_treeViewHolder->SetResizedCallback(
-		std::bind_front(&Explorerplusplus::OnTreeViewHolderResized, this));
-
-	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, m_appServices,
+	m_shellTreeView = ShellTreeView::Create(foldersPaneView->GetHWND(), this, m_appServices,
 		&m_fileActionHandler);
-	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
+	foldersPaneView->SetTreeView(m_shellTreeView->GetHWND());
 }
 
-void Explorerplusplus::OnTreeViewHolderResized(int newWidth)
+void Explorerplusplus::OnFoldersPaneResized(int newWidth)
 {
 	m_treeViewWidth = newWidth;
 

@@ -12,15 +12,15 @@
 
 class DarkModeManager;
 enum class StartupMode;
-class ThemeManager;
 class WindowSubclass;
+class WindowThemeManager;
 
 class StartupOptionsPage : public OptionsPage
 {
 public:
 	StartupOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
 		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
-		DarkModeManager *darkModeManager, ThemeManager *themeManager);
+		DarkModeManager *darkModeManager, WindowThemeManager *windowThemeManager);
 
 	void SaveSettings() override;
 
@@ -60,7 +60,7 @@ private:
 	void OnListViewDeletePressed();
 
 	DarkModeManager *const m_darkModeManager;
-	ThemeManager *const m_themeManager;
+	WindowThemeManager *const m_windowThemeManager;
 	const wil::unique_hbrush m_listViewDisabledBackgroundBrush;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;

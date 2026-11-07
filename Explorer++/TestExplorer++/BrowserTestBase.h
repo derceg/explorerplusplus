@@ -15,7 +15,6 @@
 #include "ColorRuleModel.h"
 #include "CommandLine.h"
 #include "Config.h"
-#include "DarkModeColorProvider.h"
 #include "DarkModeManagerFake.h"
 #include "DriveModel.h"
 #include "DriveWatcherFake.h"
@@ -24,10 +23,9 @@
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
-#include "LightModeColorProvider.h"
 #include "ModelessDialogList.h"
 #include "NoOpClipboardWatcher.h"
-#include "NoOpThemeManager.h"
+#include "NoOpWindowThemeManager.h"
 #include "PlatformContextFake.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuItemsRegistry.h"
@@ -41,6 +39,7 @@
 #include "TabList.h"
 #include "TabRestorer.h"
 #include "TabStorage.h"
+#include "ThemeManager.h"
 #include "Win32ResourceLoader.h"
 #include "WindowStorage.h"
 #include "../Helper/CachedIcons.h"
@@ -79,9 +78,8 @@ protected:
 	AcceleratorManager m_acceleratorManager;
 	ModelessDialogList m_modelessDialogList;
 	DarkModeManagerFake m_darkModeManager;
-	DarkModeColorProvider m_darkModeColorProvider;
-	LightModeColorProvider m_lightModeColorProvider;
-	NoOpThemeManager m_themeManager;
+	ThemeManager m_themeManager;
+	NoOpWindowThemeManager m_windowThemeManager;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherFake m_iconFetcher;
 

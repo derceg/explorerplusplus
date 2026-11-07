@@ -76,9 +76,6 @@
     <ClCompile Include="DisplayWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="HolderWindow.cpp">
-      <Filter>Holder Window</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\BrowsingHandler.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -391,14 +388,11 @@
     <ClCompile Include="Theme.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ThemeManagerImpl.cpp">
+    <ClCompile Include="WindowThemeManagerImpl.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
     <ClCompile Include="ThemeWindowTracker.cpp">
       <Filter>Dark Mode Support</Filter>
-    </ClCompile>
-    <ClCompile Include="ToolbarHelper.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="FontsOptionsPage.cpp">
       <Filter>Dialogs\Options</Filter>
@@ -970,6 +964,21 @@
     <ClCompile Include="LightModeColorProvider.cpp">
       <Filter>Theming</Filter>
     </ClCompile>
+    <ClCompile Include="FoldersPaneView.cpp">
+      <Filter>Folders Pane\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="FoldersPaneToolbarView.cpp">
+      <Filter>Folders Pane\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="FoldersPane.cpp">
+      <Filter>Folders Pane\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="FoldersPaneToolbar.cpp">
+      <Filter>Folders Pane\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ThemeManager.cpp">
+      <Filter>Theming</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1028,9 +1037,6 @@
     </ClInclude>
     <ClInclude Include="..\targetver.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="HolderWindow.h">
-      <Filter>Holder Window</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\SortModes.h">
       <Filter>ShellBrowser</Filter>
@@ -1380,16 +1386,13 @@
     <ClInclude Include="Theme.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ThemeManagerImpl.h">
+    <ClInclude Include="WindowThemeManagerImpl.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="ThemeWindowTracker.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="Literals.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ToolbarHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FontsOptionsPage.h">
@@ -1935,7 +1938,7 @@
     <ClInclude Include="AsyncIconFetcher.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ThemeManager.h">
+    <ClInclude Include="WindowThemeManager.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="AppInfo.h">
@@ -2118,6 +2121,21 @@
     <ClInclude Include="LightModeColorProvider.h">
       <Filter>Theming</Filter>
     </ClInclude>
+    <ClInclude Include="FoldersPaneToolbarView.h">
+      <Filter>Folders Pane\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="FoldersPaneToolbar.h">
+      <Filter>Folders Pane\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="FoldersPaneView.h">
+      <Filter>Folders Pane\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="FoldersPane.h">
+      <Filter>Folders Pane\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ThemeManager.h">
+      <Filter>Theming</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2174,9 +2192,6 @@
     </Filter>
     <Filter Include="Context Menu Support\New Menu">
       <UniqueIdentifier>{ab5e701f-15f5-4cd1-901a-77738a8f1779}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Holder Window">
-      <UniqueIdentifier>{d9276f12-e3f5-4d23-a177-79772ff8b9dc}</UniqueIdentifier>
     </Filter>
     <Filter Include="ShellBrowser">
       <UniqueIdentifier>{c4c4c6aa-6087-4b72-bcd0-4a1c19499130}</UniqueIdentifier>
@@ -2402,6 +2417,15 @@
     </Filter>
     <Filter Include="Tab Backing\UI\Views">
       <UniqueIdentifier>{4b1b9db9-1807-46f7-9418-8c9e24f509e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Folders Pane">
+      <UniqueIdentifier>{d9276f12-e3f5-4d23-a177-79772ff8b9dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Folders Pane\UI">
+      <UniqueIdentifier>{07e171ac-eb4b-49b5-b193-479c74910705}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Folders Pane\UI\Views">
+      <UniqueIdentifier>{a8a1463f-2443-416d-b624-d1ebb329338c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

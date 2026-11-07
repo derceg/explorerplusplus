@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "ThemeManager.h"
+#include "WindowThemeManager.h"
 
-class NoOpThemeManager : public ThemeManager
+class NoOpWindowThemeManager : public WindowThemeManager
 {
 public:
-	// ThemeManager
+	// WindowThemeManager
 	void TrackTopLevelWindow(HWND hwnd) override;
 	void UntrackTopLevelWindow(HWND hwnd) override;
 	void ApplyThemeToWindowAndChildren(HWND hwnd) override;

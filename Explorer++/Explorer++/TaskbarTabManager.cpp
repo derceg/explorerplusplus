@@ -8,8 +8,6 @@
 #include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "DarkModeColorProvider.h"
-#include "DarkModeManager.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
@@ -17,6 +15,7 @@
 #include "TabBar.h"
 #include "TabEvents.h"
 #include "TestHelper.h"
+#include "ThemeManager.h"
 #include "../Helper/D2DHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ImageInterop.h"
@@ -64,7 +63,7 @@ class TaskbarTabManager::TaskbarTabProxy
 public:
 	TaskbarTabProxy(const Tab *tab, BrowserWindow *browser,
 		wil::com_ptr_nothrow<ITaskbarList4> taskbarList, TaskbarTabIconProvider *iconProvider,
-		DarkModeManager *darkModeManager, DarkModeColorProvider *darkModeColorProvider);
+		const ThemeManager *themeManager);
 
 	HWND GetWindow() const;
 	const Tab *GetTab() const;
@@ -92,8 +91,7 @@ private:
 	const Tab *const m_tab;
 	BrowserWindow *const m_browser;
 	TaskbarTabIconProvider *const m_iconProvider;
-	DarkModeManager *const m_darkModeManager;
-	DarkModeColorProvider *const m_darkModeColorProvider;
+	const ThemeManager *const m_themeManager;
 	wil::unique_hicon m_icon;
 	wil::unique_hwnd m_hwnd;
 	std::unique_ptr<WindowSubclass> m_subclass;
@@ -242,7 +240,7 @@ void TaskbarTabManager::CreateTabProxy(const Tab &tab)
 {
 	auto [itr, didInsert] = m_tabProxies.insert({ &tab,
 		std::make_unique<TaskbarTabProxy>(&tab, m_browser, m_taskbarList, &m_iconProvider,
-			m_appServices->GetDarkModeManager(), m_appServices->GetDarkModeColorProvider()) });
+			m_appServices->GetThemeManager()) });
 	DCHECK(didInsert);
 }
 
@@ -333,12 +331,11 @@ const Tab *TaskbarTabManager::GetTabForProxyWindowForTesting(HWND proxyWindow) c
 
 TaskbarTabManager::TaskbarTabProxy::TaskbarTabProxy(const Tab *tab, BrowserWindow *browser,
 	wil::com_ptr_nothrow<ITaskbarList4> taskbarList, TaskbarTabIconProvider *iconProvider,
-	DarkModeManager *darkModeManager, DarkModeColorProvider *darkModeColorProvider) :
+	const ThemeManager *themeManager) :
 	m_tab(tab),
 	m_browser(browser),
 	m_iconProvider(iconProvider),
-	m_darkModeManager(darkModeManager),
-	m_darkModeColorProvider(darkModeColorProvider)
+	m_themeManager(themeManager)
 {
 	static bool classRegistered = false;
 
@@ -487,10 +484,8 @@ HRESULT TaskbarTabManager::TaskbarTabProxy::CreateFallbackThumbnailBitmap(int wi
 // against a solid background.
 HRESULT TaskbarTabManager::TaskbarTabProxy::DrawFallbackThumbnail(ID2D1RenderTarget *renderTarget)
 {
-	COLORREF backgroundColor = m_darkModeManager->IsDarkModeEnabled()
-		? m_darkModeColorProvider->GetBackgroundColor()
-		: GetSysColor(COLOR_WINDOW);
-	renderTarget->Clear(D2DHelper::ColorFromColorRef(backgroundColor));
+	renderTarget->Clear(D2DHelper::ColorFromColorRef(
+		m_themeManager->GetCurrentColorProvider()->GetBackgroundColor()));
 
 	auto icon = m_iconProvider->GetIconForTab(m_tab, TaskbarTabIconProvider::IconSize::Large);
 

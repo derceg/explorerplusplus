@@ -4,16 +4,16 @@
 
 #include "stdafx.h"
 #include "ThemeWindowTracker.h"
-#include "ThemeManager.h"
+#include "WindowThemeManager.h"
 
-ThemeWindowTracker::ThemeWindowTracker(HWND hwnd, ThemeManager *themeManager) :
+ThemeWindowTracker::ThemeWindowTracker(HWND hwnd, WindowThemeManager *windowThemeManager) :
 	m_hwnd(hwnd),
-	m_themeManager(themeManager)
+	m_windowThemeManager(windowThemeManager)
 {
-	m_themeManager->TrackTopLevelWindow(m_hwnd);
+	m_windowThemeManager->TrackTopLevelWindow(m_hwnd);
 }
 
 ThemeWindowTracker::~ThemeWindowTracker()
 {
-	m_themeManager->UntrackTopLevelWindow(m_hwnd);
+	m_windowThemeManager->UntrackTopLevelWindow(m_hwnd);
 }

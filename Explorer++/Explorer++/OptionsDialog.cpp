@@ -27,20 +27,20 @@
 
 OptionsDialog *OptionsDialog::Create(const ResourceLoader *resourceLoader, HWND parent,
 	AppController *appController, Config *config, DarkModeManager *darkModeManager,
-	ThemeManager *themeManager, CoreInterface *coreInterface)
+	WindowThemeManager *windowThemeManager, CoreInterface *coreInterface)
 {
 	return new OptionsDialog(resourceLoader, parent, appController, config, darkModeManager,
-		themeManager, coreInterface);
+		windowThemeManager, coreInterface);
 }
 
 OptionsDialog::OptionsDialog(const ResourceLoader *resourceLoader, HWND parent,
 	AppController *appController, Config *config, DarkModeManager *darkModeManager,
-	ThemeManager *themeManager, CoreInterface *coreInterface) :
+	WindowThemeManager *windowThemeManager, CoreInterface *coreInterface) :
 	BaseDialog(resourceLoader, IDD_OPTIONS, parent, DialogSizingType::Both),
 	m_appController(appController),
 	m_config(config),
 	m_darkModeManager(darkModeManager),
-	m_themeManager(themeManager),
+	m_windowThemeManager(windowThemeManager),
 	m_coreInterface(coreInterface)
 {
 }
@@ -140,7 +140,7 @@ void OptionsDialog::AddPages()
 		m_config, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<StartupOptionsPage>(m_hDlg, m_resourceLoader, m_config,
 		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd, m_darkModeManager,
-		m_themeManager));
+		m_windowThemeManager));
 	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, m_resourceLoader, m_config,
 		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd, m_darkModeManager));
 	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, m_resourceLoader, m_config,

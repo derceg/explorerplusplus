@@ -16,14 +16,12 @@ class CachedIcons;
 class ClipboardWatcher;
 class ColorRuleModel;
 struct Config;
-class DarkModeColorProvider;
 class DarkModeManager;
 class DirectoryWatcherFactory;
 class DriveModel;
 class FeatureList;
 class FrequentLocationsModel;
 class HistoryModel;
-class LightModeColorProvider;
 class ModelessDialogList;
 class NavigationEvents;
 class PlatformContext;
@@ -34,6 +32,7 @@ class TabEvents;
 class TabList;
 class TabRestorer;
 class ThemeManager;
+class WindowThemeManager;
 
 namespace Applications
 {
@@ -122,10 +121,6 @@ public:
 	const Config *GetConfig() const;
 	void SetConfig(Config *config);
 
-	DarkModeColorProvider *GetDarkModeColorProvider();
-	const DarkModeColorProvider *GetDarkModeColorProvider() const;
-	void SetDarkModeColorProvider(DarkModeColorProvider *darkModeColorProvider);
-
 	DarkModeManager *GetDarkModeManager();
 	const DarkModeManager *GetDarkModeManager() const;
 	void SetDarkModeManager(DarkModeManager *darkModeManager);
@@ -149,10 +144,6 @@ public:
 	HistoryModel *GetHistoryModel();
 	const HistoryModel *GetHistoryModel() const;
 	void SetHistoryModel(HistoryModel *historyModel);
-
-	LightModeColorProvider *GetLightModeColorProvider();
-	const LightModeColorProvider *GetLightModeColorProvider() const;
-	void SetLightModeColorProvider(LightModeColorProvider *lightModeColorProvider);
 
 	ModelessDialogList *GetModelessDialogList();
 	const ModelessDialogList *GetModelessDialogList() const;
@@ -202,6 +193,10 @@ public:
 	const ThemeManager *GetThemeManager() const;
 	void SetThemeManager(ThemeManager *themeManager);
 
+	WindowThemeManager *GetWindowThemeManager();
+	const WindowThemeManager *GetWindowThemeManager() const;
+	void SetWindowThemeManager(WindowThemeManager *windowThemeManager);
+
 	void CheckFullyInitialized() const;
 
 private:
@@ -217,10 +212,10 @@ private:
 	std::tuple<AcceleratorManager *, AppController *, Applications::ApplicationModel *,
 		AsyncIconFetcher *, BookmarkTree *, BrowserList *, BrowserWindowFactory *, CachedIcons *,
 		ClipboardWatcher *, ColorRuleModel *, const CommandLine::Settings *, Config *,
-		DarkModeColorProvider *, DarkModeManager *, DirectoryWatcherFactory *, DriveModel *,
-		FeatureList *, FrequentLocationsModel *, HistoryModel *, LightModeColorProvider *,
-		ModelessDialogList *, NavigationEvents *, PlatformContext *,
-		Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *, ResourceLoader *,
-		Runtime *, ShellBrowserEvents *, TabEvents *, TabList *, TabRestorer *, ThemeManager *>
+		DarkModeManager *, DirectoryWatcherFactory *, DriveModel *, FeatureList *,
+		FrequentLocationsModel *, HistoryModel *, ModelessDialogList *, NavigationEvents *,
+		PlatformContext *, Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *,
+		ResourceLoader *, Runtime *, ShellBrowserEvents *, TabEvents *, TabList *, TabRestorer *,
+		ThemeManager *, WindowThemeManager *>
 		m_services;
 };

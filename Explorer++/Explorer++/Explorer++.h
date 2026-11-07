@@ -38,7 +38,7 @@ struct Config;
 class DisplayWindow;
 class DrivesToolbar;
 class FeatureList;
-class HolderWindow;
+class FoldersPane;
 class MainMenu;
 class MainRebar;
 class MainToolbar;
@@ -170,6 +170,7 @@ private:
 	void OnTabPreRemoval(const Tab &tab, int index);
 	void OnTabRemoved(const Tab &tab);
 	void CreateFolderControls();
+	void OnFoldersPaneResized(int newWidth);
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
@@ -222,7 +223,6 @@ private:
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
-	void OnTreeViewHolderResized(int newWidth);
 
 	void OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition);
 
@@ -296,7 +296,7 @@ private:
 	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
 
 	// Treeview
-	HolderWindow *m_treeViewHolder = nullptr;
+	std::unique_ptr<FoldersPane> m_foldersPane;
 	ShellTreeView *m_shellTreeView = nullptr;
 	int m_treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 

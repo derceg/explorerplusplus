@@ -3,19 +3,19 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "NoOpThemeManager.h"
+#include "NoOpWindowThemeManager.h"
 
-void NoOpThemeManager::TrackTopLevelWindow(HWND hwnd)
+void NoOpWindowThemeManager::TrackTopLevelWindow(HWND hwnd)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 }
 
-void NoOpThemeManager::UntrackTopLevelWindow(HWND hwnd)
+void NoOpWindowThemeManager::UntrackTopLevelWindow(HWND hwnd)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 }
 
-void NoOpThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
+void NoOpWindowThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 }

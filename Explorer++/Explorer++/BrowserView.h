@@ -19,6 +19,7 @@ class BookmarksToolbarView;
 class BrowserPaneView;
 struct Config;
 class DrivesToolbarView;
+class FoldersPaneView;
 class MainRebarView;
 class MainToolbarView;
 class MenuView;
@@ -26,8 +27,8 @@ class NavigationRequest;
 class ResourceLoader;
 class ShellBrowser;
 class StatusBarView;
-class ThemeManager;
 class ThemeWindowTracker;
+class WindowThemeManager;
 
 namespace Applications
 {
@@ -59,8 +60,8 @@ public:
 	DrivesToolbarView *GetDrivesToolbarView() const;
 	Applications::ApplicationToolbarView *GetApplicationToolbarView() const;
 
+	FoldersPaneView *GetFoldersPaneView() const;
 	BrowserPaneView *GetBrowserPaneView() const;
-
 	StatusBarView *GetStatusBarView() const;
 
 	void RedrawMenuBar();
@@ -97,7 +98,7 @@ private:
 	const WindowSubclass m_subclass;
 	BrowserWindow *const m_browser;
 	const Config *const m_config;
-	ThemeManager *const m_themeManager;
+	WindowThemeManager *const m_windowThemeManager;
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
@@ -114,7 +115,7 @@ private:
 	std::unique_ptr<DrivesToolbarView> m_drivesToolbarView;
 	std::unique_ptr<Applications::ApplicationToolbarView> m_applicationToolbarView;
 
+	std::unique_ptr<FoldersPaneView> m_foldersPaneView;
 	std::unique_ptr<BrowserPaneView> m_browserPaneView;
-
 	std::unique_ptr<StatusBarView> m_statusBarView;
 };

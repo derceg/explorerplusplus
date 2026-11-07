@@ -7,14 +7,12 @@
 #include "../Helper/DpiCompatibility.h"
 #include <CommCtrl.h>
 
-TabBarView::TabBarView(HWND parent, const DarkModeManager *darkModeManager,
-	const DarkModeColorProvider *darkModeColorProvider,
-	const LightModeColorProvider *lightModeColorProvider, const Config *config,
+TabBarView::TabBarView(HWND parent, const ThemeManager *themeManager, const Config *config,
 	const ResourceLoader *resourceLoader) :
 	TabView(parent,
 		WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE | TCS_TOOLTIPS | WS_CLIPSIBLINGS
 			| WS_CLIPCHILDREN,
-		darkModeManager, darkModeColorProvider, lightModeColorProvider, config, resourceLoader),
+		themeManager, config, resourceLoader),
 	m_imageListManager(resourceLoader, DpiCompatibility::GetInstance().GetDpiForWindow(GetHWND()))
 {
 	SetImageList(m_imageListManager.GetImageList());

@@ -13,11 +13,11 @@
 #include "../Helper/ResourceHelper.h"
 
 Win32ResourceLoader::Win32ResourceLoader(HINSTANCE resourceInstance, IconSet iconSet,
-	const DarkModeManager *darkModeManager, ThemeManager *themeManager) :
+	const DarkModeManager *darkModeManager, WindowThemeManager *windowThemeManager) :
 	m_resourceInstance(resourceInstance),
 	m_iconSet(iconSet),
 	m_darkModeManager(darkModeManager),
-	m_themeManager(themeManager)
+	m_windowThemeManager(windowThemeManager)
 {
 }
 
@@ -169,7 +169,7 @@ INT_PTR Win32ResourceLoader::CreateModalDialog(UINT dialogId, HWND parent,
 {
 	INT_PTR res;
 
-	auto *themedDialogWrapper = ThemedDialogWrapper::Create(dialogProc, m_themeManager);
+	auto *themedDialogWrapper = ThemedDialogWrapper::Create(dialogProc, m_windowThemeManager);
 
 	if (IsProcessRTL())
 	{
@@ -206,7 +206,7 @@ HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent,
 {
 	HWND dialog;
 
-	auto *themedDialogWrapper = ThemedDialogWrapper::Create(dialogProc, m_themeManager);
+	auto *themedDialogWrapper = ThemedDialogWrapper::Create(dialogProc, m_windowThemeManager);
 
 	if (IsProcessRTL())
 	{
@@ -235,15 +235,16 @@ HWND Win32ResourceLoader::CreateModelessDialog(UINT dialogId, HWND parent,
 }
 
 Win32ResourceLoader::Win32ResourceLoader::ThemedDialogWrapper *Win32ResourceLoader::
-	ThemedDialogWrapper::Create(DialogProc originalDialogProc, ThemeManager *themeManager)
+	ThemedDialogWrapper::Create(DialogProc originalDialogProc,
+		WindowThemeManager *windowThemeManager)
 {
-	return new ThemedDialogWrapper(originalDialogProc, themeManager);
+	return new ThemedDialogWrapper(originalDialogProc, windowThemeManager);
 }
 
 Win32ResourceLoader::ThemedDialogWrapper::ThemedDialogWrapper(DialogProc originalDialogProc,
-	ThemeManager *themeManager) :
+	WindowThemeManager *windowThemeManager) :
 	m_originalDialogProc(originalDialogProc),
-	m_themeManager(themeManager)
+	m_windowThemeManager(windowThemeManager)
 {
 }
 
@@ -289,7 +290,7 @@ INT_PTR Win32ResourceLoader::ThemedDialogWrapper::ThemedDialogProc(HWND dialog, 
 	case WM_INITDIALOG:
 		// This is explicitly done after the original dialog procedure has been invoked, so that any
 		// controls the dialog dynamically creates will be themed.
-		m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(dialog, m_themeManager);
+		m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(dialog, m_windowThemeManager);
 		break;
 
 	case WM_NCDESTROY:

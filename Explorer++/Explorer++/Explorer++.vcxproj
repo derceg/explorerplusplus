@@ -1219,6 +1219,9 @@
     <ClCompile Include="DirectoryWatcherFactoryImpl.cpp" />
     <ClCompile Include="DisplayWindow\DisplayWindowContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="FoldersPane.cpp" />
+    <ClCompile Include="FoldersPaneToolbar.cpp" />
+    <ClCompile Include="FoldersPaneToolbarView.cpp" />
     <ClCompile Include="JumpListHelper.cpp" />
     <ClCompile Include="LightModeColorProvider.cpp" />
     <ClCompile Include="ListView.cpp" />
@@ -1338,6 +1341,7 @@
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="TabList.cpp" />
     <ClCompile Include="TestHelper.cpp" />
+    <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="ToolbarBase.cpp" />
     <ClCompile Include="ToolbarOptionsMenu.cpp" />
     <ClCompile Include="ToolbarOverflowMenu.cpp" />
@@ -1372,7 +1376,7 @@
     <ClCompile Include="TabParentItemsMenu.cpp" />
     <ClCompile Include="TabRegistryStorage.cpp" />
     <ClCompile Include="TabXmlStorage.cpp" />
-    <ClCompile Include="ThemeManagerImpl.cpp" />
+    <ClCompile Include="WindowThemeManagerImpl.cpp" />
     <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
@@ -1386,7 +1390,6 @@
     <ClCompile Include="TabsOptionsPage.cpp" />
     <ClCompile Include="Theme.cpp" />
     <ClCompile Include="ThemeWindowTracker.cpp" />
-    <ClCompile Include="ToolbarHelper.cpp" />
     <ClCompile Include="ToolbarViewBase.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="DarkModeManagerImpl.cpp" />
@@ -1438,7 +1441,7 @@
     <ClCompile Include="FileSelectionTests.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="DriveWatcherImpl.cpp" />
-    <ClCompile Include="HolderWindow.cpp" />
+    <ClCompile Include="FoldersPaneView.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
     <ClCompile Include="BrowserView.cpp" />
@@ -1591,6 +1594,9 @@
     <ClInclude Include="DirectoryWatcherFactoryImpl.h" />
     <ClInclude Include="DisplayWindow\DisplayWindowContextMenu.h" />
     <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="FoldersPane.h" />
+    <ClInclude Include="FoldersPaneToolbar.h" />
+    <ClInclude Include="FoldersPaneToolbarView.h" />
     <ClInclude Include="IconModel.h" />
     <ClInclude Include="IconUpdateCallback.h" />
     <ClInclude Include="InsertMarkPosition.h" />
@@ -1739,6 +1745,7 @@
     <ClInclude Include="TabList.h" />
     <ClInclude Include="TestHelper.h" />
     <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="WindowThemeManager.h" />
     <ClInclude Include="ToolbarBase.h" />
     <ClInclude Include="ToolbarOptionsMenu.h" />
     <ClInclude Include="ToolbarOverflowMenu.h" />
@@ -1782,7 +1789,7 @@
     <ClInclude Include="TabRegistryStorage.h" />
     <ClInclude Include="TabStorage.h" />
     <ClInclude Include="TabXmlStorage.h" />
-    <ClInclude Include="ThemeManagerImpl.h" />
+    <ClInclude Include="WindowThemeManagerImpl.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogStorageHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
@@ -1799,7 +1806,6 @@
     <ClInclude Include="TabsOptionsPage.h" />
     <ClInclude Include="Theme.h" />
     <ClInclude Include="ThemeWindowTracker.h" />
-    <ClInclude Include="ToolbarHelper.h" />
     <ClInclude Include="ToolbarViewBase.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="DarkModeManagerImpl.h" />
@@ -1841,7 +1847,7 @@
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="DriveWatcherImpl.h" />
-    <ClInclude Include="HolderWindow.h" />
+    <ClInclude Include="FoldersPaneView.h" />
     <ClInclude Include="Icon.h" />
     <ClInclude Include="IconMappings.h" />
     <ClInclude Include="IDropFilesCallback.h" />

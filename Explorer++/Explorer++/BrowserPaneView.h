@@ -8,18 +8,14 @@
 #include "TabBarView.h"
 
 struct Config;
-class DarkModeColorProvider;
-class DarkModeManager;
-class LightModeColorProvider;
 class ResourceLoader;
+class ThemeManager;
 class ViewBase;
 
 class BrowserPaneView
 {
 public:
-	BrowserPaneView(ViewBase *parent, const DarkModeManager *darkModeManager,
-		const DarkModeColorProvider *darkModeColorProvider,
-		const LightModeColorProvider *lightModeColorProvider, const Config *config,
+	BrowserPaneView(ViewBase *parent, const ThemeManager *themeManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 
 	TabBarBackingView *GetTabBarBackingView();
