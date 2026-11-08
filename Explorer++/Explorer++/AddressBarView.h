@@ -16,7 +16,7 @@ struct Config;
 class AddressBarView : public ViewBase, public RebarBandView
 {
 public:
-	AddressBarView(HWND parent, const Config *config);
+	AddressBarView(ViewBase *parent, const Config *config);
 
 	void SetDelegate(AddressBarViewDelegate *delegate);
 
@@ -36,7 +36,7 @@ public:
 	void SetTextForTesting(const std::wstring &text);
 
 private:
-	static HWND CreateAddressBar(HWND parent);
+	static HWND CreateAddressBar(ViewBase *parent);
 
 	LRESULT ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

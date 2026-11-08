@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "BookmarksToolbarView.h"
 
-BookmarksToolbarView::BookmarksToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost,
+BookmarksToolbarView::BookmarksToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
 	const Config *config) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

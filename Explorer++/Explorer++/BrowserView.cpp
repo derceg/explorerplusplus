@@ -80,7 +80,7 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 	m_browserPaneView = std::make_unique<BrowserPaneView>(this, appServices->GetThemeManager(),
 		m_config, m_resourceLoader);
 
-	m_statusBarView = std::make_unique<StatusBarView>(GetHWND(), m_config);
+	m_statusBarView = std::make_unique<StatusBarView>(this, m_config);
 }
 
 BrowserView::~BrowserView() = default;
@@ -137,16 +137,16 @@ ATOM BrowserView::RegisterBrowserWindowClass(HINSTANCE instance)
 
 void BrowserView::CreateMainRebarAndChildren()
 {
-	m_mainRebarView = std::make_unique<MainRebarView>(GetHWND());
+	m_mainRebarView = std::make_unique<MainRebarView>(this);
 	m_mainToolbarView =
-		std::make_unique<MainToolbarView>(m_mainRebarView->GetHWND(), m_browser, m_config);
-	m_addressBarView = std::make_unique<AddressBarView>(m_mainRebarView->GetHWND(), m_config);
+		std::make_unique<MainToolbarView>(m_mainRebarView.get(), m_browser, m_config);
+	m_addressBarView = std::make_unique<AddressBarView>(m_mainRebarView.get(), m_config);
 	m_bookmarksToolbarView =
-		std::make_unique<BookmarksToolbarView>(m_mainRebarView->GetHWND(), m_browser, m_config);
+		std::make_unique<BookmarksToolbarView>(m_mainRebarView.get(), m_browser, m_config);
 	m_drivesToolbarView =
-		std::make_unique<DrivesToolbarView>(m_mainRebarView->GetHWND(), m_browser, m_config);
+		std::make_unique<DrivesToolbarView>(m_mainRebarView.get(), m_browser, m_config);
 	m_applicationToolbarView = std::make_unique<Applications::ApplicationToolbarView>(
-		m_mainRebarView->GetHWND(), m_browser, m_config);
+		m_mainRebarView.get(), m_browser, m_config);
 }
 
 MenuView *BrowserView::GetMainMenuView() const

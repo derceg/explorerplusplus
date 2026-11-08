@@ -20,7 +20,7 @@
 class CustomizableToolbarView : public ToolbarViewBase
 {
 public:
-	CustomizableToolbarView(HWND parent, DWORD style, DWORD extendedStyle,
+	CustomizableToolbarView(ViewBase *parent, DWORD style, DWORD extendedStyle,
 		MenuHelpTextHost *menuHelpTextHost, const Config *config);
 
 	// This specifies the available buttons (i.e. the complete set of buttons that can be shown).

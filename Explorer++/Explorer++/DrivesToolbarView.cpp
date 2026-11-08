@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "DrivesToolbarView.h"
 
-DrivesToolbarView::DrivesToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost,
+DrivesToolbarView::DrivesToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
 	const Config *config) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

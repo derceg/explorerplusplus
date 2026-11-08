@@ -9,5 +9,5 @@
 class MainRebarView : public RebarView
 {
 public:
-	MainRebarView(HWND parent);
+	MainRebarView(ViewBase *parent);
 };

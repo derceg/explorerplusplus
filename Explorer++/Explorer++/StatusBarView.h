@@ -13,7 +13,7 @@ struct Config;
 class StatusBarView : public ViewBase
 {
 public:
-	StatusBarView(HWND parent, const Config *config);
+	StatusBarView(ViewBase *parent, const Config *config);
 
 	// The parts are specified here as a list of integer values between 1 and 100, with each value
 	// indicating how far along the status bar the associated part ends. For example, if the values

@@ -24,7 +24,7 @@ public:
 		Enabled
 	};
 
-	RebarView(HWND parent, DWORD style);
+	RebarView(ViewBase *parent, DWORD style);
 	~RebarView();
 
 	void SetDelegate(RebarViewDelegate *delegate);
@@ -44,7 +44,7 @@ public:
 private:
 	friend class RebarViewTestApi;
 
-	static HWND CreateRebar(HWND parent, DWORD style);
+	static HWND CreateRebar(ViewBase *parent, DWORD style);
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnShowContextMenu(HWND source, const POINT &ptScreen);

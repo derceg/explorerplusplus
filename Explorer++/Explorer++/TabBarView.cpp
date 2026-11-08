@@ -7,7 +7,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include <CommCtrl.h>
 
-TabBarView::TabBarView(HWND parent, const ThemeManager *themeManager, const Config *config,
+TabBarView::TabBarView(ViewBase *parent, const ThemeManager *themeManager, const Config *config,
 	const ResourceLoader *resourceLoader) :
 	TabView(parent,
 		WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE | TCS_TOOLTIPS | WS_CLIPSIBLINGS

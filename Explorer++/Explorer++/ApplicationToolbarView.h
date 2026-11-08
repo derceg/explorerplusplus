@@ -12,7 +12,8 @@ namespace Applications
 class ApplicationToolbarView : public ToolbarView
 {
 public:
-	ApplicationToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost, const Config *config);
+	ApplicationToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
+		const Config *config);
 };
 
 }

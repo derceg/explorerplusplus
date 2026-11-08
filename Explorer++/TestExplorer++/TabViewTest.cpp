@@ -9,6 +9,7 @@
 #include "DarkModeManagerFake.h"
 #include "ImageTestHelper.h"
 #include "TabViewTestApi.h"
+#include "TestParentView.h"
 #include "ThemeManager.h"
 #include "Win32ResourceLoader.h"
 #include "../Helper/GdiplusHelper.h"
@@ -62,20 +63,11 @@ class TabViewTest : public Test
 protected:
 	TabViewTest() :
 		m_themeManager(&m_darkModeManager),
-		m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr)
+		m_resourceLoader(GetModuleHandle(nullptr), IconSet::Color, nullptr, nullptr),
+		m_view(&m_parentView, WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE, &m_themeManager,
+			&m_config, &m_resourceLoader),
+		m_testApi(&m_view)
 	{
-	}
-
-	void SetUp() override
-	{
-		m_parentWindow.reset(CreateWindow(WC_STATIC, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
-			GetModuleHandle(nullptr), nullptr));
-		ASSERT_NE(m_parentWindow, nullptr);
-
-		m_view = std::make_unique<TabView>(m_parentWindow.get(),
-			WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE, &m_themeManager, &m_config,
-			&m_resourceLoader);
-		m_testApi = std::make_unique<TabViewTestApi>(m_view.get());
 	}
 
 	std::vector<std::wstring> GetTabTitles() const
@@ -91,7 +83,7 @@ protected:
 		{
 			auto tabItem = std::make_unique<TestTabViewItem>(tabTitles[i]);
 			rawTabItems.push_back(tabItem.get());
-			m_view->AddTab(std::move(tabItem), static_cast<int>(i));
+			m_view.AddTab(std::move(tabItem), static_cast<int>(i));
 		}
 
 		return rawTabItems;
@@ -99,29 +91,29 @@ protected:
 
 	void VerifyTabs(std::vector<TestTabViewItem *> rawTabItems)
 	{
-		ASSERT_EQ(static_cast<size_t>(m_view->GetNumTabs()), rawTabItems.size());
+		ASSERT_EQ(static_cast<size_t>(m_view.GetNumTabs()), rawTabItems.size());
 
 		for (size_t i = 0; i < rawTabItems.size(); i++)
 		{
-			EXPECT_EQ(m_view->GetTabAtIndex(static_cast<int>(i)), rawTabItems[i]);
+			EXPECT_EQ(m_view.GetTabAtIndex(static_cast<int>(i)), rawTabItems[i]);
 		}
 	}
 
 	void ResizeWindowToFitTabs()
 	{
 		RECT displayRect = { 0, 0, 0, 0 };
-		TabCtrl_AdjustRect(m_view->GetHWND(), true, &displayRect);
+		TabCtrl_AdjustRect(m_view.GetHWND(), true, &displayRect);
 		int height = std::abs(displayRect.top);
 
-		int numTabs = m_view->GetNumTabs();
+		int numTabs = m_view.GetNumTabs();
 		ASSERT_NE(numTabs, 0);
 
-		auto lastTabRect = m_testApi->GetTabRect(numTabs - 1);
+		auto lastTabRect = m_testApi.GetTabRect(numTabs - 1);
 
-		auto res = MoveWindow(m_parentWindow.get(), 0, 0, lastTabRect.right, height, false);
+		auto res = MoveWindow(m_parentView.GetHWND(), 0, 0, lastTabRect.right, height, false);
 		ASSERT_TRUE(res);
 
-		res = MoveWindow(m_view->GetHWND(), 0, 0, lastTabRect.right, height, false);
+		res = MoveWindow(m_view.GetHWND(), 0, 0, lastTabRect.right, height, false);
 		ASSERT_TRUE(res);
 	}
 
@@ -130,9 +122,9 @@ protected:
 	ThemeManager m_themeManager;
 	Win32ResourceLoader m_resourceLoader;
 
-	wil::unique_hwnd m_parentWindow;
-	std::unique_ptr<TabView> m_view;
-	std::unique_ptr<TabViewTestApi> m_testApi;
+	TestParentView m_parentView;
+	TabView m_view;
+	TabViewTestApi m_testApi;
 };
 
 TEST_F(TabViewTest, AddTab)
@@ -147,47 +139,47 @@ TEST_F(TabViewTest, RemoveTab)
 	std::vector<std::wstring> tabTitles = GetTabTitles();
 	auto rawTabItems = AddTabs(tabTitles);
 
-	m_view->RemoveTab(1);
+	m_view.RemoveTab(1);
 	rawTabItems.erase(rawTabItems.begin() + 1);
 	VerifyTabs(rawTabItems);
 
-	m_view->RemoveTab(0);
+	m_view.RemoveTab(0);
 	rawTabItems.erase(rawTabItems.begin());
 	VerifyTabs(rawTabItems);
 }
 
 TEST_F(TabViewTest, SelectedIndex)
 {
-	EXPECT_EQ(m_view->MaybeGetSelectedIndex(), std::nullopt);
+	EXPECT_EQ(m_view.MaybeGetSelectedIndex(), std::nullopt);
 
-	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab"), 0);
-	EXPECT_EQ(m_view->MaybeGetSelectedIndex(), 0);
-	EXPECT_EQ(m_view->GetSelectedIndex(), 0);
+	m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab"), 0);
+	EXPECT_EQ(m_view.MaybeGetSelectedIndex(), 0);
+	EXPECT_EQ(m_view.GetSelectedIndex(), 0);
 }
 
 TEST_F(TabViewTest, GetNumTabs)
 {
-	EXPECT_EQ(m_view->GetNumTabs(), 0);
+	EXPECT_EQ(m_view.GetNumTabs(), 0);
 
 	std::vector<std::wstring> tabTitles = GetTabTitles();
 	AddTabs(tabTitles);
-	EXPECT_EQ(m_view->GetNumTabs(), 3);
+	EXPECT_EQ(m_view.GetNumTabs(), 3);
 
-	m_view->RemoveTab(2);
-	EXPECT_EQ(m_view->GetNumTabs(), 2);
+	m_view.RemoveTab(2);
+	EXPECT_EQ(m_view.GetNumTabs(), 2);
 
-	m_view->RemoveTab(0);
-	EXPECT_EQ(m_view->GetNumTabs(), 1);
+	m_view.RemoveTab(0);
+	EXPECT_EQ(m_view.GetNumTabs(), 1);
 
-	m_view->RemoveTab(0);
-	EXPECT_EQ(m_view->GetNumTabs(), 0);
+	m_view.RemoveTab(0);
+	EXPECT_EQ(m_view.GetNumTabs(), 0);
 }
 
 TEST_F(TabViewTest, SelectOnClick)
 {
-	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 1"), 0);
-	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 2"), 1);
-	m_view->SelectTabAtIndex(0);
+	m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 1"), 0);
+	m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 2"), 1);
+	m_view.SelectTabAtIndex(0);
 
 	// For the tab control to select a tab on click, the tab needs to be in the visible portion of
 	// the control, which is why the window is resized here. Without this, the test would fail,
@@ -195,60 +187,60 @@ TEST_F(TabViewTest, SelectOnClick)
 	ResizeWindowToFitTabs();
 
 	// If a tab is clicked outside of the close button, the tab should be selected.
-	auto layout = m_testApi->GetTabContentLayout(1);
-	SimulateClick(m_view->GetHWND(), { layout.text.left, layout.text.top });
-	EXPECT_EQ(m_view->GetSelectedIndex(), 1);
+	auto layout = m_testApi.GetTabContentLayout(1);
+	SimulateClick(m_view.GetHWND(), { layout.text.left, layout.text.top });
+	EXPECT_EQ(m_view.GetSelectedIndex(), 1);
 
 	// If the close button is clicked, the tab shouldn't be selected.
-	layout = m_testApi->GetTabContentLayout(0);
-	SimulateClick(m_view->GetHWND(), { layout.closeButton.left, layout.closeButton.top });
-	EXPECT_EQ(m_view->GetSelectedIndex(), 1);
+	layout = m_testApi.GetTabContentLayout(0);
+	SimulateClick(m_view.GetHWND(), { layout.closeButton.left, layout.closeButton.top });
+	EXPECT_EQ(m_view.GetSelectedIndex(), 1);
 }
 
 TEST_F(TabViewTest, CloseButtonClick)
 {
-	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 1"), 0);
+	m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 1"), 0);
 
 	auto tab2 = std::make_unique<TestTabViewItem>(L"Tab 2");
 
 	MockFunction<void()> closedCallback;
 	tab2->SetClosedCallback(closedCallback.AsStdFunction());
 
-	m_view->AddTab(std::move(tab2), 1);
+	m_view.AddTab(std::move(tab2), 1);
 
 	ResizeWindowToFitTabs();
 
-	auto layout = m_testApi->GetTabContentLayout(1);
+	auto layout = m_testApi.GetTabContentLayout(1);
 
 	EXPECT_CALL(closedCallback, Call());
-	SimulateClick(m_view->GetHWND(), { layout.closeButton.left, layout.closeButton.top });
+	SimulateClick(m_view.GetHWND(), { layout.closeButton.left, layout.closeButton.top });
 }
 
 TEST_F(TabViewTest, IgnoredCloseButtonClick)
 {
-	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 1"), 0);
+	m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 1"), 0);
 
 	auto tab2 = std::make_unique<TestTabViewItem>(L"Tab 2");
 
 	MockFunction<void()> closedCallback;
 	tab2->SetClosedCallback(closedCallback.AsStdFunction());
 
-	m_view->AddTab(std::move(tab2), 1);
+	m_view.AddTab(std::move(tab2), 1);
 
 	ResizeWindowToFitTabs();
 
-	auto layout = m_testApi->GetTabContentLayout(1);
+	auto layout = m_testApi.GetTabContentLayout(1);
 
 	EXPECT_CALL(closedCallback, Call()).Times(0);
 
 	// The mouse button goes down on the close button, but up elsewhere on the tab, so the close
 	// callback shouldn't be invoked.
-	SimulateClick(m_view->GetHWND(), { layout.closeButton.left, layout.closeButton.top },
+	SimulateClick(m_view.GetHWND(), { layout.closeButton.left, layout.closeButton.top },
 		{ layout.text.left, layout.text.top });
 
 	// Here, the mouse button goes up on the close button, but down somewhere else, so the close
 	// callback shouldn't be invoked in this case either.
-	SimulateClick(m_view->GetHWND(), { layout.text.left, layout.text.top },
+	SimulateClick(m_view.GetHWND(), { layout.text.left, layout.text.top },
 		{ layout.closeButton.left, layout.closeButton.top });
 }
 
@@ -278,13 +270,13 @@ protected:
 		m_imageIndex = ImageList_Add(m_imageList.get(), bitmap.get(), nullptr);
 		ASSERT_NE(m_imageIndex, -1);
 
-		m_view->SetImageList(m_imageList.get());
+		m_view.SetImageList(m_imageList.get());
 
-		m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 1", m_imageIndex), 0);
-		m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 2", m_imageIndex), 1);
-		m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 3", m_imageIndex), 2);
+		m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 1", m_imageIndex), 0);
+		m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 2", m_imageIndex), 1);
+		m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 3", m_imageIndex), 2);
 
-		m_view->SelectTabAtIndex(0);
+		m_view.SelectTabAtIndex(0);
 
 		ResizeWindowToFitTabs();
 	}
@@ -292,7 +284,7 @@ protected:
 	void PerformPaintTest(ChangeType changeType)
 	{
 		RECT clientRect;
-		auto res = GetClientRect(m_view->GetHWND(), &clientRect);
+		auto res = GetClientRect(m_view.GetHWND(), &clientRect);
 		ASSERT_TRUE(res);
 
 		std::unique_ptr<Gdiplus::Bitmap> bitmap;
@@ -307,7 +299,7 @@ protected:
 		Gdiplus::Graphics graphics(bitmap.get());
 
 		HDC hdc = graphics.GetHDC();
-		m_testApi->Paint(hdc, clientRect);
+		m_testApi.Paint(hdc, clientRect);
 		graphics.ReleaseHDC(hdc);
 
 		EXPECT_EQ(AreGdiplusBitmapsEquivalent(bitmap.get(), m_previousBitmap.get()),
@@ -349,27 +341,27 @@ TEST_F(TabViewPaintTest, Paint)
 
 	// Previously, there was no hot item, whereas item 1 is now marked as hot. The contents of the
 	// control should now be different.
-	m_testApi->SetHotItemDetails(1, TabViewTestApi::TabPart::Body);
+	m_testApi.SetHotItemDetails(1, TabViewTestApi::TabPart::Body);
 	PerformPaintTest(ChangeType::ChangeExpected);
 
 	// The selection has changed, so the contents of the control should have changed again.
-	m_view->SelectTabAtIndex(1);
-	m_testApi->ClearHotItemDetails();
+	m_view.SelectTabAtIndex(1);
+	m_testApi.ClearHotItemDetails();
 	PerformPaintTest(ChangeType::ChangeExpected);
 
 	// Item 1 is selected. Its appearance shouldn't change if it becomes hot. So, the contents of
 	// the control shouldn't change here.
-	m_testApi->SetHotItemDetails(1, TabViewTestApi::TabPart::Body);
+	m_testApi.SetHotItemDetails(1, TabViewTestApi::TabPart::Body);
 	PerformPaintTest(ChangeType::ChangeNotExpected);
 
 	// The close button on item 1 is now hot, so it should be drawn differently.
-	m_testApi->SetHotItemDetails(1, TabViewTestApi::TabPart::CloseButton);
+	m_testApi.SetHotItemDetails(1, TabViewTestApi::TabPart::CloseButton);
 	PerformPaintTest(ChangeType::ChangeExpected);
 
-	m_view->AddTab(std::make_unique<TestTabViewItem>(L"Tab 4", m_imageIndex), 3);
+	m_view.AddTab(std::make_unique<TestTabViewItem>(L"Tab 4", m_imageIndex), 3);
 	ResizeWindowToFitTabs();
 	PerformPaintTest(ChangeType::ChangeExpected);
 
-	m_view->RemoveTab(3);
+	m_view.RemoveTab(3);
 	PerformPaintTest(ChangeType::ChangeExpected);
 }

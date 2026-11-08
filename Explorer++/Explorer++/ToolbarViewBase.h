@@ -195,7 +195,7 @@ protected:
 		std::unique_ptr<ToolbarButton> button;
 	};
 
-	ToolbarViewBase(HWND parent, DWORD style, DWORD extendedStyle,
+	ToolbarViewBase(ViewBase *parent, DWORD style, DWORD extendedStyle,
 		MenuHelpTextHost *menuHelpTextHost, const Config *config);
 
 	void AddButton(int id, const ToolbarButton *button, size_t index);

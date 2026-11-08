@@ -20,7 +20,7 @@ class DrivesToolbarTest : public BrowserTestBase
 protected:
 	DrivesToolbarTest() :
 		m_browser(AddBrowser()),
-		m_drivesToolbarView(m_browser->GetHWND(), m_browser, &m_config)
+		m_drivesToolbarView(m_browser->GetView(), m_browser, &m_config)
 	{
 		m_driveWatcher.AddDrive(L"C:\\");
 		m_driveWatcher.AddDrive(L"F:\\");

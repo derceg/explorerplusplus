@@ -9,8 +9,8 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/resource.h>
 
-StatusBarView::StatusBarView(HWND parent, const Config *config) :
-	ViewBase(CreateStatusBar(parent,
+StatusBarView::StatusBarView(ViewBase *parent, const Config *config) :
+	ViewBase(CreateStatusBar(parent->GetHWND(),
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | WS_CLIPCHILDREN)),
 	m_fontSetter(GetHWND(), config),
 	m_parts({ 100 })

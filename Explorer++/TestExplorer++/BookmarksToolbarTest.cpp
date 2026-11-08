@@ -20,7 +20,7 @@ class BookmarksToolbarTest : public BrowserTestBase
 protected:
 	BookmarksToolbarTest() :
 		m_browser(AddBrowser()),
-		m_bookmarksToolbarView(m_browser->GetHWND(), m_browser, &m_config)
+		m_bookmarksToolbarView(m_browser->GetView(), m_browser, &m_config)
 	{
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(L"Folder 1"));

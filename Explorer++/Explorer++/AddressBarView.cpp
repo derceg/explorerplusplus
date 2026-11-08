@@ -11,7 +11,7 @@
 #include "../Helper/WindowSubclass.h"
 #include <Shlwapi.h>
 
-AddressBarView::AddressBarView(HWND parent, const Config *config) :
+AddressBarView::AddressBarView(ViewBase *parent, const Config *config) :
 	ViewBase(CreateAddressBar(parent)),
 	m_fontSetter(GetHWND(), config)
 {
@@ -30,14 +30,14 @@ AddressBarView::AddressBarView(HWND parent, const Config *config) :
 	HRESULT hr = SHAutoComplete(edit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 	DCHECK(SUCCEEDED(hr));
 
-	AddSubclass(std::make_unique<WindowSubclass>(parent,
+	AddSubclass(std::make_unique<WindowSubclass>(parent->GetHWND(),
 		std::bind_front(&AddressBarView::ParentSubclass, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(
 		std::bind(&AddressBarView::OnFontOrDpiUpdated, this));
 }
 
-HWND AddressBarView::CreateAddressBar(HWND parent)
+HWND AddressBarView::CreateAddressBar(ViewBase *parent)
 {
 	// Note that a non 0 height needs to be passed in here. That's because the control will
 	// interpret the height as the combined height of the edit control plus dropdown (see
@@ -48,7 +48,7 @@ HWND AddressBarView::CreateAddressBar(HWND parent)
 	return CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX, L"",
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_CLIPSIBLINGS
 			| WS_CLIPCHILDREN,
-		0, 0, 0, 200, parent, nullptr, GetModuleHandle(nullptr), nullptr);
+		0, 0, 0, 200, parent->GetHWND(), nullptr, GetModuleHandle(nullptr), nullptr);
 }
 
 LRESULT AddressBarView::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

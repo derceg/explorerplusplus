@@ -83,7 +83,7 @@ protected:
 
 TEST_F(MainRebarTest, StorageData)
 {
-	MainRebarView mainRebarView(m_browser->GetHWND());
+	MainRebarView mainRebarView(m_browser->GetView());
 
 	RebarBandTestData band1(mainRebarView.GetHWND());
 	RebarBandTestData band2(mainRebarView.GetHWND());
@@ -107,7 +107,7 @@ TEST_F(MainRebarTest, StorageData)
 
 TEST_F(MainRebarTest, ShowState)
 {
-	MainRebarView mainRebarView(m_browser->GetHWND());
+	MainRebarView mainRebarView(m_browser->GetView());
 
 	RebarBandTestData band1(mainRebarView.GetHWND(), InitialShowState::Hide);
 	RebarBandTestData band2(mainRebarView.GetHWND(), InitialShowState::Show);
@@ -134,7 +134,7 @@ TEST_F(MainRebarTest, LockToolbars)
 {
 	m_config.lockToolbars = true;
 
-	MainRebarView mainRebarView(m_browser->GetHWND());
+	MainRebarView mainRebarView(m_browser->GetView());
 	MainRebar mainRebar(&mainRebarView, {}, {}, m_browser, &m_appServices);
 
 	RebarViewTestApi testApi(&mainRebarView);

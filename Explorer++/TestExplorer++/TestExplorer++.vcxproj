@@ -326,6 +326,7 @@
     <ClCompile Include="TabViewTestApi.cpp" />
     <ClCompile Include="TaskbarTabManagerTest.cpp" />
     <ClCompile Include="TestMenuView.cpp" />
+    <ClCompile Include="TestParentView.cpp" />
     <ClCompile Include="TestRebarBandView.cpp" />
     <ClCompile Include="TestToolbarButton.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
@@ -555,6 +556,7 @@
     <ClInclude Include="StorageTestHelper.h" />
     <ClInclude Include="TabViewTestApi.h" />
     <ClInclude Include="TestMenuView.h" />
+    <ClInclude Include="TestParentView.h" />
     <ClInclude Include="TestRebarBandView.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />

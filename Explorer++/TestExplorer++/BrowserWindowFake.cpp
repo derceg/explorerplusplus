@@ -21,7 +21,7 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	m_view(storageData.bounds),
 	m_config(appServices->GetConfig()),
 	m_shellBrowserFactory(this, appServices->GetNavigationEvents()),
-	m_tabBarView(m_view.GetHWND(), appServices->GetThemeManager(), appServices->GetConfig(),
+	m_tabBarView(&m_view, appServices->GetThemeManager(), appServices->GetConfig(),
 		appServices->GetResourceLoader()),
 	m_tabBar(&m_tabBarView, this, &m_shellBrowserFactory, appServices)
 {

@@ -9,5 +9,6 @@
 class BookmarksToolbarView : public ToolbarView
 {
 public:
-	BookmarksToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost, const Config *config);
+	BookmarksToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
+		const Config *config);
 };

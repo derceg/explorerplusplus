@@ -186,9 +186,9 @@ ToolbarButton *ToolbarItem::GetButton() const
 	return m_button;
 }
 
-ToolbarViewBase::ToolbarViewBase(HWND parent, DWORD style, DWORD extendedStyle,
+ToolbarViewBase::ToolbarViewBase(ViewBase *parent, DWORD style, DWORD extendedStyle,
 	MenuHelpTextHost *menuHelpTextHost, const Config *config) :
-	ViewBase(CreateToolbar(parent, style, extendedStyle)),
+	ViewBase(CreateToolbar(parent->GetHWND(), style, extendedStyle)),
 	m_menuHelpTextHost(menuHelpTextHost),
 	m_fontSetter(GetHWND(), config)
 {
@@ -203,7 +203,7 @@ ToolbarViewBase::ToolbarViewBase(HWND parent, DWORD style, DWORD extendedStyle,
 
 	AddSubclass(std::make_unique<WindowSubclass>(GetHWND(),
 		std::bind_front(&ToolbarViewBase::WndProc, this)));
-	AddSubclass(std::make_unique<WindowSubclass>(parent,
+	AddSubclass(std::make_unique<WindowSubclass>(parent->GetHWND(),
 		std::bind_front(&ToolbarViewBase::ParentWndProc, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(

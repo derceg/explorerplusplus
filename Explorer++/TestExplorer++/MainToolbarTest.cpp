@@ -63,7 +63,7 @@ TEST_F(MainToolbarTest, GetLayoutForStorage)
 		MainToolbarButtonId::Refresh,
 	});
 
-	MainToolbarView mainToolbarView(m_browser->GetHWND(), m_browser, &m_config);
+	MainToolbarView mainToolbarView(m_browser->GetView(), m_browser, &m_config);
 	MainToolbar mainToolbar(&mainToolbarView, initialLayout, m_browser, &m_appServices,
 		&m_coreInterface, &m_shellIconLoader);
 

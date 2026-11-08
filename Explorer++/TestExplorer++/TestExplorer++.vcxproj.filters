@@ -671,6 +671,9 @@
     <ClCompile Include="TabViewTestApi.cpp">
       <Filter>UI\Views\TabView</Filter>
     </ClCompile>
+    <ClCompile Include="TestParentView.cpp">
+      <Filter>UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -1117,6 +1120,9 @@
     <ClInclude Include="ControlTestHelper.h" />
     <ClInclude Include="TabViewTestApi.h">
       <Filter>UI\Views\TabView</Filter>
+    </ClInclude>
+    <ClInclude Include="TestParentView.h">
+      <Filter>UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,8 +15,8 @@
 class ToolbarView : public ToolbarViewBase
 {
 public:
-	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, MenuHelpTextHost *menuHelpTextHost,
-		const Config *config);
+	ToolbarView(ViewBase *parent, DWORD style, DWORD extendedStyle,
+		MenuHelpTextHost *menuHelpTextHost, const Config *config);
 
 	void AddButton(std::unique_ptr<ToolbarButton> button, size_t index);
 	ToolbarButton *GetButtonAtIndex(size_t index) const;

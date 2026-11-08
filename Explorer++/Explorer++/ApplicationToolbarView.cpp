@@ -8,7 +8,7 @@
 namespace Applications
 {
 
-ApplicationToolbarView::ApplicationToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost,
+ApplicationToolbarView::ApplicationToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
 	const Config *config) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

@@ -10,7 +10,7 @@
 class TabBarView : public TabView
 {
 public:
-	TabBarView(HWND parent, const ThemeManager *themeManager, const Config *config,
+	TabBarView(ViewBase *parent, const ThemeManager *themeManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 
 	TabBarViewImageListManager *GetImageListManager();

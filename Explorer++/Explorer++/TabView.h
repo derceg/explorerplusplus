@@ -68,7 +68,7 @@ public:
 		Right
 	};
 
-	TabView(HWND parent, DWORD style, const ThemeManager *themeManager, const Config *config,
+	TabView(ViewBase *parent, DWORD style, const ThemeManager *themeManager, const Config *config,
 		const ResourceLoader *resourceLoader);
 	~TabView();
 

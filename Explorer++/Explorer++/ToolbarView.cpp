@@ -6,7 +6,7 @@
 #include "ToolbarView.h"
 #include <algorithm>
 
-ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle,
+ToolbarView::ToolbarView(ViewBase *parent, DWORD style, DWORD extendedStyle,
 	MenuHelpTextHost *menuHelpTextHost, const Config *config) :
 	ToolbarViewBase(parent, style, extendedStyle, menuHelpTextHost, config)
 {

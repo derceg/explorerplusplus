@@ -22,7 +22,7 @@ class ApplicationToolbarTestBase : public BrowserTestBase
 protected:
 	ApplicationToolbarTestBase(std::vector<std::unique_ptr<Application>> initialApplications = {}) :
 		m_browser(AddBrowser()),
-		m_applicationToolbarView(m_browser->GetHWND(), m_browser, &m_config)
+		m_applicationToolbarView(m_browser->GetView(), m_browser, &m_config)
 	{
 		for (auto &application : initialApplications)
 		{

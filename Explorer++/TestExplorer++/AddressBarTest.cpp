@@ -21,7 +21,7 @@ class AddressBarTest : public BrowserTestBase
 protected:
 	AddressBarTest() :
 		m_browser(AddBrowser()),
-		m_addressBarView(std::make_unique<AddressBarView>(m_browser->GetHWND(), &m_config)),
+		m_addressBarView(std::make_unique<AddressBarView>(m_browser->GetView(), &m_config)),
 		m_addressBar(std::make_unique<AddressBar>(m_addressBarView.get(), m_browser, &m_tabEvents,
 			&m_shellBrowserEvents, &m_navigationEvents, &m_runtime, &m_iconFetcher))
 	{

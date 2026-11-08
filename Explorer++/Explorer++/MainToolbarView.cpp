@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "MainToolbarView.h"
 
-MainToolbarView::MainToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost,
+MainToolbarView::MainToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
 	const Config *config) :
 	CustomizableToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

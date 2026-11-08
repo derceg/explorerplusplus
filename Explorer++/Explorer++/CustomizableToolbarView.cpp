@@ -7,7 +7,7 @@
 #include "TestHelper.h"
 #include <algorithm>
 
-CustomizableToolbarView::CustomizableToolbarView(HWND parent, DWORD style, DWORD extendedStyle,
+CustomizableToolbarView::CustomizableToolbarView(ViewBase *parent, DWORD style, DWORD extendedStyle,
 	MenuHelpTextHost *menuHelpTextHost, const Config *config) :
 	ToolbarViewBase(parent, style, extendedStyle, menuHelpTextHost, config)
 {

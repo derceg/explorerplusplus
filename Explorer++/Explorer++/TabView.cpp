@@ -86,9 +86,9 @@ void TabViewItem::NotifyParentOfUpdate() const
 	}
 }
 
-TabView::TabView(HWND parent, DWORD style, const ThemeManager *themeManager, const Config *config,
-	const ResourceLoader *resourceLoader) :
-	ViewBase(CreateTabControl(parent, style)),
+TabView::TabView(ViewBase *parent, DWORD style, const ThemeManager *themeManager,
+	const Config *config, const ResourceLoader *resourceLoader) :
+	ViewBase(CreateTabControl(parent->GetHWND(), style)),
 	m_themeManager(themeManager),
 	m_resourceLoader(resourceLoader),
 	m_fontSetter(GetHWND(), config, GetDefaultSystemFontForDefaultDpi())
@@ -104,8 +104,8 @@ TabView::TabView(HWND parent, DWORD style, const ThemeManager *themeManager, con
 
 	AddSubclass(
 		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&TabView::WndProc, this)));
-	AddSubclass(
-		std::make_unique<WindowSubclass>(parent, std::bind_front(&TabView::ParentWndProc, this)));
+	AddSubclass(std::make_unique<WindowSubclass>(parent->GetHWND(),
+		std::bind_front(&TabView::ParentWndProc, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&TabView::OnFontUpdated, this));
 }

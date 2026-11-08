@@ -7,7 +7,7 @@
 
 FoldersPaneToolbarView::FoldersPaneToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
 	const Config *config) :
-	ToolbarView(parent->GetHWND(),
+	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
 			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE,
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DOUBLEBUFFER, menuHelpTextHost, config)

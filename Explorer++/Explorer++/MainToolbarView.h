@@ -9,5 +9,5 @@
 class MainToolbarView : public CustomizableToolbarView
 {
 public:
-	MainToolbarView(HWND parent, MenuHelpTextHost *menuHelpTextHost, const Config *config);
+	MainToolbarView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost, const Config *config);
 };

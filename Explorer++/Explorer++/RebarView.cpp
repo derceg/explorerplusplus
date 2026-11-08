@@ -10,20 +10,20 @@
 #include "../Helper/WindowSubclass.h"
 #include <wil/common.h>
 
-RebarView::RebarView(HWND parent, DWORD style) : ViewBase(CreateRebar(parent, style))
+RebarView::RebarView(ViewBase *parent, DWORD style) : ViewBase(CreateRebar(parent, style))
 {
 	AddSubclass(
 		std::make_unique<WindowSubclass>(GetHWND(), std::bind_front(&RebarView::WndProc, this)));
-	AddSubclass(
-		std::make_unique<WindowSubclass>(parent, std::bind_front(&RebarView::ParentWndProc, this)));
+	AddSubclass(std::make_unique<WindowSubclass>(parent->GetHWND(),
+		std::bind_front(&RebarView::ParentWndProc, this)));
 }
 
 RebarView::~RebarView() = default;
 
-HWND RebarView::CreateRebar(HWND parent, DWORD style)
+HWND RebarView::CreateRebar(ViewBase *parent, DWORD style)
 {
-	HWND hwnd = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, L"", style, 0, 0, 0, 0, parent,
-		nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hwnd = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, L"", style, 0, 0, 0, 0,
+		parent->GetHWND(), nullptr, GetModuleHandle(nullptr), nullptr);
 	CHECK(hwnd);
 	return hwnd;
 }

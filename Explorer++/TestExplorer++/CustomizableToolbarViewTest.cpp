@@ -6,6 +6,7 @@
 #include "CustomizableToolbarView.h"
 #include "Config.h"
 #include "NoOpMenuHelpTextHost.h"
+#include "TestParentView.h"
 #include "TestToolbarButton.h"
 #include <gtest/gtest.h>
 #include <memory>
@@ -15,15 +16,9 @@ using namespace testing;
 class CustomizableToolbarViewTest : public Test
 {
 protected:
-	void SetUp() override
+	CustomizableToolbarViewTest() :
+		m_view(&m_parentView, WS_CHILD, 0, NoOpMenuHelpTextHost::GetInstance(), &m_config)
 	{
-		m_parentWindow.reset(CreateWindow(WC_STATIC, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr,
-			GetModuleHandle(nullptr), nullptr));
-		ASSERT_NE(m_parentWindow, nullptr);
-
-		m_view = std::make_unique<CustomizableToolbarView>(m_parentWindow.get(), WS_CHILD, 0,
-			NoOpMenuHelpTextHost::GetInstance(), &m_config);
-
 		auto button1 = std::make_unique<TestToolbarButton>();
 		auto button2 = std::make_unique<TestToolbarButton>();
 		auto button3 = std::make_unique<TestToolbarButton>();
@@ -42,7 +37,7 @@ protected:
 			m_availableButtons.push_back(button.get());
 		}
 
-		m_view->InitializeAvailableButtons(std::move(buttons));
+		m_view.InitializeAvailableButtons(std::move(buttons));
 	}
 
 	bool SendGetButtonInfo(int index, std::wstring &outputText)
@@ -50,12 +45,12 @@ protected:
 		wchar_t text[256] = {};
 
 		NMTOOLBAR notification = {};
-		notification.hdr.hwndFrom = m_view->GetHWND();
+		notification.hdr.hwndFrom = m_view.GetHWND();
 		notification.hdr.code = TBN_GETBUTTONINFO;
 		notification.iItem = index;
 		notification.pszText = text;
 		notification.cchText = static_cast<int>(std::size(text));
-		bool result = static_cast<bool>(SendMessage(m_parentWindow.get(), WM_NOTIFY, 0,
+		bool result = static_cast<bool>(SendMessage(m_parentView.GetHWND(), WM_NOTIFY, 0,
 			reinterpret_cast<LPARAM>(&notification)));
 
 		if (result)
@@ -69,15 +64,15 @@ protected:
 	void SendToolbarReset()
 	{
 		NMHDR notification = {};
-		notification.hwndFrom = m_view->GetHWND();
+		notification.hwndFrom = m_view.GetHWND();
 		notification.code = TBN_RESET;
-		SendMessage(m_parentWindow.get(), WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&notification));
+		SendMessage(m_parentView.GetHWND(), WM_NOTIFY, 0, reinterpret_cast<LPARAM>(&notification));
 	}
 
 	Config m_config;
 
-	wil::unique_hwnd m_parentWindow;
-	std::unique_ptr<CustomizableToolbarView> m_view;
+	TestParentView m_parentView;
+	CustomizableToolbarView m_view;
 
 	TestToolbarButton *m_button1 = nullptr;
 	TestToolbarButton *m_button2 = nullptr;
@@ -89,8 +84,8 @@ TEST_F(CustomizableToolbarViewTest, SetItems)
 {
 	std::vector<ToolbarItem> items = { ToolbarItem::Button(m_button2), ToolbarItem::Separator(),
 		ToolbarItem::Button(m_button1) };
-	m_view->SetItems(items);
-	EXPECT_EQ(m_view->GetItems(), items);
+	m_view.SetItems(items);
+	EXPECT_EQ(m_view.GetItems(), items);
 }
 
 TEST_F(CustomizableToolbarViewTest, GetButtonInfo)
@@ -117,12 +112,12 @@ TEST_F(CustomizableToolbarViewTest, ResetItems)
 {
 	std::vector<ToolbarItem> defaultItems = { ToolbarItem::Button(m_button1),
 		ToolbarItem::Button(m_button3), ToolbarItem::Separator(), ToolbarItem::Button(m_button2) };
-	m_view->SetDefaultItems(defaultItems);
+	m_view.SetDefaultItems(defaultItems);
 
 	std::vector<ToolbarItem> items = { ToolbarItem::Button(m_button3),
 		ToolbarItem::Button(m_button1) };
-	m_view->SetItems(items);
+	m_view.SetItems(items);
 
 	SendToolbarReset();
-	EXPECT_EQ(m_view->GetItems(), defaultItems);
+	EXPECT_EQ(m_view.GetItems(), defaultItems);
 }
