@@ -566,8 +566,8 @@ void BrowserCommandController::OnResetMainFontSize()
 
 void BrowserCommandController::OnChangeDisplayColors()
 {
-	auto *displayColoursDialog = DisplayColoursDialog::Create(m_appServices->GetResourceLoader(),
-		m_browser->GetHWND(), m_browser, m_config, m_appServices->GetAcceleratorManager());
+	auto *displayColoursDialog =
+		DisplayColoursDialog::Create(m_browser->GetHWND(), m_browser, m_appServices);
 	displayColoursDialog->ShowModalDialog();
 }
 

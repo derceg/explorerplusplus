@@ -117,3 +117,9 @@ int AsyncIconFetcherImpl::GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const
 
 	return m_defaultFileIconIndex;
 }
+
+int AsyncIconFetcherImpl::GetDefaultIconIndex(DefaultIconType defaultIconType) const
+{
+	return defaultIconType == DefaultIconType::File ? m_defaultFileIconIndex
+													: m_defaultFolderIconIndex;
+}

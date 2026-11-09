@@ -3,7 +3,6 @@
 // Used by Explorer++_NoTranslation.rc
 //
 #define IDI_MAIN                        105
-#define IDI_DISPLAYWINDOW               106
 #define IDB_CUT_16                      250
 #define IDB_CUT_WINDOWS_10_16           251
 #define IDB_BACK_16                     252

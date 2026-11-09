@@ -5,6 +5,7 @@
 #pragma once
 
 #include <boost/signals2.hpp>
+#include <wil/com.h>
 #include <wil/resource.h>
 #include <gdiplus.h>
 #include <memory>
@@ -31,6 +32,8 @@
 #define WM_USER_DISPLAYWINDOWRESIZED (WM_APP + 100)
 
 class AcceleratorManager;
+class AppServices;
+class AsyncIconFetcher;
 class BrowserWindow;
 struct Config;
 class ResourceLoader;
@@ -57,8 +60,8 @@ public:
 		Preview
 	};
 
-	static DisplayWindow *Create(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
+	static DisplayWindow *Create(HWND parent, Mode mode, BrowserWindow *browser,
+		AppServices *appServices, Config *config);
 
 	HWND GetHWND() const;
 
@@ -70,8 +73,8 @@ private:
 	static inline const wchar_t CLASS_NAME[] = L"DisplayWindow";
 	static inline const wchar_t WINDOW_NAME[] = L"DisplayWindow";
 
-	DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
+	DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser, AppServices *appServices,
+		Config *config);
 	~DisplayWindow();
 
 	static HWND CreateDisplayWindow(HWND parent);
@@ -93,12 +96,13 @@ private:
 	void ExtractThumbnailImage();
 	void CancelThumbnailExtraction();
 
-	void OnDisplayConfigChanged();
+	void InvalidateWindow();
 	void OnFontConfigChanged();
 
 	const HWND m_hwnd;
 	const Mode m_mode;
 	BrowserWindow *const m_browser;
+	AsyncIconFetcher *const m_iconFetcher;
 	Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;
@@ -106,7 +110,10 @@ private:
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	wil::unique_hicon m_mainIcon;
+	wil::com_ptr_nothrow<IImageList> m_systemImageList;
+	int m_folderIconWidth;
+	int m_folderIconHeight;
+
 	wil::unique_hfont m_font;
 
 	/* Text drawing attributes. */

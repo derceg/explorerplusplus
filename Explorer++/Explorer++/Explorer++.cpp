@@ -223,8 +223,8 @@ void Explorerplusplus::CreateApplicationToolbar()
 
 void Explorerplusplus::InitializeDisplayWindow()
 {
-	m_displayWindow = DisplayWindow::Create(m_hwnd, DisplayWindow::Mode::Normal, this, m_config,
-		m_acceleratorManager, m_resourceLoader);
+	m_displayWindow =
+		DisplayWindow::Create(m_hwnd, DisplayWindow::Mode::Normal, this, m_appServices, m_config);
 }
 
 void Explorerplusplus::InitializeTabObservers()

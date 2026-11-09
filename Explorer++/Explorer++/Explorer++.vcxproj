@@ -1588,6 +1588,7 @@
     <ClInclude Include="CustomizableToolbarView.h" />
     <ClInclude Include="DarkModeColorProvider.h" />
     <ClInclude Include="DarkModeManager.h" />
+    <ClInclude Include="DefaultIconType.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DirectoryWatcher.h" />
     <ClInclude Include="DirectoryWatcherFactory.h" />
@@ -1933,7 +1934,6 @@
     <ClInclude Include="XmlAppStorageFactory.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Display Window.ico" />
     <None Include="res\Explorer++.ico" />
     <None Include="VersionConstants.h" />
   </ItemGroup>

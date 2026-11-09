@@ -4,25 +4,25 @@
 
 #include "stdafx.h"
 #include "DisplayColoursDialog.h"
+#include "AppServices.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
-DisplayColoursDialog *DisplayColoursDialog::Create(const ResourceLoader *resourceLoader,
-	HWND parent, BrowserWindow *browser, Config *config,
-	const AcceleratorManager *acceleratorManager)
+DisplayColoursDialog *DisplayColoursDialog::Create(HWND parent, BrowserWindow *browser,
+	AppServices *appServices)
 {
-	return new DisplayColoursDialog(resourceLoader, parent, browser, config, acceleratorManager);
+	return new DisplayColoursDialog(parent, browser, appServices);
 }
 
-DisplayColoursDialog::DisplayColoursDialog(const ResourceLoader *resourceLoader, HWND parent,
-	BrowserWindow *browser, Config *config, const AcceleratorManager *acceleratorManager) :
-	BaseDialog(resourceLoader, IDD_DISPLAYCOLOURS, parent, DialogSizingType::None),
+DisplayColoursDialog::DisplayColoursDialog(HWND parent, BrowserWindow *browser,
+	AppServices *appServices) :
+	BaseDialog(appServices->GetResourceLoader(), IDD_DISPLAYCOLOURS, parent,
+		DialogSizingType::None),
 	m_browser(browser),
-	m_config(config),
-	m_acceleratorManager(acceleratorManager)
+	m_appServices(appServices)
 {
 	m_pdcdps = &DisplayColoursDialogPersistentSettings::GetInstance();
 }
@@ -110,11 +110,11 @@ void DisplayColoursDialog::SetColorGroupValues(ColorGroup colorGroup[NUM_COLORS]
 
 void DisplayColoursDialog::InitializePreviewWindow()
 {
-	CopyDisplayConfigFields(*m_config, m_previewConfig);
+	CopyDisplayConfigFields(*m_appServices->GetConfig(), m_previewConfig);
 
 	HWND hStatic = GetDlgItem(m_hDlg, IDC_STATIC_PREVIEWDISPLAY);
 	m_previewDisplayWindow = DisplayWindow::Create(hStatic, DisplayWindow::Mode::Preview, m_browser,
-		&m_previewConfig, m_acceleratorManager, m_resourceLoader);
+		m_appServices, &m_previewConfig);
 
 	DisplayWindow_ClearTextBuffer(m_previewDisplayWindow->GetHWND());
 
@@ -322,7 +322,7 @@ void DisplayColoursDialog::OnEnChange(UINT ControlID)
 
 void DisplayColoursDialog::OnOk()
 {
-	CopyDisplayConfigFields(m_previewConfig, *m_config);
+	CopyDisplayConfigFields(m_previewConfig, *m_appServices->GetConfig());
 
 	EndDialog(m_hDlg, 1);
 }

@@ -23,6 +23,7 @@ public:
 	int GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const override;
 	std::optional<int> MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const override;
 	int GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const override;
+	int GetDefaultIconIndex(DefaultIconType defaultIconType) const override;
 
 private:
 	static concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsyncImpl(

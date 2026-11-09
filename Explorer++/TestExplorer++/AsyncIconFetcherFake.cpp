@@ -43,6 +43,13 @@ int AsyncIconFetcherFake::GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const
 	return m_defaultFileIconIndex;
 }
 
+int AsyncIconFetcherFake::GetDefaultIconIndex(DefaultIconType defaultIconType) const
+{
+	UNREFERENCED_PARAMETER(defaultIconType);
+
+	return m_defaultFileIconIndex;
+}
+
 bool AsyncIconFetcherFake::HasPendingRequests() const
 {
 	return !m_pendingRequests.empty();

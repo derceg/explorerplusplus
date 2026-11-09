@@ -29,8 +29,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 // remains consistent on all systems.
 IDI_MAIN                ICON                    "res\\Explorer++.ico"
 
-IDI_DISPLAYWINDOW       ICON                    "res\\Display Window.ico"
-
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

@@ -2136,6 +2136,9 @@
     <ClInclude Include="ThemeManager.h">
       <Filter>Theming</Filter>
     </ClInclude>
+    <ClInclude Include="DefaultIconType.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -2152,9 +2155,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Display Window.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\Explorer++.ico">
       <Filter>Resource Files</Filter>
     </None>

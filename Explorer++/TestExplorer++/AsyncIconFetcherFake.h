@@ -18,6 +18,7 @@ public:
 	int GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const override;
 	std::optional<int> MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const override;
 	int GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const override;
+	int GetDefaultIconIndex(DefaultIconType defaultIconType) const override;
 
 	bool HasPendingRequests() const;
 	void CompletePendingRequests();

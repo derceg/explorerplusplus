@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DefaultIconType.h"
 #include "../Helper/ShellHelper.h"
 #include <concurrencpp/concurrencpp.h>
 #include <shtypes.h>
@@ -20,4 +21,5 @@ public:
 	virtual int GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const = 0;
 	virtual std::optional<int> MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const = 0;
 	virtual int GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const = 0;
+	virtual int GetDefaultIconIndex(DefaultIconType defaultIconType) const = 0;
 };

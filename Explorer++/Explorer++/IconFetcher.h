@@ -4,15 +4,10 @@
 
 #pragma once
 
+#include "DefaultIconType.h"
 #include <ShlObj.h>
 #include <functional>
 #include <optional>
-
-enum class DefaultIconType
-{
-	File,
-	Folder
-};
 
 class IconFetcher
 {

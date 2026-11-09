@@ -20,11 +20,17 @@
 
 #include "stdafx.h"
 #include "DisplayWindow.h"
+#include "AppServices.h"
+#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "DisplayWindowContextMenu.h"
 #include "MainResource.h"
 #include "PopupMenuView.h"
+#include "ShellBrowser/NavigationEvents.h"
+#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserEvents.h"
+#include "TabEvents.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
 
@@ -36,12 +42,8 @@ next column. */
 /* Defines the horizontal spacing between text columns. */
 #define TEXT_COLUMN_SPACING 50
 
-/* These give the position and size of the
-main 'folder' icon. */
 #define MAIN_ICON_LEFT 20
 #define MAIN_ICON_TOP 20
-#define MAIN_ICON_WIDTH 48
-#define MAIN_ICON_HEIGHT 48
 
 /* Defines the position of thumbnails
 for image files. The y-coordinate of
@@ -55,23 +57,22 @@ at the top and bottom of the thumbnail. */
 
 std::list<ThumbnailEntry_t> g_ThumbnailEntries;
 
-DisplayWindow *DisplayWindow::Create(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
+DisplayWindow *DisplayWindow::Create(HWND parent, Mode mode, BrowserWindow *browser,
+	AppServices *appServices, Config *config)
 {
-	return new DisplayWindow(parent, mode, browser, config, acceleratorManager, resourceLoader);
+	return new DisplayWindow(parent, mode, browser, appServices, config);
 }
 
-DisplayWindow::DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser, Config *config,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
+DisplayWindow::DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser,
+	AppServices *appServices, Config *config) :
 	m_hwnd(CreateDisplayWindow(parent)),
 	m_mode(mode),
 	m_browser(browser),
+	m_iconFetcher(appServices->GetAsyncIconFetcher()),
 	m_config(config),
-	m_acceleratorManager(acceleratorManager),
-	m_resourceLoader(resourceLoader),
-	m_mainIcon(static_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
-		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION))),
-	m_font(CreateFontIndirect(&config->displayWindowFont.get()))
+	m_acceleratorManager(appServices->GetAcceleratorManager()),
+	m_resourceLoader(appServices->GetResourceLoader()),
+	m_font(CreateFontIndirect(&m_config->displayWindowFont.get()))
 {
 	m_LineSpacing = 20;
 	m_LeftIndent = 80;
@@ -88,15 +89,34 @@ DisplayWindow::DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser, Con
 		std::bind_front(&DisplayWindow::DisplayWindowProc, this)));
 
 	m_connections.push_back(m_config->displayWindowCentreColor.addObserver(
-		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+		std::bind(&DisplayWindow::InvalidateWindow, this)));
 	m_connections.push_back(m_config->displayWindowSurroundColor.addObserver(
-		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+		std::bind(&DisplayWindow::InvalidateWindow, this)));
 	m_connections.push_back(m_config->displayWindowFont.addObserver(
 		std::bind(&DisplayWindow::OnFontConfigChanged, this)));
 	m_connections.push_back(m_config->displayWindowTextColor.addObserver(
-		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+		std::bind(&DisplayWindow::InvalidateWindow, this)));
 	m_connections.push_back(m_config->displayWindowVertical.addObserver(
-		std::bind(&DisplayWindow::OnDisplayConfigChanged, this)));
+		std::bind(&DisplayWindow::InvalidateWindow, this)));
+
+	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&m_systemImageList)));
+	FAIL_FAST_IF_FAILED(m_systemImageList->GetIconSize(&m_folderIconWidth, &m_folderIconHeight));
+
+	if (m_mode == Mode::Normal)
+	{
+		m_connections.push_back(appServices->GetTabEvents()->AddSelectedObserver(
+			std::bind(&DisplayWindow::InvalidateWindow, this),
+			TabEventScope::ForBrowser(*m_browser)));
+
+		m_connections.push_back(
+			appServices->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
+				std::bind(&DisplayWindow::InvalidateWindow, this),
+				ShellBrowserEventScope::ForActiveShellBrowser(*m_browser)));
+
+		m_connections.push_back(appServices->GetNavigationEvents()->AddCommittedObserver(
+			std::bind(&DisplayWindow::InvalidateWindow, this),
+			NavigationEventScope::ForActiveShellBrowser(*m_browser)));
+	}
 }
 
 DisplayWindow::~DisplayWindow()
@@ -195,7 +215,7 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		}
 
 		/* TODO: Optimize? */
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
+		InvalidateWindow();
 	}
 	break;
 
@@ -230,13 +250,13 @@ LRESULT DisplayWindow::DisplayWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPA
 		}
 
 		/* TODO: Optimize? */
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
+		InvalidateWindow();
 	}
 	break;
 
 	case DWM_SETTHUMBNAILFILE:
 		OnSetThumbnailFile(wParam, lParam);
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
+		InvalidateWindow();
 		break;
 
 	case WM_NCDESTROY:
@@ -252,7 +272,7 @@ HWND DisplayWindow::GetHWND() const
 	return m_hwnd;
 }
 
-void DisplayWindow::OnDisplayConfigChanged()
+void DisplayWindow::InvalidateWindow()
 {
 	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
 }
@@ -260,8 +280,7 @@ void DisplayWindow::OnDisplayConfigChanged()
 void DisplayWindow::OnFontConfigChanged()
 {
 	m_font.reset(CreateFontIndirect(&m_config->displayWindowFont.get()));
-
-	RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE);
+	InvalidateWindow();
 }
 
 void DisplayWindow::Draw(HDC hdc, RECT *rc, RECT *updateRect)
@@ -273,8 +292,23 @@ void DisplayWindow::Draw(HDC hdc, RECT *rc, RECT *updateRect)
 	DrawBackground(hdcMem, rc);
 
 	PaintText(hdcMem, m_LeftIndent);
-	DrawIconEx(hdcMem, MAIN_ICON_LEFT, MAIN_ICON_TOP, m_mainIcon.get(), MAIN_ICON_WIDTH,
-		MAIN_ICON_HEIGHT, 0, nullptr, DI_NORMAL);
+
+	int folderIconIndex;
+
+	if (m_mode == Mode::Normal)
+	{
+		auto *shellBrowser = m_browser->GetActiveShellBrowser();
+		folderIconIndex =
+			m_iconFetcher->GetCachedIconIndexOrDefault(shellBrowser->GetDirectory().Raw());
+	}
+	else
+	{
+		folderIconIndex = m_iconFetcher->GetDefaultIconIndex(DefaultIconType::Folder);
+	}
+
+	auto res = ImageList_Draw(reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
+		folderIconIndex, hdcMem, MAIN_ICON_LEFT, MAIN_ICON_TOP, ILD_TRANSPARENT);
+	DCHECK(res);
 
 	if (m_bShowThumbnail)
 	{
@@ -659,8 +693,8 @@ void DisplayWindow::OnShowContextMenu(const POINT &ptScreen)
 	auto res = ScreenToClient(m_hwnd, &ptClient);
 	CHECK(res);
 
-	RECT rc = { MAIN_ICON_LEFT, MAIN_ICON_TOP, MAIN_ICON_LEFT + MAIN_ICON_WIDTH,
-		MAIN_ICON_TOP + MAIN_ICON_HEIGHT };
+	RECT rc = { MAIN_ICON_LEFT, MAIN_ICON_TOP, MAIN_ICON_LEFT + m_folderIconWidth,
+		MAIN_ICON_TOP + m_folderIconHeight };
 
 	if (PtInRect(&rc, ptClient))
 	{
