@@ -9,10 +9,29 @@
 namespace RegistrySettings
 {
 
+LSTATUS CreateKeyEx(HKEY key, LPCWSTR subKey, DWORD reserved, LPWSTR keyClass, DWORD options,
+	REGSAM access, const LPSECURITY_ATTRIBUTES security, PHKEY result, LPDWORD disposition)
+{
+	HANDLE transaction = StorageWriteScope::Transaction();
+	return StorageWriteScope::RecordWin32(transaction
+			? RegCreateKeyTransacted(key, subKey, reserved, keyClass, options, access, security,
+				  result, disposition, transaction, nullptr)
+			: RegCreateKeyEx(key, subKey, reserved, keyClass, options, access, security, result,
+				  disposition));
+}
+
+HRESULT CreateKey(HKEY key, const wchar_t *path, wil::unique_hkey &result,
+	wil::reg::key_access access)
+{
+	return HRESULT_FROM_WIN32(CreateKeyEx(key, path, 0, nullptr, REG_OPTION_NON_VOLATILE,
+		access == wil::reg::key_access::read ? KEY_READ : KEY_ALL_ACCESS, nullptr, result.put(),
+		nullptr));
+}
+
 LSTATUS SaveDword(HKEY key, const std::wstring &valueName, DWORD value)
 {
-	return RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD,
-		reinterpret_cast<const BYTE *>(&value), sizeof(value));
+	return StorageWriteScope::RecordWin32(RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD,
+		reinterpret_cast<const BYTE *>(&value), sizeof(value)));
 }
 
 // This could return something like:
@@ -72,8 +91,8 @@ void ReadDword(HKEY key, const std::wstring &valueName,
 
 LSTATUS SaveQword(HKEY key, const std::wstring &valueName, uint64_t value)
 {
-	return RegSetValueEx(key, valueName.c_str(), 0, REG_QWORD,
-		reinterpret_cast<const BYTE *>(&value), sizeof(value));
+	return StorageWriteScope::RecordWin32(RegSetValueEx(key, valueName.c_str(), 0, REG_QWORD,
+		reinterpret_cast<const BYTE *>(&value), sizeof(value)));
 }
 
 LSTATUS ReadQword(HKEY key, const std::wstring &subKey, const std::wstring &valueName,
@@ -102,9 +121,9 @@ LSTATUS ReadQword(HKEY key, const std::wstring &valueName, uint64_t &output)
 
 LSTATUS SaveString(HKEY key, const std::wstring &valueName, const std::wstring &value)
 {
-	return RegSetValueEx(key, valueName.c_str(), 0, REG_SZ,
+	return StorageWriteScope::RecordWin32(RegSetValueEx(key, valueName.c_str(), 0, REG_SZ,
 		reinterpret_cast<const BYTE *>(value.c_str()),
-		static_cast<DWORD>((value.size() + 1) * sizeof(wchar_t)));
+		static_cast<DWORD>((value.size() + 1) * sizeof(wchar_t))));
 }
 
 LSTATUS ReadString(HKEY key, const std::wstring &valueName, std::wstring &output)
@@ -206,7 +225,8 @@ bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputD
 
 LSTATUS SaveBinaryValue(HKEY key, const std::wstring &valueName, const BYTE *data, DWORD length)
 {
-	return RegSetValueEx(key, valueName.c_str(), 0, REG_BINARY, data, length);
+	return StorageWriteScope::RecordWin32(
+		RegSetValueEx(key, valueName.c_str(), 0, REG_BINARY, data, length));
 }
 
 LSTATUS ReadBinaryValueSize(HKEY key, const std::wstring &valueName, DWORD &length)

@@ -130,7 +130,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const Application
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> applicationToolbarNode;
 	auto nodeName = wil::make_bstr_nothrow(APPLICATION_TOOLBAR_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(nodeName.get(), &applicationToolbarNode);
+	HRESULT hr = StorageWriteScope::Record(
+		xmlDocument->createElement(nodeName.get(), &applicationToolbarNode));
 
 	if (FAILED(hr))
 	{

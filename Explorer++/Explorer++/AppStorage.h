@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <windows.h>
 #include <vector>
 
 namespace Applications
@@ -42,5 +43,5 @@ public:
 	virtual void SaveDialogStates() = 0;
 	virtual void SaveDefaultColumns(const FolderColumns &defaultColumns) = 0;
 	virtual void SaveFrequentLocations(const FrequentLocationsModel *frequentLocationsModel) = 0;
-	virtual void Commit() = 0;
+	[[nodiscard]] virtual HRESULT Commit() = 0;
 };

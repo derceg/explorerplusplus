@@ -97,7 +97,7 @@ void SaveToKey(HKEY frequentLocationsKey, const FrequentLocationsModel *model)
 		model->GetVisits() | std::views::take(FrequentLocationsStorageHelper::MAX_ITEMS_TO_STORE))
 	{
 		wil::unique_hkey childKey;
-		HRESULT hr = wil::reg::create_unique_key_nothrow(frequentLocationsKey,
+		HRESULT hr = RegistrySettings::CreateKey(frequentLocationsKey,
 			std::to_wstring(index).c_str(), childKey, wil::reg::key_access::readwrite);
 
 		if (SUCCEEDED(hr))
@@ -131,7 +131,7 @@ void Load(HKEY applicationKey, FrequentLocationsModel *model)
 void Save(HKEY applicationKey, const FrequentLocationsModel *model)
 {
 	wil::unique_hkey frequentLocationsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(applicationKey, FREQUENT_LOCATIONS_KEY_PATH,
+	HRESULT hr = RegistrySettings::CreateKey(applicationKey, FREQUENT_LOCATIONS_KEY_PATH,
 		frequentLocationsKey, wil::reg::key_access::readwrite);
 
 	if (FAILED(hr))

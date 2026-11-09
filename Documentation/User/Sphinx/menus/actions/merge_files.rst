@@ -93,3 +93,16 @@ reasons:
   temp is a sub-folder. This may be a result of choosing an output
   folder but forgetting the file name - see :ref:`Output Folder:
   <menus/actions/merge_files:Output Folder>` above.
+Completion and cancellation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Large files, including inputs larger than 4 GiB, are copied completely.
+If an input cannot be read or the result cannot be fully written, the
+operation reports an error instead of skipping that input or reporting
+success. Existing output files are not overwritten.
+
+While merging, the Merge button becomes Cancel. Cancel requests an
+interruption. Close or Esc also requests cancellation and closes the
+dialog after cleanup. Files created by an unsuccessful operation are
+removed; a cleanup error identifies any remaining file. Input files
+are kept.

@@ -22,6 +22,7 @@
 #include "SplitFileDialog.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
+#include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 #include <wil/resource.h>
@@ -79,8 +80,8 @@ void LoadDialogStatesFromRegistry(HKEY applicationKey)
 void SaveDialogStatesToRegistry(HKEY applicationKey)
 {
 	wil::unique_hkey key;
-	LSTATUS res = RegCreateKeyEx(applicationKey, DIALOGS_REGISTRY_KEY_PATH, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr);
+	LSTATUS res = RegistrySettings::CreateKeyEx(applicationKey, DIALOGS_REGISTRY_KEY_PATH, 0,
+		nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -167,7 +168,10 @@ void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> pe;
 	auto bstr = wil::make_bstr_nothrow(DIALOGS_XML_KEY);
-	xmlDocument->createElement(bstr.get(), &pe);
+	if (FAILED(StorageWriteScope::Record(xmlDocument->createElement(bstr.get(), &pe))))
+	{
+		return;
+	}
 
 	for (DialogSettings *ds : DIALOG_SETTINGS)
 	{

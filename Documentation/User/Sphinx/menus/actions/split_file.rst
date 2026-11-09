@@ -76,9 +76,20 @@ same as the target file, but with a number appended, that is, if
 **message.txt** is split, *sub-files* will be **message.txt.1**,
 **message.txt.2**, and so on.
 
-.. note::
+Completion and cancellation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  If **Split File...** involves creating a large number of files (e.g. >
-  500), there may be delays in response, depending on the speed of your
-  computer. Be patient - **Explorer++** **will** finish the operations
-  properly.
+Files and part sizes larger than 4 GiB are supported. Choose a larger
+part size to reduce the number of output files.
+
+Existing output files are not overwritten. If a part cannot be created,
+read or fully written, the operation reports the error and removes the
+files it created. The original input file is kept.
+
+The Split button becomes Stop while the operation is running. Stop
+requests cancellation. Close or Esc also requests cancellation and
+closes the dialog after cleanup. If a created file cannot be removed,
+the error identifies the remaining file.
+
+A forced termination of Explorer++ can leave output files behind.
+Check those files before starting the same operation again.

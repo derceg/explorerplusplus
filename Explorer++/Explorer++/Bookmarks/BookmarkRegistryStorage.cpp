@@ -77,7 +77,7 @@ void Load(HKEY applicationKey, BookmarkTree *bookmarkTree)
 void Save(HKEY applicationKey, const BookmarkTree *bookmarkTree)
 {
 	wil::unique_hkey bookmarksKey;
-	LSTATUS res = RegCreateKeyEx(applicationKey, V2::bookmarksKeyPath, 0, nullptr,
+	LSTATUS res = RegistrySettings::CreateKeyEx(applicationKey, V2::bookmarksKeyPath, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &bookmarksKey, nullptr);
 
 	if (res == ERROR_SUCCESS)
@@ -213,8 +213,8 @@ void Save(HKEY parentKey, const BookmarkTree *bookmarkTree)
 void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name)
 {
 	wil::unique_hkey childKey;
-	LSTATUS res = RegCreateKeyEx(parentKey, name.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE,
-		KEY_WRITE, nullptr, &childKey, nullptr);
+	LSTATUS res = RegistrySettings::CreateKeyEx(parentKey, name.c_str(), 0, nullptr,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -234,8 +234,8 @@ void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem
 	for (auto &child : parentBookmarkItem->GetChildren())
 	{
 		wil::unique_hkey childKey;
-		LSTATUS res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
-			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
+		LSTATUS res = RegistrySettings::CreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0,
+			nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
 
 		if (res == ERROR_SUCCESS)
 		{

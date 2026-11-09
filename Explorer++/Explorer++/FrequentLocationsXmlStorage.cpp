@@ -151,8 +151,8 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *frequentLocationsN
 	{
 		wil::com_ptr_nothrow<IXMLDOMElement> frequentLocationNode;
 		auto frequentLocationNodeName = wil::make_bstr_nothrow(FREQUENT_LOCATION_NODE_NAME);
-		HRESULT hr =
-			xmlDocument->createElement(frequentLocationNodeName.get(), &frequentLocationNode);
+		HRESULT hr = StorageWriteScope::Record(
+			xmlDocument->createElement(frequentLocationNodeName.get(), &frequentLocationNode));
 
 		if (hr == S_OK)
 		{
@@ -185,7 +185,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const FrequentLoc
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> frequentLocationsNode;
 	auto nodeName = wil::make_bstr_nothrow(FREQUENT_LOCATIONS_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(nodeName.get(), &frequentLocationsNode);
+	HRESULT hr = StorageWriteScope::Record(
+		xmlDocument->createElement(nodeName.get(), &frequentLocationsNode));
 
 	if (hr != S_OK)
 	{

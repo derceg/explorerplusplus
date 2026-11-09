@@ -107,8 +107,8 @@ void SaveToKey(HKEY parentKey, const ColorRuleModel *model)
 	for (const auto &colorRule : model->GetItems())
 	{
 		wil::unique_hkey childKey;
-		LSTATUS res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
-			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
+		LSTATUS res = RegistrySettings::CreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0,
+			nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
 
 		if (res == ERROR_SUCCESS)
 		{
@@ -137,7 +137,7 @@ void Load(HKEY applicationKey, ColorRuleModel *model)
 void Save(HKEY applicationKey, const ColorRuleModel *model)
 {
 	wil::unique_hkey colorRulesKey;
-	LSTATUS res = RegCreateKeyEx(applicationKey, COLOR_RULES_KEY_PATH, 0, nullptr,
+	LSTATUS res = RegistrySettings::CreateKeyEx(applicationKey, COLOR_RULES_KEY_PATH, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &colorRulesKey, nullptr);
 
 	if (res == ERROR_SUCCESS)

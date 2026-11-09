@@ -77,37 +77,36 @@ Run in portable mode
 
 .. _install_folder:
 
-Enabling this option (ie. checking the box) tells **Explorer++** to save
-and fetch all its settings to an XML file (a text file, structured
-hierarchically to enable **Explorer++** to re-construct its
-settings, etc. at program startup).
+Enabling this option tells **Explorer++** to save its settings in an
+XML file. By default, this is ``config.xml`` beside the executable.
+The environment variable ``EXPLORERPP_CONFIG`` can override this with
+the full path to another file. The destination folder must be writable.
 
-By default, the XML file is named config.xml and is located in the
-installation folder, usually ...\\Program Files\\Explorer++ v1.2
-(your version might be different). You can change where the config file
-is found by setting the environment variable ``EXPLORERPP_CONFIG`` to
-the full path to the file where you would like to store yours.  If the
-variable points to an invalid location, the Windows registry will be
-used as a fallback.
+Settings are saved periodically and before the application closes. An
+XML save keeps the previous version in ``config.xml.bak`` (or the
+configured filename followed by ``.bak``). A failed save reports the
+error and keeps the previously saved settings. Registry saves likewise
+keep the previous settings if the new save cannot be completed.
 
-.. note::
+At startup, Explorer++ prefers the XML configuration. If that file
+cannot be read, a valid backup can be loaded for recovery. A recovery
+message is shown, and automatic saving is disabled to protect the
+configuration files. To restore a backup, close Explorer++, keep copies
+of both files, copy the valid backup to the main configuration filename,
+and start Explorer++ again.
 
-  At startup, **Explorer++** always looks for a valid XML file in the
-  correct location, and if it is found loads it and uses those settings.
-  The actual setting value for portable mode **is not saved**, either in
-  the Windows registry, or in the XML.
+If the XML configuration or backup is present but cannot be loaded,
+Explorer++ reports the problem instead of silently switching to the
+registry. The registry is used when both XML files are absent.
 
-If **Explorer++** is currently using portable mode (ie. XML file), and
-it is desired to switch back to using the Windows registry, the XML file
-must be either
+To switch back to registry storage, clear the portable mode option and
+close Explorer++ to save the current settings there. Then move both
+the XML configuration and its backup out of their expected locations
+before restarting. Renaming the main file to ``config.xml.bak`` does
+not disable portable mode, since that name is used for recovery.
 
-- deleted, or
-- renamed (eg. config.xml.bak)
-
-**and** the portable mode option must be disabled (ie. clear the
-checkbox) prior to closing **Explorer++**, to avoid re-writing the XML
-file. Note that **Explorer++** creates the XML file (if this setting is
-enabled) immediately upon closing the options dialog.
+The portable mode choice itself is not stored: the presence of the XML
+files determines the storage used at the next startup.
 
 Default new tab folder
 ~~~~~~~~~~~~~~~~~~~~~~

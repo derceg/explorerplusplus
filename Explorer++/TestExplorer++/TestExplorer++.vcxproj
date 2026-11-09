@@ -211,6 +211,12 @@
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="FileStreamOperationsTest.cpp" />
+    <ClCompile Include="RegistryAppStorageTest.cpp" />
+    <ClCompile Include="XmlAppStorageTest.cpp" />
+    <ClCompile Include="AtomicFileTest.cpp" />
+    <ClCompile Include="StorageWriteScopeTest.cpp" />
+    <ClCompile Include="FileOperationsTest.cpp" />
     <ClCompile Include="AcceleratorHelperTest.cpp" />
     <ClCompile Include="AcceleratorManagerTest.cpp" />
     <ClCompile Include="AcceleratorTestHelper.cpp" />
@@ -484,6 +490,7 @@
     <ResourceCompile Include="TestResources.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="TemporaryFileTest.h" />
     <ClInclude Include="AcceleratorTestHelper.h" />
     <ClInclude Include="AppControllerFake.h" />
     <ClInclude Include="ApplicationExecutorMock.h" />

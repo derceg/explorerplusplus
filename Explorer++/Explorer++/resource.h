@@ -1,4 +1,7 @@
 //{{NO_DEPENDENCIES}}
+#define IDS_SETTINGS_LOAD_FAILED        9100
+#define IDS_SETTINGS_SAVE_FAILED        9101
+#define IDS_SETTINGS_RECOVERED          9102
 // Microsoft Visual C++ generated include file.
 // Used by Explorer++.rc
 //

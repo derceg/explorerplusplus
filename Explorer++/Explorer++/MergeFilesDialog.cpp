@@ -20,12 +20,9 @@
 
 namespace NMergeFilesDialog
 {
-const int WM_APP_SETTOTALMERGECOUNT = WM_APP + 1;
 const int WM_APP_SETCURRENTMERGECOUNT = WM_APP + 2;
 const int WM_APP_MERGINGFINISHED = WM_APP + 3;
-const int WM_APP_OUTPUTFILEINVALID = WM_APP + 4;
 
-DWORD WINAPI MergeFilesThread(LPVOID pParam);
 }
 
 const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles");
@@ -47,19 +44,17 @@ MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hP
 	m_strOutputDirectory(strOutputDirectory),
 	m_filePaths(filePaths),
 	m_bShowFriendlyDates(bShowFriendlyDates),
-	m_pMergeFiles(nullptr),
-	m_bMergingFiles(false),
-	m_bStopMerging(false)
+	m_bMergingFiles(false)
 {
 	m_persistentSettings = &MergeFilesDialogPersistentSettings::GetInstance();
 }
 
 MergeFilesDialog::~MergeFilesDialog()
 {
-	if (m_pMergeFiles != nullptr)
+	if (m_worker.joinable())
 	{
-		m_pMergeFiles->StopMerging();
-		m_pMergeFiles->Release();
+		m_worker.request_stop();
+		m_worker.join();
 	}
 }
 
@@ -253,46 +248,22 @@ INT_PTR MergeFilesDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 INT_PTR MergeFilesDialog::OnClose()
 {
-	EndDialog(m_hDlg, 0);
+	OnCancel();
 	return 0;
 }
 
 INT_PTR MergeFilesDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
-
 	switch (uMsg)
 	{
-	case NMergeFilesDialog::WM_APP_SETTOTALMERGECOUNT:
-		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETRANGE32, 0, wParam);
-		break;
-
 	case NMergeFilesDialog::WM_APP_SETCURRENTMERGECOUNT:
 		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, wParam, 0);
 		break;
-
 	case NMergeFilesDialog::WM_APP_MERGINGFINISHED:
 		OnFinished();
 		break;
-
-	case NMergeFilesDialog::WM_APP_OUTPUTFILEINVALID:
-	{
-		auto errorMessage = m_resourceLoader->LoadString(IDS_MERGE_FILES_OUTPUTFILEINVALID);
-		MessageBox(m_hDlg, errorMessage.c_str(), AppInfo::NAME, MB_ICONWARNING | MB_OK);
-
-		assert(m_pMergeFiles != nullptr);
-
-		m_pMergeFiles->Release();
-		m_pMergeFiles = nullptr;
-
-		m_bMergingFiles = false;
-		m_bStopMerging = false;
-
-		SetDlgItemText(m_hDlg, IDOK, m_szOk);
 	}
-	break;
-	}
-
 	return 0;
 }
 
@@ -317,8 +288,6 @@ void MergeFilesDialog::OnOk()
 
 		std::wstring outputFileName = GetWindowString(hOutputFileName);
 
-		m_pMergeFiles = new MergeFiles(m_hDlg, outputFileName, m_filePaths);
-
 		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, 0, 0);
 
 		GetDlgItemText(m_hDlg, IDOK, m_szOk, static_cast<int>(std::size(m_szOk)));
@@ -328,19 +297,59 @@ void MergeFilesDialog::OnOk()
 
 		m_bMergingFiles = true;
 
-		HANDLE hThread = CreateThread(nullptr, 0, NMergeFilesDialog::MergeFilesThread,
-			reinterpret_cast<LPVOID>(m_pMergeFiles), 0, nullptr);
-		SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-		CloseHandle(hThread);
+		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETRANGE32, 0, 1000);
+		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, 0, 0);
+		for (int id : { IDC_MERGE_EDIT_FILENAME, IDC_MERGE_BUTTON_OUTPUT, IDC_MERGE_BUTTON_MOVEUP,
+				 IDC_MERGE_BUTTON_MOVEDOWN })
+			EnableWindow(GetDlgItem(m_hDlg, id), FALSE);
+		m_closePending = false;
+		m_result = {};
+		try
+		{
+			m_worker = std::jthread(
+				[this, inputs = m_filePaths, output = outputFileName](std::stop_token stop)
+				{
+					int previous = -1;
+					auto progress = [this, &previous](uint64_t completed, uint64_t total)
+					{
+						int value = total ? static_cast<int>(999.0 * completed / total) : 0;
+						if (value == previous)
+							return;
+						previous = value;
+						PostMessage(m_hDlg, NMergeFilesDialog::WM_APP_SETCURRENTMERGECOUNT, value,
+							0);
+					};
+
+					try
+					{
+						m_result = FileStreamOperations::Merge(inputs, output, stop, progress);
+					}
+					catch (const std::bad_alloc &)
+					{
+						m_result.error = E_OUTOFMEMORY;
+					}
+					catch (const std::exception &)
+					{
+						m_result.error = E_FAIL;
+					}
+
+					PostMessage(m_hDlg, NMergeFilesDialog::WM_APP_MERGINGFINISHED, 0, 0);
+				});
+		}
+		catch (const std::system_error &)
+		{
+			m_result = { HRESULT_FROM_WIN32(ERROR_MAX_THRDS_REACHED) };
+			OnFinished();
+		}
+		catch (const std::bad_alloc &)
+		{
+			m_result = { E_OUTOFMEMORY };
+			OnFinished();
+		}
 	}
 	else
 	{
-		m_bStopMerging = true;
-
-		if (m_pMergeFiles != nullptr)
-		{
-			m_pMergeFiles->StopMerging();
-		}
+		m_worker.request_stop();
 	}
 }
 
@@ -348,7 +357,8 @@ void MergeFilesDialog::OnCancel()
 {
 	if (m_bMergingFiles)
 	{
-		m_bStopMerging = true;
+		m_closePending = true;
+		m_worker.request_stop();
 	}
 	else
 	{
@@ -381,6 +391,8 @@ void MergeFilesDialog::OnChangeOutputDirectory()
 
 void MergeFilesDialog::OnMove(bool bUp)
 {
+	if (m_bMergingFiles)
+		return;
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MERGE_LISTVIEW);
 	int iSelected = ListView_GetNextItem(hListView, -1, LVNI_SELECTED);
 
@@ -407,13 +419,8 @@ void MergeFilesDialog::OnMove(bool bUp)
 			iSwap = iSelected + 1;
 		}
 
-		auto itrSelected = m_filePaths.begin();
-		std::advance(itrSelected, iSelected);
-
-		auto itrSwap = m_filePaths.begin();
-		std::advance(itrSelected, iSwap);
-
-		std::iter_swap(itrSelected, itrSwap);
+		if (!FileStreamOperations::MoveItem(m_filePaths, iSelected, bUp))
+			return;
 
 		ListViewHelper::SwapItems(hListView, iSelected, iSwap);
 	}
@@ -421,119 +428,25 @@ void MergeFilesDialog::OnMove(bool bUp)
 
 void MergeFilesDialog::OnFinished()
 {
-	assert(m_pMergeFiles != nullptr);
-
-	m_pMergeFiles->Release();
-	m_pMergeFiles = nullptr;
-
+	// Joining establishes publication of the result and releases the worker before
+	// any dialog state is reset or the HWND can be destroyed.
+	if (m_worker.joinable())
+		m_worker.join();
 	m_bMergingFiles = false;
-	m_bStopMerging = false;
-
-	/* Set the progress bar position to the end. */
-	int iHighLimit =
-		static_cast<int>(SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_GETRANGE, FALSE, 0));
-	SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, iHighLimit, 0);
-
+	for (int id : { IDC_MERGE_EDIT_FILENAME, IDC_MERGE_BUTTON_OUTPUT, IDC_MERGE_BUTTON_MOVEUP,
+			 IDC_MERGE_BUTTON_MOVEDOWN })
+		EnableWindow(GetDlgItem(m_hDlg, id), TRUE);
 	SetDlgItemText(m_hDlg, IDOK, m_szOk);
-}
 
-DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
-{
-	assert(pParam != nullptr);
-
-	auto *pMergeFiles = reinterpret_cast<MergeFiles *>(pParam);
-	pMergeFiles->StartMerging();
-
-	return 0;
-}
-
-MergeFiles::MergeFiles(HWND hDlg, const std::wstring &strOutputFilename,
-	const std::vector<std::wstring> &filePaths)
-{
-	m_hDlg = hDlg;
-	m_strOutputFilename = strOutputFilename;
-	m_filePaths = filePaths;
-
-	m_bstopMerging = false;
-
-	InitializeCriticalSection(&m_csStop);
-}
-
-MergeFiles::~MergeFiles()
-{
-	DeleteCriticalSection(&m_csStop);
-}
-
-void MergeFiles::StartMerging()
-{
-	LARGE_INTEGER lMergeFileSize;
-	int nFilesMerged = 1;
-	bool bStop = false;
-
-	HANDLE hOutputFile = CreateFile(m_strOutputFilename.c_str(), GENERIC_WRITE, 0, nullptr,
-		CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-	if (hOutputFile == INVALID_HANDLE_VALUE)
+	if (SUCCEEDED(m_result.error))
+		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, 1000, 0);
+	if ((FAILED(m_result.error) && !m_result.Cancelled()) || FAILED(m_result.cleanupError))
 	{
-		PostMessage(m_hDlg, NMergeFilesDialog::WM_APP_OUTPUTFILEINVALID, 0, 0);
-		return;
+		auto message = FileStreamOperations::DescribeError(m_result);
+		MessageBox(m_hDlg, message.c_str(), AppInfo::NAME, MB_ICONERROR | MB_OK);
 	}
-
-	PostMessage(m_hDlg, NMergeFilesDialog::WM_APP_SETTOTALMERGECOUNT,
-		static_cast<WPARAM>(m_filePaths.size()), 0);
-
-	for (const auto &strFullFilename : m_filePaths)
-	{
-		if (bStop)
-		{
-			break;
-		}
-
-		HANDLE hInputFile = CreateFile(strFullFilename.c_str(), GENERIC_READ, FILE_SHARE_READ,
-			nullptr, OPEN_EXISTING, 0, nullptr);
-
-		if (hInputFile != INVALID_HANDLE_VALUE)
-		{
-			GetFileSizeEx(hInputFile, &lMergeFileSize);
-
-			if (lMergeFileSize.QuadPart != 0)
-			{
-				auto buffer = std::make_unique<char[]>(lMergeFileSize.LowPart);
-
-				DWORD dwNumberOfBytesRead;
-				ReadFile(hInputFile, reinterpret_cast<LPVOID>(buffer.get()),
-					static_cast<DWORD>(lMergeFileSize.LowPart), &dwNumberOfBytesRead, nullptr);
-
-				DWORD dwNumberOfBytesWritten;
-				WriteFile(hOutputFile, reinterpret_cast<LPCVOID>(buffer.get()), dwNumberOfBytesRead,
-					&dwNumberOfBytesWritten, nullptr);
-			}
-
-			CloseHandle(hInputFile);
-
-			PostMessage(m_hDlg, NMergeFilesDialog::WM_APP_SETCURRENTMERGECOUNT, nFilesMerged, 0);
-
-			nFilesMerged++;
-
-			EnterCriticalSection(&m_csStop);
-			if (m_bstopMerging)
-			{
-				bStop = true;
-			}
-			LeaveCriticalSection(&m_csStop);
-		}
-	}
-
-	CloseHandle(hOutputFile);
-
-	SendMessage(m_hDlg, NMergeFilesDialog::WM_APP_MERGINGFINISHED, 0, 0);
-}
-
-void MergeFiles::StopMerging()
-{
-	EnterCriticalSection(&m_csStop);
-	m_bstopMerging = true;
-	LeaveCriticalSection(&m_csStop);
+	if (m_closePending)
+		EndDialog(m_hDlg, 0);
 }
 
 MergeFilesDialogPersistentSettings::MergeFilesDialogPersistentSettings() :

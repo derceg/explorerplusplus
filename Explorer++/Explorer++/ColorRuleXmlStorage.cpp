@@ -147,7 +147,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const ColorRuleMo
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> colorRulesNode;
 	auto nodeName = wil::make_bstr_nothrow(COLOR_RULES_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(nodeName.get(), &colorRulesNode);
+	HRESULT hr =
+		StorageWriteScope::Record(xmlDocument->createElement(nodeName.get(), &colorRulesNode));
 
 	if (FAILED(hr))
 	{

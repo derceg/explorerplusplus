@@ -35,11 +35,13 @@ public:
 	void SaveDialogStates() override;
 	void SaveDefaultColumns(const FolderColumns &defaultColumns) override;
 	void SaveFrequentLocations(const FrequentLocationsModel *frequentLocationsModel) override;
-	void Commit() override;
+	[[nodiscard]] HRESULT Commit() override;
 
 private:
 	const wil::com_ptr_nothrow<IXMLDOMDocument> m_xmlDocument;
 	const wil::com_ptr_nothrow<IXMLDOMNode> m_rootNode;
 	const std::wstring m_configFilePath;
 	const Storage::OperationType m_operationType;
+	HRESULT m_writeError = S_OK;
+	bool m_committed = false;
 };

@@ -74,6 +74,7 @@ private:
 	void LoadSettings(std::vector<WindowStorageData> &windows);
 	void SaveSettings();
 	void OnConfigLoaded();
+	void ReportSettingsError(HRESULT error, bool loading);
 	void SetUpLanguageResourceInstance();
 	void SetUpAppServices();
 	void InitializePlugins();
@@ -95,6 +96,10 @@ private:
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	SaveLocation m_saveLocation = SaveLocation::Registry;
+	HRESULT m_settingsLoadError = S_OK;
+	HRESULT m_lastSaveError = S_OK;
+	bool m_settingsSaveBlocked = false;
+	bool m_settingsRecovered = false;
 	AppServices m_appServices;
 	PlatformContextImpl m_platformContext;
 	Runtime m_runtime;

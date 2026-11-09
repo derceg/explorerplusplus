@@ -36,6 +36,7 @@
 #include "../Helper/ProcessHelper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+#include <comdef.h>
 #include <filesystem>
 
 using namespace std::chrono_literals;
@@ -106,6 +107,8 @@ void App::OnBrowserRemoved()
 int App::Run()
 {
 	SetUpSession();
+	if (FAILED(m_settingsLoadError))
+		ReportSettingsError(m_settingsLoadError, true);
 
 	// Internally, concurrencpp converts the duration to size_t, which triggers a warning in the
 	// 32-bit build. The conversion is fine, since the duration here is well below the point at
@@ -158,19 +161,39 @@ void App::SetUpSession()
 
 void App::LoadSettings(std::vector<WindowStorageData> &windows)
 {
-	// Settings will be loaded from the config file by default, if that file is present and can be
-	// read.
-	std::unique_ptr<AppStorage> appStorage = XmlAppStorageFactory::MaybeCreate(
-		Storage::GetConfigFilePath(), Storage::OperationType::Load);
+	// Only an absent config file permits falling back to the registry. An unreadable
+	// or malformed file must not silently switch profiles and overwrite user state.
+	HRESULT error;
+	std::unique_ptr<AppStorage> appStorage =
+		XmlAppStorageFactory::LoadWithRecovery(Storage::GetConfigFilePath(), error);
 
 	if (appStorage)
 	{
 		m_saveLocation = SaveLocation::ConfigFile;
+		if (FAILED(error))
+		{
+			m_settingsLoadError = error;
+			m_settingsSaveBlocked = true;
+			m_settingsRecovered = true;
+		}
+	}
+	else if (error == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)
+		|| error == HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND))
+	{
+		appStorage = RegistryAppStorageFactory::MaybeCreate(Storage::REGISTRY_APPLICATION_KEY_PATH,
+			Storage::OperationType::Load, &error);
+		if (!appStorage && error != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)
+			&& error != HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND))
+		{
+			m_settingsLoadError = error;
+			m_settingsSaveBlocked = true;
+		}
 	}
 	else
 	{
-		appStorage = RegistryAppStorageFactory::MaybeCreate(Storage::REGISTRY_APPLICATION_KEY_PATH,
-			Storage::OperationType::Load);
+		m_saveLocation = SaveLocation::ConfigFile;
+		m_settingsLoadError = error;
+		m_settingsSaveBlocked = true;
 	}
 
 	if (appStorage)
@@ -202,44 +225,87 @@ void App::SaveSettings()
 	// something that should be attempted. That's because one or more of the windows may have
 	// already been closed.
 	CHECK(!m_exitStarted);
-
-	std::unique_ptr<AppStorage> appStorage;
-
-	if (m_saveLocation == SaveLocation::ConfigFile)
-	{
-		appStorage = XmlAppStorageFactory::MaybeCreate(Storage::GetConfigFilePath(),
-			Storage::OperationType::Save);
-	}
-	else
-	{
-		appStorage = RegistryAppStorageFactory::MaybeCreate(Storage::REGISTRY_APPLICATION_KEY_PATH,
-			Storage::OperationType::Save);
-	}
-
-	if (!appStorage)
-	{
+	if (m_settingsSaveBlocked)
 		return;
-	}
-
-	std::vector<WindowStorageData> windows;
-
-	for (const auto *browser : m_browserList.GetList())
+	try
 	{
-		windows.push_back(browser->GetStorageData());
+		std::unique_ptr<AppStorage> appStorage;
+		HRESULT error;
+
+		if (m_saveLocation == SaveLocation::ConfigFile)
+		{
+			appStorage = XmlAppStorageFactory::MaybeCreate(Storage::GetConfigFilePath(),
+				Storage::OperationType::Save, &error);
+		}
+		else
+		{
+			appStorage = RegistryAppStorageFactory::MaybeCreate(
+				Storage::REGISTRY_APPLICATION_KEY_PATH, Storage::OperationType::Save, &error);
+		}
+
+		if (!appStorage)
+		{
+			ReportSettingsError(error, false);
+			return;
+		}
+
+		std::vector<WindowStorageData> windows;
+
+		for (const auto *browser : m_browserList.GetList())
+		{
+			windows.push_back(browser->GetStorageData());
+		}
+
+		DCHECK_GE(windows.size(), 1u);
+
+		appStorage->SaveConfig(m_config);
+		appStorage->SaveWindows(windows);
+		appStorage->SaveBookmarks(m_bookmarkTree.get());
+		appStorage->SaveColorRules(m_colorRuleModel.get());
+		appStorage->SaveApplications(&m_applicationModel);
+		appStorage->SaveDialogStates();
+		appStorage->SaveDefaultColumns(m_config.globalFolderSettings.folderColumns);
+		appStorage->SaveFrequentLocations(&m_frequentLocationsModel);
+
+		error = appStorage->Commit();
+		appStorage.reset();
+		if (FAILED(error))
+			ReportSettingsError(error, false);
+		else
+			m_lastSaveError = S_OK;
 	}
+	catch (const std::bad_alloc &)
+	{
+		ReportSettingsError(E_OUTOFMEMORY, false);
+	}
+}
 
-	DCHECK_GE(windows.size(), 1u);
-
-	appStorage->SaveConfig(m_config);
-	appStorage->SaveWindows(windows);
-	appStorage->SaveBookmarks(m_bookmarkTree.get());
-	appStorage->SaveColorRules(m_colorRuleModel.get());
-	appStorage->SaveApplications(&m_applicationModel);
-	appStorage->SaveDialogStates();
-	appStorage->SaveDefaultColumns(m_config.globalFolderSettings.folderColumns);
-	appStorage->SaveFrequentLocations(&m_frequentLocationsModel);
-
-	appStorage->Commit();
+void App::ReportSettingsError(HRESULT error, bool loading)
+{
+	// An automatic retry must not display the same modal every thirty seconds.
+	if (!loading && error == m_lastSaveError)
+		return;
+	if (!loading)
+		m_lastSaveError = error;
+	std::wstring path = m_saveLocation == SaveLocation::ConfigFile
+		? Storage::GetConfigFilePath()
+		: L"HKEY_CURRENT_USER\\" + std::wstring(Storage::REGISTRY_APPLICATION_KEY_PATH);
+	const auto *browser = m_browserList.GetLastActive();
+	auto instance = GetModuleHandle(nullptr);
+	const auto stringId = loading
+		? (m_settingsRecovered ? IDS_SETTINGS_RECOVERED : IDS_SETTINGS_LOAD_FAILED)
+		: IDS_SETTINGS_SAVE_FAILED;
+	auto message = ResourceHelper::LoadString(instance, stringId);
+	if (m_resourceLoader)
+	{
+		auto translated = m_resourceLoader->MaybeLoadString(stringId);
+		if (translated)
+			message = *translated;
+	}
+	message += L"\n\n" + path + L"\n" + _com_error(error).ErrorMessage();
+	LOG(ERROR) << "Settings " << (loading ? "load" : "save") << " failed: " << error;
+	MessageBox(browser ? browser->GetHWND() : nullptr, message.c_str(), AppInfo::NAME,
+		MB_OK | MB_ICONERROR);
 }
 
 void App::OnConfigLoaded()
@@ -370,6 +436,11 @@ SaveLocation App::GetSaveLocation() const
 
 void App::SetSaveLocation(SaveLocation saveLocation)
 {
+	if (saveLocation != m_saveLocation)
+	{
+		m_settingsSaveBlocked = false;
+		m_lastSaveError = S_OK;
+	}
 	m_saveLocation = saveLocation;
 }
 
@@ -458,6 +529,7 @@ void App::OnExitStarted()
 	// The application is going to exit, so the settings need to be saved before the shutdown
 	// begins.
 	m_saveSettingsTimer.cancel();
+	m_lastSaveError = S_OK;
 	SaveSettings();
 
 	m_exitStarted = true;

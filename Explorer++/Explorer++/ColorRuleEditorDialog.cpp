@@ -293,8 +293,8 @@ ColorRuleEditorDialogPersistentSettings &ColorRuleEditorDialogPersistentSettings
 
 void ColorRuleEditorDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	RegSetValueEx(hKey, SETTING_CUSTOM_COLORS, 0, REG_BINARY,
-		reinterpret_cast<LPBYTE>(&m_customColors), sizeof(m_customColors));
+	StorageWriteScope::RecordWin32(RegSetValueEx(hKey, SETTING_CUSTOM_COLORS, 0, REG_BINARY,
+		reinterpret_cast<LPBYTE>(&m_customColors), sizeof(m_customColors)));
 }
 
 void ColorRuleEditorDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)

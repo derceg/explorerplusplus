@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "ColumnRegistryStorage.h"
+#include "../Helper/RegistrySettings.h"
 #include <wil/registry.h>
 
 namespace
@@ -34,7 +35,7 @@ void Load(HKEY applicationKey, FolderColumns &defaultColumns)
 void Save(HKEY applicationKey, const FolderColumns &defaultColumns)
 {
 	wil::unique_hkey defaultColumnsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(applicationKey, DEFAULT_COLUMNS_KEY_PATH,
+	HRESULT hr = RegistrySettings::CreateKey(applicationKey, DEFAULT_COLUMNS_KEY_PATH,
 		defaultColumnsKey, wil::reg::key_access::readwrite);
 
 	if (FAILED(hr))

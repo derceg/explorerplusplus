@@ -25,6 +25,9 @@ enum class TransferAction
 namespace FileOperations
 {
 
+// PerformOperations can return S_OK even if the user aborted the batch.
+HRESULT PerformOperations(IFileOperation *operation);
+
 enum class OverwriteMethod
 {
 	OnePass = 1,
@@ -45,7 +48,7 @@ HRESULT CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFo
 
 TCHAR *BuildFilenameList(const std::list<std::wstring> &FilenameList);
 
-BOOL SaveDirectoryListing(const std::wstring &strDirectory, const std::wstring &strFilename);
+HRESULT SaveDirectoryListing(const std::wstring &strDirectory, const std::wstring &strFilename);
 
 HRESULT CreateLinkToFile(const std::wstring &strTargetFilename, const std::wstring &strLinkFilename,
 	const std::wstring &strLinkDescription);

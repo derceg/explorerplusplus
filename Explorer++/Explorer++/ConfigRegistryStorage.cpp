@@ -352,8 +352,8 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	if (mainFont)
 	{
 		wil::unique_hkey mainFontKey;
-		HRESULT hr = wil::reg::create_unique_key_nothrow(settingsKey, MAIN_FONT_KEY_NAME,
-			mainFontKey, wil::reg::key_access::readwrite);
+		HRESULT hr = RegistrySettings::CreateKey(settingsKey, MAIN_FONT_KEY_NAME, mainFontKey,
+			wil::reg::key_access::readwrite);
 
 		if (SUCCEEDED(hr))
 		{
@@ -362,7 +362,7 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 	}
 
 	wil::unique_hkey startupFoldersKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(settingsKey, STARTUP_FOLDERS_KEY_NAME,
+	HRESULT hr = RegistrySettings::CreateKey(settingsKey, STARTUP_FOLDERS_KEY_NAME,
 		startupFoldersKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
@@ -393,8 +393,8 @@ void Load(HKEY applicationKey, Config &config)
 void Save(HKEY applicationKey, const Config &config)
 {
 	wil::unique_hkey settingsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(applicationKey,
-		Storage::REGISTRY_SETTINGS_KEY_NAME, settingsKey, wil::reg::key_access::readwrite);
+	HRESULT hr = RegistrySettings::CreateKey(applicationKey, Storage::REGISTRY_SETTINGS_KEY_NAME,
+		settingsKey, wil::reg::key_access::readwrite);
 
 	if (FAILED(hr))
 	{
