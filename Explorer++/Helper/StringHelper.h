@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <functional>
+#include <locale>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -26,6 +27,8 @@ using StringComparatorFunc =
 
 [[nodiscard]] std::wstring FormatSizeString(uint64_t size,
 	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::None);
+[[nodiscard]] std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat,
+	const std::locale &locale);
 BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
 void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement);
 void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput, UINT cchMax,
