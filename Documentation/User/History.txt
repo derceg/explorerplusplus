@@ -214,6 +214,7 @@ Bug fixes:
   moved, duplicate bookmark items could appear in the listview.
 
 Misc:
+- The application icon has been updated.
 - ARM64 builds are now available.
 - When changing the default file manager setting (via Tools >
   Options > General > Default File Manager), Explorer++ will only
