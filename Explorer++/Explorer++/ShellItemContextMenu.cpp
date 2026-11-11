@@ -13,30 +13,30 @@
 
 ShellItemContextMenu::ShellItemContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, const PidlAbsolute &directory,
-	const std::vector<PidlChild> &items, HWND hwnd, IUnknown *site, Flags flags,
-	BrowserWindow *browser, const ResourceLoader *resourceLoader,
+	const std::vector<PidlChild> &items, IUnknown *site, Flags flags, BrowserWindow *browser,
+	const ResourceLoader *resourceLoader,
 	MaybeHandleShellMenuItemCallback maybeHandleShellMenuItemCallback) :
-	ShellItemContextMenu(menuView, acceleratorManager, directory, items, hwnd, site, flags, browser,
+	ShellItemContextMenu(menuView, acceleratorManager, directory, items, site, flags, browser,
 		nullptr, resourceLoader, std::move(maybeHandleShellMenuItemCallback))
 {
 }
 
 ShellItemContextMenu::ShellItemContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, const PidlAbsolute &directory,
-	const std::vector<PidlChild> &items, HWND hwnd, IUnknown *site, Flags flags,
-	BrowserList *browserList, const ResourceLoader *resourceLoader,
+	const std::vector<PidlChild> &items, IUnknown *site, Flags flags, BrowserList *browserList,
+	const ResourceLoader *resourceLoader,
 	MaybeHandleShellMenuItemCallback maybeHandleShellMenuItemCallback) :
-	ShellItemContextMenu(menuView, acceleratorManager, directory, items, hwnd, site, flags, nullptr,
+	ShellItemContextMenu(menuView, acceleratorManager, directory, items, site, flags, nullptr,
 		browserList, resourceLoader, std::move(maybeHandleShellMenuItemCallback))
 {
 }
 
 ShellItemContextMenu::ShellItemContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, const PidlAbsolute &directory,
-	const std::vector<PidlChild> &items, HWND hwnd, IUnknown *site, Flags flags,
-	BrowserWindow *browser, BrowserList *browserList, const ResourceLoader *resourceLoader,
+	const std::vector<PidlChild> &items, IUnknown *site, Flags flags, BrowserWindow *browser,
+	BrowserList *browserList, const ResourceLoader *resourceLoader,
 	MaybeHandleShellMenuItemCallback maybeHandleShellMenuItemCallback) :
-	ShellContextMenu(menuView, acceleratorManager, directory, hwnd),
+	ShellContextMenu(menuView, acceleratorManager, directory),
 	m_items(items),
 	m_browser(browser),
 	m_browserList(browserList),
@@ -92,7 +92,7 @@ void ShellItemContextMenu::MaybeAddOpenInNewTabItem(const ResourceLoader *resour
 		openItemIndex ? *openItemIndex + 1 : 0);
 }
 
-wil::com_ptr_nothrow<IContextMenu> ShellItemContextMenu::MaybeGetShellContextMenu(HWND hwnd) const
+wil::com_ptr_nothrow<IContextMenu> ShellItemContextMenu::MaybeGetShellContextMenu() const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	HRESULT hr = SHBindToObject(nullptr, m_directory.Raw(), nullptr, IID_PPV_ARGS(&shellFolder));
@@ -107,8 +107,8 @@ wil::com_ptr_nothrow<IContextMenu> ShellItemContextMenu::MaybeGetShellContextMen
 		[](const auto &pidl) { return pidl.Raw(); });
 
 	wil::com_ptr_nothrow<IContextMenu> contextMenu;
-	hr = GetUIObjectOf(shellFolder.get(), hwnd, static_cast<UINT>(pidlItemsRaw.size()),
-		pidlItemsRaw.data(), IID_PPV_ARGS(&contextMenu));
+	hr = GetUIObjectOf(shellFolder.get(), m_rootMenuView->GetOwnerWindow(),
+		static_cast<UINT>(pidlItemsRaw.size()), pidlItemsRaw.data(), IID_PPV_ARGS(&contextMenu));
 
 	if (FAILED(hr))
 	{

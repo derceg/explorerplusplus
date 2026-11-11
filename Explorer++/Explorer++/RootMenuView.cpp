@@ -13,7 +13,7 @@
 
 RootMenuView::RootMenuView(wil::unique_hmenu menu, HWND ownerWindow, MenuType menuType,
 	MenuHelpTextHost *menuHelpTextHost) :
-	MenuView(std::move(menu)),
+	MenuView(std::move(menu), ownerWindow),
 	m_menuType(menuType),
 	m_menuHelpTextHost(menuHelpTextHost)
 {

@@ -297,8 +297,7 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 
 	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
 	BookmarksMenu menu(&popupMenu, m_acceleratorManager, m_bookmarkTree, bookmarkItem,
-		m_bookmarkIconManager.get(), m_browser, m_view->GetHWND(), m_platformContext,
-		m_resourceLoader);
+		m_bookmarkIconManager.get(), m_browser, m_platformContext, m_resourceLoader);
 	popupMenu.Show(pt);
 }
 
@@ -311,9 +310,9 @@ void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
-	PopupMenuView popupMenu(m_browser->GetHWND(), m_browser);
+	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-		{ bookmarkItem }, m_resourceLoader, m_browser, m_browser->GetHWND(), m_platformContext);
+		{ bookmarkItem }, m_resourceLoader, m_browser, m_platformContext);
 	popupMenu.Show(event.ptScreen);
 }
 
@@ -329,7 +328,7 @@ void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
 	BookmarksMenu menu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
 		m_bookmarkTree->GetBookmarksToolbarFolder(), m_bookmarkIconManager.get(), m_browser,
-		m_view->GetHWND(), m_platformContext, m_resourceLoader, includePredicate);
+		m_platformContext, m_resourceLoader, includePredicate);
 	popupMenu.Show(ptScreen);
 }
 

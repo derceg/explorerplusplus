@@ -12,7 +12,4 @@ public:
 	PopupMenuView(HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost);
 
 	void Show(const POINT &ptScreen);
-
-private:
-	const HWND m_ownerWindow;
 };

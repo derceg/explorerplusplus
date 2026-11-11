@@ -45,7 +45,7 @@ protected:
 	{
 		return std::make_unique<BookmarkContextMenu>(menuView, &m_acceleratorManager,
 			&m_bookmarkTree, RawBookmarkItems{ m_bookmark }, &m_resourceLoader, m_browser,
-			m_browser->GetHWND(), &m_platformContext);
+			&m_platformContext);
 	}
 
 	BookmarkItem *const m_bookmark;
@@ -165,8 +165,7 @@ protected:
 	std::unique_ptr<BookmarkContextMenu> BuildContextMenu(MenuView *menuView)
 	{
 		return std::make_unique<BookmarkContextMenu>(menuView, &m_acceleratorManager,
-			&m_bookmarkTree, m_bookmarkItems, &m_resourceLoader, m_browser, m_browser->GetHWND(),
-			&m_platformContext);
+			&m_bookmarkTree, m_bookmarkItems, &m_resourceLoader, m_browser, &m_platformContext);
 	}
 
 	RawBookmarkItems m_bookmarkItems;

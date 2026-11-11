@@ -9,6 +9,7 @@
 
 class BrowserWindow;
 class PidlAbsolute;
+class ResourceLoader;
 class ShellIconLoader;
 
 // Displays a set of shell items in a menu, with the name and icon of each item being displayed.
@@ -19,7 +20,7 @@ class ShellItemsMenu : public MenuBase
 public:
 	ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		const std::vector<PidlAbsolute> &pidls, BrowserWindow *browser,
-		ShellIconLoader *shellIconLoader);
+		ShellIconLoader *shellIconLoader, const ResourceLoader *resourceLoader);
 
 	void RebuildMenu(const std::vector<PidlAbsolute> &pidls);
 
@@ -28,8 +29,10 @@ private:
 
 	void OpenSelectedItem(const PidlAbsolute &pidl, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
+	void OnItemRightClicked(const PidlAbsolute &pidl, const POINT &ptScreen);
 	MenuDragAction OnItemDragged(const PidlAbsolute &pidl);
 
 	BrowserWindow *const m_browser;
 	ShellIconLoader *const m_shellIconLoader;
+	const ResourceLoader *const m_resourceLoader;
 };

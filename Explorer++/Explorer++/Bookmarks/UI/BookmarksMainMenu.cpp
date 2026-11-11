@@ -90,7 +90,7 @@ void BookmarksMainMenu::BuildMenu()
 
 		auto bookmarksMenuFolderMenu = std::make_unique<BookmarksMenu>(m_rootMenuView,
 			m_acceleratorManager, m_bookmarkTree, bookmarksMenuFolder, m_iconManager.get(),
-			m_browser, m_browser->GetHWND(), m_platformContext, m_resourceLoader);
+			m_browser, m_platformContext, m_resourceLoader);
 
 		m_childMenus.push_back(std::move(bookmarksMenuFolderMenu));
 	}
@@ -101,11 +101,11 @@ void BookmarksMainMenu::BuildMenu()
 	{
 		m_rootMenuView->AppendSeparator();
 
-		m_childMenus.push_back(std::make_unique<BookmarksMenu>(m_rootMenuView, m_acceleratorManager,
-			m_bookmarkTree, m_bookmarkTree->GetRoot(), m_iconManager.get(), m_browser,
-			m_browser->GetHWND(), m_platformContext, m_resourceLoader,
-			[otherBookmarksFolder](const BookmarkItem *bookmarkItem)
-			{ return bookmarkItem == otherBookmarksFolder; }));
+		m_childMenus.push_back(
+			std::make_unique<BookmarksMenu>(m_rootMenuView, m_acceleratorManager, m_bookmarkTree,
+				m_bookmarkTree->GetRoot(), m_iconManager.get(), m_browser, m_platformContext,
+				m_resourceLoader, [otherBookmarksFolder](const BookmarkItem *bookmarkItem)
+				{ return bookmarkItem == otherBookmarksFolder; }));
 	}
 }
 

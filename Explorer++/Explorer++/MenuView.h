@@ -52,6 +52,7 @@ public:
 	MenuView(MenuView *parent, HMENU menu, PassKey);
 	virtual ~MenuView() = default;
 
+	HWND GetOwnerWindow() const;
 	void SetExternalItemDelegate(ExternalMenuItemDelegate *externalItemDelegate);
 
 	void AppendItem(MenuItemParams params);
@@ -76,7 +77,7 @@ public:
 protected:
 	// This is used to construct a new root menu. External clients should use PopupMenuView or
 	// WindowMenuView to construct a top-level menu.
-	MenuView(wil::unique_hmenu menu);
+	MenuView(wil::unique_hmenu menu, HWND ownerWindow);
 
 	// Releases ownership of the current menu when ownership has been transferred to a window.
 	HMENU ReleaseMenu();
@@ -186,6 +187,9 @@ private:
 	// This will be set for a top-level context menu, but will be null for a window menu, since in
 	// the that case, the window owns the menu.
 	wil::unique_hmenu m_ownedMenu;
+
+	// This exists on every MenuView instance, but is only valid (non-null) on the root menu.
+	const HWND m_ownerWindow;
 
 	MenuView *const m_parent;
 	ExternalMenuItemDelegate *m_externalItemDelegate = nullptr;

@@ -34,8 +34,7 @@ protected:
 		BookmarksMenu::IncludePredicate includePredicate = {})
 	{
 		return { menuView, &m_acceleratorManager, &m_bookmarkTree, targetFolder, &m_iconManager,
-			m_browser, m_browser->GetHWND(), &m_platformContext, &m_resourceLoader,
-			includePredicate };
+			m_browser, &m_platformContext, &m_resourceLoader, includePredicate };
 	}
 
 	void VerifyMenuItems(const MenuView *menuView, const BookmarkItem *bookmarkFolder,

@@ -35,7 +35,7 @@ public:
 
 	BookmarkContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems,
-		const ResourceLoader *resourceLoader, BrowserWindow *browser, HWND parentWindow,
+		const ResourceLoader *resourceLoader, BrowserWindow *browser,
 		PlatformContext *platformContext);
 
 private:
@@ -65,6 +65,5 @@ private:
 	const RawBookmarkItems m_bookmarkItems;
 	const ResourceLoader *const m_resourceLoader;
 	BrowserWindow *const m_browser;
-	const HWND m_parentWindow;
 	PlatformContext *const m_platformContext;
 };

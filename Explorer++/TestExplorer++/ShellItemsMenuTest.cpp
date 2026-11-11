@@ -45,7 +45,8 @@ TEST_F(ShellItemsMenuTest, CheckItems)
 {
 	TestMenuView menuView;
 	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader,
+		&m_resourceLoader);
 
 	MenuViewTestHelper::CheckShellItemDetails(&menuView, pidls);
 }
@@ -54,7 +55,8 @@ TEST_F(ShellItemsMenuTest, CheckItemBitmapsAssigned)
 {
 	TestMenuView menuView;
 	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader,
+		&m_resourceLoader);
 
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
 
@@ -70,7 +72,8 @@ TEST_F(ShellItemsMenuTest, RebuildMenu)
 {
 	TestMenuView menuView;
 	auto pidls = BuildPidlCollection(3);
-	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, pidls, m_browser, &m_shellIconLoader,
+		&m_resourceLoader);
 
 	auto updatedPidls = BuildPidlCollection(5);
 	menu.RebuildMenu(updatedPidls);
@@ -82,7 +85,8 @@ TEST_F(ShellItemsMenuTest, OpenOnClick)
 {
 	TestMenuView menuView;
 	auto pidl = CreateSimplePidlForTest(L"c:\\users");
-	ShellItemsMenu menu(&menuView, &m_acceleratorManager, { pidl }, m_browser, &m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, { pidl }, m_browser, &m_shellIconLoader,
+		&m_resourceLoader);
 
 	RootMenuViewTestApi::SelectItemAtIndex(&menuView, 0, false, false);
 
@@ -95,7 +99,8 @@ TEST_F(ShellItemsMenuTest, OpenOnMiddleClick)
 {
 	TestMenuView menuView;
 	auto pidl = CreateSimplePidlForTest(L"c:\\users");
-	ShellItemsMenu menu(&menuView, &m_acceleratorManager, { pidl }, m_browser, &m_shellIconLoader);
+	ShellItemsMenu menu(&menuView, &m_acceleratorManager, { pidl }, m_browser, &m_shellIconLoader,
+		&m_resourceLoader);
 
 	RootMenuViewTestApi::MiddleClickItemAtIndex(&menuView, 0, false, false);
 

@@ -486,8 +486,8 @@ void ShellBrowserImpl::ShowBackgroundContextMenu(const POINT &pt)
 
 	PopupMenuView popupMenu(m_listView, m_browser);
 	ShellBackgroundContextMenu menu(&popupMenu, m_acceleratorManager,
-		m_directoryState.pidlDirectory, m_listView, serviceProvider.get(), flags, m_browser,
-		m_clipboardStore, m_resourceLoader);
+		m_directoryState.pidlDirectory, serviceProvider.get(), flags, m_browser, m_clipboardStore,
+		m_resourceLoader);
 	popupMenu.Show(pt);
 }
 
@@ -516,7 +516,7 @@ void ShellBrowserImpl::ShowItemContextMenu(const POINT &pt)
 
 	PopupMenuView popupMenu(m_listView, m_browser);
 	ShellItemContextMenu menu(&popupMenu, m_acceleratorManager, m_directoryState.pidlDirectory,
-		childPidls, m_listView, nullptr, flags, m_browser, m_resourceLoader,
+		childPidls, nullptr, flags, m_browser, m_resourceLoader,
 		std::bind_front(&ShellBrowserImpl::MaybeHandleShellMenuItem,
 			m_weakPtrFactory.GetWeakPtr()));
 	popupMenu.Show(pt);

@@ -979,6 +979,9 @@
     <ClCompile Include="ThemeManager.cpp">
       <Filter>Theming</Filter>
     </ClCompile>
+    <ClCompile Include="ShellItemContextMenuHelper.cpp">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -2138,6 +2141,9 @@
     </ClInclude>
     <ClInclude Include="DefaultIconType.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellItemContextMenuHelper.h">
+      <Filter>Menus\UI\Shell Context Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

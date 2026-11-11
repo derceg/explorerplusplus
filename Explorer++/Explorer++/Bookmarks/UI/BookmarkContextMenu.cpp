@@ -17,13 +17,12 @@
 BookmarkContextMenu::BookmarkContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
 	const RawBookmarkItems &bookmarkItems, const ResourceLoader *resourceLoader,
-	BrowserWindow *browser, HWND parentWindow, PlatformContext *platformContext) :
+	BrowserWindow *browser, PlatformContext *platformContext) :
 	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItems(bookmarkItems),
 	m_resourceLoader(resourceLoader),
 	m_browser(browser),
-	m_parentWindow(parentWindow),
 	m_platformContext(platformContext)
 {
 	BuildMenu();
@@ -208,8 +207,8 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	auto creationTarget = GetCreationTarget();
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, creationTarget.folder,
-		creationTarget.index, m_parentWindow, m_browser, m_acceleratorManager, m_resourceLoader,
-		m_platformContext);
+		creationTarget.index, m_rootMenuView->GetOwnerWindow(), m_browser, m_acceleratorManager,
+		m_resourceLoader, m_platformContext);
 }
 
 void BookmarkContextMenu::OnCopy(ClipboardAction action)
@@ -233,8 +232,9 @@ void BookmarkContextMenu::OnDelete()
 void BookmarkContextMenu::OnShowProperties()
 {
 	DCHECK_EQ(m_bookmarkItems.size(), 1U);
-	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree, m_parentWindow,
-		m_acceleratorManager, m_resourceLoader, m_platformContext);
+	BookmarkHelper::EditBookmarkItem(m_bookmarkItems[0], m_bookmarkTree,
+		m_rootMenuView->GetOwnerWindow(), m_acceleratorManager, m_resourceLoader,
+		m_platformContext);
 }
 
 BookmarkContextMenu::CreationTarget BookmarkContextMenu::GetCreationTarget() const

@@ -25,16 +25,15 @@ public:
 	};
 
 	ShellBackgroundContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const PidlAbsolute &directory, HWND hwnd, IUnknown *site, Flags flags,
-		BrowserWindow *browser, ClipboardStore *clipboardStore,
-		const ResourceLoader *resourceLoader);
+		const PidlAbsolute &directory, IUnknown *site, Flags flags, BrowserWindow *browser,
+		ClipboardStore *clipboardStore, const ResourceLoader *resourceLoader);
 
 private:
 	void BuildMenu(IUnknown *site, Flags flags, const ResourceLoader *resourceLoader);
 	bool CanPaste(PasteType pasteType) const;
 
 	// ShellContextMenu
-	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const override;
+	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu() const override;
 
 	void OnCustomizeDirectory();
 	void SendCommandToBrowser(WORD id);

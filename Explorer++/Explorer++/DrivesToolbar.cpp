@@ -5,16 +5,16 @@
 #include "stdafx.h"
 #include "DrivesToolbar.h"
 #include "BrowserWindow.h"
-#include "Config.h"
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "NavigationHelper.h"
-#include "PopupMenuView.h"
-#include "ResourceHelper.h"
 #include "ResourceLoader.h"
-#include "ShellItemContextMenu.h"
+#include "ShellItemContextMenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <ShlObj.h>
+
+namespace
+{
 
 class DrivesToolbarButton : public ToolbarButton
 {
@@ -60,6 +60,8 @@ public:
 private:
 	std::wstring m_path;
 };
+
+}
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, DriveModel *driveModel,
 	BrowserWindow *browser, const AcceleratorManager *acceleratorManager,
@@ -163,12 +165,6 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		return;
 	}
 
-	auto child = fullPidl.GetLastItem();
-
-	auto parent = fullPidl;
-	auto res = parent.RemoveLastItem();
-	DCHECK(res);
-
 	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::None;
 
 	if (showExtended)
@@ -176,8 +172,6 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
-	ShellItemContextMenu menu(&popupMenu, m_acceleratorManager, parent, { child },
-		m_view->GetHWND(), nullptr, flags, m_browser, m_resourceLoader);
-	popupMenu.Show(ptScreen);
+	ShowShellContextMenuForItem(fullPidl, m_view->GetHWND(), ptScreen, flags, m_browser,
+		m_acceleratorManager, m_resourceLoader);
 }

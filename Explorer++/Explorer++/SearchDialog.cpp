@@ -632,7 +632,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 						PopupMenuView popupMenu(m_hDlg, NoOpMenuHelpTextHost::GetInstance());
 						SearchResultsItemContextMenu menu(&popupMenu, m_acceleratorManager, parent,
-							{ child }, m_hDlg, nullptr, flags, m_browserList, m_resourceLoader);
+							{ child }, nullptr, flags, m_browserList, m_resourceLoader);
 						popupMenu.Show(ptCursor);
 					}
 				}

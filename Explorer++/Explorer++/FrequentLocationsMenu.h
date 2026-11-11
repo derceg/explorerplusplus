@@ -15,7 +15,7 @@ class FrequentLocationsMenu : public ShellItemsMenu
 public:
 	FrequentLocationsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		FrequentLocationsModel *frequentLocationsModel, BrowserWindow *browserWindow,
-		ShellIconLoader *shellIconLoader);
+		ShellIconLoader *shellIconLoader, const ResourceLoader *resourceLoader);
 
 private:
 	static constexpr int MAX_MENU_ITEMS = 10;

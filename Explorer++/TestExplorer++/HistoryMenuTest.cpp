@@ -16,7 +16,8 @@ class HistoryMenuTest : public BrowserTestBase
 protected:
 	HistoryMenuTest() :
 		m_browser(AddBrowser()),
-		m_menu(&m_menuView, &m_acceleratorManager, &m_historyModel, m_browser, &m_shellIconLoader)
+		m_menu(&m_menuView, &m_acceleratorManager, &m_historyModel, m_browser, &m_shellIconLoader,
+			&m_resourceLoader)
 	{
 	}
 

@@ -1230,6 +1230,7 @@
     <ClCompile Include="ListViewModel.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainRebar.cpp" />
+    <ClCompile Include="ShellItemContextMenuHelper.cpp" />
     <ClCompile Include="TabBarView.cpp" />
     <ClCompile Include="TabBarViewImageListManager.cpp" />
     <ClCompile Include="MainToolbarLayout.cpp" />
@@ -1613,6 +1614,7 @@
     <ClInclude Include="ListViewModel.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MainRebar.h" />
+    <ClInclude Include="ShellItemContextMenuHelper.h" />
     <ClInclude Include="TabBarView.h" />
     <ClInclude Include="TabBarViewImageListManager.h" />
     <ClInclude Include="MainToolbarLayout.h" />

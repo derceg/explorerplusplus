@@ -15,10 +15,10 @@
 #include <wil/common.h>
 
 ShellBackgroundContextMenu::ShellBackgroundContextMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, const PidlAbsolute &directory, HWND hwnd,
-	IUnknown *site, Flags flags, BrowserWindow *browser, ClipboardStore *clipboardStore,
+	const AcceleratorManager *acceleratorManager, const PidlAbsolute &directory, IUnknown *site,
+	Flags flags, BrowserWindow *browser, ClipboardStore *clipboardStore,
 	const ResourceLoader *resourceLoader) :
-	ShellContextMenu(menuView, acceleratorManager, directory, hwnd),
+	ShellContextMenu(menuView, acceleratorManager, directory),
 	m_browser(browser),
 	m_clipboardStore(clipboardStore)
 {
@@ -103,8 +103,7 @@ bool ShellBackgroundContextMenu::CanPaste(PasteType pasteType) const
 	return CanPasteInDirectory(m_clipboardStore, m_directory.Raw(), pasteType);
 }
 
-wil::com_ptr_nothrow<IContextMenu> ShellBackgroundContextMenu::MaybeGetShellContextMenu(
-	HWND hwnd) const
+wil::com_ptr_nothrow<IContextMenu> ShellBackgroundContextMenu::MaybeGetShellContextMenu() const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	HRESULT hr = SHBindToObject(nullptr, m_directory.Raw(), nullptr, IID_PPV_ARGS(&shellFolder));
@@ -115,7 +114,8 @@ wil::com_ptr_nothrow<IContextMenu> ShellBackgroundContextMenu::MaybeGetShellCont
 	}
 
 	wil::com_ptr_nothrow<IContextMenu> contextMenu;
-	hr = shellFolder->CreateViewObject(hwnd, IID_PPV_ARGS(&contextMenu));
+	hr =
+		shellFolder->CreateViewObject(m_rootMenuView->GetOwnerWindow(), IID_PPV_ARGS(&contextMenu));
 
 	if (FAILED(hr))
 	{

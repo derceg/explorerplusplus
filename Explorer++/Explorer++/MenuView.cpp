@@ -9,14 +9,18 @@
 #include "../Helper/WeakPtr.h"
 #include <ranges>
 
-MenuView::MenuView(wil::unique_hmenu menu) :
+MenuView::MenuView(wil::unique_hmenu menu, HWND ownerWindow) :
 	m_menu(menu.get()),
 	m_ownedMenu(std::move(menu)),
+	m_ownerWindow(ownerWindow),
 	m_parent(nullptr)
 {
 }
 
-MenuView::MenuView(MenuView *parent, HMENU menu, PassKey) : m_menu(menu), m_parent(parent)
+MenuView::MenuView(MenuView *parent, HMENU menu, PassKey) :
+	m_menu(menu),
+	m_ownerWindow(nullptr),
+	m_parent(parent)
 {
 }
 
@@ -24,6 +28,12 @@ HMENU MenuView::ReleaseMenu()
 {
 	CHECK(m_ownedMenu);
 	return m_ownedMenu.release();
+}
+
+HWND MenuView::GetOwnerWindow() const
+{
+	auto *root = GetRoot();
+	return root->m_ownerWindow;
 }
 
 void MenuView::SetExternalItemDelegate(ExternalMenuItemDelegate *externalItemDelegate)

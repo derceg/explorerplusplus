@@ -290,8 +290,7 @@ void BookmarkListPresenter::OnShowItemContextMenu(const std::vector<ListViewItem
 
 	PopupMenuView popupMenu(m_view->GetHWND(), NoOpMenuHelpTextHost::GetInstance());
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-		GetBookmarksForItems(items), m_resourceLoader, browser, m_view->GetHWND(),
-		m_platformContext);
+		GetBookmarksForItems(items), m_resourceLoader, browser, m_platformContext);
 	popupMenu.Show(ptScreen);
 }
 

@@ -9,8 +9,7 @@
 
 PopupMenuView::PopupMenuView(HWND ownerWindow, MenuHelpTextHost *menuHelpTextHost) :
 	RootMenuView(MenuHelper::CheckedCreatePopupMenu(), ownerWindow, MenuType::ContextMenu,
-		menuHelpTextHost),
-	m_ownerWindow(ownerWindow)
+		menuHelpTextHost)
 {
 }
 
@@ -24,7 +23,7 @@ void PopupMenuView::Show(const POINT &ptScreen)
 	UINT cmd = TrackPopupMenu(m_menu,
 		(GetSystemMetrics(SM_MENUDROPALIGNMENT) == 0 ? TPM_LEFTALIGN : TPM_RIGHTALIGN)
 			| TPM_VERTICAL | TPM_RECURSE | TPM_RETURNCMD,
-		ptScreen.x, ptScreen.y, 0, m_ownerWindow, nullptr);
+		ptScreen.x, ptScreen.y, 0, GetOwnerWindow(), nullptr);
 
 	if (cmd == 0)
 	{

@@ -119,7 +119,7 @@ class TestShellContextMenu : public ShellContextMenu
 public:
 	TestShellContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		wil::com_ptr_nothrow<IContextMenu> externalContextMenu) :
-		ShellContextMenu(menuView, acceleratorManager, PidlAbsolute(), nullptr),
+		ShellContextMenu(menuView, acceleratorManager, PidlAbsolute()),
 		m_externalContextMenu(externalContextMenu)
 	{
 		AppendShellItems(nullptr, CMF_NORMAL);
@@ -134,10 +134,8 @@ public:
 	}
 
 private:
-	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const override
+	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu() const override
 	{
-		UNREFERENCED_PARAMETER(hwnd);
-
 		return m_externalContextMenu;
 	}
 

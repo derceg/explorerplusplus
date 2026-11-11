@@ -8,16 +8,19 @@
 #include "MenuView.h"
 #include "NavigationHelper.h"
 #include "ShellIconModel.h"
+#include "ShellItemContextMenuHelper.h"
 #include "../Helper/DragDropHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Pidl.h"
 #include "../Helper/ShellHelper.h"
 
 ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	const std::vector<PidlAbsolute> &pidls, BrowserWindow *browser,
-	ShellIconLoader *shellIconLoader) :
+	ShellIconLoader *shellIconLoader, const ResourceLoader *resourceLoader) :
 	MenuBase(menuView, acceleratorManager),
 	m_browser(browser),
-	m_shellIconLoader(shellIconLoader)
+	m_shellIconLoader(shellIconLoader),
+	m_resourceLoader(resourceLoader)
 {
 	RebuildMenu(pidls);
 }
@@ -41,6 +44,8 @@ void ShellItemsMenu::AddMenuItemForPidl(const PidlAbsolute &pidl)
 				std::bind_front(&ShellItemsMenu::OpenSelectedItem, this, pidl, false))
 			.SetMiddleClickedCallback(
 				std::bind_front(&ShellItemsMenu::OpenSelectedItem, this, pidl, true))
+			.SetRightClickedCallback(
+				std::bind_front(&ShellItemsMenu::OnItemRightClicked, this, pidl))
 			.SetDraggedCallback([this, pidl] { return OnItemDragged(pidl); }));
 }
 
@@ -49,6 +54,19 @@ void ShellItemsMenu::OpenSelectedItem(const PidlAbsolute &pidl, bool isMiddleBut
 {
 	m_browser->OpenItem(pidl.Raw(),
 		DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
+}
+
+void ShellItemsMenu::OnItemRightClicked(const PidlAbsolute &pidl, const POINT &ptScreen)
+{
+	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::None;
+
+	if (IsKeyDown(VK_SHIFT))
+	{
+		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
+	}
+
+	ShowShellContextMenuForItem(pidl, m_rootMenuView->GetOwnerWindow(), ptScreen, flags, m_browser,
+		m_acceleratorManager, m_resourceLoader);
 }
 
 MenuDragAction ShellItemsMenu::OnItemDragged(const PidlAbsolute &pidl)

@@ -12,10 +12,10 @@
 
 SearchResultsItemContextMenu::SearchResultsItemContextMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, const PidlAbsolute &directory,
-	const std::vector<PidlChild> &items, HWND hwnd, IUnknown *site, Flags flags,
-	BrowserList *browserList, const ResourceLoader *resourceLoader) :
-	ShellItemContextMenu(menuView, acceleratorManager, directory, items, hwnd, site, flags,
-		browserList, resourceLoader),
+	const std::vector<PidlChild> &items, IUnknown *site, Flags flags, BrowserList *browserList,
+	const ResourceLoader *resourceLoader) :
+	ShellItemContextMenu(menuView, acceleratorManager, directory, items, site, flags, browserList,
+		resourceLoader),
 	m_browserList(browserList)
 {
 	MaybeAddOpenLocationItem(directory, items, resourceLoader);

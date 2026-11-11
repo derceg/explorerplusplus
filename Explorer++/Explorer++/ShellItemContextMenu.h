@@ -29,18 +29,18 @@ public:
 	};
 
 	ShellItemContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const PidlAbsolute &directory, const std::vector<PidlChild> &items, HWND hwnd,
-		IUnknown *site, Flags flags, BrowserWindow *browser, const ResourceLoader *resourceLoader,
+		const PidlAbsolute &directory, const std::vector<PidlChild> &items, IUnknown *site,
+		Flags flags, BrowserWindow *browser, const ResourceLoader *resourceLoader,
 		MaybeHandleShellMenuItemCallback maybeHandleShellMenuItemCallback = {});
 	ShellItemContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const PidlAbsolute &directory, const std::vector<PidlChild> &items, HWND hwnd,
-		IUnknown *site, Flags flags, BrowserList *browserList, const ResourceLoader *resourceLoader,
+		const PidlAbsolute &directory, const std::vector<PidlChild> &items, IUnknown *site,
+		Flags flags, BrowserList *browserList, const ResourceLoader *resourceLoader,
 		MaybeHandleShellMenuItemCallback maybeHandleShellMenuItemCallback = {});
 
 private:
 	ShellItemContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const PidlAbsolute &directory, const std::vector<PidlChild> &items, HWND hwnd,
-		IUnknown *site, Flags flags, BrowserWindow *browser, BrowserList *browserList,
+		const PidlAbsolute &directory, const std::vector<PidlChild> &items, IUnknown *site,
+		Flags flags, BrowserWindow *browser, BrowserList *browserList,
 		const ResourceLoader *resourceLoader,
 		MaybeHandleShellMenuItemCallback maybeHandleShellMenuItemCallback);
 
@@ -48,7 +48,7 @@ private:
 	void MaybeAddOpenInNewTabItem(const ResourceLoader *resourceLoader);
 
 	// ShellContextMenu
-	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const override;
+	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu() const override;
 	bool MaybeHandleShellMenuItem(const std::wstring &verb) override;
 
 	void OnOpenDirectoryInNewTab(const PidlAbsolute &directory);

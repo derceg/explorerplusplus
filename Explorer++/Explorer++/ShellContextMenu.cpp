@@ -9,17 +9,16 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 ShellContextMenu::ShellContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	const PidlAbsolute &directory, HWND hwnd) :
+	const PidlAbsolute &directory) :
 	MenuBase(menuView, acceleratorManager),
-	m_directory(directory),
-	m_hwnd(hwnd)
+	m_directory(directory)
 {
 	m_rootMenuView->SetExternalItemDelegate(this);
 }
 
 void ShellContextMenu::AppendShellItems(IUnknown *site, UINT flags)
 {
-	m_contextMenu = MaybeGetShellContextMenu(m_hwnd);
+	m_contextMenu = MaybeGetShellContextMenu();
 
 	if (!m_contextMenu)
 	{
@@ -209,7 +208,7 @@ void ShellContextMenu::OnExternalItemSelected(UINT id)
 	CMINVOKECOMMANDINFOEX commandInfo = {};
 	commandInfo.cbSize = sizeof(commandInfo);
 	commandInfo.fMask = CMIC_MASK_UNICODE;
-	commandInfo.hwnd = m_hwnd;
+	commandInfo.hwnd = m_rootMenuView->GetOwnerWindow();
 	commandInfo.lpVerb = MAKEINTRESOURCEA(commandOffset);
 	commandInfo.lpVerbW = MAKEINTRESOURCEW(commandOffset);
 	commandInfo.lpDirectoryW = parsingPath ? parsingPath->c_str() : nullptr;

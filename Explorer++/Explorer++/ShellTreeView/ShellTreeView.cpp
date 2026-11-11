@@ -25,14 +25,13 @@
 #include "LabelEditHandler.h"
 #include "MainResource.h"
 #include "PlatformContext.h"
-#include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "Runtime.h"
 #include "ShellBrowser/NavigateParams.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellItemContextMenu.h"
+#include "ShellItemContextMenuHelper.h"
 #include "ShellTreeNode.h"
 #include "TabBar.h"
 #include "TabEvents.h"
@@ -1303,12 +1302,6 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		TreeView_SetItemState(m_hTreeView, targetItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
 	}
 
-	auto pidl = GetNodePidl(targetItem);
-
-	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
-
-	ILRemoveLastID(pidl.get());
-
 	ShellItemContextMenu::Flags flags = ShellItemContextMenu::Flags::Rename;
 
 	if (IsKeyDown(VK_SHIFT))
@@ -1316,11 +1309,10 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		WI_SetFlag(flags, ShellItemContextMenu::Flags::ExtendedVerbs);
 	}
 
-	PopupMenuView popupMenu(m_hTreeView, m_browser);
-	ShellItemContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), pidl.get(),
-		{ child.get() }, m_hTreeView, nullptr, flags, m_browser, m_appServices->GetResourceLoader(),
+	auto pidl = GetNodePidl(targetItem);
+	ShowShellContextMenuForItem(pidl.get(), m_hTreeView, finalPoint, flags, m_browser,
+		m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader(),
 		std::bind_front(&ShellTreeView::MaybeHandleShellMenuItem, this));
-	popupMenu.Show(finalPoint);
 
 	if (highlightTargetItem)
 	{

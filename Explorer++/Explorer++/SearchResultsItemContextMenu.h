@@ -10,9 +10,8 @@ class SearchResultsItemContextMenu : public ShellItemContextMenu
 {
 public:
 	SearchResultsItemContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const PidlAbsolute &directory, const std::vector<PidlChild> &items, HWND hwnd,
-		IUnknown *site, Flags flags, BrowserList *browserList,
-		const ResourceLoader *resourceLoader);
+		const PidlAbsolute &directory, const std::vector<PidlChild> &items, IUnknown *site,
+		Flags flags, BrowserList *browserList, const ResourceLoader *resourceLoader);
 
 private:
 	void MaybeAddOpenLocationItem(const PidlAbsolute &directory,

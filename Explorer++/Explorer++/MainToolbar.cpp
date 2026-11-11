@@ -325,7 +325,7 @@ public:
 		return [this](MenuView *menuView)
 		{
 			return std::make_unique<TabParentItemsMenu>(menuView, m_acceleratorManager, m_browser,
-				m_shellIconLoader);
+				m_shellIconLoader, m_resourceLoader);
 		};
 	}
 

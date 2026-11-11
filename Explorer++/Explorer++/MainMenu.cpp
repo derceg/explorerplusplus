@@ -237,11 +237,12 @@ void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
 
 	auto *historySubMenuView = AppendSubMenu(menuView, IDS_GO_HISTORY_POPUP);
 	m_childMenus.push_back(std::make_unique<HistoryMenu>(historySubMenuView, m_acceleratorManager,
-		appServices->GetHistoryModel(), browser, shellIconLoader));
+		appServices->GetHistoryModel(), browser, shellIconLoader, m_resourceLoader));
 
 	auto *frequentLocationsSubMenuView = AppendSubMenu(menuView, IDS_GO_FREQUENT_LOCATIONS_POPUP);
-	m_childMenus.push_back(std::make_unique<FrequentLocationsMenu>(frequentLocationsSubMenuView,
-		m_acceleratorManager, appServices->GetFrequentLocationsModel(), browser, shellIconLoader));
+	m_childMenus.push_back(
+		std::make_unique<FrequentLocationsMenu>(frequentLocationsSubMenuView, m_acceleratorManager,
+			appServices->GetFrequentLocationsModel(), browser, shellIconLoader, m_resourceLoader));
 
 	menuView->AppendSeparator();
 

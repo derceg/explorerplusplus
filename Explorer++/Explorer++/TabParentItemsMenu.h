@@ -13,7 +13,8 @@ class TabParentItemsMenu : public ShellItemsMenu
 {
 public:
 	TabParentItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader);
+		BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader,
+		const ResourceLoader *resourceLoader);
 
 private:
 	static std::vector<PidlAbsolute> GetParentPidlCollection(const ShellBrowser *shellBrowser);

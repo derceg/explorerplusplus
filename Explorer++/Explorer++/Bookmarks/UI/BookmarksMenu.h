@@ -25,7 +25,7 @@ public:
 	// folder. That is, the predicate doesn't apply recursively.
 	BookmarksMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkFolder,
-		BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser, HWND parentWindow,
+		BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser,
 		PlatformContext *platformContext, const ResourceLoader *resourceLoader,
 		IncludePredicate includePredicate = {});
 
@@ -56,7 +56,6 @@ private:
 	BookmarkTree *const m_bookmarkTree;
 	BookmarkIconManager *const m_bookmarkIconManager;
 	BrowserWindow *const m_browser;
-	const HWND m_parentWindow;
 	PlatformContext *const m_platformContext;
 	const ResourceLoader *const m_resourceLoader;
 };

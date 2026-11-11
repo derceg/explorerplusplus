@@ -46,14 +46,13 @@ private:
 
 BookmarksMenu::BookmarksMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkFolder,
-	BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser, HWND parentWindow,
+	BookmarkIconManager *bookmarkIconManager, BrowserWindow *browser,
 	PlatformContext *platformContext, const ResourceLoader *resourceLoader,
 	IncludePredicate includePredicate) :
 	MenuBase(menuView, acceleratorManager),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkIconManager(bookmarkIconManager),
 	m_browser(browser),
-	m_parentWindow(parentWindow),
 	m_platformContext(platformContext),
 	m_resourceLoader(resourceLoader)
 {
@@ -165,9 +164,9 @@ void BookmarksMenu::OnBookmarkItemRightClicked(WeakPtr<BookmarkItem> bookmarkIte
 		return;
 	}
 
-	PopupMenuView popupMenu(m_parentWindow, m_browser);
+	PopupMenuView popupMenu(m_rootMenuView->GetOwnerWindow(), m_browser);
 	BookmarkContextMenu contextMenu(&popupMenu, m_acceleratorManager, m_bookmarkTree,
-		{ bookmarkItem.Get() }, m_resourceLoader, m_browser, m_parentWindow, m_platformContext);
+		{ bookmarkItem.Get() }, m_resourceLoader, m_browser, m_platformContext);
 	popupMenu.Show(ptScreen);
 }
 

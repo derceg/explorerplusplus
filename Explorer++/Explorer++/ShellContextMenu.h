@@ -20,7 +20,7 @@ class ShellContextMenu : public MenuBase, private ExternalMenuItemDelegate
 {
 public:
 	ShellContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const PidlAbsolute &directory, HWND hwnd);
+		const PidlAbsolute &directory);
 
 protected:
 	void AppendShellItems(IUnknown *site, UINT flags);
@@ -34,7 +34,7 @@ private:
 	// It's possible for a folder to not provide any IContextMenu instance (for example, the Home
 	// folder in Windows 11 doesn't provide any IContextMenu instance for the background menu). So,
 	// this method may return null.
-	virtual wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const = 0;
+	virtual wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu() const = 0;
 
 	void RemoveShellItem(const std::wstring &verb);
 
@@ -47,7 +47,6 @@ private:
 	virtual bool MaybeHandleShellMenuItem(const std::wstring &verb);
 	std::optional<std::wstring> MaybeGetFilesystemDirectory() const;
 
-	const HWND m_hwnd;
 	wil::com_ptr_nothrow<IContextMenu> m_contextMenu;
 	wil::unique_set_site_null_call m_resetSite;
 };

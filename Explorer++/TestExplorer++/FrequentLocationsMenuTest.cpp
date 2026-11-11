@@ -18,7 +18,7 @@ protected:
 	FrequentLocationsMenuTest() :
 		m_browser(AddBrowser()),
 		m_menu(&m_menuView, &m_acceleratorManager, &m_frequentLocationsModel, m_browser,
-			&m_shellIconLoader)
+			&m_shellIconLoader, &m_resourceLoader)
 	{
 	}
 
