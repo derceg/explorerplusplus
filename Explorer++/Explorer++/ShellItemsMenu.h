@@ -5,7 +5,7 @@
 #pragma once
 
 #include "MenuBase.h"
-#include <shtypes.h>
+#include "MenuItemCallbacks.h"
 
 class BrowserWindow;
 class PidlAbsolute;
@@ -18,7 +18,7 @@ class ShellItemsMenu : public MenuBase
 {
 public:
 	ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
+		const std::vector<PidlAbsolute> &pidls, BrowserWindow *browser,
 		ShellIconLoader *shellIconLoader);
 
 	void RebuildMenu(const std::vector<PidlAbsolute> &pidls);
@@ -26,9 +26,10 @@ public:
 private:
 	void AddMenuItemForPidl(const PidlAbsolute &pidl);
 
-	void OpenSelectedItem(PCIDLIST_ABSOLUTE pidl, bool isMiddleButtonDown, bool isCtrlKeyDown,
+	void OpenSelectedItem(const PidlAbsolute &pidl, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
+	MenuDragAction OnItemDragged(const PidlAbsolute &pidl);
 
-	BrowserWindow *const m_browserWindow;
+	BrowserWindow *const m_browser;
 	ShellIconLoader *const m_shellIconLoader;
 };
