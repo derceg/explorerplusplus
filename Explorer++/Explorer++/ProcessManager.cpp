@@ -8,13 +8,27 @@
 #include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "Config.h"
+#include "Runtime.h"
+#include "ShellBrowser/NavigateParams.h"
+#include "ShellNameParser.h"
+#include "TabBar.h"
 #include "TestHelper.h"
 #include "Version.h"
 #include "VersionHelper.h"
 #include "../Helper/MessageWindowHelper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclass.h"
 
-ProcessManager::ProcessManager(const BrowserList *browserList) : m_browserList(browserList)
+namespace
+{
+constexpr ULONG_PTR SELECT_FILE = 1;
+}
+
+ProcessManager::ProcessManager(const BrowserList *browserList, ShellNameParser *shellNameParser,
+	const Runtime *runtime) :
+	m_browserList(browserList),
+	m_shellNameParser(shellNameParser),
+	m_runtime(runtime)
 {
 }
 
@@ -60,7 +74,8 @@ bool ProcessManager::InitializeCurrentProcess(const CommandLine::Settings *comma
 
 		if (!config->allowMultipleInstances)
 		{
-			AttemptToNotifyExistingProcess(existingWindow, commandLineSettings->directories);
+			AttemptToNotifyExistingProcess(existingWindow, commandLineSettings->directories,
+				commandLineSettings->filesToSelect);
 			return false;
 		}
 	}
@@ -86,18 +101,62 @@ LRESULT ProcessManager::MessageWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 void ProcessManager::OnCopyData(const COPYDATASTRUCT *cds)
 {
-	auto *browser = m_browserList->GetLastActive();
+	if (cds->dwData != 0 && cds->dwData != SELECT_FILE)
+	{
+		return;
+	}
 
+	std::wstring path;
+	if (cds->cbData > 0)
+	{
+		if (!cds->lpData || cds->cbData % sizeof(wchar_t) != 0)
+		{
+			return;
+		}
+
+		path.assign(static_cast<const wchar_t *>(cds->lpData), cds->cbData / sizeof(wchar_t));
+	}
+
+	// Copy the payload before returning, then leave SendMessage's input-synchronous context
+	// before creating tabs and calling the shell's out-of-process COM interfaces.
+	m_runtime->GetUiThreadExecutor()->post(
+		[weakSelf = m_weakPtrFactory.GetWeakPtr(), path = std::move(path), type = cds->dwData]
+		{
+			if (weakSelf)
+			{
+				weakSelf->OpenItem(path, type);
+			}
+		});
+}
+
+void ProcessManager::OpenItem(const std::wstring &path, ULONG_PTR type)
+{
+	auto *browser = m_browserList->GetLastActive();
 	if (!browser)
 	{
 		return;
 	}
 
-	if (cds->cbData > 0)
+	if (!path.empty())
 	{
-		std::wstring directory(static_cast<wchar_t *>(cds->lpData), cds->cbData / sizeof(wchar_t));
+		if (type == SELECT_FILE)
+		{
+			auto result = m_shellNameParser->ParseDisplayName(path);
+			if (!result)
+			{
+				return;
+			}
 
-		browser->OpenItem(directory, OpenFolderDisposition::NewTabDefault);
+			auto parent = result.value();
+			parent.RemoveLastItem();
+			auto navigateParams = NavigateParams::Normal(parent.Raw());
+			navigateParams.itemsToSelect = { result.value() };
+			browser->GetActiveTabBar()->CreateNewTab(navigateParams, { .selected = true });
+		}
+		else
+		{
+			browser->OpenItem(path, OpenFolderDisposition::NewTabDefault);
+		}
 	}
 	else
 	{
@@ -108,7 +167,7 @@ void ProcessManager::OnCopyData(const COPYDATASTRUCT *cds)
 }
 
 void ProcessManager::AttemptToNotifyExistingProcess(HWND existingWindow,
-	const std::vector<std::wstring> &directories)
+	const std::vector<std::wstring> &directories, const std::vector<std::wstring> &filesToSelect)
 {
 	DWORD processId;
 	auto threadId = GetWindowThreadProcessId(existingWindow, &processId);
@@ -120,14 +179,39 @@ void ProcessManager::AttemptToNotifyExistingProcess(HWND existingWindow,
 
 	AllowSetForegroundWindow(processId);
 
-	if (!directories.empty())
+	if (!directories.empty() || !filesToSelect.empty())
 	{
+		auto currentDirectory = GetCurrentDirectoryWrapper();
+		if (!currentDirectory)
+		{
+			return;
+		}
+
+		// Resolve paths in the sending process; the existing window can have a different cwd.
+		auto sendPath = [&](const std::wstring &path, ULONG_PTR type)
+		{
+			auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(path,
+				*currentDirectory, EnvVarsExpansion::DontExpand);
+			if (!absolutePath)
+			{
+				return;
+			}
+
+			COPYDATASTRUCT cds = {};
+			cds.dwData = type;
+			cds.cbData = static_cast<DWORD>(absolutePath->size() * sizeof(wchar_t));
+			cds.lpData = const_cast<wchar_t *>(absolutePath->c_str());
+			SendMessage(existingWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
+		};
+
 		for (const auto &directory : directories)
 		{
-			COPYDATASTRUCT cds = {};
-			cds.cbData = static_cast<DWORD>(directory.size() * sizeof(wchar_t));
-			cds.lpData = const_cast<wchar_t *>(directory.c_str());
-			SendMessage(existingWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
+			sendPath(directory, 0);
+		}
+
+		for (const auto &file : filesToSelect)
+		{
+			sendPath(file, SELECT_FILE);
 		}
 	}
 	else

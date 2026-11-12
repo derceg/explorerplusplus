@@ -218,6 +218,7 @@ TEST_F(SessionRestorerTest, CommandLineFilesToSelect)
 	ASSERT_NE(restoredBrowser, nullptr);
 
 	VerifyTabs(restoredBrowser, { L"c:\\", L"h:\\project" });
+	EXPECT_EQ(restoredBrowser->GetActiveTabBar()->GetSelectedTabIndex(), 1);
 
 	// TODO: At the moment, there's no way to check that the requested files have been selected, but
 	// it should be tested if possible.

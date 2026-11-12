@@ -176,4 +176,8 @@ void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 	targetWindow.tabs.insert(targetWindow.tabs.end(),
 		std::make_move_iterator(commandLineTabs.begin()),
 		std::make_move_iterator(commandLineTabs.end()));
+	if (!m_commandLineSettings->filesToSelect.empty())
+	{
+		targetWindow.selectedTab = static_cast<int>(targetWindow.tabs.size()) - 1;
+	}
 }
