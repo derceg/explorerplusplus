@@ -55,7 +55,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_iconFetcher(&m_runtime, &m_cachedIcons),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
-	m_processManager(&m_browserList),
+	m_processManager(&m_browserList, &m_shellNameParser, &m_runtime),
 	m_tabList(&m_tabEvents),
 	m_tabRestorer(&m_tabEvents, &m_browserList),
 	m_historyTracker(&m_historyModel, &m_navigationEvents),
