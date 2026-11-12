@@ -271,7 +271,7 @@ concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout(WeakPtr<Explore
 
 void Explorerplusplus::UpdateLayout()
 {
-	if (GetLifecycleState() != LifecycleState::Main)
+	if (GetLifecycleState() != LifecycleState::Main || IsIconic(m_hwnd))
 	{
 		return;
 	}
@@ -298,7 +298,8 @@ void Explorerplusplus::UpdateLayout()
 
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
-	m_treeViewWidth = std::clamp(m_treeViewWidth,
+	// A temporarily narrow window must not overwrite the user's preferred pane width.
+	int treeViewWidth = std::clamp(m_treeViewWidth,
 		dpiCompatibility.ScaleValue(m_view.GetFoldersPaneView()->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
 	m_displayWindowWidth = std::max(m_displayWindowWidth,
@@ -334,7 +335,7 @@ void Explorerplusplus::UpdateLayout()
 
 	if (m_config->showFolders.get())
 	{
-		indentLeft = m_treeViewWidth;
+		indentLeft = treeViewWidth;
 	}
 
 	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
@@ -414,8 +415,8 @@ void Explorerplusplus::UpdateLayout()
 		foldersPaneHeight = mainWindowHeight - indentBottom - foldersPaneTop;
 	}
 
-	SetWindowPos(m_view.GetFoldersPaneView()->GetHWND(), nullptr, 0, foldersPaneTop,
-		m_treeViewWidth, foldersPaneHeight,
+	SetWindowPos(m_view.GetFoldersPaneView()->GetHWND(), nullptr, 0, foldersPaneTop, treeViewWidth,
+		foldersPaneHeight,
 		(m_config->showFolders.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER);
 
 	/* <---- Display window ----> */
