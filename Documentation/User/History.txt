@@ -115,6 +115,8 @@ New features:
   environment variable EXPLORERPP_CONFIG.
 
 Bug fixes:
+- Newly created startup tabs now use the configured default view
+  settings and column layout, including custom column widths.
 - Fixed a crash that could occur on startup when the "Open new
   tabs next to the current one" option was enabled.
 - Fixed a crash that could occur when autosizing columns.

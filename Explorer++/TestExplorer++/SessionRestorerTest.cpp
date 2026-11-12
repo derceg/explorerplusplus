@@ -222,3 +222,73 @@ TEST_F(SessionRestorerTest, CommandLineFilesToSelect)
 	// TODO: At the moment, there's no way to check that the requested files have been selected, but
 	// it should be tested if possible.
 }
+
+TEST_F(SessionRestorerTest, NewStartupTabsUseDefaultFolderSettings)
+{
+	m_config.startupMode = StartupMode::CustomFolders;
+	m_config.startupFolders = { L"c:\\startup" };
+	m_config.defaultFolderSettings.viewMode = ViewMode::Details;
+	m_config.defaultFolderSettings.showHidden = false;
+	m_config.defaultFolderSettings.sortDirection = SortDirection::Descending;
+
+	m_config.globalFolderSettings.folderColumns.realFolderColumns[0].width = 497;
+	m_config.globalFolderSettings.folderColumns.realFolderColumns[1].width = 186;
+	WindowStorageData createdWindow;
+	BrowserWindowFactoryFake factory(
+		[&](const WindowStorageData &storageData)
+		{
+			createdWindow = storageData;
+			return nullptr;
+		});
+	SessionRestorer restorer(&m_commandLineSettings, &m_config, &m_featureList, &factory,
+		&m_shellNameParser);
+
+	for (int scenario = 0; scenario < 3; scenario++)
+	{
+		SCOPED_TRACE(scenario);
+		m_commandLineSettings.directories.clear();
+		m_commandLineSettings.filesToSelect.clear();
+		if (scenario == 1)
+		{
+			m_commandLineSettings.directories = { L"d:\\command-line" };
+		}
+		else if (scenario == 2)
+		{
+			m_commandLineSettings.filesToSelect = { L"e:\\project\\selected.cpp" };
+		}
+
+		restorer.Restore({});
+		ASSERT_EQ(createdWindow.tabs.size(), 1u);
+		EXPECT_EQ(createdWindow.tabs[0].folderSettings, m_config.defaultFolderSettings);
+		EXPECT_EQ(createdWindow.tabs[0].columns, m_config.globalFolderSettings.folderColumns);
+	}
+}
+
+TEST_F(SessionRestorerTest, RestoredTabsKeepSavedFolderSettings)
+{
+	m_config.startupMode = StartupMode::PreviousTabs;
+	m_config.defaultFolderSettings.viewMode = ViewMode::Details;
+	m_commandLineSettings.directories = { L"d:\\new-tab" };
+	WindowStorageData previousWindow;
+	previousWindow.tabs = { { .directory = L"c:\\saved-tab" } };
+	previousWindow.tabs[0].folderSettings.viewMode = ViewMode::LargeIcons;
+	previousWindow.tabs[0].columns.realFolderColumns[0].width = 363;
+	m_config.globalFolderSettings.folderColumns.realFolderColumns[0].width = 497;
+
+	WindowStorageData createdWindow;
+	BrowserWindowFactoryFake factory(
+		[&](const WindowStorageData &storageData)
+		{
+			createdWindow = storageData;
+			return nullptr;
+		});
+	SessionRestorer restorer(&m_commandLineSettings, &m_config, &m_featureList, &factory,
+		&m_shellNameParser);
+	restorer.Restore({ previousWindow });
+
+	ASSERT_EQ(createdWindow.tabs.size(), 2u);
+	EXPECT_EQ(createdWindow.tabs[0].folderSettings, previousWindow.tabs[0].folderSettings);
+	EXPECT_EQ(createdWindow.tabs[1].folderSettings, m_config.defaultFolderSettings);
+	EXPECT_EQ(createdWindow.tabs[0].columns, previousWindow.tabs[0].columns);
+	EXPECT_EQ(createdWindow.tabs[1].columns, m_config.globalFolderSettings.folderColumns);
+}
