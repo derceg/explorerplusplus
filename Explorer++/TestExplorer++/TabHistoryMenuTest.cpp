@@ -11,7 +11,6 @@
 #include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellIconLoaderFake.h"
 #include "TestMenuView.h"
 #include <gtest/gtest.h>
 
@@ -26,7 +25,6 @@ protected:
 		NavigateTab(m_tab, L"c:\\fake3");
 	}
 
-	ShellIconLoaderFake m_shellIconLoader;
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
 };

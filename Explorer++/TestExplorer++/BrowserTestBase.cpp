@@ -62,6 +62,7 @@ void BrowserTestBase::SetUpAppServices()
 	m_appServices.SetResourceLoader(&m_resourceLoader);
 	m_appServices.SetRuntime(&m_runtime);
 	m_appServices.SetShellBrowserEvents(&m_shellBrowserEvents);
+	m_appServices.SetShellIconLoader(&m_shellIconLoader);
 	m_appServices.SetTabEvents(&m_tabEvents);
 	m_appServices.SetTabList(&m_tabList);
 	m_appServices.SetTabRestorer(&m_tabRestorer);

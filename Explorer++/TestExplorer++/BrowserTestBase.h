@@ -33,6 +33,7 @@
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
+#include "ShellIconLoaderFake.h"
 #include "SimulatedFileSystem.h"
 #include "SimulatedFileSystemWatcherFactory.h"
 #include "TabEvents.h"
@@ -82,6 +83,7 @@ protected:
 	NoOpWindowThemeManager m_windowThemeManager;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherFake m_iconFetcher;
+	ShellIconLoaderFake m_shellIconLoader;
 
 	BookmarkTree m_bookmarkTree;
 	ColorRuleModel m_colorRuleModel;

@@ -54,6 +54,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_windowThemeManager(&m_darkModeManager, m_themeManager.GetDarkModeColorProvider()),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_iconFetcher(&m_runtime, &m_cachedIcons),
+	m_shellIconLoader(&m_runtime, &m_iconFetcher),
 	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_processManager(&m_browserList),
 	m_tabList(&m_tabEvents),
@@ -314,6 +315,7 @@ void App::SetUpAppServices()
 	m_appServices.SetResourceLoader(m_resourceLoader.get());
 	m_appServices.SetRuntime(&m_runtime);
 	m_appServices.SetShellBrowserEvents(&m_shellBrowserEvents);
+	m_appServices.SetShellIconLoader(&m_shellIconLoader);
 	m_appServices.SetTabEvents(&m_tabEvents);
 	m_appServices.SetTabList(&m_tabList);
 	m_appServices.SetTabRestorer(&m_tabRestorer);

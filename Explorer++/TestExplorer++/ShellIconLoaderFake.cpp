@@ -7,14 +7,14 @@
 #include "ImageTestHelper.h"
 
 wil::unique_hbitmap ShellIconLoaderFake::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-	IconUpdateCallback updateCallback)
+	IconUpdateCallback updateCallback, std::stop_token stopToken)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(size);
 
 	if (m_storeUpdateCallbacks)
 	{
-		m_updateCallbacks.push_back(updateCallback);
+		m_pendingUpdates.push_back({ std::move(updateCallback), stopToken });
 	}
 
 	return GenerateImage();
@@ -32,12 +32,17 @@ void ShellIconLoaderFake::ClearBitmapGeneratedCallback()
 
 void ShellIconLoaderFake::TriggerPendingUpdateCallbacks()
 {
-	for (const auto &callback : m_updateCallbacks)
+	for (const auto &pendingUpdate : m_pendingUpdates)
 	{
-		callback(GenerateImage());
+		if (pendingUpdate.stopToken.stop_requested())
+		{
+			continue;
+		}
+
+		pendingUpdate.callback(GenerateImage());
 	}
 
-	m_updateCallbacks.clear();
+	m_pendingUpdates.clear();
 }
 
 void ShellIconLoaderFake::SetStoreUpdateCallbacks(bool storeUpdateCallbacks)

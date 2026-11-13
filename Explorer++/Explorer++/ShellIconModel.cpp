@@ -27,5 +27,6 @@ wil::unique_hbitmap ShellIconModel::GetBitmap(UINT dpi, IconUpdateCallback updat
 	// So, this may require more work to handle properly.
 	UNREFERENCED_PARAMETER(dpi);
 
-	return m_shellIconLoader->LoadShellIcon(m_pidl.Raw(), m_size, updateCallback);
+	return m_shellIconLoader->LoadShellIcon(m_pidl.Raw(), m_size, updateCallback,
+		m_scopedStopSource.GetToken());
 }

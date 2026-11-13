@@ -5,23 +5,30 @@
 #pragma once
 
 #include "ShellIconLoader.h"
+#include "../Helper/Pidl.h"
+#include "../Helper/WeakPtrFactory.h"
+#include <concurrencpp/concurrencpp.h>
 #include <wil/com.h>
-#include <commoncontrols.h>
 
-class IconFetcher;
+class AsyncIconFetcher;
+class Runtime;
 
 class ShellIconLoaderImpl : public ShellIconLoader
 {
 public:
-	ShellIconLoaderImpl(IconFetcher *iconFetcher);
+	ShellIconLoaderImpl(const Runtime *runtime, AsyncIconFetcher *iconFetcher);
 
 	wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-		IconUpdateCallback updateCallback) override;
+		IconUpdateCallback updateCallback, std::stop_token stopToken) override;
 
 private:
-	void QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl, IconUpdateCallback updateCallback);
+	static concurrencpp::null_result RetrieveIcon(WeakPtr<ShellIconLoaderImpl> weakSelf,
+		PidlAbsolute pidl, IconUpdateCallback updateCallback, std::stop_token stopToken);
 	wil::unique_hbitmap GetDefaultIcon(PCIDLIST_ABSOLUTE pidl);
 
-	IconFetcher *const m_iconFetcher;
+	const Runtime *const m_runtime;
+	AsyncIconFetcher *const m_iconFetcher;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
+
+	WeakPtrFactory<ShellIconLoaderImpl> m_weakPtrFactory{ this };
 };

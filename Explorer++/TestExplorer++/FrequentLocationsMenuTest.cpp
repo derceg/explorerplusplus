@@ -8,7 +8,6 @@
 #include "BrowserWindowFake.h"
 #include "MenuViewTestHelper.h"
 #include "PidlTestHelper.h"
-#include "ShellIconLoaderFake.h"
 #include "TestMenuView.h"
 #include <gtest/gtest.h>
 
@@ -21,8 +20,6 @@ protected:
 			&m_shellIconLoader, &m_resourceLoader)
 	{
 	}
-
-	ShellIconLoaderFake m_shellIconLoader;
 
 	BrowserWindowFake *const m_browser;
 

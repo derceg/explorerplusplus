@@ -4,84 +4,72 @@
 
 #include "stdafx.h"
 #include "ShellIconLoaderImpl.h"
-#include "IconFetcher.h"
+#include "AsyncIconFetcher.h"
+#include "RuntimeHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-ShellIconLoaderImpl::ShellIconLoaderImpl(IconFetcher *iconFetcher) : m_iconFetcher(iconFetcher)
+ShellIconLoaderImpl::ShellIconLoaderImpl(const Runtime *runtime, AsyncIconFetcher *iconFetcher) :
+	m_runtime(runtime),
+	m_iconFetcher(iconFetcher)
 {
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 }
 
 wil::unique_hbitmap ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-	IconUpdateCallback updateCallback)
+	IconUpdateCallback updateCallback, std::stop_token stopToken)
 {
 	if (size != IconSize::Small)
 	{
 		return nullptr;
 	}
 
-	QueueIconUpdateTask(pidl, updateCallback);
+	// The item may not have a cached icon, or the cached icon may be out of date. Therefore, this
+	// call will retrieve the updated icon.
+	RetrieveIcon(m_weakPtrFactory.GetWeakPtr(), pidl, std::move(updateCallback), stopToken);
+
 	return GetDefaultIcon(pidl);
 }
 
-void ShellIconLoaderImpl::QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl,
-	IconUpdateCallback updateCallback)
+concurrencpp::null_result ShellIconLoaderImpl::RetrieveIcon(WeakPtr<ShellIconLoaderImpl> weakSelf,
+	PidlAbsolute pidl, IconUpdateCallback updateCallback, std::stop_token stopToken)
 {
-	// The item may not have a cached icon, or the cached icon may be out of date. Therefore, this
-	// call will retrieve the updated icon. Even if the caller doesn't use the updated icon, doing
-	// this is still useful, since the updated icon will be cached.
-	m_iconFetcher->QueueIconTask(pidl,
-		[systemImageList = m_systemImageList, updateCallback](int iconIndex, int overlayIndex)
-		{
-			UNREFERENCED_PARAMETER(overlayIndex);
+	auto *runtime = weakSelf->m_runtime;
+	auto iconFetcher = weakSelf->m_iconFetcher;
 
-			wil::unique_hbitmap bitmap;
-			HRESULT hr = ImageHelper::CreateHBITMAPFromImageListIcon(systemImageList.get(),
-				iconIndex, bitmap);
+	auto iconInfo = co_await iconFetcher->GetIconIndexAsync(pidl.Raw(), stopToken);
 
-			if (FAILED(hr))
-			{
-				return;
-			}
+	if (!iconInfo)
+	{
+		co_return;
+	}
 
-			updateCallback(std::move(bitmap));
-		});
+	co_await ResumeOnUiThread(runtime);
+
+	if (stopToken.stop_requested() || !weakSelf)
+	{
+		co_return;
+	}
+
+	wil::unique_hbitmap bitmap;
+	HRESULT hr = ImageHelper::CreateHBITMAPFromImageListIcon(weakSelf->m_systemImageList.get(),
+		iconInfo->iconIndex, bitmap);
+
+	if (FAILED(hr))
+	{
+		co_return;
+	}
+
+	updateCallback(std::move(bitmap));
 }
 
 wil::unique_hbitmap ShellIconLoaderImpl::GetDefaultIcon(PCIDLIST_ABSOLUTE pidl)
 {
-	std::wstring itemPath;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, itemPath);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	SFGAOF attributes = SFGAO_FOLDER;
-	hr = GetItemAttributes(pidl, &attributes);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	DefaultIconType defaultIconType;
-
-	if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
-	{
-		defaultIconType = DefaultIconType::Folder;
-	}
-	else
-	{
-		defaultIconType = DefaultIconType::File;
-	}
-
-	int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(itemPath, defaultIconType);
+	int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(pidl);
 
 	wil::unique_hbitmap bitmap;
-	hr = ImageHelper::CreateHBITMAPFromImageListIcon(m_systemImageList.get(), iconIndex, bitmap);
+	HRESULT hr =
+		ImageHelper::CreateHBITMAPFromImageListIcon(m_systemImageList.get(), iconIndex, bitmap);
 
 	if (FAILED(hr))
 	{

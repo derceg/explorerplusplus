@@ -14,17 +14,24 @@ public:
 	using BitmapGeneratedCallback = std::function<void(HBITMAP bitmap)>;
 
 	wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-		IconUpdateCallback updateCallback) override;
+		IconUpdateCallback updateCallback, std::stop_token stopToken) override;
 
 	void SetBitmapGeneratedCallback(BitmapGeneratedCallback callback);
 	void ClearBitmapGeneratedCallback();
+
 	void TriggerPendingUpdateCallbacks();
 	void SetStoreUpdateCallbacks(bool storeUpdateCallbacks);
 
 private:
+	struct PendingUpdate
+	{
+		IconUpdateCallback callback;
+		std::stop_token stopToken;
+	};
+
 	wil::unique_hbitmap GenerateImage() const;
 
-	std::vector<IconUpdateCallback> m_updateCallbacks;
+	std::vector<PendingUpdate> m_pendingUpdates;
 	bool m_storeUpdateCallbacks = true;
 	BitmapGeneratedCallback m_bitmapGeneratedCallback;
 };

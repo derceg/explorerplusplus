@@ -32,6 +32,7 @@
 #include "Runtime.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
+#include "ShellIconLoaderImpl.h"
 #include "ShellNameParserImpl.h"
 #include "ShellWatcherManager.h"
 #include "TabEvents.h"
@@ -111,6 +112,7 @@ private:
 	WindowThemeManagerImpl m_windowThemeManager;
 	CachedIcons m_cachedIcons;
 	AsyncIconFetcherImpl m_iconFetcher;
+	ShellIconLoaderImpl m_shellIconLoader;
 	BrowserList m_browserList;
 	std::unique_ptr<BrowserWindowFactoryImpl> m_browserWindowFactory;
 	ModelessDialogList m_modelessDialogList;

@@ -63,7 +63,6 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 	m_taskbarTabManager(this, m_appServices,
 		[]() { return wil::CoCreateInstanceNoThrow<ITaskbarList4>(CLSID_TaskbarList); }),
 	m_iconFetcher(m_hwnd, appServices->GetCachedIcons()),
-	m_shellIconLoader(&m_iconFetcher),
 	m_applicationExecutor(this)
 {
 	m_bShowTabBar = true;
@@ -144,7 +143,7 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 void Explorerplusplus::InitializeMainMenu()
 {
 	m_mainMenu = std::make_unique<MainMenu>(m_view.GetMainMenuView(), this, m_appServices,
-		&m_shellIconLoader, &m_iconFetcher, &m_fileActionHandler, this);
+		m_appServices->GetShellIconLoader(), &m_iconFetcher, &m_fileActionHandler, this);
 
 	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly
 	// redrawn.
@@ -191,7 +190,7 @@ void Explorerplusplus::OnMainRebarHeightChanged()
 void Explorerplusplus::CreateMainToolbar(const std::optional<MainToolbarLayout> &initialLayout)
 {
 	m_mainToolbar = std::make_unique<MainToolbar>(m_view.GetMainToolbarView(), initialLayout, this,
-		m_appServices, this, &m_shellIconLoader);
+		m_appServices, this, m_appServices->GetShellIconLoader());
 }
 
 void Explorerplusplus::CreateAddressBar()

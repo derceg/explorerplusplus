@@ -12,7 +12,6 @@
 #include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellIconLoaderFake.h"
 #include "TestMenuView.h"
 #include <gtest/gtest.h>
 
@@ -34,8 +33,6 @@ protected:
 
 		return pidls;
 	}
-
-	ShellIconLoaderFake m_shellIconLoader;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;

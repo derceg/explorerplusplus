@@ -8,6 +8,7 @@
 #include "../Helper/IconSize.h"
 #include <wil/resource.h>
 #include <shtypes.h>
+#include <stop_token>
 
 class ShellIconLoader
 {
@@ -15,5 +16,5 @@ public:
 	virtual ~ShellIconLoader() = default;
 
 	virtual wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-		IconUpdateCallback updateCallback) = 0;
+		IconUpdateCallback updateCallback, std::stop_token stopToken) = 0;
 };

@@ -391,6 +391,21 @@ void AppServices::SetShellBrowserEvents(ShellBrowserEvents *shellBrowserEvents)
 	Set(shellBrowserEvents);
 }
 
+ShellIconLoader *AppServices::GetShellIconLoader()
+{
+	return Get<ShellIconLoader>();
+}
+
+const ShellIconLoader *AppServices::GetShellIconLoader() const
+{
+	return Get<ShellIconLoader>();
+}
+
+void AppServices::SetShellIconLoader(ShellIconLoader *shellIconLoader)
+{
+	Set(shellIconLoader);
+}
+
 TabEvents *AppServices::GetTabEvents()
 {
 	return Get<TabEvents>();

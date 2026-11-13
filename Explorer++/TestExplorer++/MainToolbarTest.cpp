@@ -8,7 +8,6 @@
 #include "BrowserWindowFake.h"
 #include "CoreInterface.h"
 #include "MainToolbarView.h"
-#include "ShellIconLoaderFake.h"
 
 namespace
 {
@@ -44,7 +43,6 @@ protected:
 	}
 
 	BrowserWindowFake *const m_browser;
-	ShellIconLoaderFake m_shellIconLoader;
 	CoreInterfaceFake m_coreInterface;
 };
 

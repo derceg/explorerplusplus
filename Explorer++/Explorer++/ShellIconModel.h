@@ -8,6 +8,7 @@
 #include "ShellIconLoader.h"
 #include "../Helper/IconSize.h"
 #include "../Helper/Pidl.h"
+#include "../Helper/ScopedStopSource.h"
 
 // Represents a shell icon (i.e. the icon for a shell item). Using this class, it's possible to
 // signify that a shell icon should be shown, without needing to know the exact details of how that
@@ -24,4 +25,5 @@ private:
 	ShellIconLoader *const m_shellIconLoader;
 	const PidlAbsolute m_pidl;
 	const IconSize m_size;
+	ScopedStopSource m_scopedStopSource;
 };

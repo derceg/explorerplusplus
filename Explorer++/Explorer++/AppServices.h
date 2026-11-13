@@ -28,6 +28,7 @@ class PlatformContext;
 class ResourceLoader;
 class Runtime;
 class ShellBrowserEvents;
+class ShellIconLoader;
 class TabEvents;
 class TabList;
 class TabRestorer;
@@ -177,6 +178,10 @@ public:
 	const ShellBrowserEvents *GetShellBrowserEvents() const;
 	void SetShellBrowserEvents(ShellBrowserEvents *shellBrowserEvents);
 
+	ShellIconLoader *GetShellIconLoader();
+	const ShellIconLoader *GetShellIconLoader() const;
+	void SetShellIconLoader(ShellIconLoader *shellIconLoader);
+
 	TabEvents *GetTabEvents();
 	const TabEvents *GetTabEvents() const;
 	void SetTabEvents(TabEvents *tabEvents);
@@ -215,7 +220,7 @@ private:
 		DarkModeManager *, DirectoryWatcherFactory *, DriveModel *, FeatureList *,
 		FrequentLocationsModel *, HistoryModel *, ModelessDialogList *, NavigationEvents *,
 		PlatformContext *, Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *,
-		ResourceLoader *, Runtime *, ShellBrowserEvents *, TabEvents *, TabList *, TabRestorer *,
-		ThemeManager *, WindowThemeManager *>
+		ResourceLoader *, Runtime *, ShellBrowserEvents *, ShellIconLoader *, TabEvents *,
+		TabList *, TabRestorer *, ThemeManager *, WindowThemeManager *>
 		m_services;
 };

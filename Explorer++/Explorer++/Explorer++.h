@@ -14,7 +14,6 @@
 #include "LayoutDefaults.h"
 #include "Literals.h"
 #include "ShellBrowser/ShellBrowserFactoryImpl.h"
-#include "ShellIconLoaderImpl.h"
 #include "Tab.h"
 #include "TaskbarTabManager.h"
 #include "WindowStorage.h"
@@ -328,7 +327,6 @@ private:
 	// but as far as I'm aware, it's not possible to cancel SHGetFileInfo (which is what's
 	// ultimately used to retrieve the icons).
 	IconFetcherImpl m_iconFetcher;
-	ShellIconLoaderImpl m_shellIconLoader;
 
 	// Main rebar
 	std::unique_ptr<MainRebar> m_mainRebar;
