@@ -67,8 +67,7 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 	// Rather than having to register every window, the top-level window can simply be registered
 	// instead. That way, it will act as a fallback if there isn't a more specific child window
 	// registered.
-	m_dropTargetWindow =
-		winrt::make_self<DropTargetWindow>(GetHWND(), static_cast<DropTargetInternal *>(this));
+	EnableDropTarget(this);
 
 	m_mainMenuView = std::make_unique<WindowMenuView>(GetHWND(), m_browser);
 
@@ -405,7 +404,6 @@ void BrowserView::FocusNextWindow(FocusChangeDirection direction)
 	}
 }
 
-// DropTargetInternal
 // Note that, as described above, this window is registered as a drop target only so that drag
 // images are shown consistently. Dropping items isn't supported at all.
 DWORD BrowserView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)

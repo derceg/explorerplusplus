@@ -11,7 +11,7 @@
 #include "Tab.h"
 #include "TabView.h"
 #include "TabViewDelegate.h"
-#include "../Helper/ShellDropTargetWindow.h"
+#include "../Helper/ShellDropTargetDelegate.h"
 #include <functional>
 #include <optional>
 #include <unordered_map>
@@ -37,7 +37,7 @@ struct TabSettings
 	bool operator==(const TabSettings &) const = default;
 };
 
-class TabBar : public ShellDropTargetWindow<int>, private TabViewDelegate
+class TabBar : private TabViewDelegate, private ShellDropTargetDelegate<int>
 {
 public:
 	// When selecting an adjacent tab, indicates whether the previous or next tab should be
@@ -131,7 +131,7 @@ private:
 	bool ShouldRemoveIcon(int iconIndex) override;
 	void OnSelectionChanged() override;
 
-	// ShellDropTargetWindow
+	// ShellDropTargetDelegate
 	int GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;

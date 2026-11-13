@@ -40,7 +40,7 @@
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/DriveInfo.h"
+#include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
@@ -59,15 +59,15 @@ ShellTreeView *ShellTreeView::Create(HWND parent, BrowserWindow *browser, AppSer
 
 ShellTreeView::ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *appServices,
 	FileActionHandler *fileActionHandler) :
-	ShellDropTargetWindow(CreateTreeView(parent)),
-	m_hTreeView(GetHWND()),
+	m_hTreeView(CreateTreeView(parent)),
 	m_browser(browser),
 	m_appServices(appServices),
+	m_dropTargetRegistration(m_hTreeView, this),
 	m_config(appServices->GetConfig()),
 	m_clipboardStore(appServices->GetPlatformContext()->GetClipboardStore()),
 	m_fileActionHandler(fileActionHandler),
 	m_commandTarget(browser->GetCommandTargetManager(), this),
-	m_fontSetter(GetHWND(), appServices->GetConfig()),
+	m_fontSetter(m_hTreeView, appServices->GetConfig()),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_iconResultIDCounter(0),
@@ -137,13 +137,6 @@ ShellTreeView::ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *a
 		std::bind_front(&ShellTreeView::OnShowQuickAccessUpdated, this)));
 }
 
-HWND ShellTreeView::CreateTreeView(HWND parent)
-{
-	return ::CreateTreeView(parent,
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS
-			| TVS_HASLINES | TVS_TRACKSELECT);
-}
-
 ShellTreeView::~ShellTreeView()
 {
 	auto *clipboardDataObject = m_cutCopiedItemManager.GetCutCopiedClipboardDataObject();
@@ -154,6 +147,18 @@ ShellTreeView::~ShellTreeView()
 	}
 
 	m_iconThreadPool.clear_queue();
+}
+
+HWND ShellTreeView::CreateTreeView(HWND parent)
+{
+	return ::CreateTreeView(parent,
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS
+			| TVS_HASLINES | TVS_TRACKSELECT);
+}
+
+HWND ShellTreeView::GetHWND() const
+{
+	return m_hTreeView;
 }
 
 LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

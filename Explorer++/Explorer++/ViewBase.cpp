@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ViewBase.h"
+#include "../Helper/ScopedDropTargetRegistration.h"
 #include "../Helper/WindowSubclass.h"
 
 ViewBase::ViewBase(HWND hwnd) : m_hwnd(hwnd)
@@ -21,6 +22,17 @@ HWND ViewBase::GetHWND() const
 	CHECK(m_hwnd);
 
 	return m_hwnd;
+}
+
+void ViewBase::EnableDropTarget(DropTargetDelegate *dropTargetDelegate)
+{
+	m_dropTargetRegistration =
+		std::make_unique<ScopedDropTargetRegistration>(GetHWND(), dropTargetDelegate);
+}
+
+void ViewBase::DisableDropTarget()
+{
+	m_dropTargetRegistration.reset();
 }
 
 void ViewBase::AddSubclass(std::unique_ptr<WindowSubclass> subclass)
@@ -58,6 +70,8 @@ void ViewBase::OnNcDestroy()
 	// Therefore, clearing the subclasses here ensures that a derived class isn't going to continue
 	// to process window messages after the window is destroyed.
 	m_windowSubclasses.clear();
+
+	DisableDropTarget();
 
 	m_hwnd = nullptr;
 }

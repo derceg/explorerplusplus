@@ -211,7 +211,7 @@
     <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarkDropTargetWindow.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkDropTargetDelegate.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="Bookmarks\BookmarkRegistryStorage.cpp">
@@ -1197,7 +1197,7 @@
     <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkDropTargetDelegate.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkRegistryStorage.h">

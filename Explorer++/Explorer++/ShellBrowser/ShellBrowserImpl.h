@@ -18,7 +18,7 @@
 #include "ViewModes.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/ShellDropTargetWindow.h"
+#include "../Helper/ShellDropTargetDelegate.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
@@ -52,6 +52,7 @@ class NavigationRequest;
 struct PreservedShellBrowser;
 class ResourceLoader;
 class Runtime;
+class ScopedDropTargetRegistration;
 class ShellBrowserEvents;
 class ShellEnumeratorImpl;
 class ShellNavigationController;
@@ -65,8 +66,8 @@ typedef struct
 
 class ShellBrowserImpl :
 	public ShellBrowser,
-	public ShellDropTargetWindow<int>,
 	public BrowserCommandTarget,
+	private ShellDropTargetDelegate<int>,
 	private boost::noncopyable
 {
 public:
@@ -603,7 +604,7 @@ private:
 	void OnClipboardUpdate();
 	void RestoreStateOfCutItems();
 
-	// ShellDropTargetWindow
+	// ShellDropTargetDelegate
 	int GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
@@ -713,6 +714,7 @@ private:
 	std::vector<std::wstring> m_cutFileNames;
 
 	/* Drag and drop related data. */
+	std::unique_ptr<ScopedDropTargetRegistration> m_dropTargetRegistration;
 	winrt::com_ptr<ServiceProvider> m_dropServiceProvider;
 	std::vector<PidlAbsolute> m_draggedItems;
 	POINT m_ptDraggedOffset;

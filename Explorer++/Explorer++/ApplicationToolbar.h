@@ -7,7 +7,7 @@
 #include "ApplicationDropper.h"
 #include "ToolbarBase.h"
 #include "ToolbarViewBase.h"
-#include "../Helper/DropTargetWindow.h"
+#include "../Helper/DropTargetDelegate.h"
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <vector>
@@ -24,7 +24,7 @@ class ApplicationExecutor;
 class ApplicationModel;
 class ApplicationToolbarView;
 
-class ApplicationToolbar : public ToolbarBase, private DropTargetInternal
+class ApplicationToolbar : public ToolbarBase, private DropTargetDelegate
 {
 public:
 	ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
@@ -75,6 +75,7 @@ private:
 	void OnButtonClicked(const Application *application, const MouseEvent &event);
 	void OnButtonRightClicked(Application *application, const MouseEvent &event);
 
+	// DropTargetDelegate
 	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
 	void DragLeave() override;
@@ -95,7 +96,6 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	// Drag and drop
-	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	std::optional<DragData> m_dragData;
 };
 

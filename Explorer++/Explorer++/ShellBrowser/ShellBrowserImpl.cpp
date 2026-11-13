@@ -42,7 +42,9 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileDialogs.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ScopedDropTargetRegistration.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowSubclass.h"
 #include <wil/com.h>
 #include <commoncontrols.h>
 #include <list>
@@ -77,8 +79,7 @@ ShellBrowserImpl::ShellBrowserImpl(const PidlAbsolute &initialPidl,
 ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns, BrowserWindow *browser, AppServices *appServices,
 	HINSTANCE resourceInstance, FileActionHandler *fileActionHandler) :
-	ShellDropTargetWindow(CreateListView(browser->GetHWND())),
-	m_listView(GetHWND()),
+	m_listView(CreateListView(browser->GetHWND())),
 	m_owner(browser->GetHWND()),
 	m_browser(browser),
 	m_appServices(appServices),
@@ -93,8 +94,8 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	m_progressCursor(LoadCursor(nullptr, IDC_APPSTARTING)),
 	m_commandTarget(browser->GetCommandTargetManager(), this),
 	m_fileActionHandler(fileActionHandler),
-	m_fontSetter(GetHWND(), appServices->GetConfig()),
-	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(GetHWND(), LVM_GETTOOLTIPS, 0, 0)),
+	m_fontSetter(m_listView, appServices->GetConfig()),
+	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_listView, LVM_GETTOOLTIPS, 0, 0)),
 		appServices->GetConfig()),
 	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
@@ -187,6 +188,9 @@ HWND ShellBrowserImpl::CreateListView(HWND parent)
 
 void ShellBrowserImpl::InitializeListView()
 {
+	m_dropTargetRegistration = std::make_unique<ScopedDropTargetRegistration>(m_listView,
+		static_cast<DropTargetDelegate *>(this));
+
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(m_listView);
 
 	if (m_config->useFullRowSelect.get())

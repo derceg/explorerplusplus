@@ -177,17 +177,17 @@ private:
 
 TabBar::TabBar(TabBarView *view, BrowserWindow *browser, ShellBrowserFactory *shellBrowserFactory,
 	AppServices *appServices) :
-	ShellDropTargetWindow(view->GetHWND()),
 	m_view(view),
 	m_browser(browser),
 	m_shellBrowserFactory(shellBrowserFactory),
 	m_appServices(appServices),
 	m_tabEvents(appServices->GetTabEvents()),
-	m_timerManager(m_hwnd),
+	m_timerManager(view->GetHWND()),
 	m_config(appServices->GetConfig()),
 	m_iPreviousTabSelectionId(-1)
 {
 	m_view->SetDelegate(this);
+	m_view->EnableDropTarget(this);
 }
 
 void TabBar::OnTabDoubleClicked(Tab *tab, const MouseEvent &event)
@@ -209,7 +209,7 @@ void TabBar::OnTabMiddleClicked(Tab *tab, const MouseEvent &event)
 
 void TabBar::OnTabRightClicked(Tab *tab, const MouseEvent &event)
 {
-	PopupMenuView popupMenu(m_hwnd, m_browser);
+	PopupMenuView popupMenu(m_view->GetHWND(), m_browser);
 	TabContextMenu menu(&popupMenu, m_appServices->GetAcceleratorManager(), tab->GetWeakPtr(), this,
 		m_tabEvents, m_appServices->GetResourceLoader());
 	popupMenu.Show(event.ptScreen);
@@ -637,7 +637,7 @@ void TabBar::OnSelectionChanged()
 int TabBar::GetDropTargetItem(const POINT &pt)
 {
 	POINT ptClient = pt;
-	BOOL res = ScreenToClient(m_hwnd, &ptClient);
+	BOOL res = ScreenToClient(m_view->GetHWND(), &ptClient);
 
 	if (!res)
 	{
@@ -646,7 +646,7 @@ int TabBar::GetDropTargetItem(const POINT &pt)
 
 	TCHITTESTINFO hitTestInfo;
 	hitTestInfo.pt = ptClient;
-	return TabCtrl_HitTest(m_hwnd, &hitTestInfo);
+	return TabCtrl_HitTest(m_view->GetHWND(), &hitTestInfo);
 }
 
 unique_pidl_absolute TabBar::GetPidlForTargetItem(int targetItem)
@@ -703,7 +703,7 @@ void TabBar::UpdateUiForTargetItem(int targetItem)
 void TabBar::ScrollTabControlForDrop(const POINT &pt)
 {
 	POINT ptClient = pt;
-	BOOL res = ScreenToClient(m_hwnd, &ptClient);
+	BOOL res = ScreenToClient(m_view->GetHWND(), &ptClient);
 
 	if (!res)
 	{
@@ -711,14 +711,14 @@ void TabBar::ScrollTabControlForDrop(const POINT &pt)
 	}
 
 	RECT rc;
-	res = GetClientRect(m_hwnd, &rc);
+	res = GetClientRect(m_view->GetHWND(), &rc);
 
 	if (!res)
 	{
 		return;
 	}
 
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_view->GetHWND());
 	std::optional<TabView::ScrollDirection> scrollDirection;
 
 	if (ptClient.x < MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI))

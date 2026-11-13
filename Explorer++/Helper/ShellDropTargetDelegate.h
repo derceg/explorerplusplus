@@ -4,25 +4,27 @@
 
 #pragma once
 
-#include "DropTargetWindow.h"
-#include "ShellHelper.h"
-#include "WinRTBaseWrapper.h"
+#include "DropTargetDelegate.h"
+#include "WilExtraTypes.h"
 #include <wil/com.h>
+#include <shtypes.h>
 #include <optional>
 
 template <typename DropTargetItemIdentifierType>
-class ShellDropTargetWindow : private DropTargetInternal
+class ShellDropTargetDelegate : public DropTargetDelegate
 {
 public:
-	HWND GetHWND() const;
+	// DropTargetDelegate
+	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
+	void DragLeave() override;
+	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
 protected:
-	ShellDropTargetWindow(HWND hwnd);
-	~ShellDropTargetWindow() = default;
+	ShellDropTargetDelegate();
+	~ShellDropTargetDelegate() = default;
 
 	wil::com_ptr_nothrow<IDropTarget> GetDropTargetForPidl(PCIDLIST_ABSOLUTE pidl);
-
-	const HWND m_hwnd;
 
 private:
 	enum class DropType
@@ -37,12 +39,6 @@ private:
 		wil::com_ptr_nothrow<IDropTarget> dropTarget;
 		bool dropTargetInitialised;
 	};
-
-	// DropTargetInternal methods.
-	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
-	void DragLeave() override;
-	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
 	virtual DropTargetItemIdentifierType GetDropTargetItem(const POINT &pt) = 0;
 	virtual unique_pidl_absolute GetPidlForTargetItem(DropTargetItemIdentifierType targetItem) = 0;
@@ -63,8 +59,7 @@ private:
 		DWORD previousKeyState, DWORD keyState, POINT pt, DWORD allowedEffects);
 	void ResetDropState();
 
-	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
-	IDataObject *m_currentDropObject;
+	IDataObject *m_currentDropObject = nullptr;
 	DropType m_dropType;
 	DWORD m_previousKeyState;
 	std::optional<DropTargetInfo> m_previousTargetInfo;

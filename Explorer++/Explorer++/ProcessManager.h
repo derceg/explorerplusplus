@@ -23,6 +23,7 @@ class ProcessManager : private boost::noncopyable
 {
 public:
 	ProcessManager(const BrowserList *browserList);
+	~ProcessManager();
 
 	bool InitializeCurrentProcess(const CommandLine::Settings *commandLineSettings,
 		const Config *config, const std::wstring &overriddenWindowName = L"");

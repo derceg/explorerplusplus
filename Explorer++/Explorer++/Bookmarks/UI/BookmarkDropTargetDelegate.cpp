@@ -3,17 +3,18 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "Bookmarks/UI/BookmarkDropTargetDelegate.h"
+#include "Bookmarks/BookmarkDropper.h"
 
-BookmarkDropTargetWindow::BookmarkDropTargetWindow(HWND hwnd, BookmarkTree *bookmarkTree) :
+BookmarkDropTargetDelegate::BookmarkDropTargetDelegate(BookmarkTree *bookmarkTree) :
 	m_bookmarkTree(bookmarkTree),
 	m_blockDrop(false)
 {
-	m_dropTargetWindow =
-		winrt::make_self<DropTargetWindow>(hwnd, static_cast<DropTargetInternal *>(this));
 }
 
-DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt,
+BookmarkDropTargetDelegate::~BookmarkDropTargetDelegate() = default;
+
+DWORD BookmarkDropTargetDelegate::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt,
 	DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
@@ -26,7 +27,7 @@ DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyStat
 	return m_bookmarkDropper->GetDropEffect(dropLocation.parentFolder, dropLocation.position);
 }
 
-DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
+DWORD BookmarkDropTargetDelegate::DragOver(DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
@@ -67,12 +68,12 @@ DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	return targetEffect;
 }
 
-void BookmarkDropTargetWindow::DragLeave()
+void BookmarkDropTargetDelegate::DragLeave()
 {
 	ResetDropState();
 }
 
-DWORD BookmarkDropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, POINT pt,
+DWORD BookmarkDropTargetDelegate::Drop(IDataObject *dataObject, DWORD keyState, POINT pt,
 	DWORD effect)
 {
 	UNREFERENCED_PARAMETER(dataObject);
@@ -88,7 +89,7 @@ DWORD BookmarkDropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, PO
 	return finalEffect;
 }
 
-void BookmarkDropTargetWindow::ResetDropState()
+void BookmarkDropTargetDelegate::ResetDropState()
 {
 	ResetDropUiState();
 
@@ -97,7 +98,7 @@ void BookmarkDropTargetWindow::ResetDropState()
 	m_previousDropLocation.reset();
 }
 
-void BookmarkDropTargetWindow::SetBlockDrop(bool blockDrop)
+void BookmarkDropTargetDelegate::SetBlockDrop(bool blockDrop)
 {
 	if (m_bookmarkDropper)
 	{

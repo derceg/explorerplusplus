@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+class DropTargetDelegate;
+class ScopedDropTargetRegistration;
 class WindowSubclass;
 
 class ViewBase
@@ -17,6 +19,9 @@ public:
 
 	HWND GetHWND() const;
 
+	void EnableDropTarget(DropTargetDelegate *dropTargetDelegate);
+	void DisableDropTarget();
+
 protected:
 	void AddSubclass(std::unique_ptr<WindowSubclass> subclass);
 
@@ -26,4 +31,5 @@ private:
 
 	HWND m_hwnd = nullptr;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
+	std::unique_ptr<ScopedDropTargetRegistration> m_dropTargetRegistration;
 };

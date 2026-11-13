@@ -92,8 +92,7 @@ void ApplicationToolbar::Initialize()
 	m_connections.push_back(m_model->AddItemRemovedObserver(
 		std::bind_front(&ApplicationToolbar::OnApplicationRemoved, this)));
 
-	m_dropTargetWindow = winrt::make_self<DropTargetWindow>(m_view->GetHWND(),
-		static_cast<DropTargetInternal *>(this));
+	m_view->EnableDropTarget(this);
 }
 
 void ApplicationToolbar::AddButtons()
@@ -152,7 +151,6 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	popupMenu.Show(event.ptScreen);
 }
 
-// DropTargetInternal
 DWORD ApplicationToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);

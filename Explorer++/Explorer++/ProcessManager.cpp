@@ -18,6 +18,8 @@ ProcessManager::ProcessManager(const BrowserList *browserList) : m_browserList(b
 {
 }
 
+ProcessManager::~ProcessManager() = default;
+
 bool ProcessManager::InitializeCurrentProcess(const CommandLine::Settings *commandLineSettings,
 	const Config *config, const std::wstring &overriddenWindowName)
 {

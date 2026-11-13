@@ -7,7 +7,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/BookmarkNavigatorInterface.h"
 #include "Bookmarks/UI/BookmarkColumn.h"
-#include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "Bookmarks/UI/BookmarkDropTargetDelegate.h"
 #include "Bookmarks/UI/OrganizeBookmarksContextMenuDelegate.h"
 #include "ListViewDelegate.h"
 #include "../Helper/SortDirection.h"
@@ -30,7 +30,7 @@ class ResourceLoader;
 class BookmarkListPresenter :
 	public BookmarkNavigatorInterface,
 	public OrganizeBookmarksContextMenuDelegate,
-	private BookmarkDropTargetWindow,
+	private BookmarkDropTargetDelegate,
 	private ListViewDelegate
 {
 public:
@@ -89,7 +89,7 @@ private:
 		const POINT &ptScreen) override;
 	void OnBeginDrag(const std::vector<ListViewItem *> &items) override;
 
-	// BookmarkDropTargetWindow
+	// BookmarkDropTargetDelegate
 	DropLocation GetDropLocation(const POINT &pt) override;
 	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
 	void ResetDropUiState() override;

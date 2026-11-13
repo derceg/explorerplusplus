@@ -807,6 +807,7 @@
     <ClCompile Include="PidlHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedDCState.cpp" />
+    <ClCompile Include="ScopedDropTargetRegistration.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
     <ClCompile Include="ScopedStopSource.cpp" />
     <ClCompile Include="SystemClipboardStore.cpp" />
@@ -818,7 +819,7 @@
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="DataObjectImpl.cpp" />
     <ClCompile Include="DropSourceImpl.cpp" />
-    <ClCompile Include="DropTargetWindow.cpp" />
+    <ClCompile Include="WindowDropTarget.cpp" />
     <ClCompile Include="EnumFormatEtcImpl.cpp" />
     <ClCompile Include="ImageHelper.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
@@ -833,7 +834,7 @@
     <ClCompile Include="RichEditHelper.cpp" />
     <ClCompile Include="ServiceProviderBase.cpp" />
     <ClCompile Include="SetDefaultFileManager.cpp" />
-    <ClCompile Include="ShellDropTargetWindow.cpp" />
+    <ClCompile Include="ShellDropTargetDelegate.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -895,6 +896,7 @@
     <ClInclude Include="D2DHelper.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
+    <ClInclude Include="DropTargetDelegate.h" />
     <ClInclude Include="EnumHelper.h" />
     <ClInclude Include="GraphicsFactories.h" />
     <ClInclude Include="IconSize.h" />
@@ -919,6 +921,7 @@
     <ClInclude Include="MessageWindowHelper.h" />
     <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ScopedDCState.h" />
+    <ClInclude Include="ScopedDropTargetRegistration.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />
     <ClInclude Include="ScopedStopSource.h" />
     <ClInclude Include="SignalHelper.h" />
@@ -935,7 +938,7 @@
     <ClInclude Include="Helper.h" />
     <ClInclude Include="DataObjectImpl.h" />
     <ClInclude Include="DropSourceImpl.h" />
-    <ClInclude Include="DropTargetWindow.h" />
+    <ClInclude Include="WindowDropTarget.h" />
     <ClInclude Include="EnumFormatEtcImpl.h" />
     <ClInclude Include="ImageHelper.h" />
     <ClInclude Include="ListViewHelper.h" />
@@ -951,7 +954,7 @@
     <ClInclude Include="RichEditHelper.h" />
     <ClInclude Include="ServiceProviderBase.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
-    <ClInclude Include="ShellDropTargetWindow.h" />
+    <ClInclude Include="ShellDropTargetDelegate.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringHelper.h" />

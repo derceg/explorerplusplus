@@ -118,10 +118,10 @@
     <ClCompile Include="ClipboardHelper.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
-    <ClCompile Include="DropTargetWindow.cpp">
+    <ClCompile Include="WindowDropTarget.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
-    <ClCompile Include="ShellDropTargetWindow.cpp">
+    <ClCompile Include="ShellDropTargetDelegate.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="ServiceProviderBase.cpp">
@@ -210,6 +210,9 @@
     </ClCompile>
     <ClCompile Include="ScopedDCState.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedDropTargetRegistration.cpp">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -336,10 +339,10 @@
     <ClInclude Include="ClipboardHelper.h">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
-    <ClInclude Include="DropTargetWindow.h">
+    <ClInclude Include="WindowDropTarget.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
-    <ClInclude Include="ShellDropTargetWindow.h">
+    <ClInclude Include="ShellDropTargetDelegate.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="ServiceProviderBase.h">
@@ -485,6 +488,12 @@
     </ClInclude>
     <ClInclude Include="ScopedDCState.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedDropTargetRegistration.h">
+      <Filter>Data Exchange\Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="DropTargetDelegate.h">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

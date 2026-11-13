@@ -142,7 +142,7 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
 	ToolbarBase(view, browser, acceleratorManager),
-	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
+	BookmarkDropTargetDelegate(bookmarkTree),
 	m_view(view),
 	m_browser(browser),
 	m_resourceLoader(resourceLoader),
@@ -164,6 +164,7 @@ void BookmarksToolbar::Initialize(IconFetcher *iconFetcher, const ResourceLoader
 		std::make_unique<BookmarkIconManager>(resourceLoader, iconFetcher, iconWidth, iconHeight);
 
 	m_view->SetImageList(m_bookmarkIconManager->GetImageList());
+	m_view->EnableDropTarget(this);
 
 	AddBookmarkItems();
 
@@ -365,7 +366,7 @@ void BookmarksToolbar::OnButtonDragStarted(BookmarkItem *bookmarkItem)
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
-BookmarkDropTargetWindow::DropLocation BookmarksToolbar::GetDropLocation(const POINT &pt)
+BookmarkDropTargetDelegate::DropLocation BookmarksToolbar::GetDropLocation(const POINT &pt)
 {
 	POINT ptClient = pt;
 	ScreenToClient(m_view->GetHWND(), &ptClient);

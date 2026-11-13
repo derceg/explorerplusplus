@@ -31,7 +31,7 @@ BookmarkTreePresenter::BookmarkTreePresenter(std::unique_ptr<TreeView> view,
 	const std::unordered_set<std::wstring> &initiallyExpandedBookmarkIds,
 	const std::optional<std::wstring> &initiallySelectedBookmarkId,
 	MiddleClickOpenPolicy middleClickOpenPolicy) :
-	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
+	BookmarkDropTargetDelegate(bookmarkTree),
 	m_view(std::move(view)),
 	m_bookmarkTree(bookmarkTree),
 	m_browserListOpt(browserListOpt),
@@ -60,6 +60,7 @@ BookmarkTreePresenter::BookmarkTreePresenter(std::unique_ptr<TreeView> view,
 		m_imageListMappings[Icon::Folder]);
 	m_view->SetAdapter(m_adapter.get());
 	m_view->SetDelegate(this);
+	m_view->EnableDropTarget(this);
 
 	SetUpTreeView(initiallyExpandedBookmarkIds, initiallySelectedBookmarkId);
 }

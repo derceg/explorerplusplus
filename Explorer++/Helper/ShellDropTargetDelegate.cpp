@@ -3,27 +3,19 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellDropTargetWindow.h"
+#include "ShellDropTargetDelegate.h"
 #include "DragDropHelper.h"
+#include "ShellHelper.h"
 
 template <typename DropTargetItemIdentifierType>
-ShellDropTargetWindow<DropTargetItemIdentifierType>::ShellDropTargetWindow(HWND hwnd) :
-	m_hwnd(hwnd),
+ShellDropTargetDelegate<DropTargetItemIdentifierType>::ShellDropTargetDelegate() :
 	m_currentDropObject(nullptr),
 	m_previousKeyState(0)
 {
-	m_dropTargetWindow =
-		winrt::make_self<DropTargetWindow>(hwnd, static_cast<DropTargetInternal *>(this));
 }
 
 template <typename DropTargetItemIdentifierType>
-HWND ShellDropTargetWindow<DropTargetItemIdentifierType>::GetHWND() const
-{
-	return m_hwnd;
-}
-
-template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragEnter(IDataObject *dataObject,
+DWORD ShellDropTargetDelegate<DropTargetItemIdentifierType>::DragEnter(IDataObject *dataObject,
 	DWORD keyState, POINT pt, DWORD effect)
 {
 	if (WI_IsFlagSet(keyState, MK_RBUTTON))
@@ -40,7 +32,7 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragEnter(IDataObject
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragOver(DWORD keyState, POINT pt,
+DWORD ShellDropTargetDelegate<DropTargetItemIdentifierType>::DragOver(DWORD keyState, POINT pt,
 	DWORD effect)
 {
 	CHECK(m_currentDropObject);
@@ -48,7 +40,7 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragOver(DWORD keySta
 }
 
 template <typename DropTargetItemIdentifierType>
-void ShellDropTargetWindow<DropTargetItemIdentifierType>::DragLeave()
+void ShellDropTargetDelegate<DropTargetItemIdentifierType>::DragLeave()
 {
 	if (m_previousTargetInfo && m_previousTargetInfo->dropTarget
 		&& m_previousTargetInfo->dropTargetInitialised)
@@ -61,7 +53,7 @@ void ShellDropTargetWindow<DropTargetItemIdentifierType>::DragLeave()
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::Drop(IDataObject *dataObject,
+DWORD ShellDropTargetDelegate<DropTargetItemIdentifierType>::Drop(IDataObject *dataObject,
 	DWORD keyState, POINT pt, DWORD effect)
 {
 	auto targetItem = GetDropTargetItem(pt);
@@ -74,7 +66,7 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::Drop(IDataObject *dat
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::OnDragInWindow(IDataObject *dataObject,
+DWORD ShellDropTargetDelegate<DropTargetItemIdentifierType>::OnDragInWindow(IDataObject *dataObject,
 	DWORD keyState, POINT pt, DWORD effect)
 {
 	auto targetItem = GetDropTargetItem(pt);
@@ -88,7 +80,7 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::OnDragInWindow(IDataO
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::GetDropEffect(
+DWORD ShellDropTargetDelegate<DropTargetItemIdentifierType>::GetDropEffect(
 	DropTargetItemIdentifierType targetItem, IDataObject *dataObject, DWORD keyState, POINT pt,
 	DWORD allowedEffects)
 {
@@ -138,8 +130,9 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::GetDropEffect(
 }
 
 template <typename DropTargetItemIdentifierType>
-typename ShellDropTargetWindow<DropTargetItemIdentifierType>::DropTargetInfo ShellDropTargetWindow<
-	DropTargetItemIdentifierType>::GetDropTargetInfoForItem(DropTargetItemIdentifierType targetItem)
+typename ShellDropTargetDelegate<DropTargetItemIdentifierType>::DropTargetInfo
+	ShellDropTargetDelegate<DropTargetItemIdentifierType>::GetDropTargetInfoForItem(
+		DropTargetItemIdentifierType targetItem)
 {
 	if (m_previousTargetInfo && targetItem == m_previousTargetInfo->item)
 	{
@@ -158,7 +151,7 @@ typename ShellDropTargetWindow<DropTargetItemIdentifierType>::DropTargetInfo She
 }
 
 template <typename DropTargetItemIdentifierType>
-wil::com_ptr_nothrow<IDropTarget> ShellDropTargetWindow<
+wil::com_ptr_nothrow<IDropTarget> ShellDropTargetDelegate<
 	DropTargetItemIdentifierType>::GetDropTargetForPidl(PCIDLIST_ABSOLUTE pidl)
 {
 	wil::com_ptr_nothrow<IShellFolder> parent;
@@ -171,7 +164,7 @@ wil::com_ptr_nothrow<IDropTarget> ShellDropTargetWindow<
 	}
 
 	wil::com_ptr_nothrow<IDropTarget> dropTarget;
-	hr = GetUIObjectOf(parent.get(), m_hwnd, 1, &child, IID_PPV_ARGS(&dropTarget));
+	hr = GetUIObjectOf(parent.get(), nullptr, 1, &child, IID_PPV_ARGS(&dropTarget));
 
 	if (FAILED(hr))
 	{
@@ -198,7 +191,7 @@ wil::com_ptr_nothrow<IDropTarget> ShellDropTargetWindow<
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::PerformDrop(
+DWORD ShellDropTargetDelegate<DropTargetItemIdentifierType>::PerformDrop(
 	DropTargetItemIdentifierType targetItem, IDataObject *dataObject, DWORD previousKeyState,
 	DWORD keyState, POINT pt, DWORD allowedEffects)
 {
@@ -251,7 +244,7 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::PerformDrop(
 }
 
 template <typename DropTargetItemIdentifierType>
-void ShellDropTargetWindow<DropTargetItemIdentifierType>::ResetDropState()
+void ShellDropTargetDelegate<DropTargetItemIdentifierType>::ResetDropState()
 {
 	ResetDropUiState();
 
@@ -260,5 +253,5 @@ void ShellDropTargetWindow<DropTargetItemIdentifierType>::ResetDropState()
 	m_previousTargetInfo.reset();
 }
 
-template class ShellDropTargetWindow<int>;
-template class ShellDropTargetWindow<HTREEITEM>;
+template class ShellDropTargetDelegate<int>;
+template class ShellDropTargetDelegate<HTREEITEM>;

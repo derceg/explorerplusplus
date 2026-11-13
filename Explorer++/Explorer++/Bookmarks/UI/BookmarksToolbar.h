@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "Bookmarks/UI/BookmarkDropTargetDelegate.h"
 #include "ToolbarBase.h"
 #include <boost/signals2.hpp>
 #include <memory>
@@ -20,7 +20,7 @@ struct MouseEvent;
 class PlatformContext;
 class ResourceLoader;
 
-class BookmarksToolbar : public ToolbarBase, private BookmarkDropTargetWindow
+class BookmarksToolbar : public ToolbarBase, private BookmarkDropTargetDelegate
 {
 public:
 	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
@@ -66,7 +66,7 @@ private:
 
 	void OnButtonDragStarted(BookmarkItem *bookmarkItem);
 
-	// BookmarkDropTargetWindow
+	// BookmarkDropTargetDelegate
 	DropLocation GetDropLocation(const POINT &pt) override;
 	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
 	void ResetDropUiState() override;

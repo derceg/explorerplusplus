@@ -7,8 +7,7 @@
 #include "BrowserWindow.h"
 #include "Tab.h"
 #include "ViewBase.h"
-#include "../Helper/DropTargetWindow.h"
-#include "../Helper/WinRTBaseWrapper.h"
+#include "../Helper/DropTargetDelegate.h"
 #include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <memory>
@@ -37,7 +36,7 @@ class ApplicationToolbarView;
 
 }
 
-class BrowserView : public ViewBase, private DropTargetInternal
+class BrowserView : public ViewBase, private DropTargetDelegate
 {
 public:
 	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
@@ -89,7 +88,7 @@ private:
 
 	void UpdateWindowText();
 
-	// DropTargetInternal
+	// DropTargetDelegate
 	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
 	void DragLeave() override;
@@ -102,7 +101,6 @@ private:
 	const ResourceLoader *const m_resourceLoader;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 
 	std::unique_ptr<MenuView> m_mainMenuView;

@@ -1404,7 +1404,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarkContextMenu.cpp" />
     <ClCompile Include="Bookmarks\BookmarkDataExchange.cpp" />
     <ClCompile Include="Bookmarks\BookmarkDropper.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarkDropTargetWindow.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkDropTargetDelegate.cpp" />
     <ClCompile Include="Bookmarks\BookmarkItem.cpp" />
     <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp" />
     <ClCompile Include="Bookmarks\BookmarkRegistryStorage.cpp" />
@@ -1822,7 +1822,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarkContextMenu.h" />
     <ClInclude Include="Bookmarks\BookmarkDataExchange.h" />
     <ClInclude Include="Bookmarks\BookmarkDropper.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkDropTargetDelegate.h" />
     <ClInclude Include="Bookmarks\BookmarkHelper.h" />
     <ClInclude Include="Bookmarks\BookmarkItem.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkListPresenter.h" />

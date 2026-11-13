@@ -31,7 +31,7 @@ BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	const BrowserList *browserList, const Config *config,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
 	IconFetcher *iconFetcher, PlatformContext *platformContext) :
-	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
+	BookmarkDropTargetDelegate(bookmarkTree),
 	m_view(std::move(view)),
 	m_bookmarkTree(bookmarkTree),
 	m_browserList(browserList),
@@ -60,6 +60,7 @@ BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	m_view->SetModel(m_model.get());
 
 	m_view->SetDelegate(this);
+	m_view->EnableDropTarget(this);
 }
 
 BookmarkListPresenter::~BookmarkListPresenter() = default;

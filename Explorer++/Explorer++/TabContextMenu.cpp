@@ -16,6 +16,7 @@
 #include "Tab.h"
 #include "TabBar.h"
 #include "TabEvents.h"
+#include "../Helper/ShellHelper.h"
 #include <ranges>
 
 TabContextMenu::TabContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,

@@ -9,10 +9,9 @@
 #include "MainFontSetter.h"
 #include "ScopedBrowserCommandTarget.h"
 #include "../Helper/ClipboardHelper.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/ShellDropTargetWindow.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/ScopedDropTargetRegistration.h"
+#include "../Helper/ShellDropTargetDelegate.h"
 #include "../Helper/SignalWrapper.h"
 #include "../Helper/WindowSubclass.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
@@ -30,11 +29,13 @@ class FileActionHandler;
 class ShellBrowserImpl;
 class ShellTreeNode;
 
-class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public BrowserCommandTarget
+class ShellTreeView : public BrowserCommandTarget, private ShellDropTargetDelegate<HTREEITEM>
 {
 public:
 	static ShellTreeView *Create(HWND parent, BrowserWindow *browser, AppServices *appServices,
 		FileActionHandler *fileActionHandler);
+
+	HWND GetHWND() const;
 
 	/* User functions. */
 	unique_pidl_absolute GetSelectedNodePidl() const;
@@ -190,7 +191,7 @@ private:
 	ShellTreeNode *GetNodeById(int id) const;
 	ShellTreeNode *GetNodeByIdRecursive(ShellTreeNode *node, int id) const;
 
-	// ShellDropTargetWindow
+	// ShellDropTargetDelegate
 	HTREEITEM GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(HTREEITEM targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
@@ -220,6 +221,7 @@ private:
 	AppServices *const m_appServices;
 	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
+	ScopedDropTargetRegistration m_dropTargetRegistration;
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *const m_config;

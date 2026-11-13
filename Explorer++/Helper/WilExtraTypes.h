@@ -7,6 +7,7 @@
 #include <wil/resource.h>
 #include <exdisp.h>
 #include <shellapi.h>
+#include <shtypes.h>
 #include <type_traits>
 
 void ReleaseFormatEtc(FORMATETC *formatEtc);

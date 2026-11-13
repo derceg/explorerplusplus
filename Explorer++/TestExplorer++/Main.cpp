@@ -29,13 +29,13 @@ public:
 		// methods that are being called are doing that either.
 		// Ultimately, COM needs to be initialized for some of the methods called within the tests
 		// to succeed.
-		HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+		HRESULT hr = OleInitialize(nullptr);
 		ASSERT_HRESULT_SUCCEEDED(hr);
 	}
 
 	void TearDown() override
 	{
-		CoUninitialize();
+		OleUninitialize();
 	}
 };
 

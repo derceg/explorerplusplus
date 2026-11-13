@@ -340,7 +340,7 @@ void Explorerplusplus::UpdateLayout()
 	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
 	// height of the tab control above the display area.
 	RECT displayRect = { 0, 0, 0, 0 };
-	TabCtrl_AdjustRect(GetActivePane()->GetTabBar()->GetHWND(), true, &displayRect);
+	TabCtrl_AdjustRect(GetActivePane()->GetTabBar()->GetView()->GetHWND(), true, &displayRect);
 	int tabWindowHeight = std::abs(displayRect.top);
 
 	indentTop = indentRebar;
@@ -387,7 +387,7 @@ void Explorerplusplus::UpdateLayout()
 	SetWindowPos(m_view.GetBrowserPaneView()->GetTabBarBackingView()->GetHWND(), nullptr,
 		tabBackingLeft, tabTop, tabBackingWidth, tabWindowHeight, showFlags);
 
-	SetWindowPos(GetActivePane()->GetTabBar()->GetHWND(), nullptr, 0, 0, tabBackingWidth,
+	SetWindowPos(GetActivePane()->GetTabBar()->GetView()->GetHWND(), nullptr, 0, 0, tabBackingWidth,
 		tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	int foldersPaneTop;

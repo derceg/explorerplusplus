@@ -32,6 +32,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/ScopedDropTargetRegistration.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <boost/range/adaptor/transformed.hpp>
@@ -162,6 +163,10 @@ LRESULT ShellBrowserImpl::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
+		break;
+
+	case WM_DESTROY:
+		m_dropTargetRegistration.reset();
 		break;
 	}
 

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Bookmarks/BookmarkHelper.h"
-#include "Bookmarks/UI/BookmarkDropTargetWindow.h"
+#include "Bookmarks/UI/BookmarkDropTargetDelegate.h"
 #include "Bookmarks/UI/BookmarkTreeViewContextMenu.h"
 #include "Bookmarks/UI/OrganizeBookmarksContextMenuDelegate.h"
 #include "ResourceHelper.h"
@@ -29,7 +29,7 @@ class TreeView;
 class BookmarkTreePresenter :
 	public OrganizeBookmarksContextMenuDelegate,
 	private TreeViewDelegate,
-	private BookmarkDropTargetWindow,
+	private BookmarkDropTargetDelegate,
 	private BookmarkTreeViewContextMenuDelegate
 {
 public:
@@ -96,7 +96,7 @@ private:
 	// BookmarkTreeViewContextMenuDelegate
 	void StartRenamingFolder(BookmarkItem *folder) override;
 
-	// BookmarkDropTargetWindow
+	// BookmarkDropTargetDelegate
 	DropLocation GetDropLocation(const POINT &pt) override;
 	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
 	void ResetDropUiState() override;
