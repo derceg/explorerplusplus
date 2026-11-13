@@ -637,16 +637,10 @@ void TabBar::OnSelectionChanged()
 int TabBar::GetDropTargetItem(const POINT &pt)
 {
 	POINT ptClient = pt;
-	BOOL res = ScreenToClient(m_view->GetHWND(), &ptClient);
+	auto res = ScreenToClient(m_view->GetHWND(), &ptClient);
+	CHECK(res);
 
-	if (!res)
-	{
-		return -1;
-	}
-
-	TCHITTESTINFO hitTestInfo;
-	hitTestInfo.pt = ptClient;
-	return TabCtrl_HitTest(m_view->GetHWND(), &hitTestInfo);
+	return m_view->MaybeGetIndexOfTabAtPoint(ptClient).value_or(-1);
 }
 
 unique_pidl_absolute TabBar::GetPidlForTargetItem(int targetItem)

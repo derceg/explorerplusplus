@@ -83,6 +83,7 @@ public:
 	int GetSelectedIndex() const;
 	std::optional<int> MaybeGetSelectedIndex() const;
 	int GetNumTabs() const;
+	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &ptClient) const;
 
 	void SetImageList(HIMAGELIST imageList);
 	void Scroll(ScrollDirection direction);
@@ -207,7 +208,6 @@ private:
 	void OnSelectionChanged();
 	bool IsValidIndex(int index) const;
 	RECT GetTabRect(int index) const;
-	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &pt) const;
 	void OnFontUpdated();
 
 	const ThemeManager *const m_themeManager;

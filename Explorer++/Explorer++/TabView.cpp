@@ -1019,10 +1019,10 @@ RECT TabView::GetTabRect(int index) const
 	return tabRect;
 }
 
-std::optional<int> TabView::MaybeGetIndexOfTabAtPoint(const POINT &pt) const
+std::optional<int> TabView::MaybeGetIndexOfTabAtPoint(const POINT &ptClient) const
 {
 	TCHITTESTINFO hitTestInfo = {};
-	hitTestInfo.pt = pt;
+	hitTestInfo.pt = ptClient;
 	int index = TabCtrl_HitTest(GetHWND(), &hitTestInfo);
 
 	if (index < 0)
