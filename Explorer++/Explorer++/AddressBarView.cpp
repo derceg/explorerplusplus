@@ -152,6 +152,14 @@ void AddressBarView::SelectAllText()
 	SendMessage(GetEditControl(), EM_SETSEL, 0, -1);
 }
 
+AddressBarView::TextSelection AddressBarView::GetSelection() const
+{
+	TextSelection selection;
+	SendMessage(GetEditControl(), EM_GETSEL, reinterpret_cast<WPARAM>(&selection.start),
+		reinterpret_cast<LPARAM>(&selection.end));
+	return selection;
+}
+
 void AddressBarView::UpdateTextAndIcon(const std::optional<std::wstring> &optionalText,
 	int iconIndex)
 {
@@ -172,6 +180,12 @@ void AddressBarView::UpdateTextAndIcon(const std::optional<std::wstring> &option
 
 	auto res = SendMessage(GetHWND(), CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 	DCHECK(res);
+}
+
+void AddressBarView::SetUserText(const std::wstring &text)
+{
+	SendMessage(GetHWND(), WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text.c_str()));
+	SendMessage(GetEditControl(), EM_SETMODIFY, true, 0);
 }
 
 void AddressBarView::RevertText()

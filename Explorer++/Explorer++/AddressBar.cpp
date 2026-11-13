@@ -13,6 +13,7 @@
 #include "ShellBrowser/ShellBrowserEvents.h"
 #include "Tab.h"
 #include "TabEvents.h"
+#include "TestHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
@@ -35,6 +36,7 @@ void AddressBar::Initialize(TabEvents *tabEvents, ShellBrowserEvents *shellBrows
 	NavigationEvents *navigationEvents)
 {
 	m_view->SetDelegate(this);
+	m_view->EnableDropTarget(this);
 
 	m_connections.push_back(tabEvents->AddSelectedObserver(
 		std::bind_front(&AddressBar::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
@@ -215,4 +217,122 @@ bool AddressBar::IsCommandEnabled(int command) const
 void AddressBar::ExecuteCommand(int command)
 {
 	UNREFERENCED_PARAMETER(command);
+}
+
+DWORD AddressBar::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+
+	CHECK(std::holds_alternative<std::monostate>(m_droppedData));
+	m_droppedData = MaybeExtractDropData(dataObject);
+	return GetDropEffect(effect);
+}
+
+DWORD AddressBar::DragOver(DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+
+	return GetDropEffect(effect);
+}
+
+void AddressBar::DragLeave()
+{
+	m_droppedData = {};
+}
+
+DWORD AddressBar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(dataObject);
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+
+	auto dropEffect = GetDropEffect(effect);
+	auto droppedData = std::exchange(m_droppedData, DroppedData{});
+
+	if (dropEffect == DROPEFFECT_NONE)
+	{
+		return DROPEFFECT_NONE;
+	}
+
+	if (const auto *pidl = std::get_if<PidlAbsolute>(&droppedData))
+	{
+		m_browser->OpenItem(pidl->Raw());
+	}
+	else if (const auto *text = std::get_if<std::wstring>(&droppedData))
+	{
+		m_view->SetUserText(*text);
+		m_view->Focus();
+		m_view->SelectAllText();
+	}
+
+	return dropEffect;
+}
+
+AddressBar::DroppedData AddressBar::MaybeExtractDropData(IDataObject *dataObject)
+{
+	PidlAbsolute pidl;
+	HRESULT hr = MaybeExtractFirstPidlFromDataObject(dataObject, pidl);
+
+	if (SUCCEEDED(hr))
+	{
+		return pidl;
+	}
+
+	std::wstring text;
+	hr = GetTextFromDataObject(dataObject, text);
+
+	if (SUCCEEDED(hr))
+	{
+		return text;
+	}
+
+	return {};
+}
+
+HRESULT AddressBar::MaybeExtractFirstPidlFromDataObject(IDataObject *dataObject,
+	PidlAbsolute &outputPidl)
+{
+	wil::com_ptr_nothrow<IShellItemArray> shellItems;
+	RETURN_IF_FAILED(SHCreateShellItemArrayFromDataObject(dataObject, IID_PPV_ARGS(&shellItems)));
+
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	RETURN_IF_FAILED(shellItems->GetItemAt(0, &shellItem));
+
+	PidlAbsolute pidl;
+	RETURN_IF_FAILED(SHGetIDListFromObject(shellItem.get(), PidlOutParam(pidl)));
+
+	outputPidl = std::move(pidl);
+
+	return S_OK;
+}
+
+DWORD AddressBar::GetDropEffect(DWORD allowedEffects) const
+{
+	if (std::holds_alternative<std::monostate>(m_droppedData))
+	{
+		return DROPEFFECT_NONE;
+	}
+
+	if (WI_IsFlagSet(allowedEffects, DROPEFFECT_COPY))
+	{
+		return DROPEFFECT_COPY;
+	}
+
+	if (WI_IsFlagSet(allowedEffects, DROPEFFECT_LINK))
+	{
+		return DROPEFFECT_LINK;
+	}
+
+	return DROPEFFECT_NONE;
+}
+
+DWORD AddressBar::SimulateDropForTest(IDataObject *dataObject, DWORD keyState, POINT pt,
+	DWORD effect)
+{
+	CHECK(IsInTest());
+
+	DragEnter(dataObject, keyState, pt, effect);
+	return Drop(dataObject, keyState, pt, effect);
 }

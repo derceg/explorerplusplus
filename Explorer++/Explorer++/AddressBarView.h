@@ -16,6 +16,14 @@ struct Config;
 class AddressBarView : public ViewBase, public RebarBandView
 {
 public:
+	struct TextSelection
+	{
+		DWORD start;
+		DWORD end;
+
+		bool operator==(const TextSelection &) const = default;
+	};
+
 	AddressBarView(ViewBase *parent, const Config *config);
 
 	void SetDelegate(AddressBarViewDelegate *delegate);
@@ -28,7 +36,9 @@ public:
 	std::wstring GetText() const;
 	bool IsTextModified() const;
 	void SelectAllText();
+	TextSelection GetSelection() const;
 	void UpdateTextAndIcon(const std::optional<std::wstring> &optionalText, int iconIndex);
+	void SetUserText(const std::wstring &text);
 	void RevertText();
 	void ShowDropDown();
 

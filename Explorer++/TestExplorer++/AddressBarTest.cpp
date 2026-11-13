@@ -11,6 +11,8 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
+#include "../Helper/DataObjectImpl.h"
+#include "../Helper/DragDropHelper.h"
 #include <gtest/gtest.h>
 #include <memory>
 
@@ -120,4 +122,45 @@ TEST_F(AddressBarTest, IconRetrievalAfterDestruction)
 	// This will cause the pending icon retrieval task(s) to return. This should be safe, even
 	// though the address bar has been destroyed.
 	m_iconFetcher.CompletePendingRequests();
+}
+
+TEST_F(AddressBarTest, DropShellItem)
+{
+	m_browser->AddTab(L"c:\\");
+
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	auto droppedPidl = CreateSimplePidlForTest(L"d:\\drop-folder", nullptr, ShellItemType::Folder);
+	ASSERT_HRESULT_SUCCEEDED(CreateDataObjectForShellTransfer({ droppedPidl }, &dataObject));
+
+	POINT dropPt = { 0, 0 };
+	ASSERT_TRUE(ClientToScreen(m_addressBarView->GetHWND(), &dropPt));
+
+	auto effect =
+		m_addressBar->SimulateDropForTest(dataObject.get(), MK_LBUTTON, dropPt, DROPEFFECT_COPY);
+	ASSERT_EQ(effect, static_cast<DWORD>(DROPEFFECT_COPY));
+
+	EXPECT_EQ(m_browser->GetActiveShellBrowser()->GetDirectory(), droppedPidl);
+}
+
+TEST_F(AddressBarTest, DropText)
+{
+	m_browser->AddTab(L"c:\\");
+
+	auto dataObject = winrt::make<DataObjectImpl>();
+	std::wstring droppedText = L"e:\\path\\to\\folder";
+	ASSERT_HRESULT_SUCCEEDED(SetTextOnDataObject(dataObject.get(), droppedText));
+
+	POINT dropPt = { 0, 0 };
+	ASSERT_TRUE(ClientToScreen(m_addressBarView->GetHWND(), &dropPt));
+
+	auto effect =
+		m_addressBar->SimulateDropForTest(dataObject.get(), MK_LBUTTON, dropPt, DROPEFFECT_COPY);
+	ASSERT_EQ(effect, static_cast<DWORD>(DROPEFFECT_COPY));
+
+	// Dropping text onto the address bar should result in the display text being updated and the
+	// modification flag being set (so that pressing escape will revert back to the original text).
+	EXPECT_EQ(m_addressBarView->GetText(), droppedText);
+	EXPECT_EQ(m_addressBarView->GetSelection(),
+		AddressBarView::TextSelection(0, static_cast<DWORD>(droppedText.size())));
+	EXPECT_TRUE(m_addressBarView->IsTextModified());
 }
