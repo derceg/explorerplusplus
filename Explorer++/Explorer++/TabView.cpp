@@ -1033,6 +1033,27 @@ std::optional<int> TabView::MaybeGetIndexOfTabAtPoint(const POINT &ptClient) con
 	return index;
 }
 
+std::optional<TabView::ScrollDirection> TabView::MaybeGetScrollDirectionForDrag(
+	const POINT &ptClient) const
+{
+	RECT clientRect;
+	auto res = GetClientRect(GetHWND(), &clientRect);
+	CHECK(res);
+
+	int margin = DpiCompatibility::GetInstance().ScaleValue(GetHWND(), DROP_SCROLL_MARGIN_X_96DPI);
+
+	if (ptClient.x < margin)
+	{
+		return ScrollDirection::Left;
+	}
+	else if (ptClient.x >= clientRect.right - margin)
+	{
+		return ScrollDirection::Right;
+	}
+
+	return std::nullopt;
+}
+
 void TabView::OnFontUpdated()
 {
 	sizeUpdatedSignal.m_signal();

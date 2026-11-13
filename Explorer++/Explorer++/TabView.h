@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Literals.h"
 #include "MainFontSetter.h"
 #include "MouseEvent.h"
 #include "ViewBase.h"
@@ -84,6 +85,7 @@ public:
 	std::optional<int> MaybeGetSelectedIndex() const;
 	int GetNumTabs() const;
 	std::optional<int> MaybeGetIndexOfTabAtPoint(const POINT &ptClient) const;
+	std::optional<ScrollDirection> MaybeGetScrollDirectionForDrag(const POINT &ptClient) const;
 
 	void SetImageList(HIMAGELIST imageList);
 	void Scroll(ScrollDirection direction);
@@ -93,6 +95,8 @@ public:
 
 private:
 	friend class TabViewTestApi;
+
+	static constexpr int DROP_SCROLL_MARGIN_X_96DPI = 40_px;
 
 	// When dragging a tab, the tab will typically be moved if the cursor moves outside the
 	// left/right edges of the tab.

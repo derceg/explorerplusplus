@@ -697,44 +697,21 @@ void TabBar::UpdateUiForTargetItem(int targetItem)
 void TabBar::ScrollTabControlForDrop(const POINT &pt)
 {
 	POINT ptClient = pt;
-	BOOL res = ScreenToClient(m_view->GetHWND(), &ptClient);
+	auto res = ScreenToClient(m_view->GetHWND(), &ptClient);
+	CHECK(res);
 
-	if (!res)
+	auto direction = m_view->MaybeGetScrollDirectionForDrag(ptClient);
+
+	if (!direction)
 	{
-		return;
-	}
-
-	RECT rc;
-	res = GetClientRect(m_view->GetHWND(), &rc);
-
-	if (!res)
-	{
-		return;
-	}
-
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_view->GetHWND());
-	std::optional<TabView::ScrollDirection> scrollDirection;
-
-	if (ptClient.x < MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI))
-	{
-		scrollDirection = TabView::ScrollDirection::Left;
-	}
-	else if (ptClient.x
-		> (rc.right - MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI)))
-	{
-		scrollDirection = TabView::ScrollDirection::Right;
-	}
-
-	if (!scrollDirection)
-	{
+		m_dropTargetContext->scrollDirection.reset();
 		m_dropTargetContext->scrollTimer.Stop();
 		return;
 	}
 
-	if (!m_dropTargetContext->scrollDirection
-		|| scrollDirection != *m_dropTargetContext->scrollDirection)
+	if (direction != m_dropTargetContext->scrollDirection)
 	{
-		m_dropTargetContext->scrollDirection = scrollDirection;
+		m_dropTargetContext->scrollDirection = direction;
 		m_dropTargetContext->scrollTimer.Start(1s, std::bind(&TabBar::OnDropScrollTimer, this));
 	}
 }

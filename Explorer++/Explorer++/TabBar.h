@@ -113,8 +113,6 @@ private:
 		Force
 	};
 
-	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
-
 	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
 	void OnTabDoubleClicked(Tab *tab, const MouseEvent &event);
