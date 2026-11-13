@@ -6,6 +6,7 @@
 
 #include "EnumHelper.h"
 #include "Pidl.h"
+#include "StorageWriteScope.h"
 #include <magic_enum/magic_enum.hpp>
 #include <wil/registry.h>
 #include <windows.h>
@@ -18,6 +19,11 @@
 
 namespace RegistrySettings
 {
+
+LSTATUS CreateKeyEx(HKEY key, LPCWSTR subKey, DWORD reserved, LPWSTR keyClass, DWORD options,
+	REGSAM access, const LPSECURITY_ATTRIBUTES security, PHKEY result, LPDWORD disposition);
+HRESULT CreateKey(HKEY key, const wchar_t *path, wil::unique_hkey &result,
+	wil::reg::key_access access = wil::reg::key_access::readwrite);
 
 LSTATUS SaveDword(HKEY key, const std::wstring &valueName, DWORD value);
 LSTATUS ReadDword(HKEY key, const std::wstring &subKey, const std::wstring &valueName,
@@ -166,8 +172,8 @@ void SaveItemList(HKEY key, const std::vector<T> &items,
 	for (const auto &item : items)
 	{
 		wil::unique_hkey childKey;
-		HRESULT hr = wil::reg::create_unique_key_nothrow(key, std::to_wstring(index).c_str(),
-			childKey, wil::reg::key_access::readwrite);
+		HRESULT hr = CreateKey(key, std::to_wstring(index).c_str(), childKey,
+			wil::reg::key_access::readwrite);
 
 		if (SUCCEEDED(hr))
 		{

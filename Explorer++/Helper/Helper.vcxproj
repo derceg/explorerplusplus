@@ -774,6 +774,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AtomicFile.cpp" />
+    <ClCompile Include="FileStreamOperations.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="BulkClipboardWriter.cpp" />
     <ClCompile Include="CachedIcons.cpp" />
@@ -877,6 +879,9 @@
     <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AtomicFile.h" />
+    <ClInclude Include="FileStreamOperations.h" />
+    <ClInclude Include="StorageWriteScope.h" />
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="AutoReset.h" />
     <ClInclude Include="Base64Wrapper.h" />

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "AppInfo.h"
 #include "AppServices.h"
 #include "BrowserWindow.h"
 #include "ClipboardOperations.h"
@@ -41,6 +42,7 @@
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileDialogs.h"
+#include "../Helper/FileStreamOperations.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
@@ -1505,7 +1507,12 @@ void ShellBrowserImpl::SaveDirectoryListing()
 		return;
 	}
 
-	FileOperations::SaveDirectoryListing(m_directoryState.directory, filePath);
+	hr = FileOperations::SaveDirectoryListing(m_directoryState.directory, filePath);
+	if (FAILED(hr))
+	{
+		auto message = FileStreamOperations::DescribeError({ hr, filePath });
+		MessageBox(m_listView, message.c_str(), AppInfo::NAME, MB_OK | MB_ICONERROR);
+	}
 }
 
 boost::signals2::connection ShellBrowserImpl::AddDestroyedObserver(

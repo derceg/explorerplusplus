@@ -35,7 +35,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const FolderColum
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> defaultColumnsNode;
 	auto nodeName = wil::make_bstr_nothrow(DEFAULT_COLUMNS_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(nodeName.get(), &defaultColumnsNode);
+	HRESULT hr =
+		StorageWriteScope::Record(xmlDocument->createElement(nodeName.get(), &defaultColumnsNode));
 
 	if (FAILED(hr))
 	{

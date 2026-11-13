@@ -182,7 +182,7 @@ void SaveFolderSettings(HKEY key, const FolderSettings &folderSettings)
 void SaveColumns(HKEY key, const FolderColumns &columns)
 {
 	wil::unique_hkey columnsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(key, SETTING_COLUMNS, columnsKey,
+	HRESULT hr = RegistrySettings::CreateKey(key, SETTING_COLUMNS, columnsKey,
 		wil::reg::key_access::readwrite);
 
 	if (FAILED(hr))

@@ -79,7 +79,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const BookmarkTre
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> bookmarksNode;
 	auto bookmarksKeyNodeName = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
-	HRESULT hr = xmlDocument->createElement(bookmarksKeyNodeName.get(), &bookmarksNode);
+	HRESULT hr = StorageWriteScope::Record(
+		xmlDocument->createElement(bookmarksKeyNodeName.get(), &bookmarksNode));
 
 	if (hr == S_OK)
 	{

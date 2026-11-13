@@ -221,7 +221,7 @@ void SaveColumns(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> columnsNode;
 	auto bstr = wil::make_bstr_nothrow(SETTING_COLUMNS);
-	HRESULT hr = xmlDocument->createElement(bstr.get(), &columnsNode);
+	HRESULT hr = StorageWriteScope::Record(xmlDocument->createElement(bstr.get(), &columnsNode));
 
 	if (FAILED(hr))
 	{

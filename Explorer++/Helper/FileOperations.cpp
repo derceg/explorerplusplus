@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FileOperations.h"
+#include "AtomicFile.h"
 #include "ClipboardStore.h"
 #include "DragDropHelper.h"
 #include "DriveInfo.h"
@@ -17,6 +18,15 @@
 #include <sstream>
 
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
+
+HRESULT FileOperations::PerformOperations(IFileOperation *operation)
+{
+	RETURN_HR_IF_NULL(E_POINTER, operation);
+	RETURN_IF_FAILED(operation->PerformOperations());
+	BOOL aborted = FALSE;
+	RETURN_IF_FAILED(operation->GetAnyOperationsAborted(&aborted));
+	return aborted ? HRESULT_FROM_WIN32(ERROR_CANCELLED) : S_OK;
+}
 
 HRESULT FileOperations::RenameFile(IShellItem *item, const std::wstring &newName)
 {
@@ -42,7 +52,7 @@ HRESULT FileOperations::RenameFile(IShellItem *item, const std::wstring &newName
 		return hr;
 	}
 
-	hr = fo->PerformOperations();
+	hr = PerformOperations(fo.get());
 
 	return hr;
 }
@@ -115,7 +125,7 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLU
 		return hr;
 	}
 
-	hr = fo->PerformOperations();
+	hr = PerformOperations(fo.get());
 
 	return hr;
 }
@@ -200,7 +210,7 @@ HRESULT FileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 		return hr;
 	}
 
-	hr = fo->PerformOperations();
+	hr = PerformOperations(fo.get());
 
 	return hr;
 }
@@ -256,14 +266,17 @@ HRESULT FileOperations::CreateNewFolder(IShellItem *destinationFolder,
 		return hr;
 	}
 
-	hr = fo->PerformOperations();
+	hr = PerformOperations(fo.get());
 
 	return hr;
 }
 
-BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
+HRESULT FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	const std::wstring &strFilename)
 {
+	DWORD attributes = GetFileAttributes(strDirectory.c_str());
+	RETURN_LAST_ERROR_IF(attributes == INVALID_FILE_ATTRIBUTES);
+	RETURN_HR_IF(HRESULT_FROM_WIN32(ERROR_DIRECTORY), !(attributes & FILE_ATTRIBUTE_DIRECTORY));
 	std::wstring strContents = _T("Directory\r\n---------\r\n") + strDirectory + _T("\r\n\r\n");
 
 	SYSTEMTIME st;
@@ -280,7 +293,7 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	std::wstring strSearch = strDirectory + _T("\\*");
 
 	WIN32_FIND_DATA wfd;
-	HANDLE hFirstFile = FindFirstFile(strSearch.c_str(), &wfd);
+	wil::unique_hfind hFirstFile(FindFirstFile(strSearch.c_str(), &wfd));
 
 	std::list<std::wstring> folderList;
 	std::list<std::wstring> fileList;
@@ -288,7 +301,7 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 
 	ulTotalSize.QuadPart = 0;
 
-	if (hFirstFile != INVALID_HANDLE_VALUE)
+	if (hFirstFile)
 	{
 		ULARGE_INTEGER ulFileSize;
 
@@ -309,7 +322,7 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 			}
 		}
 
-		while (FindNextFile(hFirstFile, &wfd) != 0)
+		while (FindNextFile(hFirstFile.get(), &wfd) != 0)
 		{
 			if (lstrcmpi(wfd.cFileName, _T(".")) != 0 && lstrcmpi(wfd.cFileName, _T("..")) != 0)
 			{
@@ -329,7 +342,15 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 			}
 		}
 
-		FindClose(hFirstFile);
+		auto error = GetLastError();
+		if (error != ERROR_NO_MORE_FILES)
+			return HRESULT_FROM_WIN32(error);
+	}
+	else
+	{
+		auto error = GetLastError();
+		if (error != ERROR_FILE_NOT_FOUND)
+			return HRESULT_FROM_WIN32(error);
 	}
 
 	std::wstringstream ss;
@@ -365,29 +386,15 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	/* Remove the trailing newline. */
 	strContents = strContents.substr(0, strContents.size() - 2);
 
-	HANDLE hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, nullptr);
-
-	if (hFile != INVALID_HANDLE_VALUE)
-	{
-		DWORD nBytesWritten;
-
-		/* Write out the BOM for UTF-16 LE data.
-		See http://en.wikipedia.org/wiki/Byte-order_mark */
-		WriteFile(hFile, reinterpret_cast<LPCVOID>("\xFF\xFE"), 2, &nBytesWritten, nullptr);
-
-		WriteFile(hFile, reinterpret_cast<LPCVOID>(strContents.c_str()),
-			static_cast<DWORD>(strContents.size() * sizeof(WCHAR)), &nBytesWritten, nullptr);
-
-		if (nBytesWritten == strContents.size())
-		{
-			return TRUE;
-		}
-
-		CloseHandle(hFile);
-	}
-
-	return FALSE;
+	AtomicFile file;
+	RETURN_IF_FAILED(file.Create(strFilename));
+	const wchar_t bom = 0xfeff;
+	RETURN_IF_FAILED(file.Write(&bom, sizeof(bom)));
+	RETURN_IF_FAILED(file.Write(strContents.data(), strContents.size() * sizeof(wchar_t)));
+	RETURN_IF_FAILED(file.Flush());
+	RETURN_IF_FAILED(file.Publish(true));
+	file.Accept();
+	return S_OK;
 }
 
 HRESULT CopyFiles(ClipboardStore *clipboardStore, const std::vector<PidlAbsolute> &items,

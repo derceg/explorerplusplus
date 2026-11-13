@@ -115,6 +115,16 @@ New features:
   environment variable EXPLORERPP_CONFIG.
 
 Bug fixes:
+- Fixed the file order used when merging reordered inputs.
+- Fixed truncation and overflow when merging or splitting large
+  files, and handle incomplete reads and writes.
+- Fixed cancellation and closing the merge and split dialogs
+  while a file operation is running.
+- Preserve previous settings when an XML or registry save fails.
+  Keep an XML backup and recover readable settings from it.
+- Report file operation and settings errors instead of treating
+  interrupted or incomplete operations as successful.
+- Fixed saving directory listings and reporting write failures.
 - Fixed a crash that could occur on startup when the "Open new
   tabs next to the current one" option was enabled.
 - Fixed a crash that could occur when autosizing columns.

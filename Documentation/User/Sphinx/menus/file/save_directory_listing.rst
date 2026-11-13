@@ -11,6 +11,10 @@ file is saved in Unicode format (codepage = UTF-16 LE), with a BOM (byte
 order mark = FFFE hex) header. Windows Notepad can read this file format
 and can save the file is ANSI format, if desired.
 
+If the listing cannot be read or fully written, Explorer++ reports the
+error. An existing destination is replaced only after the new listing
+has been written successfully, so a failed save keeps the old file.
+
 Example
 ~~~~~~~
 

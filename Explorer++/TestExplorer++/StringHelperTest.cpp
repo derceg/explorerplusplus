@@ -37,22 +37,24 @@ http://connect.microsoft.com/VisualStudio/feedback/details/431433/unicode-string
 
 TEST(FormatSizeString, Simple)
 {
-	auto formattedSize = FormatSizeString(1);
+	auto formattedSize = FormatSizeString(1, SizeDisplayFormat::None, std::locale::classic());
 	EXPECT_EQ(formattedSize, L"1 bytes");
 
-	formattedSize = FormatSizeString(1024);
+	formattedSize = FormatSizeString(1024, SizeDisplayFormat::None, std::locale::classic());
 	EXPECT_EQ(formattedSize, L"1.00 KB");
 
-	formattedSize = FormatSizeString(1024 * 1024 * 2);
+	formattedSize =
+		FormatSizeString(1024 * 1024 * 2, SizeDisplayFormat::None, std::locale::classic());
 	EXPECT_EQ(formattedSize, L"2.00 MB");
 
-	formattedSize = FormatSizeString(48169402368);
+	formattedSize = FormatSizeString(48169402368, SizeDisplayFormat::None, std::locale::classic());
 	EXPECT_EQ(formattedSize, L"44.8 GB");
 
-	formattedSize = FormatSizeString(517637815320);
+	formattedSize = FormatSizeString(517637815320, SizeDisplayFormat::None, std::locale::classic());
 	EXPECT_EQ(formattedSize, L"482 GB");
 
-	formattedSize = FormatSizeString(1000202039296);
+	formattedSize =
+		FormatSizeString(1000202039296, SizeDisplayFormat::None, std::locale::classic());
 	EXPECT_EQ(formattedSize, L"931 GB");
 }
 
@@ -118,4 +120,34 @@ TEST(StrToWstr, NullTerminator)
 {
 	auto result = StrToWstr("Test string");
 	EXPECT_EQ(result, L"Test string");
+}
+
+namespace
+{
+class CommaDecimalPoint : public std::numpunct<wchar_t>
+{
+protected:
+	wchar_t do_decimal_point() const override
+	{
+		return L',';
+	}
+};
+}
+
+TEST(FormatSizeString, ExplicitDecimalComma)
+{
+	const std::locale locale(std::locale::classic(), new CommaDecimalPoint);
+	EXPECT_EQ(FormatSizeString(1024, SizeDisplayFormat::None, locale), L"1,00 KB");
+	EXPECT_EQ(FormatSizeString(48169402368, SizeDisplayFormat::None, locale), L"44,8 GB");
+}
+
+TEST(FormatSizeString, UsesSystemLocaleByDefault)
+{
+	wchar_t decimal[8];
+	ASSERT_GT(GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_SDECIMAL, decimal,
+				  static_cast<int>(std::size(decimal))),
+		0);
+	auto formatted = FormatSizeString(1024);
+	RecordProperty("system_sample", wstrToUtf8Str(formatted));
+	EXPECT_EQ(formatted, L"1" + std::wstring(decimal) + L"00 KB");
 }

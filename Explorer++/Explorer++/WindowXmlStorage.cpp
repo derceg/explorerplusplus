@@ -406,7 +406,8 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> windowNode;
 	auto windowNodeName = wil::make_bstr_nothrow(WINDOW_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(windowNodeName.get(), &windowNode);
+	HRESULT hr =
+		StorageWriteScope::Record(xmlDocument->createElement(windowNodeName.get(), &windowNode));
 
 	if (hr != S_OK)
 	{
@@ -434,7 +435,7 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 
 	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
 	auto tabsNodeName = wil::make_bstr_nothrow(TABS_NODE_NAME);
-	hr = xmlDocument->createElement(tabsNodeName.get(), &tabsNode);
+	hr = StorageWriteScope::Record(xmlDocument->createElement(tabsNodeName.get(), &tabsNode));
 
 	if (hr == S_OK)
 	{
@@ -445,7 +446,8 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 
 	wil::com_ptr_nothrow<IXMLDOMElement> mainRebarNode;
 	auto mainRebarNodeName = wil::make_bstr_nothrow(MAIN_REBAR_NODE_NAME);
-	hr = xmlDocument->createElement(mainRebarNodeName.get(), &mainRebarNode);
+	hr = StorageWriteScope::Record(
+		xmlDocument->createElement(mainRebarNodeName.get(), &mainRebarNode));
 
 	if (hr == S_OK)
 	{
@@ -456,7 +458,8 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 
 	wil::com_ptr_nothrow<IXMLDOMElement> mainToolbarNode;
 	auto mainToolbarNodeName = wil::make_bstr_nothrow(MAIN_TOOLBAR_NODE_NAME);
-	hr = xmlDocument->createElement(mainToolbarNodeName.get(), &mainToolbarNode);
+	hr = StorageWriteScope::Record(
+		xmlDocument->createElement(mainToolbarNodeName.get(), &mainToolbarNode));
 
 	if (hr == S_OK)
 	{
@@ -519,7 +522,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode,
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> windowsNode;
 	auto windowsNodeName = wil::make_bstr_nothrow(V2::WINDOWS_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(windowsNodeName.get(), &windowsNode);
+	HRESULT hr =
+		StorageWriteScope::Record(xmlDocument->createElement(windowsNodeName.get(), &windowsNode));
 
 	if (hr != S_OK)
 	{

@@ -87,23 +87,14 @@ void WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparent
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	auto bstr = wil::make_bstr_nothrow(elementName.c_str());
-	pXMLDom->createElement(bstr.get(), &pParentNode);
-
-	/* This will form an attribute of the form:
-	name="AttributeName" */
-	bstr = wil::make_bstr_nothrow(L"name");
-
-	wil::unique_variant var(VariantString(attributeName));
-
-	wil::com_ptr_nothrow<IXMLDOMAttribute> pa;
-	pXMLDom->createAttribute(bstr.get(), &pa);
-	pa->put_value(var);
-
-	wil::com_ptr_nothrow<IXMLDOMAttribute> pa1;
-	pParentNode->setAttributeNode(pa.get(), &pa1);
+	if (FAILED(StorageWriteScope::Record(pXMLDom->createElement(bstr.get(), &pParentNode))))
+	{
+		return;
+	}
+	AddAttributeToNode(pXMLDom, pParentNode.get(), L"name", attributeName);
 
 	bstr = wil::make_bstr_nothrow(attributeValue.c_str());
-	pParentNode->put_text(bstr.get());
+	StorageWriteScope::Record(pParentNode->put_text(bstr.get()));
 
 	AppendChildToParent(pParentNode.get(), pGrandparentNode);
 }
@@ -115,6 +106,8 @@ VARIANT VariantString(const std::wstring &str)
 	VariantInit(&var);
 	V_BSTR(&var) = SysAllocString(str.c_str());
 	V_VT(&var) = VT_BSTR;
+	if (!V_BSTR(&var))
+		StorageWriteScope::Record(E_OUTOFMEMORY);
 
 	return var;
 }
@@ -122,22 +115,36 @@ VARIANT VariantString(const std::wstring &str)
 /* Helper function to append a child to a parent node. */
 void AppendChildToParent(IXMLDOMNode *pChild, IXMLDOMNode *pParent)
 {
+	if (!pChild || !pParent)
+	{
+		StorageWriteScope::Record(E_POINTER);
+		return;
+	}
 	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
-	pParent->appendChild(pChild, &pNode);
+	StorageWriteScope::Record(pParent->appendChild(pChild, &pNode));
 }
 
 void AddAttributeToNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode,
 	const std::wstring &attributeName, const std::wstring &attributeValue)
 {
+	if (!pXMLDom || !pParentNode)
+	{
+		StorageWriteScope::Record(E_POINTER);
+		return;
+	}
 	wil::com_ptr_nothrow<IXMLDOMAttribute> pa;
 	auto bstr = wil::make_bstr_nothrow(attributeName.c_str());
-	pXMLDom->createAttribute(bstr.get(), &pa);
+	if (FAILED(StorageWriteScope::Record(pXMLDom->createAttribute(bstr.get(), &pa))))
+	{
+		return;
+	}
 
 	wil::unique_variant var(VariantString(attributeValue));
-	pa->put_value(var);
+	if (FAILED(StorageWriteScope::Record(pa->put_value(var))))
+		return;
 
 	wil::com_ptr_nothrow<IXMLDOMAttribute> pa1;
-	pParentNode->setAttributeNode(pa.get(), &pa1);
+	StorageWriteScope::Record(pParentNode->setAttributeNode(pa.get(), &pa1));
 }
 
 void AddStringListToNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode,
@@ -158,7 +165,7 @@ void CreateElementNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement **pParentNode,
 	const std::wstring &attributeName)
 {
 	auto bstrElement = wil::make_bstr_nothrow(elementName.c_str());
-	HRESULT hr = pXMLDom->createElement(bstrElement.get(), pParentNode);
+	HRESULT hr = StorageWriteScope::Record(pXMLDom->createElement(bstrElement.get(), pParentNode));
 
 	if (FAILED(hr))
 	{
@@ -169,14 +176,14 @@ void CreateElementNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement **pParentNode,
 
 	wil::com_ptr_nothrow<IXMLDOMAttribute> pa;
 	auto bstrName = wil::make_bstr_nothrow(L"name");
-	hr = pXMLDom->createAttribute(bstrName.get(), &pa);
+	hr = StorageWriteScope::Record(pXMLDom->createAttribute(bstrName.get(), &pa));
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	hr = pa->put_value(var);
+	hr = StorageWriteScope::Record(pa->put_value(var));
 
 	if (FAILED(hr))
 	{
@@ -184,7 +191,7 @@ void CreateElementNode(IXMLDOMDocument *pXMLDom, IXMLDOMElement **pParentNode,
 	}
 
 	wil::com_ptr_nothrow<IXMLDOMAttribute> pa1;
-	hr = (*pParentNode)->setAttributeNode(pa.get(), &pa1);
+	hr = StorageWriteScope::Record((*pParentNode)->setAttributeNode(pa.get(), &pa1));
 
 	if (FAILED(hr))
 	{

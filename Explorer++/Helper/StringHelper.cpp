@@ -13,6 +13,12 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString,
 
 std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat)
 {
+	return FormatSizeString(size, sizeDisplayFormat, std::locale(""));
+}
+
+std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat,
+	const std::locale &locale)
+{
 	static const TCHAR *SIZE_STRINGS[] = { _T("bytes"), _T("KB"), _T("MB"), _T("GB"), _T("TB"),
 		_T("PB") };
 
@@ -105,7 +111,7 @@ std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat
 	}
 
 	std::wstringstream ss;
-	ss.imbue(std::locale(""));
+	ss.imbue(locale);
 	ss.precision(iPrecision);
 
 	ss << std::fixed << sizeAsDouble << _T(" ") << SIZE_STRINGS[sizeIndex];

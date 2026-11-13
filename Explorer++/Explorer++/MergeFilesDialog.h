@@ -6,9 +6,10 @@
 
 #include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ReferenceCount.h"
+#include "../Helper/FileStreamOperations.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <string>
+#include <thread>
 #include <vector>
 
 class MergeFilesDialog;
@@ -27,26 +28,6 @@ private:
 
 	MergeFilesDialogPersistentSettings(const MergeFilesDialogPersistentSettings &);
 	MergeFilesDialogPersistentSettings &operator=(const MergeFilesDialogPersistentSettings &);
-};
-
-class MergeFiles : public ReferenceCount
-{
-public:
-	MergeFiles(HWND hDlg, const std::wstring &strOutputFilename,
-		const std::vector<std::wstring> &filePaths);
-	~MergeFiles();
-
-	void StartMerging();
-	void StopMerging();
-
-private:
-	HWND m_hDlg;
-
-	std::wstring m_strOutputFilename;
-	std::vector<std::wstring> m_filePaths;
-
-	CRITICAL_SECTION m_csStop;
-	bool m_bstopMerging;
 };
 
 class MergeFilesDialog : public BaseDialog
@@ -84,9 +65,10 @@ private:
 	std::vector<std::wstring> m_filePaths;
 	BOOL m_bShowFriendlyDates;
 
-	MergeFiles *m_pMergeFiles;
+	FileStreamOperations::Result m_result;
+	std::jthread m_worker;
 	bool m_bMergingFiles;
-	bool m_bStopMerging;
+	bool m_closePending = false;
 	TCHAR m_szOk[32];
 
 	MergeFilesDialogPersistentSettings *m_persistentSettings;

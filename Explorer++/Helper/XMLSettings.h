@@ -5,6 +5,7 @@
 #pragma once
 
 #include "EnumHelper.h"
+#include "StorageWriteScope.h"
 #include <magic_enum/magic_enum.hpp>
 #include <wil/com.h>
 #include <MsXml2.h>
@@ -111,8 +112,8 @@ void SaveItemList(IXMLDOMDocument *xmlDocument, IXMLDOMElement *node, const std:
 	for (const auto &item : items)
 	{
 		wil::com_ptr_nothrow<IXMLDOMElement> childNode;
-		HRESULT hr = xmlDocument->createElement(
-			wil::make_bstr_failfast(childNodeName.c_str()).get(), &childNode);
+		HRESULT hr = StorageWriteScope::Record(xmlDocument->createElement(
+			wil::make_bstr_failfast(childNodeName.c_str()).get(), &childNode));
 
 		if (hr == S_OK)
 		{

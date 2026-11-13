@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SplitFileDialog.h"
+#include "AppInfo.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/FileOperations.h"
@@ -19,14 +20,11 @@
 
 namespace NSplitFileDialog
 {
-const int WM_APP_SETTOTALSPLITCOUNT = WM_APP + 1;
 const int WM_APP_SETCURRENTSPLITCOUNT = WM_APP + 2;
 const int WM_APP_SPLITFINISHED = WM_APP + 3;
-const int WM_APP_INPUTFILEINVALID = WM_APP + 4;
 
 const TCHAR COUNTER_PATTERN[] = _T("/N");
 
-DWORD WINAPI SplitFileThreadProcStub(LPVOID pParam);
 }
 
 const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
@@ -44,19 +42,17 @@ SplitFileDialog::SplitFileDialog(const ResourceLoader *resourceLoader, HWND hPar
 	const std::wstring &strFullFilename) :
 	BaseDialog(resourceLoader, IDD_SPLITFILE, hParent, DialogSizingType::None),
 	m_strFullFilename(strFullFilename),
-	m_bSplittingFile(false),
-	m_bStopSplitting(false),
-	m_pSplitFile(nullptr)
+	m_bSplittingFile(false)
 {
 	m_persistentSettings = &SplitFileDialogPersistentSettings::GetInstance();
 }
 
 SplitFileDialog::~SplitFileDialog()
 {
-	if (m_pSplitFile != nullptr)
+	if (m_worker.joinable())
 	{
-		m_pSplitFile->StopSplitting();
-		m_pSplitFile->Release();
+		m_worker.request_stop();
+		m_worker.join();
 	}
 }
 
@@ -177,22 +173,19 @@ INT_PTR SplitFileDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	if (lParam != 0)
+	switch (LOWORD(wParam))
 	{
-		switch (LOWORD(wParam))
-		{
-		case IDC_SPLIT_BUTTON_OUTPUT:
-			OnChangeOutputDirectory();
-			break;
+	case IDC_SPLIT_BUTTON_OUTPUT:
+		OnChangeOutputDirectory();
+		break;
 
-		case IDOK:
-			OnOk();
-			break;
+	case IDOK:
+		OnOk();
+		break;
 
-		case IDCANCEL:
-			OnCancel();
-			break;
-		}
+	case IDCANCEL:
+		OnCancel();
+		break;
 	}
 
 	return 0;
@@ -200,7 +193,7 @@ INT_PTR SplitFileDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 INT_PTR SplitFileDialog::OnClose()
 {
-	EndDialog(m_hDlg, 0);
+	OnCancel();
 	return 0;
 }
 
@@ -225,41 +218,15 @@ void SplitFileDialog::SaveState()
 INT_PTR SplitFileDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
-
 	switch (uMsg)
 	{
-	case NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT:
-		SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_SETRANGE32, 0, wParam);
-		break;
-
 	case NSplitFileDialog::WM_APP_SETCURRENTSPLITCOUNT:
 		SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_SETPOS, wParam, 0);
 		break;
-
 	case NSplitFileDialog::WM_APP_SPLITFINISHED:
 		OnSplitFinished();
 		break;
-
-	case NSplitFileDialog::WM_APP_INPUTFILEINVALID:
-	{
-		auto errorMessage = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_INPUTFILEINVALID);
-		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
-
-		assert(m_pSplitFile != nullptr);
-
-		m_pSplitFile->Release();
-		m_pSplitFile = nullptr;
-
-		m_bSplittingFile = false;
-		m_bStopSplitting = false;
-
-		KillTimer(m_hDlg, ELPASED_TIMER_ID);
-
-		SetDlgItemText(m_hDlg, IDOK, m_szOk);
 	}
-	break;
-	}
-
 	return 0;
 }
 
@@ -308,48 +275,36 @@ void SplitFileDialog::OnOk()
 
 		std::wstring strOutputDirectory = GetWindowString(hEditOutputDirectory);
 
-		BOOL bTranslated;
-		UINT uSplitSize = GetDlgItemInt(m_hDlg, IDC_SPLIT_EDIT_SIZE, &bTranslated, FALSE);
-
-		if (!bTranslated || uSplitSize == 0)
-		{
-			auto errorMessage = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_SIZEERROR);
-			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, errorMessage.c_str());
-
-			SetFocus(GetDlgItem(m_hDlg, IDC_SPLIT_EDIT_SIZE));
-			return;
-		}
-
 		HWND hComboBox = GetDlgItem(m_hDlg, IDC_SPLIT_COMBOBOX_SIZES);
-		int iCurSel = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
-
-		auto itr = m_SizeMap.find(iCurSel);
-
-		if (itr != m_SizeMap.end())
+		int selection = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
+		auto entry = m_SizeMap.find(selection);
+		uint64_t multiplier = 1;
+		if (entry != m_SizeMap.end())
 		{
-			switch (itr->second)
+			switch (entry->second)
 			{
 			case SizeType::Bytes:
-				/* Nothing needs to be done, as the selection
-				is in bytes. */
 				break;
-
 			case SizeType::KB:
-				uSplitSize *= KB;
+				multiplier = KB;
 				break;
-
 			case SizeType::MB:
-				uSplitSize *= MB;
+				multiplier = MB;
 				break;
-
 			case SizeType::GB:
-				uSplitSize *= GB;
+				multiplier = GB;
 				break;
 			}
 		}
-
-		m_pSplitFile = new SplitFile(m_hDlg, m_strFullFilename, strOutputFilename,
-			strOutputDirectory, uSplitSize);
+		auto partSize = FileStreamOperations::ParsePartSize(
+			GetWindowString(GetDlgItem(m_hDlg, IDC_SPLIT_EDIT_SIZE)), multiplier);
+		if (!partSize || entry == m_SizeMap.end())
+		{
+			auto message = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_SIZEERROR);
+			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, message.c_str());
+			SetFocus(GetDlgItem(m_hDlg, IDC_SPLIT_EDIT_SIZE));
+			return;
+		}
 
 		GetDlgItemText(m_hDlg, IDOK, m_szOk, static_cast<int>(std::size(m_szOk)));
 
@@ -364,19 +319,61 @@ void SplitFileDialog::OnOk()
 		auto splittingText = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_SPLITTING);
 		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, splittingText.c_str());
 
-		HANDLE hThread = CreateThread(nullptr, 0, NSplitFileDialog::SplitFileThreadProcStub,
-			reinterpret_cast<LPVOID>(m_pSplitFile), 0, nullptr);
-		SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-		CloseHandle(hThread);
+		SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_SETRANGE32, 0, 1000);
+		SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_SETPOS, 0, 0);
+		for (int id : { IDC_SPLIT_EDIT_SIZE, IDC_SPLIT_COMBOBOX_SIZES, IDC_SPLIT_EDIT_OUTPUT,
+				 IDC_SPLIT_EDIT_OUTPUTFILENAME, IDC_SPLIT_BUTTON_OUTPUT })
+			EnableWindow(GetDlgItem(m_hDlg, id), FALSE);
+		m_closePending = false;
+		m_result = {};
+		try
+		{
+			m_worker = std::jthread(
+				[this, input = m_strFullFilename, directory = strOutputDirectory,
+					pattern = strOutputFilename, size = *partSize](std::stop_token stop)
+				{
+					int previous = -1;
+					auto progress = [this, &previous](uint64_t completed, uint64_t total)
+					{
+						int value = total ? static_cast<int>(999.0 * completed / total) : 0;
+						if (value == previous)
+							return;
+						previous = value;
+						PostMessage(m_hDlg, NSplitFileDialog::WM_APP_SETCURRENTSPLITCOUNT, value,
+							0);
+					};
+
+					try
+					{
+						m_result = FileStreamOperations::Split(input, directory, pattern, size,
+							stop, progress);
+					}
+					catch (const std::bad_alloc &)
+					{
+						m_result.error = E_OUTOFMEMORY;
+					}
+					catch (const std::exception &)
+					{
+						m_result.error = E_FAIL;
+					}
+
+					PostMessage(m_hDlg, NSplitFileDialog::WM_APP_SPLITFINISHED, 0, 0);
+				});
+		}
+		catch (const std::system_error &)
+		{
+			m_result = { HRESULT_FROM_WIN32(ERROR_MAX_THRDS_REACHED) };
+			OnSplitFinished();
+		}
+		catch (const std::bad_alloc &)
+		{
+			m_result = { E_OUTOFMEMORY };
+			OnSplitFinished();
+		}
 	}
 	else
 	{
-		m_bStopSplitting = true;
-
-		if (m_pSplitFile != nullptr)
-		{
-			m_pSplitFile->StopSplitting();
-		}
+		m_worker.request_stop();
 	}
 }
 
@@ -384,7 +381,8 @@ void SplitFileDialog::OnCancel()
 {
 	if (m_bSplittingFile)
 	{
-		m_bStopSplitting = true;
+		m_closePending = true;
+		m_worker.request_stop();
 	}
 	else
 	{
@@ -417,160 +415,32 @@ void SplitFileDialog::OnChangeOutputDirectory()
 
 void SplitFileDialog::OnSplitFinished()
 {
-	std::wstring message;
-
-	if (!m_bStopSplitting)
-	{
-		message = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_FINISHED);
-	}
-	else
-	{
-		message = m_resourceLoader->LoadString(IDS_SPLITFILEDIALOG_CANCELLED);
-	}
-
-	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, message.c_str());
-
-	assert(m_pSplitFile != nullptr);
-
-	m_pSplitFile->Release();
-	m_pSplitFile = nullptr;
-
+	// Joining establishes publication of the result and releases the worker before
+	// any dialog state is reset or the HWND can be destroyed.
+	if (m_worker.joinable())
+		m_worker.join();
 	m_bSplittingFile = false;
-	m_bStopSplitting = false;
+	for (int id : { IDC_SPLIT_EDIT_SIZE, IDC_SPLIT_COMBOBOX_SIZES, IDC_SPLIT_EDIT_OUTPUT,
+			 IDC_SPLIT_EDIT_OUTPUTFILENAME, IDC_SPLIT_BUTTON_OUTPUT })
+		EnableWindow(GetDlgItem(m_hDlg, id), TRUE);
+	SetDlgItemText(m_hDlg, IDOK, m_szOk);
 
 	KillTimer(m_hDlg, ELPASED_TIMER_ID);
+	auto message = m_resourceLoader->LoadString(
+		m_result.Cancelled() ? IDS_SPLITFILEDIALOG_CANCELLED : IDS_SPLITFILEDIALOG_FINISHED);
+	if (FAILED(m_result.error) && !m_result.Cancelled())
+		message = FileStreamOperations::DescribeError(m_result);
+	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, message.c_str());
 
-	int iHighLimit =
-		static_cast<int>(SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_GETRANGE, FALSE, 0));
-	SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_SETPOS, iHighLimit, 0);
-
-	SetDlgItemText(m_hDlg, IDOK, m_szOk);
-}
-
-DWORD WINAPI NSplitFileDialog::SplitFileThreadProcStub(LPVOID pParam)
-{
-	assert(pParam != nullptr);
-
-	auto *pSplitFile = reinterpret_cast<SplitFile *>(pParam);
-	pSplitFile->Split();
-
-	return 0;
-}
-
-SplitFile::SplitFile(HWND hDlg, const std::wstring &strFullFilename,
-	const std::wstring &strOutputFilename, const std::wstring &strOutputDirectory, UINT uSplitSize)
-{
-	m_hDlg = hDlg;
-	m_strFullFilename = strFullFilename;
-	m_strOutputFilename = strOutputFilename;
-	m_strOutputDirectory = strOutputDirectory;
-	m_uSplitSize = uSplitSize;
-
-	m_bStopSplitting = false;
-
-	InitializeCriticalSection(&m_csStop);
-}
-
-SplitFile::~SplitFile()
-{
-	DeleteCriticalSection(&m_csStop);
-}
-
-void SplitFile::Split()
-{
-	HANDLE hInputFile = CreateFile(m_strFullFilename.c_str(), GENERIC_READ, FILE_SHARE_READ,
-		nullptr, OPEN_EXISTING, 0, nullptr);
-
-	if (hInputFile == INVALID_HANDLE_VALUE)
+	if (SUCCEEDED(m_result.error))
+		SendDlgItemMessage(m_hDlg, IDC_SPLIT_PROGRESS, PBM_SETPOS, 1000, 0);
+	if ((FAILED(m_result.error) && !m_result.Cancelled()) || FAILED(m_result.cleanupError))
 	{
-		PostMessage(m_hDlg, NSplitFileDialog::WM_APP_INPUTFILEINVALID, 0, 0);
-		return;
+		auto errorMessage = FileStreamOperations::DescribeError(m_result);
+		MessageBox(m_hDlg, errorMessage.c_str(), AppInfo::NAME, MB_ICONERROR | MB_OK);
 	}
-
-	LARGE_INTEGER lFileSize;
-	GetFileSizeEx(hInputFile, &lFileSize);
-
-	LONGLONG nSplits = lFileSize.QuadPart / m_uSplitSize;
-
-	if ((lFileSize.QuadPart % m_uSplitSize) != 0)
-	{
-		nSplits++;
-	}
-
-	PostMessage(m_hDlg, NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT, static_cast<WPARAM>(nSplits),
-		0);
-
-	SplitInternal(hInputFile, lFileSize);
-
-	CloseHandle(hInputFile);
-
-	SendMessage(m_hDlg, NSplitFileDialog::WM_APP_SPLITFINISHED, 0, 0);
-}
-
-void SplitFile::SplitInternal(HANDLE hInputFile, const LARGE_INTEGER &lFileSize)
-{
-	LARGE_INTEGER lRunningSplitSize = {};
-
-	char *pBuffer = new char[m_uSplitSize];
-	bool bStop = false;
-	int nSplitsMade = 1;
-
-	while (lRunningSplitSize.QuadPart < lFileSize.QuadPart && !bStop)
-	{
-		DWORD dwNumberOfBytesRead;
-		ReadFile(hInputFile, reinterpret_cast<LPVOID>(pBuffer), m_uSplitSize, &dwNumberOfBytesRead,
-			nullptr);
-
-		std::wstring strOutputFullFilename;
-		ProcessFilename(nSplitsMade, strOutputFullFilename);
-
-		HANDLE hOutputFile = CreateFile(strOutputFullFilename.c_str(), GENERIC_WRITE, 0, nullptr,
-			CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-		if (hOutputFile != INVALID_HANDLE_VALUE)
-		{
-			DWORD dwNumberOfBytesWritten;
-			WriteFile(hOutputFile, reinterpret_cast<LPCVOID>(pBuffer), dwNumberOfBytesRead,
-				&dwNumberOfBytesWritten, nullptr);
-
-			CloseHandle(hOutputFile);
-		}
-
-		/* TODO: Wait for a set period of time before sending message
-		(so as not to block the GUI). */
-		PostMessage(m_hDlg, NSplitFileDialog::WM_APP_SETCURRENTSPLITCOUNT, nSplitsMade, 0);
-
-		lRunningSplitSize.QuadPart += dwNumberOfBytesRead;
-		nSplitsMade++;
-
-		EnterCriticalSection(&m_csStop);
-		if (m_bStopSplitting)
-		{
-			bStop = true;
-		}
-		LeaveCriticalSection(&m_csStop);
-	}
-
-	delete[] pBuffer;
-}
-
-void SplitFile::ProcessFilename(int nSplitsMade, std::wstring &strOutputFullFilename)
-{
-	std::wstring strOutputFilename = m_strOutputFilename;
-
-	std::wstringstream ss;
-	ss << nSplitsMade;
-	strOutputFilename.replace(strOutputFilename.find(NSplitFileDialog::COUNTER_PATTERN), 2,
-		ss.str());
-
-	strOutputFullFilename = m_strOutputDirectory + _T("\\") + strOutputFilename;
-}
-
-void SplitFile::StopSplitting()
-{
-	EnterCriticalSection(&m_csStop);
-	m_bStopSplitting = true;
-	LeaveCriticalSection(&m_csStop);
+	if (m_closePending)
+		EndDialog(m_hDlg, 0);
 }
 
 SplitFileDialogPersistentSettings::SplitFileDialogPersistentSettings() :

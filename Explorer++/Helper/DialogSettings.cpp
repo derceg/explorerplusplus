@@ -40,15 +40,15 @@ void DialogSettings::SaveRegistrySettings(HKEY hParentKey)
 	HKEY hKey;
 	DWORD dwDisposition;
 
-	LSTATUS lRes = RegCreateKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, nullptr,
+	LSTATUS lRes = RegistrySettings::CreateKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, &dwDisposition);
 
 	if (lRes == ERROR_SUCCESS)
 	{
 		if (m_bSavePosition)
 		{
-			RegSetValueEx(hKey, SETTING_POSITION, 0, REG_BINARY,
-				reinterpret_cast<LPBYTE>(&m_ptDialog), sizeof(m_ptDialog));
+			StorageWriteScope::RecordWin32(RegSetValueEx(hKey, SETTING_POSITION, 0, REG_BINARY,
+				reinterpret_cast<LPBYTE>(&m_ptDialog), sizeof(m_ptDialog)));
 
 			RegistrySettings::SaveDword(hKey, SETTING_WIDTH, m_iWidth);
 			RegistrySettings::SaveDword(hKey, SETTING_HEIGHT, m_iHeight);

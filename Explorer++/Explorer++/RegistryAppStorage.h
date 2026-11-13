@@ -12,7 +12,8 @@ class BookmarkTree;
 class RegistryAppStorage : public AppStorage
 {
 public:
-	RegistryAppStorage(wil::unique_hkey applicationKey);
+	RegistryAppStorage(wil::unique_hkey applicationKey, wil::unique_handle transaction = {});
+	~RegistryAppStorage() override;
 
 	void LoadConfig(Config &config) override;
 	[[nodiscard]] std::vector<WindowStorageData> LoadWindows() override;
@@ -31,8 +32,11 @@ public:
 	void SaveDialogStates() override;
 	void SaveDefaultColumns(const FolderColumns &defaultColumns) override;
 	void SaveFrequentLocations(const FrequentLocationsModel *frequentLocationsModel) override;
-	void Commit() override;
+	[[nodiscard]] HRESULT Commit() override;
 
 private:
-	const wil::unique_hkey m_applicationKey;
+	wil::unique_handle m_transaction;
+	wil::unique_hkey m_applicationKey;
+	HRESULT m_writeError = S_OK;
+	bool m_committed = false;
 };

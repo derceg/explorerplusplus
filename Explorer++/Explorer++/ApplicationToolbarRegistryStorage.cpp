@@ -87,8 +87,8 @@ void SaveToKey(HKEY parentKey, const ApplicationModel *model)
 	for (const auto &application : model->GetItems())
 	{
 		wil::unique_hkey childKey;
-		LSTATUS res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
-			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
+		LSTATUS res = RegistrySettings::CreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0,
+			nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
 
 		if (res == ERROR_SUCCESS)
 		{
@@ -116,8 +116,8 @@ void Load(HKEY applicationKey, ApplicationModel *model)
 void Save(HKEY applicationKey, const ApplicationModel *model)
 {
 	wil::unique_hkey applicationToolbarKey;
-	LSTATUS res = RegCreateKeyEx(applicationKey, APPLICATION_TOOLBAR_KEY_PATH, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &applicationToolbarKey, nullptr);
+	LSTATUS res = RegistrySettings::CreateKeyEx(applicationKey, APPLICATION_TOOLBAR_KEY_PATH, 0,
+		nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &applicationToolbarKey, nullptr);
 
 	if (res == ERROR_SUCCESS)
 	{

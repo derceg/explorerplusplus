@@ -6,8 +6,9 @@
 
 #include "BaseDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ReferenceCount.h"
+#include "../Helper/FileStreamOperations.h"
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 class SplitFileDialog;
@@ -38,31 +39,6 @@ private:
 
 	std::wstring m_strSplitSize;
 	std::wstring m_strSplitGroup;
-};
-
-class SplitFile : public ReferenceCount
-{
-public:
-	SplitFile(HWND hDlg, const std::wstring &strFullFilename, const std::wstring &strOutputFilename,
-		const std::wstring &strOutputDirectory, UINT uSplitSize);
-	~SplitFile();
-
-	void Split();
-	void StopSplitting();
-
-private:
-	void SplitInternal(HANDLE hInputFile, const LARGE_INTEGER &lFileSize);
-	void ProcessFilename(int nSplitsMade, std::wstring &strOutputFullFilename);
-
-	HWND m_hDlg;
-
-	std::wstring m_strFullFilename;
-	std::wstring m_strOutputFilename;
-	std::wstring m_strOutputDirectory;
-	UINT m_uSplitSize;
-
-	CRITICAL_SECTION m_csStop;
-	bool m_bStopSplitting;
 };
 
 class SplitFileDialog : public BaseDialog
@@ -111,11 +87,12 @@ private:
 
 	std::wstring m_strFullFilename;
 	bool m_bSplittingFile;
-	bool m_bStopSplitting;
+	bool m_closePending = false;
 
 	std::unordered_map<int, SizeType> m_SizeMap;
 
-	SplitFile *m_pSplitFile;
+	FileStreamOperations::Result m_result;
+	std::jthread m_worker;
 	HFONT m_hHelperTextFont;
 
 	TCHAR m_szOk[32];

@@ -523,7 +523,8 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMNode *rootNode, const Config &con
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> settingsNode;
 	auto settingsNodeName = wil::make_bstr_nothrow(Storage::CONFIG_FILE_SETTINGS_NODE_NAME);
-	HRESULT hr = xmlDocument->createElement(settingsNodeName.get(), &settingsNode);
+	HRESULT hr = StorageWriteScope::Record(
+		xmlDocument->createElement(settingsNodeName.get(), &settingsNode));
 
 	if (hr != S_OK)
 	{

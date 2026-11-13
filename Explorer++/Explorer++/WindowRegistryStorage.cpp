@@ -301,7 +301,7 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 		window.displayWindowHeight);
 
 	wil::unique_hkey tabsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(windowKey, TABS_SUB_KEY_PATH, tabsKey,
+	HRESULT hr = RegistrySettings::CreateKey(windowKey, TABS_SUB_KEY_PATH, tabsKey,
 		wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
@@ -310,7 +310,7 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	}
 
 	wil::unique_hkey mainRebarKey;
-	hr = wil::reg::create_unique_key_nothrow(windowKey, MAIN_REBAR_SUB_KEY_PATH, mainRebarKey,
+	hr = RegistrySettings::CreateKey(windowKey, MAIN_REBAR_SUB_KEY_PATH, mainRebarKey,
 		wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
@@ -332,7 +332,7 @@ void Save(HKEY windowsKey, const std::vector<WindowStorageData> &windows)
 	for (const auto &window : windows)
 	{
 		wil::unique_hkey childKey;
-		HRESULT hr = wil::reg::create_unique_key_nothrow(windowsKey, std::to_wstring(index).c_str(),
+		HRESULT hr = RegistrySettings::CreateKey(windowsKey, std::to_wstring(index).c_str(),
 			childKey, wil::reg::key_access::readwrite);
 
 		if (SUCCEEDED(hr))
@@ -384,8 +384,8 @@ std::vector<WindowStorageData> Load(HKEY applicationKey)
 void Save(HKEY applicationKey, const std::vector<WindowStorageData> &windows)
 {
 	wil::unique_hkey windowsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(applicationKey, V2::WINDOWS_KEY_PATH,
-		windowsKey, wil::reg::key_access::readwrite);
+	HRESULT hr = RegistrySettings::CreateKey(applicationKey, V2::WINDOWS_KEY_PATH, windowsKey,
+		wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{
