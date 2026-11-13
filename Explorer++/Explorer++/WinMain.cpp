@@ -11,7 +11,6 @@
 #include <boost/locale.hpp>
 #include <wil/result.h>
 #include <cstdlib>
-#include <format>
 
 namespace
 {
@@ -88,21 +87,17 @@ unique_glog_shutdown_call InitializeLogging()
 	google::InstallFailureFunction(
 		[]
 		{
-			if (!IsDebuggerPresent())
-			{
-				// By default, glog will call abort() on a CHECK failure. The issue with that is
-				// that it won't invoke the exception handler. By calling DebugBreak() instead, the
-				// exception handler will be called, which gives a chance for the crash dialog to be
-				// shown and a minidump to be generated, before the application is terminated.
-				// This is only done when not debugging. When the application is being debugged,
-				// calling DebugBreak() would simply cause the debugger to break, which isn't
-				// desirable, as the application should exit when a CHECK condition is violated.
-				DebugBreak();
-			}
-			else
-			{
-				std::abort();
-			}
+			// By default, glog will call abort() on a CHECK failure. The issue with that is
+			// that it won't invoke the exception handler. By calling DebugBreak() instead, the
+			// exception handler will be called, which gives a chance for the crash dialog to be
+			// shown and a minidump to be generated, before the application is terminated.
+			//
+			// Additionally, when debugging, this will cause the debugger to break.
+			DebugBreak();
+
+			// When debugging, it's not valid to continue past this point, so the application will
+			// be aborted here.
+			std::abort();
 		});
 
 	wil::SetResultLoggingCallback(
