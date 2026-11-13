@@ -19,6 +19,7 @@
 #include "ResourceLoader.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/ImageHelper.h"
+#include "../Helper/ScopedStopSource.h"
 #include <format>
 
 namespace
@@ -38,6 +39,7 @@ private:
 
 	BookmarkIconManager *const m_bookmarkIconManager;
 	const WeakPtr<BookmarkItem, const BookmarkItem> m_bookmarkItem;
+	ScopedStopSource m_scopedStopSource;
 
 	WeakPtrFactory<BookmarkIconModel> m_weakPtrFactory{ this };
 };
@@ -249,7 +251,8 @@ wil::unique_hbitmap BookmarkIconModel::GetBitmap(UINT dpi, IconUpdateCallback up
 		return nullptr;
 	}
 
-	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem.Get(),
+	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(
+		m_bookmarkItem.Get(),
 		[weakSelf = m_weakPtrFactory.GetWeakPtr(), updateCallback](int updatedIconIndex)
 		{
 			if (!weakSelf)
@@ -265,7 +268,8 @@ wil::unique_hbitmap BookmarkIconModel::GetBitmap(UINT dpi, IconUpdateCallback up
 			}
 
 			updateCallback(std::move(bitmap));
-		});
+		},
+		m_scopedStopSource.GetToken());
 
 	return MaybeGetBitmapForIconIndex(iconIndex);
 }

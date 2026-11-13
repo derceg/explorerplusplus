@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarksToolbar.h"
+#include "AppServices.h"
 #include "BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
@@ -16,12 +17,16 @@
 #include "PopupMenuView.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
+#include "../Helper/ScopedStopSource.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 #include <wil/com.h>
 #include <format>
+
+namespace
+{
 
 class BookmarksToolbarBookmarkButton : public ToolbarButton
 {
@@ -31,7 +36,7 @@ public:
 		ToolbarButton(clickedCallback),
 		m_bookmarkItem(bookmarkItem),
 		m_bookmarkIconManager(bookmarkIconManager),
-		m_weakPtrFactory(this)
+		m_scopedStopSource(std::make_unique<ScopedStopSource>())
 	{
 		DCHECK(bookmarkItem->IsBookmark());
 	}
@@ -53,7 +58,8 @@ public:
 			return *m_iconIndex;
 		}
 
-		m_iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem,
+		m_iconIndex = m_bookmarkIconManager->GetBookmarkIconIndex(
+			m_bookmarkItem,
 			[self = m_weakPtrFactory.GetWeakPtr()](int iconIndex)
 			{
 				if (!self)
@@ -62,13 +68,15 @@ public:
 				}
 
 				self->OnIconLoaded(iconIndex);
-			});
+			},
+			m_scopedStopSource->GetToken());
 
 		return *m_iconIndex;
 	}
 
 	void InvalidateCachedIcon()
 	{
+		m_scopedStopSource.reset();
 		m_iconIndex.reset();
 	}
 
@@ -80,13 +88,14 @@ private:
 		NotifyParentOfUpdate();
 	}
 
-	const BookmarkItem *m_bookmarkItem;
-	BookmarkIconManager *m_bookmarkIconManager;
+	const BookmarkItem *const m_bookmarkItem;
+	BookmarkIconManager *const m_bookmarkIconManager;
+	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 
 	// Stores the cached icon index.
 	mutable std::optional<int> m_iconIndex;
 
-	WeakPtrFactory<BookmarksToolbarBookmarkButton> m_weakPtrFactory;
+	WeakPtrFactory<BookmarksToolbarBookmarkButton> m_weakPtrFactory{ this };
 };
 
 class BookmarksToolbarFolderButton : public ToolbarMenuButton
@@ -113,7 +122,7 @@ public:
 
 	std::optional<int> GetImageIndex() const override
 	{
-		return m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem);
+		return m_bookmarkIconManager->GetBookmarkFolderIconIndex();
 	}
 
 	bool IsChecked() const override
@@ -138,30 +147,31 @@ private:
 	bool m_dragHighlighted = false;
 };
 
+}
+
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext) :
-	ToolbarBase(view, browser, acceleratorManager),
-	BookmarkDropTargetDelegate(bookmarkTree),
+	AppServices *appServices) :
+	ToolbarBase(view, browser, appServices->GetAcceleratorManager()),
+	BookmarkDropTargetDelegate(appServices->GetBookmarkTree()),
 	m_view(view),
 	m_browser(browser),
-	m_resourceLoader(resourceLoader),
-	m_bookmarkTree(bookmarkTree),
-	m_platformContext(platformContext)
+	m_resourceLoader(appServices->GetResourceLoader()),
+	m_bookmarkTree(appServices->GetBookmarkTree()),
+	m_platformContext(appServices->GetPlatformContext())
 {
-	Initialize(iconFetcher, resourceLoader);
+	Initialize(appServices->GetRuntime(), appServices->GetAsyncIconFetcher());
 }
 
 BookmarksToolbar::~BookmarksToolbar() = default;
 
-void BookmarksToolbar::Initialize(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader)
+void BookmarksToolbar::Initialize(const Runtime *runtime, AsyncIconFetcher *iconFetcher)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(m_view->GetHWND());
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_bookmarkIconManager =
-		std::make_unique<BookmarkIconManager>(resourceLoader, iconFetcher, iconWidth, iconHeight);
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(runtime, iconFetcher,
+		m_resourceLoader, iconWidth, iconHeight);
 
 	m_view->SetImageList(m_bookmarkIconManager->GetImageList());
 	m_view->EnableDropTarget(this);

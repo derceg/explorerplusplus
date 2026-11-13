@@ -9,6 +9,7 @@
 #include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "Config.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ScopedStopSource.h"
 
 BookmarkListViewItem::BookmarkListViewItem(BookmarkItem *bookmarkItem,
 	const BookmarkTree *bookmarkTree, BookmarkIconManager *bookmarkIconManager,
@@ -16,11 +17,14 @@ BookmarkListViewItem::BookmarkListViewItem(BookmarkItem *bookmarkItem,
 	m_bookmarkItem(bookmarkItem),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkIconManager(bookmarkIconManager),
-	m_config(config)
+	m_config(config),
+	m_scopedStopSource(std::make_unique<ScopedStopSource>())
 {
 	m_updateConnection = m_bookmarkItem->updatedSignal.AddObserver(
 		std::bind_front(&BookmarkListViewItem::OnBookmarkItemUpdated, this));
 }
+
+BookmarkListViewItem::~BookmarkListViewItem() = default;
 
 void BookmarkListViewItem::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 	BookmarkItem::PropertyType propertyType)
@@ -29,6 +33,9 @@ void BookmarkListViewItem::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 
 	if (m_bookmarkItem->IsBookmark() && propertyType == BookmarkItem::PropertyType::Location)
 	{
+		// This will stop any ongoing icon request.
+		m_scopedStopSource = std::make_unique<ScopedStopSource>();
+
 		m_iconIndex.reset();
 	}
 
@@ -80,7 +87,8 @@ std::optional<int> BookmarkListViewItem::GetIconIndex() const
 	{
 		m_iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem,
 			std::bind_front(&BookmarkListViewItem::OnIconAvailable,
-				m_weakPtrFactory.GetMutableWeakPtr()));
+				m_weakPtrFactory.GetMutableWeakPtr()),
+			m_scopedStopSource->GetToken());
 	}
 
 	return m_iconIndex;

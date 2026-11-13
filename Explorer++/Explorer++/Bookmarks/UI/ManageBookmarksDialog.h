@@ -16,15 +16,13 @@
 #include <vector>
 
 class AcceleratorManager;
+class AppServices;
 class BookmarkHistoryEntry;
 class BookmarkItem;
 class BookmarkListPresenter;
 class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreePresenter;
-class BrowserList;
-struct Config;
-class IconFetcher;
 class ManageBookmarksDialog;
 class PlatformContext;
 class WindowSubclass;
@@ -52,10 +50,7 @@ private:
 class ManageBookmarksDialog : public BaseDialog
 {
 public:
-	static ManageBookmarksDialog *Create(const ResourceLoader *resourceLoader, HWND hParent,
-		BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
-		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-		PlatformContext *platformContext);
+	static ManageBookmarksDialog *Create(HWND parent, AppServices *appServices);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -73,10 +68,7 @@ private:
 	static const int TOOLBAR_ID_ORGANIZE = 10002;
 	static const int TOOLBAR_ID_VIEWS = 10003;
 
-	ManageBookmarksDialog(const ResourceLoader *resourceLoader, HWND hParent,
-		BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
-		const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-		PlatformContext *platformContext);
+	ManageBookmarksDialog(HWND parent, AppServices *appServices);
 	~ManageBookmarksDialog() = default;
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
@@ -105,17 +97,15 @@ private:
 	void OnOk();
 	void OnCancel();
 
+	AppServices *const m_appServices;
+	BookmarkTree *const m_bookmarkTree;
+	const AcceleratorManager *const m_acceleratorManager;
+	PlatformContext *const m_platformContext;
+
 	HWND m_toolbarParent;
 	HWND m_hToolbar;
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
-
-	BookmarkTree *const m_bookmarkTree;
-	const BrowserList *const m_browserList;
-	const Config *const m_config;
-	const AcceleratorManager *const m_acceleratorManager;
-	IconFetcher *const m_iconFetcher;
-	PlatformContext *const m_platformContext;
 
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 

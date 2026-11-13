@@ -10,7 +10,6 @@
 #include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
-#include "IconFetcherImpl.h"
 #include "LayoutDefaults.h"
 #include "Literals.h"
 #include "ShellBrowser/ShellBrowserFactoryImpl.h"
@@ -309,24 +308,6 @@ private:
 
 	std::unique_ptr<WindowSubclass> m_mainWindowSubclass;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-
-	// IconFetcher retrieves file icons in a background thread. A queue of requests is maintained
-	// and that queue is cleared when the instance is destroyed. However, any current request that's
-	// running in the background thread will continue to run and the main thread will wait for it to
-	// finish.
-	// This, however, could cause problems if the IconFetcher instance is held by an object that
-	// only exists for a specific period of time. For example, if the instance were being managed by
-	// the manage bookmark dialog, and the dialog was closed, the instance would be destroyed and
-	// the main thread would wait for any operation in the background thread to finish. That could
-	// then cause the application to appear to hang.
-	// Since this class exists for the entire lifetime of the application, it means that the
-	// IconFetcher instance will only be destroyed at application shutdown and that's the only point
-	// at which the main thread will wait. While the application is running, the most that would
-	// happen is that the process of retrieving other icons would be delayed.
-	// Ideally, it would be better to cancel operations that are running in the background thread,
-	// but as far as I'm aware, it's not possible to cancel SHGetFileInfo (which is what's
-	// ultimately used to retrieve the icons).
-	IconFetcherImpl m_iconFetcher;
 
 	// Main rebar
 	std::unique_ptr<MainRebar> m_mainRebar;

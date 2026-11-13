@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
+#include "AppServices.h"
 #include "Bookmarks/BookmarkNavigationController.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkListPresenter.h"
@@ -28,26 +29,18 @@
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
-ManageBookmarksDialog *ManageBookmarksDialog::Create(const ResourceLoader *resourceLoader,
-	HWND hParent, BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
-	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	PlatformContext *platformContext)
+ManageBookmarksDialog *ManageBookmarksDialog::Create(HWND parent, AppServices *appServices)
 {
-	return new ManageBookmarksDialog(resourceLoader, hParent, bookmarkTree, browserList, config,
-		acceleratorManager, iconFetcher, platformContext);
+	return new ManageBookmarksDialog(parent, appServices);
 }
 
-ManageBookmarksDialog::ManageBookmarksDialog(const ResourceLoader *resourceLoader, HWND hParent,
-	BookmarkTree *bookmarkTree, const BrowserList *browserList, const Config *config,
-	const AcceleratorManager *acceleratorManager, IconFetcher *iconFetcher,
-	PlatformContext *platformContext) :
-	BaseDialog(resourceLoader, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
-	m_bookmarkTree(bookmarkTree),
-	m_browserList(browserList),
-	m_config(config),
-	m_acceleratorManager(acceleratorManager),
-	m_iconFetcher(iconFetcher),
-	m_platformContext(platformContext)
+ManageBookmarksDialog::ManageBookmarksDialog(HWND parent, AppServices *appServices) :
+	BaseDialog(appServices->GetResourceLoader(), IDD_MANAGE_BOOKMARKS, parent,
+		DialogSizingType::Both),
+	m_appServices(appServices),
+	m_bookmarkTree(appServices->GetBookmarkTree()),
+	m_acceleratorManager(appServices->GetAcceleratorManager()),
+	m_platformContext(appServices->GetPlatformContext())
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 }
@@ -184,8 +177,8 @@ void ManageBookmarksDialog::SetupTreeView()
 	m_bookmarkTreePresenter = std::make_unique<BookmarkTreePresenter>(
 		std::make_unique<TreeView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW),
 			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog),
-		m_bookmarkTree, m_browserList, m_platformContext, m_acceleratorManager, m_resourceLoader,
-		m_persistentSettings->m_expandedBookmarkIds);
+		m_bookmarkTree, m_appServices->GetBrowserList(), m_platformContext, m_acceleratorManager,
+		m_resourceLoader, m_persistentSettings->m_expandedBookmarkIds);
 
 	m_connections.push_back(m_bookmarkTreePresenter->selectionChangedSignal.AddObserver(
 		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
@@ -193,13 +186,13 @@ void ManageBookmarksDialog::SetupTreeView()
 
 void ManageBookmarksDialog::SetupListView()
 {
-	m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(
-		std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
-			m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog,
-			NoOpMenuHelpTextHost::GetInstance(), m_acceleratorManager, m_resourceLoader),
-		m_bookmarkTree, m_persistentSettings->m_listViewColumnModel, std::nullopt,
-		SortDirection::Ascending, m_browserList, m_config, m_acceleratorManager, m_resourceLoader,
-		m_iconFetcher, m_platformContext);
+	auto listView = std::make_unique<ListView>(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW),
+		m_platformContext->GetKeyboardState(), LabelEditHandler::CreateForDialog,
+		NoOpMenuHelpTextHost::GetInstance(), m_acceleratorManager, m_resourceLoader);
+
+	m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(std::move(listView),
+		m_persistentSettings->m_listViewColumnModel, std::nullopt, SortDirection::Ascending,
+		m_appServices);
 
 	m_connections.push_back(m_bookmarkListPresenter->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));

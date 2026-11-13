@@ -8,9 +8,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "IconFetcherFake.h"
 #include "MenuViewTestApi.h"
-#include "MenuViewTestHelper.h"
 #include "PidlTestHelper.h"
 #include "RootMenuViewTestApi.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -26,7 +24,7 @@ protected:
 	BookmarksMenuTest() :
 		m_browser(AddBrowser()),
 		m_tab(m_browser->AddTab(L"c:\\initial\\folder")),
-		m_iconManager(&m_resourceLoader, &m_iconFetcher, 16, 16)
+		m_iconManager(&m_runtime, &m_iconFetcher, &m_resourceLoader, 16, 16)
 	{
 	}
 
@@ -103,7 +101,6 @@ protected:
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;
 
-	IconFetcherFake m_iconFetcher;
 	BookmarkIconManager m_iconManager;
 };
 

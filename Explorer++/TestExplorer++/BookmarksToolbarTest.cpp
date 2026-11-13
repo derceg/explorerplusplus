@@ -7,7 +7,6 @@
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "IconFetcherFake.h"
 #include "PidlTestHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -29,9 +28,8 @@ protected:
 		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksToolbarFolder(),
 			std::make_unique<BookmarkItem>(L"Folder 2"));
 
-		m_bookmarksToolbar = std::make_unique<BookmarksToolbar>(&m_bookmarksToolbarView, m_browser,
-			&m_acceleratorManager, &m_resourceLoader, &m_iconFetcher, &m_bookmarkTree,
-			&m_platformContext);
+		m_bookmarksToolbar =
+			std::make_unique<BookmarksToolbar>(&m_bookmarksToolbarView, m_browser, &m_appServices);
 	}
 
 	void VerifyToolbarButtons()
@@ -52,8 +50,6 @@ protected:
 									   : L"");
 		}
 	}
-
-	IconFetcherFake m_iconFetcher;
 
 	BrowserWindowFake *const m_browser;
 	BookmarksToolbarView m_bookmarksToolbarView;

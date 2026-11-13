@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkListPresenter.h"
+#include "AppServices.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
@@ -26,19 +27,16 @@
 #include <boost/range/iterator_range.hpp>
 
 BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
-	BookmarkTree *bookmarkTree, const BookmarkColumnModel &columnModel,
-	std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
-	const BrowserList *browserList, const Config *config,
-	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-	IconFetcher *iconFetcher, PlatformContext *platformContext) :
-	BookmarkDropTargetDelegate(bookmarkTree),
+	const BookmarkColumnModel &columnModel, std::optional<BookmarkColumn> sortColumn,
+	SortDirection sortDirection, AppServices *appServices) :
+	BookmarkDropTargetDelegate(appServices->GetBookmarkTree()),
 	m_view(std::move(view)),
-	m_bookmarkTree(bookmarkTree),
-	m_browserList(browserList),
-	m_config(config),
-	m_acceleratorManager(acceleratorManager),
-	m_resourceLoader(resourceLoader),
-	m_platformContext(platformContext)
+	m_bookmarkTree(appServices->GetBookmarkTree()),
+	m_browserList(appServices->GetBrowserList()),
+	m_config(appServices->GetConfig()),
+	m_acceleratorManager(appServices->GetAcceleratorManager()),
+	m_resourceLoader(appServices->GetResourceLoader()),
+	m_platformContext(appServices->GetPlatformContext())
 {
 	m_view->AddExtendedStyles(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP);
 
@@ -47,8 +45,8 @@ BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	m_bookmarkIconManager =
-		std::make_unique<BookmarkIconManager>(m_resourceLoader, iconFetcher, iconWidth, iconHeight);
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(appServices->GetRuntime(),
+		appServices->GetAsyncIconFetcher(), m_resourceLoader, iconWidth, iconHeight);
 	m_view->SetImageList(m_bookmarkIconManager->GetImageList(),
 		ListView::ImageListType::SmallIcons);
 

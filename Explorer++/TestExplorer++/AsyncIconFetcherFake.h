@@ -15,8 +15,11 @@ public:
 	// AsyncIconFetcher
 	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
 		PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken) override;
+	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
+		const std::wstring &path, std::stop_token stopToken) override;
 	int GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const override;
 	std::optional<int> MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const override;
+	std::optional<int> MaybeGetCachedIconIndex(const std::wstring &path) const override;
 	int GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const override;
 	int GetDefaultIconIndex(DefaultIconType defaultIconType) const override;
 
@@ -29,6 +32,9 @@ private:
 		std::stop_token stopToken;
 		concurrencpp::result_promise<std::optional<ShellIconInfo>> promise;
 	};
+
+	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsyncImpl(
+		std::stop_token stopToken);
 
 	std::deque<PendingRequest> m_pendingRequests;
 	int m_defaultFileIconIndex;

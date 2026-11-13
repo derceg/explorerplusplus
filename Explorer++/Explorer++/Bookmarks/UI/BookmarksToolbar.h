@@ -11,21 +11,21 @@
 #include <memory>
 #include <vector>
 
+class AppServices;
+class AsyncIconFetcher;
 class BookmarkIconManager;
 class BookmarksToolbarView;
 class BookmarkTree;
 class BrowserWindow;
-class IconFetcher;
 struct MouseEvent;
 class PlatformContext;
 class ResourceLoader;
+class Runtime;
 
 class BookmarksToolbar : public ToolbarBase, private BookmarkDropTargetDelegate
 {
 public:
-	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, PlatformContext *platformContext);
+	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browser, AppServices *appServices);
 	~BookmarksToolbar();
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
@@ -49,7 +49,7 @@ private:
 	// main portion of the button.
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	void Initialize(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader);
+	void Initialize(const Runtime *runtime, AsyncIconFetcher *iconFetcher);
 	void AddBookmarkItems();
 	void AddBookmarkItem(BookmarkItem *bookmarkItem, size_t index);
 

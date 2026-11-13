@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "AppServices.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarksMenu.h"
@@ -14,21 +15,19 @@
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 
-BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView,
-	const AcceleratorManager *acceleratorManager, BookmarkTree *bookmarkTree,
-	BrowserWindow *browser, IconFetcher *iconFetcher, PlatformContext *platformContext,
-	const ResourceLoader *resourceLoader) :
-	MenuBase(menuView, acceleratorManager),
-	m_bookmarkTree(bookmarkTree),
+BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView, BrowserWindow *browser,
+	AppServices *appServices) :
+	MenuBase(menuView, appServices->GetAcceleratorManager()),
+	m_bookmarkTree(appServices->GetBookmarkTree()),
 	m_browser(browser),
-	m_platformContext(platformContext),
-	m_resourceLoader(resourceLoader)
+	m_platformContext(appServices->GetPlatformContext()),
+	m_resourceLoader(appServices->GetResourceLoader())
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	int scaledIconSize =
 		dpiCompat.ScaleValue(m_browser->GetHWND(), GetIconPixelSizeAtDefaultDpi(IconSize::Small));
-	m_iconManager = std::make_unique<BookmarkIconManager>(resourceLoader, iconFetcher,
-		scaledIconSize, scaledIconSize);
+	m_iconManager = std::make_unique<BookmarkIconManager>(appServices->GetRuntime(),
+		appServices->GetAsyncIconFetcher(), m_resourceLoader, scaledIconSize, scaledIconSize);
 
 	// Note that this class builds the menu, but item selection is currently handled externally, by
 	// the main window switch.
@@ -37,13 +36,13 @@ BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView,
 	// The observers set up here will result in the menu being rebuilt any time a bookmark item
 	// changes. That's somewhat broader then necessary, as only changes in Bookmarks Menu/Other
 	// Bookmarks affect the menu.
-	m_connections.push_back(bookmarkTree->bookmarkItemAddedSignal.AddObserver(
+	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind(&BookmarksMainMenu::RebuildMenu, this)));
-	m_connections.push_back(bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
+	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
 		std::bind(&BookmarksMainMenu::RebuildMenu, this)));
-	m_connections.push_back(bookmarkTree->bookmarkItemMovedSignal.AddObserver(
+	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
 		std::bind(&BookmarksMainMenu::RebuildMenu, this)));
-	m_connections.push_back(bookmarkTree->bookmarkItemRemovedSignal.AddObserver(
+	m_connections.push_back(m_bookmarkTree->bookmarkItemRemovedSignal.AddObserver(
 		std::bind(&BookmarksMainMenu::RebuildMenu, this)));
 }
 

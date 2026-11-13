@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "AsyncIconFetcherFake.h"
-#include <wil/result.h>
 
 AsyncIconFetcherFake::AsyncIconFetcherFake()
 {
@@ -16,6 +15,20 @@ concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::Ge
 {
 	UNREFERENCED_PARAMETER(pidl);
 
+	return GetIconIndexAsyncImpl(stopToken);
+}
+
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::GetIconIndexAsync(
+	const std::wstring &path, std::stop_token stopToken)
+{
+	UNREFERENCED_PARAMETER(path);
+
+	return GetIconIndexAsyncImpl(stopToken);
+}
+
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::GetIconIndexAsyncImpl(
+	std::stop_token stopToken)
+{
 	PendingRequest request(stopToken);
 	auto result = request.promise.get_result();
 	m_pendingRequests.push_back(std::move(request));
@@ -32,6 +45,13 @@ int AsyncIconFetcherFake::GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) co
 std::optional<int> AsyncIconFetcherFake::MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const
 {
 	UNREFERENCED_PARAMETER(pidl);
+
+	return std::nullopt;
+}
+
+std::optional<int> AsyncIconFetcherFake::MaybeGetCachedIconIndex(const std::wstring &path) const
+{
+	UNREFERENCED_PARAMETER(path);
 
 	return std::nullopt;
 }

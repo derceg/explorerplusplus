@@ -15,13 +15,13 @@
 #include <optional>
 
 class AcceleratorManager;
+class AppServices;
 class BookmarkColumnModel;
 class BookmarkIconManager;
 class BookmarkListViewModel;
 class BookmarkTree;
 class BrowserList;
 struct Config;
-class IconFetcher;
 class ListView;
 class PlatformContext;
 class ResourceLoader;
@@ -34,11 +34,9 @@ class BookmarkListPresenter :
 	private ListViewDelegate
 {
 public:
-	BookmarkListPresenter(std::unique_ptr<ListView> view, BookmarkTree *bookmarkTree,
-		const BookmarkColumnModel &columnModel, std::optional<BookmarkColumn> sortColumn,
-		SortDirection sortDirection, const BrowserList *browserList, const Config *config,
-		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader,
-		IconFetcher *iconFetcher, PlatformContext *platformContext);
+	BookmarkListPresenter(std::unique_ptr<ListView> view, const BookmarkColumnModel &columnModel,
+		std::optional<BookmarkColumn> sortColumn, SortDirection sortDirection,
+		AppServices *appServices);
 	~BookmarkListPresenter();
 
 	ListView *GetView();

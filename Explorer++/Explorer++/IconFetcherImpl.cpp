@@ -48,12 +48,6 @@ void IconFetcherImpl::QueueIconTask(std::wstring_view path, Callback callback)
 		{
 			UNREFERENCED_PARAMETER(id);
 
-			// SHGetFileInfo will fail for non-filesystem paths that are passed in
-			// as strings. For example, attempting to retrieve the icon for the
-			// recycle bin will fail if you pass the parsing path (i.e.
-			// ::{645FF040-5081-101B-9F08-00AA002F954E}). If, however, you pass the
-			// pidl, the function will succeed. Therefore, paths will always be
-			// converted to pidls first here.
 			unique_pidl_absolute pidl;
 			HRESULT hr =
 				SHParseDisplayName(copiedPath.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);

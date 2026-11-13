@@ -489,12 +489,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 	case IDM_BOOKMARKS_MANAGE_BOOKMARKS:
 		CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(),
 			L"ManageBookmarksDialog",
-			[this, hwnd]
-			{
-				return ManageBookmarksDialog::Create(m_resourceLoader, hwnd,
-					m_appServices->GetBookmarkTree(), m_browserList, m_config, m_acceleratorManager,
-					&m_iconFetcher, m_platformContext);
-			});
+			[this, hwnd] { return ManageBookmarksDialog::Create(hwnd, m_appServices); });
 		break;
 
 	case ToUnderlying(MainToolbarButtonId::Search):

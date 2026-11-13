@@ -23,14 +23,27 @@ concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherImpl::Ge
 	return GetIconIndexAsyncImpl(m_weakPtrFactory.GetWeakPtr(), pidl, stopToken);
 }
 
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherImpl::GetIconIndexAsync(
+	const std::wstring &path, std::stop_token stopToken)
+{
+	return GetIconIndexAsyncImpl(m_weakPtrFactory.GetWeakPtr(), path, stopToken);
+}
+
 concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherImpl::GetIconIndexAsyncImpl(
-	WeakPtr<AsyncIconFetcherImpl> weakSelf, PidlAbsolute pidl, std::stop_token stopToken)
+	WeakPtr<AsyncIconFetcherImpl> weakSelf, IconTarget target, std::stop_token stopToken)
 {
 	auto *runtime = weakSelf->m_runtime;
 
 	co_await ResumeOnComStaThread(runtime);
 
 	if (stopToken.stop_requested())
+	{
+		co_return std::nullopt;
+	}
+
+	auto pidl = MaybeResolveTargetToPidl(target);
+
+	if (!pidl.HasValue())
 	{
 		co_return std::nullopt;
 	}
@@ -80,6 +93,29 @@ concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherImpl::Ge
 	co_return iconInfo;
 }
 
+PidlAbsolute AsyncIconFetcherImpl::MaybeResolveTargetToPidl(const IconTarget &target)
+{
+	if (const auto *pidl = std::get_if<PidlAbsolute>(&target))
+	{
+		return *pidl;
+	}
+
+	// SHGetFileInfo will fail for non-filesystem paths that are passed in as strings. For example,
+	// attempting to retrieve the icon for the recycle bin will fail if you pass the parsing path
+	// (i.e. ::{645FF040-5081-101B-9F08-00AA002F954E}). If, however, you pass the pidl, the function
+	// will succeed. Therefore, the path will always be converted to a pidl first here.
+	PidlAbsolute pidl;
+	HRESULT hr = SHParseDisplayName(std::get<std::wstring>(target).c_str(), nullptr,
+		PidlOutParam(pidl), 0, nullptr);
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	return pidl;
+}
+
 int AsyncIconFetcherImpl::GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const
 {
 	auto cachedIconIndex = MaybeGetCachedIconIndex(pidl);
@@ -94,15 +130,20 @@ int AsyncIconFetcherImpl::GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) co
 
 std::optional<int> AsyncIconFetcherImpl::MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const
 {
-	std::wstring itemPath;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, itemPath);
+	std::wstring path;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, path);
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	return m_cachedIcons->MaybeGetIconIndex(itemPath);
+	return MaybeGetCachedIconIndex(path);
+}
+
+std::optional<int> AsyncIconFetcherImpl::MaybeGetCachedIconIndex(const std::wstring &path) const
+{
+	return m_cachedIcons->MaybeGetIconIndex(path);
 }
 
 int AsyncIconFetcherImpl::GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const

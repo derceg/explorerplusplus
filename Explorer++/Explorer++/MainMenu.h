@@ -19,7 +19,6 @@ struct Config;
 class CoreInterface;
 class FeatureList;
 class FileActionHandler;
-class IconFetcher;
 class IconModel;
 class PidlAbsolute;
 class ResourceLoader;
@@ -37,12 +36,10 @@ class MainMenu : public MenuBase
 {
 public:
 	MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-		ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher,
 		const FileActionHandler *fileActionHandler, CoreInterface *coreInterface);
 
 private:
-	void BuildMenu(BrowserWindow *browser, AppServices *appServices,
-		ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher);
+	void BuildMenu(BrowserWindow *browser, AppServices *appServices);
 	void BuildFileMenu(TabRestorer *tabRestorer, const FeatureList *featureList,
 		ShellIconLoader *shellIconLoader);
 	void BuildEditMenu();
@@ -50,16 +47,14 @@ private:
 	void BuildViewMenu(BrowserWindow *browser, AppServices *appServices);
 	void BuildFilterSubMenu(MenuView *filterMenuView);
 	void BuildActionsMenu();
-	void BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
-		ShellIconLoader *shellIconLoader);
+	void BuildGoMenu(BrowserWindow *browser, AppServices *appServices);
 	void AppendGoMenuItem(MenuView *goMenuView, WORD id, const KNOWNFOLDERID &folderId,
 		ShellIconLoader *shellIconLoader);
 	void AppendGoMenuItem(MenuView *goMenuView, WORD id, const std::wstring &path,
 		ShellIconLoader *shellIconLoader);
 	void AppendGoMenuItem(MenuView *goMenuView, WORD id, const PidlAbsolute &pidl,
 		ShellIconLoader *shellIconLoader);
-	void BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
-		IconFetcher *iconFetcher);
+	void BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices);
 	void BuildToolsMenu(BrowserWindow *browser, const FeatureList *featureList,
 		Plugins::PluginMenuItemsRegistry *pluginMenuItemsRegistry);
 	void BuildWindowMenu();

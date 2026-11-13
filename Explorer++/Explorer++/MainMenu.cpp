@@ -33,7 +33,6 @@
 #include "../Helper/ShellHelper.h"
 
 MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-	ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher,
 	const FileActionHandler *fileActionHandler, CoreInterface *coreInterface) :
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
 	m_browser(browser),
@@ -43,19 +42,19 @@ MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appS
 	m_resourceLoader(appServices->GetResourceLoader()),
 	m_coreInterface(coreInterface)
 {
-	BuildMenu(browser, appServices, shellIconLoader, iconFetcher);
+	BuildMenu(browser, appServices);
 }
 
-void MainMenu::BuildMenu(BrowserWindow *browser, AppServices *appServices,
-	ShellIconLoader *shellIconLoader, IconFetcher *iconFetcher)
+void MainMenu::BuildMenu(BrowserWindow *browser, AppServices *appServices)
 {
-	BuildFileMenu(appServices->GetTabRestorer(), appServices->GetFeatureList(), shellIconLoader);
+	BuildFileMenu(appServices->GetTabRestorer(), appServices->GetFeatureList(),
+		appServices->GetShellIconLoader());
 	BuildEditMenu();
 	BuildSelectionMenu();
 	BuildViewMenu(browser, appServices);
 	BuildActionsMenu();
-	BuildGoMenu(browser, appServices, shellIconLoader);
-	BuildBookmarksMenu(browser, appServices, iconFetcher);
+	BuildGoMenu(browser, appServices);
+	BuildBookmarksMenu(browser, appServices);
 	BuildToolsMenu(browser, appServices->GetFeatureList(),
 		appServices->GetPluginMenuItemsRegistry());
 	BuildWindowMenu();
@@ -224,8 +223,7 @@ void MainMenu::BuildActionsMenu()
 	AppendItem(menuView, IDM_ACTIONS_DESTROYFILES, IDS_ACTIONS_DESTROYFILES);
 }
 
-void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
-	ShellIconLoader *shellIconLoader)
+void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices)
 {
 	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_GO_POPUP);
 
@@ -234,6 +232,8 @@ void MainMenu::BuildGoMenu(BrowserWindow *browser, AppServices *appServices,
 	AppendItem(menuView, IDM_GO_UP, IDS_GO_UP);
 
 	menuView->AppendSeparator();
+
+	auto *shellIconLoader = appServices->GetShellIconLoader();
 
 	auto *historySubMenuView = AppendSubMenu(menuView, IDS_GO_HISTORY_POPUP);
 	m_childMenus.push_back(std::make_unique<HistoryMenu>(historySubMenuView, m_acceleratorManager,
@@ -327,14 +327,11 @@ void MainMenu::AppendGoMenuItem(MenuView *goMenuView, WORD id, const PidlAbsolut
 			.SetSelectedCallback([this, id] { SendCommandToBrowser(id); }));
 }
 
-void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices,
-	IconFetcher *iconFetcher)
+void MainMenu::BuildBookmarksMenu(BrowserWindow *browser, AppServices *appServices)
 {
 	auto *menuView = AppendSubMenu(m_rootMenuView, IDS_BOOKMARKS_POPUP);
 
-	m_childMenus.push_back(std::make_unique<BookmarksMainMenu>(menuView, m_acceleratorManager,
-		appServices->GetBookmarkTree(), browser, iconFetcher, appServices->GetPlatformContext(),
-		m_resourceLoader));
+	m_childMenus.push_back(std::make_unique<BookmarksMainMenu>(menuView, browser, appServices));
 }
 
 void MainMenu::BuildToolsMenu(BrowserWindow *browser, const FeatureList *featureList,

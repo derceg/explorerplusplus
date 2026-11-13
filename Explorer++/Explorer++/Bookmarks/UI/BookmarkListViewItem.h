@@ -10,17 +10,20 @@
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
+#include <memory>
 #include <optional>
 
 class BookmarkIconManager;
 class BookmarkTree;
 struct Config;
+class ScopedStopSource;
 
 class BookmarkListViewItem : public ListViewItem
 {
 public:
 	BookmarkListViewItem(BookmarkItem *bookmarkItem, const BookmarkTree *bookmarkTree,
 		BookmarkIconManager *bookmarkIconManager, const Config *config);
+	~BookmarkListViewItem();
 
 	std::wstring GetColumnText(ListViewColumnId columnId) const override;
 	std::optional<int> GetIconIndex() const override;
@@ -45,6 +48,7 @@ private:
 	const Config *const m_config;
 	mutable std::optional<int> m_iconIndex;
 	boost::signals2::scoped_connection m_updateConnection;
+	std::unique_ptr<ScopedStopSource> m_scopedStopSource;
 
 	WeakPtrFactory<BookmarkListViewItem> m_weakPtrFactory{ this };
 };

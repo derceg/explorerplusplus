@@ -278,7 +278,6 @@
     <ClCompile Include="SimulatedFileSystemWatcher.cpp" />
     <ClCompile Include="SimulatedFileSystem.cpp" />
     <ClCompile Include="SimulatedFileSystemItem.cpp" />
-    <ClCompile Include="IconFetcherFake.cpp" />
     <ClCompile Include="KeyboardStateFake.cpp" />
     <ClCompile Include="ListViewColumnModelFake.cpp" />
     <ClCompile Include="ListViewColumnModelTest.cpp" />
@@ -512,7 +511,6 @@
     <ClInclude Include="SimulatedFileSystem.h" />
     <ClInclude Include="SimulatedFileSystemItem.h" />
     <ClInclude Include="KeyboardStateFake.h" />
-    <ClInclude Include="IconFetcherFake.h" />
     <ClInclude Include="ListViewColumnModelFake.h" />
     <ClInclude Include="ListViewItemFake.h" />
     <ClInclude Include="ListViewModelFake.h" />

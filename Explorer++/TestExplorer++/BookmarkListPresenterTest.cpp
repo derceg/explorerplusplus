@@ -13,7 +13,6 @@
 #include "BrowserWindowFake.h"
 #include "CopiedBookmark.h"
 #include "GeneratorTestHelper.h"
-#include "IconFetcherFake.h"
 #include "LabelEditHandler.h"
 #include "ListView.h"
 #include "NoOpMenuHelpTextHost.h"
@@ -45,13 +44,12 @@ protected:
 			m_parentWindow.get(), nullptr, GetModuleHandle(nullptr), nullptr);
 		CHECK(listViewWindow);
 
-		return std::make_unique<BookmarkListPresenter>(
-			std::make_unique<ListView>(listViewWindow, m_platformContext.GetKeyboardState(),
-				LabelEditHandler::CreateForTest, NoOpMenuHelpTextHost::GetInstance(),
-				&m_acceleratorManager, &m_resourceLoader),
-			&m_bookmarkTree, columnModel, std::nullopt, SortDirection::Ascending, &m_browserList,
-			&m_config, &m_acceleratorManager, &m_resourceLoader, &m_iconFetcher,
-			&m_platformContext);
+		auto listView = std::make_unique<ListView>(listViewWindow,
+			m_platformContext.GetKeyboardState(), LabelEditHandler::CreateForTest,
+			NoOpMenuHelpTextHost::GetInstance(), &m_acceleratorManager, &m_resourceLoader);
+
+		return std::make_unique<BookmarkListPresenter>(std::move(listView), columnModel,
+			std::nullopt, SortDirection::Ascending, &m_appServices);
 	}
 
 	void VerifyViewItems(const BookmarkListPresenter *presenter)
@@ -75,8 +73,6 @@ protected:
 			}
 		}
 	}
-
-	IconFetcherFake m_iconFetcher;
 
 	BrowserWindowFake *const m_browser;
 	Tab *const m_tab;

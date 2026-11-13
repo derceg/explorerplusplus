@@ -457,9 +457,6 @@
     <ClCompile Include="BookmarkListPresenterTest.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="IconFetcherFake.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ListViewTest.cpp">
       <Filter>UI\Views\ListView</Filter>
     </ClCompile>
@@ -1014,9 +1011,6 @@
     </ClInclude>
     <ClInclude Include="CopiedBookmark.h">
       <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="IconFetcherFake.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ListViewColumnModelFake.h">
       <Filter>UI\Views\ListView</Filter>

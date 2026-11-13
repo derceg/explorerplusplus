@@ -9,19 +9,17 @@
 #include <memory>
 #include <vector>
 
+class AppServices;
 class BookmarkIconManager;
 class BookmarkTree;
 class BrowserWindow;
-class IconFetcher;
 class PlatformContext;
 class ResourceLoader;
 
 class BookmarksMainMenu : public MenuBase
 {
 public:
-	BookmarksMainMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		BookmarkTree *bookmarkTree, BrowserWindow *browser, IconFetcher *iconFetcher,
-		PlatformContext *platformContext, const ResourceLoader *resourceLoader);
+	BookmarksMainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices);
 	~BookmarksMainMenu();
 
 private:

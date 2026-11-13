@@ -7,11 +7,9 @@
 #include "Bookmarks/UI/BookmarkColumnModel.h"
 #include "Bookmarks/UI/BookmarkListPresenter.h"
 #include "BrowserTestBase.h"
-#include "IconFetcherFake.h"
 #include "LabelEditHandler.h"
 #include "ListView.h"
 #include "MenuViewTestApi.h"
-#include "MenuViewTestHelper.h"
 #include "NoOpMenuHelpTextHost.h"
 #include "RootMenuViewTestApi.h"
 #include "TestMenuView.h"
@@ -37,15 +35,11 @@ protected:
 			NoOpMenuHelpTextHost::GetInstance(), &m_acceleratorManager, &m_resourceLoader);
 
 		m_bookmarkListPresenter = std::make_unique<BookmarkListPresenter>(std::move(listView),
-			&m_bookmarkTree, BookmarkColumnModel(), std::nullopt, SortDirection::Ascending,
-			&m_browserList, &m_config, &m_acceleratorManager, &m_resourceLoader, &m_iconFetcher,
-			&m_platformContext);
+			BookmarkColumnModel(), std::nullopt, SortDirection::Ascending, &m_appServices);
 
 		m_menu = std::make_unique<ManageBookmarksViewsMenu>(&m_menuView, &m_acceleratorManager,
 			m_bookmarkListPresenter.get(), &m_resourceLoader);
 	}
-
-	IconFetcherFake m_iconFetcher;
 
 	wil::unique_hwnd m_parentWindow;
 	std::unique_ptr<BookmarkListPresenter> m_bookmarkListPresenter;
