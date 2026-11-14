@@ -18,6 +18,7 @@
 #include "ViewModes.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/ScopedStopSource.h"
 #include "../Helper/ShellDropTargetDelegate.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WeakPtr.h"
@@ -43,11 +44,9 @@ class AcceleratorManager;
 class AppServices;
 struct BasicItemInfo_t;
 class BrowserWindow;
-class CachedIcons;
 class ClipboardStore;
 struct Config;
 class FileActionHandler;
-class IconFetcher;
 class NavigationRequest;
 struct PreservedShellBrowser;
 class ResourceLoader;
@@ -310,6 +309,8 @@ private:
 		been created and are awaiting insertion
 		into the listview. */
 		std::vector<AwaitingAdd_t> awaitingAddList;
+
+		std::unique_ptr<ScopedStopSource> m_iconStopSource = std::make_unique<ScopedStopSource>();
 
 		// Directory monitoring
 		std::unique_ptr<DirectoryWatcher> directoryWatcher;
@@ -578,6 +579,8 @@ private:
 	std::optional<int> GetItemGroupId(int index);
 
 	/* Listview icons. */
+	concurrencpp::null_result RetrieveIcon(WeakPtr<ShellBrowserImpl> weakSelf, PidlAbsolute pidl,
+		int internalIndex);
 	void ProcessIconResult(int internalIndex, int iconIndex, int overlayIndex);
 
 	/* Thumbnails view. */
@@ -661,9 +664,6 @@ private:
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
 	int m_columnResultIDCounter;
 
-	std::unique_ptr<IconFetcher> m_iconFetcher;
-	CachedIcons *m_cachedIcons;
-
 	ctpl::thread_pool m_thumbnailThreadPool;
 	std::unordered_map<int, std::future<std::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int m_thumbnailResultIDCounter;
@@ -676,8 +676,6 @@ private:
 	const HINSTANCE m_resourceInstance;
 	AcceleratorManager *const m_acceleratorManager;
 	bool m_folderVisited = false;
-	int m_iFolderIcon;
-	int m_iFileIcon;
 
 	/* Stores a unique index for each folder.
 	This may be needed so that folders can be

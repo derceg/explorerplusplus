@@ -16,7 +16,6 @@
 #include "FileOperations.h"
 #include "FileProgressSink.h"
 #include "FolderView.h"
-#include "IconFetcherImpl.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "MassRenameDialog.h"
@@ -100,7 +99,6 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_columnResultIDCounter(0),
-	m_cachedIcons(appServices->GetCachedIcons()),
 	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_thumbnailResultIDCounter(0),
@@ -120,7 +118,6 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	m_weakPtrFactory(this)
 {
 	InitializeListView();
-	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_listView, m_cachedIcons);
 
 	m_connections.push_back(m_appServices->GetNavigationEvents()->AddStartedObserver(
 		std::bind_front(&ShellBrowserImpl::OnNavigationStarted, this),
@@ -146,9 +143,6 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	m_uniqueFolderId = 0;
 
 	m_PreviousSortColumnExists = false;
-
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_iFolderIcon));
-	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_iFileIcon));
 
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 }

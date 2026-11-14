@@ -9,7 +9,6 @@
 #include "DocumentServiceProvider.h"
 #include "FeatureList.h"
 #include "HistoryEntry.h"
-#include "IconFetcher.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "NavigationRequest.h"
@@ -82,8 +81,6 @@ void ShellBrowserImpl::ClearPendingResults()
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
 
-	m_iconFetcher->ClearQueue();
-
 	m_thumbnailThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
@@ -105,7 +102,7 @@ void ShellBrowserImpl::ResetFolderState()
 
 	ListView_RemoveAllGroups(m_listView);
 
-	m_directoryState = DirectoryState();
+	m_directoryState = {};
 
 	m_itemInfoMap.clear();
 }

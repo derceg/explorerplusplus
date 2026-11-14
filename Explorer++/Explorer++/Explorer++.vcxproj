@@ -1361,7 +1361,6 @@
     <ClCompile Include="TabBarBackgroundContextMenu.cpp" />
     <ClCompile Include="TabHistoryMenu.cpp" />
     <ClCompile Include="HistoryModel.cpp" />
-    <ClCompile Include="IconFetcherImpl.cpp" />
     <ClCompile Include="LabelEditHandler.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
     <ClCompile Include="FontHelper.cpp" />
@@ -1771,8 +1770,6 @@
     <ClInclude Include="TabBarBackgroundContextMenu.h" />
     <ClInclude Include="TabHistoryMenu.h" />
     <ClInclude Include="HistoryModel.h" />
-    <ClInclude Include="IconFetcher.h" />
-    <ClInclude Include="IconFetcherImpl.h" />
     <ClInclude Include="LabelEditHandler.h" />
     <ClInclude Include="Literals.h" />
     <ClInclude Include="MainFontSetter.h" />

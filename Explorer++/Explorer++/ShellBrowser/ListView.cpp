@@ -5,20 +5,20 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "AppServices.h"
+#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColumnHelper.h"
 #include "Config.h"
 #include "FolderView.h"
-#include "IconFetcher.h"
 #include "ItemData.h"
 #include "LabelEditHandler.h"
 #include "MainResource.h"
-#include "NavigateParams.h"
 #include "NewMenuClient.h"
 #include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
+#include "RuntimeHelper.h"
 #include "SelectColumnsDialog.h"
 #include "ServiceProvider.h"
 #include "ShellBackgroundContextMenu.h"
@@ -643,33 +643,41 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 	if ((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
-		auto cachedIconIndex = m_cachedIcons->MaybeGetIconIndex(itemInfo.parsingName);
 
-		if (cachedIconIndex)
-		{
-			// Note that only the icon is set here. Any overlay will be added by the icon retrieval
-			// task (scheduled below).
-			plvItem->iImage = *cachedIconIndex;
-		}
-		else
-		{
-			if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-				== FILE_ATTRIBUTE_DIRECTORY)
-			{
-				plvItem->iImage = m_iFolderIcon;
-			}
-			else
-			{
-				plvItem->iImage = m_iFileIcon;
-			}
-		}
+		auto *iconFetcher = m_appServices->GetAsyncIconFetcher();
 
-		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.Raw(),
-			[this, internalIndex](int iconIndex, int overlayIndex)
-			{ ProcessIconResult(internalIndex, iconIndex, overlayIndex); });
+		// Note that only the icon is set here. Any overlay will be added by the icon retrieval task
+		// (scheduled below).
+		plvItem->iImage = iconFetcher->GetCachedIconIndexOrDefault(itemInfo.pidlComplete.Raw());
+
+		RetrieveIcon(m_weakPtrFactory.GetWeakPtr(), itemInfo.pidlComplete, internalIndex);
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
+}
+
+concurrencpp::null_result ShellBrowserImpl::RetrieveIcon(WeakPtr<ShellBrowserImpl> weakSelf,
+	PidlAbsolute pidl, int internalIndex)
+{
+	auto *runtime = weakSelf->m_appServices->GetRuntime();
+	auto iconFetcher = weakSelf->m_appServices->GetAsyncIconFetcher();
+	auto stopToken = weakSelf->m_directoryState.m_iconStopSource->GetToken();
+
+	auto iconInfo = co_await iconFetcher->GetIconIndexAsync(pidl.Raw(), stopToken);
+
+	if (!iconInfo)
+	{
+		co_return;
+	}
+
+	co_await ResumeOnUiThread(runtime);
+
+	if (stopToken.stop_requested() || !weakSelf)
+	{
+		co_return;
+	}
+
+	weakSelf->ProcessIconResult(internalIndex, iconInfo->iconIndex, iconInfo->overlayIndex);
 }
 
 void ShellBrowserImpl::ProcessIconResult(int internalIndex, int iconIndex, int overlayIndex)

@@ -421,9 +421,6 @@
     <ClCompile Include="LabelEditHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="IconFetcherImpl.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="OneShotTimerManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1426,12 +1423,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="LabelEditHandler.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="IconFetcher.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="IconFetcherImpl.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\ShellBrowser.h">
