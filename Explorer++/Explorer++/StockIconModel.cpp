@@ -13,7 +13,8 @@ StockIconModel::StockIconModel(SHSTOCKICONID stockIconId, IconSize size) :
 {
 }
 
-wil::unique_hbitmap StockIconModel::GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const
+wil::com_ptr_nothrow<IWICBitmapSource> StockIconModel::GetBitmap(UINT dpi,
+	IconUpdateCallback updateCallback) const
 {
 	// The system will scale the image to the current DPI, but the scaling won't change if the DPI
 	// changes. So, this may require more work to handle properly.
@@ -21,19 +22,11 @@ wil::unique_hbitmap StockIconModel::GetBitmap(UINT dpi, IconUpdateCallback updat
 
 	UNREFERENCED_PARAMETER(updateCallback);
 
-	auto wicIcon = GetStockIconImage(m_stockIconId, m_size);
+	auto bitmap = GetStockIconImage(m_stockIconId, m_size);
 
-	if (!wicIcon)
+	if (!bitmap)
 	{
 		DCHECK(false);
-		return nullptr;
-	}
-
-	wil::unique_hbitmap bitmap;
-	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(wicIcon.get(), bitmap);
-
-	if (FAILED(hr))
-	{
 		return nullptr;
 	}
 

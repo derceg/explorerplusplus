@@ -8,8 +8,8 @@
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
-#include <wil/resource.h>
 #include <ShObjIdl.h>
+#include <wincodec.h>
 #include <functional>
 #include <memory>
 #include <unordered_map>
@@ -47,7 +47,8 @@ private:
 
 		TaskbarTabIconProvider(AsyncIconFetcher *iconFetcher, const ResourceLoader *resourceLoader);
 
-		wil::unique_hicon GetIconForTab(const Tab *tab, IconSize iconSize) const;
+		wil::com_ptr_nothrow<IWICBitmapSource> GetIconForTab(const Tab *tab,
+			IconSize iconSize) const;
 
 	private:
 		struct ImageListInfo

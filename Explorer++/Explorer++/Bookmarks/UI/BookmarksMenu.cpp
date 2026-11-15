@@ -32,10 +32,11 @@ public:
 		WeakPtr<BookmarkItem, const BookmarkItem> bookmarkItem);
 
 	// IconModel
-	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
+	wil::com_ptr_nothrow<IWICBitmapSource> GetBitmap(UINT dpi,
+		IconUpdateCallback updateCallback) const override;
 
 private:
-	wil::unique_hbitmap MaybeGetBitmapForIconIndex(int iconIndex) const;
+	wil::com_ptr_nothrow<IWICBitmapSource> MaybeGetBitmapForIconIndex(int iconIndex) const;
 
 	BookmarkIconManager *const m_bookmarkIconManager;
 	const WeakPtr<BookmarkItem, const BookmarkItem> m_bookmarkItem;
@@ -241,7 +242,8 @@ BookmarkIconModel::BookmarkIconModel(BookmarkIconManager *bookmarkIconManager,
 {
 }
 
-wil::unique_hbitmap BookmarkIconModel::GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const
+wil::com_ptr_nothrow<IWICBitmapSource> BookmarkIconModel::GetBitmap(UINT dpi,
+	IconUpdateCallback updateCallback) const
 {
 	// TODO: The requested DPI should be taken into account.
 	UNREFERENCED_PARAMETER(dpi);
@@ -267,14 +269,15 @@ wil::unique_hbitmap BookmarkIconModel::GetBitmap(UINT dpi, IconUpdateCallback up
 				return;
 			}
 
-			updateCallback(std::move(bitmap));
+			updateCallback(bitmap.get());
 		},
 		m_scopedStopSource.GetToken());
 
 	return MaybeGetBitmapForIconIndex(iconIndex);
 }
 
-wil::unique_hbitmap BookmarkIconModel::MaybeGetBitmapForIconIndex(int iconIndex) const
+wil::com_ptr_nothrow<IWICBitmapSource> BookmarkIconModel::MaybeGetBitmapForIconIndex(
+	int iconIndex) const
 {
 	wil::com_ptr_nothrow<IImageList> imageList;
 	HRESULT hr =
@@ -285,8 +288,8 @@ wil::unique_hbitmap BookmarkIconModel::MaybeGetBitmapForIconIndex(int iconIndex)
 		return nullptr;
 	}
 
-	wil::unique_hbitmap bitmap;
-	hr = ImageHelper::CreateHBITMAPFromImageListIcon(imageList.get(), iconIndex, bitmap);
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	hr = ImageHelper::CreateBitmapFromImageListIcon(imageList.get(), iconIndex, bitmap);
 
 	if (FAILED(hr))
 	{

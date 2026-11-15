@@ -26,7 +26,7 @@ FilterDialog *FilterDialog::Create(const ResourceLoader *resourceLoader, HWND hP
 
 FilterDialog::FilterDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	ShellBrowser *shellBrowser) :
-	BaseDialog(resourceLoader, IDD_FILTER, hParent, DialogSizingType::Horizontal),
+	BaseDialog(resourceLoader, IDD_FILTER, hParent, DialogSizingType::Horizontal, Icon::Filter),
 	m_shellBrowser(shellBrowser)
 {
 	m_persistentSettings = &FilterDialogPersistentSettings::GetInstance();
@@ -59,11 +59,6 @@ INT_PTR FilterDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
-}
-
-wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> FilterDialog::GetResizableControls()

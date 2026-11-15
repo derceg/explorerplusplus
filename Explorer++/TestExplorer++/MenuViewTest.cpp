@@ -189,17 +189,13 @@ TEST_F(MenuViewIconTest, OnShow)
 	TestMenuView menuView;
 	AddItemsToMenu(&menuView, 1);
 
-	HBITMAP generatedBitmap = nullptr;
-	m_shellIconLoader.SetBitmapGeneratedCallback(
-		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
-
 	// The item image should be set once the menu is shown.
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
-	EXPECT_NE(generatedBitmap, nullptr);
+	EXPECT_EQ(m_shellIconLoader.GetNumIconsRequested(), 1);
 
 	auto bitmap = MenuHelper::GetItemBitmap(MenuViewTestApi::GetNativeMenu(&menuView), 0,
 		MenuHelper::ItemLookup::ByPosition);
-	EXPECT_EQ(bitmap, generatedBitmap);
+	EXPECT_NE(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, OnShowWithNoImage)
@@ -208,6 +204,7 @@ TEST_F(MenuViewIconTest, OnShowWithNoImage)
 	AddItemsToMenu(&menuView, 1, ImageOption::Exclude);
 
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
+	EXPECT_EQ(m_shellIconLoader.GetNumIconsRequested(), 0);
 
 	// The item didn't have any image set, so showing the menu shouldn't result in any image being
 	// assigned.
@@ -221,17 +218,13 @@ TEST_F(MenuViewIconTest, MenuBeingShown)
 	TestMenuView menuView;
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
 
-	HBITMAP generatedBitmap = nullptr;
-	m_shellIconLoader.SetBitmapGeneratedCallback(
-		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
-
 	// The menu is being shown, so the item image should be immediately added.
 	AddItemsToMenu(&menuView, 1);
-	EXPECT_NE(generatedBitmap, nullptr);
+	EXPECT_EQ(m_shellIconLoader.GetNumIconsRequested(), 1);
 
 	auto bitmap = MenuHelper::GetItemBitmap(MenuViewTestApi::GetNativeMenu(&menuView), 0,
 		MenuHelper::ItemLookup::ByPosition);
-	EXPECT_EQ(bitmap, generatedBitmap);
+	EXPECT_NE(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, ShowAfterDpiChange)
@@ -242,38 +235,30 @@ TEST_F(MenuViewIconTest, ShowAfterDpiChange)
 	AddItemsToMenu(&menuView, 1);
 	MenuViewTestApi::OnPopupClosed(&menuView);
 
-	HBITMAP generatedBitmap = nullptr;
-	m_shellIconLoader.SetBitmapGeneratedCallback(
-		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
-
 	// The menu is being shown again, but at a different DPI level, so the image should be updated.
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI * 2);
-	EXPECT_NE(generatedBitmap, nullptr);
+	EXPECT_EQ(m_shellIconLoader.GetNumIconsRequested(), 2);
 
 	auto bitmap = MenuHelper::GetItemBitmap(MenuViewTestApi::GetNativeMenu(&menuView), 0,
 		MenuHelper::ItemLookup::ByPosition);
-	EXPECT_EQ(bitmap, generatedBitmap);
+	EXPECT_NE(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, ShowAtSameDpi)
 {
 	TestMenuView menuView;
 
-	HBITMAP generatedBitmap = nullptr;
-	m_shellIconLoader.SetBitmapGeneratedCallback(
-		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
-
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
 	AddItemsToMenu(&menuView, 1);
 	MenuViewTestApi::OnPopupClosed(&menuView);
-	EXPECT_NE(generatedBitmap, nullptr);
 
 	// The menu is being shown again, at the same DPI level, so the image shouldn't be updated.
 	MenuViewTestApi::OnPopupWillShowForDpi(&menuView, USER_DEFAULT_SCREEN_DPI);
+	EXPECT_EQ(m_shellIconLoader.GetNumIconsRequested(), 1);
 
 	auto bitmap = MenuHelper::GetItemBitmap(MenuViewTestApi::GetNativeMenu(&menuView), 0,
 		MenuHelper::ItemLookup::ByPosition);
-	EXPECT_EQ(bitmap, generatedBitmap);
+	EXPECT_NE(bitmap, nullptr);
 }
 
 TEST_F(MenuViewIconTest, IconUpdate)
@@ -283,16 +268,16 @@ TEST_F(MenuViewIconTest, IconUpdate)
 
 	AddItemsToMenu(&menuView, 1);
 
-	HBITMAP generatedBitmap = nullptr;
-	m_shellIconLoader.SetBitmapGeneratedCallback(
-		[&generatedBitmap](HBITMAP bitmap) { generatedBitmap = bitmap; });
+	auto originalBitmap = MenuHelper::GetItemBitmap(MenuViewTestApi::GetNativeMenu(&menuView), 0,
+		MenuHelper::ItemLookup::ByPosition);
+	EXPECT_NE(originalBitmap, nullptr);
 
 	m_shellIconLoader.TriggerPendingUpdateCallbacks();
-	EXPECT_NE(generatedBitmap, nullptr);
 
 	auto bitmap = MenuHelper::GetItemBitmap(MenuViewTestApi::GetNativeMenu(&menuView), 0,
 		MenuHelper::ItemLookup::ByPosition);
-	EXPECT_EQ(bitmap, generatedBitmap);
+	EXPECT_NE(bitmap, nullptr);
+	EXPECT_NE(bitmap, originalBitmap);
 }
 
 TEST_F(MenuViewIconTest, AddItemAfterClose)

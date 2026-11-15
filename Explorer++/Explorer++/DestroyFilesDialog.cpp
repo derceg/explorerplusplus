@@ -35,9 +35,6 @@ DestroyFilesDialog::DestroyFilesDialog(const ResourceLoader *resourceLoader, HWN
 
 INT_PTR DestroyFilesDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
-	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	HWND hListView = GetDlgItem(m_hDlg, IDC_DESTROYFILES_LISTVIEW);
 
 	HIMAGELIST himlSmall;

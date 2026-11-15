@@ -13,6 +13,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DoubleBufferedPaint.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/LayoutHelper.h"
 #include "../Helper/ScopedDCState.h"
 #include "../Helper/TabHelper.h"
@@ -718,9 +719,9 @@ void TabView::UpdateDpiDependentResources()
 		ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 1, 0));
 	CHECK(m_closeIconImageList);
 
-	wil::unique_hbitmap closeIcon =
-		m_resourceLoader->LoadBitmapFromPNGAndScale(Icon::CloseButton, iconWidth, iconHeight);
-	m_closeIconImageIndex = ImageList_Add(m_closeIconImageList.get(), closeIcon.get(), nullptr);
+	auto closeIcon = m_resourceLoader->LoadBitmap(Icon::CloseButton, iconWidth, iconHeight);
+	m_closeIconImageIndex =
+		ImageHelper::AddBitmapToImageList(m_closeIconImageList.get(), closeIcon.get());
 	CHECK_NE(m_closeIconImageIndex, -1);
 
 	m_horizontalPadding = dpiCompat.GetSystemMetricsForDpi(SM_CXEDGE, dpi) * 3;

@@ -23,13 +23,14 @@ protected:
 		auto bitmap = m_iconModel.GetBitmap(USER_DEFAULT_SCREEN_DPI * scale, {});
 		ASSERT_NE(bitmap, nullptr);
 
-		BITMAP bitmapInfo;
-		int res = GetObject(bitmap.get(), sizeof(bitmapInfo), &bitmapInfo);
-		ASSERT_NE(res, 0);
+		UINT width;
+		UINT height;
+		ASSERT_HRESULT_SUCCEEDED(bitmap->GetSize(&width, &height));
 
 		int defaultPixelSize = GetIconPixelSizeAtDefaultDpi(IconSize::Small);
-		EXPECT_EQ(bitmapInfo.bmWidth, defaultPixelSize * scale);
-		EXPECT_EQ(bitmapInfo.bmHeight, defaultPixelSize * scale);
+		UINT expectedPixelSize = static_cast<UINT>(defaultPixelSize * scale);
+		EXPECT_EQ(width, expectedPixelSize);
+		EXPECT_EQ(height, expectedPixelSize);
 	}
 
 private:

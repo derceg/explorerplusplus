@@ -8,7 +8,6 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
-#include <wil/resource.h>
 #include <unordered_map>
 
 enum class FolderType
@@ -86,8 +85,6 @@ private:
 
 	std::unordered_map<int, FolderType> m_FolderMap;
 	FolderType m_PreviousFolderType;
-
-	wil::unique_hicon m_icon;
 
 	SetDefaultColumnsDialogPersistentSettings *m_psdcdps;
 };

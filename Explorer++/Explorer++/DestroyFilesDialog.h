@@ -8,7 +8,6 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ResizableDialogHelper.h"
-#include <wil/resource.h>
 
 class DestroyFilesDialog;
 
@@ -62,8 +61,6 @@ private:
 	void OnConfirmDestroy();
 
 	std::list<std::wstring> m_FullFilenameList;
-
-	wil::unique_hicon m_icon;
 
 	DestroyFilesDialogPersistentSettings *m_pdfdps;
 

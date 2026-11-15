@@ -11,7 +11,15 @@
 namespace ImageInterop
 {
 
+enum class AlphaMode
+{
+	Straight,
+	Premultiplied
+};
+
 HRESULT CreateWICBitmapFromHICON(HICON source, wil::com_ptr_nothrow<IWICBitmapSource> &output);
-HRESULT CreateHBITMAPFromWICBitmap(IWICBitmapSource *source, wil::unique_hbitmap &output);
+HRESULT CreateHICONFromWICBitmap(IWICBitmapSource *source, wil::unique_hicon &output);
+HRESULT CreateHBITMAPFromWICBitmap(IWICBitmapSource *source, AlphaMode alphaMode,
+	wil::unique_hbitmap &output);
 
 }

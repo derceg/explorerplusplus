@@ -36,9 +36,6 @@ SetDefaultColumnsDialog::SetDefaultColumnsDialog(const ResourceLoader *resourceL
 
 INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
-	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	HWND hComboBox = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_COMBOBOX);
 
 	std::wstring folderName;

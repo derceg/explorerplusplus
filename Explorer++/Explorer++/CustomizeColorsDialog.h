@@ -41,8 +41,6 @@ protected:
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
-
 private:
 	static constexpr COLORREF DEFAULT_INITIAL_COLOR = RGB(0, 94, 138);
 

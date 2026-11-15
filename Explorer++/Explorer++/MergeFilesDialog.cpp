@@ -43,7 +43,7 @@ MergeFilesDialog *MergeFilesDialog::Create(const ResourceLoader *resourceLoader,
 MergeFilesDialog::MergeFilesDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::wstring &strOutputDirectory, const std::vector<std::wstring> &filePaths,
 	BOOL bShowFriendlyDates) :
-	BaseDialog(resourceLoader, IDD_MERGEFILES, hParent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_MERGEFILES, hParent, DialogSizingType::Both, Icon::MergeFiles),
 	m_strOutputDirectory(strOutputDirectory),
 	m_filePaths(filePaths),
 	m_bShowFriendlyDates(bShowFriendlyDates),
@@ -190,11 +190,6 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
-}
-
-wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::MergeFiles, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> MergeFilesDialog::GetResizableControls()

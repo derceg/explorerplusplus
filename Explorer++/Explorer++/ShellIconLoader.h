@@ -6,8 +6,9 @@
 
 #include "IconUpdateCallback.h"
 #include "../Helper/IconSize.h"
-#include <wil/resource.h>
+#include <wil/com.h>
 #include <shtypes.h>
+#include <wincodec.h>
 #include <stop_token>
 
 class ShellIconLoader
@@ -15,6 +16,6 @@ class ShellIconLoader
 public:
 	virtual ~ShellIconLoader() = default;
 
-	virtual wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-		IconUpdateCallback updateCallback, std::stop_token stopToken) = 0;
+	virtual wil::com_ptr_nothrow<IWICBitmapSource> LoadShellIcon(PCIDLIST_ABSOLUTE pidl,
+		IconSize size, IconUpdateCallback updateCallback, std::stop_token stopToken) = 0;
 };

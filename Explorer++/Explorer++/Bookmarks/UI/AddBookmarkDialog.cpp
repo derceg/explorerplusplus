@@ -32,7 +32,8 @@ AddBookmarkDialog::AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND 
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
 	BookmarkItem **selectedParentFolder, const AcceleratorManager *acceleratorManager,
 	PlatformContext *platformContext, std::optional<std::wstring> customDialogTitle) :
-	BaseDialog(resourceLoader, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both,
+		Icon::AddBookmark),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
@@ -187,11 +188,6 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 	}
 
 	return m_resourceLoader->LoadString(stringId);
-}
-
-wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> AddBookmarkDialog::GetResizableControls()

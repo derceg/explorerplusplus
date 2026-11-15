@@ -6,7 +6,6 @@
 
 #include "IconSet.h"
 #include "ResourceLoader.h"
-#include <gdiplus.h>
 #include <memory>
 
 class DarkModeManager;
@@ -23,13 +22,9 @@ public:
 	std::wstring LoadString(UINT stringId) const override;
 	std::optional<std::wstring> MaybeLoadString(UINT stringId) const override;
 
-	wil::unique_hbitmap LoadBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight,
-		int dpi) const override;
-	wil::unique_hbitmap LoadBitmapFromPNGAndScale(Icon icon, int iconWidth,
-		int iconHeight) const override;
-	wil::unique_hicon LoadIconFromPNGForDpi(Icon icon, int iconWidth, int iconHeight,
-		int dpi) const override;
-	wil::unique_hicon LoadIconFromPNGAndScale(Icon icon, int iconWidth,
+	wil::com_ptr_nothrow<IWICBitmapSource> LoadBitmapForDpi(Icon icon, int iconWidth,
+		int iconHeight, int dpi) const override;
+	wil::com_ptr_nothrow<IWICBitmapSource> LoadBitmap(Icon icon, int iconWidth,
 		int iconHeight) const override;
 
 	INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DialogProc dialogProc) const override;
@@ -60,11 +55,7 @@ private:
 		std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 	};
 
-	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconWidth,
-		int iconHeight, int dpi) const;
-	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGAndScalePlusInvert(Icon icon,
-		int iconWidth, int iconHeight) const;
-	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGAndScale(Icon icon, int iconWidth,
+	wil::com_ptr_nothrow<IWICBitmapSource> LoadOriginalBitmap(Icon icon, int iconWidth,
 		int iconHeight) const;
 
 	const HINSTANCE m_resourceInstance;

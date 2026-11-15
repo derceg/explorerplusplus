@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wil/resource.h>
+#include <wincodec.h>
 #include <functional>
 
-using IconUpdateCallback = std::function<void(wil::unique_hbitmap updatedIcon)>;
+using IconUpdateCallback = std::function<void(IWICBitmapSource *updatedIcon)>;

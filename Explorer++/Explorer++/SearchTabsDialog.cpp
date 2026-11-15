@@ -55,14 +55,6 @@ INT_PTR SearchTabsDialog::OnInitDialog()
 	return FALSE;
 }
 
-wil::unique_hicon SearchTabsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	UNREFERENCED_PARAMETER(iconWidth);
-	UNREFERENCED_PARAMETER(iconHeight);
-
-	return wil::unique_hicon(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
-}
-
 std::vector<ResizableDialogControl> SearchTabsDialog::GetResizableControls()
 {
 	std::vector<ResizableDialogControl> controls;

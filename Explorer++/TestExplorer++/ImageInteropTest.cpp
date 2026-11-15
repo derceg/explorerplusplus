@@ -29,12 +29,33 @@ TEST(ImageInteropTest, CreateWICBitmapFromHICON)
 	EXPECT_EQ(height, 16u);
 }
 
+TEST(ImageInteropTest, CreateHICONFromWICBitmap)
+{
+	auto bitmap = BuildTestWICBitmap(80, 60);
+
+	wil::unique_hicon icon;
+	HRESULT hr = ImageInterop::CreateHICONFromWICBitmap(bitmap.get(), icon);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	ICONINFO iconInfo;
+	auto res = GetIconInfo(icon.get(), &iconInfo);
+	ASSERT_TRUE(res);
+	EXPECT_TRUE(iconInfo.fIcon);
+
+	BITMAP bitmapInfo;
+	res = GetObject(iconInfo.hbmColor, sizeof(bitmapInfo), &bitmapInfo);
+	ASSERT_NE(res, 0);
+	EXPECT_EQ(bitmapInfo.bmWidth, 80);
+	EXPECT_EQ(bitmapInfo.bmHeight, 60);
+}
+
 TEST(ImageInteropTest, CreateHBITMAPFromWICBitmap)
 {
 	auto bitmap = BuildTestWICBitmap(120, 60);
 
 	wil::unique_hbitmap outputBitmap;
-	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(), outputBitmap);
+	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(),
+		ImageInterop::AlphaMode::Straight, outputBitmap);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	BITMAP bitmapInfo;

@@ -63,7 +63,6 @@ private:
 	~SearchTabsDialog() = default;
 
 	INT_PTR OnInitDialog() override;
-	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SetupListView();
 	void SelectFirstItem();

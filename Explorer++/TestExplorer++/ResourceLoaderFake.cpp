@@ -19,8 +19,8 @@ std::optional<std::wstring> ResourceLoaderFake::MaybeLoadString(UINT stringId) c
 	return L"";
 }
 
-wil::unique_hbitmap ResourceLoaderFake::LoadBitmapFromPNGForDpi(Icon icon, int iconWidth,
-	int iconHeight, int dpi) const
+wil::com_ptr_nothrow<IWICBitmapSource> ResourceLoaderFake::LoadBitmapForDpi(Icon icon,
+	int iconWidth, int iconHeight, int dpi) const
 {
 	UNREFERENCED_PARAMETER(icon);
 	UNREFERENCED_PARAMETER(iconWidth);
@@ -30,28 +30,7 @@ wil::unique_hbitmap ResourceLoaderFake::LoadBitmapFromPNGForDpi(Icon icon, int i
 	return nullptr;
 }
 
-wil::unique_hbitmap ResourceLoaderFake::LoadBitmapFromPNGAndScale(Icon icon, int iconWidth,
-	int iconHeight) const
-{
-	UNREFERENCED_PARAMETER(icon);
-	UNREFERENCED_PARAMETER(iconWidth);
-	UNREFERENCED_PARAMETER(iconHeight);
-
-	return nullptr;
-}
-
-wil::unique_hicon ResourceLoaderFake::LoadIconFromPNGForDpi(Icon icon, int iconWidth,
-	int iconHeight, int dpi) const
-{
-	UNREFERENCED_PARAMETER(icon);
-	UNREFERENCED_PARAMETER(iconWidth);
-	UNREFERENCED_PARAMETER(iconHeight);
-	UNREFERENCED_PARAMETER(dpi);
-
-	return nullptr;
-}
-
-wil::unique_hicon ResourceLoaderFake::LoadIconFromPNGAndScale(Icon icon, int iconWidth,
+wil::com_ptr_nothrow<IWICBitmapSource> ResourceLoaderFake::LoadBitmap(Icon icon, int iconWidth,
 	int iconHeight) const
 {
 	UNREFERENCED_PARAMETER(icon);

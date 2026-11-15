@@ -4,22 +4,22 @@
 
 #pragma once
 
-#include <wil/resource.h>
+#include <wil/com.h>
 #include <CommCtrl.h>
 #include <commoncontrols.h>
-#include <gdiplus.h>
-#include <memory>
+#include <wincodec.h>
 
 namespace ImageHelper
 {
 
-std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
-	UINT resourceId);
-HRESULT CreateHBITMAPFromImageListIcon(IImageList *imageList, int iconIndex,
-	wil::unique_hbitmap &outputBitmap);
-int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex);
+HRESULT LoadBitmapFromPNG(HINSTANCE resourceInstance, UINT resourceId,
+	wil::com_ptr_nothrow<IWICBitmapSource> &output);
 
-wil::unique_hbitmap GdiplusBitmapToBitmap(Gdiplus::Bitmap *gdiplusBitmap);
-wil::unique_hicon GdiplusBitmapToIcon(Gdiplus::Bitmap *gdiplusBitmap);
+HRESULT InvertBitmap(IWICBitmapSource *source, wil::com_ptr_nothrow<IWICBitmapSource> &output);
+
+int AddBitmapToImageList(HIMAGELIST imageList, IWICBitmapSource *bitmap);
+HRESULT CreateBitmapFromImageListIcon(IImageList *imageList, int iconIndex,
+	wil::com_ptr_nothrow<IWICBitmapSource> &output);
+int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex);
 
 }

@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include "Icon.h"
 #include "../Helper/MessageForwarder.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
 #include <functional>
+#include <optional>
 
 class ResourceLoader;
 
@@ -37,10 +39,8 @@ public:
 
 protected:
 	BaseDialog(const ResourceLoader *resourceLoader, int iResource, HWND hParent,
-		DialogSizingType dialogSizingType);
+		DialogSizingType dialogSizingType, std::optional<Icon> iconType = std::nullopt);
 	virtual ~BaseDialog() = default;
-
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;
 
 	INT_PTR GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -56,6 +56,7 @@ private:
 	INT_PTR CALLBACK BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual void AddDynamicControls();
+	void SetDialogIcon();
 	virtual std::vector<ResizableDialogControl> GetResizableControls();
 	virtual void SaveState();
 	INT_PTR OnNcDestroy() override final;
@@ -64,10 +65,11 @@ private:
 	const HWND m_hParent;
 	std::function<void()> m_modelessDialogDestroyedObserver;
 
-	wil::unique_hicon m_icon;
-
 	bool m_showingModelessDialog = false;
 
 	const DialogSizingType m_dialogSizingType;
 	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelper;
+
+	std::optional<Icon> m_iconType;
+	wil::unique_hicon m_icon;
 };

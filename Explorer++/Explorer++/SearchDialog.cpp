@@ -19,6 +19,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileDialogs.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageInterop.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -72,7 +73,7 @@ SearchDialog *SearchDialog::Create(const ResourceLoader *resourceLoader, HWND hP
 SearchDialog::SearchDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	std::wstring_view searchDirectory, BrowserList *browserList,
 	const AcceleratorManager *acceleratorManager) :
-	BaseDialog(resourceLoader, IDD_SEARCH, hParent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_SEARCH, hParent, DialogSizingType::Both, Icon::Search),
 	m_searchDirectory(searchDirectory),
 	m_browserList(browserList),
 	m_acceleratorManager(acceleratorManager),
@@ -98,7 +99,9 @@ SearchDialog::~SearchDialog()
 INT_PTR SearchDialog::OnInitDialog()
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
-	m_directoryIcon = m_resourceLoader->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+	auto directoryBitmap = m_resourceLoader->LoadBitmapForDpi(Icon::Folder, 16, 16, dpi);
+	HRESULT hr = ImageInterop::CreateHICONFromWICBitmap(directoryBitmap.get(), m_directoryIcon);
+	CHECK(SUCCEEDED(hr));
 	SendMessage(GetDlgItem(m_hDlg, IDC_BUTTON_DIRECTORY), BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_directoryIcon.get()));
 
@@ -177,11 +180,6 @@ INT_PTR SearchDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return FALSE;
-}
-
-wil::unique_hicon SearchDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::Search, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> SearchDialog::GetResizableControls()

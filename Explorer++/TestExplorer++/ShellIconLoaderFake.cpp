@@ -6,8 +6,8 @@
 #include "ShellIconLoaderFake.h"
 #include "ImageTestHelper.h"
 
-wil::unique_hbitmap ShellIconLoaderFake::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-	IconUpdateCallback updateCallback, std::stop_token stopToken)
+wil::com_ptr_nothrow<IWICBitmapSource> ShellIconLoaderFake::LoadShellIcon(PCIDLIST_ABSOLUTE pidl,
+	IconSize size, IconUpdateCallback updateCallback, std::stop_token stopToken)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(size);
@@ -17,17 +17,14 @@ wil::unique_hbitmap ShellIconLoaderFake::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, I
 		m_pendingUpdates.push_back({ std::move(updateCallback), stopToken });
 	}
 
+	m_numIconsRequested++;
+
 	return GenerateImage();
 }
 
-void ShellIconLoaderFake::SetBitmapGeneratedCallback(BitmapGeneratedCallback callback)
+int ShellIconLoaderFake::GetNumIconsRequested() const
 {
-	m_bitmapGeneratedCallback = callback;
-}
-
-void ShellIconLoaderFake::ClearBitmapGeneratedCallback()
-{
-	m_bitmapGeneratedCallback = {};
+	return m_numIconsRequested;
 }
 
 void ShellIconLoaderFake::TriggerPendingUpdateCallbacks()
@@ -39,7 +36,8 @@ void ShellIconLoaderFake::TriggerPendingUpdateCallbacks()
 			continue;
 		}
 
-		pendingUpdate.callback(GenerateImage());
+		auto bitmap = GenerateImage();
+		pendingUpdate.callback(bitmap.get());
 	}
 
 	m_pendingUpdates.clear();
@@ -50,15 +48,7 @@ void ShellIconLoaderFake::SetStoreUpdateCallbacks(bool storeUpdateCallbacks)
 	m_storeUpdateCallbacks = storeUpdateCallbacks;
 }
 
-wil::unique_hbitmap ShellIconLoaderFake::GenerateImage() const
+wil::com_ptr_nothrow<IWICBitmapSource> ShellIconLoaderFake::GenerateImage() const
 {
-	wil::unique_hbitmap bitmap;
-	BuildTestBitmap(10, 10, bitmap);
-
-	if (m_bitmapGeneratedCallback)
-	{
-		m_bitmapGeneratedCallback(bitmap.get());
-	}
-
-	return bitmap;
+	return BuildTestWICBitmap(10, 10);
 }

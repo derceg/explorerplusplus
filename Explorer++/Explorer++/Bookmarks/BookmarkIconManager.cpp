@@ -20,9 +20,10 @@ BookmarkIconManager::BookmarkIconManager(const Runtime *runtime, AsyncIconFetche
 {
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
 
-	wil::unique_hbitmap folderIcon =
-		resourceLoader->LoadBitmapFromPNGAndScale(Icon::Folder, iconWidth, iconHeight);
-	m_bookmarkFolderIconIndex = ImageList_Add(m_imageList.get(), folderIcon.get(), nullptr);
+	auto folderIcon =
+		resourceLoader->LoadBitmap(Icon::Folder, iconWidth, iconHeight);
+	m_bookmarkFolderIconIndex =
+		ImageHelper::AddBitmapToImageList(m_imageList.get(), folderIcon.get());
 
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 

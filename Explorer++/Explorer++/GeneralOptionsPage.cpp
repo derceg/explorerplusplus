@@ -12,6 +12,7 @@
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageInterop.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -77,7 +78,10 @@ void GeneralOptionsPage::InitializeControls()
 	}
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(GetDialog());
-	m_newTabDirectoryIcon = m_resourceLoader->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+	auto newTabDirectoryBitmap = m_resourceLoader->LoadBitmapForDpi(Icon::Folder, 16, 16, dpi);
+	HRESULT hr =
+		ImageInterop::CreateHICONFromWICBitmap(newTabDirectoryBitmap.get(), m_newTabDirectoryIcon);
+	CHECK(SUCCEEDED(hr));
 
 	HWND hButton = GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_BUTTON);
 	SendMessage(hButton, BM_SETIMAGE, IMAGE_ICON, (LPARAM) m_newTabDirectoryIcon.get());

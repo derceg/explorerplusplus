@@ -4,18 +4,21 @@
 
 #include "stdafx.h"
 #include "BaseDialog.h"
+#include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ImageInterop.h"
 #include "../Helper/WindowHelper.h"
 #include <glog/logging.h>
 
 BaseDialog::BaseDialog(const ResourceLoader *resourceLoader, int iResource, HWND hParent,
-	DialogSizingType dialogSizingType) :
+	DialogSizingType dialogSizingType, std::optional<Icon> iconType) :
 	m_resourceLoader(resourceLoader),
 	m_iResource(iResource),
 	m_hParent(hParent),
-	m_dialogSizingType(dialogSizingType)
+	m_dialogSizingType(dialogSizingType),
+	m_iconType(iconType)
 {
 }
 
@@ -62,16 +65,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 			m_resizableDialogHelper = std::make_unique<ResizableDialogHelper>(m_hDlg, controls);
 		}
 
-		auto &dpiCompat = DpiCompatibility::GetInstance();
-		UINT dpi = dpiCompat.GetDpiForWindow(m_hDlg);
-		int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-		int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-		m_icon = GetDialogIcon(iconWidth, iconHeight);
-
-		if (m_icon)
-		{
-			SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
-		}
+		SetDialogIcon();
 	}
 	break;
 
@@ -126,12 +120,31 @@ void BaseDialog::AddDynamicControls()
 {
 }
 
-wil::unique_hicon BaseDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+void BaseDialog::SetDialogIcon()
 {
-	UNREFERENCED_PARAMETER(iconWidth);
-	UNREFERENCED_PARAMETER(iconHeight);
+	wil::unique_hicon icon;
 
-	return nullptr;
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hDlg);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+
+	if (m_iconType)
+	{
+		auto bitmap = m_resourceLoader->LoadBitmap(*m_iconType, iconWidth, iconHeight);
+
+		HRESULT hr = ImageInterop::CreateHICONFromWICBitmap(bitmap.get(), icon);
+		CHECK(SUCCEEDED(hr));
+	}
+	else
+	{
+		icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
+			MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, iconWidth, iconHeight, LR_DEFAULTCOLOR)));
+		CHECK(icon);
+	}
+
+	SendMessage(m_hDlg, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon.get()));
+	m_icon = std::move(icon);
 }
 
 INT_PTR BaseDialog::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

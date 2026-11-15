@@ -18,13 +18,13 @@ class ShellIconLoaderImpl : public ShellIconLoader
 public:
 	ShellIconLoaderImpl(const Runtime *runtime, AsyncIconFetcher *iconFetcher);
 
-	wil::unique_hbitmap LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
+	wil::com_ptr_nothrow<IWICBitmapSource> LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
 		IconUpdateCallback updateCallback, std::stop_token stopToken) override;
 
 private:
 	static concurrencpp::null_result RetrieveIcon(WeakPtr<ShellIconLoaderImpl> weakSelf,
 		PidlAbsolute pidl, IconUpdateCallback updateCallback, std::stop_token stopToken);
-	wil::unique_hbitmap GetDefaultIcon(PCIDLIST_ABSOLUTE pidl);
+	wil::com_ptr_nothrow<IWICBitmapSource> GetDefaultIcon(PCIDLIST_ABSOLUTE pidl);
 
 	const Runtime *const m_runtime;
 	AsyncIconFetcher *const m_iconFetcher;

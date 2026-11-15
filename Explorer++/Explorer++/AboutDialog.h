@@ -22,6 +22,5 @@ private:
 	AboutDialog(const ResourceLoader *resourceLoader, HWND hParent);
 	~AboutDialog() = default;
 
-	wil::unique_hicon m_icon;
 	wil::unique_hicon m_mainIcon;
 };

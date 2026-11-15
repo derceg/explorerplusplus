@@ -40,7 +40,6 @@ private:
 	void SetupSearchField();
 	LRESULT SearchFieldWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void AddDynamicControls() override;
-	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void AddPages();
 	void AddPage(std::unique_ptr<OptionsPage> page);

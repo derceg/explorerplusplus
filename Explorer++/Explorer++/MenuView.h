@@ -12,6 +12,7 @@
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
+#include <wincodec.h>
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -179,7 +180,7 @@ private:
 	void UpdateDynamicPropertiesForItem(UINT id);
 	void UpdateItemState(UINT id);
 	void SetItemImage(UINT id);
-	void UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap);
+	void UpdateItemBitmap(UINT id, IWICBitmapSource *optBitmap);
 	UINT GetCurrentDpi() const;
 	Item *GetItem(UINT id);
 	const Item *GetItem(UINT id) const;

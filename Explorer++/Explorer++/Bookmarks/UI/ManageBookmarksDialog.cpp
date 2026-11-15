@@ -36,7 +36,7 @@ ManageBookmarksDialog *ManageBookmarksDialog::Create(HWND parent, AppServices *a
 
 ManageBookmarksDialog::ManageBookmarksDialog(HWND parent, AppServices *appServices) :
 	BaseDialog(appServices->GetResourceLoader(), IDD_MANAGE_BOOKMARKS, parent,
-		DialogSizingType::Both),
+		DialogSizingType::Both, Icon::Bookmarks),
 	m_appServices(appServices),
 	m_bookmarkTree(appServices->GetBookmarkTree()),
 	m_acceleratorManager(appServices->GetAcceleratorManager()),
@@ -76,11 +76,6 @@ std::vector<ResizableDialogControl> ManageBookmarksDialog::GetResizableControls(
 		SizingType::Both);
 	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
 	return controls;
-}
-
-wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);
 }
 
 void ManageBookmarksDialog::CreateToolbar()

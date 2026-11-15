@@ -153,8 +153,6 @@ protected:
 
 	INT_PTR OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
-
 private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ID = 0;
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;

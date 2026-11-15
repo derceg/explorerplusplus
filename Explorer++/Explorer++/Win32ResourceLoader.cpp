@@ -10,6 +10,7 @@
 #include "ThemeWindowTracker.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
+#include "../Helper/ImageOperations.h"
 #include "../Helper/ResourceHelper.h"
 
 Win32ResourceLoader::Win32ResourceLoader(HINSTANCE resourceInstance, IconSet iconSet,
@@ -33,75 +34,29 @@ std::optional<std::wstring> Win32ResourceLoader::MaybeLoadString(UINT stringId) 
 	return ResourceHelper::MaybeLoadString(m_resourceInstance, stringId);
 }
 
-wil::unique_hbitmap Win32ResourceLoader::LoadBitmapFromPNGForDpi(Icon icon, int iconWidth,
-	int iconHeight, int dpi) const
-{
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconWidth, iconHeight, dpi);
-	return ImageHelper::GdiplusBitmapToBitmap(gdiplusBitmap.get());
-}
-
-wil::unique_hbitmap Win32ResourceLoader::LoadBitmapFromPNGAndScale(Icon icon, int iconWidth,
-	int iconHeight) const
-{
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScalePlusInvert(icon, iconWidth, iconHeight);
-	return ImageHelper::GdiplusBitmapToBitmap(gdiplusBitmap.get());
-}
-
-wil::unique_hicon Win32ResourceLoader::LoadIconFromPNGForDpi(Icon icon, int iconWidth,
-	int iconHeight, int dpi) const
-{
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconWidth, iconHeight, dpi);
-	return ImageHelper::GdiplusBitmapToIcon(gdiplusBitmap.get());
-}
-
-wil::unique_hicon Win32ResourceLoader::LoadIconFromPNGAndScale(Icon icon, int iconWidth,
-	int iconHeight) const
-{
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScalePlusInvert(icon, iconWidth, iconHeight);
-	return ImageHelper::GdiplusBitmapToIcon(gdiplusBitmap.get());
-}
-
-std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGForDpi(Icon icon,
+wil::com_ptr_nothrow<IWICBitmapSource> Win32ResourceLoader::LoadBitmapForDpi(Icon icon,
 	int iconWidth, int iconHeight, int dpi) const
 {
 	int scaledIconWidth = MulDiv(iconWidth, dpi, USER_DEFAULT_SCREEN_DPI);
 	int scaledIconHeight = MulDiv(iconHeight, dpi, USER_DEFAULT_SCREEN_DPI);
-	return LoadGdiplusBitmapFromPNGAndScalePlusInvert(icon, scaledIconWidth, scaledIconHeight);
+	return LoadBitmap(icon, scaledIconWidth, scaledIconHeight);
 }
 
-// Loads and scales a PNG and then inverts the colors, when required by the current color mode.
-std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAndScalePlusInvert(
-	Icon icon, int iconWidth, int iconHeight) const
+// Loads and scales a PNG resource and then inverts the colors, when required by the current color
+// mode.
+wil::com_ptr_nothrow<IWICBitmapSource> Win32ResourceLoader::LoadBitmap(Icon icon, int iconWidth,
+	int iconHeight) const
 {
-	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	auto bitmap = LoadOriginalBitmap(icon, iconWidth, iconHeight);
 
 	if (m_iconSet == IconSet::Color || !m_darkModeManager->IsDarkModeEnabled())
 	{
 		return bitmap;
 	}
 
-	auto invertedBitmap = std::make_unique<Gdiplus::Bitmap>(iconWidth, iconHeight);
-	invertedBitmap->SetResolution(bitmap->GetHorizontalResolution(),
-		bitmap->GetVerticalResolution());
-
-	Gdiplus::Graphics graphics(invertedBitmap.get());
-
-	// This matrix will result in the RGB components all being inverted, while the alpha component
-	// will stay as-is. See the documentation on ColorMatrix for information on how this structure
-	// is laid out.
-	Gdiplus::ColorMatrix colorMatrix = { {
-		{ -1, 0, 0, 0, 0 },
-		{ 0, -1, 0, 0, 0 },
-		{ 0, 0, -1, 0, 0 },
-		{ 0, 0, 0, 1, 0 },
-		{ 1, 1, 1, 0, 1 },
-	} };
-
-	Gdiplus::ImageAttributes attributes;
-	attributes.SetColorMatrix(&colorMatrix);
-
-	graphics.DrawImage(bitmap.get(), Gdiplus::Rect(0, 0, iconWidth, iconHeight), 0, 0, iconWidth,
-		iconHeight, Gdiplus::UnitPixel, &attributes);
+	wil::com_ptr_nothrow<IWICBitmapSource> invertedBitmap;
+	HRESULT hr = ImageHelper::InvertBitmap(bitmap.get(), invertedBitmap);
+	CHECK(SUCCEEDED(hr));
 
 	return invertedBitmap;
 }
@@ -109,7 +64,7 @@ std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAn
 // This function is based on the steps performed by
 // https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric when
 // loading an icon (see the remarks section on that page for details).
-std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAndScale(Icon icon,
+wil::com_ptr_nothrow<IWICBitmapSource> Win32ResourceLoader::LoadOriginalBitmap(Icon icon,
 	int iconWidth, int iconHeight) const
 {
 	const IconMapping *mapping = nullptr;
@@ -129,37 +84,35 @@ std::unique_ptr<Gdiplus::Bitmap> Win32ResourceLoader::LoadGdiplusBitmapFromPNGAn
 		break;
 	}
 
-	const auto &iconSizeMappins = mapping->at(icon);
+	auto itr = mapping->find(icon);
+	CHECK(itr != mapping->end());
+	const auto &iconSizeMappings = itr->second;
 
-	auto match = std::find_if(iconSizeMappins.begin(), iconSizeMappins.end(),
-		[iconWidth, iconHeight](auto entry)
+	auto match = std::find_if(iconSizeMappings.begin(), iconSizeMappings.end(),
+		[iconWidth, iconHeight](const auto &entry)
 		{ return iconWidth <= entry.first && iconHeight <= entry.first; });
 
-	if (match == iconSizeMappins.end())
+	if (match == iconSizeMappings.end())
 	{
-		match = std::prev(iconSizeMappins.end());
+		match = std::prev(iconSizeMappings.end());
 	}
 
 	// Images are always loaded from the executable's resource instance.
-	auto bitmap = ImageHelper::LoadGdiplusBitmapFromPNG(GetModuleHandle(nullptr), match->second);
-	DCHECK(bitmap);
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	HRESULT hr = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), match->second, bitmap);
+	CHECK(SUCCEEDED(hr));
 
-	// If the icon size matches exactly, it doesn't need to be scaled, so can be
-	// returned immediately.
+	// If the icon size matches exactly, it doesn't need to be scaled, so can be returned
+	// immediately.
 	if (match->first == iconWidth && match->first == iconHeight)
 	{
 		return bitmap;
 	}
 
-	auto scaledBitmap = std::make_unique<Gdiplus::Bitmap>(iconWidth, iconHeight);
-	scaledBitmap->SetResolution(bitmap->GetHorizontalResolution(), bitmap->GetVerticalResolution());
-
-	Gdiplus::Graphics graphics(scaledBitmap.get());
-
-	float scalingFactorX = static_cast<float>(iconWidth) / static_cast<float>(match->first);
-	float scalingFactorY = static_cast<float>(iconHeight) / static_cast<float>(match->first);
-	graphics.ScaleTransform(scalingFactorX, scalingFactorY);
-	graphics.DrawImage(bitmap.get(), 0, 0);
+	wil::com_ptr_nothrow<IWICBitmapSource> scaledBitmap;
+	hr = ImageOperations::ResizeBitmap(bitmap.get(), iconWidth, iconHeight,
+		WICBitmapInterpolationModeFant, scaledBitmap);
+	CHECK(SUCCEEDED(hr));
 
 	return scaledBitmap;
 }

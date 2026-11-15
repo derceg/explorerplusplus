@@ -13,7 +13,8 @@ class StockIconModel : public IconModel
 public:
 	StockIconModel(SHSTOCKICONID stockIconId, IconSize size);
 
-	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
+	wil::com_ptr_nothrow<IWICBitmapSource> GetBitmap(UINT dpi,
+		IconUpdateCallback updateCallback) const override;
 
 private:
 	const SHSTOCKICONID m_stockIconId;

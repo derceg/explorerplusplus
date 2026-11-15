@@ -40,8 +40,6 @@ protected:
 	INT_PTR OnNotify(NMHDR *pnmhdr) override;
 	INT_PTR OnClose() override;
 
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
-
 private:
 	enum class MoveDirection
 	{

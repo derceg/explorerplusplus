@@ -25,7 +25,8 @@ CustomizeColorsDialog *CustomizeColorsDialog::Create(const ResourceLoader *resou
 
 CustomizeColorsDialog::CustomizeColorsDialog(const ResourceLoader *resourceLoader, HWND parent,
 	ColorRuleModel *model) :
-	BaseDialog(resourceLoader, IDD_CUSTOMIZE_COLORS, parent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_CUSTOMIZE_COLORS, parent, DialogSizingType::Both,
+		Icon::CustomizeColors),
 	m_model(model)
 {
 	m_persistentSettings = &CustomizeColorsDialogPersistentSettings::GetInstance();
@@ -50,11 +51,6 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
-}
-
-wil::unique_hicon CustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::CustomizeColors, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> CustomizeColorsDialog::GetResizableControls()

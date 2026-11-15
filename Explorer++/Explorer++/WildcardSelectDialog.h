@@ -9,9 +9,6 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
-#include <wil/resource.h>
-#include <MsXml2.h>
-#include <objbase.h>
 #include <list>
 #include <string>
 #include <vector>
@@ -74,7 +71,6 @@ private:
 
 	ShellBrowser *const m_shellBrowser;
 	const SelectionType m_selectionType;
-	wil::unique_hicon m_icon;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	WildcardSelectDialogPersistentSettings *m_pwsdps = nullptr;

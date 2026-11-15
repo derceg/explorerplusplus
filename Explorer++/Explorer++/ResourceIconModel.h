@@ -18,7 +18,8 @@ class ResourceIconModel : public IconModel
 public:
 	ResourceIconModel(Icon icon, IconSize size, const ResourceLoader *resourceLoader);
 
-	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
+	wil::com_ptr_nothrow<IWICBitmapSource> GetBitmap(UINT dpi,
+		IconUpdateCallback updateCallback) const override;
 
 private:
 	const Icon m_icon;

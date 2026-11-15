@@ -261,14 +261,8 @@ protected:
 		m_imageList.reset(ImageList_Create(imageSize, imageSize, ILC_COLOR32 | ILC_MASK, 0, 1));
 		ASSERT_NE(m_imageList, nullptr);
 
-		std::unique_ptr<Gdiplus::Bitmap> gdiPlusBitmap;
-		BuildTestGdiplusBitmap(imageSize, imageSize, gdiPlusBitmap);
-
-		auto bitmap = ImageHelper::GdiplusBitmapToBitmap(gdiPlusBitmap.get());
-		ASSERT_NE(bitmap, nullptr);
-
-		m_imageIndex = ImageList_Add(m_imageList.get(), bitmap.get(), nullptr);
-		ASSERT_NE(m_imageIndex, -1);
+		auto bitmap = BuildTestWICBitmap(imageSize, imageSize);
+		m_imageIndex = ImageHelper::AddBitmapToImageList(m_imageList.get(), bitmap.get());
 
 		m_view.SetImageList(m_imageList.get());
 

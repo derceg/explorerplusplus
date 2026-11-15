@@ -21,7 +21,8 @@ public:
 		wil::com_ptr_nothrow<IImageList> imageList);
 
 	// IconModel
-	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
+	wil::com_ptr_nothrow<IWICBitmapSource> GetBitmap(UINT dpi,
+		IconUpdateCallback updateCallback) const override;
 
 private:
 	WeakPtr<ToolbarButton> m_button;
@@ -142,7 +143,7 @@ ToolbarButtonIconModel::ToolbarButtonIconModel(WeakPtr<ToolbarButton> button,
 {
 }
 
-wil::unique_hbitmap ToolbarButtonIconModel::GetBitmap(UINT dpi,
+wil::com_ptr_nothrow<IWICBitmapSource> ToolbarButtonIconModel::GetBitmap(UINT dpi,
 	IconUpdateCallback updateCallback) const
 {
 	UNREFERENCED_PARAMETER(dpi);
@@ -160,9 +161,8 @@ wil::unique_hbitmap ToolbarButtonIconModel::GetBitmap(UINT dpi,
 		return nullptr;
 	}
 
-	wil::unique_hbitmap bitmap;
-	HRESULT hr =
-		ImageHelper::CreateHBITMAPFromImageListIcon(m_imageList.get(), *imageIndex, bitmap);
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	HRESULT hr = ImageHelper::CreateBitmapFromImageListIcon(m_imageList.get(), *imageIndex, bitmap);
 
 	if (FAILED(hr))
 	{

@@ -36,7 +36,7 @@ OptionsDialog *OptionsDialog::Create(const ResourceLoader *resourceLoader, HWND 
 OptionsDialog::OptionsDialog(const ResourceLoader *resourceLoader, HWND parent,
 	AppController *appController, Config *config, DarkModeManager *darkModeManager,
 	WindowThemeManager *windowThemeManager, CoreInterface *coreInterface) :
-	BaseDialog(resourceLoader, IDD_OPTIONS, parent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_OPTIONS, parent, DialogSizingType::Both, Icon::Options),
 	m_appController(appController),
 	m_config(config),
 	m_darkModeManager(darkModeManager),
@@ -110,11 +110,6 @@ void OptionsDialog::AddDynamicControls()
 {
 	AddPages();
 	AddPagesToTreeView();
-}
-
-wil::unique_hicon OptionsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::Options, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> OptionsDialog::GetResizableControls()

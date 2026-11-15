@@ -14,10 +14,11 @@ ResourceIconModel::ResourceIconModel(Icon icon, IconSize size,
 {
 }
 
-wil::unique_hbitmap ResourceIconModel::GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const
+wil::com_ptr_nothrow<IWICBitmapSource> ResourceIconModel::GetBitmap(UINT dpi,
+	IconUpdateCallback updateCallback) const
 {
 	UNREFERENCED_PARAMETER(updateCallback);
 
 	int pixelSize = GetIconPixelSizeAtDefaultDpi(m_size);
-	return m_resourceLoader->LoadBitmapFromPNGForDpi(m_icon, pixelSize, pixelSize, dpi);
+	return m_resourceLoader->LoadBitmapForDpi(m_icon, pixelSize, pixelSize, dpi);
 }

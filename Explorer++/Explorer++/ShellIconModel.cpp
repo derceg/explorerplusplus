@@ -13,7 +13,8 @@ ShellIconModel::ShellIconModel(ShellIconLoader *shellIconLoader, PCIDLIST_ABSOLU
 {
 }
 
-wil::unique_hbitmap ShellIconModel::GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const
+wil::com_ptr_nothrow<IWICBitmapSource> ShellIconModel::GetBitmap(UINT dpi,
+	IconUpdateCallback updateCallback) const
 {
 	// The system image list is automatically scaled to the system DPI, so there is no need to
 	// perform manual scaling. Note that the automatic scaling isn't ideal, for at least two

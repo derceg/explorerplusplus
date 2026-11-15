@@ -60,8 +60,6 @@ protected:
 
 	void SaveState() override;
 
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
-
 private:
 	static const int TOOLBAR_ID_BACK = 10000;
 	static const int TOOLBAR_ID_FORWARD = 10001;

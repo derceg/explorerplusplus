@@ -445,15 +445,18 @@ void TaskbarTabManager::TaskbarTabProxy::OnDwmSendIconicThumbnail(int maxWidth, 
 	// otherwise a loading spinner will be shown in place of the thumbnail and that spinner will
 	// remain indefinitely, even with a call to DwmInvalidateIconicBitmaps().
 	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	HRESULT hr;
 
 	if (IsIconic(m_browser->GetHWND()))
 	{
-		CreateFallbackThumbnailBitmap(maxWidth, maxHeight, bitmap);
+		hr = CreateFallbackThumbnailBitmap(maxWidth, maxHeight, bitmap);
 	}
 	else
 	{
-		CreateWindowThumbnailBitmap(maxWidth, maxHeight, bitmap);
+		hr = CreateWindowThumbnailBitmap(maxWidth, maxHeight, bitmap);
 	}
+
+	DCHECK(SUCCEEDED(hr));
 
 	if (!bitmap)
 	{
@@ -461,7 +464,8 @@ void TaskbarTabManager::TaskbarTabProxy::OnDwmSendIconicThumbnail(int maxWidth, 
 	}
 
 	wil::unique_hbitmap outputBitmap;
-	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(), outputBitmap);
+	hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(), ImageInterop::AlphaMode::Straight,
+		outputBitmap);
 
 	if (FAILED(hr))
 	{
@@ -489,11 +493,15 @@ HRESULT TaskbarTabManager::TaskbarTabProxy::DrawFallbackThumbnail(ID2D1RenderTar
 
 	auto icon = m_iconProvider->GetIconForTab(m_tab, TaskbarTabIconProvider::IconSize::Large);
 
-	wil::com_ptr_nothrow<IWICBitmapSource> wicIcon;
-	RETURN_IF_FAILED(ImageInterop::CreateWICBitmapFromHICON(icon.get(), wicIcon));
+	// The bitmap target will always use the PBGRA format, so the bitmap here needs to be converted
+	// to that format.
+	wil::com_ptr_nothrow<IWICBitmapSource> convertedIcon;
+	RETURN_IF_FAILED(
+		WICConvertBitmapSource(GUID_WICPixelFormat32bppPBGRA, icon.get(), &convertedIcon));
 
 	wil::com_ptr_nothrow<ID2D1Bitmap> d2dIcon;
-	RETURN_IF_FAILED(renderTarget->CreateBitmapFromWicBitmap(wicIcon.get(), nullptr, &d2dIcon));
+	RETURN_IF_FAILED(
+		renderTarget->CreateBitmapFromWicBitmap(convertedIcon.get(), nullptr, &d2dIcon));
 
 	D2DHelper::DrawCenteredBitmap(renderTarget, d2dIcon.get());
 
@@ -513,7 +521,7 @@ HRESULT TaskbarTabManager::TaskbarTabProxy::CreateWindowThumbnailBitmap(int maxW
 		std::bind_front(&TaskbarTabManager::TaskbarTabProxy::DrawWindowThumbnail, this), bitmap));
 
 	RETURN_IF_FAILED(ImageOperations::ResizeBitmapToFit(bitmap.get(), maxWidth, maxHeight,
-		WICBitmapInterpolationModeHighQualityCubic, output));
+		WICBitmapInterpolationModeFant, output));
 
 	return S_OK;
 }
@@ -586,7 +594,8 @@ void TaskbarTabManager::TaskbarTabProxy::OnDwmSendIconicLivePreviewBitmap()
 	POINT ptOrigin = { tabRect.left, tabRect.top + ptClientOrigin.y - menuBarInfo.rcBar.top };
 
 	wil::unique_hbitmap outputBitmap;
-	hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(), outputBitmap);
+	hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(), ImageInterop::AlphaMode::Straight,
+		outputBitmap);
 
 	if (FAILED(hr))
 	{
@@ -623,8 +632,13 @@ void TaskbarTabManager::TaskbarTabProxy::UpdateTitleAndIcon()
 	DCHECK(res);
 
 	auto icon = m_iconProvider->GetIconForTab(m_tab, TaskbarTabIconProvider::IconSize::Small);
-	SendMessage(m_hwnd.get(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon.get()));
-	m_icon = std::move(icon);
+
+	wil::unique_hicon gdiIcon;
+	HRESULT hr = ImageInterop::CreateHICONFromWICBitmap(icon.get(), gdiIcon);
+	CHECK(SUCCEEDED(hr));
+
+	SendMessage(m_hwnd.get(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(gdiIcon.get()));
+	m_icon = std::move(gdiIcon);
 }
 
 void TaskbarTabManager::TaskbarTabProxy::InvalidateIconicBitmaps()
@@ -645,28 +659,28 @@ TaskbarTabManager::TaskbarTabIconProvider::TaskbarTabIconProvider(AsyncIconFetch
 	FAIL_FAST_IF_FAILED(m_largeShellImageList->GetIconSize(&m_largeIconWidth, &m_largeIconHeight));
 }
 
-wil::unique_hicon TaskbarTabManager::TaskbarTabIconProvider::GetIconForTab(const Tab *tab,
-	IconSize iconSize) const
+wil::com_ptr_nothrow<IWICBitmapSource> TaskbarTabManager::TaskbarTabIconProvider::GetIconForTab(
+	const Tab *tab, IconSize iconSize) const
 {
 	auto imageListInfo = GetImageListInfo(iconSize);
-	wil::unique_hicon icon;
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
 
 	if (tab->IsLocked())
 	{
-		icon = m_resourceLoader->LoadIconFromPNGAndScale(Icon::Lock, imageListInfo.iconWidth,
+		bitmap = m_resourceLoader->LoadBitmap(Icon::Lock, imageListInfo.iconWidth,
 			imageListInfo.iconHeight);
 	}
 	else
 	{
 		int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(
 			tab->GetShellBrowser()->GetDirectory().Raw());
-		HRESULT hr = imageListInfo.imageList->GetIcon(iconIndex, ILD_NORMAL, &icon);
+
+		HRESULT hr =
+			ImageHelper::CreateBitmapFromImageListIcon(imageListInfo.imageList, iconIndex, bitmap);
 		CHECK(SUCCEEDED(hr));
 	}
 
-	CHECK(icon);
-
-	return icon;
+	return bitmap;
 }
 
 TaskbarTabManager::TaskbarTabIconProvider::ImageListInfo TaskbarTabManager::TaskbarTabIconProvider::

@@ -42,7 +42,7 @@ SplitFileDialog *SplitFileDialog::Create(const ResourceLoader *resourceLoader, H
 
 SplitFileDialog::SplitFileDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::wstring &strFullFilename) :
-	BaseDialog(resourceLoader, IDD_SPLITFILE, hParent, DialogSizingType::None),
+	BaseDialog(resourceLoader, IDD_SPLITFILE, hParent, DialogSizingType::None, Icon::SplitFiles),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
 	m_bStopSplitting(false),
@@ -150,11 +150,6 @@ INT_PTR SplitFileDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 
 	return 0;
-}
-
-wil::unique_hicon SplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
 }
 
 INT_PTR SplitFileDialog::OnTimer(int iTimerID)

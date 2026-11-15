@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "MenuView.h"
 #include "TestHelper.h"
+#include "../Helper/ImageInterop.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WeakPtr.h"
 #include <ranges>
@@ -313,7 +314,7 @@ void MenuView::SetItemImage(UINT id)
 	}
 
 	auto bitmap = item->GetIconModel()->GetBitmap(GetCurrentDpi(),
-		[id, self = m_weakPtrFactory.GetWeakPtr()](wil::unique_hbitmap updatedBitmap)
+		[id, self = m_weakPtrFactory.GetWeakPtr()](IWICBitmapSource *updatedBitmap)
 		{
 			if (!self)
 			{
@@ -322,23 +323,38 @@ void MenuView::SetItemImage(UINT id)
 				return;
 			}
 
-			self->UpdateItemBitmap(id, std::move(updatedBitmap));
+			self->UpdateItemBitmap(id, updatedBitmap);
 		});
 
-	UpdateItemBitmap(id, std::move(bitmap));
+	UpdateItemBitmap(id, bitmap.get());
 }
 
-void MenuView::UpdateItemBitmap(UINT id, wil::unique_hbitmap bitmap)
+void MenuView::UpdateItemBitmap(UINT id, IWICBitmapSource *optBitmap)
 {
+	wil::unique_hbitmap gdiBitmap;
+
+	if (optBitmap)
+	{
+		// Menu bitmaps require premultiplied alpha.
+		HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(optBitmap,
+			ImageInterop::AlphaMode::Premultiplied, gdiBitmap);
+
+		if (FAILED(hr))
+		{
+			DCHECK(false);
+			return;
+		}
+	}
+
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_BITMAP;
-	menuItemInfo.hbmpItem = bitmap.get();
+	menuItemInfo.hbmpItem = gdiBitmap.get();
 	auto res = SetMenuItemInfo(m_menu, id, false, &menuItemInfo);
 	CHECK(res);
 
 	auto *item = GetItem(id);
-	item->UpdateBitmap(std::move(bitmap));
+	item->UpdateBitmap(std::move(gdiBitmap));
 }
 
 UINT MenuView::GetCurrentDpi() const

@@ -19,15 +19,6 @@ wil::com_ptr_nothrow<IWICBitmapSource> BuildTestWICBitmap(UINT width, UINT heigh
 	return bitmap;
 }
 
-void BuildTestBitmap(int width, int height, wil::unique_hbitmap &bitmap)
-{
-	std::unique_ptr<Gdiplus::Bitmap> gdiplusBitmap;
-	BuildTestGdiplusBitmap(width, height, gdiplusBitmap);
-
-	bitmap = ImageHelper::GdiplusBitmapToBitmap(gdiplusBitmap.get());
-	ASSERT_NE(bitmap, nullptr);
-}
-
 void BuildTestGdiplusBitmap(int width, int height, std::unique_ptr<Gdiplus::Bitmap> &bitmap)
 {
 	bitmap = std::make_unique<Gdiplus::Bitmap>(width, height, PixelFormat32bppARGB);

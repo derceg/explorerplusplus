@@ -16,8 +16,8 @@ ShellIconLoaderImpl::ShellIconLoaderImpl(const Runtime *runtime, AsyncIconFetche
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 }
 
-wil::unique_hbitmap ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
-	IconUpdateCallback updateCallback, std::stop_token stopToken)
+wil::com_ptr_nothrow<IWICBitmapSource> ShellIconLoaderImpl::LoadShellIcon(PCIDLIST_ABSOLUTE pidl,
+	IconSize size, IconUpdateCallback updateCallback, std::stop_token stopToken)
 {
 	if (size != IconSize::Small)
 	{
@@ -51,8 +51,8 @@ concurrencpp::null_result ShellIconLoaderImpl::RetrieveIcon(WeakPtr<ShellIconLoa
 		co_return;
 	}
 
-	wil::unique_hbitmap bitmap;
-	HRESULT hr = ImageHelper::CreateHBITMAPFromImageListIcon(weakSelf->m_systemImageList.get(),
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	HRESULT hr = ImageHelper::CreateBitmapFromImageListIcon(weakSelf->m_systemImageList.get(),
 		iconInfo->iconIndex, bitmap);
 
 	if (FAILED(hr))
@@ -60,16 +60,16 @@ concurrencpp::null_result ShellIconLoaderImpl::RetrieveIcon(WeakPtr<ShellIconLoa
 		co_return;
 	}
 
-	updateCallback(std::move(bitmap));
+	updateCallback(bitmap.get());
 }
 
-wil::unique_hbitmap ShellIconLoaderImpl::GetDefaultIcon(PCIDLIST_ABSOLUTE pidl)
+wil::com_ptr_nothrow<IWICBitmapSource> ShellIconLoaderImpl::GetDefaultIcon(PCIDLIST_ABSOLUTE pidl)
 {
 	int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(pidl);
 
-	wil::unique_hbitmap bitmap;
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
 	HRESULT hr =
-		ImageHelper::CreateHBITMAPFromImageListIcon(m_systemImageList.get(), iconIndex, bitmap);
+		ImageHelper::CreateBitmapFromImageListIcon(m_systemImageList.get(), iconIndex, bitmap);
 
 	if (FAILED(hr))
 	{

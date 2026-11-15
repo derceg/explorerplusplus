@@ -10,6 +10,7 @@
 #include "PopupMenuView.h"
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ImageInterop.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <Shlwapi.h>
@@ -34,7 +35,7 @@ MassRenameDialog *MassRenameDialog::Create(const ResourceLoader *resourceLoader,
 MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler,
 	const AcceleratorManager *acceleratorManager) :
-	BaseDialog(resourceLoader, IDD_MASSRENAME, hParent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_MASSRENAME, hParent, DialogSizingType::Both, Icon::MassRename),
 	m_FullFilenameList(FullFilenameList),
 	m_pFileActionHandler(pFileActionHandler),
 	m_acceleratorManager(acceleratorManager)
@@ -45,7 +46,9 @@ MassRenameDialog::MassRenameDialog(const ResourceLoader *resourceLoader, HWND hP
 INT_PTR MassRenameDialog::OnInitDialog()
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
-	m_moreIcon = m_resourceLoader->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
+	auto moreBitmap = m_resourceLoader->LoadBitmapForDpi(Icon::ArrowRight, 16, 16, dpi);
+	HRESULT hr = ImageInterop::CreateHICONFromWICBitmap(moreBitmap.get(), m_moreIcon);
+	CHECK(SUCCEEDED(hr));
 	SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_MORE, BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 
@@ -110,11 +113,6 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
-}
-
-wil::unique_hicon MassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
 std::vector<ResizableDialogControl> MassRenameDialog::GetResizableControls()

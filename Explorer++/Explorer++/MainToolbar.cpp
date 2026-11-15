@@ -24,6 +24,7 @@
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/EnumHelper.h"
+#include "../Helper/ImageHelper.h"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <magic_enum/magic_enum.hpp>
@@ -462,15 +463,15 @@ void MainToolbar::CreateImageLists()
 
 	for (const auto &mapping : BUTTON_ICON_MAPPINGS)
 	{
-		wil::unique_hbitmap smallBitmap = m_resourceLoader->LoadBitmapFromPNGForDpi(mapping.icon,
+		auto smallBitmap = m_resourceLoader->LoadBitmapForDpi(mapping.icon,
 			TOOLBAR_IMAGE_SIZE_SMALL, TOOLBAR_IMAGE_SIZE_SMALL, dpi);
-		int smallImageIndex = ImageList_Add(m_imageListSmall.get(), smallBitmap.get(), nullptr);
-		CHECK(smallImageIndex != -1);
+		int smallImageIndex =
+			ImageHelper::AddBitmapToImageList(m_imageListSmall.get(), smallBitmap.get());
 
-		wil::unique_hbitmap largeBitmap = m_resourceLoader->LoadBitmapFromPNGForDpi(mapping.icon,
+		auto largeBitmap = m_resourceLoader->LoadBitmapForDpi(mapping.icon,
 			TOOLBAR_IMAGE_SIZE_LARGE, TOOLBAR_IMAGE_SIZE_LARGE, dpi);
-		int largeImageIndex = ImageList_Add(m_imageListLarge.get(), largeBitmap.get(), nullptr);
-		CHECK(largeImageIndex != -1);
+		int largeImageIndex =
+			ImageHelper::AddBitmapToImageList(m_imageListLarge.get(), largeBitmap.get());
 
 		// When the config option to use large toolbar icons is toggled, the image list assigned to
 		// the toolbar control will be changed. The image indexes for the buttons won't be updated,

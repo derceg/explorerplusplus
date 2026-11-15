@@ -53,8 +53,6 @@ protected:
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
-
 private:
 	AddBookmarkDialog(const ResourceLoader *resourceLoader, HWND hParent,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,

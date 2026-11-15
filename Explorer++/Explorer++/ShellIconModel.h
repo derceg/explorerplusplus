@@ -19,7 +19,8 @@ public:
 	ShellIconModel(ShellIconLoader *shellIconLoader, PCIDLIST_ABSOLUTE pidl,
 		IconSize size = IconSize::Small);
 
-	wil::unique_hbitmap GetBitmap(UINT dpi, IconUpdateCallback updateCallback) const override;
+	wil::com_ptr_nothrow<IWICBitmapSource> GetBitmap(UINT dpi,
+		IconUpdateCallback updateCallback) const override;
 
 private:
 	ShellIconLoader *const m_shellIconLoader;

@@ -20,10 +20,9 @@ TabBarViewImageListManager::TabBarViewImageListManager(const ResourceLoader *res
 		ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 10));
 	CHECK(m_imageList);
 
-	wil::unique_hbitmap bitmap =
-		resourceLoader->LoadBitmapFromPNGForDpi(Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
-	m_lockIconIndex = ImageList_Add(m_imageList.get(), bitmap.get(), nullptr);
-	CHECK_NE(m_lockIconIndex, -1);
+	auto bitmap =
+		resourceLoader->LoadBitmapForDpi(Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
+	m_lockIconIndex = ImageHelper::AddBitmapToImageList(m_imageList.get(), bitmap.get());
 
 	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),

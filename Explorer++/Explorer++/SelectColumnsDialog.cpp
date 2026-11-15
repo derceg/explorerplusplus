@@ -26,7 +26,8 @@ SelectColumnsDialog *SelectColumnsDialog::Create(const ResourceLoader *resourceL
 
 SelectColumnsDialog::SelectColumnsDialog(const ResourceLoader *resourceLoader, HWND hParent,
 	ShellBrowserImpl *shellBrowser) :
-	BaseDialog(resourceLoader, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
+	BaseDialog(resourceLoader, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both,
+		Icon::SelectColumns),
 	m_shellBrowser(shellBrowser),
 	m_bColumnsSwapped(FALSE)
 {
@@ -74,11 +75,6 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
-}
-
-wil::unique_hicon SelectColumnsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
-{
-	return m_resourceLoader->LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
 }
 
 bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)

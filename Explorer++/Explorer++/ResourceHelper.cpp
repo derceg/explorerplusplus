@@ -6,6 +6,7 @@
 #include "ResourceHelper.h"
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ImageHelper.h"
 #include <glog/logging.h>
 
 std::wstring ResourceHelper::LoadString(HINSTANCE resourceInstance, UINT stringId)
@@ -30,29 +31,6 @@ std::optional<std::wstring> ResourceHelper::MaybeLoadString(HINSTANCE resourceIn
 	return std::wstring(string, numCharacters);
 }
 
-void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId,
-	const ResourceLoader *resourceLoader, Icon icon, int dpi,
-	std::vector<wil::unique_hbitmap> &menuImages)
-{
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	wil::unique_hbitmap bitmap =
-		resourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_BITMAP;
-	mii.hbmpItem = bitmap.get();
-	const BOOL res = SetMenuItemInfo(menu, menuItemId, false, &mii);
-
-	if (res)
-	{
-		/* The bitmap needs to live for as long as the menu does. */
-		menuImages.push_back(std::move(bitmap));
-	}
-}
-
 std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateIconImageList(
 	const ResourceLoader *resourceLoader, int iconWidth, int iconHeight,
 	const std::initializer_list<Icon> &icons)
@@ -73,10 +51,8 @@ std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateI
 void ResourceHelper::AddIconToImageList(HIMAGELIST imageList, const ResourceLoader *resourceLoader,
 	Icon icon, int iconWidth, int iconHeight, IconImageListMapping &imageListMappings)
 {
-	wil::unique_hbitmap bitmap =
-		resourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
-	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
-	CHECK_NE(imagePosition, -1);
+	auto bitmap = resourceLoader->LoadBitmap(icon, iconWidth, iconHeight);
+	int imagePosition = ImageHelper::AddBitmapToImageList(imageList, bitmap.get());
 
 	imageListMappings.insert({ icon, imagePosition });
 }

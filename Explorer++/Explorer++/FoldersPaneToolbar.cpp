@@ -9,6 +9,7 @@
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ImageHelper.h"
 
 namespace
 {
@@ -69,10 +70,9 @@ FoldersPaneToolbar::FoldersPaneToolbar(FoldersPaneToolbarView *view, Config *con
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 1, 0));
 	CHECK(m_imageList);
 
-	wil::unique_hbitmap closeIcon =
-		resourceLoader->LoadBitmapFromPNGAndScale(Icon::CloseButton, iconWidth, iconHeight);
-	int closeIconImageIndex = ImageList_Add(m_imageList.get(), closeIcon.get(), nullptr);
-	CHECK_NE(closeIconImageIndex, -1);
+	auto closeIcon =
+		resourceLoader->LoadBitmap(Icon::CloseButton, iconWidth, iconHeight);
+	int closeIconImageIndex = ImageHelper::AddBitmapToImageList(m_imageList.get(), closeIcon.get());
 
 	view->SetImageList(m_imageList.get());
 

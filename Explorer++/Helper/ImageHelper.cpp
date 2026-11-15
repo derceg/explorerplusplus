@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ImageHelper.h"
+#include "GraphicsFactories.h"
 #include "ImageInterop.h"
 #include "ResourceHelper.h"
 #include <wil/com.h>
@@ -12,46 +13,99 @@
 namespace ImageHelper
 {
 
-std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
-	UINT resourceId)
+HRESULT LoadBitmapFromPNG(HINSTANCE resourceInstance, UINT resourceId,
+	wil::com_ptr_nothrow<IWICBitmapSource> &output)
 {
 	auto resourceData = CopyResource(resourceInstance, resourceId, L"PNG");
 
 	if (!resourceData)
 	{
-		return nullptr;
+		return E_FAIL;
 	}
 
 	wil::com_ptr_nothrow<IStream> stream(
 		SHCreateMemStream(reinterpret_cast<const BYTE *>(resourceData->data()),
 			static_cast<UINT>(resourceData->size())));
+	RETURN_IF_NULL_ALLOC(stream);
 
-	if (!stream)
-	{
-		return nullptr;
-	}
+	auto *imagingFactory = GraphicsFactories::GetWICFactory();
 
-	auto bitmap = std::make_unique<Gdiplus::Bitmap>(stream.get());
+	wil::com_ptr_nothrow<IWICBitmapDecoder> decoder;
+	RETURN_IF_FAILED(imagingFactory->CreateDecoderFromStream(stream.get(), nullptr,
+		WICDecodeMetadataCacheOnLoad, &decoder));
 
-	if (bitmap->GetLastStatus() != Gdiplus::Ok)
-	{
-		return nullptr;
-	}
+	wil::com_ptr_nothrow<IWICBitmapFrameDecode> frame;
+	RETURN_IF_FAILED(decoder->GetFrame(0, &frame));
 
-	return bitmap;
+	output = frame;
+
+	return S_OK;
 }
 
-HRESULT CreateHBITMAPFromImageListIcon(IImageList *imageList, int iconIndex,
-	wil::unique_hbitmap &outputBitmap)
+HRESULT InvertBitmap(IWICBitmapSource *source, wil::com_ptr_nothrow<IWICBitmapSource> &output)
+{
+	auto *imagingFactory = GraphicsFactories::GetWICFactory();
+
+	wil::com_ptr_nothrow<IWICBitmapSource> converted;
+	RETURN_IF_FAILED(WICConvertBitmapSource(GUID_WICPixelFormat32bppBGRA, source, &converted));
+
+	wil::com_ptr_nothrow<IWICBitmap> bitmap;
+	RETURN_IF_FAILED(
+		imagingFactory->CreateBitmapFromSource(converted.get(), WICBitmapCacheOnLoad, &bitmap));
+
+	UINT width;
+	UINT height;
+	RETURN_IF_FAILED(bitmap->GetSize(&width, &height));
+
+	wil::com_ptr_nothrow<IWICBitmapLock> lock;
+	RETURN_IF_FAILED(bitmap->Lock(nullptr, WICBitmapLockRead | WICBitmapLockWrite, &lock));
+
+	UINT stride;
+	RETURN_IF_FAILED(lock->GetStride(&stride));
+
+	UINT bufferSize;
+	BYTE *pixels;
+	RETURN_IF_FAILED(lock->GetDataPointer(&bufferSize, &pixels));
+
+	for (UINT y = 0; y < height; y++)
+	{
+		auto *pixel = pixels + static_cast<size_t>(y) * stride;
+
+		for (UINT x = 0; x < width; x++)
+		{
+			pixel[0] = static_cast<BYTE>(255 - pixel[0]);
+			pixel[1] = static_cast<BYTE>(255 - pixel[1]);
+			pixel[2] = static_cast<BYTE>(255 - pixel[2]);
+
+			pixel += 4;
+		}
+	}
+
+	output = bitmap;
+
+	return S_OK;
+}
+
+int AddBitmapToImageList(HIMAGELIST imageList, IWICBitmapSource *bitmap)
+{
+	// Image lists require non-premultiplied alpha.
+	wil::unique_hbitmap gdiBitmap;
+	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap, ImageInterop::AlphaMode::Straight,
+		gdiBitmap);
+	CHECK(SUCCEEDED(hr));
+
+	int imageIndex = ImageList_Add(imageList, gdiBitmap.get(), nullptr);
+	CHECK_NE(imageIndex, -1);
+
+	return imageIndex;
+}
+
+HRESULT CreateBitmapFromImageListIcon(IImageList *imageList, int iconIndex,
+	wil::com_ptr_nothrow<IWICBitmapSource> &output)
 {
 	wil::unique_hicon icon;
 	RETURN_IF_FAILED(imageList->GetIcon(iconIndex, ILD_NORMAL, &icon));
-
-	wil::com_ptr_nothrow<IWICBitmapSource> wicIcon;
-	RETURN_IF_FAILED(ImageInterop::CreateWICBitmapFromHICON(icon.get(), wicIcon));
-
-	RETURN_IF_FAILED(ImageInterop::CreateHBITMAPFromWICBitmap(wicIcon.get(), outputBitmap));
-
+	RETURN_IF_FAILED(ImageInterop::CreateWICBitmapFromHICON(icon.get(), output));
 	return S_OK;
 }
 
@@ -72,32 +126,6 @@ int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconI
 	CHECK_NE(index, -1);
 
 	return index;
-}
-
-wil::unique_hbitmap GdiplusBitmapToBitmap(Gdiplus::Bitmap *gdiplusBitmap)
-{
-	wil::unique_hbitmap bitmap;
-	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(Gdiplus::Color(), &bitmap);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return nullptr;
-	}
-
-	return bitmap;
-}
-
-wil::unique_hicon GdiplusBitmapToIcon(Gdiplus::Bitmap *gdiplusBitmap)
-{
-	wil::unique_hicon hicon;
-	Gdiplus::Status status = gdiplusBitmap->GetHICON(&hicon);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return nullptr;
-	}
-
-	return hicon;
 }
 
 }
