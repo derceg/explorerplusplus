@@ -643,6 +643,9 @@
     <ClCompile Include="MainToolbarLayoutTest.cpp">
       <Filter>Main Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="PaneLayoutTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="MainToolbarTest.cpp">
       <Filter>Main Toolbar\UI</Filter>
     </ClCompile>

@@ -31,9 +31,10 @@ struct WindowStorageData
 	int selectedTab = 0;
 	std::vector<RebarBandStorageData> mainRebarInfo;
 	std::optional<MainToolbarLayout> mainToolbarLayout;
-	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
-	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
-	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	// Preferred sizes are retained when a smaller window requires a temporary reduction.
+	int treeViewPreferredWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int displayWindowPreferredWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowPreferredHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
 	// This is only used in tests.
 	bool operator==(const WindowStorageData &other) const;

@@ -117,7 +117,6 @@ private:
 	static const int DISPLAY_WINDOW_MINIMUM_HEIGHT = 70_px;
 
 	static constexpr int TREEVIEW_MINIMUM_WIDTH = 70_px;
-	static constexpr double TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE = 0.8;
 
 	// Main rebar band IDs. These are used to load and save data, so the values shouldn't be
 	// changed.
@@ -172,7 +171,6 @@ private:
 	void CreateFolderControls();
 	void OnFoldersPaneResized(int newWidth);
 	bool OnActivate(int activationState, bool minimized);
-	void OnSize(UINT state);
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
 		Runtime *runtime);
 	void UpdateLayout();
@@ -287,8 +285,8 @@ private:
 	std::unique_ptr<StatusBar> m_statusBar;
 
 	DisplayWindow *m_displayWindow = nullptr;
-	int m_displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
-	int m_displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	int m_displayWindowPreferredWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int m_displayWindowPreferredHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
 	std::unique_ptr<MainMenu> m_mainMenu;
 
@@ -298,7 +296,7 @@ private:
 	// Treeview
 	std::unique_ptr<FoldersPane> m_foldersPane;
 	ShellTreeView *m_shellTreeView = nullptr;
-	int m_treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int m_treeViewPreferredWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 
 	std::unique_ptr<BrowserPane> m_browserPane;
 

@@ -171,16 +171,18 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 	rootNode->selectSingleNode(settingsQuery.get(), &settingsNode);
 
 	int selectedTab = 0;
-	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
-	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
-	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	int treeViewPreferredWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int displayWindowPreferredWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowPreferredHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 
 	if (settingsNode)
 	{
 		GetIntSetting(settingsNode.get(), SETTING_SELECTED_TAB, selectedTab);
-		GetIntSetting(settingsNode.get(), SETTING_TREEVIEW_WIDTH, treeViewWidth);
-		GetIntSetting(settingsNode.get(), SETTING_DISPLAY_WINDOW_WIDTH, displayWindowWidth);
-		GetIntSetting(settingsNode.get(), SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
+		GetIntSetting(settingsNode.get(), SETTING_TREEVIEW_WIDTH, treeViewPreferredWidth);
+		GetIntSetting(settingsNode.get(), SETTING_DISPLAY_WINDOW_WIDTH,
+			displayWindowPreferredWidth);
+		GetIntSetting(settingsNode.get(), SETTING_DISPLAY_WINDOW_HEIGHT,
+			displayWindowPreferredHeight);
 	}
 
 	auto mainRebarInfo = LoadMainRebarInfo(rootNode);
@@ -198,9 +200,9 @@ std::optional<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *window
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarLayout = mainToolbarLayout,
-		.treeViewWidth = treeViewWidth,
-		.displayWindowWidth = displayWindowWidth,
-		.displayWindowHeight = displayWindowHeight };
+		.treeViewPreferredWidth = treeViewPreferredWidth,
+		.displayWindowPreferredWidth = displayWindowPreferredWidth,
+		.displayWindowPreferredHeight = displayWindowPreferredHeight };
 }
 
 }
@@ -302,30 +304,33 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		GetIntSetting(settingsNode.get(), V1::SETTING_SELECTED_TAB, selectedTab);
 	}
 
-	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
-	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_TREEVIEW_WIDTH, treeViewWidth);
+	int treeViewPreferredWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_TREEVIEW_WIDTH,
+		treeViewPreferredWidth);
 
 	if (hr != S_OK && settingsNode)
 	{
-		GetIntSetting(settingsNode.get(), V1::SETTING_TREEVIEW_WIDTH, treeViewWidth);
+		GetIntSetting(settingsNode.get(), V1::SETTING_TREEVIEW_WIDTH, treeViewPreferredWidth);
 	}
 
-	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowPreferredWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_DISPLAY_WINDOW_WIDTH,
-		displayWindowWidth);
+		displayWindowPreferredWidth);
 
 	if (hr != S_OK && settingsNode)
 	{
-		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_WIDTH, displayWindowWidth);
+		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_WIDTH,
+			displayWindowPreferredWidth);
 	}
 
-	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	int displayWindowPreferredHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_DISPLAY_WINDOW_HEIGHT,
-		displayWindowHeight);
+		displayWindowPreferredHeight);
 
 	if (hr != S_OK && settingsNode)
 	{
-		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
+		GetIntSetting(settingsNode.get(), V1::SETTING_DISPLAY_WINDOW_HEIGHT,
+			displayWindowPreferredHeight);
 	}
 
 	std::vector<RebarBandStorageData> mainRebarInfo;
@@ -364,9 +369,9 @@ std::optional<WindowStorageData> LoadWindow(IXMLDOMNode *rootNode, IXMLDOMNode *
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarLayout = mainToolbarLayout,
-		.treeViewWidth = treeViewWidth,
-		.displayWindowWidth = displayWindowWidth,
-		.displayWindowHeight = displayWindowHeight };
+		.treeViewPreferredWidth = treeViewPreferredWidth,
+		.displayWindowPreferredWidth = displayWindowPreferredWidth,
+		.displayWindowPreferredHeight = displayWindowPreferredHeight };
 }
 
 std::vector<WindowStorageData> Load(IXMLDOMNode *rootNode, IXMLDOMNode *windowsNode)
@@ -426,11 +431,11 @@ void SaveWindow(IXMLDOMDocument *xmlDocument, IXMLDOMNode *windowsNode,
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_SELECTED_TAB,
 		XMLSettings::EncodeIntValue(window.selectedTab));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_TREEVIEW_WIDTH,
-		XMLSettings::EncodeIntValue(window.treeViewWidth));
+		XMLSettings::EncodeIntValue(window.treeViewPreferredWidth));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_DISPLAY_WINDOW_WIDTH,
-		XMLSettings::EncodeIntValue(window.displayWindowWidth));
+		XMLSettings::EncodeIntValue(window.displayWindowPreferredWidth));
 	XMLSettings::AddAttributeToNode(xmlDocument, windowNode.get(), SETTING_DISPLAY_WINDOW_HEIGHT,
-		XMLSettings::EncodeIntValue(window.displayWindowHeight));
+		XMLSettings::EncodeIntValue(window.displayWindowPreferredHeight));
 
 	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
 	auto tabsNodeName = wil::make_bstr_nothrow(TABS_NODE_NAME);

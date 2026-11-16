@@ -256,6 +256,7 @@
     <ClCompile Include="ListViewColumnsMenuTest.cpp" />
     <ClCompile Include="MainRebarTest.cpp" />
     <ClCompile Include="MainToolbarLayoutTest.cpp" />
+    <ClCompile Include="PaneLayoutTest.cpp" />
     <ClCompile Include="MainToolbarTest.cpp" />
     <ClCompile Include="ManageBookmarksViewsMenuTest.cpp" />
     <ClCompile Include="MassRenameHelperTest.cpp" />
