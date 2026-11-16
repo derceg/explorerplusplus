@@ -952,6 +952,9 @@
     <ClCompile Include="MainToolbarLayout.cpp">
       <Filter>Main Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="PaneLayout.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="TabBarBacking.cpp">
       <Filter>Tab Backing\UI</Filter>
     </ClCompile>
@@ -2108,6 +2111,9 @@
     </ClInclude>
     <ClInclude Include="MainToolbarLayout.h">
       <Filter>Main Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="PaneLayout.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TabBarBackingView.h">
       <Filter>Tab Backing\UI\Views</Filter>

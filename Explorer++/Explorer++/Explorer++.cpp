@@ -73,9 +73,9 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 
 	m_iDWFolderSizeUniqueId = 0;
 
-	m_treeViewWidth = storageData.treeViewWidth;
-	m_displayWindowWidth = storageData.displayWindowWidth;
-	m_displayWindowHeight = storageData.displayWindowHeight;
+	m_treeViewPreferredWidth = storageData.treeViewPreferredWidth;
+	m_displayWindowPreferredWidth = storageData.displayWindowPreferredWidth;
+	m_displayWindowPreferredHeight = storageData.displayWindowPreferredHeight;
 
 	SetUpLayoutConfigListeners();
 
@@ -278,7 +278,7 @@ void Explorerplusplus::CreateFolderControls()
 
 void Explorerplusplus::OnFoldersPaneResized(int newWidth)
 {
-	m_treeViewWidth = newWidth;
+	m_treeViewPreferredWidth = newWidth;
 
 	UpdateLayout();
 }
@@ -308,9 +308,9 @@ WindowStorageData Explorerplusplus::GetStorageData() const
 		.selectedTab = tabBar->GetSelectedTabIndex(),
 		.mainRebarInfo = m_view.GetMainRebarView()->GetStorageData(),
 		.mainToolbarLayout = m_mainToolbar->GetLayoutForStorage(),
-		.treeViewWidth = m_treeViewWidth,
-		.displayWindowWidth = m_displayWindowWidth,
-		.displayWindowHeight = m_displayWindowHeight };
+		.treeViewPreferredWidth = m_treeViewPreferredWidth,
+		.displayWindowPreferredWidth = m_displayWindowPreferredWidth,
+		.displayWindowPreferredHeight = m_displayWindowPreferredHeight };
 }
 
 bool Explorerplusplus::IsActive() const

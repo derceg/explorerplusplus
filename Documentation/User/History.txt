@@ -115,8 +115,6 @@ New features:
   environment variable EXPLORERPP_CONFIG.
 
 Bug fixes:
-- The folders pane width is now preserved when layout updates
-  occur while minimized or the window is temporarily narrowed.
 - Fixed a crash that could occur on startup when the "Open new
   tabs next to the current one" option was enabled.
 - Fixed a crash that could occur when autosizing columns.
@@ -204,6 +202,10 @@ Bug fixes:
 - The treeview now has both a minimum width and maximum width.
   This also means that in situations where the treeview width was
   previously reduced below 0, it will be shown again.
+- Preferred folders pane and display window sizes are preserved
+  while minimized or temporarily constrained by a smaller window.
+  Display window sizes are now capped to keep the file list
+  visible when dragging the panel edge.
 - When renaming an item in the listview or treeview,
   Ctrl+Backspace now erases the last word, rather than inserting
   a non-printable character. See #299.

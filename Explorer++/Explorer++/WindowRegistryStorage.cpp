@@ -77,17 +77,17 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 	int selectedTab = 0;
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_SELECTED_TAB, selectedTab);
 
-	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int treeViewPreferredWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_TREEVIEW_WIDTH,
-		treeViewWidth);
+		treeViewPreferredWidth);
 
-	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowPreferredWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_DISPLAY_WINDOW_WIDTH,
-		displayWindowWidth);
+		displayWindowPreferredWidth);
 
-	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	int displayWindowPreferredHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, SETTING_DISPLAY_WINDOW_HEIGHT,
-		displayWindowHeight);
+		displayWindowPreferredHeight);
 
 	auto mainRebarInfo = LoadMainRebarInfo(applicationKey);
 
@@ -100,9 +100,9 @@ std::optional<WindowStorageData> Load(HKEY applicationKey, HKEY settingsKey)
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarLayout = mainToolbarLayout,
-		.treeViewWidth = treeViewWidth,
-		.displayWindowWidth = displayWindowWidth,
-		.displayWindowHeight = displayWindowHeight };
+		.treeViewPreferredWidth = treeViewPreferredWidth,
+		.displayWindowPreferredWidth = displayWindowPreferredWidth,
+		.displayWindowPreferredHeight = displayWindowPreferredHeight };
 }
 
 }
@@ -195,34 +195,34 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 			selectedTab);
 	}
 
-	int treeViewWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
+	int treeViewPreferredWidth = LayoutDefaults::DEFAULT_TREEVIEW_WIDTH;
 	res = RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_TREEVIEW_WIDTH,
-		treeViewWidth);
+		treeViewPreferredWidth);
 
 	if (res != ERROR_SUCCESS && settingsKey)
 	{
 		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(), V1::SETTING_TREEVIEW_WIDTH,
-			treeViewWidth);
+			treeViewPreferredWidth);
 	}
 
-	int displayWindowWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
+	int displayWindowPreferredWidth = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_WIDTH;
 	res = RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_DISPLAY_WINDOW_WIDTH,
-		displayWindowWidth);
+		displayWindowPreferredWidth);
 
 	if (res != ERROR_SUCCESS && settingsKey)
 	{
 		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(),
-			V1::SETTING_DISPLAY_WINDOW_WIDTH, displayWindowWidth);
+			V1::SETTING_DISPLAY_WINDOW_WIDTH, displayWindowPreferredWidth);
 	}
 
-	int displayWindowHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
+	int displayWindowPreferredHeight = LayoutDefaults::DEFAULT_DISPLAY_WINDOW_HEIGHT;
 	res = RegistrySettings::Read32BitValueFromRegistry(windowKey, SETTING_DISPLAY_WINDOW_HEIGHT,
-		displayWindowHeight);
+		displayWindowPreferredHeight);
 
 	if (res != ERROR_SUCCESS && settingsKey)
 	{
 		RegistrySettings::Read32BitValueFromRegistry(settingsKey.get(),
-			V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowHeight);
+			V1::SETTING_DISPLAY_WINDOW_HEIGHT, displayWindowPreferredHeight);
 	}
 
 	std::vector<RebarBandStorageData> mainRebarInfo;
@@ -252,9 +252,9 @@ std::optional<WindowStorageData> LoadWindow(HKEY applicationKey, HKEY windowKey,
 		.selectedTab = selectedTab,
 		.mainRebarInfo = mainRebarInfo,
 		.mainToolbarLayout = mainToolbarLayout,
-		.treeViewWidth = treeViewWidth,
-		.displayWindowWidth = displayWindowWidth,
-		.displayWindowHeight = displayWindowHeight };
+		.treeViewPreferredWidth = treeViewPreferredWidth,
+		.displayWindowPreferredWidth = displayWindowPreferredWidth,
+		.displayWindowPreferredHeight = displayWindowPreferredHeight };
 }
 
 std::vector<WindowStorageData> Load(HKEY applicationKey, HKEY windowsKey)
@@ -295,10 +295,11 @@ void SaveWindow(HKEY windowKey, const WindowStorageData &window)
 	RegistrySettings::SaveDword(windowKey, SETTING_SHOW_STATE,
 		static_cast<DWORD>(window.showState));
 	RegistrySettings::SaveDword(windowKey, SETTING_SELECTED_TAB, window.selectedTab);
-	RegistrySettings::SaveDword(windowKey, SETTING_TREEVIEW_WIDTH, window.treeViewWidth);
-	RegistrySettings::SaveDword(windowKey, SETTING_DISPLAY_WINDOW_WIDTH, window.displayWindowWidth);
+	RegistrySettings::SaveDword(windowKey, SETTING_TREEVIEW_WIDTH, window.treeViewPreferredWidth);
+	RegistrySettings::SaveDword(windowKey, SETTING_DISPLAY_WINDOW_WIDTH,
+		window.displayWindowPreferredWidth);
 	RegistrySettings::SaveDword(windowKey, SETTING_DISPLAY_WINDOW_HEIGHT,
-		window.displayWindowHeight);
+		window.displayWindowPreferredHeight);
 
 	wil::unique_hkey tabsKey;
 	HRESULT hr = wil::reg::create_unique_key_nothrow(windowKey, TABS_SUB_KEY_PATH, tabsKey,

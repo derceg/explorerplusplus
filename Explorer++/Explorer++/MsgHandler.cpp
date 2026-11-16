@@ -18,6 +18,7 @@
 #include "MainResource.h"
 #include "ModelessDialogHelper.h"
 #include "OptionsDialog.h"
+#include "PaneLayout.h"
 #include "PlatformContext.h"
 #include "Runtime.h"
 #include "SelectColumnsDialog.h"
@@ -241,17 +242,6 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const std::wstri
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectoryPath().c_str());
 }
 
-void Explorerplusplus::OnSize(UINT state)
-{
-	if (state == SIZE_MINIMIZED)
-	{
-		// There's no need to update the layout when the window is being minimized.
-		return;
-	}
-
-	UpdateLayout();
-}
-
 concurrencpp::null_result Explorerplusplus::ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
 	Runtime *runtime)
 {
@@ -298,15 +288,6 @@ void Explorerplusplus::UpdateLayout()
 
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
-	// A temporarily narrow window must not overwrite the user's preferred pane width.
-	int treeViewWidth = std::clamp(m_treeViewWidth,
-		dpiCompatibility.ScaleValue(m_view.GetFoldersPaneView()->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
-		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
-	m_displayWindowWidth = std::max(m_displayWindowWidth,
-		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_WIDTH));
-	m_displayWindowHeight = std::max(m_displayWindowHeight,
-		dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT));
-
 	auto *mainRebarView = m_view.GetMainRebarView();
 	auto rebarHeight = mainRebarView->GetHeight();
 	SetWindowPos(mainRebarView->GetHWND(), nullptr, 0, 0, mainWindowWidth, rebarHeight,
@@ -321,28 +302,44 @@ void Explorerplusplus::UpdateLayout()
 		indentBottom += GetRectHeight(&statusBarRect);
 	}
 
-	if (m_config->showDisplayWindow.get())
-	{
-		if (m_config->displayWindowVertical.get())
-		{
-			indentRight += m_displayWindowWidth;
-		}
-		else
-		{
-			indentBottom += m_displayWindowHeight;
-		}
-	}
-
-	if (m_config->showFolders.get())
-	{
-		indentLeft = treeViewWidth;
-	}
-
 	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
 	// height of the tab control above the display area.
 	RECT displayRect = { 0, 0, 0, 0 };
 	TabCtrl_AdjustRect(GetActivePane()->GetTabBar()->GetHWND(), true, &displayRect);
 	int tabWindowHeight = std::abs(displayRect.top);
+
+	// Reserve the toolbars, status bar and tabs before limiting pane sizes. Layout never changes
+	// the preferred sizes, so they can be restored when more space becomes available.
+	auto paneSizes = CalculatePaneSizes({ .availableWidth = mainWindowWidth,
+		.availableHeight =
+			mainWindowHeight - indentRebar - indentBottom - (m_bShowTabBar ? tabWindowHeight : 0),
+		.treeViewPreferredWidth = m_treeViewPreferredWidth,
+		.treeViewMinimumWidth = dpiCompatibility.ScaleValue(m_view.GetFoldersPaneView()->GetHWND(),
+			TREEVIEW_MINIMUM_WIDTH),
+		.displayWindowPreferredWidth = m_displayWindowPreferredWidth,
+		.displayWindowMinimumWidth =
+			dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_WIDTH),
+		.displayWindowPreferredHeight = m_displayWindowPreferredHeight,
+		.displayWindowMinimumHeight =
+			dpiCompatibility.ScaleValue(m_displayWindow->GetHWND(), DISPLAY_WINDOW_MINIMUM_HEIGHT),
+		.showFolders = m_config->showFolders.get() });
+
+	if (m_config->showDisplayWindow.get())
+	{
+		if (m_config->displayWindowVertical.get())
+		{
+			indentRight += paneSizes.displayWindowWidth;
+		}
+		else
+		{
+			indentBottom += paneSizes.displayWindowHeight;
+		}
+	}
+
+	if (m_config->showFolders.get())
+	{
+		indentLeft = paneSizes.treeViewWidth;
+	}
 
 	indentTop = indentRebar;
 
@@ -415,8 +412,8 @@ void Explorerplusplus::UpdateLayout()
 		foldersPaneHeight = mainWindowHeight - indentBottom - foldersPaneTop;
 	}
 
-	SetWindowPos(m_view.GetFoldersPaneView()->GetHWND(), nullptr, 0, foldersPaneTop, treeViewWidth,
-		foldersPaneHeight,
+	SetWindowPos(m_view.GetFoldersPaneView()->GetHWND(), nullptr, 0, foldersPaneTop,
+		paneSizes.treeViewWidth, std::max(foldersPaneHeight, 0),
 		(m_config->showFolders.get() ? SWP_SHOWWINDOW : SWP_HIDEWINDOW) | SWP_NOZORDER);
 
 	/* <---- Display window ----> */
@@ -427,13 +424,13 @@ void Explorerplusplus::UpdateLayout()
 	if (m_config->displayWindowVertical.get())
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, mainWindowWidth - indentRight,
-			indentRebar, m_displayWindowWidth, mainWindowHeight - indentRebar - indentBottom,
-			displayWindowShowFlags);
+			indentRebar, paneSizes.displayWindowWidth,
+			std::max(mainWindowHeight - indentRebar - indentBottom, 0), displayWindowShowFlags);
 	}
 	else
 	{
 		SetWindowPos(m_displayWindow->GetHWND(), nullptr, 0, mainWindowHeight - indentBottom,
-			mainWindowWidth, m_displayWindowHeight, displayWindowShowFlags);
+			mainWindowWidth, paneSizes.displayWindowHeight, displayWindowShowFlags);
 	}
 
 	/* <---- ALL listview windows ----> */
@@ -455,8 +452,8 @@ void Explorerplusplus::UpdateLayout()
 			height -= tabWindowHeight;
 		}
 
-		SetWindowPos(tab->GetShellBrowserImpl()->GetListView(), NULL, indentLeft, indentTop, width,
-			height, showFlags);
+		SetWindowPos(tab->GetShellBrowserImpl()->GetListView(), NULL, indentLeft, indentTop,
+			std::max(width, 0), std::max(height, 0), showFlags);
 	}
 
 	/* <---- Status bar ----> */
@@ -478,11 +475,11 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical.get())
 	{
-		m_displayWindowWidth = LOWORD(wParam);
+		m_displayWindowPreferredWidth = LOWORD(wParam);
 	}
 	else
 	{
-		m_displayWindowHeight = HIWORD(wParam);
+		m_displayWindowPreferredHeight = HIWORD(wParam);
 	}
 
 	UpdateLayout();

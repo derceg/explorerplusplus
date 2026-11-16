@@ -126,7 +126,7 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		return NotifyHandler(hwnd, msg, wParam, lParam);
 
 	case WM_SIZE:
-		OnSize(static_cast<UINT>(wParam));
+		UpdateLayout();
 		return 0;
 
 	case WM_ENDSESSION:
