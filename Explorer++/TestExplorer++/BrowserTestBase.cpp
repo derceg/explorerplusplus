@@ -39,7 +39,6 @@ void BrowserTestBase::SetUpAppServices()
 	m_appServices.SetAcceleratorManager(&m_acceleratorManager);
 	m_appServices.SetAppController(&m_appController);
 	m_appServices.SetApplicationModel(&m_applicationModel);
-	m_appServices.SetAsyncIconFetcher(&m_iconFetcher);
 	m_appServices.SetBookmarkTree(&m_bookmarkTree);
 	m_appServices.SetBrowserList(&m_browserList);
 	m_appServices.SetBrowserWindowFactory(&m_browserWindowFactory);
@@ -54,6 +53,7 @@ void BrowserTestBase::SetUpAppServices()
 	m_appServices.SetFeatureList(&m_featureList);
 	m_appServices.SetFrequentLocationsModel(&m_frequentLocationsModel);
 	m_appServices.SetHistoryModel(&m_historyModel);
+	m_appServices.SetIconFetcher(&m_iconFetcher);
 	m_appServices.SetModelessDialogList(&m_modelessDialogList);
 	m_appServices.SetNavigationEvents(&m_navigationEvents);
 	m_appServices.SetPlatformContext(&m_platformContext);

@@ -10,13 +10,13 @@
 #include <concurrencpp/concurrencpp.h>
 #include <wil/com.h>
 
-class AsyncIconFetcher;
+class IconFetcher;
 class Runtime;
 
 class ShellIconLoaderImpl : public ShellIconLoader
 {
 public:
-	ShellIconLoaderImpl(const Runtime *runtime, AsyncIconFetcher *iconFetcher);
+	ShellIconLoaderImpl(const Runtime *runtime, IconFetcher *iconFetcher);
 
 	wil::com_ptr_nothrow<IWICBitmapSource> LoadShellIcon(PCIDLIST_ABSOLUTE pidl, IconSize size,
 		IconUpdateCallback updateCallback, std::stop_token stopToken) override;
@@ -27,7 +27,7 @@ private:
 	wil::com_ptr_nothrow<IWICBitmapSource> GetDefaultIcon(PCIDLIST_ABSOLUTE pidl);
 
 	const Runtime *const m_runtime;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 
 	WeakPtrFactory<ShellIconLoaderImpl> m_weakPtrFactory{ this };

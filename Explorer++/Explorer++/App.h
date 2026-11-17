@@ -8,7 +8,6 @@
 #include "AppController.h"
 #include "AppServices.h"
 #include "ApplicationModel.h"
-#include "AsyncIconFetcherImpl.h"
 #include "BrowserList.h"
 #include "BrowserWindowFactoryImpl.h"
 #include "CommandLine.h"
@@ -23,6 +22,7 @@
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
+#include "IconFetcherImpl.h"
 #include "ModelessDialogList.h"
 #include "PlatformContextImpl.h"
 #include "Plugins/PluginCommandManager.h"
@@ -111,7 +111,7 @@ private:
 	ThemeManager m_themeManager;
 	WindowThemeManagerImpl m_windowThemeManager;
 	CachedIcons m_cachedIcons;
-	AsyncIconFetcherImpl m_iconFetcher;
+	IconFetcherImpl m_iconFetcher;
 	ShellIconLoaderImpl m_shellIconLoader;
 	BrowserList m_browserList;
 	std::unique_ptr<BrowserWindowFactoryImpl> m_browserWindowFactory;

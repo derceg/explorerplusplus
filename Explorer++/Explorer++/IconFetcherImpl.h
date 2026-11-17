@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "AsyncIconFetcher.h"
+#include "IconFetcher.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/core/noncopyable.hpp>
@@ -13,12 +13,12 @@
 class CachedIcons;
 class Runtime;
 
-class AsyncIconFetcherImpl : public AsyncIconFetcher, private boost::noncopyable
+class IconFetcherImpl : public IconFetcher, private boost::noncopyable
 {
 public:
-	AsyncIconFetcherImpl(const Runtime *runtime, CachedIcons *cachedIcons);
+	IconFetcherImpl(const Runtime *runtime, CachedIcons *cachedIcons);
 
-	// AsyncIconFetcher
+	// IconFetcher
 	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
 		PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken) override;
 	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
@@ -33,7 +33,7 @@ private:
 	using IconTarget = std::variant<PidlAbsolute, std::wstring>;
 
 	static concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsyncImpl(
-		WeakPtr<AsyncIconFetcherImpl> weakSelf, IconTarget target, std::stop_token stopToken);
+		WeakPtr<IconFetcherImpl> weakSelf, IconTarget target, std::stop_token stopToken);
 	static PidlAbsolute MaybeResolveTargetToPidl(const IconTarget &target);
 
 	const Runtime *const m_runtime;
@@ -41,5 +41,5 @@ private:
 	int m_defaultFileIconIndex;
 	int m_defaultFolderIconIndex;
 
-	WeakPtrFactory<AsyncIconFetcherImpl> m_weakPtrFactory{ this };
+	WeakPtrFactory<IconFetcherImpl> m_weakPtrFactory{ this };
 };

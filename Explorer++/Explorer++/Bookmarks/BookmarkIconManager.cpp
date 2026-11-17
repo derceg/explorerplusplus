@@ -4,24 +4,23 @@
 
 #include "stdafx.h"
 #include "Bookmarks/BookmarkIconManager.h"
-#include "AsyncIconFetcher.h"
 #include "Bookmarks/BookmarkItem.h"
 #include "Icon.h"
+#include "IconFetcher.h"
 #include "ResourceLoader.h"
 #include "RuntimeHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WeakPtr.h"
 
-BookmarkIconManager::BookmarkIconManager(const Runtime *runtime, AsyncIconFetcher *iconFetcher,
+BookmarkIconManager::BookmarkIconManager(const Runtime *runtime, IconFetcher *iconFetcher,
 	const ResourceLoader *resourceLoader, int iconWidth, int iconHeight) :
 	m_runtime(runtime),
 	m_iconFetcher(iconFetcher)
 {
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
 
-	auto folderIcon =
-		resourceLoader->LoadBitmap(Icon::Folder, iconWidth, iconHeight);
+	auto folderIcon = resourceLoader->LoadBitmap(Icon::Folder, iconWidth, iconHeight);
 	m_bookmarkFolderIconIndex =
 		ImageHelper::AddBitmapToImageList(m_imageList.get(), folderIcon.get());
 

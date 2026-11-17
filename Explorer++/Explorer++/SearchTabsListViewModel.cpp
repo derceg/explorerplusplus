@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "SearchTabsListViewModel.h"
-#include "AsyncIconFetcher.h"
+#include "IconFetcher.h"
 #include "MainResource.h"
 #include "SearchTabsModel.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -41,7 +41,7 @@ SearchTabsColumn SearchTabsColumnModel::ColumnIdToSearchTabsColumn(ListViewColum
 	return *column;
 }
 
-SearchTabsListViewItem::SearchTabsListViewItem(const Tab *tab, AsyncIconFetcher *iconFetcher) :
+SearchTabsListViewItem::SearchTabsListViewItem(const Tab *tab, IconFetcher *iconFetcher) :
 	m_tab(tab),
 	m_iconFetcher(iconFetcher)
 {
@@ -88,7 +88,7 @@ const Tab *SearchTabsListViewItem::GetTab() const
 }
 
 SearchTabsListViewModel::SearchTabsListViewModel(SearchTabsModel *searchTabsModel,
-	const TabList *tabList, AsyncIconFetcher *iconFetcher) :
+	const TabList *tabList, IconFetcher *iconFetcher) :
 	ListViewModel(SortPolicy::HasDefault),
 	m_searchTabsModel(searchTabsModel),
 	m_tabList(tabList),

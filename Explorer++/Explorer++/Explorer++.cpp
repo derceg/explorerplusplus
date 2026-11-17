@@ -196,7 +196,7 @@ void Explorerplusplus::CreateAddressBar()
 {
 	m_addressBar = std::make_unique<AddressBar>(m_view.GetAddressBarView(), this, m_tabEvents,
 		m_shellBrowserEvents, m_navigationEvents, m_appServices->GetRuntime(),
-		m_appServices->GetAsyncIconFetcher());
+		m_appServices->GetIconFetcher());
 }
 
 void Explorerplusplus::CreateBookmarksToolbar()

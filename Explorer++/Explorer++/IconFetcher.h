@@ -11,10 +11,10 @@
 #include <optional>
 #include <stop_token>
 
-class AsyncIconFetcher
+class IconFetcher
 {
 public:
-	virtual ~AsyncIconFetcher() = default;
+	virtual ~IconFetcher() = default;
 
 	[[nodiscard]] virtual concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
 		PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken) = 0;

@@ -159,12 +159,12 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *br
 	m_bookmarkTree(appServices->GetBookmarkTree()),
 	m_platformContext(appServices->GetPlatformContext())
 {
-	Initialize(appServices->GetRuntime(), appServices->GetAsyncIconFetcher());
+	Initialize(appServices->GetRuntime(), appServices->GetIconFetcher());
 }
 
 BookmarksToolbar::~BookmarksToolbar() = default;
 
-void BookmarksToolbar::Initialize(const Runtime *runtime, AsyncIconFetcher *iconFetcher)
+void BookmarksToolbar::Initialize(const Runtime *runtime, IconFetcher *iconFetcher)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(m_view->GetHWND());

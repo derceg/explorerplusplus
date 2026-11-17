@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include "AsyncIconFetcher.h"
+#include "IconFetcher.h"
 #include <deque>
 
-class AsyncIconFetcherFake : public AsyncIconFetcher
+class IconFetcherFake : public IconFetcher
 {
 public:
-	AsyncIconFetcherFake();
+	IconFetcherFake();
 
-	// AsyncIconFetcher
+	// IconFetcher
 	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(
 		PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken) override;
 	concurrencpp::lazy_result<std::optional<ShellIconInfo>> GetIconIndexAsync(

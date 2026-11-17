@@ -15,7 +15,7 @@
 #include <vector>
 
 class AcceleratorManager;
-class AsyncIconFetcher;
+class IconFetcher;
 class KeyboardState;
 class ListView;
 class ResourceLoader;
@@ -47,7 +47,7 @@ class SearchTabsDialog : public BaseDialog, private ListViewDelegate
 {
 public:
 	static SearchTabsDialog *Create(HWND parent, std::unique_ptr<SearchTabsModel> model,
-		const TabList *tabList, AsyncIconFetcher *iconFetcher, const KeyboardState *keyboardState,
+		const TabList *tabList, IconFetcher *iconFetcher, const KeyboardState *keyboardState,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 
 private:
@@ -58,7 +58,7 @@ private:
 	};
 
 	SearchTabsDialog(HWND parent, std::unique_ptr<SearchTabsModel> model, const TabList *tabList,
-		AsyncIconFetcher *iconFetcher, const KeyboardState *keyboardState,
+		IconFetcher *iconFetcher, const KeyboardState *keyboardState,
 		const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader);
 	~SearchTabsDialog() = default;
 
@@ -83,7 +83,7 @@ private:
 
 	const std::unique_ptr<SearchTabsModel> m_model;
 	const TabList *const m_tabList;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	const KeyboardState *const m_keyboardState;
 	const AcceleratorManager *const m_acceleratorManager;
 	std::unique_ptr<SearchTabsListViewModel> m_listViewModel;

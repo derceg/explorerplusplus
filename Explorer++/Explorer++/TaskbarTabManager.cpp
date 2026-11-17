@@ -5,9 +5,9 @@
 #include "stdafx.h"
 #include "TaskbarTabManager.h"
 #include "AppServices.h"
-#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "Config.h"
+#include "IconFetcher.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
 #include "ShellBrowser/ShellBrowserEvents.h"
@@ -106,7 +106,7 @@ TaskbarTabManager::TaskbarTabManager(BrowserWindow *browser, AppServices *appSer
 	m_browser(browser),
 	m_appServices(appServices),
 	m_maybeCreateTaskbarList(maybeCreateTaskbarList),
-	m_iconProvider(appServices->GetAsyncIconFetcher(), appServices->GetResourceLoader())
+	m_iconProvider(appServices->GetIconFetcher(), appServices->GetResourceLoader())
 {
 	m_taskbarButtonCreatedMessage = RegisterWindowMessage(L"TaskbarButtonCreated");
 	ChangeWindowMessageFilter(m_taskbarButtonCreatedMessage, MSGFLT_ADD);
@@ -647,7 +647,7 @@ void TaskbarTabManager::TaskbarTabProxy::InvalidateIconicBitmaps()
 	DCHECK(SUCCEEDED(hr));
 }
 
-TaskbarTabManager::TaskbarTabIconProvider::TaskbarTabIconProvider(AsyncIconFetcher *iconFetcher,
+TaskbarTabManager::TaskbarTabIconProvider::TaskbarTabIconProvider(IconFetcher *iconFetcher,
 	const ResourceLoader *resourceLoader) :
 	m_iconFetcher(iconFetcher),
 	m_resourceLoader(resourceLoader)

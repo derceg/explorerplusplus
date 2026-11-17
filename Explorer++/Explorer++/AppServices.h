@@ -8,7 +8,6 @@
 
 class AcceleratorManager;
 class AppController;
-class AsyncIconFetcher;
 class BookmarkTree;
 class BrowserList;
 class BrowserWindowFactory;
@@ -22,6 +21,7 @@ class DriveModel;
 class FeatureList;
 class FrequentLocationsModel;
 class HistoryModel;
+class IconFetcher;
 class ModelessDialogList;
 class NavigationEvents;
 class PlatformContext;
@@ -87,10 +87,6 @@ public:
 	const Applications::ApplicationModel *GetApplicationModel() const;
 	void SetApplicationModel(Applications::ApplicationModel *applicationModel);
 
-	AsyncIconFetcher *GetAsyncIconFetcher();
-	const AsyncIconFetcher *GetAsyncIconFetcher() const;
-	void SetAsyncIconFetcher(AsyncIconFetcher *asyncIconFetcher);
-
 	BookmarkTree *GetBookmarkTree();
 	const BookmarkTree *GetBookmarkTree() const;
 	void SetBookmarkTree(BookmarkTree *bookmarkTree);
@@ -145,6 +141,10 @@ public:
 	HistoryModel *GetHistoryModel();
 	const HistoryModel *GetHistoryModel() const;
 	void SetHistoryModel(HistoryModel *historyModel);
+
+	IconFetcher *GetIconFetcher();
+	const IconFetcher *GetIconFetcher() const;
+	void SetIconFetcher(IconFetcher *iconFetcher);
 
 	ModelessDialogList *GetModelessDialogList();
 	const ModelessDialogList *GetModelessDialogList() const;
@@ -215,12 +215,12 @@ private:
 	void Set(T *service);
 
 	std::tuple<AcceleratorManager *, AppController *, Applications::ApplicationModel *,
-		AsyncIconFetcher *, BookmarkTree *, BrowserList *, BrowserWindowFactory *, CachedIcons *,
-		ClipboardWatcher *, ColorRuleModel *, const CommandLine::Settings *, Config *,
-		DarkModeManager *, DirectoryWatcherFactory *, DriveModel *, FeatureList *,
-		FrequentLocationsModel *, HistoryModel *, ModelessDialogList *, NavigationEvents *,
-		PlatformContext *, Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *,
-		ResourceLoader *, Runtime *, ShellBrowserEvents *, ShellIconLoader *, TabEvents *,
-		TabList *, TabRestorer *, ThemeManager *, WindowThemeManager *>
+		BookmarkTree *, BrowserList *, BrowserWindowFactory *, CachedIcons *, ClipboardWatcher *,
+		ColorRuleModel *, const CommandLine::Settings *, Config *, DarkModeManager *,
+		DirectoryWatcherFactory *, DriveModel *, FeatureList *, FrequentLocationsModel *,
+		HistoryModel *, IconFetcher *, ModelessDialogList *, NavigationEvents *, PlatformContext *,
+		Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *, ResourceLoader *,
+		Runtime *, ShellBrowserEvents *, ShellIconLoader *, TabEvents *, TabList *, TabRestorer *,
+		ThemeManager *, WindowThemeManager *>
 		m_services;
 };

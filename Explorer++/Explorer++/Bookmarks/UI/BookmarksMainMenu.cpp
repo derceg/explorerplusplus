@@ -27,7 +27,7 @@ BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView, BrowserWindow *browser,
 	int scaledIconSize =
 		dpiCompat.ScaleValue(m_browser->GetHWND(), GetIconPixelSizeAtDefaultDpi(IconSize::Small));
 	m_iconManager = std::make_unique<BookmarkIconManager>(appServices->GetRuntime(),
-		appServices->GetAsyncIconFetcher(), m_resourceLoader, scaledIconSize, scaledIconSize);
+		appServices->GetIconFetcher(), m_resourceLoader, scaledIconSize, scaledIconSize);
 
 	// Note that this class builds the menu, but item selection is currently handled externally, by
 	// the main window switch.

@@ -15,8 +15,8 @@
 #include <unordered_map>
 
 class AppServices;
-class AsyncIconFetcher;
 class BrowserWindow;
+class IconFetcher;
 class NavigationRequest;
 class ResourceLoader;
 class ShellBrowser;
@@ -45,7 +45,7 @@ private:
 			Large
 		};
 
-		TaskbarTabIconProvider(AsyncIconFetcher *iconFetcher, const ResourceLoader *resourceLoader);
+		TaskbarTabIconProvider(IconFetcher *iconFetcher, const ResourceLoader *resourceLoader);
 
 		wil::com_ptr_nothrow<IWICBitmapSource> GetIconForTab(const Tab *tab,
 			IconSize iconSize) const;
@@ -60,7 +60,7 @@ private:
 
 		ImageListInfo GetImageListInfo(IconSize iconSize) const;
 
-		AsyncIconFetcher *const m_iconFetcher;
+		IconFetcher *const m_iconFetcher;
 		const ResourceLoader *const m_resourceLoader;
 		wil::com_ptr_nothrow<IImageList> m_smallShellImageList;
 		wil::com_ptr_nothrow<IImageList> m_largeShellImageList;

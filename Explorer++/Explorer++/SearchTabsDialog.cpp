@@ -19,7 +19,7 @@
 #include <glog/logging.h>
 
 SearchTabsDialog *SearchTabsDialog::Create(HWND parent, std::unique_ptr<SearchTabsModel> model,
-	const TabList *tabList, AsyncIconFetcher *iconFetcher, const KeyboardState *keyboardState,
+	const TabList *tabList, IconFetcher *iconFetcher, const KeyboardState *keyboardState,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader)
 {
 	return new SearchTabsDialog(parent, std::move(model), tabList, iconFetcher, keyboardState,
@@ -27,7 +27,7 @@ SearchTabsDialog *SearchTabsDialog::Create(HWND parent, std::unique_ptr<SearchTa
 }
 
 SearchTabsDialog::SearchTabsDialog(HWND parent, std::unique_ptr<SearchTabsModel> model,
-	const TabList *tabList, AsyncIconFetcher *iconFetcher, const KeyboardState *keyboardState,
+	const TabList *tabList, IconFetcher *iconFetcher, const KeyboardState *keyboardState,
 	const AcceleratorManager *acceleratorManager, const ResourceLoader *resourceLoader) :
 	BaseDialog(resourceLoader, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both),
 	m_model(std::move(model)),

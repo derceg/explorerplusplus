@@ -3,14 +3,14 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "AsyncIconFetcherFake.h"
+#include "IconFetcherFake.h"
 
-AsyncIconFetcherFake::AsyncIconFetcherFake()
+IconFetcherFake::IconFetcherFake()
 {
 	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_defaultFileIconIndex));
 }
 
-concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::GetIconIndexAsync(
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> IconFetcherFake::GetIconIndexAsync(
 	PCIDLIST_ABSOLUTE pidl, std::stop_token stopToken)
 {
 	UNREFERENCED_PARAMETER(pidl);
@@ -18,7 +18,7 @@ concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::Ge
 	return GetIconIndexAsyncImpl(stopToken);
 }
 
-concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::GetIconIndexAsync(
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> IconFetcherFake::GetIconIndexAsync(
 	const std::wstring &path, std::stop_token stopToken)
 {
 	UNREFERENCED_PARAMETER(path);
@@ -26,7 +26,7 @@ concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::Ge
 	return GetIconIndexAsyncImpl(stopToken);
 }
 
-concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::GetIconIndexAsyncImpl(
+concurrencpp::lazy_result<std::optional<ShellIconInfo>> IconFetcherFake::GetIconIndexAsyncImpl(
 	std::stop_token stopToken)
 {
 	PendingRequest request(stopToken);
@@ -35,47 +35,47 @@ concurrencpp::lazy_result<std::optional<ShellIconInfo>> AsyncIconFetcherFake::Ge
 	co_return co_await result;
 }
 
-int AsyncIconFetcherFake::GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const
+int IconFetcherFake::GetCachedIconIndexOrDefault(PCIDLIST_ABSOLUTE pidl) const
 {
 	UNREFERENCED_PARAMETER(pidl);
 
 	return m_defaultFileIconIndex;
 }
 
-std::optional<int> AsyncIconFetcherFake::MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const
+std::optional<int> IconFetcherFake::MaybeGetCachedIconIndex(PCIDLIST_ABSOLUTE pidl) const
 {
 	UNREFERENCED_PARAMETER(pidl);
 
 	return std::nullopt;
 }
 
-std::optional<int> AsyncIconFetcherFake::MaybeGetCachedIconIndex(const std::wstring &path) const
+std::optional<int> IconFetcherFake::MaybeGetCachedIconIndex(const std::wstring &path) const
 {
 	UNREFERENCED_PARAMETER(path);
 
 	return std::nullopt;
 }
 
-int AsyncIconFetcherFake::GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const
+int IconFetcherFake::GetDefaultIconIndex(PCIDLIST_ABSOLUTE pidl) const
 {
 	UNREFERENCED_PARAMETER(pidl);
 
 	return m_defaultFileIconIndex;
 }
 
-int AsyncIconFetcherFake::GetDefaultIconIndex(DefaultIconType defaultIconType) const
+int IconFetcherFake::GetDefaultIconIndex(DefaultIconType defaultIconType) const
 {
 	UNREFERENCED_PARAMETER(defaultIconType);
 
 	return m_defaultFileIconIndex;
 }
 
-bool AsyncIconFetcherFake::HasPendingRequests() const
+bool IconFetcherFake::HasPendingRequests() const
 {
 	return !m_pendingRequests.empty();
 }
 
-void AsyncIconFetcherFake::CompletePendingRequests()
+void IconFetcherFake::CompletePendingRequests()
 {
 	while (!m_pendingRequests.empty())
 	{

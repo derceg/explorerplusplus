@@ -46,7 +46,7 @@ BookmarkListPresenter::BookmarkListPresenter(std::unique_ptr<ListView> view,
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
 	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(appServices->GetRuntime(),
-		appServices->GetAsyncIconFetcher(), m_resourceLoader, iconWidth, iconHeight);
+		appServices->GetIconFetcher(), m_resourceLoader, iconWidth, iconHeight);
 	m_view->SetImageList(m_bookmarkIconManager->GetImageList(),
 		ListView::ImageListType::SmallIcons);
 

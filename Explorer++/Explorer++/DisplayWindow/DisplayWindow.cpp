@@ -21,10 +21,10 @@
 #include "stdafx.h"
 #include "DisplayWindow.h"
 #include "AppServices.h"
-#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "DisplayWindowContextMenu.h"
+#include "IconFetcher.h"
 #include "MainResource.h"
 #include "PopupMenuView.h"
 #include "ShellBrowser/NavigationEvents.h"
@@ -68,7 +68,7 @@ DisplayWindow::DisplayWindow(HWND parent, Mode mode, BrowserWindow *browser,
 	m_hwnd(CreateDisplayWindow(parent)),
 	m_mode(mode),
 	m_browser(browser),
-	m_iconFetcher(appServices->GetAsyncIconFetcher()),
+	m_iconFetcher(appServices->GetIconFetcher()),
 	m_config(config),
 	m_acceleratorManager(appServices->GetAcceleratorManager()),
 	m_resourceLoader(appServices->GetResourceLoader()),

@@ -12,7 +12,7 @@
 #include <boost/signals2.hpp>
 #include <vector>
 
-class AsyncIconFetcher;
+class IconFetcher;
 class SearchTabsModel;
 class Tab;
 class TabList;
@@ -40,7 +40,7 @@ private:
 class SearchTabsListViewItem : public ListViewItem
 {
 public:
-	SearchTabsListViewItem(const Tab *tab, AsyncIconFetcher *iconFetcher);
+	SearchTabsListViewItem(const Tab *tab, IconFetcher *iconFetcher);
 
 	// ListViewItem
 	std::wstring GetColumnText(ListViewColumnId columnId) const override;
@@ -53,14 +53,14 @@ public:
 
 private:
 	const Tab *const m_tab;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 };
 
 class SearchTabsListViewModel : public ListViewModel
 {
 public:
 	SearchTabsListViewModel(SearchTabsModel *searchTabsModel, const TabList *tabList,
-		AsyncIconFetcher *iconFetcher);
+		IconFetcher *iconFetcher);
 
 	// ListViewModel
 	ListViewColumnModel *GetColumnModel() override;
@@ -81,6 +81,6 @@ private:
 	SearchTabsColumnModel m_columnModel;
 	SearchTabsModel *const m_searchTabsModel;
 	const TabList *const m_tabList;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

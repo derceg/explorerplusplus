@@ -10,8 +10,8 @@
 #include <wil/resource.h>
 #include <stop_token>
 
-class AsyncIconFetcher;
 class BookmarkItem;
+class IconFetcher;
 class ResourceLoader;
 class Runtime;
 
@@ -20,7 +20,7 @@ class BookmarkIconManager
 public:
 	using IconAvailableCallback = std::function<void(int iconIndex)>;
 
-	BookmarkIconManager(const Runtime *runtime, AsyncIconFetcher *iconFetcher,
+	BookmarkIconManager(const Runtime *runtime, IconFetcher *iconFetcher,
 		const ResourceLoader *resourceLoader, int iconWidth, int iconHeight);
 
 	BookmarkIconManager(const BookmarkIconManager &other) = delete;
@@ -43,7 +43,7 @@ private:
 	int AddSystemIconToImageList(int systemIconIndex);
 
 	const Runtime *const m_runtime;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	wil::unique_himagelist m_imageList;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	int m_defaultFolderIconSystemImageListIndex;

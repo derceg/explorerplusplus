@@ -5,12 +5,12 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "AppServices.h"
-#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColumnHelper.h"
 #include "Config.h"
 #include "FolderView.h"
+#include "IconFetcher.h"
 #include "ItemData.h"
 #include "LabelEditHandler.h"
 #include "MainResource.h"
@@ -644,7 +644,7 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 	{
 		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
 
-		auto *iconFetcher = m_appServices->GetAsyncIconFetcher();
+		auto *iconFetcher = m_appServices->GetIconFetcher();
 
 		// Note that only the icon is set here. Any overlay will be added by the icon retrieval task
 		// (scheduled below).
@@ -660,7 +660,7 @@ concurrencpp::null_result ShellBrowserImpl::RetrieveIcon(WeakPtr<ShellBrowserImp
 	PidlAbsolute pidl, int internalIndex)
 {
 	auto *runtime = weakSelf->m_appServices->GetRuntime();
-	auto iconFetcher = weakSelf->m_appServices->GetAsyncIconFetcher();
+	auto iconFetcher = weakSelf->m_appServices->GetIconFetcher();
 	auto stopToken = weakSelf->m_directoryState.m_iconStopSource->GetToken();
 
 	auto iconInfo = co_await iconFetcher->GetIconIndexAsync(pidl.Raw(), stopToken);

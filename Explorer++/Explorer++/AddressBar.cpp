@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
-#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
+#include "IconFetcher.h"
 #include "NavigationHelper.h"
 #include "RuntimeHelper.h"
 #include "ShellBrowser/NavigationEvents.h"
@@ -21,7 +21,7 @@
 
 AddressBar::AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
 	ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-	const Runtime *runtime, AsyncIconFetcher *iconFetcher) :
+	const Runtime *runtime, IconFetcher *iconFetcher) :
 	m_view(view),
 	m_browser(browser),
 	m_runtime(runtime),

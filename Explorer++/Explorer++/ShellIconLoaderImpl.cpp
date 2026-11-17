@@ -4,12 +4,12 @@
 
 #include "stdafx.h"
 #include "ShellIconLoaderImpl.h"
-#include "AsyncIconFetcher.h"
+#include "IconFetcher.h"
 #include "RuntimeHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-ShellIconLoaderImpl::ShellIconLoaderImpl(const Runtime *runtime, AsyncIconFetcher *iconFetcher) :
+ShellIconLoaderImpl::ShellIconLoaderImpl(const Runtime *runtime, IconFetcher *iconFetcher) :
 	m_runtime(runtime),
 	m_iconFetcher(iconFetcher)
 {

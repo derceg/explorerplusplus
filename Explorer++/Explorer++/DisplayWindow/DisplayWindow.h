@@ -33,9 +33,9 @@
 
 class AcceleratorManager;
 class AppServices;
-class AsyncIconFetcher;
 class BrowserWindow;
 struct Config;
+class IconFetcher;
 class ResourceLoader;
 class WindowSubclass;
 
@@ -102,7 +102,7 @@ private:
 	const HWND m_hwnd;
 	const Mode m_mode;
 	BrowserWindow *const m_browser;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	Config *const m_config;
 	const AcceleratorManager *const m_acceleratorManager;
 	const ResourceLoader *const m_resourceLoader;

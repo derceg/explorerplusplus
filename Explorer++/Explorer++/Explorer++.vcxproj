@@ -1311,7 +1311,7 @@
     <ClCompile Include="FrequentLocationsTracker.cpp" />
     <ClCompile Include="FrequentLocationsXmlStorage.cpp" />
     <ClCompile Include="HistoryMenu.cpp" />
-    <ClCompile Include="AsyncIconFetcherImpl.cpp" />
+    <ClCompile Include="IconFetcherImpl.cpp" />
     <ClCompile Include="HistoryTracker.cpp" />
     <ClCompile Include="SearchTabsModel.cpp" />
     <ClCompile Include="ShellBrowser\ColumnHelper.cpp" />
@@ -1558,7 +1558,7 @@
     <ClInclude Include="AppInfo.h" />
     <ClInclude Include="AppServices.h" />
     <ClInclude Include="AppStorage.h" />
-    <ClInclude Include="AsyncIconFetcher.h" />
+    <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumn.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumnModel.h" />
@@ -1712,7 +1712,7 @@
     <ClInclude Include="FrequentLocationsTracker.h" />
     <ClInclude Include="FrequentLocationsXmlStorage.h" />
     <ClInclude Include="HistoryMenu.h" />
-    <ClInclude Include="AsyncIconFetcherImpl.h" />
+    <ClInclude Include="IconFetcherImpl.h" />
     <ClInclude Include="HistoryTracker.h" />
     <ClInclude Include="IconSet.h" />
     <ClInclude Include="ScopedBrowserCommandTarget.h" />

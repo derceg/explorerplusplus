@@ -5,9 +5,9 @@
 #include "stdafx.h"
 #include "TabBar.h"
 #include "AppServices.h"
-#include "AsyncIconFetcher.h"
 #include "BrowserWindow.h"
 #include "Config.h"
+#include "IconFetcher.h"
 #include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "RuntimeHelper.h"
@@ -40,7 +40,7 @@ class TabBarItem : public TabViewItem
 {
 public:
 	TabBarItem(Tab *tab, TabEvents *tabEvents, ShellBrowserEvents *shellBrowserEvents,
-		NavigationEvents *navigationEvents, const Runtime *runtime, AsyncIconFetcher *iconFetcher,
+		NavigationEvents *navigationEvents, const Runtime *runtime, IconFetcher *iconFetcher,
 		TabBarViewImageListManager *imageListManager) :
 		m_tab(tab),
 		m_runtime(runtime),
@@ -164,7 +164,7 @@ private:
 
 	Tab *const m_tab;
 	const Runtime *const m_runtime;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	TabBarViewImageListManager *const m_imageListManager;
 	mutable std::optional<int> m_iconIndex;
 	mutable std::unique_ptr<ScopedStopSource> m_scopedStopSource;
@@ -359,7 +359,7 @@ Tab &TabBar::SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSett
 	auto tabItem =
 		std::make_unique<TabBarItem>(&tab, m_tabEvents, m_appServices->GetShellBrowserEvents(),
 			m_appServices->GetNavigationEvents(), m_appServices->GetRuntime(),
-			m_appServices->GetAsyncIconFetcher(), m_view->GetImageListManager());
+			m_appServices->GetIconFetcher(), m_view->GetImageListManager());
 	tabItem->SetDoubleClickedCallback(std::bind_front(&TabBar::OnTabDoubleClicked, this, &tab));
 	tabItem->SetMiddleClickedCallback(std::bind_front(&TabBar::OnTabMiddleClicked, this, &tab));
 	tabItem->SetRightClickedCallback(std::bind_front(&TabBar::OnTabRightClicked, this, &tab));

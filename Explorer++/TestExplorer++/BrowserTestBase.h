@@ -8,7 +8,6 @@
 #include "AppControllerFake.h"
 #include "AppServices.h"
 #include "ApplicationModel.h"
-#include "AsyncIconFetcherFake.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserList.h"
 #include "BrowserWindowFactoryFake.h"
@@ -23,6 +22,7 @@
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
 #include "HistoryTracker.h"
+#include "IconFetcherFake.h"
 #include "ModelessDialogList.h"
 #include "NoOpClipboardWatcher.h"
 #include "NoOpWindowThemeManager.h"
@@ -82,7 +82,7 @@ protected:
 	ThemeManager m_themeManager;
 	NoOpWindowThemeManager m_windowThemeManager;
 	CachedIcons m_cachedIcons;
-	AsyncIconFetcherFake m_iconFetcher;
+	IconFetcherFake m_iconFetcher;
 	ShellIconLoaderFake m_shellIconLoader;
 
 	BookmarkTree m_bookmarkTree;

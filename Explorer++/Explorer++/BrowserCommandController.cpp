@@ -710,7 +710,7 @@ void BrowserCommandController::OnSearchTabs()
 				m_appServices->GetNavigationEvents());
 
 			return SearchTabsDialog::Create(m_browser->GetHWND(), std::move(searchTabsModel),
-				m_appServices->GetTabList(), m_appServices->GetAsyncIconFetcher(),
+				m_appServices->GetTabList(), m_appServices->GetIconFetcher(),
 				m_appServices->GetPlatformContext()->GetKeyboardState(),
 				m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader());
 		});

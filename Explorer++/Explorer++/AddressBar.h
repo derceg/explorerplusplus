@@ -20,8 +20,8 @@
 #include <variant>
 #include <vector>
 
-class AsyncIconFetcher;
 class BrowserWindow;
+class IconFetcher;
 class NavigationEvents;
 class NavigationRequest;
 class Runtime;
@@ -39,7 +39,7 @@ class AddressBar :
 public:
 	AddressBar(AddressBarView *view, BrowserWindow *browser, TabEvents *tabEvents,
 		ShellBrowserEvents *shellBrowserEvents, NavigationEvents *navigationEvents,
-		const Runtime *runtime, AsyncIconFetcher *iconFetcher);
+		const Runtime *runtime, IconFetcher *iconFetcher);
 
 	// RebarBand
 	AddressBarView *GetView() override;
@@ -94,7 +94,7 @@ private:
 	AddressBarView *const m_view;
 	BrowserWindow *const m_browser;
 	const Runtime *const m_runtime;
-	AsyncIconFetcher *const m_iconFetcher;
+	IconFetcher *const m_iconFetcher;
 	ScopedBrowserCommandTarget m_commandTarget;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	std::unique_ptr<ScopedStopSource> m_scopedStopSource;

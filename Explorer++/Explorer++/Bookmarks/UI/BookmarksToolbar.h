@@ -12,11 +12,11 @@
 #include <vector>
 
 class AppServices;
-class AsyncIconFetcher;
 class BookmarkIconManager;
 class BookmarksToolbarView;
 class BookmarkTree;
 class BrowserWindow;
+class IconFetcher;
 struct MouseEvent;
 class PlatformContext;
 class ResourceLoader;
@@ -49,7 +49,7 @@ private:
 	// main portion of the button.
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	void Initialize(const Runtime *runtime, AsyncIconFetcher *iconFetcher);
+	void Initialize(const Runtime *runtime, IconFetcher *iconFetcher);
 	void AddBookmarkItems();
 	void AddBookmarkItem(BookmarkItem *bookmarkItem, size_t index);
 

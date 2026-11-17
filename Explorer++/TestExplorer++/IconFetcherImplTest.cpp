@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "AsyncIconFetcherImpl.h"
+#include "IconFetcherImpl.h"
 #include "MessageLoop.h"
 #include "PidlTestHelper.h"
 #include "Runtime.h"
@@ -14,10 +14,10 @@
 
 using namespace testing;
 
-class AsyncIconFetcherImplTest : public Test
+class IconFetcherImplTest : public Test
 {
 protected:
-	AsyncIconFetcherImplTest() :
+	IconFetcherImplTest() :
 		m_runtime(BuildRuntimeForTest()),
 		m_cachedIcons(10),
 		m_iconFetcher(&m_runtime, &m_cachedIcons)
@@ -49,10 +49,10 @@ protected:
 
 	Runtime m_runtime;
 	CachedIcons m_cachedIcons;
-	AsyncIconFetcherImpl m_iconFetcher;
+	IconFetcherImpl m_iconFetcher;
 };
 
-TEST_F(AsyncIconFetcherImplTest, GetIconIndexAsync)
+TEST_F(IconFetcherImplTest, GetIconIndexAsync)
 {
 	std::wstring path = L"C:\\Fake";
 	auto pidl = CreateSimplePidlForTest(path);
@@ -67,7 +67,7 @@ TEST_F(AsyncIconFetcherImplTest, GetIconIndexAsync)
 	EXPECT_EQ(cachedIconIndex, iconInfo->iconIndex);
 }
 
-TEST_F(AsyncIconFetcherImplTest, GetIconIndexAsyncStop)
+TEST_F(IconFetcherImplTest, GetIconIndexAsyncStop)
 {
 	std::wstring path = L"C:\\Fake";
 	auto pidl = CreateSimplePidlForTest(path);
