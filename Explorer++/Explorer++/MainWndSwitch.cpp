@@ -43,10 +43,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		break;
 
-	case WM_MENUSELECT:
-		MenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
-		break;
-
 	case WM_TIMER:
 		if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
 		{
