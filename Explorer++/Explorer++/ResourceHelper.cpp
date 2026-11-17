@@ -11,22 +11,10 @@
 
 std::wstring ResourceHelper::LoadString(HINSTANCE resourceInstance, UINT stringId)
 {
-	auto string = MaybeLoadString(resourceInstance, stringId);
-	CHECK(string) << "String resource not found";
-	return *string;
-}
-
-std::optional<std::wstring> ResourceHelper::MaybeLoadString(HINSTANCE resourceInstance,
-	UINT stringId)
-{
 	WCHAR *string;
 	int numCharacters =
 		LoadString(resourceInstance, stringId, reinterpret_cast<LPWSTR>(&string), 0);
-
-	if (numCharacters == 0)
-	{
-		return std::nullopt;
-	}
+	CHECK_NE(numCharacters, 0);
 
 	return std::wstring(string, numCharacters);
 }

@@ -20,7 +20,6 @@ public:
 		const DarkModeManager *darkModeManager, WindowThemeManager *windowThemeManager);
 
 	std::wstring LoadString(UINT stringId) const override;
-	std::optional<std::wstring> MaybeLoadString(UINT stringId) const override;
 
 	wil::com_ptr_nothrow<IWICBitmapSource> LoadBitmapForDpi(Icon icon, int iconWidth,
 		int iconHeight, int dpi) const override;

@@ -29,11 +29,6 @@ std::wstring Win32ResourceLoader::LoadString(UINT stringId) const
 	return ResourceHelper::LoadString(m_resourceInstance, stringId);
 }
 
-std::optional<std::wstring> Win32ResourceLoader::MaybeLoadString(UINT stringId) const
-{
-	return ResourceHelper::MaybeLoadString(m_resourceInstance, stringId);
-}
-
 wil::com_ptr_nothrow<IWICBitmapSource> Win32ResourceLoader::LoadBitmapForDpi(Icon icon,
 	int iconWidth, int iconHeight, int dpi) const
 {

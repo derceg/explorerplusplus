@@ -12,13 +12,6 @@ std::wstring ResourceLoaderFake::LoadString(UINT stringId) const
 	return L"";
 }
 
-std::optional<std::wstring> ResourceLoaderFake::MaybeLoadString(UINT stringId) const
-{
-	UNREFERENCED_PARAMETER(stringId);
-
-	return L"";
-}
-
 wil::com_ptr_nothrow<IWICBitmapSource> ResourceLoaderFake::LoadBitmapForDpi(Icon icon,
 	int iconWidth, int iconHeight, int dpi) const
 {

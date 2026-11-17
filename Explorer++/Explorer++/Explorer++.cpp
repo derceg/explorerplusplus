@@ -507,12 +507,5 @@ boost::signals2::connection Explorerplusplus::AddMenuHelpTextRequestObserver(
 
 std::optional<std::wstring> Explorerplusplus::RequestMenuHelpText(HMENU menu, UINT id) const
 {
-	auto helpText = m_menuHelpTextRequestSignal(menu, id);
-
-	if (!helpText)
-	{
-		helpText = m_resourceLoader->MaybeLoadString(id);
-	}
-
-	return helpText;
+	return m_menuHelpTextRequestSignal(menu, id);
 }

@@ -21,12 +21,11 @@ public:
 	virtual ~ResourceLoader() = default;
 
 	virtual std::wstring LoadString(UINT stringId) const = 0;
-	virtual std::optional<std::wstring> MaybeLoadString(UINT stringId) const = 0;
 
 	virtual wil::com_ptr_nothrow<IWICBitmapSource> LoadBitmapForDpi(Icon icon, int iconWidth,
 		int iconHeight, int dpi) const = 0;
-	virtual wil::com_ptr_nothrow<IWICBitmapSource> LoadBitmap(Icon icon,
-		int iconWidth, int iconHeight) const = 0;
+	virtual wil::com_ptr_nothrow<IWICBitmapSource> LoadBitmap(Icon icon, int iconWidth,
+		int iconHeight) const = 0;
 
 	virtual INT_PTR CreateModalDialog(UINT dialogId, HWND parent, DialogProc dialogProc) const = 0;
 	virtual HWND CreateModelessDialog(UINT dialogId, HWND parent, DialogProc dialogProc) const = 0;
