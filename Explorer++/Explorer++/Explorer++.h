@@ -158,7 +158,7 @@ private:
 
 	/* Main window message handlers. */
 	LRESULT CommandHandler(HWND hwnd, HWND control, UINT id, UINT notificationCode);
-	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id, UINT notificationCode);
+	LRESULT HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize(const WindowStorageData &storageData);

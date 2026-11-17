@@ -10,9 +10,7 @@
 #include "AppServices.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
-#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
-#include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "BrowserView.h"
 #include "Config.h"
@@ -24,7 +22,6 @@
 #include "MainToolbar.h"
 #include "MainToolbarButtonId.h"
 #include "MenuRanges.h"
-#include "ModelessDialogHelper.h"
 #include "Plugins/PluginCommandManager.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -162,14 +159,13 @@ LRESULT Explorerplusplus::CommandHandler(HWND hwnd, HWND control, UINT id, UINT 
 	}
 	else
 	{
-		return HandleMenuOrToolbarButtonOrAccelerator(hwnd, id, notificationCode);
+		return HandleMenuOrToolbarButtonOrAccelerator(id, notificationCode);
 	}
 }
 
 // It makes sense to handle menu items/toolbar buttons/accelerators together, since an individual
 // command might be represented by all three of those.
-LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT id,
-	UINT notificationCode)
+LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT notificationCode)
 {
 	if (notificationCode == 1 && id >= ACCELERATOR_PLUGIN_START_ID
 		&& id < ACCELERATOR_PLUGIN_END_ID)
@@ -476,9 +472,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case ToUnderlying(MainToolbarButtonId::AddBookmark):
 	case IDM_BOOKMARKS_BOOKMARK_THIS_TAB:
-		BookmarkHelper::AddBookmarkItem(m_appServices->GetBookmarkTree(),
-			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, hwnd, this, m_acceleratorManager,
-			m_resourceLoader, m_platformContext);
+		m_commandController.ExecuteCommand(IDM_BOOKMARKS_BOOKMARK_THIS_TAB);
 		break;
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
@@ -487,9 +481,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, UINT
 
 	case ToUnderlying(MainToolbarButtonId::Bookmarks):
 	case IDM_BOOKMARKS_MANAGE_BOOKMARKS:
-		CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(),
-			L"ManageBookmarksDialog",
-			[this, hwnd] { return ManageBookmarksDialog::Create(hwnd, m_appServices); });
+		m_commandController.ExecuteCommand(IDM_BOOKMARKS_MANAGE_BOOKMARKS);
 		break;
 
 	case ToUnderlying(MainToolbarButtonId::Search):

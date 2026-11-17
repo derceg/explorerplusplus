@@ -9,6 +9,7 @@
 #include "AppInfo.h"
 #include "AppServices.h"
 #include "Bookmarks/BookmarkHelper.h"
+#include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "BrowserCommands.h"
 #include "BrowserWindow.h"
 #include "Config.h"
@@ -365,10 +366,23 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GoToPath(WSL_DISTRIBUTIONS_PATH, disposition);
 		break;
 
+	case IDM_BOOKMARKS_BOOKMARK_THIS_TAB:
+		BookmarkHelper::AddBookmarkItem(m_appServices->GetBookmarkTree(),
+			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, m_browser->GetHWND(), m_browser,
+			m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader(),
+			m_appServices->GetPlatformContext());
+		break;
+
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
 		BookmarkHelper::BookmarkAllTabs(m_appServices->GetBookmarkTree(), m_browser,
 			m_appServices->GetPlatformContext(), m_appServices->GetAcceleratorManager(),
 			m_appServices->GetResourceLoader());
+		break;
+
+	case IDM_BOOKMARKS_MANAGE_BOOKMARKS:
+		CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(),
+			L"ManageBookmarksDialog",
+			[this] { return ManageBookmarksDialog::Create(m_browser->GetHWND(), m_appServices); });
 		break;
 
 	case IDM_TOOLS_SEARCH:
