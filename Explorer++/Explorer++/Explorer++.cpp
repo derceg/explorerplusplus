@@ -13,6 +13,7 @@
 #include "Config.h"
 #include "DrivesToolbar.h"
 #include "EventScope.h"
+#include "FmtWrapper.h"
 #include "FoldersPane.h"
 #include "FoldersPaneView.h"
 #include "MainMenu.h"
@@ -34,7 +35,6 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclass.h"
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 
 Explorerplusplus *Explorerplusplus::Create(const WindowStorageData &storageData,

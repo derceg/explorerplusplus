@@ -4,13 +4,13 @@
 
 #include "stdafx.h"
 #include "AboutDialog.h"
+#include "FmtWrapper.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ThirdPartyCreditsDialog.h"
 #include "Version.h"
 #include "VersionHelper.h"
 #include "../Helper/WindowHelper.h"
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 
 AboutDialog *AboutDialog::Create(const ResourceLoader *resourceLoader, HWND hParent)

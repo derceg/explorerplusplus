@@ -8,6 +8,7 @@
 #include "BrowserCommandController.h"
 #include "BrowserView.h"
 #include "Config.h"
+#include "FmtWrapper.h"
 #include "MainResource.h"
 #include "MainToolbarLayout.h"
 #include "MainToolbarView.h"
@@ -26,7 +27,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/EnumHelper.h"
 #include "../Helper/ImageHelper.h"
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <magic_enum/magic_enum.hpp>
 #include <algorithm>

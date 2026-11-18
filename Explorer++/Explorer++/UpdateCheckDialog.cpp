@@ -11,13 +11,13 @@
 
 #include "stdafx.h"
 #include "UpdateCheckDialog.h"
+#include "FmtWrapper.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "Version.h"
 #include "VersionHelper.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <WinInet.h>
 #include <stdexcept>

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <boost/interprocess/containers/string.hpp>
+#include <boost/container/string.hpp>
 #include <boost/interprocess/managed_windows_shared_memory.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -22,7 +22,7 @@ protected:
 	template <typename T>
 	using Allocator = boost::interprocess::allocator<T, Manager>;
 	using CharAllocator = Allocator<char>;
-	using String = boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator>;
+	using String = boost::container::basic_string<char, std::char_traits<char>, CharAllocator>;
 
 	struct SharedData
 	{

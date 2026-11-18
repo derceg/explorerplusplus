@@ -2139,6 +2139,9 @@
     <ClInclude Include="BrowserView.h">
       <Filter>Browser\UI\Views</Filter>
     </ClInclude>
+    <ClInclude Include="FmtWrapper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

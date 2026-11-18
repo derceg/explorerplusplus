@@ -7,6 +7,7 @@
 #include "AppController.h"
 #include "AppInfo.h"
 #include "Config.h"
+#include "FmtWrapper.h"
 #include "LanguageHelper.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
@@ -16,7 +17,6 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <Shlwapi.h>
 

@@ -1559,6 +1559,7 @@
     <ClInclude Include="AppServices.h" />
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="BrowserView.h" />
+    <ClInclude Include="FmtWrapper.h" />
     <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumn.h" />

@@ -16,6 +16,7 @@
 #include "DriveEnumeratorImpl.h"
 #include "ExitCode.h"
 #include "FileSystemWatcher.h"
+#include "FmtWrapper.h"
 #include "JumpListHelper.h"
 #include "LanguageHelper.h"
 #include "MainResource.h"
@@ -35,7 +36,6 @@
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <filesystem>
 

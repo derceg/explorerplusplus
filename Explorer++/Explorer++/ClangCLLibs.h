@@ -67,7 +67,6 @@
 	#pragma comment(lib, EPP_BOOST_LIB_NAME(thread))
 	#pragma comment(lib, "CLI11.lib")
 	#pragma comment(lib, "concurrencpp.lib")
-	#pragma comment(lib, "cppwinrt_fast_forwarder.lib")
 	#pragma comment(lib, "detours.lib")
 	#pragma comment(lib, EPP_FMT_LIB_NAME)
 	#pragma comment(lib, EPP_GFLAGS_LIB_NAME)

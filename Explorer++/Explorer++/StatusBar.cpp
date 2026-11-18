@@ -6,6 +6,7 @@
 #include "StatusBar.h"
 #include "BrowserWindow.h"
 #include "Config.h"
+#include "FmtWrapper.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
 #include "ShellBrowser/NavigationEvents.h"
@@ -13,7 +14,6 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "StatusBarView.h"
 #include "TabEvents.h"
-#include <fmt/format.h>
 #include <fmt/xchar.h>
 #include <wil/common.h>
 #include <format>
