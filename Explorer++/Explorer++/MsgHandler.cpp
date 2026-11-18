@@ -545,11 +545,6 @@ ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowserImpl() const
 	return m_pActiveShellBrowser;
 }
 
-TabBar *Explorerplusplus::GetTabBar() const
-{
-	return GetActivePane()->GetTabBar();
-}
-
 void Explorerplusplus::FocusActiveTab()
 {
 	Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
@@ -605,7 +600,7 @@ void Explorerplusplus::OnShowOptions()
 		{
 			return OptionsDialog::Create(m_resourceLoader, m_hwnd,
 				m_appServices->GetAppController(), m_config, m_appServices->GetDarkModeManager(),
-				m_appServices->GetWindowThemeManager(), this);
+				m_appServices->GetWindowThemeManager(), m_appServices->GetTabList());
 		});
 }
 

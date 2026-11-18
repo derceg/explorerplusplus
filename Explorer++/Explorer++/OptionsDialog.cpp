@@ -6,7 +6,6 @@
 #include "OptionsDialog.h"
 #include "AdvancedOptionsPage.h"
 #include "AppearanceOptionsPage.h"
-#include "CoreInterface.h"
 #include "DarkModeManager.h"
 #include "DefaultSettingsOptionsPage.h"
 #include "FilesFoldersOptionsPage.h"
@@ -27,21 +26,21 @@
 
 OptionsDialog *OptionsDialog::Create(const ResourceLoader *resourceLoader, HWND parent,
 	AppController *appController, Config *config, DarkModeManager *darkModeManager,
-	WindowThemeManager *windowThemeManager, CoreInterface *coreInterface)
+	WindowThemeManager *windowThemeManager, TabList *tabList)
 {
 	return new OptionsDialog(resourceLoader, parent, appController, config, darkModeManager,
-		windowThemeManager, coreInterface);
+		windowThemeManager, tabList);
 }
 
 OptionsDialog::OptionsDialog(const ResourceLoader *resourceLoader, HWND parent,
 	AppController *appController, Config *config, DarkModeManager *darkModeManager,
-	WindowThemeManager *windowThemeManager, CoreInterface *coreInterface) :
+	WindowThemeManager *windowThemeManager, TabList *tabList) :
 	BaseDialog(resourceLoader, IDD_OPTIONS, parent, DialogSizingType::Both, Icon::Options),
 	m_appController(appController),
 	m_config(config),
 	m_darkModeManager(darkModeManager),
 	m_windowThemeManager(windowThemeManager),
-	m_coreInterface(coreInterface)
+	m_tabList(tabList)
 {
 }
 
@@ -140,8 +139,8 @@ void OptionsDialog::AddPages()
 		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd, m_darkModeManager));
 	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, m_resourceLoader, m_config,
 		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, m_resourceLoader, m_config,
-		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd, m_coreInterface));
+	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, m_resourceLoader, m_tabList, m_config,
+		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<WindowOptionsPage>(m_hDlg, m_resourceLoader, m_config,
 		std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<TabsOptionsPage>(m_hDlg, m_resourceLoader, m_config,

@@ -20,11 +20,6 @@ public:
 		return nullptr;
 	}
 
-	TabBar *GetTabBar() const override
-	{
-		return nullptr;
-	}
-
 	BOOL CanPaste(PasteType pasteType) const override
 	{
 		UNREFERENCED_PARAMETER(pasteType);

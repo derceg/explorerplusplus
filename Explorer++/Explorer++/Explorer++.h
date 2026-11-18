@@ -239,7 +239,6 @@ private:
 
 	/* CoreInterface methods. */
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
-	TabBar *GetTabBar() const override;
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
 		LPVOID pData);

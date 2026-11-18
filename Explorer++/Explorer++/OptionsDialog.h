@@ -12,10 +12,10 @@
 
 class AppController;
 struct Config;
-class CoreInterface;
 class DarkModeManager;
 class OptionsPage;
 class ResourceLoader;
+class TabList;
 class WindowSubclass;
 class WindowThemeManager;
 
@@ -24,7 +24,7 @@ class OptionsDialog : public BaseDialog
 public:
 	static OptionsDialog *Create(const ResourceLoader *resourceLoader, HWND parent,
 		AppController *appController, Config *config, DarkModeManager *darkModeManager,
-		WindowThemeManager *windowThemeManager, CoreInterface *coreInterface);
+		WindowThemeManager *windowThemeManager, TabList *tabList);
 
 private:
 	// The amount of horizontal spacing between the navigation controls on the left side of the
@@ -33,7 +33,7 @@ private:
 
 	OptionsDialog(const ResourceLoader *resourceLoader, HWND parent, AppController *appController,
 		Config *config, DarkModeManager *darkModeManager, WindowThemeManager *windowThemeManager,
-		CoreInterface *coreInterface);
+		TabList *tabList);
 	~OptionsDialog() = default;
 
 	INT_PTR OnInitDialog() override;
@@ -69,7 +69,7 @@ private:
 	Config *const m_config;
 	DarkModeManager *const m_darkModeManager;
 	WindowThemeManager *const m_windowThemeManager;
-	CoreInterface *const m_coreInterface;
+	TabList *const m_tabList;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 

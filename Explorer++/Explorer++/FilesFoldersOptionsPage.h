@@ -7,14 +7,13 @@
 #include "OptionsPage.h"
 #include "../Helper/StringHelper.h"
 
-class CoreInterface;
+class TabList;
 
 class FilesFoldersOptionsPage : public OptionsPage
 {
 public:
-	FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader, Config *config,
-		SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
-		CoreInterface *coreInterface);
+	FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader, TabList *tabList,
+		Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow);
 
 	void SaveSettings() override;
 
@@ -28,5 +27,5 @@ private:
 	void SetFolderSizeControlState();
 	std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat);
 
-	CoreInterface *const m_coreInterface;
+	TabList *const m_tabList;
 };

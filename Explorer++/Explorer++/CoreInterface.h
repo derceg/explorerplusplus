@@ -7,7 +7,6 @@
 #include "../Helper/ClipboardHelper.h"
 
 class ShellBrowserImpl;
-class TabBar;
 
 // Deprecated interface between Explorerplusplus and some of the other components (such as the
 // dialogs and toolbars).
@@ -17,8 +16,6 @@ public:
 	virtual ~CoreInterface() = default;
 
 	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;
-
-	virtual TabBar *GetTabBar() const = 0;
 
 	virtual BOOL CanPaste(PasteType pasteType) const = 0;
 };

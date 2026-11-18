@@ -5,25 +5,23 @@
 #include "stdafx.h"
 #include "FilesFoldersOptionsPage.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
-#include "ShellBrowser/ShellBrowserImpl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabBar.h"
+#include "Tab.h"
+#include "TabList.h"
 #include "../Helper/Controls.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
-#include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
 #include <magic_enum/magic_enum.hpp>
 
 FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
-	Config *config, SettingChangedCallback settingChangedCallback, HWND tooltipWindow,
-	CoreInterface *coreInterface) :
+	TabList *tabList, Config *config, SettingChangedCallback settingChangedCallback,
+	HWND tooltipWindow) :
 	OptionsPage(IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, parent, resourceLoader,
 		config, settingChangedCallback, tooltipWindow),
-	m_coreInterface(coreInterface)
+	m_tabList(tabList)
 {
 }
 
@@ -375,8 +373,8 @@ void FilesFoldersOptionsPage::SaveSettings()
 	CHECK(sizeDisplayFormat);
 	m_config->globalFolderSettings.sizeDisplayFormat = *sizeDisplayFormat;
 
-	for (auto &tab : m_coreInterface->GetTabBar()->GetAllTabs() | boost::adaptors::map_values)
+	for (auto *tab : m_tabList->GetAll())
 	{
-		tab->GetShellBrowserImpl()->GetNavigationController()->Refresh();
+		tab->GetShellBrowser()->GetNavigationController()->Refresh();
 	}
 }
