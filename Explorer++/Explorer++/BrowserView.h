@@ -14,6 +14,7 @@
 #include <optional>
 
 class AddressBarView;
+class AppController;
 class AppServices;
 class BookmarksToolbarView;
 class BrowserPaneView;
@@ -98,6 +99,7 @@ private:
 
 	const WindowSubclass m_subclass;
 	BrowserWindow *const m_browser;
+	AppController *const m_appController;
 	const Config *const m_config;
 	WindowThemeManager *const m_windowThemeManager;
 	const ResourceLoader *const m_resourceLoader;

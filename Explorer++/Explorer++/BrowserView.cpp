@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "BrowserView.h"
 #include "AddressBarView.h"
+#include "AppController.h"
 #include "AppInfo.h"
 #include "AppServices.h"
 #include "ApplicationToolbarView.h"
@@ -33,6 +34,7 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 	ViewBase(CreateBrowserWindow(bounds)),
 	m_subclass(GetHWND(), std::bind_front(&BrowserView::WndProc, this)),
 	m_browser(browser),
+	m_appController(appServices->GetAppController()),
 	m_config(appServices->GetConfig()),
 	m_windowThemeManager(appServices->GetWindowThemeManager()),
 	m_resourceLoader(appServices->GetResourceLoader())
@@ -232,6 +234,13 @@ LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_APP_CLOSE:
 		m_browser->TryClose();
 		break;
+
+	case WM_ENDSESSION:
+		if (wParam)
+		{
+			m_appController->NotifySessionEnding();
+		}
+		return 0;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

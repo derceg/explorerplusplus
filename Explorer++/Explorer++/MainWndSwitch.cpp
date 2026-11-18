@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "AddressBar.h"
 #include "AddressBarView.h"
-#include "AppController.h"
 #include "AppServices.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
@@ -116,13 +115,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 	case WM_SIZE:
 		OnSize(static_cast<UINT>(wParam));
-		return 0;
-
-	case WM_ENDSESSION:
-		if (wParam)
-		{
-			m_appServices->GetAppController()->NotifySessionEnding();
-		}
 		return 0;
 
 	case WM_NCDESTROY:
