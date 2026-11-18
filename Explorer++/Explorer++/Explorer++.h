@@ -181,7 +181,6 @@ private:
 	void OnPaste();
 	void OnPasteShortcut();
 	void OnResolveLink();
-	void OnShowHiddenFiles();
 	void OnSelectColumns();
 	void OnDestroyFiles();
 	void OnShowOptions();

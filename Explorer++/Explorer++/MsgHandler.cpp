@@ -550,13 +550,6 @@ TabBar *Explorerplusplus::GetTabBar() const
 	return GetActivePane()->GetTabBar();
 }
 
-void Explorerplusplus::OnShowHiddenFiles()
-{
-	Tab &tab = GetActivePane()->GetTabBar()->GetSelectedTab();
-	tab.GetShellBrowserImpl()->SetShowHidden(!tab.GetShellBrowserImpl()->GetShowHidden());
-	tab.GetShellBrowserImpl()->GetNavigationController()->Refresh();
-}
-
 void Explorerplusplus::FocusActiveTab()
 {
 	Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();

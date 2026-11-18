@@ -880,6 +880,8 @@ bool ShellBrowserImpl::GetShowHidden() const
 void ShellBrowserImpl::SetShowHidden(bool showHidden)
 {
 	m_folderSettings.showHidden = showHidden;
+
+	m_navigationController->Refresh();
 }
 
 std::vector<SortMode> ShellBrowserImpl::GetAvailableSortModes() const

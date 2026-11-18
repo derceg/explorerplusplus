@@ -272,6 +272,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 			!GetActiveShellBrowser()->IsAutoArrangeEnabled());
 		break;
 
+	case IDM_VIEW_SHOWHIDDENFILES:
+		GetActiveShellBrowser()->SetShowHidden(!GetActiveShellBrowser()->GetShowHidden());
+		break;
+
 	case IDM_VIEW_REFRESH:
 		GetActiveShellBrowser()->GetNavigationController()->Refresh();
 		break;

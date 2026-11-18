@@ -249,13 +249,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDM_FILTER_FILTERRESULTS:
 	case IDM_FILTER_ENABLE_FILTER:
 	case IDM_VIEW_AUTOARRANGE:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_VIEW_SHOWHIDDENFILES:
-		OnShowHiddenFiles();
-		break;
-
 	case IDM_VIEW_REFRESH:
 		m_commandController.ExecuteCommand(id);
 		break;

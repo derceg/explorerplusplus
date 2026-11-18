@@ -141,6 +141,16 @@ void ShellBrowserFake::SetGroupSortDirection(SortDirection direction)
 	m_folderSettings.groupSortDirection = direction;
 }
 
+bool ShellBrowserFake::GetShowHidden() const
+{
+	return m_folderSettings.showHidden;
+}
+
+void ShellBrowserFake::SetShowHidden(bool showHidden)
+{
+	m_folderSettings.showHidden = showHidden;
+}
+
 void ShellBrowserFake::SetAllColumnSets(const FolderColumns &folderColumns)
 {
 	m_folderColumns = folderColumns;

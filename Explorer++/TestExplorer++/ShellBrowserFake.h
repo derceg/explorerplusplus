@@ -48,6 +48,8 @@ public:
 	void SetGroupMode(SortMode groupMode) override;
 	SortDirection GetGroupSortDirection() const override;
 	void SetGroupSortDirection(SortDirection direction) override;
+	bool GetShowHidden() const override;
+	void SetShowHidden(bool showHidden) override;
 	void SetAllColumnSets(const FolderColumns &folderColumns) override;
 	const FolderColumns &GetAllColumnSets() const override;
 	bool IsAutoArrangeEnabled() const override;

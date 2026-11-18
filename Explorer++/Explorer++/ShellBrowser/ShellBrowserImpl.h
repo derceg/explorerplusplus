@@ -95,6 +95,8 @@ public:
 	void SetGroupMode(SortMode groupMode) override;
 	SortDirection GetGroupSortDirection() const override;
 	void SetGroupSortDirection(SortDirection direction) override;
+	bool GetShowHidden() const override;
+	void SetShowHidden(bool showHidden) override;
 	void SetAllColumnSets(const FolderColumns &folderColumns) override;
 	const FolderColumns &GetAllColumnSets() const override;
 	bool IsAutoArrangeEnabled() const override;
@@ -132,8 +134,6 @@ public:
 	/* Get/Set current state. */
 	int GetUniqueFolderId() const;
 	void CycleViewMode(bool cycleForward);
-	bool GetShowHidden() const;
-	void SetShowHidden(bool showHidden);
 	int GetNumItems() const;
 	int GetNumSelectedFiles() const;
 	int GetNumSelectedFolders() const;
