@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "TaskbarTabManager.h"
 #include "AppServices.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "IconFetcher.h"
@@ -115,7 +116,7 @@ TaskbarTabManager::TaskbarTabManager(BrowserWindow *browser, AppServices *appSer
 	ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP, MSGFLT_ADD);
 
 	// Subclass the browser window until the above message (TaskbarButtonCreated) is caught.
-	m_bowserWindowSubclass = std::make_unique<WindowSubclass>(m_browser->GetHWND(),
+	m_bowserWindowSubclass = std::make_unique<WindowSubclass>(m_browser->GetView()->GetHWND(),
 		std::bind_front(&TaskbarTabManager::BrowserWndProc, this));
 
 	m_connections.push_back(m_appServices->GetConfig()->showTaskbarThumbnails.addObserver(
@@ -247,7 +248,7 @@ void TaskbarTabManager::CreateTabProxy(const Tab &tab)
 void TaskbarTabManager::OnTabSelectionChanged(const Tab &tab)
 {
 	auto *proxy = GetProxyForTab(&tab);
-	m_taskbarList->SetTabActive(proxy->GetWindow(), m_browser->GetHWND(), 0);
+	m_taskbarList->SetTabActive(proxy->GetWindow(), m_browser->GetView()->GetHWND(), 0);
 
 	proxy->InvalidateIconicBitmaps();
 }
@@ -364,7 +365,7 @@ TaskbarTabManager::TaskbarTabProxy::TaskbarTabProxy(const Tab *tab, BrowserWindo
 	m_subclass = std::make_unique<WindowSubclass>(m_hwnd.get(),
 		std::bind_front(&TaskbarTabProxy::WndProc, this));
 	m_taskbarRegistration = std::make_unique<ScopedTaskbarTabRegistration>(taskbarList,
-		m_hwnd.get(), m_browser->GetHWND());
+		m_hwnd.get(), m_browser->GetView()->GetHWND());
 
 	UpdateTitleAndIcon();
 }
@@ -447,7 +448,7 @@ void TaskbarTabManager::TaskbarTabProxy::OnDwmSendIconicThumbnail(int maxWidth, 
 	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
 	HRESULT hr;
 
-	if (IsIconic(m_browser->GetHWND()))
+	if (IsIconic(m_browser->GetView()->GetHWND()))
 	{
 		hr = CreateFallbackThumbnailBitmap(maxWidth, maxHeight, bitmap);
 	}
@@ -512,7 +513,7 @@ HRESULT TaskbarTabManager::TaskbarTabProxy::CreateWindowThumbnailBitmap(int maxW
 	wil::com_ptr_nothrow<IWICBitmapSource> &output)
 {
 	RECT browserRect;
-	auto res = GetClientRect(m_browser->GetHWND(), &browserRect);
+	auto res = GetClientRect(m_browser->GetView()->GetHWND(), &browserRect);
 	CHECK(res);
 
 	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
@@ -539,16 +540,17 @@ HRESULT TaskbarTabManager::TaskbarTabProxy::DrawWindowThumbnail(ID2D1RenderTarge
 	// 2. The listview (for whatever reason) won't be redrawn properly.
 	//
 	// Forcing a redraw here fixes both of those issues.
-	RedrawWindow(m_browser->GetHWND(), nullptr, nullptr, RDW_ALLCHILDREN | RDW_UPDATENOW);
+	HWND browserWindow = m_browser->GetView()->GetHWND();
+	RedrawWindow(browserWindow, nullptr, nullptr, RDW_ALLCHILDREN | RDW_UPDATENOW);
 
-	RETURN_IF_FAILED(D2DHelper::DrawWindowToTarget(m_browser->GetHWND(),
+	RETURN_IF_FAILED(D2DHelper::DrawWindowToTarget(browserWindow,
 		D2DHelper::PrintWindowTarget::Client, renderTarget));
 
 	RECT tabRect;
 	HWND listView = m_tab->GetShellBrowserImpl()->GetListView();
 	auto res = GetWindowRect(listView, &tabRect);
 	CHECK(res);
-	MapWindowPoints(HWND_DESKTOP, m_browser->GetHWND(), reinterpret_cast<LPPOINT>(&tabRect), 2);
+	MapWindowPoints(HWND_DESKTOP, browserWindow, reinterpret_cast<LPPOINT>(&tabRect), 2);
 	RETURN_IF_FAILED(D2DHelper::PrintWindowToTarget(listView, D2DHelper::PrintWindowTarget::Full,
 		renderTarget, { tabRect.left, tabRect.top }));
 
@@ -557,7 +559,9 @@ HRESULT TaskbarTabManager::TaskbarTabProxy::DrawWindowThumbnail(ID2D1RenderTarge
 
 void TaskbarTabManager::TaskbarTabProxy::OnDwmSendIconicLivePreviewBitmap()
 {
-	if (IsIconic(m_browser->GetHWND()))
+	HWND browserWindow = m_browser->GetView()->GetHWND();
+
+	if (IsIconic(browserWindow))
 	{
 		return;
 	}
@@ -575,14 +579,14 @@ void TaskbarTabManager::TaskbarTabProxy::OnDwmSendIconicLivePreviewBitmap()
 	RECT tabRect;
 	auto res = GetWindowRect(m_tab->GetShellBrowserImpl()->GetListView(), &tabRect);
 	CHECK(res);
-	MapWindowPoints(HWND_DESKTOP, m_browser->GetHWND(), reinterpret_cast<LPPOINT>(&tabRect), 2);
+	MapWindowPoints(HWND_DESKTOP, browserWindow, reinterpret_cast<LPPOINT>(&tabRect), 2);
 
 	MENUBARINFO menuBarInfo;
 	menuBarInfo.cbSize = sizeof(menuBarInfo);
-	GetMenuBarInfo(m_browser->GetHWND(), OBJID_MENU, 0, &menuBarInfo);
+	GetMenuBarInfo(browserWindow, OBJID_MENU, 0, &menuBarInfo);
 
 	POINT ptClientOrigin = { 0, 0 };
-	ClientToScreen(m_browser->GetHWND(), &ptClientOrigin);
+	ClientToScreen(browserWindow, &ptClientOrigin);
 
 	// DwmSetIconicLivePreviewBitmap() needs to be provided with the offset of the tab (so that it
 	// knows where to draw the provided bitmap). For whatever reason, the offset can't just be in

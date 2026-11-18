@@ -805,7 +805,7 @@
     <ClCompile Include="AppServices.cpp">
       <Filter>App</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserView.cpp">
+    <ClCompile Include="BrowserViewImpl.cpp">
       <Filter>Browser\UI\Views</Filter>
     </ClCompile>
     <ClCompile Include="DarkModeManager.cpp">
@@ -1920,7 +1920,7 @@
     <ClInclude Include="AppServices.h">
       <Filter>App</Filter>
     </ClInclude>
-    <ClInclude Include="BrowserView.h">
+    <ClInclude Include="BrowserViewImpl.h">
       <Filter>Browser\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="AppController.h">
@@ -2135,6 +2135,9 @@
     </ClInclude>
     <ClInclude Include="ShellItemContextMenuHelper.h">
       <Filter>Menus\UI\Shell Context Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserView.h">
+      <Filter>Browser\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

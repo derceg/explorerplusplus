@@ -7,7 +7,7 @@
 #include "ApplicationExecutorImpl.h"
 #include "BrowserCommandController.h"
 #include "BrowserPane.h"
-#include "BrowserView.h"
+#include "BrowserViewImpl.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "LayoutDefaults.h"
@@ -71,7 +71,8 @@ public:
 		HINSTANCE resourceInstance);
 
 	// BrowserWindow
-	HWND GetHWND() const override;
+	BrowserView *GetView() override;
+	const BrowserView *GetView() const override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
 	TabBar *GetActiveTabBar() override;
@@ -261,7 +262,7 @@ private:
 	ShellBrowserEvents *const m_shellBrowserEvents;
 	NavigationEvents *const m_navigationEvents;
 	const ResourceLoader *const m_resourceLoader;
-	BrowserView m_view;
+	BrowserViewImpl m_view;
 	HWND m_hwnd;
 	BrowserCommandController m_commandController;
 

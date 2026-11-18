@@ -11,6 +11,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "BrowserCommands.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "CustomizeColorsDialog.h"
@@ -368,8 +369,8 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_BOOKMARKS_BOOKMARK_THIS_TAB:
 		BookmarkHelper::AddBookmarkItem(m_appServices->GetBookmarkTree(),
-			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, m_browser->GetHWND(), m_browser,
-			m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader(),
+			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, m_browser->GetView()->GetHWND(),
+			m_browser, m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader(),
 			m_appServices->GetPlatformContext());
 		break;
 
@@ -382,7 +383,11 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 	case IDM_BOOKMARKS_MANAGE_BOOKMARKS:
 		CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(),
 			L"ManageBookmarksDialog",
-			[this] { return ManageBookmarksDialog::Create(m_browser->GetHWND(), m_appServices); });
+			[this]
+			{
+				return ManageBookmarksDialog::Create(m_browser->GetView()->GetHWND(),
+					m_appServices);
+			});
 		break;
 
 	case IDM_TOOLS_SEARCH:
@@ -581,7 +586,7 @@ void BrowserCommandController::OnResetMainFontSize()
 void BrowserCommandController::OnChangeDisplayColors()
 {
 	auto *displayColoursDialog =
-		DisplayColoursDialog::Create(m_browser->GetHWND(), m_browser, m_appServices);
+		DisplayColoursDialog::Create(m_browser->GetView()->GetHWND(), m_browser, m_appServices);
 	displayColoursDialog->ShowModalDialog();
 }
 
@@ -677,16 +682,16 @@ void BrowserCommandController::OnSearch()
 	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"SearchDialog",
 		[this]
 		{
-			return SearchDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetHWND(),
-				GetActiveShellBrowser()->GetDirectoryPath(), m_appServices->GetBrowserList(),
-				m_appServices->GetAcceleratorManager());
+			return SearchDialog::Create(m_appServices->GetResourceLoader(),
+				m_browser->GetView()->GetHWND(), GetActiveShellBrowser()->GetDirectoryPath(),
+				m_appServices->GetBrowserList(), m_appServices->GetAcceleratorManager());
 		});
 }
 
 void BrowserCommandController::OnCustomizeColors()
 {
 	auto *customizeColorsDialog = CustomizeColorsDialog::Create(m_appServices->GetResourceLoader(),
-		m_browser->GetHWND(), m_appServices->GetColorRuleModel());
+		m_browser->GetView()->GetHWND(), m_appServices->GetColorRuleModel());
 	customizeColorsDialog->ShowModalDialog();
 }
 
@@ -695,8 +700,8 @@ void BrowserCommandController::OnRunScript()
 	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"ScriptingDialog",
 		[this]
 		{
-			return ScriptingDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetHWND(),
-				m_appServices);
+			return ScriptingDialog::Create(m_appServices->GetResourceLoader(),
+				m_browser->GetView()->GetHWND(), m_appServices);
 		});
 }
 
@@ -709,8 +714,9 @@ void BrowserCommandController::OnSearchTabs()
 				m_appServices->GetTabEvents(), m_appServices->GetShellBrowserEvents(),
 				m_appServices->GetNavigationEvents());
 
-			return SearchTabsDialog::Create(m_browser->GetHWND(), std::move(searchTabsModel),
-				m_appServices->GetTabList(), m_appServices->GetIconFetcher(),
+			return SearchTabsDialog::Create(m_browser->GetView()->GetHWND(),
+				std::move(searchTabsModel), m_appServices->GetTabList(),
+				m_appServices->GetIconFetcher(),
 				m_appServices->GetPlatformContext()->GetKeyboardState(),
 				m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader());
 		});
@@ -723,15 +729,15 @@ void BrowserCommandController::OnOpenOnlineDocumentation()
 
 void BrowserCommandController::OnCheckForUpdates()
 {
-	auto *updateCheckDialog =
-		UpdateCheckDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetHWND());
+	auto *updateCheckDialog = UpdateCheckDialog::Create(m_appServices->GetResourceLoader(),
+		m_browser->GetView()->GetHWND());
 	updateCheckDialog->ShowModalDialog();
 }
 
 void BrowserCommandController::OnAbout()
 {
 	auto *aboutDialog =
-		AboutDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetHWND());
+		AboutDialog::Create(m_appServices->GetResourceLoader(), m_browser->GetView()->GetHWND());
 	aboutDialog->ShowModalDialog();
 }
 

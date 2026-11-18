@@ -9,6 +9,7 @@
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainResource.h"
@@ -131,8 +132,9 @@ void ToolbarOptionsMenu::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	auto *bookmarkTree = m_appServices->GetBookmarkTree();
 	BookmarkHelper::AddBookmarkItem(bookmarkTree, type, bookmarkTree->GetBookmarksToolbarFolder(),
-		std::nullopt, m_browser->GetHWND(), m_browser, m_appServices->GetAcceleratorManager(),
-		m_appServices->GetResourceLoader(), m_appServices->GetPlatformContext());
+		std::nullopt, m_browser->GetView()->GetHWND(), m_browser,
+		m_appServices->GetAcceleratorManager(), m_appServices->GetResourceLoader(),
+		m_appServices->GetPlatformContext());
 }
 
 void ToolbarOptionsMenu::OnPasteBookmark()
@@ -147,7 +149,7 @@ void ToolbarOptionsMenu::OnNewApplication()
 {
 	using namespace Applications;
 
-	auto *editorDialog = ApplicationEditorDialog::Create(m_browser->GetHWND(),
+	auto *editorDialog = ApplicationEditorDialog::Create(m_browser->GetView()->GetHWND(),
 		m_appServices->GetResourceLoader(), m_appServices->GetApplicationModel(),
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Applications::Application>(L"", L"")));

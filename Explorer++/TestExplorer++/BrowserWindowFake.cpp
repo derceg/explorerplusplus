@@ -45,14 +45,14 @@ BrowserWindowFake::BrowserWindowFake(const WindowStorageData &storageData,
 	}
 }
 
-BrowserWindowFakeView *BrowserWindowFake::GetView()
+BrowserView *BrowserWindowFake::GetView()
 {
 	return &m_view;
 }
 
-HWND BrowserWindowFake::GetHWND() const
+const BrowserView *BrowserWindowFake::GetView() const
 {
-	return m_view.GetHWND();
+	return &m_view;
 }
 
 BrowserCommandController *BrowserWindowFake::GetCommandController()

@@ -6,6 +6,7 @@
 #include "MainToolbar.h"
 #include "AppServices.h"
 #include "BrowserCommandController.h"
+#include "BrowserView.h"
 #include "Config.h"
 #include "MainResource.h"
 #include "MainToolbarLayout.h"
@@ -172,7 +173,8 @@ protected:
 private:
 	void OnClicked()
 	{
-		SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(ToUnderlying(m_buttonId), 0), 0);
+		SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND,
+			MAKEWPARAM(ToUnderlying(m_buttonId), 0), 0);
 	}
 
 	bool m_enabled = true;

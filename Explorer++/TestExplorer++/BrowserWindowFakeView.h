@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "ViewBase.h"
+#include "BrowserView.h"
 #include <wil/resource.h>
 
-class BrowserWindowFakeView : public ViewBase
+class BrowserWindowFakeView : public BrowserView
 {
 public:
 	BrowserWindowFakeView(const RECT &bounds);

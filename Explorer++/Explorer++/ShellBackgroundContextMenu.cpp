@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBackgroundContextMenu.h"
 #include "BrowserCommandController.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "DirectoryOperationsHelper.h"
 #include "MainResource.h"
@@ -144,10 +145,11 @@ void ShellBackgroundContextMenu::OnCustomizeDirectory()
 	// Therefore, this will only work when the actual title of the properties dialog is "customize"
 	// (ignoring case). That's not ideal, but not too much of an issue, since the properties dialog
 	// will always be opened, just not always on the customize tab.
-	ExecuteFileAction(m_browser->GetHWND(), m_directory.Raw(), L"properties", L"customize", L"");
+	ExecuteFileAction(m_browser->GetView()->GetHWND(), m_directory.Raw(), L"properties",
+		L"customize", L"");
 }
 
 void ShellBackgroundContextMenu::SendCommandToBrowser(WORD id)
 {
-	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
 }

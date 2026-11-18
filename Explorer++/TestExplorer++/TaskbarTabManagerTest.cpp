@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "TaskbarTabManager.h"
 #include "BrowserTestBase.h"
+#include "BrowserView.h"
 #include "BrowserWindowFake.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include "../Helper/WindowHelper.h"
@@ -278,14 +279,14 @@ protected:
 
 	void SendTaskbarButtonCreatedMessage()
 	{
-		SendMessage(m_browser->GetHWND(), m_taskbarButtonCreatedMessage, 0, 0);
+		SendMessage(m_browser->GetView()->GetHWND(), m_taskbarButtonCreatedMessage, 0, 0);
 	}
 
 	std::vector<const Tab *> GetTabsForProxyWindows() const
 	{
 		std::vector<const Tab *> tabs;
 
-		for (HWND proxy : m_taskbarList->GetTabsForWindow(m_browser->GetHWND()))
+		for (HWND proxy : m_taskbarList->GetTabsForWindow(m_browser->GetView()->GetHWND()))
 		{
 			tabs.push_back(m_taskbarTabManager->GetTabForProxyWindowForTesting(proxy));
 		}
@@ -295,7 +296,7 @@ protected:
 
 	void VerifyProxyWindowTitles()
 	{
-		for (HWND proxy : m_taskbarList->GetTabsForWindow(m_browser->GetHWND()))
+		for (HWND proxy : m_taskbarList->GetTabsForWindow(m_browser->GetView()->GetHWND()))
 		{
 			auto *tab = m_taskbarTabManager->GetTabForProxyWindowForTesting(proxy);
 			EXPECT_EQ(GetWindowString(proxy), tab->GetName());
@@ -340,12 +341,12 @@ TEST_F(TaskbarTabManagerTest, TabActivation)
 	auto *tabBar = m_browser->GetActiveTabBar();
 	tabBar->SelectTab(*tab2);
 	auto *activeTab = m_taskbarTabManager->GetTabForProxyWindowForTesting(
-		m_taskbarList->GetActiveTabForWindow(m_browser->GetHWND()));
+		m_taskbarList->GetActiveTabForWindow(m_browser->GetView()->GetHWND()));
 	EXPECT_EQ(activeTab, tab2);
 
 	tabBar->SelectTab(*tab3);
 	activeTab = m_taskbarTabManager->GetTabForProxyWindowForTesting(
-		m_taskbarList->GetActiveTabForWindow(m_browser->GetHWND()));
+		m_taskbarList->GetActiveTabForWindow(m_browser->GetView()->GetHWND()));
 	EXPECT_EQ(activeTab, tab3);
 }
 
@@ -383,7 +384,7 @@ TEST_F(TaskbarTabManagerTest, ActivationHandling)
 	m_browser->AddTab(L"c:\\");
 	auto *tab2 = m_browser->AddTab(L"d:\\");
 
-	const auto &proxyWindows = m_taskbarList->GetTabsForWindow(m_browser->GetHWND());
+	const auto &proxyWindows = m_taskbarList->GetTabsForWindow(m_browser->GetView()->GetHWND());
 	ASSERT_EQ(proxyWindows.size(), 2u);
 
 	SendMessage(proxyWindows[1], WM_ACTIVATE, MAKEWPARAM(WA_ACTIVE, 0), 0);
@@ -397,7 +398,7 @@ TEST_F(TaskbarTabManagerTest, CloseTabHandling)
 	m_browser->AddTab(L"d:\\");
 	auto *tab3 = m_browser->AddTab(L"e:\\");
 
-	const auto &proxyWindows = m_taskbarList->GetTabsForWindow(m_browser->GetHWND());
+	const auto &proxyWindows = m_taskbarList->GetTabsForWindow(m_browser->GetView()->GetHWND());
 	ASSERT_EQ(proxyWindows.size(), 3u);
 
 	SendMessage(proxyWindows[1], WM_CLOSE, 0, 0);
@@ -411,7 +412,7 @@ TEST_F(TaskbarTabManagerTest, TabsReAddedAfterReEnabling)
 	m_browser->AddTab(L"e:\\");
 
 	m_config.showTaskbarThumbnails = false;
-	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetHWND()));
+	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetView()->GetHWND()));
 
 	m_config.showTaskbarThumbnails = true;
 	auto *tabBar = m_browser->GetActiveTabBar();
@@ -425,7 +426,7 @@ TEST_F(TaskbarTabManagerTest, TabsClearedOnDestruction)
 	m_browser->AddTab(L"e:\\");
 
 	m_taskbarTabManager.reset();
-	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetHWND()));
+	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetView()->GetHWND()));
 }
 
 TEST_F(TaskbarTabManagerTest, NoTabsRegisteredWhenDisabled)
@@ -435,7 +436,7 @@ TEST_F(TaskbarTabManagerTest, NoTabsRegisteredWhenDisabled)
 	m_browser->AddTab(L"c:\\");
 	m_browser->AddTab(L"d:\\");
 	m_browser->AddTab(L"e:\\");
-	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetHWND()));
+	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetView()->GetHWND()));
 }
 
 class TaskbarTabManagerDelayedTaskbarButtonTest : public TaskbarTabManagerTest
@@ -452,7 +453,7 @@ TEST_F(TaskbarTabManagerDelayedTaskbarButtonTest, TabsCreatedBeforeTaskbarButton
 	m_browser->AddTab(L"c:\\");
 	m_browser->AddTab(L"d:\\");
 	m_browser->AddTab(L"e:\\");
-	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetHWND()));
+	EXPECT_FALSE(m_taskbarList->AreAnyTabsRegisteredForWindow(m_browser->GetView()->GetHWND()));
 
 	SendTaskbarButtonCreatedMessage();
 	auto *tabBar = m_browser->GetActiveTabBar();

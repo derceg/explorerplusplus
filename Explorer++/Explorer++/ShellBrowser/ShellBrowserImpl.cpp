@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
 #include "AppServices.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "ClipboardOperations.h"
 #include "ColorRuleModel.h"
@@ -78,8 +79,8 @@ ShellBrowserImpl::ShellBrowserImpl(const PidlAbsolute &initialPidl,
 ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns, BrowserWindow *browser, AppServices *appServices,
 	HINSTANCE resourceInstance, FileActionHandler *fileActionHandler) :
-	m_listView(CreateListView(browser->GetHWND())),
-	m_owner(browser->GetHWND()),
+	m_listView(CreateListView(browser->GetView()->GetHWND())),
+	m_owner(browser->GetView()->GetHWND()),
 	m_browser(browser),
 	m_appServices(appServices),
 	m_shellEnumerator(std::make_shared<ShellEnumeratorImpl>(m_owner)),

@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarksMenu.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
@@ -24,8 +25,8 @@ BookmarksMainMenu::BookmarksMainMenu(MenuView *menuView, BrowserWindow *browser,
 	m_resourceLoader(appServices->GetResourceLoader())
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
-	int scaledIconSize =
-		dpiCompat.ScaleValue(m_browser->GetHWND(), GetIconPixelSizeAtDefaultDpi(IconSize::Small));
+	int scaledIconSize = dpiCompat.ScaleValue(m_browser->GetView()->GetHWND(),
+		GetIconPixelSizeAtDefaultDpi(IconSize::Small));
 	m_iconManager = std::make_unique<BookmarkIconManager>(appServices->GetRuntime(),
 		appServices->GetIconFetcher(), m_resourceLoader, scaledIconSize, scaledIconSize);
 
@@ -110,5 +111,5 @@ void BookmarksMainMenu::BuildMenu()
 
 void BookmarksMainMenu::SendCommandToBrowser(WORD id)
 {
-	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
 }

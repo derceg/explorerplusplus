@@ -11,7 +11,6 @@
 #include "ApplicationToolbarView.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
-#include "BrowserView.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
@@ -506,11 +505,11 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 		break;
 
 	case IDA_PREVIOUSWINDOW:
-		m_view.FocusNextWindow(BrowserView::FocusChangeDirection::Previous);
+		m_view.FocusNextWindow(BrowserViewImpl::FocusChangeDirection::Previous);
 		break;
 
 	case IDA_NEXTWINDOW:
-		m_view.FocusNextWindow(BrowserView::FocusChangeDirection::Next);
+		m_view.FocusNextWindow(BrowserViewImpl::FocusChangeDirection::Next);
 		break;
 
 	case IDA_DUPLICATE_TAB:

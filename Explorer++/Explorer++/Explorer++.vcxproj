@@ -1444,7 +1444,7 @@
     <ClCompile Include="FoldersPaneView.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
-    <ClCompile Include="BrowserView.cpp" />
+    <ClCompile Include="BrowserViewImpl.cpp" />
     <ClCompile Include="AcceleratorHelper.cpp" />
     <ClCompile Include="ServiceProvider.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
@@ -1558,6 +1558,7 @@
     <ClInclude Include="AppInfo.h" />
     <ClInclude Include="AppServices.h" />
     <ClInclude Include="AppStorage.h" />
+    <ClInclude Include="BrowserView.h" />
     <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkColumn.h" />
@@ -1856,7 +1857,7 @@
     <ClInclude Include="Plugins\LuaPlugin.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
-    <ClInclude Include="BrowserView.h" />
+    <ClInclude Include="BrowserViewImpl.h" />
     <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h" />
     <ClInclude Include="Plugins\Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />

@@ -18,6 +18,7 @@
 #include "ShellTreeView.h"
 #include "AppServices.h"
 #include "BrowserPane.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "DialogHelper.h"
@@ -1451,7 +1452,7 @@ void ShellTreeView::SetFileAttributesForSelectedItem()
 {
 	auto pidl = GetSelectedNodePidl();
 	DialogHelper::MaybeShowSetFileAttributesDialog(m_appServices->GetResourceLoader(),
-		m_browser->GetHWND(), { { pidl.get() } });
+		m_browser->GetView()->GetHWND(), { { pidl.get() } });
 }
 
 void ShellTreeView::CopySelectedItemToFolder(TransferAction action)

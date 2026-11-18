@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ToolsMenu.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "FeatureList.h"
 #include "Icon.h"
@@ -77,5 +78,5 @@ void ToolsMenu::BuildMenu()
 
 void ToolsMenu::SendCommandToBrowser(WORD id)
 {
-	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
 }

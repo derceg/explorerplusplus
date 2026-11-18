@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceLoader.h"
@@ -59,7 +60,7 @@ void BookmarkAllTabs(BookmarkTree *bookmarkTree, BrowserWindow *browser,
 	std::wstring bookmarkAllTabsText =
 		resourceLoader->LoadString(IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr,
-		std::nullopt, browser->GetHWND(), browser, acceleratorManager, resourceLoader,
+		std::nullopt, browser->GetView()->GetHWND(), browser, acceleratorManager, resourceLoader,
 		platformContext, bookmarkAllTabsText);
 
 	if (!bookmarkFolder)

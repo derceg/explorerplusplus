@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "BrowserView.h"
+#include "BrowserViewImpl.h"
 #include "AddressBarView.h"
 #include "AppController.h"
 #include "AppInfo.h"
@@ -30,9 +30,10 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 
-BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices *appServices) :
-	ViewBase(CreateBrowserWindow(bounds)),
-	m_subclass(GetHWND(), std::bind_front(&BrowserView::WndProc, this)),
+BrowserViewImpl::BrowserViewImpl(BrowserWindow *browser, const RECT &bounds,
+	AppServices *appServices) :
+	BrowserView(CreateBrowserWindow(bounds)),
+	m_subclass(GetHWND(), std::bind_front(&BrowserViewImpl::WndProc, this)),
 	m_browser(browser),
 	m_appController(appServices->GetAppController()),
 	m_config(appServices->GetConfig()),
@@ -40,26 +41,27 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 	m_resourceLoader(appServices->GetResourceLoader())
 {
 	m_connections.push_back(m_browser->AddLifecycleStateChangedObserver(
-		std::bind_front(&BrowserView::OnBrowserLifecycleStateChanged, this)));
+		std::bind_front(&BrowserViewImpl::OnBrowserLifecycleStateChanged, this)));
 
 	m_connections.push_back(appServices->GetTabEvents()->AddSelectedObserver(
-		std::bind_front(&BrowserView::OnTabSelected, this), TabEventScope::ForBrowser(*m_browser)));
+		std::bind_front(&BrowserViewImpl::OnTabSelected, this),
+		TabEventScope::ForBrowser(*m_browser)));
 
 	m_connections.push_back(
 		appServices->GetShellBrowserEvents()->AddDirectoryPropertiesChangedObserver(
-			std::bind_front(&BrowserView::OnDirectoryPropertiesChanged, this),
+			std::bind_front(&BrowserViewImpl::OnDirectoryPropertiesChanged, this),
 			NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
 	m_connections.push_back(appServices->GetNavigationEvents()->AddCommittedObserver(
-		std::bind_front(&BrowserView::OnNavigationCommitted, this),
+		std::bind_front(&BrowserViewImpl::OnNavigationCommitted, this),
 		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
 
 	m_connections.push_back(m_config->showFullTitlePath.addObserver(
-		std::bind_front(&BrowserView::OnShowFullTitlePathUpdated, this)));
+		std::bind_front(&BrowserViewImpl::OnShowFullTitlePathUpdated, this)));
 	m_connections.push_back(m_config->showUserNameInTitleBar.addObserver(
-		std::bind_front(&BrowserView::OnShowUserNameInTitleBarUpdated, this)));
+		std::bind_front(&BrowserViewImpl::OnShowUserNameInTitleBarUpdated, this)));
 	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(
-		std::bind_front(&BrowserView::OnShowPrivilegeLevelInTitleBarUpdated, this)));
+		std::bind_front(&BrowserViewImpl::OnShowPrivilegeLevelInTitleBarUpdated, this)));
 
 	// The window is registered as a drop target only so that the drag image will be consistently
 	// shown when an item is being dragged. For the drag image to be shown, the relevant
@@ -84,9 +86,9 @@ BrowserView::BrowserView(BrowserWindow *browser, const RECT &bounds, AppServices
 	m_statusBarView = std::make_unique<StatusBarView>(this, m_config);
 }
 
-BrowserView::~BrowserView() = default;
+BrowserViewImpl::~BrowserViewImpl() = default;
 
-HWND BrowserView::CreateBrowserWindow(const RECT &bounds)
+HWND BrowserViewImpl::CreateBrowserWindow(const RECT &bounds)
 {
 	static bool browserWindowClassRegistered = false;
 
@@ -116,7 +118,7 @@ HWND BrowserView::CreateBrowserWindow(const RECT &bounds)
 	return hwnd;
 }
 
-ATOM BrowserView::RegisterBrowserWindowClass(HINSTANCE instance)
+ATOM BrowserViewImpl::RegisterBrowserWindowClass(HINSTANCE instance)
 {
 	WNDCLASSEX windowClass = {};
 	windowClass.cbSize = sizeof(windowClass);
@@ -136,7 +138,7 @@ ATOM BrowserView::RegisterBrowserWindowClass(HINSTANCE instance)
 	return RegisterClassEx(&windowClass);
 }
 
-void BrowserView::CreateMainRebarAndChildren()
+void BrowserViewImpl::CreateMainRebarAndChildren()
 {
 	m_mainRebarView = std::make_unique<MainRebarView>(this);
 	m_mainToolbarView =
@@ -150,57 +152,57 @@ void BrowserView::CreateMainRebarAndChildren()
 		m_mainRebarView.get(), m_browser, m_config);
 }
 
-MenuView *BrowserView::GetMainMenuView() const
+MenuView *BrowserViewImpl::GetMainMenuView() const
 {
 	return m_mainMenuView.get();
 }
 
-MainRebarView *BrowserView::GetMainRebarView() const
+MainRebarView *BrowserViewImpl::GetMainRebarView() const
 {
 	return m_mainRebarView.get();
 }
 
-MainToolbarView *BrowserView::GetMainToolbarView() const
+MainToolbarView *BrowserViewImpl::GetMainToolbarView() const
 {
 	return m_mainToolbarView.get();
 }
 
-AddressBarView *BrowserView::GetAddressBarView() const
+AddressBarView *BrowserViewImpl::GetAddressBarView() const
 {
 	return m_addressBarView.get();
 }
 
-BookmarksToolbarView *BrowserView::GetBookmarksToolbarView() const
+BookmarksToolbarView *BrowserViewImpl::GetBookmarksToolbarView() const
 {
 	return m_bookmarksToolbarView.get();
 }
 
-DrivesToolbarView *BrowserView::GetDrivesToolbarView() const
+DrivesToolbarView *BrowserViewImpl::GetDrivesToolbarView() const
 {
 	return m_drivesToolbarView.get();
 }
 
-Applications::ApplicationToolbarView *BrowserView::GetApplicationToolbarView() const
+Applications::ApplicationToolbarView *BrowserViewImpl::GetApplicationToolbarView() const
 {
 	return m_applicationToolbarView.get();
 }
 
-FoldersPaneView *BrowserView::GetFoldersPaneView() const
+FoldersPaneView *BrowserViewImpl::GetFoldersPaneView() const
 {
 	return m_foldersPaneView.get();
 }
 
-BrowserPaneView *BrowserView::GetBrowserPaneView() const
+BrowserPaneView *BrowserViewImpl::GetBrowserPaneView() const
 {
 	return m_browserPaneView.get();
 }
 
-StatusBarView *BrowserView::GetStatusBarView() const
+StatusBarView *BrowserViewImpl::GetStatusBarView() const
 {
 	return m_statusBarView.get();
 }
 
-LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT BrowserViewImpl::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -246,7 +248,7 @@ LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-std::optional<UINT> BrowserView::MaybeGetCommandForAppCommand(UINT appCommand)
+std::optional<UINT> BrowserViewImpl::MaybeGetCommandForAppCommand(UINT appCommand)
 {
 	switch (appCommand)
 	{
@@ -293,14 +295,14 @@ std::optional<UINT> BrowserView::MaybeGetCommandForAppCommand(UINT appCommand)
 	return std::nullopt;
 }
 
-void BrowserView::OnDpiChanged(const RECT *updatedWindowRect)
+void BrowserViewImpl::OnDpiChanged(const RECT *updatedWindowRect)
 {
 	SetWindowPos(GetHWND(), nullptr, updatedWindowRect->left, updatedWindowRect->top,
 		GetRectWidth(updatedWindowRect), GetRectHeight(updatedWindowRect),
 		SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
-void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
+void BrowserViewImpl::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState)
 {
 	if (updatedState == BrowserWindow::LifecycleState::Main)
 	{
@@ -311,49 +313,49 @@ void BrowserView::OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState u
 	}
 }
 
-void BrowserView::OnNavigationCommitted(const NavigationRequest *request)
+void BrowserViewImpl::OnNavigationCommitted(const NavigationRequest *request)
 {
 	UNREFERENCED_PARAMETER(request);
 
 	UpdateWindowText();
 }
 
-void BrowserView::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
+void BrowserViewImpl::OnDirectoryPropertiesChanged(const ShellBrowser *shellBrowser)
 {
 	UNREFERENCED_PARAMETER(shellBrowser);
 
 	UpdateWindowText();
 }
 
-void BrowserView::OnTabSelected(const Tab &tab)
+void BrowserViewImpl::OnTabSelected(const Tab &tab)
 {
 	UNREFERENCED_PARAMETER(tab);
 
 	UpdateWindowText();
 }
 
-void BrowserView::OnShowFullTitlePathUpdated(BOOL newValue)
+void BrowserViewImpl::OnShowFullTitlePathUpdated(BOOL newValue)
 {
 	UNREFERENCED_PARAMETER(newValue);
 
 	UpdateWindowText();
 }
 
-void BrowserView::OnShowUserNameInTitleBarUpdated(BOOL newValue)
+void BrowserViewImpl::OnShowUserNameInTitleBarUpdated(BOOL newValue)
 {
 	UNREFERENCED_PARAMETER(newValue);
 
 	UpdateWindowText();
 }
 
-void BrowserView::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
+void BrowserViewImpl::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 {
 	UNREFERENCED_PARAMETER(newValue);
 
 	UpdateWindowText();
 }
 
-void BrowserView::UpdateWindowText()
+void BrowserViewImpl::UpdateWindowText()
 {
 	if (m_browser->GetLifecycleState() != BrowserWindow::LifecycleState::Main)
 	{
@@ -428,7 +430,7 @@ void BrowserView::UpdateWindowText()
 	SetWindowText(GetHWND(), title.c_str());
 }
 
-void BrowserView::RedrawMenuBar()
+void BrowserViewImpl::RedrawMenuBar()
 {
 	auto res = DrawMenuBar(GetHWND());
 	CHECK(res);
@@ -438,7 +440,7 @@ void BrowserView::RedrawMenuBar()
 // handle Tab/Shift+Tab, the key combinations in this case are synonyms for each other. Since
 // F6/Shift+F6 would need to be handled manually anyway, handling both with the same function
 // ensures that they have identical behavior.
-void BrowserView::FocusNextWindow(FocusChangeDirection direction)
+void BrowserViewImpl::FocusNextWindow(FocusChangeDirection direction)
 {
 	HWND focus = GetFocus();
 	HWND initialControl;
@@ -469,7 +471,7 @@ void BrowserView::FocusNextWindow(FocusChangeDirection direction)
 
 // Note that, as described above, this window is registered as a drop target only so that drag
 // images are shown consistently. Dropping items isn't supported at all.
-DWORD BrowserView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD BrowserViewImpl::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(dataObject);
 	UNREFERENCED_PARAMETER(keyState);
@@ -479,7 +481,7 @@ DWORD BrowserView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, 
 	return DROPEFFECT_NONE;
 }
 
-DWORD BrowserView::DragOver(DWORD keyState, POINT pt, DWORD effect)
+DWORD BrowserViewImpl::DragOver(DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(pt);
@@ -488,11 +490,11 @@ DWORD BrowserView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	return DROPEFFECT_NONE;
 }
 
-void BrowserView::DragLeave()
+void BrowserViewImpl::DragLeave()
 {
 }
 
-DWORD BrowserView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD BrowserViewImpl::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(dataObject);
 	UNREFERENCED_PARAMETER(keyState);

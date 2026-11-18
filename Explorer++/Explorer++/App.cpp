@@ -6,6 +6,7 @@
 #include "App.h"
 #include "AppInfo.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
@@ -355,9 +356,9 @@ bool App::MaybeTranslateAccelerator(MSG *msg)
 {
 	for (auto *browser : m_browserList.GetList())
 	{
-		if (IsChild(browser->GetHWND(), msg->hwnd))
+		if (IsChild(browser->GetView()->GetHWND(), msg->hwnd))
 		{
-			return TranslateAccelerator(browser->GetHWND(),
+			return TranslateAccelerator(browser->GetView()->GetHWND(),
 				m_acceleratorManager.GetAcceleratorTable(), msg);
 		}
 	}
@@ -417,7 +418,7 @@ bool App::ConfirmExit()
 	std::wstring message =
 		fmt::format(fmt::runtime(m_resourceLoader->LoadString(IDS_CLOSE_ALL_WINDOWS)),
 			fmt::arg(L"num_windows", numWindows));
-	int response = MessageBox(browser->GetHWND(), message.c_str(), AppInfo::NAME,
+	int response = MessageBox(browser->GetView()->GetHWND(), message.c_str(), AppInfo::NAME,
 		MB_ICONINFORMATION | MB_YESNO);
 
 	if (response == IDNO)

@@ -10,7 +10,6 @@
 #include "ApplicationToolbar.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "BrowserList.h"
-#include "BrowserView.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
@@ -285,9 +284,14 @@ Tab *Explorerplusplus::CreateTabFromPreservedTab(const PreservedTab *tab)
 	return &GetActivePane()->GetTabBar()->CreateNewTab(*tab);
 }
 
-HWND Explorerplusplus::GetHWND() const
+BrowserView *Explorerplusplus::GetView()
 {
-	return m_hwnd;
+	return &m_view;
+}
+
+const BrowserView *Explorerplusplus::GetView() const
+{
+	return &m_view;
 }
 
 WindowStorageData Explorerplusplus::GetStorageData() const

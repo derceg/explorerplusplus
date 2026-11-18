@@ -20,10 +20,9 @@ class BrowserWindowFake : public BrowserWindow
 public:
 	BrowserWindowFake(const WindowStorageData &storageData, AppServices *appServices);
 
-	BrowserWindowFakeView *GetView();
-
 	// BrowserWindow
-	HWND GetHWND() const override;
+	BrowserView *GetView() override;
+	const BrowserView *GetView() const override;
 	BrowserCommandController *GetCommandController() override;
 	BrowserPane *GetActivePane() const override;
 	TabBar *GetActiveTabBar() override;

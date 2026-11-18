@@ -8,6 +8,7 @@
 #include "ApplicationEditorDialog.h"
 #include "ApplicationExecutor.h"
 #include "ApplicationModel.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
@@ -69,7 +70,7 @@ void ApplicationContextMenu::OnNew()
 	auto index = m_model->GetItemIndex(m_application);
 
 	auto *editorDialog =
-		ApplicationEditorDialog::Create(m_browser->GetHWND(), m_resourceLoader, m_model,
+		ApplicationEditorDialog::Create(m_browser->GetView()->GetHWND(), m_resourceLoader, m_model,
 			ApplicationEditorDialog::EditDetails::AddNewApplication(
 				std::make_unique<Application>(L"", L""), index));
 	editorDialog->ShowModalDialog();
@@ -78,8 +79,8 @@ void ApplicationContextMenu::OnNew()
 void ApplicationContextMenu::OnDelete()
 {
 	std::wstring message = m_resourceLoader->LoadString(IDS_APPLICATIONBUTTON_DELETE);
-	int messageBoxReturn = MessageBox(m_browser->GetHWND(), message.c_str(), AppInfo::NAME,
-		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
+	int messageBoxReturn = MessageBox(m_browser->GetView()->GetHWND(), message.c_str(),
+		AppInfo::NAME, MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
 	if (messageBoxReturn != IDYES)
 	{
@@ -91,8 +92,9 @@ void ApplicationContextMenu::OnDelete()
 
 void ApplicationContextMenu::OnShowProperties()
 {
-	auto *editorDialog = ApplicationEditorDialog::Create(m_browser->GetHWND(), m_resourceLoader,
-		m_model, ApplicationEditorDialog::EditDetails::EditApplication(m_application));
+	auto *editorDialog =
+		ApplicationEditorDialog::Create(m_browser->GetView()->GetHWND(), m_resourceLoader, m_model,
+			ApplicationEditorDialog::EditDetails::EditApplication(m_application));
 	editorDialog->ShowModalDialog();
 }
 

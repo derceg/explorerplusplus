@@ -6,7 +6,7 @@
 #include "BrowserWindowFakeView.h"
 
 BrowserWindowFakeView::BrowserWindowFakeView(const RECT &bounds) :
-	ViewBase(CreateBrowserWindow(bounds)),
+	BrowserView(CreateBrowserWindow(bounds)),
 	m_ownedWindow(GetHWND())
 {
 }

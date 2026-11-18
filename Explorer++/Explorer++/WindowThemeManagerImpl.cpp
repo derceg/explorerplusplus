@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "WindowThemeManagerImpl.h"
-#include "BrowserView.h"
+#include "BrowserViewImpl.h"
 #include "DarkModeColorProvider.h"
 #include "DarkModeManager.h"
 #include "SystemFontHelper.h"
@@ -127,7 +127,7 @@ void WindowThemeManagerImpl::ApplyThemeToWindow(HWND hwnd)
 		return;
 	}
 
-	if (lstrcmp(className, BrowserView::WINDOW_CLASS_NAME) == 0)
+	if (lstrcmp(className, BrowserViewImpl::WINDOW_CLASS_NAME) == 0)
 	{
 		ApplyThemeToMainWindow(hwnd, enableDarkMode);
 	}

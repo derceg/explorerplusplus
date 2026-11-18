@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabContextMenu.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
@@ -181,8 +182,8 @@ void TabContextMenu::OnRenameTab()
 		return;
 	}
 
-	auto *renameTabDialog = RenameTabDialog::Create(m_tab->GetBrowser()->GetHWND(), m_tab.Get(),
-		m_tabEvents, m_resourceLoader);
+	auto *renameTabDialog = RenameTabDialog::Create(m_tab->GetBrowser()->GetView()->GetHWND(),
+		m_tab.Get(), m_tabEvents, m_resourceLoader);
 	renameTabDialog->ShowModalDialog();
 }
 

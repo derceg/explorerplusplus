@@ -8,7 +8,6 @@
 #include "BrowserCommands.h"
 #include "BrowserList.h"
 #include "BrowserPaneView.h"
-#include "BrowserView.h"
 #include "Config.h"
 #include "DestroyFilesDialog.h"
 #include "DisplayWindow/DisplayWindow.h"

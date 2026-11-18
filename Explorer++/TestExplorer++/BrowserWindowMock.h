@@ -14,7 +14,8 @@ class BrowserWindowMock : public BrowserWindow
 {
 public:
 	// BrowserWindow
-	MOCK_METHOD(HWND, GetHWND, (), (const, override));
+	MOCK_METHOD(BrowserView *, GetView, (), (override));
+	MOCK_METHOD(const BrowserView *, GetView, (), (const, override));
 	MOCK_METHOD(BrowserCommandController *, GetCommandController, (), (override));
 	MOCK_METHOD(BrowserPane *, GetActivePane, (), (const, override));
 	MOCK_METHOD(TabBar *, GetActiveTabBar, (), (override));

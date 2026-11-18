@@ -7,6 +7,7 @@
 #include "AppServices.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "BrowserCommandController.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
@@ -816,5 +817,5 @@ MenuItemCheckedCallback MainMenu::MaybeGetCheckedCallback(WORD id) const
 
 void MainMenu::SendCommandToBrowser(WORD id)
 {
-	SendMessage(m_browser->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
 }

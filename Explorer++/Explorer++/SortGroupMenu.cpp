@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SortGroupMenu.h"
+#include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "MenuView.h"
@@ -240,8 +241,9 @@ void SortGroupMenu::OnSortDirectionSelected(SortDirection sortDirection)
 
 void SortGroupMenu::OnSelectColumns()
 {
-	auto *selectColumnsDialog = SelectColumnsDialog::Create(m_resourceLoader, m_browser->GetHWND(),
-		m_browser->GetActiveTabBar()->GetSelectedTab().GetShellBrowserImpl());
+	auto *selectColumnsDialog =
+		SelectColumnsDialog::Create(m_resourceLoader, m_browser->GetView()->GetHWND(),
+			m_browser->GetActiveTabBar()->GetSelectedTab().GetShellBrowserImpl());
 	selectColumnsDialog->ShowModalDialog();
 }
 

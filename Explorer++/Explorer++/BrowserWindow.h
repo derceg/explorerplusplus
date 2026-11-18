@@ -13,6 +13,7 @@
 
 class BrowserCommandController;
 class BrowserPane;
+class BrowserView;
 struct PreservedTab;
 class ShellBrowser;
 class Tab;
@@ -58,7 +59,8 @@ public:
 
 	bool IsShellBrowserActive(const ShellBrowser *shellBrowser) const;
 
-	virtual HWND GetHWND() const = 0;
+	virtual BrowserView *GetView() = 0;
+	virtual const BrowserView *GetView() const = 0;
 	virtual BrowserCommandController *GetCommandController() = 0;
 
 	virtual BrowserPane *GetActivePane() const = 0;
