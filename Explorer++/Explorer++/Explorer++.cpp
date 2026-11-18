@@ -403,10 +403,8 @@ concurrencpp::null_result Explorerplusplus::ScheduleFinishShutdown(WeakPtr<Explo
 void Explorerplusplus::FinishShutdown()
 {
 	SetLifecycleState(LifecycleState::Closing);
-
 	m_browserList->RemoveBrowser(this);
-
-	DestroyWindow(m_hwnd);
+	m_view.Destroy();
 }
 
 BrowserCommandController *Explorerplusplus::GetCommandController()

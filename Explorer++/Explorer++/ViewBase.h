@@ -22,6 +22,8 @@ public:
 	void EnableDropTarget(DropTargetDelegate *dropTargetDelegate);
 	void DisableDropTarget();
 
+	void Destroy();
+
 protected:
 	void AddSubclass(std::unique_ptr<WindowSubclass> subclass);
 

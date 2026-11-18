@@ -35,6 +35,12 @@ void ViewBase::DisableDropTarget()
 	m_dropTargetRegistration.reset();
 }
 
+void ViewBase::Destroy()
+{
+	auto res = DestroyWindow(GetHWND());
+	CHECK(res);
+}
+
 void ViewBase::AddSubclass(std::unique_ptr<WindowSubclass> subclass)
 {
 	m_windowSubclasses.push_back(std::move(subclass));
