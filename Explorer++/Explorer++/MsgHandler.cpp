@@ -469,12 +469,6 @@ void Explorerplusplus::UpdateLayout()
 	CHECK(res);
 }
 
-void Explorerplusplus::OnCycleView()
-{
-	Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
-	selectedTab.GetShellBrowserImpl()->CycleViewMode(true);
-}
-
 void Explorerplusplus::CopyColumnInfoToClipboard()
 {
 	const auto &currentColumns = m_pActiveShellBrowser->GetCurrentColumnSet();

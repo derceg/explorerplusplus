@@ -84,6 +84,7 @@ public:
 	ShellNavigationController *GetNavigationController() const override;
 	ViewMode GetViewMode() const override;
 	void SetViewMode(ViewMode viewMode) override;
+	void CycleViewMode(ViewModeCycleDirection direction) override;
 	std::vector<SortMode> GetAvailableSortModes() const override;
 	SortMode GetSortMode() const override;
 	void SetSortMode(SortMode sortMode) override;
@@ -133,7 +134,6 @@ public:
 
 	/* Get/Set current state. */
 	int GetUniqueFolderId() const;
-	void CycleViewMode(bool cycleForward);
 	int GetNumItems() const;
 	int GetNumSelectedFiles() const;
 	int GetNumSelectedFolders() const;

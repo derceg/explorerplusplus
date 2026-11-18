@@ -493,11 +493,11 @@ void ShellBrowserImpl::SetFirstColumnTextToFilename()
 	}
 }
 
-void ShellBrowserImpl::CycleViewMode(bool cycleForward)
+void ShellBrowserImpl::CycleViewMode(ViewModeCycleDirection direction)
 {
 	ViewMode newViewMode;
 
-	if (cycleForward)
+	if (direction == ShellBrowser::ViewModeCycleDirection::Forward)
 	{
 		newViewMode = GetNextViewMode(VIEW_MODES, m_folderSettings.viewMode);
 	}

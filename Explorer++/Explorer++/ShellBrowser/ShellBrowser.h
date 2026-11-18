@@ -24,6 +24,12 @@ class ShellBrowser
 public:
 	using DestroyedSignal = boost::signals2::signal<void()>;
 
+	enum class ViewModeCycleDirection
+	{
+		Forward,
+		Backward
+	};
+
 	ShellBrowser();
 	virtual ~ShellBrowser() = default;
 
@@ -41,6 +47,7 @@ public:
 
 	virtual ViewMode GetViewMode() const = 0;
 	virtual void SetViewMode(ViewMode viewMode) = 0;
+	virtual void CycleViewMode(ViewModeCycleDirection direction) = 0;
 
 	virtual std::vector<SortMode> GetAvailableSortModes() const = 0;
 	virtual SortMode GetSortMode() const = 0;

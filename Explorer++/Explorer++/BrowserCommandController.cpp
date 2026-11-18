@@ -479,6 +479,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		m_appServices->GetTabRestorer()->RestoreLastTab();
 		break;
 
+	case IDM_CYCLE_VIEW:
+		GetActiveShellBrowser()->CycleViewMode(ShellBrowser::ViewModeCycleDirection::Forward);
+		break;
+
 	default:
 		DCHECK(false);
 		break;

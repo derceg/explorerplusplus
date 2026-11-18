@@ -388,11 +388,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDA_SELECT_TAB_8:
 	case IDA_SELECT_LAST_TAB:
 	case IDA_RESTORE_LAST_TAB:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_CYCLE_VIEW:
-		OnCycleView();
+		m_commandController.ExecuteCommand(id);
 		break;
 	}
 

@@ -9,6 +9,7 @@
 #include "ShellBrowser/PreservedShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellEnumeratorFake.h"
+#include "ViewModeHelper.h"
 
 ShellBrowserFake::ShellBrowserFake(BrowserWindow *browser, NavigationEvents *navigationEvents,
 	const PreservedShellBrowser &preservedShellBrowser) :
@@ -84,6 +85,22 @@ ViewMode ShellBrowserFake::GetViewMode() const
 void ShellBrowserFake::SetViewMode(ViewMode viewMode)
 {
 	m_folderSettings.viewMode = viewMode;
+}
+
+void ShellBrowserFake::CycleViewMode(ViewModeCycleDirection direction)
+{
+	ViewMode newViewMode;
+
+	if (direction == ShellBrowser::ViewModeCycleDirection::Forward)
+	{
+		newViewMode = GetNextViewMode(VIEW_MODES, m_folderSettings.viewMode);
+	}
+	else
+	{
+		newViewMode = GetPreviousViewMode(VIEW_MODES, m_folderSettings.viewMode);
+	}
+
+	SetViewMode(newViewMode);
 }
 
 std::vector<SortMode> ShellBrowserFake::GetAvailableSortModes() const

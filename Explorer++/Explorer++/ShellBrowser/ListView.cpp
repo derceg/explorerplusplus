@@ -408,7 +408,8 @@ bool ShellBrowserImpl::OnMouseWheel(int xPos, int yPos, int delta, UINT keys)
 		// the view once.
 		for (int i = 0; i < abs(delta / WHEEL_DELTA); i++)
 		{
-			CycleViewMode(delta > 0);
+			CycleViewMode(
+				delta > 0 ? ViewModeCycleDirection::Forward : ViewModeCycleDirection::Backward);
 		}
 
 		return true;

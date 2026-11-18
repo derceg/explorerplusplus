@@ -186,9 +186,6 @@ private:
 
 	int HighlightSimilarFiles(HWND ListView) const;
 
-	/* Main toolbar-specific handlers. */
-	void OnCycleView();
-
 	/* ListView private message handlers. */
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	void OnListViewPaste();
