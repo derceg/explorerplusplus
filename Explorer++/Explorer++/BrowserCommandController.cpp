@@ -19,6 +19,7 @@
 #include "DisplayColoursDialog.h"
 #include "MainResource.h"
 #include "ModelessDialogHelper.h"
+#include "OptionsDialog.h"
 #include "PlatformContext.h"
 #include "ScriptingDialog.h"
 #include "SearchDialog.h"
@@ -407,6 +408,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		OnRunScript();
 		break;
 
+	case IDM_TOOLS_OPTIONS:
+		OnShowOptions();
+		break;
+
 	case IDM_WINDOW_SEARCH_TABS:
 		OnSearchTabs();
 		break;
@@ -723,6 +728,18 @@ void BrowserCommandController::OnRunScript()
 		{
 			return ScriptingDialog::Create(m_appServices->GetResourceLoader(),
 				m_browser->GetView()->GetHWND(), m_appServices);
+		});
+}
+
+void BrowserCommandController::OnShowOptions()
+{
+	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"OptionsDialog",
+		[this]
+		{
+			return OptionsDialog::Create(m_appServices->GetResourceLoader(),
+				m_browser->GetView()->GetHWND(), m_appServices->GetAppController(), m_config,
+				m_appServices->GetDarkModeManager(), m_appServices->GetWindowThemeManager(),
+				m_appServices->GetTabList());
 		});
 }
 

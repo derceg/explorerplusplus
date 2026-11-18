@@ -183,7 +183,6 @@ private:
 	void OnResolveLink();
 	void OnSelectColumns();
 	void OnDestroyFiles();
-	void OnShowOptions();
 
 	int HighlightSimilarFiles(HWND ListView) const;
 

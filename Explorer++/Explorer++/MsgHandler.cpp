@@ -14,8 +14,6 @@
 #include "FoldersPaneView.h"
 #include "MainRebarView.h"
 #include "MainResource.h"
-#include "ModelessDialogHelper.h"
-#include "OptionsDialog.h"
 #include "PlatformContext.h"
 #include "Runtime.h"
 #include "SelectColumnsDialog.h"
@@ -591,17 +589,6 @@ void Explorerplusplus::OnDestroyFiles()
 	auto *destroyFilesDialog = DestroyFilesDialog::Create(m_resourceLoader, m_hwnd,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog->ShowModalDialog();
-}
-
-void Explorerplusplus::OnShowOptions()
-{
-	CreateOrSwitchToModelessDialog(m_appServices->GetModelessDialogList(), L"OptionsDialog",
-		[this]
-		{
-			return OptionsDialog::Create(m_resourceLoader, m_hwnd,
-				m_appServices->GetAppController(), m_config, m_appServices->GetDarkModeManager(),
-				m_appServices->GetWindowThemeManager(), m_appServices->GetTabList());
-		});
 }
 
 void Explorerplusplus::OnResolveLink()

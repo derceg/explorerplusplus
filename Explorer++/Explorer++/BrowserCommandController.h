@@ -53,6 +53,7 @@ private:
 	void OnSearch();
 	void OnCustomizeColors();
 	void OnRunScript();
+	void OnShowOptions();
 	void OnSearchTabs();
 	void OnOpenOnlineDocumentation();
 	void OnCheckForUpdates();

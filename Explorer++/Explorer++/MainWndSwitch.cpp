@@ -365,13 +365,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDM_TOOLS_SEARCH:
 	case IDM_TOOLS_CUSTOMIZECOLORS:
 	case IDM_TOOLS_RUNSCRIPT:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_TOOLS_OPTIONS:
-		OnShowOptions();
-		break;
-
 	case IDM_WINDOW_SEARCH_TABS:
 	case IDM_HELP_ONLINE_DOCUMENTATION:
 	case IDM_HELP_CHECKFORUPDATES:
