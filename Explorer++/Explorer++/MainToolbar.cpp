@@ -174,7 +174,89 @@ private:
 	void OnClicked()
 	{
 		SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND,
-			MAKEWPARAM(ToUnderlying(m_buttonId), 0), 0);
+			MAKEWPARAM(GetCommandIdForButton(), 0), 0);
+	}
+
+	UINT GetCommandIdForButton() const
+	{
+		switch (m_buttonId)
+		{
+		case MainToolbarButtonId::NewTab:
+			return IDM_FILE_NEWTAB;
+
+		case MainToolbarButtonId::CloseTab:
+			return IDM_FILE_CLOSETAB;
+
+		case MainToolbarButtonId::OpenCommandPrompt:
+			return IDM_FILE_OPENCOMMANDPROMPT;
+
+		case MainToolbarButtonId::Delete:
+			return IDM_FILE_DELETE;
+
+		case MainToolbarButtonId::DeletePermanently:
+			return IDM_FILE_DELETEPERMANENTLY;
+
+		case MainToolbarButtonId::Properties:
+			return IDM_FILE_PROPERTIES;
+
+		case MainToolbarButtonId::Cut:
+			return IDM_EDIT_CUT;
+
+		case MainToolbarButtonId::Copy:
+			return IDM_EDIT_COPY;
+
+		case MainToolbarButtonId::Paste:
+			return IDM_EDIT_PASTE;
+
+		case MainToolbarButtonId::MoveTo:
+			return IDM_EDIT_MOVETOFOLDER;
+
+		case MainToolbarButtonId::CopyTo:
+			return IDM_EDIT_COPYTOFOLDER;
+
+		case MainToolbarButtonId::Folders:
+			return IDM_VIEW_FOLDERS;
+
+		case MainToolbarButtonId::Refresh:
+			return IDM_VIEW_REFRESH;
+
+		case MainToolbarButtonId::NewFolder:
+			return IDM_ACTIONS_NEWFOLDER;
+
+		case MainToolbarButtonId::SplitFile:
+			return IDM_ACTIONS_SPLITFILE;
+
+		case MainToolbarButtonId::MergeFiles:
+			return IDM_ACTIONS_MERGEFILES;
+
+		case MainToolbarButtonId::Back:
+			return IDM_GO_BACK;
+
+		case MainToolbarButtonId::Forward:
+			return IDM_GO_FORWARD;
+
+		case MainToolbarButtonId::Up:
+			return IDM_GO_UP;
+
+		case MainToolbarButtonId::AddBookmark:
+			return IDM_BOOKMARKS_BOOKMARK_THIS_TAB;
+
+		case MainToolbarButtonId::Bookmarks:
+			return IDM_BOOKMARKS_MANAGE_BOOKMARKS;
+
+		case MainToolbarButtonId::Search:
+			return IDM_TOOLS_SEARCH;
+
+		case MainToolbarButtonId::Views:
+			return IDM_CYCLE_VIEW;
+
+		case MainToolbarButtonId::Separator:
+			// This is a valid enum value, but isn't a valid ID for a button. Doing nothing here
+			// will result in the LOG() statement below being triggered.
+			break;
+		}
+
+		LOG(FATAL) << "Invalid MainToolbarButtonId";
 	}
 
 	bool m_enabled = true;

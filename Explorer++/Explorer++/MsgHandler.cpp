@@ -486,8 +486,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 	UpdateLayout();
 }
 
-/* Cycle through the current views. */
-void Explorerplusplus::OnToolbarViews()
+void Explorerplusplus::OnCycleView()
 {
 	Tab &selectedTab = GetActivePane()->GetTabBar()->GetSelectedTab();
 	selectedTab.GetShellBrowserImpl()->CycleViewMode(true);

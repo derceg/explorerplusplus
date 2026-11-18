@@ -1040,23 +1040,24 @@
 #define IDM_VIEW_DUAL_PANE              40548
 #define IDM_EDIT_PASTE_SYMBOLIC_LINK    40551
 #define IDM_FILE_NEW_WINDOW             40552
-#define IDM_VIEW_EXTRALARGEICONS        60000
-#define IDM_VIEW_LARGEICONS             60001
-#define IDM_VIEW_ICONS                  60002
-#define IDM_VIEW_SMALLICONS             60003
-#define IDM_VIEW_LIST                   60004
-#define IDM_VIEW_DETAILS                60005
-#define IDM_VIEW_EXTRALARGETHUMBNAILS   60006
-#define IDM_VIEW_LARGETHUMBNAILS        60007
-#define IDM_VIEW_THUMBNAILS             60008
-#define IDM_VIEW_TILES                  60009
+#define IDM_VIEW_EXTRALARGEICONS        40553
+#define IDM_VIEW_LARGEICONS             40554
+#define IDM_VIEW_ICONS                  40555
+#define IDM_VIEW_SMALLICONS             40556
+#define IDM_VIEW_LIST                   40557
+#define IDM_VIEW_DETAILS                40558
+#define IDM_VIEW_EXTRALARGETHUMBNAILS   40559
+#define IDM_VIEW_LARGETHUMBNAILS        40560
+#define IDM_VIEW_THUMBNAILS             40561
+#define IDM_VIEW_TILES                  40562
+#define IDM_CYCLE_VIEW                  40563
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        663
-#define _APS_NEXT_COMMAND_VALUE         40556
+#define _APS_NEXT_COMMAND_VALUE         40564
 #define _APS_NEXT_CONTROL_VALUE         1376
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
