@@ -10,7 +10,6 @@
 #include "BrowserPaneView.h"
 #include "Config.h"
 #include "DestroyFilesDialog.h"
-#include "DisplayWindow/DisplayWindow.h"
 #include "FeatureList.h"
 #include "FoldersPaneView.h"
 #include "MainRebarView.h"
@@ -470,20 +469,6 @@ void Explorerplusplus::UpdateLayout()
 
 	auto res = RedrawWindow(m_hwnd, nullptr, nullptr, RDW_ALLCHILDREN | RDW_UPDATENOW);
 	CHECK(res);
-}
-
-void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
-{
-	if (m_config->displayWindowVertical.get())
-	{
-		m_displayWindowWidth = LOWORD(wParam);
-	}
-	else
-	{
-		m_displayWindowHeight = HIWORD(wParam);
-	}
-
-	UpdateLayout();
 }
 
 void Explorerplusplus::OnCycleView()

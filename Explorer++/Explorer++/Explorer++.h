@@ -10,6 +10,7 @@
 #include "BrowserViewImpl.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
+#include "DisplayWindow/DisplayWindow.h"
 #include "LayoutDefaults.h"
 #include "Literals.h"
 #include "ShellBrowser/ShellBrowserFactoryImpl.h"
@@ -33,7 +34,6 @@ class AppServices;
 class BookmarksToolbar;
 class BrowserList;
 struct Config;
-class DisplayWindow;
 class DrivesToolbar;
 class FeatureList;
 class FoldersPane;
@@ -161,12 +161,13 @@ private:
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize(const WindowStorageData &storageData);
 	void InitializeMainMenu();
-	void InitializeDisplayWindow();
+	void CreateDisplayWindow();
+	void OnDisplayWindowResizeRequested(DisplayWindow::ResizeDimension dimension, int updatedSize);
 	void InitializeTabObservers();
 	void OnTabPreRemoval(const Tab &tab, int index);
 	void OnTabRemoved(const Tab &tab);
 	void CreateFolderControls();
-	void OnFoldersPaneResized(int newWidth);
+	void OnFoldersPaneResizeRequested(int updatedWidth);
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(UINT state);
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
@@ -229,7 +230,6 @@ private:
 	PidlAbsolute MaybeGetFocusedDirectory() const;
 
 	/* Display window. */
-	void OnDisplayWindowResized(WPARAM wParam);
 	void UpdateDisplayWindow(const Tab &tab);
 	void UpdateDisplayWindowForZeroFiles(const Tab &tab);
 	void UpdateDisplayWindowForOneFile(const Tab &tab);

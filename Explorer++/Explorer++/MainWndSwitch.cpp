@@ -12,7 +12,6 @@
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
-#include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
 #include "MainRebarView.h"
@@ -50,10 +49,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 			KillTimer(m_hwnd, LISTVIEW_ITEM_CHANGED_TIMER_ID);
 		}
-		break;
-
-	case WM_USER_DISPLAYWINDOWRESIZED:
-		OnDisplayWindowResized(wParam);
 		break;
 
 	case WM_APP_FOLDERSIZECOMPLETED:

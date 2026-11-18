@@ -8,6 +8,7 @@
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <gdiplus.h>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -28,8 +29,6 @@
 
 #define DisplayWindow_SetLine(hDisplay, iLine, szText)                                             \
 	SendMessage(hDisplay, DWM_SETLINE, iLine, (LPARAM) szText)
-
-#define WM_USER_DISPLAYWINDOWRESIZED (WM_APP + 100)
 
 class AcceleratorManager;
 class AppServices;
@@ -60,10 +59,19 @@ public:
 		Preview
 	};
 
+	enum class ResizeDimension
+	{
+		Width,
+		Height
+	};
+
+	using ResizeRequestedCallback = std::function<void(ResizeDimension dimension, int updatedSize)>;
+
 	static DisplayWindow *Create(HWND parent, Mode mode, BrowserWindow *browser,
 		AppServices *appServices, Config *config);
 
 	HWND GetHWND() const;
+	void SetResizeRequestedCallback(ResizeRequestedCallback callback);
 
 	void ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 
@@ -136,4 +144,6 @@ private:
 	BOOL m_bThumbnailExtractionFailed;
 
 	int m_xColumnFinal;
+
+	ResizeRequestedCallback m_resizeRequestedCallback;
 };

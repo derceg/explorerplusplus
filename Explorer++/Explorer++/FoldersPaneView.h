@@ -20,7 +20,7 @@ class ThemeManager;
 class FoldersPaneView : public ViewBase
 {
 public:
-	using ResizedCallback = std::function<void(int newWidth)>;
+	using ResizeRequestedCallback = std::function<void(int updatedWidth)>;
 
 	FoldersPaneView(ViewBase *parent, MenuHelpTextHost *menuHelpTextHost,
 		const ThemeManager *themeManager, const Config *config,
@@ -29,7 +29,7 @@ public:
 	FoldersPaneToolbarView *GetToolbarView();
 
 	void SetTreeView(HWND treeView);
-	void SetResizedCallback(ResizedCallback callback);
+	void SetResizeRequestedCallback(ResizeRequestedCallback callback);
 
 private:
 	static constexpr WCHAR CLASS_NAME[] = L"Explorer++FoldersPaneWindowClass";
@@ -76,5 +76,5 @@ private:
 	HCURSOR m_sizingCursor;
 	bool m_resizing = false;
 	std::optional<int> m_resizeDistanceToEdge;
-	ResizedCallback m_resizedCallback;
+	ResizeRequestedCallback m_resizeRequestedCallback;
 };

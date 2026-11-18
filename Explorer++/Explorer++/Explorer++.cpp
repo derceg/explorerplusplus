@@ -11,7 +11,6 @@
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "BrowserList.h"
 #include "Config.h"
-#include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "EventScope.h"
 #include "FoldersPane.h"
@@ -116,7 +115,7 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 		m_tabEvents, m_shellBrowserEvents, m_navigationEvents, m_resourceLoader);
 
 	CreateMainRebarAndChildren(storageData);
-	InitializeDisplayWindow();
+	CreateDisplayWindow();
 	InitializeTabObservers();
 	InitializeTabs();
 	CreateFolderControls();
@@ -217,10 +216,27 @@ void Explorerplusplus::CreateApplicationToolbar()
 		&m_applicationExecutor, this, m_acceleratorManager, m_resourceLoader);
 }
 
-void Explorerplusplus::InitializeDisplayWindow()
+void Explorerplusplus::CreateDisplayWindow()
 {
 	m_displayWindow =
 		DisplayWindow::Create(m_hwnd, DisplayWindow::Mode::Normal, this, m_appServices, m_config);
+	m_displayWindow->SetResizeRequestedCallback(
+		std::bind_front(&Explorerplusplus::OnDisplayWindowResizeRequested, this));
+}
+
+void Explorerplusplus::OnDisplayWindowResizeRequested(DisplayWindow::ResizeDimension dimension,
+	int updatedSize)
+{
+	if (dimension == DisplayWindow::ResizeDimension::Width)
+	{
+		m_displayWindowWidth = updatedSize;
+	}
+	else
+	{
+		m_displayWindowHeight = updatedSize;
+	}
+
+	UpdateLayout();
 }
 
 void Explorerplusplus::InitializeTabObservers()
@@ -261,8 +277,8 @@ void Explorerplusplus::OnTabRemoved(const Tab &tab)
 void Explorerplusplus::CreateFolderControls()
 {
 	auto *foldersPaneView = m_view.GetFoldersPaneView();
-	foldersPaneView->SetResizedCallback(
-		std::bind_front(&Explorerplusplus::OnFoldersPaneResized, this));
+	foldersPaneView->SetResizeRequestedCallback(
+		std::bind_front(&Explorerplusplus::OnFoldersPaneResizeRequested, this));
 
 	m_foldersPane = std::make_unique<FoldersPane>(foldersPaneView, m_config, this,
 		m_acceleratorManager, m_resourceLoader);
@@ -272,9 +288,9 @@ void Explorerplusplus::CreateFolderControls()
 	foldersPaneView->SetTreeView(m_shellTreeView->GetHWND());
 }
 
-void Explorerplusplus::OnFoldersPaneResized(int newWidth)
+void Explorerplusplus::OnFoldersPaneResizeRequested(int updatedWidth)
 {
-	m_treeViewWidth = newWidth;
+	m_treeViewWidth = updatedWidth;
 
 	UpdateLayout();
 }

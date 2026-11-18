@@ -280,9 +280,9 @@ int FoldersPaneView::OnMouseMove(const POINT &pt)
 	{
 		int newWidth = std::max(pt.x + m_resizeDistanceToEdge.value(), 0L);
 
-		if (m_resizedCallback)
+		if (m_resizeRequestedCallback)
 		{
-			m_resizedCallback(newWidth);
+			m_resizeRequestedCallback(newWidth);
 		}
 
 		return 1;
@@ -340,7 +340,7 @@ void FoldersPaneView::SetTreeView(HWND treeView)
 	UpdateLayout();
 }
 
-void FoldersPaneView::SetResizedCallback(ResizedCallback callback)
+void FoldersPaneView::SetResizeRequestedCallback(ResizeRequestedCallback callback)
 {
-	m_resizedCallback = callback;
+	m_resizeRequestedCallback = callback;
 }

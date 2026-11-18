@@ -607,11 +607,24 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 		prevCursorPos.x = cursorPos.x;
 		prevCursorPos.y = cursorPos.y;
 
-		/* Notify the main window, so that it can redraw/reposition
-		its other windows. */
-		SendMessage(GetParent(m_hwnd), WM_USER_DISPLAYWINDOWRESIZED,
-			MAKEWPARAM(std::max(rc.right - cursorPos.x, 0L), std::max(rc.bottom - cursorPos.y, 0L)),
-			0);
+		ResizeDimension dimension;
+		int updatedSize;
+
+		if (m_config->displayWindowVertical.get())
+		{
+			dimension = ResizeDimension::Width;
+			updatedSize = rc.right - cursorPos.x;
+		}
+		else
+		{
+			dimension = ResizeDimension::Height;
+			updatedSize = rc.bottom - cursorPos.y;
+		}
+
+		if (m_resizeRequestedCallback)
+		{
+			m_resizeRequestedCallback(dimension, updatedSize);
+		}
 	}
 
 	if ((m_config->displayWindowVertical.get() && cursorPos.x <= (rc.left + 5))
@@ -742,4 +755,9 @@ void DisplayWindow::OnSetThumbnailFile(WPARAM wParam, LPARAM lParam)
 		m_bThumbnailExtractionFailed = FALSE;
 		StringCchCopy(m_ImageFile, std::size(m_ImageFile), (TCHAR *) wParam);
 	}
+}
+
+void DisplayWindow::SetResizeRequestedCallback(ResizeRequestedCallback callback)
+{
+	m_resizeRequestedCallback = callback;
 }
