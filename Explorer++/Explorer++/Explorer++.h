@@ -171,7 +171,6 @@ private:
 	static concurrencpp::null_result ScheduleUpdateLayout(WeakPtr<Explorerplusplus> self,
 		Runtime *runtime);
 	void UpdateLayout();
-	void OnAppCommand(UINT cmd);
 	void OnDirectoryContentsChanged(const ShellBrowser *shellBrowser);
 
 	/* Main menu handlers. */

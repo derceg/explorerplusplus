@@ -108,10 +108,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	}
 	break;
 
-	case WM_APPCOMMAND:
-		OnAppCommand(GET_APPCOMMAND_LPARAM(lParam));
-		break;
-
 	case WM_COMMAND:
 		return CommandHandler(hwnd, reinterpret_cast<HWND>(lParam), LOWORD(wParam), HIWORD(wParam));
 

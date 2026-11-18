@@ -11,6 +11,7 @@
 #include "../Helper/WindowSubclass.h"
 #include <boost/signals2.hpp>
 #include <memory>
+#include <optional>
 
 class AddressBarView;
 class AppServices;
@@ -75,6 +76,7 @@ private:
 	void CreateMainRebarAndChildren();
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	std::optional<UINT> MaybeGetCommandForAppCommand(UINT appCommand);
 	void OnDpiChanged(const RECT *updatedWindowRect);
 
 	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);

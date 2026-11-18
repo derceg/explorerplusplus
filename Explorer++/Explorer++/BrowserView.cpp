@@ -202,6 +202,13 @@ LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case WM_APPCOMMAND:
+		if (auto command = MaybeGetCommandForAppCommand(GET_APPCOMMAND_LPARAM(lParam)))
+		{
+			SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(*command, 0), 0);
+		}
+		break;
+
 	case WM_DPICHANGED:
 		OnDpiChanged(reinterpret_cast<RECT *>(lParam));
 		return 0;
@@ -228,6 +235,53 @@ LRESULT BrowserView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+std::optional<UINT> BrowserView::MaybeGetCommandForAppCommand(UINT appCommand)
+{
+	switch (appCommand)
+	{
+	case APPCOMMAND_BROWSER_BACKWARD:
+		return IDM_GO_BACK;
+
+	case APPCOMMAND_BROWSER_FORWARD:
+		return IDM_GO_FORWARD;
+
+	case APPCOMMAND_BROWSER_HOME:
+		return IDA_HOME;
+
+	case APPCOMMAND_BROWSER_FAVORITES:
+		return IDM_BOOKMARKS_MANAGE_BOOKMARKS;
+
+	case APPCOMMAND_BROWSER_REFRESH:
+		return IDM_VIEW_REFRESH;
+
+	case APPCOMMAND_BROWSER_SEARCH:
+		return IDM_TOOLS_SEARCH;
+
+	case APPCOMMAND_CLOSE:
+		return IDM_FILE_CLOSETAB;
+
+	case APPCOMMAND_CUT:
+		return IDM_EDIT_CUT;
+
+	case APPCOMMAND_COPY:
+		return IDM_EDIT_COPY;
+
+	case APPCOMMAND_HELP:
+		return IDM_HELP_ONLINE_DOCUMENTATION;
+
+	case APPCOMMAND_NEW:
+		return IDM_FILE_NEWTAB;
+
+	case APPCOMMAND_PASTE:
+		return IDM_EDIT_PASTE;
+
+	case APPCOMMAND_UNDO:
+		return IDM_EDIT_UNDO;
+	}
+
+	return std::nullopt;
 }
 
 void BrowserView::OnDpiChanged(const RECT *updatedWindowRect)
