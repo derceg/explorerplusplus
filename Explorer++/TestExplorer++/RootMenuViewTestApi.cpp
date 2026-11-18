@@ -7,6 +7,43 @@
 #include "MenuViewTestApi.h"
 #include "RootMenuView.h"
 
+std::wstring RootMenuViewTestApi::ResolveItemHelpText(const RootMenuView *menuView, UINT id)
+{
+	return menuView->ResolveItemHelpText(id);
+}
+
+void RootMenuViewTestApi::HighlightItemAtIndex(RootMenuView *menuView, HMENU parentMenu, int index)
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_FTYPE | MIIM_STATE | MIIM_SUBMENU | MIIM_ID;
+	auto res = GetMenuItemInfo(parentMenu, index, true, &menuItemInfo);
+	CHECK(res);
+
+	WORD indexOrId = static_cast<WORD>(index);
+	UINT flags = MF_HILITE;
+
+	if (WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR))
+	{
+		WI_SetFlag(flags, MF_SEPARATOR);
+	}
+	else if (menuItemInfo.hSubMenu)
+	{
+		WI_SetFlag(flags, MF_POPUP);
+	}
+	else
+	{
+		indexOrId = static_cast<WORD>(menuItemInfo.wID);
+	}
+
+	menuItemInfo.fMask = MIIM_STATE;
+	WI_SetFlag(menuItemInfo.fState, MFS_HILITE);
+	res = SetMenuItemInfo(parentMenu, index, true, &menuItemInfo);
+	CHECK(res);
+
+	menuView->OnMenuItemHighlighted(parentMenu, indexOrId, flags);
+}
+
 void RootMenuViewTestApi::SelectItem(RootMenuView *menuView, const MenuItemKey &key,
 	bool isCtrlKeyDown, bool isShiftKeyDown)
 {

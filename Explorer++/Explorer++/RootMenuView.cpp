@@ -54,7 +54,7 @@ LRESULT RootMenuView::OwnerWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		break;
 
 	case WM_MENUSELECT:
-		OnMenuItemSelected(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
+		OnMenuItemHighlighted(reinterpret_cast<HMENU>(lParam), LOWORD(wParam), HIWORD(wParam));
 		break;
 
 	case WM_MENUCOMMAND:
@@ -166,9 +166,6 @@ void RootMenuView::OnMenuOpened()
 {
 	m_isMenuOpen = true;
 
-	m_helpTextConnection = m_menuHelpTextHost->AddMenuHelpTextRequestObserver(
-		std::bind_front(&RootMenuView::OnHelpTextRequested, this));
-
 	m_menuHelpTextHost->NotifyTopLevelMenuShown();
 }
 
@@ -177,19 +174,45 @@ void RootMenuView::OnMenuClosed()
 	m_menuHelpTextHost->NotifyTopLevelMenuClosed();
 
 	m_dropTarget.reset();
-	m_helpTextConnection.disconnect();
 
 	m_isMenuOpen = false;
 }
 
-void RootMenuView::OnMenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
+void RootMenuView::OnMenuItemHighlighted(HMENU menu, WORD indexOrId, UINT flags)
 {
 	if (!menu || !IsPartOfMenu(menu))
 	{
 		return;
 	}
 
-	m_menuHelpTextHost->MenuItemSelected(menu, indexOrId, flags);
+	auto helpText = GetHelpTextForHighlightedItem(menu, indexOrId, flags);
+	m_menuHelpTextHost->SetMenuHelpText(helpText);
+}
+
+std::wstring RootMenuView::GetHelpTextForHighlightedItem(HMENU menu, WORD indexOrId,
+	UINT flags) const
+{
+	if (WI_IsAnyFlagSet(flags, MF_POPUP | MF_SEPARATOR))
+	{
+		return {};
+	}
+
+	// WM_MENUSELECT silently truncates the ID to 16-bit. As IDs here can be above that range, the
+	// provided ID will be ignored and the highlighted item will be found instead.
+	auto highlightedItemId = MenuHelper::MaybeGetHighlightedItem(menu);
+
+	if (!highlightedItemId)
+	{
+		// This is invoked in response to WM_MENUSELECT, so there should be a highlighted item.
+		DCHECK(false);
+		return {};
+	}
+
+	// The ID of the highlighted item should match the truncated ID that was provided. Since this
+	// isn't a popup item or a separator item, the indexOrId value should be the truncated ID.
+	DCHECK_EQ(static_cast<WORD>(*highlightedItemId), indexOrId);
+
+	return ResolveItemHelpText(*highlightedItemId);
 }
 
 bool RootMenuView::OnMenuCommand(HMENU menu, int index)
@@ -445,17 +468,7 @@ std::optional<UINT> RootMenuView::MaybeGetItemIdForNativeMenu(HMENU menu, int in
 	return MenuHelper::MaybeGetItemIdIncludingSubmenu(menu, index);
 }
 
-std::optional<std::wstring> RootMenuView::OnHelpTextRequested(HMENU menu, UINT id)
-{
-	if (!IsPartOfMenu(menu))
-	{
-		return std::nullopt;
-	}
-
-	return GetItemHelpText(id);
-}
-
-std::wstring RootMenuView::GetItemHelpText(UINT id) const
+std::wstring RootMenuView::ResolveItemHelpText(UINT id) const
 {
 	if (IsExternalItem(id))
 	{

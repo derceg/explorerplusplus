@@ -5,7 +5,6 @@
 #pragma once
 
 #include "MenuView.h"
-#include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <memory>
 #include <optional>
@@ -45,7 +44,8 @@ private:
 	void OnUninitMenuPopup(HMENU menu);
 	void OnMenuOpened();
 	void OnMenuClosed();
-	void OnMenuItemSelected(HMENU menu, WORD indexOrId, UINT flags);
+	void OnMenuItemHighlighted(HMENU menu, WORD indexOrId, UINT flags);
+	std::wstring GetHelpTextForHighlightedItem(HMENU menu, WORD indexOrId, UINT flags) const;
 	bool OnMenuCommand(HMENU menu, int index);
 	void SelectExternalItem(UINT id);
 	bool OnMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
@@ -57,8 +57,7 @@ private:
 	std::optional<LRESULT> OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
 	wil::com_ptr_nothrow<IDropTarget> MaybeGetDropTargetForItem(UINT id, MenuDropPosition position);
 	std::optional<UINT> MaybeGetItemIdForNativeMenu(HMENU menu, int index) const;
-	std::optional<std::wstring> OnHelpTextRequested(HMENU menu, UINT id);
-	std::wstring GetItemHelpText(UINT id) const;
+	std::wstring ResolveItemHelpText(UINT id) const;
 	std::wstring GetExternalItemHelpText(UINT id) const;
 	std::optional<LRESULT> MaybeForwardMessageToExternalItemDelegate(UINT msg, WPARAM wParam,
 		LPARAM lParam);
@@ -69,6 +68,5 @@ private:
 	MenuHelpTextHost *const m_menuHelpTextHost;
 	std::unique_ptr<WindowSubclass> m_subclass;
 	bool m_isMenuOpen = false;
-	boost::signals2::scoped_connection m_helpTextConnection;
 	wil::com_ptr_nothrow<IDropTarget> m_dropTarget;
 };

@@ -4,12 +4,20 @@
 
 #pragma once
 
+#include <string>
+
 class MenuItemKey;
 class RootMenuView;
 
 class RootMenuViewTestApi
 {
 public:
+	static std::wstring ResolveItemHelpText(const RootMenuView *menuView, UINT id);
+
+	// This will highlight the item, resulting in the help text for that item being assigned to the
+	// MenuHelpTextHost instance.
+	static void HighlightItemAtIndex(RootMenuView *menuView, HMENU parentMenu, int index);
+
 	static void SelectItem(RootMenuView *menuView, const MenuItemKey &key, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
 	static void SelectItem(RootMenuView *menuView, UINT id, bool isCtrlKeyDown,

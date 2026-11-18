@@ -96,7 +96,6 @@ public:
 
 	const ShellBrowser *GetActiveShellBrowser() const override;
 	void StartMainToolbarCustomization() override;
-	std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;
@@ -106,9 +105,7 @@ public:
 	// MenuHelpTextHost
 	void NotifyTopLevelMenuShown() override;
 	void NotifyTopLevelMenuClosed() override;
-	void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) override;
-	boost::signals2::connection AddMenuHelpTextRequestObserver(
-		const MenuHelpTextRequestSignal::slot_type &observer) override;
+	void SetMenuHelpText(const std::wstring &text) override;
 
 private:
 	static const int DISPLAY_WINDOW_MINIMUM_WIDTH = 70_px;
@@ -223,10 +220,8 @@ private:
 	void UpdateWindowStates(const Tab &tab);
 
 	void OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition);
-
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
 	/* File selection tests. */
@@ -291,7 +286,6 @@ private:
 	std::unique_ptr<MainMenu> m_mainMenu;
 
 	int m_numTopLevelMenusActive = 0;
-	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
 
 	// Treeview
 	std::unique_ptr<FoldersPane> m_foldersPane;

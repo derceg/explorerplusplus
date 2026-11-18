@@ -213,60 +213,45 @@ TEST_F(RootMenuViewTest, RightClick)
 		{ 50, 270 });
 }
 
-TEST_F(RootMenuViewTest, HelpTextRequest)
+TEST_F(RootMenuViewTest, HelpText)
 {
 	std::wstring helpText = L"Help text";
 	m_view.AppendItem(MenuItemParams(L"Item").SetHelpText(helpText));
 
-	UINT itemId = MenuViewTestApi::GetItemId(&m_view, 0);
-
-	// The menu isn't being shown, so no help text should be returned.
-	auto retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId);
-	EXPECT_EQ(retrievedHelpText, std::nullopt);
-
-	RootMenuViewTestApi::NotifyMenuOpened(&m_view);
-
-	// The menu is now being shown, so help text should be returned.
-	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId);
-	EXPECT_EQ(retrievedHelpText, helpText);
-
-	RootMenuViewTestApi::NotifyMenuClosed(&m_view);
-
-	// The menu has been closed, so, again, no help text should be returned.
-	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId);
-	EXPECT_EQ(retrievedHelpText, std::nullopt);
+	RootMenuViewTestApi::HighlightItemAtIndex(&m_view, MenuViewTestApi::GetNativeMenu(&m_view), 0);
+	EXPECT_EQ(m_menuHelpTextHost.GetCurrentHelpText(), helpText);
 }
 
-TEST_F(RootMenuViewTest, SubMenuHelpTextRequest)
+TEST_F(RootMenuViewTest, HelpTextForSubMenuItem)
 {
 	auto *subMenuView = m_view.AppendSubMenu(SubMenuItemParams(L"SubMenu"));
 
 	std::wstring helpText = L"Help text";
 	subMenuView->AppendItem(MenuItemParams(L"SubMenu Item").SetHelpText(helpText));
 
-	UINT itemId = MenuViewTestApi::GetItemId(subMenuView, 0);
-
-	auto retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
-		MenuViewTestApi::GetNativeMenu(subMenuView), itemId);
-	EXPECT_EQ(retrievedHelpText, std::nullopt);
-
-	RootMenuViewTestApi::NotifyMenuOpened(&m_view);
-
-	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
-		MenuViewTestApi::GetNativeMenu(subMenuView), itemId);
-	EXPECT_EQ(retrievedHelpText, helpText);
-
-	RootMenuViewTestApi::NotifyMenuClosed(&m_view);
-
-	retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
-		MenuViewTestApi::GetNativeMenu(subMenuView), itemId);
-	EXPECT_EQ(retrievedHelpText, std::nullopt);
+	RootMenuViewTestApi::HighlightItemAtIndex(&m_view, MenuViewTestApi::GetNativeMenu(subMenuView),
+		0);
+	EXPECT_EQ(m_menuHelpTextHost.GetCurrentHelpText(), helpText);
 }
 
-TEST_F(RootMenuViewTest, ExternalItemHelpText)
+TEST_F(RootMenuViewTest, HelpTextForSubMenuPopupItem)
+{
+	m_view.AppendSubMenu(SubMenuItemParams(L"SubMenu"));
+
+	// The popup item shouldn't have any help text.
+	RootMenuViewTestApi::HighlightItemAtIndex(&m_view, MenuViewTestApi::GetNativeMenu(&m_view), 0);
+	EXPECT_EQ(m_menuHelpTextHost.GetCurrentHelpText(), L"");
+}
+
+TEST_F(RootMenuViewTest, HelpTextForSeparatorItem)
+{
+	m_view.AppendSeparator();
+
+	RootMenuViewTestApi::HighlightItemAtIndex(&m_view, MenuViewTestApi::GetNativeMenu(&m_view), 0);
+	EXPECT_EQ(m_menuHelpTextHost.GetCurrentHelpText(), L"");
+}
+
+TEST_F(RootMenuViewTest, HelpTextForExternalItem)
 {
 	ExternalMenuItemDelegateMock externalItemDelegate;
 	m_view.SetExternalItemDelegate(&externalItemDelegate);
@@ -275,28 +260,15 @@ TEST_F(RootMenuViewTest, ExternalItemHelpText)
 
 	UINT idCounter = MenuView::EXTERNAL_ID_MIN;
 
-	UINT itemId1 = idCounter++;
-	MenuHelper::AddStringItem(menu, itemId1, L"External item 1");
+	UINT itemId = idCounter++;
+	MenuHelper::AddStringItem(menu, itemId, L"External item");
 
-	UINT itemId2 = idCounter++;
-	MenuHelper::AddStringItem(menu, itemId2, L"External item 2");
+	std::wstring helpText = L"Help for external item";
+	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId))
+		.WillOnce(Return(std::wstring(helpText)));
 
-	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId1))
-		.WillOnce(Return(std::wstring(L"Help for external item 1")));
-	EXPECT_CALL(externalItemDelegate, MaybeGetExternalItemHelpText(itemId2))
-		.WillOnce(Return(std::wstring(L"Help for external item 2")));
-
-	RootMenuViewTestApi::NotifyMenuOpened(&m_view);
-
-	auto retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId1);
-	EXPECT_EQ(retrievedHelpText, L"Help for external item 1");
-
-	retrievedHelpText =
-		m_menuHelpTextHost.TriggerHelpTextRequest(MenuViewTestApi::GetNativeMenu(&m_view), itemId2);
-	EXPECT_EQ(retrievedHelpText, L"Help for external item 2");
-
-	RootMenuViewTestApi::NotifyMenuClosed(&m_view);
+	RootMenuViewTestApi::HighlightItemAtIndex(&m_view, MenuViewTestApi::GetNativeMenu(&m_view), 0);
+	EXPECT_EQ(m_menuHelpTextHost.GetCurrentHelpText(), helpText);
 }
 
 TEST_F(RootMenuViewTest, DropLocation)

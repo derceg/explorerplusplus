@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "ShellContextMenu.h"
 #include "AcceleratorManager.h"
-#include "MenuHelpTextHostFake.h"
 #include "MenuViewTestApi.h"
 #include "RootMenuViewTestApi.h"
 #include "TestMenuView.h"
@@ -154,7 +153,6 @@ class ShellContextMenuTest : public Test
 {
 protected:
 	ShellContextMenuTest() :
-		m_menuView(nullptr, &m_menuHelpTextHost),
 		m_externalContextMenu(winrt::make_self<ContextMenuFake>()),
 		m_menu(&m_menuView, &m_acceleratorManager, m_externalContextMenu.get())
 	{
@@ -162,7 +160,6 @@ protected:
 
 	AcceleratorManager m_acceleratorManager;
 
-	MenuHelpTextHostFake m_menuHelpTextHost;
 	TestMenuView m_menuView;
 	winrt::com_ptr<ContextMenuFake> m_externalContextMenu;
 	TestShellContextMenu m_menu;
@@ -195,9 +192,9 @@ TEST_F(ShellContextMenuTest, HelpText)
 	for (UINT i = 0; i < std::size(ContextMenuFake::ITEMS); i++)
 	{
 		const auto &item = ContextMenuFake::ITEMS[i];
-		auto retrievedHelpText = m_menuHelpTextHost.TriggerHelpTextRequest(
-			MenuViewTestApi::GetNativeMenu(&m_menuView), MenuView::EXTERNAL_ID_MIN + i);
-		EXPECT_EQ(retrievedHelpText, item.helpText);
+		auto helpText =
+			RootMenuViewTestApi::ResolveItemHelpText(&m_menuView, MenuView::EXTERNAL_ID_MIN + i);
+		EXPECT_EQ(helpText, item.helpText);
 	}
 
 	RootMenuViewTestApi::NotifyMenuClosed(&m_menuView);

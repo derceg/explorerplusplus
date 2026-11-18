@@ -13,20 +13,12 @@ void MenuHelpTextHostFake::NotifyTopLevelMenuClosed()
 {
 }
 
-void MenuHelpTextHostFake::MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
+void MenuHelpTextHostFake::SetMenuHelpText(const std::wstring &text)
 {
-	UNREFERENCED_PARAMETER(menu);
-	UNREFERENCED_PARAMETER(indexOrId);
-	UNREFERENCED_PARAMETER(flags);
+	m_helpText = text;
 }
 
-boost::signals2::connection MenuHelpTextHostFake::AddMenuHelpTextRequestObserver(
-	const MenuHelpTextRequestSignal::slot_type &observer)
+const std::wstring &MenuHelpTextHostFake::GetCurrentHelpText() const
 {
-	return m_menuHelpTextRequestSignal.connect(observer);
-}
-
-std::optional<std::wstring> MenuHelpTextHostFake::TriggerHelpTextRequest(HMENU menu, UINT id)
-{
-	return m_menuHelpTextRequestSignal(menu, id);
+	return m_helpText;
 }

@@ -30,7 +30,7 @@ public:
 
 	void NotifyMenuLoopStarted();
 	void NotifyMenuLoopEnded();
-	void OnMenuSelect(HMENU menu, UINT itemId, UINT flags);
+	void SetMenuHelpText(const std::wstring &text);
 
 private:
 	void SetStandardParts();

@@ -4,14 +4,7 @@
 
 #pragma once
 
-#include "SignalHelper.h"
-#include <boost/signals2.hpp>
-#include <optional>
 #include <string>
-
-using MenuHelpTextRequestSignal =
-	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, UINT id),
-		FirstSuccessfulRequestCombiner<std::optional<std::wstring>>>;
 
 // Represents a UI component that can ultimately display menu help text.
 class MenuHelpTextHost
@@ -22,11 +15,6 @@ public:
 	virtual void NotifyTopLevelMenuShown() = 0;
 	virtual void NotifyTopLevelMenuClosed() = 0;
 
-	// Notifies the host that a menu item has been selected.
-	virtual void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) = 0;
-
-	// Allows an observer to respond to help text requests from the host, in order to provide help
-	// text for a particular menu item.
-	virtual boost::signals2::connection AddMenuHelpTextRequestObserver(
-		const MenuHelpTextRequestSignal::slot_type &observer) = 0;
+	// Called when a menu item is highlighted and the help text needs to be shown.
+	virtual void SetMenuHelpText(const std::wstring &text) = 0;
 };

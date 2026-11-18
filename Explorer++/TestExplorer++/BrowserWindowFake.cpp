@@ -195,14 +195,6 @@ void BrowserWindowFake::StartMainToolbarCustomization()
 {
 }
 
-std::optional<std::wstring> BrowserWindowFake::RequestMenuHelpText(HMENU menu, UINT id) const
-{
-	UNREFERENCED_PARAMETER(menu);
-	UNREFERENCED_PARAMETER(id);
-
-	return std::nullopt;
-}
-
 WindowStorageData BrowserWindowFake::GetStorageData() const
 {
 	WINDOWPLACEMENT placement = {};
@@ -248,19 +240,9 @@ void BrowserWindowFake::NotifyTopLevelMenuClosed()
 {
 }
 
-void BrowserWindowFake::MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
+void BrowserWindowFake::SetMenuHelpText(const std::wstring &text)
 {
-	UNREFERENCED_PARAMETER(menu);
-	UNREFERENCED_PARAMETER(indexOrId);
-	UNREFERENCED_PARAMETER(flags);
-}
-
-boost::signals2::connection BrowserWindowFake::AddMenuHelpTextRequestObserver(
-	const MenuHelpTextRequestSignal::slot_type &observer)
-{
-	UNREFERENCED_PARAMETER(observer);
-
-	return {};
+	UNREFERENCED_PARAMETER(text);
 }
 
 void BrowserWindowFake::SetWorkspaceBounds(const RECT &bounds)

@@ -13,19 +13,9 @@ void NoOpMenuHelpTextHost::NotifyTopLevelMenuClosed()
 {
 }
 
-void NoOpMenuHelpTextHost::MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags)
+void NoOpMenuHelpTextHost::SetMenuHelpText(const std::wstring &text)
 {
-	UNREFERENCED_PARAMETER(menu);
-	UNREFERENCED_PARAMETER(indexOrId);
-	UNREFERENCED_PARAMETER(flags);
-}
-
-boost::signals2::connection NoOpMenuHelpTextHost::AddMenuHelpTextRequestObserver(
-	const MenuHelpTextRequestSignal::slot_type &observer)
-{
-	UNREFERENCED_PARAMETER(observer);
-
-	return {};
+	UNREFERENCED_PARAMETER(text);
 }
 
 NoOpMenuHelpTextHost *NoOpMenuHelpTextHost::GetInstance()

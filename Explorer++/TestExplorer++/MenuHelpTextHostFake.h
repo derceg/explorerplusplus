@@ -12,12 +12,10 @@ public:
 	// MenuHelpTextHost
 	void NotifyTopLevelMenuShown() override;
 	void NotifyTopLevelMenuClosed() override;
-	void MenuItemSelected(HMENU menu, WORD indexOrId, UINT flags) override;
-	boost::signals2::connection AddMenuHelpTextRequestObserver(
-		const MenuHelpTextRequestSignal::slot_type &observer) override;
+	void SetMenuHelpText(const std::wstring &text) override;
 
-	std::optional<std::wstring> TriggerHelpTextRequest(HMENU menu, UINT id);
+	const std::wstring &GetCurrentHelpText() const;
 
 private:
-	MenuHelpTextRequestSignal m_menuHelpTextRequestSignal;
+	std::wstring m_helpText;
 };

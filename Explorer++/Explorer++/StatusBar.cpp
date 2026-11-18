@@ -111,23 +111,11 @@ void StatusBar::NotifyMenuLoopEnded()
 	UpdateText(*tab);
 }
 
-void StatusBar::OnMenuSelect(HMENU menu, UINT itemId, UINT flags)
+void StatusBar::SetMenuHelpText(const std::wstring &text)
 {
-	if (!menu)
-	{
-		return;
-	}
-
 	DCHECK(m_showingMenuHelpText);
 
-	std::optional<std::wstring> helpText;
-
-	if (WI_AreAllFlagsClear(flags, MF_POPUP | MF_SEPARATOR))
-	{
-		helpText = m_browser->RequestMenuHelpText(menu, itemId);
-	}
-
-	m_view->SetPartText(0, helpText.value_or(L""));
+	m_view->SetPartText(0, text);
 }
 
 void StatusBar::UpdateText(const Tab &tab)

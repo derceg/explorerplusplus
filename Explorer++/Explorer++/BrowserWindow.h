@@ -88,8 +88,6 @@ public:
 
 	virtual void StartMainToolbarCustomization() = 0;
 
-	virtual std::optional<std::wstring> RequestMenuHelpText(HMENU menu, UINT id) const = 0;
-
 	virtual WindowStorageData GetStorageData() const = 0;
 
 	virtual bool IsActive() const = 0;

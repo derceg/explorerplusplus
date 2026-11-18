@@ -33,8 +33,6 @@ public:
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(const ShellBrowser *, GetActiveShellBrowser, (), (const, override));
 	MOCK_METHOD(void, StartMainToolbarCustomization, (), (override));
-	MOCK_METHOD(std::optional<std::wstring>, RequestMenuHelpText, (HMENU menu, UINT id),
-		(const, override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
 	MOCK_METHOD(bool, IsActive, (), (const, override));
 	MOCK_METHOD(void, Activate, (), (override));
@@ -44,7 +42,5 @@ public:
 	// MenuHelpTextHost
 	MOCK_METHOD(void, NotifyTopLevelMenuShown, (), (override));
 	MOCK_METHOD(void, NotifyTopLevelMenuClosed, (), (override));
-	MOCK_METHOD(void, MenuItemSelected, (HMENU menu, WORD indexOrId, UINT flags), (override));
-	MOCK_METHOD(boost::signals2::connection, AddMenuHelpTextRequestObserver,
-		(const MenuHelpTextRequestSignal::slot_type &observer), (override));
+	MOCK_METHOD(void, SetMenuHelpText, (const std::wstring &text), (override));
 };
