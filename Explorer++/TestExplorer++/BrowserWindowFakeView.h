@@ -12,6 +12,10 @@ class BrowserWindowFakeView : public BrowserView
 public:
 	BrowserWindowFakeView(const RECT &bounds);
 
+	// BrowserView
+	AddressBarView *GetAddressBarView() const override;
+	void FocusNextWindow(FocusChangeDirection direction) override;
+
 private:
 	static constexpr wchar_t CLASS_NAME[] = L"TestExplorer++BrowserWindowClass";
 

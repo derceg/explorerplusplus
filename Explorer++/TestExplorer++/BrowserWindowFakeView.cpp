@@ -51,3 +51,13 @@ void BrowserWindowFakeView::RegisterBrowserWindowClass()
 	auto atom = RegisterClass(&windowClass);
 	CHECK(atom);
 }
+
+AddressBarView *BrowserWindowFakeView::GetAddressBarView() const
+{
+	return nullptr;
+}
+
+void BrowserWindowFakeView::FocusNextWindow(FocusChangeDirection direction)
+{
+	UNREFERENCED_PARAMETER(direction);
+}

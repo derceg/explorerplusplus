@@ -43,12 +43,6 @@ class BrowserViewImpl : public BrowserView, private DropTargetDelegate
 public:
 	static constexpr wchar_t WINDOW_CLASS_NAME[] = L"Explorer++";
 
-	enum class FocusChangeDirection
-	{
-		Previous,
-		Next
-	};
-
 	BrowserViewImpl(BrowserWindow *browser, const RECT &bounds, AppServices *appServices);
 	~BrowserViewImpl();
 
@@ -56,7 +50,6 @@ public:
 
 	MainRebarView *GetMainRebarView() const;
 	MainToolbarView *GetMainToolbarView() const;
-	AddressBarView *GetAddressBarView() const;
 	BookmarksToolbarView *GetBookmarksToolbarView() const;
 	DrivesToolbarView *GetDrivesToolbarView() const;
 	Applications::ApplicationToolbarView *GetApplicationToolbarView() const;
@@ -66,7 +59,10 @@ public:
 	StatusBarView *GetStatusBarView() const;
 
 	void RedrawMenuBar();
-	void FocusNextWindow(FocusChangeDirection direction);
+
+	// BrowserView
+	AddressBarView *GetAddressBarView() const override;
+	void FocusNextWindow(FocusChangeDirection direction) override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;

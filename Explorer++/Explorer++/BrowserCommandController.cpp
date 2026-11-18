@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "BrowserCommandController.h"
 #include "AboutDialog.h"
+#include "AddressBarView.h"
 #include "AppController.h"
 #include "AppInfo.h"
 #include "AppServices.h"
@@ -424,6 +425,22 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDA_SELECT_NEXT_TAB:
 		m_browser->GetActiveTabBar()->SelectAdjacentTab(TabBar::SelectionDirection::Next);
+		break;
+
+	case IDA_ADDRESSBAR:
+		m_browser->GetView()->GetAddressBarView()->Focus();
+		break;
+
+	case IDA_COMBODROPDOWN:
+		m_browser->GetView()->GetAddressBarView()->ShowDropDown();
+		break;
+
+	case IDA_PREVIOUSWINDOW:
+		m_browser->GetView()->FocusNextWindow(BrowserView::FocusChangeDirection::Previous);
+		break;
+
+	case IDA_NEXTWINDOW:
+		m_browser->GetView()->FocusNextWindow(BrowserView::FocusChangeDirection::Next);
 		break;
 
 	case IDA_DUPLICATE_TAB:

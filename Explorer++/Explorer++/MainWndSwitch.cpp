@@ -487,31 +487,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDM_HELP_ABOUT:
 	case IDA_SELECT_PREVIOUS_TAB:
 	case IDA_SELECT_NEXT_TAB:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDA_ADDRESSBAR:
-		if (m_config->showAddressBar.get())
-		{
-			m_addressBar->GetView()->Focus();
-		}
-		break;
-
 	case IDA_COMBODROPDOWN:
-		if (m_config->showAddressBar.get())
-		{
-			m_addressBar->GetView()->ShowDropDown();
-		}
-		break;
-
 	case IDA_PREVIOUSWINDOW:
-		m_view.FocusNextWindow(BrowserViewImpl::FocusChangeDirection::Previous);
-		break;
-
 	case IDA_NEXTWINDOW:
-		m_view.FocusNextWindow(BrowserViewImpl::FocusChangeDirection::Next);
-		break;
-
 	case IDA_DUPLICATE_TAB:
 	case IDA_HOME:
 	case IDA_SELECT_TAB_1:
