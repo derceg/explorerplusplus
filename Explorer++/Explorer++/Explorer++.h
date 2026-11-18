@@ -25,9 +25,6 @@
 #include <concurrencpp/concurrencpp.h>
 #include <optional>
 
-/* Sent when a folder size calculation has finished. */
-#define WM_APP_FOLDERSIZECOMPLETED WM_APP + 3
-
 class AcceleratorManager;
 class AddressBar;
 class AppServices;
@@ -126,26 +123,6 @@ private:
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
 
-	struct DWFolderSizeCompletion
-	{
-		ULARGE_INTEGER liFolderSize;
-		int uId;
-		int iTabId;
-	};
-
-	struct DWFolderSize
-	{
-		int uId;
-		int iTabId;
-		BOOL bValid;
-	};
-
-	struct FolderSizeExtraInfo
-	{
-		void *pContainer;
-		int uId;
-	};
-
 	Explorerplusplus(const WindowStorageData &storageData, AppServices *appServices,
 		HINSTANCE resourceInstance);
 	~Explorerplusplus();
@@ -236,11 +213,6 @@ private:
 	/* CoreInterface methods. */
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 
-	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
-		LPVOID pData);
-	void FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
-		PULARGE_INTEGER lTotalFolderSize);
-
 	bool ConfirmClose();
 	void BeginShutdown();
 	static concurrencpp::null_result ScheduleFinishShutdown(WeakPtr<Explorerplusplus> self,
@@ -306,10 +278,6 @@ private:
 	std::unique_ptr<Applications::ApplicationToolbar> m_applicationToolbar;
 
 	Applications::ApplicationExecutorImpl m_applicationExecutor;
-
-	/* Display window folder sizes. */
-	std::list<DWFolderSize> m_DWFolderSizes;
-	int m_iDWFolderSizeUniqueId;
 
 	WeakPtrFactory<Explorerplusplus> m_weakPtrFactory{ this };
 };

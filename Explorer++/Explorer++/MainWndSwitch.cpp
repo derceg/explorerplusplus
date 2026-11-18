@@ -26,8 +26,6 @@
 #include "../Helper/EnumHelper.h"
 #include <windowsx.h>
 
-static const int FOLDER_SIZE_LINE_INDEX = 1;
-
 LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -50,55 +48,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 			KillTimer(m_hwnd, LISTVIEW_ITEM_CHANGED_TIMER_ID);
 		}
 		break;
-
-	case WM_APP_FOLDERSIZECOMPLETED:
-	{
-		DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
-		TCHAR szSizeString[64];
-		BOOL bValid = FALSE;
-
-		pDWFolderSizeCompletion = (DWFolderSizeCompletion *) wParam;
-
-		std::list<DWFolderSize>::iterator itr;
-
-		/* First, make sure we should still display the
-		results (we won't if the listview selection has
-		changed, or this folder size was calculated for
-		a tab other than the current one). */
-		for (itr = m_DWFolderSizes.begin(); itr != m_DWFolderSizes.end(); itr++)
-		{
-			if (itr->uId == pDWFolderSizeCompletion->uId)
-			{
-				if (itr->iTabId == GetActivePane()->GetTabBar()->GetSelectedTab().GetId())
-				{
-					bValid = itr->bValid;
-				}
-
-				m_DWFolderSizes.erase(itr);
-
-				break;
-			}
-		}
-
-		if (bValid)
-		{
-			auto displayFormat = m_config->globalFolderSettings.forceSize
-				? m_config->globalFolderSettings.sizeDisplayFormat
-				: SizeDisplayFormat::None;
-			auto folderSizeText =
-				FormatSizeString(pDWFolderSizeCompletion->liFolderSize.QuadPart, displayFormat);
-
-			auto totalSizeText = m_resourceLoader->LoadString(IDS_GENERAL_TOTALSIZE);
-			StringCchPrintf(szSizeString, std::size(szSizeString), _T("%s: %s"),
-				totalSizeText.c_str(), folderSizeText.c_str());
-
-			/* TODO: The line index should be stored in some other (variable) way. */
-			DisplayWindow_SetLine(m_displayWindow->GetHWND(), FOLDER_SIZE_LINE_INDEX, szSizeString);
-		}
-
-		free(pDWFolderSizeCompletion);
-	}
-	break;
 
 	case WM_COMMAND:
 		return CommandHandler(hwnd, reinterpret_cast<HWND>(lParam), LOWORD(wParam), HIWORD(wParam));

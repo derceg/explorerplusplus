@@ -67,8 +67,6 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
 
-	m_iDWFolderSizeUniqueId = 0;
-
 	m_treeViewWidth = storageData.treeViewWidth;
 	m_displayWindowWidth = storageData.displayWindowWidth;
 	m_displayWindowHeight = storageData.displayWindowHeight;

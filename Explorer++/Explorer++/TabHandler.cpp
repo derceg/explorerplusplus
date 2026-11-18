@@ -216,18 +216,6 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const ShellBrowser *shellBr
 {
 	const auto *tab = shellBrowser->GetTab();
 
-	/* The selection for this tab has changed, so invalidate any
-	folder size calculations that are occurring for this tab
-	(applies only to folder sizes that will be shown in the display
-	window). */
-	for (auto &item : m_DWFolderSizes)
-	{
-		if (item.iTabId == tab->GetId())
-		{
-			item.bValid = FALSE;
-		}
-	}
-
 	if (GetActivePane()->GetTabBar()->IsTabSelected(*tab))
 	{
 		SetTimer(m_hwnd, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);

@@ -112,70 +112,14 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 		if (!tab.GetShellBrowserImpl()->InVirtualFolder())
 		{
-			DWORD dwAttributes;
-
 			wfd = tab.GetShellBrowserImpl()->GetItemFileFindData(iSelected);
 
-			dwAttributes = GetFileAttributes(fullItemName.c_str());
+			DWORD dwAttributes = GetFileAttributes(fullItemName.c_str());
 
-			if (((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-				&& m_config->globalFolderSettings.showFolderSizes)
-			{
-				FolderSize_t *pfs = nullptr;
-				FolderSizeExtraInfo *pfsei = nullptr;
-				DWFolderSize displayWindowFolderSize;
-				TCHAR szDisplayText[256];
-				DWORD threadId;
+			SHGetFileInfo(fullItemName.c_str(), wfd.dwFileAttributes, &shfi, sizeof(shfi),
+				SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES);
 
-				pfs = (FolderSize_t *) malloc(sizeof(FolderSize_t));
-
-				if (pfs != nullptr)
-				{
-					pfsei = (FolderSizeExtraInfo *) malloc(sizeof(FolderSizeExtraInfo));
-
-					if (pfsei != nullptr)
-					{
-						pfsei->pContainer = (void *) this;
-						pfsei->uId = m_iDWFolderSizeUniqueId;
-						pfs->pData = (LPVOID) pfsei;
-
-						pfs->pfnCallback = FolderSizeCallbackStub;
-
-						StringCchCopy(pfs->szPath, std::size(pfs->szPath), fullItemName.c_str());
-
-						auto totalSizeText = m_resourceLoader->LoadString(IDS_GENERAL_TOTALSIZE);
-						auto calculatingText =
-							m_resourceLoader->LoadString(IDS_GENERAL_CALCULATING);
-						StringCchPrintf(szDisplayText, std::size(szDisplayText), _T("%s: %s"),
-							totalSizeText.c_str(), calculatingText.c_str());
-						DisplayWindow_BufferText(m_displayWindow->GetHWND(), szDisplayText);
-
-						/* Maintain a global list of folder size operations. */
-						displayWindowFolderSize.uId = m_iDWFolderSizeUniqueId;
-						displayWindowFolderSize.iTabId =
-							GetActivePane()->GetTabBar()->GetSelectedTab().GetId();
-						displayWindowFolderSize.bValid = TRUE;
-						m_DWFolderSizes.push_back(displayWindowFolderSize);
-
-						HANDLE hThread = CreateThread(nullptr, 0, Thread_CalculateFolderSize,
-							(LPVOID) pfs, 0, &threadId);
-						CloseHandle(hThread);
-
-						m_iDWFolderSizeUniqueId++;
-					}
-					else
-					{
-						free(pfs);
-					}
-				}
-			}
-			else
-			{
-				SHGetFileInfo(fullItemName.c_str(), wfd.dwFileAttributes, &shfi, sizeof(shfi),
-					SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES);
-
-				DisplayWindow_BufferText(m_displayWindow->GetHWND(), shfi.szTypeName);
-			}
+			DisplayWindow_BufferText(m_displayWindow->GetHWND(), shfi.szTypeName);
 
 			CreateFileTimeString(&wfd.ftLastWriteTime, szFileDate, std::size(szFileDate),
 				m_config->globalFolderSettings.showFriendlyDates);
@@ -385,33 +329,4 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 	}
 
 	DisplayWindow_BufferText(m_displayWindow->GetHWND(), szTotalSize);
-}
-
-void Explorerplusplus::FolderSizeCallbackStub(int nFolders, int nFiles,
-	PULARGE_INTEGER lTotalFolderSize, LPVOID pData)
-{
-	auto *pfsei = reinterpret_cast<Explorerplusplus::FolderSizeExtraInfo *>(pData);
-	reinterpret_cast<Explorerplusplus *>(pfsei->pContainer)
-		->FolderSizeCallback(pfsei, nFolders, nFiles, lTotalFolderSize);
-	free(pfsei);
-}
-
-void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
-	PULARGE_INTEGER lTotalFolderSize)
-{
-	UNREFERENCED_PARAMETER(nFolders);
-	UNREFERENCED_PARAMETER(nFiles);
-
-	DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
-
-	pDWFolderSizeCompletion = (DWFolderSizeCompletion *) malloc(sizeof(DWFolderSizeCompletion));
-
-	pDWFolderSizeCompletion->liFolderSize = *lTotalFolderSize;
-	pDWFolderSizeCompletion->uId = pfsei->uId;
-
-	/* Queue the result back to the main thread, so that
-	the folder size can be displayed. It is up to the main
-	thread to determine whether the folder size should actually
-	be shown. */
-	PostMessage(m_hwnd, WM_APP_FOLDERSIZECOMPLETED, (WPARAM) pDWFolderSizeCompletion, 0);
 }

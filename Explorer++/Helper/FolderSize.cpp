@@ -48,19 +48,3 @@ FolderInfo GetFolderInfo(const std::wstring &path)
 
 	return folderInfo;
 }
-
-DWORD WINAPI Thread_CalculateFolderSize(LPVOID lpParameter)
-{
-	FolderSize_t *pFolderSize = reinterpret_cast<FolderSize_t *>(lpParameter);
-
-	auto folderInfo = GetFolderInfo(pFolderSize->szPath);
-
-	ULARGE_INTEGER size;
-	size.QuadPart = folderInfo.size;
-
-	pFolderSize->pfnCallback(folderInfo.numFolders, folderInfo.numFiles, &size, pFolderSize->pData);
-
-	free(pFolderSize);
-
-	return 1;
-}
