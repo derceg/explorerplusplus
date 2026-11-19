@@ -42,6 +42,7 @@
 #include "WindowThemeManagerImpl.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardWatcherImpl.h"
+#include "../Helper/FileActionHandlerImpl.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
@@ -135,6 +136,9 @@ private:
 
 	DriveWatcherImpl m_driveWatcher;
 	DriveModel m_driveModel;
+
+	// This is used to provide undo support for some file operations.
+	FileActionHandlerImpl m_fileActionHandler;
 
 	// Plugins
 	Plugins::PluginMenuItemsRegistry m_pluginMenuItemsRegistry;

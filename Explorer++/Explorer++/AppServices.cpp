@@ -225,6 +225,21 @@ void AppServices::SetFeatureList(FeatureList *featureList)
 	Set(featureList);
 }
 
+FileActionHandler *AppServices::GetFileActionHandler()
+{
+	return Get<FileActionHandler>();
+}
+
+const FileActionHandler *AppServices::GetFileActionHandler() const
+{
+	return Get<FileActionHandler>();
+}
+
+void AppServices::SetFileActionHandler(FileActionHandler *fileActionHandler)
+{
+	Set(fileActionHandler);
+}
+
 FrequentLocationsModel *AppServices::GetFrequentLocationsModel()
 {
 	return Get<FrequentLocationsModel>();

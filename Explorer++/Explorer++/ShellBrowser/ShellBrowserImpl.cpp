@@ -51,10 +51,9 @@
 #include <ranges>
 
 ShellBrowserImpl::ShellBrowserImpl(const PreservedShellBrowser &preservedShellBrowser,
-	BrowserWindow *browser, AppServices *appServices, HINSTANCE resourceInstance,
-	FileActionHandler *fileActionHandler) :
+	BrowserWindow *browser, AppServices *appServices, HINSTANCE resourceInstance) :
 	ShellBrowserImpl(preservedShellBrowser.folderSettings, &preservedShellBrowser.folderColumns,
-		browser, appServices, resourceInstance, fileActionHandler)
+		browser, appServices, resourceInstance)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
 		&m_navigationManager, appServices->GetNavigationEvents(), preservedShellBrowser.history,
@@ -65,10 +64,8 @@ ShellBrowserImpl::ShellBrowserImpl(const PreservedShellBrowser &preservedShellBr
 
 ShellBrowserImpl::ShellBrowserImpl(const PidlAbsolute &initialPidl,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns,
-	BrowserWindow *browser, AppServices *appServices, HINSTANCE resourceInstance,
-	FileActionHandler *fileActionHandler) :
-	ShellBrowserImpl(folderSettings, initialColumns, browser, appServices, resourceInstance,
-		fileActionHandler)
+	BrowserWindow *browser, AppServices *appServices, HINSTANCE resourceInstance) :
+	ShellBrowserImpl(folderSettings, initialColumns, browser, appServices, resourceInstance)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, browser,
 		&m_navigationManager, appServices->GetNavigationEvents(), initialPidl);
@@ -78,7 +75,7 @@ ShellBrowserImpl::ShellBrowserImpl(const PidlAbsolute &initialPidl,
 
 ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns, BrowserWindow *browser, AppServices *appServices,
-	HINSTANCE resourceInstance, FileActionHandler *fileActionHandler) :
+	HINSTANCE resourceInstance) :
 	m_listView(CreateListView(browser->GetView()->GetHWND())),
 	m_owner(browser->GetView()->GetHWND()),
 	m_browser(browser),
@@ -93,7 +90,6 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 			: appServices->GetRuntime()->GetInlineExecutor()),
 	m_progressCursor(LoadCursor(nullptr, IDC_APPSTARTING)),
 	m_commandTarget(browser->GetCommandTargetManager(), this),
-	m_fileActionHandler(fileActionHandler),
 	m_fontSetter(m_listView, appServices->GetConfig()),
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_listView, LVM_GETTOOLTIPS, 0, 0)),
 		appServices->GetConfig()),
@@ -964,7 +960,7 @@ void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 		return;
 	}
 
-	m_fileActionHandler->DeleteFiles(m_listView, pidls, permanent, false);
+	m_appServices->GetFileActionHandler()->DeleteFiles(m_listView, pidls, permanent, false);
 }
 
 void ShellBrowserImpl::StartRenamingSelectedItems()
@@ -1028,7 +1024,7 @@ void ShellBrowserImpl::StartRenamingMultipleItems(const std::vector<PidlAbsolute
 	}
 
 	auto *massRenameDialog = MassRenameDialog::Create(m_resourceLoader, m_listView,
-		fullFilenameList, m_fileActionHandler, m_acceleratorManager);
+		fullFilenameList, m_appServices->GetFileActionHandler(), m_acceleratorManager);
 	massRenameDialog->ShowModalDialog();
 }
 

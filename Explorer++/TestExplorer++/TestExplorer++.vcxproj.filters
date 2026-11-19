@@ -671,6 +671,9 @@
     <ClCompile Include="TestParentView.cpp">
       <Filter>UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="FileActionHandlerFake.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -1117,6 +1120,9 @@
     </ClInclude>
     <ClInclude Include="TestParentView.h">
       <Filter>UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="FileActionHandlerFake.h">
+      <Filter>Helper\Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

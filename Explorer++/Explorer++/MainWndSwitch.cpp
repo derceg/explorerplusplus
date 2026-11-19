@@ -24,6 +24,7 @@
 #include "TabBar.h"
 #include "../Helper/Controls.h"
 #include "../Helper/EnumHelper.h"
+#include "../Helper/FileActionHandler.h"
 #include <windowsx.h>
 
 LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -138,7 +139,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 		break;
 
 	case IDM_EDIT_UNDO:
-		m_fileActionHandler.Undo();
+		m_appServices->GetFileActionHandler()->Undo();
 		break;
 
 	case IDM_EDIT_CUT:

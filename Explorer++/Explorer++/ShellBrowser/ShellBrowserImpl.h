@@ -46,7 +46,6 @@ struct BasicItemInfo_t;
 class BrowserWindow;
 class ClipboardStore;
 struct Config;
-class FileActionHandler;
 class NavigationRequest;
 struct PreservedShellBrowser;
 class ResourceLoader;
@@ -71,10 +70,10 @@ class ShellBrowserImpl :
 {
 public:
 	ShellBrowserImpl(const PreservedShellBrowser &preservedShellBrowser, BrowserWindow *browser,
-		AppServices *appServices, HINSTANCE resourceInstance, FileActionHandler *fileActionHandler);
+		AppServices *appServices, HINSTANCE resourceInstance);
 	ShellBrowserImpl(const PidlAbsolute &initialPidl, const FolderSettings &folderSettings,
 		const FolderColumns *initialColumns, BrowserWindow *browser, AppServices *appServices,
-		HINSTANCE resourceInstance, FileActionHandler *fileActionHandler);
+		HINSTANCE resourceInstance);
 	~ShellBrowserImpl();
 
 	HWND GetListView() const;
@@ -361,8 +360,7 @@ private:
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
 	ShellBrowserImpl(const FolderSettings &folderSettings, const FolderColumns *initialColumns,
-		BrowserWindow *browser, AppServices *appServices, HINSTANCE resourceInstance,
-		FileActionHandler *fileActionHandler);
+		BrowserWindow *browser, AppServices *appServices, HINSTANCE resourceInstance);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
@@ -642,7 +640,6 @@ private:
 	const HCURSOR m_progressCursor;
 
 	ScopedBrowserCommandTarget m_commandTarget;
-	FileActionHandler *m_fileActionHandler;
 
 	std::vector<std::unique_ptr<WindowSubclass>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

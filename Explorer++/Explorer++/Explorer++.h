@@ -18,7 +18,6 @@
 #include "TaskbarTabManager.h"
 #include "WindowStorage.h"
 #include "../Helper/ClipboardHelper.h"
-#include "../Helper/FileActionHandler.h"
 #include "../Helper/WeakPtr.h"
 #include "../Helper/WeakPtrFactory.h"
 #include <boost/signals2.hpp>
@@ -234,9 +233,6 @@ private:
 	/** Internal state. **/
 	HWND m_lastActiveWindow;
 	bool m_bShowTabBar;
-
-	// Undo support.
-	FileActionHandler m_fileActionHandler;
 
 #if DCHECK_IS_ON()
 	bool m_performingLayout = false;

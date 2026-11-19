@@ -223,6 +223,7 @@
     <ClCompile Include="ApplicationToolbarStorageTestHelper.cpp" />
     <ClCompile Include="ApplicationToolbarTest.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
+    <ClCompile Include="FileActionHandlerFake.cpp" />
     <ClCompile Include="IconFetcherFake.cpp" />
     <ClCompile Include="AutoResetTest.cpp" />
     <ClCompile Include="BookmarkContextMenuTest.cpp" />
@@ -487,6 +488,7 @@
     <ClInclude Include="AppControllerFake.h" />
     <ClInclude Include="ApplicationExecutorMock.h" />
     <ClInclude Include="ApplicationToolbarStorageTestHelper.h" />
+    <ClInclude Include="FileActionHandlerFake.h" />
     <ClInclude Include="IconFetcherFake.h" />
     <ClInclude Include="BookmarkStorageTestHelper.h" />
     <ClInclude Include="BookmarkTestHelper.h" />

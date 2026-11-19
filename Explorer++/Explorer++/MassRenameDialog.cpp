@@ -223,7 +223,7 @@ void MassRenameDialog::OnOk()
 		return;
 	}
 
-	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
+	std::vector<FileActionHandler::RenamedItem> itemsToRename;
 	int index = 0;
 
 	for (const auto &strOldFilename : m_FullFilenameList)
@@ -238,15 +238,15 @@ void MassRenameDialog::OnOk()
 		PathRemoveFileSpec(filename);
 		auto updatedPath = filename + L"\\"s + updatedFilename;
 
-		FileActionHandler::RenamedItem_t renamedItem;
-		renamedItem.strOldFilename = strOldFilename;
-		renamedItem.strNewFilename = updatedPath;
-		renamedItemList.push_back(renamedItem);
+		FileActionHandler::RenamedItem renamedItem;
+		renamedItem.oldFilename = strOldFilename;
+		renamedItem.newFilename = updatedPath;
+		itemsToRename.push_back(renamedItem);
 
 		index++;
 	}
 
-	m_pFileActionHandler->RenameFiles(renamedItemList);
+	m_pFileActionHandler->RenameFiles(itemsToRename);
 
 	EndDialog(m_hDlg, 1);
 }

@@ -34,12 +34,12 @@
 #include "../Helper/ShellHelper.h"
 
 MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-	const FileActionHandler *fileActionHandler, CoreInterface *coreInterface) :
+	CoreInterface *coreInterface) :
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
 	m_browser(browser),
 	m_config(appServices->GetConfig()),
 	m_clipboardStore(appServices->GetPlatformContext()->GetClipboardStore()),
-	m_fileActionHandler(fileActionHandler),
+	m_fileActionHandler(appServices->GetFileActionHandler()),
 	m_resourceLoader(appServices->GetResourceLoader()),
 	m_coreInterface(coreInterface)
 {

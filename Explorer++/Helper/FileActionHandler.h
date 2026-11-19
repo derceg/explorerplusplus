@@ -4,47 +4,25 @@
 
 #pragma once
 
-#include <list>
-#include <stack>
+#include <shtypes.h>
+#include <string>
 #include <vector>
 
 class FileActionHandler
 {
 public:
-	struct RenamedItem_t
+	struct RenamedItem
 	{
-		std::wstring strOldFilename;
-		std::wstring strNewFilename;
+		std::wstring oldFilename;
+		std::wstring newFilename;
 	};
 
-	typedef std::list<RenamedItem_t> RenamedItems_t;
-	typedef std::vector<PCIDLIST_ABSOLUTE> DeletedItems_t;
+	virtual ~FileActionHandler() = default;
 
-	BOOL RenameFiles(const RenamedItems_t &itemList);
-	HRESULT DeleteFiles(HWND hwnd, const DeletedItems_t &deletedItems, bool permanent, bool silent);
+	virtual BOOL RenameFiles(const std::vector<RenamedItem> &itemList) = 0;
+	virtual HRESULT DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLUTE> &deletedItems,
+		bool permanent, bool silent) = 0;
 
-	void Undo();
-	BOOL CanUndo() const;
-
-private:
-	enum class UndoType
-	{
-		Renamed,
-		Copied,
-		Moved,
-		Deleted
-	};
-
-	struct UndoItem_t
-	{
-		UndoType type;
-
-		RenamedItems_t renamedItems;
-		DeletedItems_t deletedItems;
-	};
-
-	void UndoRenameOperation(const RenamedItems_t &renamedItemList);
-	void UndoDeleteOperation(const DeletedItems_t &deletedItemList);
-
-	std::stack<UndoItem_t> m_stackFileActions;
+	virtual BOOL CanUndo() const = 0;
+	virtual void Undo() = 0;
 };

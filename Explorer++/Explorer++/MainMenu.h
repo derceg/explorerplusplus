@@ -36,7 +36,7 @@ class MainMenu : public MenuBase
 {
 public:
 	MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-		const FileActionHandler *fileActionHandler, CoreInterface *coreInterface);
+		CoreInterface *coreInterface);
 
 private:
 	void BuildMenu(BrowserWindow *browser, AppServices *appServices);

@@ -19,6 +19,7 @@ class DarkModeManager;
 class DirectoryWatcherFactory;
 class DriveModel;
 class FeatureList;
+class FileActionHandler;
 class FrequentLocationsModel;
 class HistoryModel;
 class IconFetcher;
@@ -134,6 +135,10 @@ public:
 	const FeatureList *GetFeatureList() const;
 	void SetFeatureList(FeatureList *featureList);
 
+	FileActionHandler *GetFileActionHandler();
+	const FileActionHandler *GetFileActionHandler() const;
+	void SetFileActionHandler(FileActionHandler *fileActionHandler);
+
 	FrequentLocationsModel *GetFrequentLocationsModel();
 	const FrequentLocationsModel *GetFrequentLocationsModel() const;
 	void SetFrequentLocationsModel(FrequentLocationsModel *frequentLocationsModel);
@@ -217,10 +222,11 @@ private:
 	std::tuple<AcceleratorManager *, AppController *, Applications::ApplicationModel *,
 		BookmarkTree *, BrowserList *, BrowserWindowFactory *, CachedIcons *, ClipboardWatcher *,
 		ColorRuleModel *, const CommandLine::Settings *, Config *, DarkModeManager *,
-		DirectoryWatcherFactory *, DriveModel *, FeatureList *, FrequentLocationsModel *,
-		HistoryModel *, IconFetcher *, ModelessDialogList *, NavigationEvents *, PlatformContext *,
-		Plugins::PluginCommandManager *, Plugins::PluginMenuItemsRegistry *, ResourceLoader *,
-		Runtime *, ShellBrowserEvents *, ShellIconLoader *, TabEvents *, TabList *, TabRestorer *,
-		ThemeManager *, WindowThemeManager *>
+		DirectoryWatcherFactory *, DriveModel *, FeatureList *, FileActionHandler *,
+		FrequentLocationsModel *, HistoryModel *, IconFetcher *, ModelessDialogList *,
+		NavigationEvents *, PlatformContext *, Plugins::PluginCommandManager *,
+		Plugins::PluginMenuItemsRegistry *, ResourceLoader *, Runtime *, ShellBrowserEvents *,
+		ShellIconLoader *, TabEvents *, TabList *, TabRestorer *, ThemeManager *,
+		WindowThemeManager *>
 		m_services;
 };

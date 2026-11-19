@@ -965,7 +965,7 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'Z':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			m_fileActionHandler->Undo();
+			m_appServices->GetFileActionHandler()->Undo();
 		}
 		break;
 

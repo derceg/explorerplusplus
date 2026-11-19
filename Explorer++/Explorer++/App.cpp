@@ -305,6 +305,7 @@ void App::SetUpAppServices()
 	m_appServices.SetDirectoryWatcherFactory(&m_directoryWatcherFactory);
 	m_appServices.SetDriveModel(&m_driveModel);
 	m_appServices.SetFeatureList(&m_featureList);
+	m_appServices.SetFileActionHandler(&m_fileActionHandler);
 	m_appServices.SetFrequentLocationsModel(&m_frequentLocationsModel);
 	m_appServices.SetHistoryModel(&m_historyModel);
 	m_appServices.SetIconFetcher(&m_iconFetcher);

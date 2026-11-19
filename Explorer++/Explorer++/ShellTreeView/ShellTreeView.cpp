@@ -52,21 +52,18 @@
 #include <propkey.h>
 #include <windowsx.h>
 
-ShellTreeView *ShellTreeView::Create(HWND parent, BrowserWindow *browser, AppServices *appServices,
-	FileActionHandler *fileActionHandler)
+ShellTreeView *ShellTreeView::Create(HWND parent, BrowserWindow *browser, AppServices *appServices)
 {
-	return new ShellTreeView(parent, browser, appServices, fileActionHandler);
+	return new ShellTreeView(parent, browser, appServices);
 }
 
-ShellTreeView::ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *appServices,
-	FileActionHandler *fileActionHandler) :
+ShellTreeView::ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *appServices) :
 	m_hTreeView(CreateTreeView(parent)),
 	m_browser(browser),
 	m_appServices(appServices),
 	m_dropTargetRegistration(m_hTreeView, this),
 	m_config(appServices->GetConfig()),
 	m_clipboardStore(appServices->GetPlatformContext()->GetClipboardStore()),
-	m_fileActionHandler(fileActionHandler),
 	m_commandTarget(browser->GetCommandTargetManager(), this),
 	m_fontSetter(m_hTreeView, appServices->GetConfig()),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
@@ -1184,7 +1181,8 @@ void ShellTreeView::DeleteSelectedItem(bool permanent)
 	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
 	auto pidl = GetNodePidl(item);
 
-	m_fileActionHandler->DeleteFiles(m_hTreeView, { pidl.get() }, permanent, false);
+	m_appServices->GetFileActionHandler()->DeleteFiles(m_hTreeView, { pidl.get() }, permanent,
+		false);
 }
 
 bool ShellTreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)

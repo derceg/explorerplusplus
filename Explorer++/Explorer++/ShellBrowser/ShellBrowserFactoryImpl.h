@@ -8,13 +8,12 @@
 
 class AppServices;
 class BrowserWindow;
-class FileActionHandler;
 
 class ShellBrowserFactoryImpl : public ShellBrowserFactory
 {
 public:
 	ShellBrowserFactoryImpl(BrowserWindow *browser, AppServices *appServices,
-		HINSTANCE resourceInstance, FileActionHandler *fileActionHandler);
+		HINSTANCE resourceInstance);
 
 	// ShellBrowserFactory
 	std::unique_ptr<ShellBrowser> Create(const PidlAbsolute &initialPidl,
@@ -26,5 +25,4 @@ private:
 	BrowserWindow *const m_browser;
 	AppServices *const m_appServices;
 	const HINSTANCE m_resourceInstance;
-	FileActionHandler *const m_fileActionHandler;
 };

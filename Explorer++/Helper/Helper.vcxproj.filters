@@ -55,7 +55,7 @@
     <ClCompile Include="DriveInfo.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="FileActionHandler.cpp">
+    <ClCompile Include="FileActionHandlerImpl.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
     <ClCompile Include="Helper.cpp">
@@ -252,7 +252,7 @@
     <ClInclude Include="DriveInfo.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="FileActionHandler.h">
+    <ClInclude Include="FileActionHandlerImpl.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="Helper.h">
@@ -494,6 +494,9 @@
     </ClInclude>
     <ClInclude Include="DropTargetDelegate.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="FileActionHandler.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -56,7 +56,7 @@ Explorerplusplus::Explorerplusplus(const WindowStorageData &storageData, AppServ
 	m_view(this, storageData.bounds, appServices),
 	m_hwnd(m_view.GetHWND()),
 	m_commandController(this, appServices),
-	m_shellBrowserFactory(this, appServices, resourceInstance, &m_fileActionHandler),
+	m_shellBrowserFactory(this, appServices, resourceInstance),
 	m_taskbarTabManager(this, m_appServices,
 		[]() { return wil::CoCreateInstanceNoThrow<ITaskbarList4>(CLSID_TaskbarList); }),
 	m_applicationExecutor(this)
@@ -136,8 +136,7 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 void Explorerplusplus::InitializeMainMenu()
 {
-	m_mainMenu = std::make_unique<MainMenu>(m_view.GetMainMenuView(), this, m_appServices,
-		&m_fileActionHandler, this);
+	m_mainMenu = std::make_unique<MainMenu>(m_view.GetMainMenuView(), this, m_appServices, this);
 
 	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly
 	// redrawn.
@@ -280,8 +279,7 @@ void Explorerplusplus::CreateFolderControls()
 	m_foldersPane = std::make_unique<FoldersPane>(foldersPaneView, m_config, this,
 		m_acceleratorManager, m_resourceLoader);
 
-	m_shellTreeView = ShellTreeView::Create(foldersPaneView->GetHWND(), this, m_appServices,
-		&m_fileActionHandler);
+	m_shellTreeView = ShellTreeView::Create(foldersPaneView->GetHWND(), this, m_appServices);
 	foldersPaneView->SetTreeView(m_shellTreeView->GetHWND());
 }
 

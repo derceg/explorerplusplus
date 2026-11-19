@@ -8,25 +8,25 @@
  */
 
 #include "stdafx.h"
-#include "FileActionHandler.h"
+#include "FileActionHandlerImpl.h"
 #include "FileOperations.h"
 #include <Shlwapi.h>
 
-BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
+BOOL FileActionHandlerImpl::RenameFiles(const std::vector<RenamedItem> &itemList)
 {
-	RenamedItems_t renamedItems;
+	std::vector<RenamedItem> renamedItems;
 
 	for (const auto &item : itemList)
 	{
 		/* TODO: This should actually be done by the caller. */
 		IShellItem *shellItem = nullptr;
-		HRESULT hr = SHCreateItemFromParsingName(item.strOldFilename.c_str(), nullptr,
+		HRESULT hr = SHCreateItemFromParsingName(item.oldFilename.c_str(), nullptr,
 			IID_PPV_ARGS(&shellItem));
 
 		if (SUCCEEDED(hr))
 		{
 			TCHAR newFilename[MAX_PATH];
-			StringCchCopy(newFilename, std::size(newFilename), item.strNewFilename.c_str());
+			StringCchCopy(newFilename, std::size(newFilename), item.newFilename.c_str());
 			PathStripPath(newFilename);
 
 			/* TODO: Could rename all files in the list in a single
@@ -57,8 +57,8 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	return FALSE;
 }
 
-HRESULT FileActionHandler::DeleteFiles(HWND hwnd, const DeletedItems_t &deletedItems,
-	bool permanent, bool silent)
+HRESULT FileActionHandlerImpl::DeleteFiles(HWND hwnd,
+	const std::vector<PCIDLIST_ABSOLUTE> &deletedItems, bool permanent, bool silent)
 {
 	HRESULT hr = FileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
 
@@ -73,7 +73,12 @@ HRESULT FileActionHandler::DeleteFiles(HWND hwnd, const DeletedItems_t &deletedI
 	return hr;
 }
 
-void FileActionHandler::Undo()
+BOOL FileActionHandlerImpl::CanUndo() const
+{
+	return !m_stackFileActions.empty();
+}
+
+void FileActionHandlerImpl::Undo()
 {
 	if (!m_stackFileActions.empty())
 	{
@@ -100,24 +105,25 @@ void FileActionHandler::Undo()
 	}
 }
 
-void FileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemList)
+void FileActionHandlerImpl::UndoRenameOperation(const std::vector<RenamedItem> &renamedItemList)
 {
-	RenamedItems_t undoList;
+	std::vector<RenamedItem> undoList;
 
 	/* When undoing a rename operation, the new name
 	becomes the old name, and vice versa. */
 	for (const auto &renamedItem : renamedItemList)
 	{
-		RenamedItem_t undoItem;
-		undoItem.strOldFilename = renamedItem.strNewFilename;
-		undoItem.strNewFilename = renamedItem.strOldFilename;
+		RenamedItem undoItem;
+		undoItem.oldFilename = renamedItem.newFilename;
+		undoItem.newFilename = renamedItem.oldFilename;
 		undoList.push_back(undoItem);
 	}
 
 	RenameFiles(undoList);
 }
 
-void FileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemList)
+void FileActionHandlerImpl::UndoDeleteOperation(
+	const std::vector<PCIDLIST_ABSOLUTE> &deletedItemList)
 {
 	UNREFERENCED_PARAMETER(deletedItemList);
 
@@ -127,9 +133,4 @@ void FileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemLis
 	 - Find the item in the recycle bin (probably need to read INFO2 file).
 	 - Restore it (context menu command).
 	 - Push delete action onto stack. */
-}
-
-BOOL FileActionHandler::CanUndo() const
-{
-	return !m_stackFileActions.empty();
 }

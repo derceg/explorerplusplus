@@ -25,15 +25,13 @@ class BrowserWindow;
 class CachedIcons;
 class ClipboardStore;
 struct Config;
-class FileActionHandler;
 class ShellBrowserImpl;
 class ShellTreeNode;
 
 class ShellTreeView : public BrowserCommandTarget, private ShellDropTargetDelegate<HTREEITEM>
 {
 public:
-	static ShellTreeView *Create(HWND parent, BrowserWindow *browser, AppServices *appServices,
-		FileActionHandler *fileActionHandler);
+	static ShellTreeView *Create(HWND parent, BrowserWindow *browser, AppServices *appServices);
 
 	HWND GetHWND() const;
 
@@ -111,8 +109,7 @@ private:
 		wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 	};
 
-	ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *appServices,
-		FileActionHandler *fileActionHandler);
+	ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *appServices);
 	~ShellTreeView();
 
 	static HWND CreateTreeView(HWND parent);
@@ -226,7 +223,6 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *const m_config;
 	ClipboardStore *const m_clipboardStore;
-	FileActionHandler *m_fileActionHandler;
 	ScopedBrowserCommandTarget m_commandTarget;
 
 	// Note that the treeview control sets the font on the tooltip control it creates each time the

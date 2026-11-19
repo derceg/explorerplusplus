@@ -795,7 +795,7 @@
     <ClCompile Include="DragDropHelper.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
-    <ClCompile Include="FileActionHandler.cpp" />
+    <ClCompile Include="FileActionHandlerImpl.cpp" />
     <ClCompile Include="FileDialogs.cpp" />
     <ClCompile Include="GraphicsFactories.cpp" />
     <ClCompile Include="IconSize.cpp" />
@@ -898,6 +898,7 @@
     <ClInclude Include="DataObjectWrapper.h" />
     <ClInclude Include="DropTargetDelegate.h" />
     <ClInclude Include="EnumHelper.h" />
+    <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="GraphicsFactories.h" />
     <ClInclude Include="IconSize.h" />
     <ClInclude Include="ImageInterop.h" />
@@ -914,7 +915,7 @@
     <ClInclude Include="DragDropHelper.h" />
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
-    <ClInclude Include="FileActionHandler.h" />
+    <ClInclude Include="FileActionHandlerImpl.h" />
     <ClInclude Include="FileDialogs.h" />
     <ClInclude Include="KeyboardState.h" />
     <ClInclude Include="MenuHelpTextHost.h" />

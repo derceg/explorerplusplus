@@ -18,6 +18,7 @@
 #include "DriveModel.h"
 #include "DriveWatcherFake.h"
 #include "FeatureList.h"
+#include "FileActionHandlerFake.h"
 #include "FrequentLocationsModel.h"
 #include "FrequentLocationsTracker.h"
 #include "HistoryModel.h"
@@ -102,6 +103,8 @@ protected:
 
 	DriveWatcherFake m_driveWatcher;
 	DriveModel m_driveModel;
+
+	FileActionHandlerFake m_fileActionHandler;
 
 	// Plugins
 	Plugins::PluginMenuItemsRegistry m_pluginMenuItemsRegistry;
