@@ -29,7 +29,6 @@
 #include "ToolbarOptionsMenu.h"
 #include "ToolsMenu.h"
 #include "ViewsMenu.h"
-#include "../Helper/FileActionHandler.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
@@ -39,7 +38,6 @@ MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appS
 	m_browser(browser),
 	m_config(appServices->GetConfig()),
 	m_clipboardStore(appServices->GetPlatformContext()->GetClipboardStore()),
-	m_fileActionHandler(appServices->GetFileActionHandler()),
 	m_resourceLoader(appServices->GetResourceLoader()),
 	m_coreInterface(coreInterface)
 {
@@ -691,6 +689,7 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 	case IDM_FILE_DELETEPERMANENTLY:
 	case IDM_FILE_RENAME:
 	case IDM_FILE_PROPERTIES:
+	case IDM_EDIT_UNDO:
 	case IDM_EDIT_CUT:
 	case IDM_EDIT_COPY:
 	case IDM_EDIT_COPYTOFOLDER:
@@ -720,12 +719,6 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 
 			return shellBrowser->GetNumSelected() > 0
 				&& (shellBrowser->GetViewMode() == ViewMode::Details);
-		};
-
-	case IDM_EDIT_UNDO:
-		return [this]
-		{
-			return m_fileActionHandler->CanUndo();
 		};
 
 	case IDM_EDIT_PASTE:

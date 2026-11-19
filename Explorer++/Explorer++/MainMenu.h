@@ -18,7 +18,6 @@ class ClipboardStore;
 struct Config;
 class CoreInterface;
 class FeatureList;
-class FileActionHandler;
 class IconModel;
 class PidlAbsolute;
 class ResourceLoader;
@@ -72,7 +71,6 @@ private:
 	BrowserWindow *const m_browser;
 	const Config *const m_config;
 	const ClipboardStore *const m_clipboardStore;
-	const FileActionHandler *const m_fileActionHandler;
 	const ResourceLoader *const m_resourceLoader;
 	CoreInterface *const m_coreInterface;
 	std::vector<std::unique_ptr<MenuBase>> m_childMenus;

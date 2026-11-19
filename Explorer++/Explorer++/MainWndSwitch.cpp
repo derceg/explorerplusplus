@@ -135,13 +135,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDM_FILE_RENAME:
 	case IDM_FILE_PROPERTIES:
 	case IDM_FILE_EXIT:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_EDIT_UNDO:
-		m_appServices->GetFileActionHandler()->Undo();
-		break;
-
 	case IDM_EDIT_CUT:
 	case IDM_EDIT_COPY:
 		m_commandController.ExecuteCommand(id);

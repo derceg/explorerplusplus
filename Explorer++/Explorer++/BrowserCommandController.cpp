@@ -33,6 +33,7 @@
 #include "UpdateCheckDialog.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/FileActionHandler.h"
 #include <memory>
 
 using namespace std::string_literals;
@@ -89,6 +90,9 @@ bool BrowserCommandController::IsCommandEnabled(int command) const
 	case IDM_FILE_OPENCOMMANDPROMPT:
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
 		return CanStartCommandPrompt();
+
+	case IDM_EDIT_UNDO:
+		return m_appServices->GetFileActionHandler()->CanUndo();
 
 	case IDM_EDIT_SELECTNONE:
 		return GetActiveShellBrowser()->CanClearSelection();
@@ -222,6 +226,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_FILE_EXIT:
 		m_appServices->GetAppController()->TryExit();
+		break;
+
+	case IDM_EDIT_UNDO:
+		m_appServices->GetFileActionHandler()->Undo();
 		break;
 
 	case IDM_EDIT_SELECTALL:
