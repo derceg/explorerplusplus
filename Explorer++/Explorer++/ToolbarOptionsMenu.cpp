@@ -13,6 +13,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "MainToolbarView.h"
 #include "MenuView.h"
 #include "PlatformContext.h"
 #include "ResourceLoader.h"
@@ -87,7 +88,8 @@ void ToolbarOptionsMenu::BuildMenu(Source source, const ResourceLoader *resource
 			MenuItemParams(resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_CUSTOMIZE))
 				.SetHelpText(
 					resourceLoader->LoadString(IDS_TOOLBAR_OPTIONS_MENU_CUSTOMIZE_HELP_TEXT))
-				.SetSelectedCallback([this] { m_browser->StartMainToolbarCustomization(); }));
+				.SetSelectedCallback(
+					[this] { m_browser->GetView()->GetMainToolbarView()->StartCustomization(); }));
 	}
 	else if (source == Source::BookmarksToolbar)
 	{

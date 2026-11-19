@@ -13,6 +13,7 @@ public:
 	BrowserWindowFakeView(const RECT &bounds);
 
 	// BrowserView
+	MainToolbarView *GetMainToolbarView() const override;
 	AddressBarView *GetAddressBarView() const override;
 	void FocusNextWindow(FocusChangeDirection direction) override;
 

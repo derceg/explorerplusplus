@@ -49,7 +49,6 @@ public:
 	MenuView *GetMainMenuView() const;
 
 	MainRebarView *GetMainRebarView() const;
-	MainToolbarView *GetMainToolbarView() const;
 	BookmarksToolbarView *GetBookmarksToolbarView() const;
 	DrivesToolbarView *GetDrivesToolbarView() const;
 	Applications::ApplicationToolbarView *GetApplicationToolbarView() const;
@@ -61,6 +60,7 @@ public:
 	void RedrawMenuBar();
 
 	// BrowserView
+	MainToolbarView *GetMainToolbarView() const override;
 	AddressBarView *GetAddressBarView() const override;
 	void FocusNextWindow(FocusChangeDirection direction) override;
 

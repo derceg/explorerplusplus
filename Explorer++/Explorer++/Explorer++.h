@@ -93,7 +93,6 @@ public:
 	ShellBrowser *GetActiveShellBrowser() override;
 
 	const ShellBrowser *GetActiveShellBrowser() const override;
-	void StartMainToolbarCustomization() override;
 	WindowStorageData GetStorageData() const override;
 	bool IsActive() const override;
 	void Activate() override;

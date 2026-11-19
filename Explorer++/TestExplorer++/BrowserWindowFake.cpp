@@ -191,10 +191,6 @@ const ShellBrowser *BrowserWindowFake::GetActiveShellBrowser() const
 	return GetActiveTabBar()->GetSelectedTab().GetShellBrowser();
 }
 
-void BrowserWindowFake::StartMainToolbarCustomization()
-{
-}
-
 WindowStorageData BrowserWindowFake::GetStorageData() const
 {
 	WINDOWPLACEMENT placement = {};

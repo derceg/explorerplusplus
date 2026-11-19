@@ -21,7 +21,6 @@
 #include "MainRebarView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "MainToolbarView.h"
 #include "RebarBandStorageData.h"
 #include "ResourceLoader.h"
 #include "Runtime.h"
@@ -453,11 +452,6 @@ ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
 const ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return GetActivePane()->GetTabBar()->GetSelectedTab().GetShellBrowser();
-}
-
-void Explorerplusplus::StartMainToolbarCustomization()
-{
-	m_view.GetMainToolbarView()->StartCustomization();
 }
 
 void Explorerplusplus::NotifyTopLevelMenuShown()

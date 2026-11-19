@@ -88,8 +88,6 @@ public:
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 	virtual const ShellBrowser *GetActiveShellBrowser() const = 0;
 
-	virtual void StartMainToolbarCustomization() = 0;
-
 	virtual WindowStorageData GetStorageData() const = 0;
 
 	virtual bool IsActive() const = 0;

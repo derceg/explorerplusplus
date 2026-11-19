@@ -52,6 +52,11 @@ void BrowserWindowFakeView::RegisterBrowserWindowClass()
 	CHECK(atom);
 }
 
+MainToolbarView *BrowserWindowFakeView::GetMainToolbarView() const
+{
+	return nullptr;
+}
+
 AddressBarView *BrowserWindowFakeView::GetAddressBarView() const
 {
 	return nullptr;

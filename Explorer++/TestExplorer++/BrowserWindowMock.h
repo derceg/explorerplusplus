@@ -33,7 +33,6 @@ public:
 		(override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
 	MOCK_METHOD(const ShellBrowser *, GetActiveShellBrowser, (), (const, override));
-	MOCK_METHOD(void, StartMainToolbarCustomization, (), (override));
 	MOCK_METHOD(WindowStorageData, GetStorageData, (), (const, override));
 	MOCK_METHOD(bool, IsActive, (), (const, override));
 	MOCK_METHOD(void, Activate, (), (override));

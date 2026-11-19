@@ -7,6 +7,7 @@
 #include "ViewBase.h"
 
 class AddressBarView;
+class MainToolbarView;
 
 class BrowserView : public ViewBase
 {
@@ -21,6 +22,7 @@ public:
 	{
 	}
 
+	virtual MainToolbarView *GetMainToolbarView() const = 0;
 	virtual AddressBarView *GetAddressBarView() const = 0;
 
 	virtual void FocusNextWindow(FocusChangeDirection direction) = 0;
