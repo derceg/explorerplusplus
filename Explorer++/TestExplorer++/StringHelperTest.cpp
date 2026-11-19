@@ -17,22 +17,10 @@ TEST(CheckWildcardMatch, SimpleMatches)
 
 TEST(CheckWildcardMatch, UnicodeMatches)
 {
-/* Warning C4566 (character represented by universal-character-name
-'char' cannot be represented in the current code page (page)) is given
-here. Using an indirect string variable (rather than passing the
-string directly to the function) seems to make the warning go away.
-Possibly related to the bug raised at
-http://connect.microsoft.com/VisualStudio/feedback/details/431433/unicode-strings-incorrectly-generating-c4566.
-*/
-#pragma warning(push)
-#pragma warning(disable : 4566)
-
 	EXPECT_EQ(CheckWildcardMatch(L"привет", L"Привет", FALSE), TRUE);
 	EXPECT_EQ(CheckWildcardMatch(L"тестовую строку", L"ТЕСТОВУЮ СТРОКУ", FALSE), TRUE);
 	EXPECT_EQ(CheckWildcardMatch(L"тестовую строку 2", L"ТЕСТОВУЮ СТРОКУ 2", TRUE), FALSE);
 	EXPECT_EQ(CheckWildcardMatch(L"Тест?1*txt", L"Тест11Тест.txt", TRUE), TRUE);
-
-#pragma warning(pop)
 }
 
 TEST(FormatSizeString, Simple)
