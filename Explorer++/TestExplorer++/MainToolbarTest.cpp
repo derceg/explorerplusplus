@@ -6,29 +6,7 @@
 #include "MainToolbar.h"
 #include "BrowserTestBase.h"
 #include "BrowserWindowFake.h"
-#include "CoreInterface.h"
 #include "MainToolbarView.h"
-
-namespace
-{
-
-class CoreInterfaceFake : public CoreInterface
-{
-public:
-	ShellBrowserImpl *GetActiveShellBrowserImpl() const override
-	{
-		return nullptr;
-	}
-
-	BOOL CanPaste(PasteType pasteType) const override
-	{
-		UNREFERENCED_PARAMETER(pasteType);
-
-		return FALSE;
-	}
-};
-
-}
 
 class MainToolbarTest : public BrowserTestBase
 {
@@ -38,7 +16,6 @@ protected:
 	}
 
 	BrowserWindowFake *const m_browser;
-	CoreInterfaceFake m_coreInterface;
 };
 
 TEST_F(MainToolbarTest, GetLayoutForStorage)
@@ -58,7 +35,7 @@ TEST_F(MainToolbarTest, GetLayoutForStorage)
 
 	MainToolbarView mainToolbarView(m_browser->GetView(), m_browser, &m_config);
 	MainToolbar mainToolbar(&mainToolbarView, initialLayout, m_browser, &m_appServices,
-		&m_coreInterface, &m_shellIconLoader);
+		&m_shellIconLoader);
 
 	auto layout = mainToolbar.GetLayoutForStorage();
 	EXPECT_EQ(layout.GetButtons(), initialLayout.GetButtons());

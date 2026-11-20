@@ -6,6 +6,7 @@
 #include "ClipboardHelper.h"
 #include "BulkClipboardWriter.h"
 #include "DragDropHelper.h"
+#include "ShellHelper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <wil/com.h>
 #include <optional>
@@ -158,4 +159,29 @@ void CopyItemPathsToClipboard(ClipboardStore *clipboardStore,
 
 	BulkClipboardWriter clipboardWriter(clipboardStore);
 	clipboardWriter.WriteText(boost::algorithm::join(paths, L"\r\n"));
+}
+
+HRESULT PasteViaSimulatedDrop(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
+	IUnknown *site, DWORD allowedEffects)
+{
+	wil::com_ptr_nothrow<IDropTarget> dropTarget;
+	RETURN_IF_FAILED(GetDropTargetWithSite(destination, site, dropTarget));
+
+	DWORD finalEffect = allowedEffects;
+	HRESULT hr = dropTarget->DragEnter(dataObject, MK_LBUTTON, { 0, 0 }, &finalEffect);
+
+	if (FAILED(hr))
+	{
+		dropTarget->DragLeave();
+		return hr;
+	}
+
+	if (finalEffect == DROPEFFECT_NONE)
+	{
+		dropTarget->DragLeave();
+		return E_FAIL;
+	}
+
+	finalEffect = allowedEffects;
+	return dropTarget->Drop(dataObject, MK_LBUTTON, { 0, 0 }, &finalEffect);
 }

@@ -1212,6 +1212,7 @@
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="ConfigRegistryStorage.cpp" />
     <ClCompile Include="ConfigXmlStorage.cpp" />
+    <ClCompile Include="CustomDropHelper.cpp" />
     <ClCompile Include="CustomizableToolbarView.cpp" />
     <ClCompile Include="DarkModeColorProvider.cpp" />
     <ClCompile Include="DarkModeManager.cpp" />
@@ -1436,18 +1437,14 @@
     <ClCompile Include="DisplayWindow.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="Plugins\Event.cpp" />
-    <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />
-    <ClCompile Include="FileSelectionTests.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="DriveWatcherImpl.cpp" />
     <ClCompile Include="FoldersPaneView.cpp" />
-    <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
     <ClCompile Include="BrowserViewImpl.cpp" />
     <ClCompile Include="AcceleratorHelper.cpp" />
     <ClCompile Include="ServiceProvider.cpp" />
-    <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Plugins\LuaPlugin.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
@@ -1559,6 +1556,7 @@
     <ClInclude Include="AppServices.h" />
     <ClInclude Include="AppStorage.h" />
     <ClInclude Include="BrowserView.h" />
+    <ClInclude Include="CustomDropHelper.h" />
     <ClInclude Include="FmtWrapper.h" />
     <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="BaseDialog.h" />
@@ -1836,7 +1834,6 @@
     <ClInclude Include="ColorRuleEditorDialog.h" />
     <ClInclude Include="Plugins\CommandApi\Events\CommandInvoked.h" />
     <ClInclude Include="CommandLine.h" />
-    <ClInclude Include="CoreInterface.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DestroyFilesDialog.h" />
@@ -1852,7 +1849,6 @@
     <ClInclude Include="FoldersPaneView.h" />
     <ClInclude Include="Icon.h" />
     <ClInclude Include="IconMappings.h" />
-    <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="NewMenuClient.h" />
     <ClInclude Include="ServiceProvider.h" />
     <ClInclude Include="Plugins\LuaPlugin.h" />

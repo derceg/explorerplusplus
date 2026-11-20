@@ -26,3 +26,5 @@ bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObj
 	PasteType pasteType);
 void CopyItemPathsToClipboard(ClipboardStore *clipboardStore,
 	const std::vector<PidlAbsolute> &items, PathType pathType);
+HRESULT PasteViaSimulatedDrop(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
+	IUnknown *site, DWORD allowedEffects);

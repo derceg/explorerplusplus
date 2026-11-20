@@ -7,6 +7,7 @@
 #include "ImageTestHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include <gtest/gtest.h>
+#include <Shlwapi.h>
 
 using namespace testing;
 
@@ -115,4 +116,16 @@ TEST(DataExchangeHelperTest, CloneGlobal)
 
 	auto retrievedText = ReadStringFromGlobal(clone.get());
 	EXPECT_EQ(retrievedText, text);
+}
+
+TEST(DataExchangeHelperTest, GetBinaryDataFromIStream)
+{
+	std::string data = "Test data";
+	wil::com_ptr_nothrow<IStream> stream(SHCreateMemStream(
+		reinterpret_cast<const BYTE *>(data.data()), static_cast<UINT>(data.size())));
+	ASSERT_NE(stream, nullptr);
+
+	std::string output;
+	ASSERT_HRESULT_SUCCEEDED(GetBinaryDataFromIStream(stream.get(), output));
+	EXPECT_EQ(output, data);
 }

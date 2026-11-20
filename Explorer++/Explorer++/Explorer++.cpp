@@ -136,7 +136,7 @@ void Explorerplusplus::Initialize(const WindowStorageData &storageData)
 
 void Explorerplusplus::InitializeMainMenu()
 {
-	m_mainMenu = std::make_unique<MainMenu>(m_view.GetMainMenuView(), this, m_appServices, this);
+	m_mainMenu = std::make_unique<MainMenu>(m_view.GetMainMenuView(), this, m_appServices);
 
 	// The menu is built after being assigned to the window, so the menu bar needs to be explicitly
 	// redrawn.
@@ -183,7 +183,7 @@ void Explorerplusplus::OnMainRebarHeightChanged()
 void Explorerplusplus::CreateMainToolbar(const std::optional<MainToolbarLayout> &initialLayout)
 {
 	m_mainToolbar = std::make_unique<MainToolbar>(m_view.GetMainToolbarView(), initialLayout, this,
-		m_appServices, this, m_appServices->GetShellIconLoader());
+		m_appServices, m_appServices->GetShellIconLoader());
 }
 
 void Explorerplusplus::CreateAddressBar()

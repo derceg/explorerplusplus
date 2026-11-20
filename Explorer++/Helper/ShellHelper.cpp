@@ -1297,3 +1297,28 @@ wil::com_ptr_nothrow<IWICBitmapSource> GetStockIconImage(SHSTOCKICONID id, IconS
 
 	return bitmap;
 }
+
+HRESULT GetDropTargetWithSite(PCIDLIST_ABSOLUTE pidl, IUnknown *site,
+	wil::com_ptr_nothrow<IDropTarget> &dropTarget)
+{
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	RETURN_IF_FAILED(SHBindToObject(nullptr, pidl, nullptr, IID_PPV_ARGS(&shellFolder)));
+
+	RETURN_IF_FAILED(shellFolder->CreateViewObject(nullptr, IID_PPV_ARGS(&dropTarget)));
+
+	if (site)
+	{
+		// This interface isn't available for at least some types of items (e.g. zip files). That
+		// means dropping an item into a zip file won't result in the item being selected (Windows
+		// Explorer doesn't select the item either).
+		wil::com_ptr_nothrow<IObjectWithSite> objectWithSite;
+		HRESULT hr = dropTarget->QueryInterface(IID_PPV_ARGS(&objectWithSite));
+
+		if (SUCCEEDED(hr))
+		{
+			objectWithSite->SetSite(site);
+		}
+	}
+
+	return S_OK;
+}

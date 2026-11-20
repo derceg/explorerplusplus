@@ -37,9 +37,6 @@
     <ClCompile Include="SetDefaultFileManager.cpp">
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
-    <ClCompile Include="DropHandler.cpp">
-      <Filter>Data Exchange\Drag and Drop</Filter>
-    </ClCompile>
     <ClCompile Include="DataObjectImpl.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
@@ -214,6 +211,9 @@
     <ClCompile Include="ScopedDropTargetRegistration.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
+    <ClCompile Include="OleWindow.cpp">
+      <Filter>COM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageForwarder.h">
@@ -233,9 +233,6 @@
     </ClInclude>
     <ClInclude Include="ListViewHelper.h">
       <Filter>Control Support</Filter>
-    </ClInclude>
-    <ClInclude Include="DropHandler.h">
-      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="DataObjectImpl.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
@@ -497,6 +494,9 @@
     </ClInclude>
     <ClInclude Include="FileActionHandler.h">
       <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="OleWindow.h">
+      <Filter>COM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

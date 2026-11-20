@@ -154,37 +154,12 @@ template <typename DropTargetItemIdentifierType>
 wil::com_ptr_nothrow<IDropTarget> ShellDropTargetDelegate<
 	DropTargetItemIdentifierType>::GetDropTargetForPidl(PCIDLIST_ABSOLUTE pidl)
 {
-	wil::com_ptr_nothrow<IShellFolder> parent;
-	PCITEMID_CHILD child;
-	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&parent), &child);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
 	wil::com_ptr_nothrow<IDropTarget> dropTarget;
-	hr = GetUIObjectOf(parent.get(), nullptr, 1, &child, IID_PPV_ARGS(&dropTarget));
+	HRESULT hr = GetDropTargetWithSite(pidl, GetSiteForTargetItem(pidl), dropTarget);
 
 	if (FAILED(hr))
 	{
 		return nullptr;
-	}
-
-	auto site = GetSiteForTargetItem(pidl);
-
-	if (site)
-	{
-		// This interface isn't available for at least some types of items (e.g. zip files). That
-		// means dropping an item into a zip file won't result in the item being selected (Windows
-		// Explorer doesn't select the item either).
-		wil::com_ptr_nothrow<IObjectWithSite> objectWithSite;
-		hr = dropTarget->QueryInterface(IID_PPV_ARGS(&objectWithSite));
-
-		if (SUCCEEDED(hr))
-		{
-			objectWithSite->SetSite(site);
-		}
 	}
 
 	return dropTarget;

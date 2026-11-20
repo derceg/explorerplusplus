@@ -16,7 +16,6 @@ class AppServices;
 class BrowserWindow;
 class ClipboardStore;
 struct Config;
-class CoreInterface;
 class FeatureList;
 class IconModel;
 class PidlAbsolute;
@@ -34,8 +33,7 @@ class PluginMenuItemsRegistry;
 class MainMenu : public MenuBase
 {
 public:
-	MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-		CoreInterface *coreInterface);
+	MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices);
 
 private:
 	void BuildMenu(BrowserWindow *browser, AppServices *appServices);
@@ -72,6 +70,5 @@ private:
 	const Config *const m_config;
 	const ClipboardStore *const m_clipboardStore;
 	const ResourceLoader *const m_resourceLoader;
-	CoreInterface *const m_coreInterface;
 	std::vector<std::unique_ptr<MenuBase>> m_childMenus;
 };

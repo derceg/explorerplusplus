@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "DirectoryOperationsHelper.h"
+#include "CustomDropHelper.h"
 #include "../Helper/ClipboardStore.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 
 namespace
@@ -24,35 +24,13 @@ bool CanShellPasteClipboardDataInDirectory(ClipboardStore *clipboardStore, PCIDL
 	return CanShellPasteDataObject(pidl, clipboardObject.get(), pasteType);
 }
 
-bool CanPasteCustomDataInDirectory(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl)
-{
-	auto customFormats = DropHandler::GetDropFormats();
-	bool dataAvailable = false;
-
-	for (const auto &customFormat : customFormats)
-	{
-		if (clipboardStore->IsDataAvailable(customFormat))
-		{
-			dataAvailable = true;
-			break;
-		}
-	}
-
-	if (!dataAvailable)
-	{
-		return false;
-	}
-
-	return CanCreateInDirectory(pidl);
-}
-
 }
 
 bool CanPasteInDirectory(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl,
 	PasteType pasteType)
 {
 	return CanShellPasteClipboardDataInDirectory(clipboardStore, pidl, pasteType)
-		|| (pasteType == PasteType::Normal && CanPasteCustomDataInDirectory(clipboardStore, pidl));
+		|| CustomDropHelper::CanPasteInDirectory(clipboardStore, pidl, pasteType);
 }
 
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl)

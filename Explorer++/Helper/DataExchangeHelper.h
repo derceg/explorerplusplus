@@ -41,3 +41,5 @@ bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);
 UINT GetPngClipboardFormat();
 HRESULT MoveStorageToObject(IDataObject *dataObject, FORMATETC *format, wil::unique_stg_medium stg);
 wil::unique_hglobal CloneGlobal(HGLOBAL global);
+
+HRESULT GetBinaryDataFromIStream(IStream *stream, std::string &output);

@@ -28,6 +28,8 @@
 #include "TabBarBackingView.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/Helper.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -640,4 +642,41 @@ void Explorerplusplus::OnSelectColumns()
 	auto *selectColumnsDialog = SelectColumnsDialog::Create(m_resourceLoader, m_hwnd,
 		GetActivePane()->GetTabBar()->GetSelectedTab().GetShellBrowserImpl());
 	selectColumnsDialog->ShowModalDialog();
+}
+
+int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
+{
+	BOOL bSimilarTypes;
+	int iSelected;
+	int nItems;
+	int nSimilar = 0;
+	int i = 0;
+
+	iSelected = ListView_GetNextItem(ListView, -1, LVNI_SELECTED);
+
+	if (iSelected == -1)
+		return -1;
+
+	std::wstring testFile = m_pActiveShellBrowser->GetItemFullName(iSelected);
+
+	nItems = ListView_GetItemCount(ListView);
+
+	for (i = 0; i < nItems; i++)
+	{
+		std::wstring fullFileName = m_pActiveShellBrowser->GetItemFullName(i);
+
+		bSimilarTypes = CompareFileTypes(fullFileName.c_str(), testFile.c_str());
+
+		if (bSimilarTypes)
+		{
+			ListViewHelper::SelectItem(ListView, i, true);
+			nSimilar++;
+		}
+		else
+		{
+			ListViewHelper::SelectItem(ListView, i, false);
+		}
+	}
+
+	return nSimilar;
 }

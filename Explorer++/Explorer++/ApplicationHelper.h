@@ -7,8 +7,6 @@
 #include <windows.h>
 #include <string>
 
-class CoreInterface;
-
 namespace Applications
 {
 

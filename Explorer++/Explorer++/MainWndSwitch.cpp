@@ -53,9 +53,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 	case WM_COMMAND:
 		return CommandHandler(hwnd, reinterpret_cast<HWND>(lParam), LOWORD(wParam), HIWORD(wParam));
 
-	case WM_NOTIFY:
-		return NotifyHandler(hwnd, msg, wParam, lParam);
-
 	case WM_SIZE:
 		OnSize(static_cast<UINT>(wParam));
 		return 0;
@@ -138,15 +135,9 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDM_EDIT_UNDO:
 	case IDM_EDIT_CUT:
 	case IDM_EDIT_COPY:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_EDIT_PASTE:
-		OnPaste();
-		break;
-
 	case IDM_EDIT_PASTESHORTCUT:
-		OnPasteShortcut();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_EDIT_PASTEHARDLINK:
@@ -353,17 +344,4 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, UINT notification
 	}
 
 	return 1;
-}
-
-LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
-
-	switch (nmhdr->code)
-	{
-	case LVN_KEYDOWN:
-		return OnListViewKeyDown(lParam);
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }

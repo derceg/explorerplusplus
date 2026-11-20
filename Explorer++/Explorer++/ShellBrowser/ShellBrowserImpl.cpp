@@ -111,8 +111,7 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	m_folderSettings(folderSettings),
 	m_shellWindowRegistered(false),
 	m_folderColumns(initialColumns ? *initialColumns
-								   : appServices->GetConfig()->globalFolderSettings.folderColumns),
-	m_weakPtrFactory(this)
+								   : appServices->GetConfig()->globalFolderSettings.folderColumns)
 {
 	InitializeListView();
 
@@ -136,8 +135,6 @@ ShellBrowserImpl::ShellBrowserImpl(const FolderSettings &folderSettings,
 	m_pActiveColumns = nullptr;
 	m_nActiveColumns = 0;
 	m_middleButtonItem = -1;
-
-	m_uniqueFolderId = 0;
 
 	m_PreviousSortColumnExists = false;
 
@@ -913,11 +910,6 @@ void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	ListView_EditLabel(m_listView, *index);
 }
 
-int ShellBrowserImpl::GetUniqueFolderId() const
-{
-	return m_uniqueFolderId;
-}
-
 BasicItemInfo_t ShellBrowserImpl::getBasicItemInfo(int internalIndex) const
 {
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
@@ -1110,6 +1102,21 @@ void ShellBrowserImpl::RestoreStateOfCutItems()
 	}
 }
 
+void ShellBrowserImpl::Paste()
+{
+	auto serviceProvider = winrt::make_self<ServiceProvider>();
+	serviceProvider->RegisterService(IID_IFolderView,
+		winrt::make<FolderView>(m_weakPtrFactory.GetWeakPtr()));
+
+	auto getWindowCallback = [weakSelf = m_weakPtrFactory.GetWeakPtr()]
+	{
+		return weakSelf ? weakSelf->m_browser->GetView()->GetHWND() : nullptr;
+	};
+
+	ClipboardOperations::Paste(m_clipboardStore, m_directoryState.pidlDirectory, getWindowCallback,
+		serviceProvider.get(), m_appServices->GetRuntime(), m_resourceLoader);
+}
+
 void ShellBrowserImpl::PasteShortcut()
 {
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
@@ -1123,16 +1130,16 @@ void ShellBrowserImpl::PasteShortcut()
 void ShellBrowserImpl::PasteHardLinks()
 {
 	auto pastedItems = ClipboardOperations::PasteHardLinks(m_clipboardStore, GetDirectoryPath());
-	OnInternalPaste(pastedItems);
+	SelectPastedItems(pastedItems);
 }
 
 void ShellBrowserImpl::PasteSymLinks()
 {
 	auto pastedItems = ClipboardOperations::PasteSymLinks(m_clipboardStore, GetDirectoryPath());
-	OnInternalPaste(pastedItems);
+	SelectPastedItems(pastedItems);
 }
 
-void ShellBrowserImpl::OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems)
+void ShellBrowserImpl::SelectPastedItems(const ClipboardOperations::PastedItems &pastedItems)
 {
 	std::vector<PidlAbsolute> pidls;
 
@@ -1193,6 +1200,14 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 	case IDM_EDIT_COPYTOFOLDER:
 	case IDM_EDIT_COPY:
 		return DoAllSelectedItemsHaveAttributes(SFGAO_CANCOPY);
+
+	case IDM_EDIT_PASTE:
+		return CanPasteInDirectory(m_clipboardStore, m_directoryState.pidlDirectory.Raw(),
+			PasteType::Normal);
+
+	case IDM_EDIT_PASTESHORTCUT:
+		return CanPasteInDirectory(m_clipboardStore, m_directoryState.pidlDirectory.Raw(),
+			PasteType::Shortcut);
 	}
 
 	return false;
@@ -1236,6 +1251,14 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 
 	case IDM_EDIT_COPY:
 		CopySelectedItemsToClipboard(ClipboardAction::Copy);
+		break;
+
+	case IDM_EDIT_PASTE:
+		Paste();
+		break;
+
+	case IDM_EDIT_PASTESHORTCUT:
+		PasteShortcut();
 		break;
 
 	case IDM_EDIT_MOVETOFOLDER:

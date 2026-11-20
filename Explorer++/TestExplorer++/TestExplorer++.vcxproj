@@ -223,6 +223,7 @@
     <ClCompile Include="ApplicationToolbarStorageTestHelper.cpp" />
     <ClCompile Include="ApplicationToolbarTest.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
+    <ClCompile Include="CustomDropHelperTest.cpp" />
     <ClCompile Include="FileActionHandlerFake.cpp" />
     <ClCompile Include="IconFetcherFake.cpp" />
     <ClCompile Include="AutoResetTest.cpp" />

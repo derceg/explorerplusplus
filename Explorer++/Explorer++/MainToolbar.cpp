@@ -118,6 +118,7 @@ constexpr bool VerifyButtonIconMappings(std::span<const ButtonIconMapping> mappi
 static_assert(VerifyButtonIconMappings(BUTTON_ICON_MAPPINGS));
 
 std::wstring GetButtonText(MainToolbarButtonId buttonId, const ResourceLoader *resourceLoader);
+UINT GetCommandIdForButton(MainToolbarButtonId buttonId);
 
 class MainToolbarButton : public ToolbarButton
 {
@@ -174,89 +175,7 @@ private:
 	void OnClicked()
 	{
 		SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND,
-			MAKEWPARAM(GetCommandIdForButton(), 0), 0);
-	}
-
-	UINT GetCommandIdForButton() const
-	{
-		switch (m_buttonId)
-		{
-		case MainToolbarButtonId::NewTab:
-			return IDM_FILE_NEWTAB;
-
-		case MainToolbarButtonId::CloseTab:
-			return IDM_FILE_CLOSETAB;
-
-		case MainToolbarButtonId::OpenCommandPrompt:
-			return IDM_FILE_OPENCOMMANDPROMPT;
-
-		case MainToolbarButtonId::Delete:
-			return IDM_FILE_DELETE;
-
-		case MainToolbarButtonId::DeletePermanently:
-			return IDM_FILE_DELETEPERMANENTLY;
-
-		case MainToolbarButtonId::Properties:
-			return IDM_FILE_PROPERTIES;
-
-		case MainToolbarButtonId::Cut:
-			return IDM_EDIT_CUT;
-
-		case MainToolbarButtonId::Copy:
-			return IDM_EDIT_COPY;
-
-		case MainToolbarButtonId::Paste:
-			return IDM_EDIT_PASTE;
-
-		case MainToolbarButtonId::MoveTo:
-			return IDM_EDIT_MOVETOFOLDER;
-
-		case MainToolbarButtonId::CopyTo:
-			return IDM_EDIT_COPYTOFOLDER;
-
-		case MainToolbarButtonId::Folders:
-			return IDM_VIEW_FOLDERS;
-
-		case MainToolbarButtonId::Refresh:
-			return IDM_VIEW_REFRESH;
-
-		case MainToolbarButtonId::NewFolder:
-			return IDM_ACTIONS_NEWFOLDER;
-
-		case MainToolbarButtonId::SplitFile:
-			return IDM_ACTIONS_SPLITFILE;
-
-		case MainToolbarButtonId::MergeFiles:
-			return IDM_ACTIONS_MERGEFILES;
-
-		case MainToolbarButtonId::Back:
-			return IDM_GO_BACK;
-
-		case MainToolbarButtonId::Forward:
-			return IDM_GO_FORWARD;
-
-		case MainToolbarButtonId::Up:
-			return IDM_GO_UP;
-
-		case MainToolbarButtonId::AddBookmark:
-			return IDM_BOOKMARKS_BOOKMARK_THIS_TAB;
-
-		case MainToolbarButtonId::Bookmarks:
-			return IDM_BOOKMARKS_MANAGE_BOOKMARKS;
-
-		case MainToolbarButtonId::Search:
-			return IDM_TOOLS_SEARCH;
-
-		case MainToolbarButtonId::Views:
-			return IDM_CYCLE_VIEW;
-
-		case MainToolbarButtonId::Separator:
-			// This is a valid enum value, but isn't a valid ID for a button. Doing nothing here
-			// will result in the LOG() statement below being triggered.
-			break;
-		}
-
-		LOG(FATAL) << "Invalid MainToolbarButtonId";
+			MAKEWPARAM(GetCommandIdForButton(m_buttonId), 0), 0);
 	}
 
 	bool m_enabled = true;
@@ -489,12 +408,11 @@ private:
 
 MainToolbar::MainToolbar(MainToolbarView *view,
 	const std::optional<MainToolbarLayout> &initialLayout, BrowserWindow *browser,
-	AppServices *appServices, CoreInterface *coreInterface, ShellIconLoader *shellIconLoader) :
+	AppServices *appServices, ShellIconLoader *shellIconLoader) :
 	ToolbarBase(view, browser, appServices->GetAcceleratorManager()),
 	m_view(view),
 	m_browser(browser),
 	m_appServices(appServices),
-	m_coreInterface(coreInterface),
 	m_shellIconLoader(shellIconLoader),
 	m_config(appServices->GetConfig()),
 	m_resourceLoader(appServices->GetResourceLoader())
@@ -715,31 +633,15 @@ void MainToolbar::UpdateToolbarButtonStates()
 		return;
 	}
 
-	auto *browserController = m_browser->GetCommandController();
+	for (auto buttonId : magic_enum::enum_values<MainToolbarButtonId>())
+	{
+		if (buttonId == MainToolbarButtonId::Separator)
+		{
+			continue;
+		}
 
-	EnableButton(MainToolbarButtonId::Back, browserController->IsCommandEnabled(IDM_GO_BACK));
-	EnableButton(MainToolbarButtonId::Forward, browserController->IsCommandEnabled(IDM_GO_FORWARD));
-	EnableButton(MainToolbarButtonId::Up, browserController->IsCommandEnabled(IDM_GO_UP));
-	EnableButton(MainToolbarButtonId::Cut, browserController->IsCommandEnabled(IDM_EDIT_CUT));
-	EnableButton(MainToolbarButtonId::Copy, browserController->IsCommandEnabled(IDM_EDIT_COPY));
-	EnableButton(MainToolbarButtonId::MoveTo,
-		browserController->IsCommandEnabled(IDM_EDIT_MOVETOFOLDER));
-	EnableButton(MainToolbarButtonId::CopyTo,
-		browserController->IsCommandEnabled(IDM_EDIT_COPYTOFOLDER));
-	EnableButton(MainToolbarButtonId::Paste, m_coreInterface->CanPaste(PasteType::Normal));
-	EnableButton(MainToolbarButtonId::Properties,
-		browserController->IsCommandEnabled(IDM_FILE_PROPERTIES));
-	EnableButton(MainToolbarButtonId::Delete, browserController->IsCommandEnabled(IDM_FILE_DELETE));
-	EnableButton(MainToolbarButtonId::DeletePermanently,
-		browserController->IsCommandEnabled(IDM_FILE_DELETEPERMANENTLY));
-	EnableButton(MainToolbarButtonId::SplitFile,
-		browserController->IsCommandEnabled(IDM_ACTIONS_SPLITFILE));
-	EnableButton(MainToolbarButtonId::MergeFiles,
-		browserController->IsCommandEnabled(IDM_ACTIONS_MERGEFILES));
-	EnableButton(MainToolbarButtonId::OpenCommandPrompt,
-		browserController->IsCommandEnabled(IDM_FILE_OPENCOMMANDPROMPT));
-	EnableButton(MainToolbarButtonId::NewFolder,
-		browserController->IsCommandEnabled(IDM_ACTIONS_NEWFOLDER));
+		UpdateButtonEnabledState(buttonId);
+	}
 }
 
 void MainToolbar::OnClipboardUpdate()
@@ -749,13 +651,14 @@ void MainToolbar::OnClipboardUpdate()
 		return;
 	}
 
-	EnableButton(MainToolbarButtonId::Paste, m_coreInterface->CanPaste(PasteType::Normal));
+	UpdateButtonEnabledState(MainToolbarButtonId::Paste);
 }
 
-void MainToolbar::EnableButton(MainToolbarButtonId buttonId, bool enable)
+void MainToolbar::UpdateButtonEnabledState(MainToolbarButtonId buttonId)
 {
 	auto *button = static_cast<MainToolbarButton *>(GetButtonForId(buttonId));
-	button->SetEnabled(enable);
+	button->SetEnabled(
+		m_browser->GetCommandController()->IsCommandEnabled(GetCommandIdForButton(buttonId)));
 }
 
 MainToolbarLayout MainToolbar::GetLayoutForStorage() const
@@ -907,6 +810,88 @@ std::wstring GetButtonText(MainToolbarButtonId buttonId, const ResourceLoader *r
 
 	CHECK(stringId);
 	return resourceLoader->LoadString(*stringId);
+}
+
+UINT GetCommandIdForButton(MainToolbarButtonId buttonId)
+{
+	switch (buttonId)
+	{
+	case MainToolbarButtonId::NewTab:
+		return IDM_FILE_NEWTAB;
+
+	case MainToolbarButtonId::CloseTab:
+		return IDM_FILE_CLOSETAB;
+
+	case MainToolbarButtonId::OpenCommandPrompt:
+		return IDM_FILE_OPENCOMMANDPROMPT;
+
+	case MainToolbarButtonId::Delete:
+		return IDM_FILE_DELETE;
+
+	case MainToolbarButtonId::DeletePermanently:
+		return IDM_FILE_DELETEPERMANENTLY;
+
+	case MainToolbarButtonId::Properties:
+		return IDM_FILE_PROPERTIES;
+
+	case MainToolbarButtonId::Cut:
+		return IDM_EDIT_CUT;
+
+	case MainToolbarButtonId::Copy:
+		return IDM_EDIT_COPY;
+
+	case MainToolbarButtonId::Paste:
+		return IDM_EDIT_PASTE;
+
+	case MainToolbarButtonId::MoveTo:
+		return IDM_EDIT_MOVETOFOLDER;
+
+	case MainToolbarButtonId::CopyTo:
+		return IDM_EDIT_COPYTOFOLDER;
+
+	case MainToolbarButtonId::Folders:
+		return IDM_VIEW_FOLDERS;
+
+	case MainToolbarButtonId::Refresh:
+		return IDM_VIEW_REFRESH;
+
+	case MainToolbarButtonId::NewFolder:
+		return IDM_ACTIONS_NEWFOLDER;
+
+	case MainToolbarButtonId::SplitFile:
+		return IDM_ACTIONS_SPLITFILE;
+
+	case MainToolbarButtonId::MergeFiles:
+		return IDM_ACTIONS_MERGEFILES;
+
+	case MainToolbarButtonId::Back:
+		return IDM_GO_BACK;
+
+	case MainToolbarButtonId::Forward:
+		return IDM_GO_FORWARD;
+
+	case MainToolbarButtonId::Up:
+		return IDM_GO_UP;
+
+	case MainToolbarButtonId::AddBookmark:
+		return IDM_BOOKMARKS_BOOKMARK_THIS_TAB;
+
+	case MainToolbarButtonId::Bookmarks:
+		return IDM_BOOKMARKS_MANAGE_BOOKMARKS;
+
+	case MainToolbarButtonId::Search:
+		return IDM_TOOLS_SEARCH;
+
+	case MainToolbarButtonId::Views:
+		return IDM_CYCLE_VIEW;
+
+	case MainToolbarButtonId::Separator:
+		// This is a valid enum value, but isn't a valid ID for a button. Doing nothing here
+		// will result in the LOG() statement below being triggered.
+		break;
+	}
+
+	LOG(FATAL) << "Invalid MainToolbarButtonId";
 }
 
 }

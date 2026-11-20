@@ -22,6 +22,7 @@
 #include "BrowserWindow.h"
 #include "Config.h"
 #include "DialogHelper.h"
+#include "DirectoryOperationsHelper.h"
 #include "FileOperations.h"
 #include "LabelEditHandler.h"
 #include "MainResource.h"
@@ -41,7 +42,6 @@
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
@@ -1385,6 +1385,14 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 	case IDM_EDIT_COPYTOFOLDER:
 	case IDM_EDIT_COPY:
 		return TestItemAttributes(GetSelectedNode(), SFGAO_CANCOPY);
+
+	case IDM_EDIT_PASTE:
+		return CanPasteInDirectory(m_clipboardStore, GetSelectedNodePidl().get(),
+			PasteType::Normal);
+
+	case IDM_EDIT_PASTESHORTCUT:
+		return CanPasteInDirectory(m_clipboardStore, GetSelectedNodePidl().get(),
+			PasteType::Shortcut);
 	}
 
 	return false;
@@ -1428,6 +1436,14 @@ void ShellTreeView::ExecuteCommand(int command)
 
 	case IDM_EDIT_COPY:
 		CopySelectedItemToClipboard(ClipboardAction::Copy);
+		break;
+
+	case IDM_EDIT_PASTE:
+		Paste();
+		break;
+
+	case IDM_EDIT_PASTESHORTCUT:
+		PasteShortcut();
 		break;
 
 	case IDM_EDIT_MOVETOFOLDER:
@@ -1545,35 +1561,17 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction acti
 
 void ShellTreeView::Paste()
 {
-	auto clipboardObject = m_clipboardStore->GetDataObject();
-
-	if (!clipboardObject)
-	{
-		return;
-	}
-
 	auto *selectedNode = GetNodeFromTreeViewItem(TreeView_GetSelection(m_hTreeView));
 	auto selectedItemPidl = selectedNode->GetFullPidl();
 
-	if (CanShellPasteDataObject(selectedItemPidl.get(), clipboardObject.get(), PasteType::Normal))
+	auto getWindowCallback = [weakSelf = m_weakPtrFactory.GetWeakPtr()]
 	{
-		ExecuteActionFromContextMenu(selectedItemPidl.get(), {}, m_hTreeView, L"paste", 0, nullptr);
-	}
-	else
-	{
-		std::wstring destinationPath;
-		HRESULT hr = GetDisplayName(selectedItemPidl.get(), SHGDN_FORPARSING, destinationPath);
+		return weakSelf ? weakSelf->m_browser->GetView()->GetHWND() : nullptr;
+	};
 
-		if (FAILED(hr))
-		{
-			return;
-		}
-
-		DropHandler *dropHandler = DropHandler::CreateNew();
-		dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath.c_str(),
-			nullptr);
-		dropHandler->Release();
-	}
+	auto serviceProvider = winrt::make_self<ServiceProvider>();
+	ClipboardOperations::Paste(m_clipboardStore, selectedItemPidl.get(), getWindowCallback,
+		serviceProvider.get(), m_appServices->GetRuntime(), m_appServices->GetResourceLoader());
 }
 
 void ShellTreeView::PasteShortcut()

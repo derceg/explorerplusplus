@@ -52,7 +52,6 @@ void ShellBrowserImpl::ChangeFolders(const PidlAbsolute &directory)
 	m_directoryState.pidlDirectory = directory;
 	m_directoryState.directory = GetDisplayNameWithFallback(directory.Raw(), SHGDN_FORPARSING);
 	m_directoryState.virtualFolder = isVirtualFolder;
-	m_uniqueFolderId++;
 
 	SetActiveColumnSet();
 	VerifySortMode();

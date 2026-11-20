@@ -9,7 +9,6 @@
 #include "BrowserPane.h"
 #include "BrowserViewImpl.h"
 #include "BrowserWindow.h"
-#include "CoreInterface.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "LayoutDefaults.h"
 #include "Literals.h"
@@ -60,7 +59,7 @@ class ApplicationToolbar;
 
 }
 
-class Explorerplusplus : public BrowserWindow, public CoreInterface
+class Explorerplusplus : public BrowserWindow
 {
 public:
 	static Explorerplusplus *Create(const WindowStorageData &storageData, AppServices *appServices,
@@ -133,7 +132,6 @@ private:
 	LRESULT CommandHandler(HWND hwnd, HWND control, UINT id, UINT notificationCode);
 	LRESULT HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
-	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize(const WindowStorageData &storageData);
 	void InitializeMainMenu();
 	void CreateDisplayWindow();
@@ -153,17 +151,11 @@ private:
 	/* Main menu handlers. */
 	void OnNewTab();
 	void OnCloneWindow();
-	void OnPaste();
-	void OnPasteShortcut();
 	void OnResolveLink();
 	void OnSelectColumns();
 	void OnDestroyFiles();
 
 	int HighlightSimilarFiles(HWND ListView) const;
-
-	/* ListView private message handlers. */
-	LRESULT OnListViewKeyDown(LPARAM lParam);
-	void OnListViewPaste();
 
 	/* Tabs. */
 	void InitializeTabs();
@@ -195,10 +187,6 @@ private:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
-	/* File selection tests. */
-	BOOL CanPaste(PasteType pasteType) const override;
-	PidlAbsolute MaybeGetFocusedDirectory() const;
-
 	/* Display window. */
 	void UpdateDisplayWindow(const Tab &tab);
 	void UpdateDisplayWindowForZeroFiles(const Tab &tab);
@@ -208,8 +196,7 @@ private:
 	/* Columns. */
 	void CopyColumnInfoToClipboard();
 
-	/* CoreInterface methods. */
-	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
+	ShellBrowserImpl *GetActiveShellBrowserImpl() const;
 
 	bool ConfirmClose();
 	void BeginShutdown();

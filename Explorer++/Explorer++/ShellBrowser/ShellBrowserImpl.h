@@ -132,7 +132,6 @@ public:
 	WeakPtr<ShellBrowserImpl> GetWeakPtr();
 
 	/* Get/Set current state. */
-	int GetUniqueFolderId() const;
 	int GetNumItems() const;
 	int GetNumSelectedFiles() const;
 	int GetNumSelectedFolders() const;
@@ -154,13 +153,10 @@ public:
 	void SelectItems(const std::vector<PidlAbsolute> &pidls);
 	uint64_t GetTotalDirectorySize();
 	uint64_t GetSelectionSize();
-	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
 	HRESULT CopyItemsToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action);
-	void PasteShortcut();
 	void PasteHardLinks();
 	void PasteSymLinks();
-	void OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems);
 	void StartRenamingItems(const std::vector<PidlAbsolute> &items);
 
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
@@ -604,6 +600,9 @@ private:
 	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 	void RestoreStateOfCutItems();
+	void Paste();
+	void PasteShortcut();
+	void SelectPastedItems(const ClipboardOperations::PastedItems &pastedItems);
 
 	// ShellDropTargetDelegate
 	int GetDropTargetItem(const POINT &pt) override;
@@ -621,6 +620,7 @@ private:
 
 	/* Miscellaneous. */
 	BOOL CompareVirtualFolders(UINT uFolderCSIDL) const;
+	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	int LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	std::optional<int> GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
 	std::optional<int> GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
@@ -674,12 +674,6 @@ private:
 	AcceleratorManager *const m_acceleratorManager;
 	bool m_folderVisited = false;
 
-	/* Stores a unique index for each folder.
-	This may be needed so that folders can be
-	told apart when adding files from directory
-	modification. */
-	int m_uniqueFolderId;
-
 	ShellBrowserEvents *const m_shellBrowserEvents;
 	const Config *const m_config;
 	ClipboardStore *const m_clipboardStore;
@@ -717,5 +711,5 @@ private:
 
 	DestroyedSignal m_destroyedSignal;
 
-	WeakPtrFactory<ShellBrowserImpl> m_weakPtrFactory;
+	WeakPtrFactory<ShellBrowserImpl> m_weakPtrFactory{ this };
 };

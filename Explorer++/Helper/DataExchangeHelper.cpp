@@ -473,3 +473,34 @@ wil::unique_hglobal CloneGlobal(HGLOBAL global)
 
 	return clone;
 }
+
+HRESULT GetBinaryDataFromIStream(IStream *stream, std::string &output)
+{
+	STATSTG stat;
+	RETURN_IF_FAILED(stream->Stat(&stat, STATFLAG_NONAME));
+
+	LARGE_INTEGER offset = { 0 };
+	RETURN_IF_FAILED(stream->Seek(offset, STREAM_SEEK_SET, nullptr));
+
+	if (stat.cbSize.QuadPart > std::numeric_limits<ULONG>::max())
+	{
+		return E_FAIL;
+	}
+
+	auto size = static_cast<ULONG>(stat.cbSize.QuadPart);
+
+	std::string result;
+	result.resize(size);
+
+	ULONG bytesRead = 0;
+	RETURN_IF_FAILED(stream->Read(result.data(), size, &bytesRead));
+
+	if (bytesRead != size)
+	{
+		return E_FAIL;
+	}
+
+	output = std::move(result);
+
+	return S_OK;
+}

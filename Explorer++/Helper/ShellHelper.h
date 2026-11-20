@@ -150,3 +150,6 @@ PidlAbsolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl);
 bool DoesItemExist(PCIDLIST_ABSOLUTE pidl);
 
 wil::com_ptr_nothrow<IWICBitmapSource> GetStockIconImage(SHSTOCKICONID id, IconSize size);
+
+HRESULT GetDropTargetWithSite(PCIDLIST_ABSOLUTE pidl, IUnknown *site,
+	wil::com_ptr_nothrow<IDropTarget> &dropTarget);

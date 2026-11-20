@@ -674,6 +674,9 @@
     <ClCompile Include="FileActionHandlerFake.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="CustomDropHelperTest.cpp">
+      <Filter>Data Exchange</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

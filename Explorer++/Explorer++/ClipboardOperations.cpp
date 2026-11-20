@@ -5,10 +5,17 @@
 #include "stdafx.h"
 #include "ClipboardOperations.h"
 #include "CommandLine.h"
+#include "CustomDropHelper.h"
 #include "DirectoryOperationsHelper.h"
+#include "MainResource.h"
 #include "PasteSymLinksServer.h"
+#include "ResourceLoader.h"
+#include "RuntimeHelper.h"
+#include "ServiceProvider.h"
 #include "../Helper/Clipboard.h"
 #include "../Helper/ClipboardStore.h"
+#include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DataObjectImpl.h"
 #include "../Helper/ShellHelper.h"
 
 using namespace std::chrono_literals;
@@ -97,6 +104,15 @@ ClipboardOperations::PastedItems PasteSymLinksViaElevatedProcess(const std::wstr
 	return server.LaunchClientAndWaitForResponse(clientLauncher, 10s);
 }
 
+std::wstring GenerateTimestampForFilename()
+{
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+
+	return std::format(L"{:04}-{:02}-{:02} {:02}.{:02}.{:02}", time.wYear, time.wMonth, time.wDay,
+		time.wHour, time.wMinute, time.wSecond);
+}
+
 }
 
 namespace ClipboardOperations
@@ -105,6 +121,87 @@ namespace ClipboardOperations
 bool CanPasteLinkInDirectory(const ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl)
 {
 	return clipboardStore->IsDataAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
+}
+
+void Paste(ClipboardStore *clipboardStore, const PidlAbsolute &destination,
+	GetWindowCallback getWindowCallback, ServiceProvider *serviceProvider, Runtime *runtime,
+	const ResourceLoader *resourceLoader)
+{
+	auto clipboardObject = clipboardStore->GetDataObject();
+
+	if (!clipboardObject)
+	{
+		return;
+	}
+
+	if (CanShellPasteDataObject(destination.Raw(), clipboardObject.get(), PasteType::Normal))
+	{
+		ExecuteActionFromContextMenu(destination.Raw(), {}, getWindowCallback(), L"paste", 0,
+			serviceProvider);
+	}
+	else
+	{
+		PasteCustomData(clipboardStore, destination, std::move(getWindowCallback), serviceProvider,
+			runtime, resourceLoader);
+	}
+}
+
+concurrencpp::null_result PasteCustomData(ClipboardStore *clipboardStore, PidlAbsolute destination,
+	GetWindowCallback getWindowCallback, wil::com_ptr_nothrow<ServiceProvider> serviceProvider,
+	Runtime *runtime, const ResourceLoader *resourceLoader)
+{
+	// The data on the clipboard can be arbitrarily large, so the extraction will be performed on a
+	// background thread.
+	co_await ResumeOnComStaThread(runtime);
+
+	auto fileContents = CustomDropHelper::MaybeExtractData(clipboardStore);
+
+	if (!fileContents)
+	{
+		co_return;
+	}
+
+	co_await ResumeOnUiThread(runtime);
+
+	auto customDataObject = winrt::make_self<DataObjectImpl>();
+	customDataObject->SetAsyncMode(VARIANT_TRUE);
+
+	std::wstring basename;
+	std::wstring extension;
+
+	switch (fileContents->type)
+	{
+	case CustomDropHelper::DataType::Text:
+		basename = resourceLoader->LoadString(IDS_CLIPBOARD_TEXT_FILENAME_PREFIX);
+		extension = L"txt";
+		break;
+
+	case CustomDropHelper::DataType::PngImage:
+		basename = resourceLoader->LoadString(IDS_CLIPBOARD_IMAGE_FILENAME_PREFIX);
+		extension = L"png";
+		break;
+	}
+
+	auto filename = std::format(L"{} ({}).{}", basename, GenerateTimestampForFilename(), extension);
+
+	std::vector<VirtualFile> virtualFiles;
+	virtualFiles.emplace_back(std::move(filename), std::move(fileContents->contents));
+	HRESULT hr = WriteVirtualFilesToDataObject(customDataObject.get(), virtualFiles);
+
+	if (FAILED(hr))
+	{
+		co_return;
+	}
+
+	// This is registered specifically because the shell will request the IOleWindow interface from
+	// the object and then call IOleWindow::GetWindow(). That's important for any dialogs that might
+	// be shown during the paste operation. Without this, a dialog that's shown during the paste
+	// operation would have no parent.
+	serviceProvider->RegisterService(SID_STopLevelBrowser,
+		winrt::make<OleWindow>(std::move(getWindowCallback)));
+
+	PasteViaSimulatedDrop(destination.Raw(), customDataObject.get(), serviceProvider.get(),
+		DROPEFFECT_COPY);
 }
 
 PastedItems PasteHardLinks(ClipboardStore *clipboardStore, const std::wstring &destination)

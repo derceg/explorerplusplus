@@ -49,22 +49,13 @@
     <ClCompile Include="SearchDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="EventSwitcher.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Explorer++.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ListViewHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="MainWndSwitch.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="MsgHandler.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="IDropFilesCallback.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -102,9 +93,6 @@
     </ClCompile>
     <ClCompile Include="ShellBrowser\ViewModes.cpp">
       <Filter>ShellBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSelectionTests.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ScriptingDialog.cpp">
       <Filter>Dialogs</Filter>
@@ -979,6 +967,9 @@
     <ClCompile Include="ShellItemContextMenuHelper.cpp">
       <Filter>Menus\UI\Shell Context Menu</Filter>
     </ClCompile>
+    <ClCompile Include="CustomDropHelper.cpp">
+      <Filter>Data Exchange</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -998,9 +989,6 @@
     </ClInclude>
     <ClInclude Include="FilterDialog.h">
       <Filter>Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="IDropFilesCallback.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="MergeFilesDialog.h">
       <Filter>Dialogs</Filter>
@@ -1117,9 +1105,6 @@
       <Filter>Plugins\TabsApi</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeHelper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="CoreInterface.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ResourceHelper.h">
@@ -2141,6 +2126,9 @@
     </ClInclude>
     <ClInclude Include="FmtWrapper.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomDropHelper.h">
+      <Filter>Data Exchange</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,13 +4,20 @@
 
 #pragma once
 
+#include "../Helper/OleWindow.h"
 #include <cereal/types/string.hpp>
+#include <concurrencpp/concurrencpp.h>
+#include <wil/com.h>
 #include <shtypes.h>
 #include <string>
 #include <system_error>
 #include <vector>
 
 class ClipboardStore;
+class PidlAbsolute;
+class ResourceLoader;
+class Runtime;
+class ServiceProvider;
 
 namespace ClipboardOperations
 {
@@ -50,6 +57,13 @@ struct PastedItem
 using PastedItems = std::vector<PastedItem>;
 
 bool CanPasteLinkInDirectory(const ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE pidl);
+
+void Paste(ClipboardStore *clipboardStore, const PidlAbsolute &destination,
+	GetWindowCallback getWindowCallback, ServiceProvider *serviceProvider, Runtime *runtime,
+	const ResourceLoader *resourceLoader);
+concurrencpp::null_result PasteCustomData(ClipboardStore *clipboardStore, PidlAbsolute destination,
+	GetWindowCallback getWindowCallback, wil::com_ptr_nothrow<ServiceProvider> serviceProvider,
+	Runtime *runtime, const ResourceLoader *resourceLoader);
 
 // There are two types of paste operations used within the application:
 //

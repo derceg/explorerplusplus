@@ -13,6 +13,7 @@
 #include "../Helper/ScopedDropTargetRegistration.h"
 #include "../Helper/ShellDropTargetDelegate.h"
 #include "../Helper/SignalWrapper.h"
+#include "../Helper/WeakPtrFactory.h"
 #include "../Helper/WindowSubclass.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/signals2.hpp>
@@ -35,17 +36,7 @@ public:
 
 	HWND GetHWND() const;
 
-	/* User functions. */
-	unique_pidl_absolute GetSelectedNodePidl() const;
 	void SetShowHidden(BOOL bShowHidden);
-
-	/* Sorting. */
-	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
-
-	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
-	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action);
-	void Paste();
-	void PasteShortcut();
 
 	// BrowserCommandTarget
 	bool IsCommandEnabled(int command) const override;
@@ -126,6 +117,7 @@ private:
 	void AddShellNamespaceRootItem();
 	HTREEITEM AddRootItem(PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter = TVI_LAST);
 	void OnShowQuickAccessUpdated(bool newValue);
+	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
 	HRESULT ExpandDirectory(HTREEITEM hParent);
 	HTREEITEM AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter = TVI_LAST);
 	void SortChildren(HTREEITEM parent);
@@ -144,12 +136,16 @@ private:
 		const std::vector<PidlChild> &items, const std::wstring &verb);
 	void UpdateSelection();
 	void StartRenamingSelectedItem();
+	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
 	void ShowPropertiesForSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 
 	void CopySelectedItemToClipboard(ClipboardAction action);
+	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, ClipboardAction action);
 	void CopyItemToClipboard(HTREEITEM treeItem, ClipboardAction action);
 	void OnClipboardUpdate();
+	void Paste();
+	void PasteShortcut();
 
 	void CopySelectedItemPath(PathType pathType) const;
 	void SetFileAttributesForSelectedItem();
@@ -184,6 +180,7 @@ private:
 	void ProcessSubfoldersResult(int subfoldersResultId);
 
 	ShellTreeNode *GetSelectedNode() const;
+	unique_pidl_absolute GetSelectedNodePidl() const;
 	ShellTreeNode *GetNodeFromTreeViewItem(HTREEITEM item) const;
 	ShellTreeNode *GetNodeById(int id) const;
 	ShellTreeNode *GetNodeByIdRecursive(ShellTreeNode *node, int id) const;
@@ -257,4 +254,6 @@ private:
 	concurrencpp::timer m_dropExpandTimer;
 
 	CutCopiedItemManager m_cutCopiedItemManager;
+
+	WeakPtrFactory<ShellTreeView> m_weakPtrFactory{ this };
 };

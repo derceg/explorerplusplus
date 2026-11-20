@@ -794,7 +794,6 @@
     <ClCompile Include="DpiCompatibility.cpp" />
     <ClCompile Include="DragDropHelper.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
-    <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandlerImpl.cpp" />
     <ClCompile Include="FileDialogs.cpp" />
     <ClCompile Include="GraphicsFactories.cpp" />
@@ -804,6 +803,7 @@
     <ClCompile Include="KeyboardStateImpl.cpp" />
     <ClCompile Include="LayoutHelper.cpp" />
     <ClCompile Include="MessageWindowHelper.cpp" />
+    <ClCompile Include="OleWindow.cpp" />
     <ClCompile Include="PidlHelper.cpp" />
     <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedDCState.cpp" />
@@ -904,6 +904,7 @@
     <ClInclude Include="ImageInterop.h" />
     <ClInclude Include="ImageOperations.h" />
     <ClInclude Include="LayoutHelper.h" />
+    <ClInclude Include="OleWindow.h" />
     <ClInclude Include="PassKey.h" />
     <ClInclude Include="PidlHelper.h" />
     <ClInclude Include="RemoveMode.h" />
@@ -914,7 +915,6 @@
     <ClInclude Include="DpiCompatibility.h" />
     <ClInclude Include="DragDropHelper.h" />
     <ClInclude Include="DriveInfo.h" />
-    <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandlerImpl.h" />
     <ClInclude Include="FileDialogs.h" />
     <ClInclude Include="KeyboardState.h" />

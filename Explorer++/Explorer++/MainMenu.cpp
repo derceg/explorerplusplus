@@ -10,7 +10,6 @@
 #include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "FeatureList.h"
 #include "FrequentLocationsMenu.h"
 #include "HistoryMenu.h"
@@ -32,14 +31,12 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
-MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices,
-	CoreInterface *coreInterface) :
+MainMenu::MainMenu(MenuView *menuView, BrowserWindow *browser, AppServices *appServices) :
 	MenuBase(menuView, appServices->GetAcceleratorManager()),
 	m_browser(browser),
 	m_config(appServices->GetConfig()),
 	m_clipboardStore(appServices->GetPlatformContext()->GetClipboardStore()),
-	m_resourceLoader(appServices->GetResourceLoader()),
-	m_coreInterface(coreInterface)
+	m_resourceLoader(appServices->GetResourceLoader())
 {
 	BuildMenu(browser, appServices);
 }
@@ -692,6 +689,8 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 	case IDM_EDIT_UNDO:
 	case IDM_EDIT_CUT:
 	case IDM_EDIT_COPY:
+	case IDM_EDIT_PASTE:
+	case IDM_EDIT_PASTESHORTCUT:
 	case IDM_EDIT_COPYTOFOLDER:
 	case IDM_EDIT_MOVETOFOLDER:
 	case IDM_EDIT_SELECTNONE:
@@ -719,18 +718,6 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 
 			return shellBrowser->GetNumSelected() > 0
 				&& (shellBrowser->GetViewMode() == ViewMode::Details);
-		};
-
-	case IDM_EDIT_PASTE:
-		return [this]
-		{
-			return m_coreInterface->CanPaste(PasteType::Normal);
-		};
-
-	case IDM_EDIT_PASTESHORTCUT:
-		return [this]
-		{
-			return m_coreInterface->CanPaste(PasteType::Shortcut);
 		};
 
 	case IDM_EDIT_PASTEHARDLINK:

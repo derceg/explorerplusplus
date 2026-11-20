@@ -5,7 +5,6 @@
 #pragma once
 
 #include "BrowserWindow.h"
-#include "CoreInterface.h"
 #include "MainToolbarButtonId.h"
 #include "Tab.h"
 #include "ToolbarBase.h"
@@ -30,8 +29,7 @@ class MainToolbar : public ToolbarBase
 {
 public:
 	MainToolbar(MainToolbarView *view, const std::optional<MainToolbarLayout> &initialLayout,
-		BrowserWindow *browser, AppServices *appServices, CoreInterface *coreInterface,
-		ShellIconLoader *shellIconLoader);
+		BrowserWindow *browser, AppServices *appServices, ShellIconLoader *shellIconLoader);
 
 	void UpdateToolbarButtonStates();
 
@@ -54,7 +52,7 @@ private:
 	void OnBrowserLifecycleStateChanged(BrowserWindow::LifecycleState updatedState);
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	void OnClipboardUpdate();
-	void EnableButton(MainToolbarButtonId buttonId, bool enable);
+	void UpdateButtonEnabledState(MainToolbarButtonId buttonId);
 
 	ToolbarButton *GetButtonForId(MainToolbarButtonId buttonId) const;
 	MainToolbarButtonId GetIdForButton(ToolbarButton *button) const;
@@ -62,7 +60,6 @@ private:
 	MainToolbarView *const m_view;
 	BrowserWindow *const m_browser;
 	AppServices *const m_appServices;
-	CoreInterface *const m_coreInterface;
 	ShellIconLoader *const m_shellIconLoader;
 	const Config *const m_config;
 	const ResourceLoader *const m_resourceLoader;
