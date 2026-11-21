@@ -27,7 +27,16 @@ std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
 		return std::nullopt;
 	}
 
-	return std::wstring(static_cast<const wchar_t *>(mem.get()), (size / sizeof(wchar_t)) - 1);
+	auto text = std::wstring(static_cast<const wchar_t *>(mem.get()), size / sizeof(wchar_t));
+
+	auto nullPos = text.find(L'\0');
+
+	if (nullPos != std::wstring::npos)
+	{
+		text.resize(nullPos);
+	}
+
+	return text;
 }
 
 wil::unique_hglobal WriteStringToGlobal(const std::wstring &str)
