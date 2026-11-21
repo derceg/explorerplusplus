@@ -20,7 +20,7 @@ std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
 		return std::nullopt;
 	}
 
-	auto size = GlobalSize(mem.get());
+	auto size = GlobalSize(global);
 
 	if (size == 0 || (size % sizeof(wchar_t)) != 0)
 	{
@@ -44,7 +44,7 @@ std::optional<std::string> ReadBinaryDataFromGlobal(HGLOBAL global)
 		return std::nullopt;
 	}
 
-	auto size = GlobalSize(mem.get());
+	auto size = GlobalSize(global);
 
 	if (size == 0)
 	{
@@ -448,7 +448,7 @@ wil::unique_hglobal CloneGlobal(HGLOBAL global)
 		return nullptr;
 	}
 
-	auto size = GlobalSize(sourceMemory.get());
+	auto size = GlobalSize(global);
 
 	if (size == 0)
 	{
