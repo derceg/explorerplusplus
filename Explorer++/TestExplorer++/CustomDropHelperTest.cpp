@@ -8,6 +8,7 @@
 #include "ResourceTestHelper.h"
 #include "SimulatedClipboardStore.h"
 #include "../Helper/Clipboard.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Pidl.h"
 #include <gtest/gtest.h>
 #include <Shlwapi.h>
@@ -58,8 +59,7 @@ TEST_F(CustomDropHelperTest, CanPasteTextInDirectory)
 
 TEST_F(CustomDropHelperTest, CanPastePngInDirectory)
 {
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestGdiplusBitmap(100, 100, bitmap);
+	auto bitmap = BuildTestBitmap(100, 100);
 	ASSERT_TRUE(m_clipboard.WritePng(bitmap.get()));
 	EXPECT_TRUE(CustomDropHelper::CanPasteInDirectory(&m_clipboardStore, m_directory.Raw(),
 		PasteType::Normal));
@@ -69,11 +69,10 @@ TEST_F(CustomDropHelperTest, CanPastePngInDirectory)
 		PasteType::Shortcut));
 }
 
-TEST_F(CustomDropHelperTest, CanPasteDIBInDirectory)
+TEST_F(CustomDropHelperTest, CanPasteGdiBitmapInDirectory)
 {
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestGdiplusBitmap(100, 100, bitmap);
-	ASSERT_TRUE(m_clipboard.WriteDIB(bitmap.get()));
+	auto bitmap = BuildTestBitmap(100, 100);
+	ASSERT_TRUE(m_clipboard.WriteGdiBitmap(bitmap.get()));
 	EXPECT_TRUE(CustomDropHelper::CanPasteInDirectory(&m_clipboardStore, m_directory.Raw(),
 		PasteType::Normal));
 	EXPECT_FALSE(CustomDropHelper::CanPasteInDirectory(&m_clipboardStore, m_directory.Raw(),
@@ -98,8 +97,7 @@ TEST_F(CustomDropHelperTest, MaybeExtractTextData)
 
 TEST_F(CustomDropHelperTest, MaybeExtractPngData)
 {
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestGdiplusBitmap(75, 220, bitmap);
+	auto bitmap = BuildTestBitmap(75, 220);
 	ASSERT_TRUE(m_clipboard.WritePng(bitmap.get()));
 
 	auto fileContents = CustomDropHelper::MaybeExtractData(&m_clipboardStore);
@@ -111,18 +109,15 @@ TEST_F(CustomDropHelperTest, MaybeExtractPngData)
 			static_cast<UINT>(fileContents->contents.size())));
 	ASSERT_NE(stream, nullptr);
 
-	Gdiplus::Bitmap outputBitmap(stream.get());
-	ASSERT_EQ(outputBitmap.GetLastStatus(), Gdiplus::Ok);
-
-	EXPECT_EQ(outputBitmap.GetWidth(), 75u);
-	EXPECT_EQ(outputBitmap.GetHeight(), 220u);
+	wil::com_ptr_nothrow<IWICBitmapSource> outputBitmap;
+	ASSERT_HRESULT_SUCCEEDED(ImageHelper::LoadBitmapFromStream(stream.get(), outputBitmap));
+	EXPECT_TRUE(AreBitmapsEquivalent(bitmap.get(), outputBitmap.get()));
 }
 
-TEST_F(CustomDropHelperTest, MaybeExtractDIBData)
+TEST_F(CustomDropHelperTest, MaybeExtractGdiBitmapData)
 {
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestGdiplusBitmap(144, 98, bitmap);
-	ASSERT_TRUE(m_clipboard.WriteDIB(bitmap.get()));
+	auto bitmap = BuildTestBitmap(144, 98);
+	ASSERT_TRUE(m_clipboard.WriteGdiBitmap(bitmap.get()));
 
 	auto fileContents = CustomDropHelper::MaybeExtractData(&m_clipboardStore);
 	ASSERT_TRUE(fileContents.has_value());
@@ -133,9 +128,7 @@ TEST_F(CustomDropHelperTest, MaybeExtractDIBData)
 			static_cast<UINT>(fileContents->contents.size())));
 	ASSERT_NE(stream, nullptr);
 
-	Gdiplus::Bitmap outputBitmap(stream.get());
-	ASSERT_EQ(outputBitmap.GetLastStatus(), Gdiplus::Ok);
-
-	EXPECT_EQ(outputBitmap.GetWidth(), 144u);
-	EXPECT_EQ(outputBitmap.GetHeight(), 98u);
+	wil::com_ptr_nothrow<IWICBitmapSource> outputBitmap;
+	ASSERT_HRESULT_SUCCEEDED(ImageHelper::LoadBitmapFromStream(stream.get(), outputBitmap));
+	EXPECT_TRUE(AreBitmapsEquivalent(bitmap.get(), outputBitmap.get()));
 }

@@ -124,9 +124,6 @@
     <ClCompile Include="ServiceProviderBase.cpp">
       <Filter>COM</Filter>
     </ClCompile>
-    <ClCompile Include="GdiplusHelper.cpp">
-      <Filter>Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="DetoursHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
     </ClCompile>
     <ClCompile Include="Pidl.cpp">
       <Filter>Shell</Filter>
-    </ClCompile>
-    <ClCompile Include="ScopedBitmapLock.cpp">
-      <Filter>Miscellaneous</Filter>
     </ClCompile>
     <ClCompile Include="UniqueThreadId.cpp">
       <Filter>Miscellaneous</Filter>
@@ -357,16 +351,10 @@
     <ClInclude Include="Pidl.h">
       <Filter>Shell</Filter>
     </ClInclude>
-    <ClInclude Include="GdiplusHelper.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
     <ClInclude Include="DetoursHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="ResourceHelper.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="ScopedBitmapLock.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="UniqueVariableSizeStruct.h">

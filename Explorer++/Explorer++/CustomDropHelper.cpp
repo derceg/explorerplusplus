@@ -9,7 +9,6 @@
 #include "../Helper/ClipboardStore.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
-#include "../Helper/GdiplusHelper.h"
 #include "../Helper/StringHelper.h"
 #include <vector>
 
@@ -18,7 +17,7 @@ namespace
 
 std::vector<CLIPFORMAT> GetSupportedCustomFormats()
 {
-	return { CF_UNICODETEXT, static_cast<CLIPFORMAT>(GetPngClipboardFormat()), CF_DIB };
+	return { CF_UNICODETEXT, static_cast<CLIPFORMAT>(GetPngClipboardFormat()), CF_BITMAP };
 }
 
 std::optional<std::string> MaybeExtractText(ClipboardStore *clipboardStore)
@@ -34,15 +33,8 @@ std::optional<std::string> MaybeExtractText(ClipboardStore *clipboardStore)
 	return wstrToUtf8Str(*text);
 }
 
-std::optional<std::string> MaybeGetPngData(Gdiplus::Bitmap *bitmap)
+std::optional<std::string> MaybeGetPngData(IWICBitmapSource *bitmap)
 {
-	auto pngClsid = GdiplusHelper::GetEncoderClsid(L"image/png");
-
-	if (!pngClsid)
-	{
-		return std::nullopt;
-	}
-
 	wil::com_ptr_nothrow<IStream> stream(SHCreateMemStream(nullptr, 0));
 
 	if (!stream)
@@ -50,15 +42,15 @@ std::optional<std::string> MaybeGetPngData(Gdiplus::Bitmap *bitmap)
 		return std::nullopt;
 	}
 
-	auto status = bitmap->Save(stream.get(), &pngClsid.value(), nullptr);
+	HRESULT hr = WritePngToStream(bitmap, stream.get());
 
-	if (status != Gdiplus::Ok)
+	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
 	std::string data;
-	HRESULT hr = GetBinaryDataFromIStream(stream.get(), data);
+	hr = GetBinaryDataFromIStream(stream.get(), data);
 
 	if (FAILED(hr))
 	{
@@ -81,10 +73,10 @@ std::optional<std::string> MaybeExtractPngData(ClipboardStore *clipboardStore)
 	return MaybeGetPngData(bitmap.get());
 }
 
-std::optional<std::string> MaybeExtractDIBData(ClipboardStore *clipboardStore)
+std::optional<std::string> MaybeExtractGdiBitmapData(ClipboardStore *clipboardStore)
 {
 	Clipboard clipboard(clipboardStore);
-	auto bitmap = clipboard.ReadDIB();
+	auto bitmap = clipboard.ReadGdiBitmap();
 
 	if (!bitmap)
 	{
@@ -154,7 +146,7 @@ std::optional<FileContents> MaybeExtractData(ClipboardStore *clipboardStore)
 		return FileContents{ DataType::PngImage, std::move(*data) };
 	}
 
-	if (auto data = MaybeExtractDIBData(clipboardStore))
+	if (auto data = MaybeExtractGdiBitmapData(clipboardStore))
 	{
 		return FileContents{ DataType::PngImage, std::move(*data) };
 	}

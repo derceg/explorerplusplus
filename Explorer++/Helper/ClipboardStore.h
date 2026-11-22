@@ -19,8 +19,12 @@ public:
 	virtual bool Close() = 0;
 
 	virtual bool IsDataAvailable(UINT format) const = 0;
-	virtual wil::unique_hglobal GetData(UINT format) const = 0;
-	virtual bool SetData(UINT format, wil::unique_hglobal global) = 0;
+
+	virtual wil::unique_hglobal GetGlobalData(UINT format) const = 0;
+	virtual bool SetGlobalData(UINT format, wil::unique_hglobal global) = 0;
+
+	virtual wil::unique_hbitmap GetGdiBitmap() const = 0;
+	virtual bool SetGdiBitmap(wil::unique_hbitmap bitmap) = 0;
 
 	virtual wil::com_ptr_nothrow<IDataObject> GetDataObject() const = 0;
 	virtual bool SetDataObject(IDataObject *dataObject) = 0;

@@ -358,7 +358,6 @@
     <ClCompile Include="FrequentLocationsStorageTestHelper.cpp" />
     <ClCompile Include="FrequentLocationsTrackerTest.cpp" />
     <ClCompile Include="FrequentLocationsXmlStorageTest.cpp" />
-    <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="IconFetcherImplTest.cpp" />
     <ClCompile Include="HistoryTrackerTest.cpp" />
     <ClCompile Include="NavigationEventsTest.cpp" />

@@ -50,5 +50,5 @@ void ShellIconLoaderFake::SetStoreUpdateCallbacks(bool storeUpdateCallbacks)
 
 wil::com_ptr_nothrow<IWICBitmapSource> ShellIconLoaderFake::GenerateImage() const
 {
-	return BuildTestWICBitmap(10, 10);
+	return BuildTestBitmap(10, 10);
 }

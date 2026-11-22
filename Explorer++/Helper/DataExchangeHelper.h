@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <wil/com.h>
 #include <wil/resource.h>
-#include <gdiplus.h>
+#include <wincodec.h>
 #include <optional>
 #include <string>
 #include <vector>
@@ -28,10 +29,9 @@ wil::unique_hglobal WriteBinaryDataToGlobal(const std::string &data);
 wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size);
 std::optional<std::vector<std::wstring>> ReadHDropDataFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &paths);
-std::unique_ptr<Gdiplus::Bitmap> ReadPngDataFromGlobal(HGLOBAL global);
-wil::unique_hglobal WritePngDataToGlobal(Gdiplus::Bitmap *bitmap);
-std::unique_ptr<Gdiplus::Bitmap> ReadDIBDataFromGlobal(HGLOBAL global);
-wil::unique_hglobal WriteDIBDataToGlobal(Gdiplus::Bitmap *bitmap);
+wil::com_ptr_nothrow<IWICBitmapSource> ReadPngDataFromGlobal(HGLOBAL global);
+wil::unique_hglobal WritePngDataToGlobal(IWICBitmapSource *bitmap);
+HRESULT WritePngToStream(IWICBitmapSource *bitmap, IStream *stream);
 HRESULT ReadVirtualFilesFromDataObject(IDataObject *dataObject,
 	std::vector<VirtualFile> &virtualFilesOutput);
 HRESULT WriteVirtualFilesToDataObject(IDataObject *dataObject,

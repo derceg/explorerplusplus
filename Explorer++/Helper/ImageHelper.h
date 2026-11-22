@@ -12,8 +12,9 @@
 namespace ImageHelper
 {
 
-HRESULT LoadBitmapFromPNG(HINSTANCE resourceInstance, UINT resourceId,
+HRESULT LoadBitmapFromPNGResource(HINSTANCE resourceInstance, UINT resourceId,
 	wil::com_ptr_nothrow<IWICBitmapSource> &output);
+HRESULT LoadBitmapFromStream(IStream *stream, wil::com_ptr_nothrow<IWICBitmapSource> &output);
 
 HRESULT InvertBitmap(IWICBitmapSource *source, wil::com_ptr_nothrow<IWICBitmapSource> &output);
 

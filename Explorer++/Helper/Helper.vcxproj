@@ -805,7 +805,6 @@
     <ClCompile Include="MessageWindowHelper.cpp" />
     <ClCompile Include="OleWindow.cpp" />
     <ClCompile Include="PidlHelper.cpp" />
-    <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ScopedDCState.cpp" />
     <ClCompile Include="ScopedDropTargetRegistration.cpp" />
     <ClCompile Include="ScopedRedrawDisabler.cpp" />
@@ -815,7 +814,6 @@
     <ClCompile Include="UniqueResources.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
-    <ClCompile Include="GdiplusHelper.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="DataObjectImpl.cpp" />
     <ClCompile Include="DropSourceImpl.cpp" />
@@ -920,7 +918,6 @@
     <ClInclude Include="KeyboardState.h" />
     <ClInclude Include="MenuHelpTextHost.h" />
     <ClInclude Include="MessageWindowHelper.h" />
-    <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ScopedDCState.h" />
     <ClInclude Include="ScopedDropTargetRegistration.h" />
     <ClInclude Include="ScopedRedrawDisabler.h" />
@@ -935,7 +932,6 @@
     <ClInclude Include="UniqueResources.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
-    <ClInclude Include="GdiplusHelper.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="DataObjectImpl.h" />
     <ClInclude Include="DropSourceImpl.h" />

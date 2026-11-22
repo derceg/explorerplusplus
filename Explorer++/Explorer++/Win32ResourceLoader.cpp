@@ -94,7 +94,7 @@ wil::com_ptr_nothrow<IWICBitmapSource> Win32ResourceLoader::LoadOriginalBitmap(I
 
 	// Images are always loaded from the executable's resource instance.
 	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
-	HRESULT hr = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), match->second, bitmap);
+	HRESULT hr = ImageHelper::LoadBitmapFromPNGResource(GetModuleHandle(nullptr), match->second, bitmap);
 	CHECK(SUCCEEDED(hr));
 
 	// If the icon size matches exactly, it doesn't need to be scaled, so can be returned

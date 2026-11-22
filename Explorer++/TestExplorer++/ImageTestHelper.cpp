@@ -4,73 +4,52 @@
 
 #include "pch.h"
 #include "ImageTestHelper.h"
-#include "../Helper/GraphicsFactories.h"
-#include "../Helper/ImageHelper.h"
-#include "../Helper/ScopedBitmapLock.h"
-#include <gtest/gtest.h>
+#include "../Helper/D2DHelper.h"
 
-wil::com_ptr_nothrow<IWICBitmapSource> BuildTestWICBitmap(UINT width, UINT height)
+wil::com_ptr_nothrow<IWICBitmapSource> BuildTestBitmap(UINT width, UINT height)
 {
-	wil::com_ptr_nothrow<IWICBitmap> bitmap;
-	auto *imagingFactory = GraphicsFactories::GetWICFactory();
-	HRESULT hr = imagingFactory->CreateBitmap(width, height, GUID_WICPixelFormat32bppPBGRA,
-		WICBitmapCacheOnLoad, &bitmap);
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+	HRESULT hr = D2DHelper::DrawToBitmap(
+		width, height, D2DHelper::GdiUsage::WontUse,
+		[](ID2D1RenderTarget *renderTarget)
+		{
+			renderTarget->Clear(D2D1::ColorF(0.62f, 0.75f, 0.43f, 1.0f));
+			return S_OK;
+		},
+		bitmap);
 	CHECK(SUCCEEDED(hr));
 	return bitmap;
 }
 
-void BuildTestGdiplusBitmap(int width, int height, std::unique_ptr<Gdiplus::Bitmap> &bitmap)
+bool AreBitmapsEquivalent(IWICBitmapSource *bitmap1, IWICBitmapSource *bitmap2)
 {
-	bitmap = std::make_unique<Gdiplus::Bitmap>(width, height, PixelFormat32bppARGB);
-	ASSERT_EQ(bitmap->GetLastStatus(), Gdiplus::Ok);
+	UINT bitmap1Width;
+	UINT bitmap1Height;
+	CHECK(SUCCEEDED(bitmap1->GetSize(&bitmap1Width, &bitmap1Height)));
 
-	Gdiplus::SolidBrush brush(static_cast<Gdiplus::ARGB>(Gdiplus::Color::White));
+	UINT bitmap2Width;
+	UINT bitmap2Height;
+	CHECK(SUCCEEDED(bitmap2->GetSize(&bitmap2Width, &bitmap2Height)));
 
-	Gdiplus::Graphics graphics(bitmap.get());
-	ASSERT_EQ(bitmap->GetLastStatus(), Gdiplus::Ok);
-
-	auto status = graphics.FillRectangle(&brush, 0, 0, width, height);
-	ASSERT_EQ(status, Gdiplus::Ok);
-}
-
-bool AreGdiplusBitmapsEquivalent(Gdiplus::Bitmap *bitmap1, Gdiplus::Bitmap *bitmap2)
-{
-	if ((bitmap1->GetWidth() != bitmap2->GetWidth())
-		|| (bitmap1->GetHeight() != bitmap2->GetHeight()))
+	if (bitmap1Width != bitmap2Width || bitmap1Height != bitmap2Height)
 	{
 		return false;
 	}
 
-	Gdiplus::Rect rect(0, 0, bitmap1->GetWidth(), bitmap1->GetHeight());
-	ScopedBitmapLock bitmapLock1(bitmap1, &rect, ScopedBitmapLock::LockMode::Read,
-		PixelFormat32bppARGB);
-	ScopedBitmapLock bitmapLock2(bitmap2, &rect, ScopedBitmapLock::LockMode::Read,
-		PixelFormat32bppARGB);
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap1Bgra;
+	CHECK(SUCCEEDED(WICConvertBitmapSource(GUID_WICPixelFormat32bppBGRA, bitmap1, &bitmap1Bgra)));
 
-	auto *bitmapData1 = bitmapLock1.GetBitmapData();
-	auto *bitmapData2 = bitmapLock2.GetBitmapData();
+	wil::com_ptr_nothrow<IWICBitmapSource> bitmap2Bgra;
+	CHECK(SUCCEEDED(WICConvertBitmapSource(GUID_WICPixelFormat32bppBGRA, bitmap2, &bitmap2Bgra)));
 
-	if (!bitmapData1 || !bitmapData2)
-	{
-		return false;
-	}
+	UINT stride = bitmap1Width * 4;
+	UINT byteCount = stride * bitmap1Height;
 
-	auto *scanLine1 = static_cast<std::byte *>(bitmapData1->Scan0);
-	auto *scanLine2 = static_cast<std::byte *>(bitmapData2->Scan0);
+	std::vector<BYTE> bitmap1Pixels(byteCount);
+	CHECK(SUCCEEDED(bitmap1Bgra->CopyPixels(nullptr, stride, byteCount, bitmap1Pixels.data())));
 
-	for (UINT y = 0; y < bitmapData1->Height; y++)
-	{
-		// PixelFormat32bppARGB is used, so there are 4 bytes per pixel.
-		int res = std::memcmp(scanLine1, scanLine2, bitmapData1->Width * 4);
+	std::vector<BYTE> bitmap2Pixels(byteCount);
+	CHECK(SUCCEEDED(bitmap2Bgra->CopyPixels(nullptr, stride, byteCount, bitmap2Pixels.data())));
 
-		if (res != 0)
-		{
-			return false;
-		}
-
-		scanLine1 += bitmapData1->Stride;
-		scanLine2 += bitmapData2->Stride;
-	}
-
-	return true;
+	return bitmap1Pixels == bitmap2Pixels;
 }

@@ -7,12 +7,14 @@
 #include "DataExchangeHelper.h"
 #include "Pidl.h"
 #include "UniqueVariableSizeStruct.h"
+#include <wil/resource.h>
 #include <wil/result.h>
 #include <ShlObj.h>
 #include <shtypes.h>
 #include <optional>
 
 wil::unique_stg_medium GetStgMediumForGlobal(wil::unique_hglobal global);
+wil::unique_stg_medium GetStgMediumForGdiBitmap(wil::unique_hbitmap bitmap);
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect);
 HRESULT GetPreferredDropEffect(IDataObject *dataObject, DWORD &effect);
 HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const std::wstring &message,

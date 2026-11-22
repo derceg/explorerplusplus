@@ -13,7 +13,7 @@
 namespace ImageHelper
 {
 
-HRESULT LoadBitmapFromPNG(HINSTANCE resourceInstance, UINT resourceId,
+HRESULT LoadBitmapFromPNGResource(HINSTANCE resourceInstance, UINT resourceId,
 	wil::com_ptr_nothrow<IWICBitmapSource> &output)
 {
 	auto resourceData = CopyResource(resourceInstance, resourceId, L"PNG");
@@ -28,16 +28,27 @@ HRESULT LoadBitmapFromPNG(HINSTANCE resourceInstance, UINT resourceId,
 			static_cast<UINT>(resourceData->size())));
 	RETURN_IF_NULL_ALLOC(stream);
 
+	RETURN_IF_FAILED(LoadBitmapFromStream(stream.get(), output));
+
+	return S_OK;
+}
+
+HRESULT LoadBitmapFromStream(IStream *stream, wil::com_ptr_nothrow<IWICBitmapSource> &output)
+{
 	auto *imagingFactory = GraphicsFactories::GetWICFactory();
 
 	wil::com_ptr_nothrow<IWICBitmapDecoder> decoder;
-	RETURN_IF_FAILED(imagingFactory->CreateDecoderFromStream(stream.get(), nullptr,
+	RETURN_IF_FAILED(imagingFactory->CreateDecoderFromStream(stream, nullptr,
 		WICDecodeMetadataCacheOnLoad, &decoder));
 
 	wil::com_ptr_nothrow<IWICBitmapFrameDecode> frame;
 	RETURN_IF_FAILED(decoder->GetFrame(0, &frame));
 
-	output = frame;
+	wil::com_ptr_nothrow<IWICBitmap> bitmap;
+	RETURN_IF_FAILED(
+		imagingFactory->CreateBitmapFromSource(frame.get(), WICBitmapCacheOnLoad, &bitmap));
+
+	output = bitmap;
 
 	return S_OK;
 }

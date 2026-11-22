@@ -6,6 +6,8 @@
 #include "Clipboard.h"
 #include "ClipboardStore.h"
 #include "DataExchangeHelper.h"
+#include "GraphicsFactories.h"
+#include "ImageInterop.h"
 
 Clipboard::Clipboard(ClipboardStore *store) : m_store(store)
 {
@@ -25,7 +27,7 @@ Clipboard::~Clipboard()
 
 std::optional<std::wstring> Clipboard::ReadText()
 {
-	auto clipboardData = m_store->GetData(CF_UNICODETEXT);
+	auto clipboardData = m_store->GetGlobalData(CF_UNICODETEXT);
 
 	if (!clipboardData)
 	{
@@ -37,7 +39,7 @@ std::optional<std::wstring> Clipboard::ReadText()
 
 std::optional<std::vector<std::wstring>> Clipboard::ReadHDropData()
 {
-	auto clipboardData = m_store->GetData(CF_HDROP);
+	auto clipboardData = m_store->GetGlobalData(CF_HDROP);
 
 	if (!clipboardData)
 	{
@@ -47,9 +49,9 @@ std::optional<std::vector<std::wstring>> Clipboard::ReadHDropData()
 	return ReadHDropDataFromGlobal(clipboardData.get());
 }
 
-std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
+wil::com_ptr_nothrow<IWICBitmapSource> Clipboard::ReadPng()
 {
-	auto clipboardData = m_store->GetData(GetPngClipboardFormat());
+	auto clipboardData = m_store->GetGlobalData(GetPngClipboardFormat());
 
 	if (!clipboardData)
 	{
@@ -59,21 +61,32 @@ std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
 	return ReadPngDataFromGlobal(clipboardData.get());
 }
 
-std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadDIB()
+wil::com_ptr_nothrow<IWICBitmapSource> Clipboard::ReadGdiBitmap()
 {
-	auto clipboardData = m_store->GetData(CF_DIB);
+	auto gdiBitmap = m_store->GetGdiBitmap();
 
-	if (!clipboardData)
+	if (!gdiBitmap)
 	{
 		return nullptr;
 	}
 
-	return ReadDIBDataFromGlobal(clipboardData.get());
+	auto *imagingFactory = GraphicsFactories::GetWICFactory();
+
+	wil::com_ptr_nothrow<IWICBitmap> bitmap;
+	HRESULT hr = imagingFactory->CreateBitmapFromHBITMAP(gdiBitmap.get(), nullptr,
+		WICBitmapIgnoreAlpha, &bitmap);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return bitmap;
 }
 
 std::optional<std::string> Clipboard::ReadCustomData(UINT format)
 {
-	auto clipboardData = m_store->GetData(format);
+	auto clipboardData = m_store->GetGlobalData(format);
 
 	if (!clipboardData)
 	{
@@ -92,7 +105,7 @@ bool Clipboard::WriteText(const std::wstring &text)
 		return false;
 	}
 
-	return m_store->SetData(CF_UNICODETEXT, std::move(global));
+	return m_store->SetGlobalData(CF_UNICODETEXT, std::move(global));
 }
 
 bool Clipboard::WriteHDropData(const std::vector<std::wstring> &paths)
@@ -104,10 +117,10 @@ bool Clipboard::WriteHDropData(const std::vector<std::wstring> &paths)
 		return false;
 	}
 
-	return m_store->SetData(CF_HDROP, std::move(global));
+	return m_store->SetGlobalData(CF_HDROP, std::move(global));
 }
 
-bool Clipboard::WritePng(Gdiplus::Bitmap *bitmap)
+bool Clipboard::WritePng(IWICBitmapSource *bitmap)
 {
 	auto global = WritePngDataToGlobal(bitmap);
 
@@ -116,19 +129,21 @@ bool Clipboard::WritePng(Gdiplus::Bitmap *bitmap)
 		return false;
 	}
 
-	return m_store->SetData(GetPngClipboardFormat(), std::move(global));
+	return m_store->SetGlobalData(GetPngClipboardFormat(), std::move(global));
 }
 
-bool Clipboard::WriteDIB(Gdiplus::Bitmap *bitmap)
+bool Clipboard::WriteGdiBitmap(IWICBitmapSource *bitmap)
 {
-	auto global = WriteDIBDataToGlobal(bitmap);
+	wil::unique_hbitmap gdiBitmap;
+	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap, ImageInterop::AlphaMode::Straight,
+		gdiBitmap);
 
-	if (!global)
+	if (FAILED(hr))
 	{
 		return false;
 	}
 
-	return m_store->SetData(CF_DIB, std::move(global));
+	return m_store->SetGdiBitmap(std::move(gdiBitmap));
 }
 
 bool Clipboard::WriteCustomData(UINT format, const std::string &data)
@@ -140,7 +155,7 @@ bool Clipboard::WriteCustomData(UINT format, const std::string &data)
 		return false;
 	}
 
-	return m_store->SetData(format, std::move(global));
+	return m_store->SetGlobalData(format, std::move(global));
 }
 
 bool Clipboard::Clear()

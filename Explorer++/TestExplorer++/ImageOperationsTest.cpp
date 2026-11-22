@@ -27,7 +27,7 @@ protected:
 	void VerifyResize(ResizeType resizeType, const ImageSize &originalSize,
 		const ImageSize &targetSize, const ImageSize &expectedSize)
 	{
-		auto bitmap = BuildTestWICBitmap(originalSize.width, originalSize.height);
+		auto bitmap = BuildTestBitmap(originalSize.width, originalSize.height);
 
 		wil::com_ptr_nothrow<IWICBitmapSource> resizedBitmap;
 

@@ -23,7 +23,7 @@ protected:
 
 	std::optional<std::wstring> ReadText() const
 	{
-		auto clipboardData = m_clipboardStore.GetData(CF_UNICODETEXT);
+		auto clipboardData = m_clipboardStore.GetGlobalData(CF_UNICODETEXT);
 
 		if (!clipboardData)
 		{
@@ -38,12 +38,12 @@ protected:
 		auto global = WriteStringToGlobal(text);
 		ASSERT_NE(global, nullptr);
 
-		ASSERT_TRUE(m_clipboardStore.SetData(CF_UNICODETEXT, std::move(global)));
+		ASSERT_TRUE(m_clipboardStore.SetGlobalData(CF_UNICODETEXT, std::move(global)));
 	}
 
 	std::optional<std::string> ReadCustomData() const
 	{
-		auto clipboardData = m_clipboardStore.GetData(CUSTOM_FORMAT);
+		auto clipboardData = m_clipboardStore.GetGlobalData(CUSTOM_FORMAT);
 
 		if (!clipboardData)
 		{
@@ -58,7 +58,7 @@ protected:
 		auto global = WriteDataToGlobal(data.data(), data.size() * sizeof(char));
 		ASSERT_NE(global, nullptr);
 
-		ASSERT_TRUE(m_clipboardStore.SetData(CUSTOM_FORMAT, std::move(global)));
+		ASSERT_TRUE(m_clipboardStore.SetGlobalData(CUSTOM_FORMAT, std::move(global)));
 	}
 
 	SimulatedClipboardStore m_clipboardStore;
@@ -221,7 +221,7 @@ TEST_F(SimulatedClipboardStoreTest, Clear)
 	ASSERT_TRUE(m_clipboardStore.Clear());
 
 	EXPECT_FALSE(m_clipboardStore.IsDataAvailable(CF_UNICODETEXT));
-	EXPECT_EQ(m_clipboardStore.GetData(CF_UNICODETEXT), nullptr);
+	EXPECT_EQ(m_clipboardStore.GetGlobalData(CF_UNICODETEXT), nullptr);
 }
 
 using SimulatedClipboardStoreDeathTest = SimulatedClipboardStoreTest;

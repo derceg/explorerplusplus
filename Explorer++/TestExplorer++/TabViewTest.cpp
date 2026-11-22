@@ -12,12 +12,11 @@
 #include "TestParentView.h"
 #include "ThemeManager.h"
 #include "Win32ResourceLoader.h"
-#include "../Helper/GdiplusHelper.h"
+#include "../Helper/D2DHelper.h"
 #include "../Helper/ImageHelper.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 #include <CommCtrl.h>
-#include <gdiplus.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -261,7 +260,7 @@ protected:
 		m_imageList.reset(ImageList_Create(imageSize, imageSize, ILC_COLOR32 | ILC_MASK, 0, 1));
 		ASSERT_NE(m_imageList, nullptr);
 
-		auto bitmap = BuildTestWICBitmap(imageSize, imageSize);
+		auto bitmap = BuildTestBitmap(imageSize, imageSize);
 		m_imageIndex = ImageHelper::AddBitmapToImageList(m_imageList.get(), bitmap.get());
 
 		m_view.SetImageList(m_imageList.get());
@@ -281,31 +280,36 @@ protected:
 		auto res = GetClientRect(m_view.GetHWND(), &clientRect);
 		ASSERT_TRUE(res);
 
-		std::unique_ptr<Gdiplus::Bitmap> bitmap;
-		BuildTestGdiplusBitmap(clientRect.right, clientRect.bottom, bitmap);
-
 		if (!m_previousBitmap)
 		{
-			m_previousBitmap = GdiplusHelper::DeepCopyBitmap(bitmap.get());
-			ASSERT_NE(m_previousBitmap, nullptr);
+			m_previousBitmap = BuildTestBitmap(clientRect.right, clientRect.bottom);
 		}
 
-		Gdiplus::Graphics graphics(bitmap.get());
+		wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
+		ASSERT_HRESULT_SUCCEEDED(D2DHelper::DrawToBitmap(
+			clientRect.right, clientRect.bottom, D2DHelper::GdiUsage::WillUse,
+			[this, &clientRect](ID2D1RenderTarget *renderTarget)
+			{ return PaintTabView(renderTarget, clientRect); }, bitmap));
 
-		HDC hdc = graphics.GetHDC();
-		m_testApi.Paint(hdc, clientRect);
-		graphics.ReleaseHDC(hdc);
-
-		EXPECT_EQ(AreGdiplusBitmapsEquivalent(bitmap.get(), m_previousBitmap.get()),
+		EXPECT_EQ(AreBitmapsEquivalent(bitmap.get(), m_previousBitmap.get()),
 			changeType == ChangeType::ChangeNotExpected);
 
-		m_previousBitmap = GdiplusHelper::DeepCopyBitmap(bitmap.get());
-		ASSERT_NE(m_previousBitmap, nullptr);
+		m_previousBitmap = bitmap;
+	}
+
+	HRESULT PaintTabView(ID2D1RenderTarget *renderTarget, const RECT &rect)
+	{
+		return D2DHelper::DrawWithGdiInterop(renderTarget, D2D1_DC_INITIALIZE_MODE_CLEAR,
+			[this, &rect](HDC hdc)
+			{
+				m_testApi.Paint(hdc, rect);
+				return S_OK;
+			});
 	}
 
 	wil::unique_himagelist m_imageList;
 	int m_imageIndex;
-	std::unique_ptr<Gdiplus::Bitmap> m_previousBitmap;
+	wil::com_ptr_nothrow<IWICBitmapSource> m_previousBitmap;
 };
 
 // Ultimately, checking that the tab control is being rendered "correctly" is difficult. Performing

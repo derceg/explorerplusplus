@@ -21,7 +21,7 @@ bool SystemClipboardStore::IsDataAvailable(UINT format) const
 	return IsClipboardFormatAvailable(format);
 }
 
-wil::unique_hglobal SystemClipboardStore::GetData(UINT format) const
+wil::unique_hglobal SystemClipboardStore::GetGlobalData(UINT format) const
 {
 	auto data = GetClipboardData(format);
 
@@ -33,7 +33,7 @@ wil::unique_hglobal SystemClipboardStore::GetData(UINT format) const
 	return CloneGlobal(data);
 }
 
-bool SystemClipboardStore::SetData(UINT format, wil::unique_hglobal global)
+bool SystemClipboardStore::SetGlobalData(UINT format, wil::unique_hglobal global)
 {
 	HANDLE clipboardData = SetClipboardData(format, global.get());
 
@@ -45,6 +45,33 @@ bool SystemClipboardStore::SetData(UINT format, wil::unique_hglobal global)
 	// SetClipboardData() takes ownership of the data passed to it. Therefore, it's important that
 	// the ownership of the data is relinquished here if the call to SetClipboardData() succeeded.
 	global.release();
+
+	return true;
+}
+
+wil::unique_hbitmap SystemClipboardStore::GetGdiBitmap() const
+{
+	auto gdiBitmap = GetClipboardData(CF_BITMAP);
+
+	if (!gdiBitmap)
+	{
+		return nullptr;
+	}
+
+	return wil::unique_hbitmap(
+		static_cast<HBITMAP>(CopyImage(gdiBitmap, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION)));
+}
+
+bool SystemClipboardStore::SetGdiBitmap(wil::unique_hbitmap bitmap)
+{
+	HANDLE clipboardData = SetClipboardData(CF_BITMAP, bitmap.get());
+
+	if (!clipboardData)
+	{
+		return false;
+	}
+
+	bitmap.release();
 
 	return true;
 }

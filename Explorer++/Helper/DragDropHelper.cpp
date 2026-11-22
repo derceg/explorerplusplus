@@ -11,9 +11,18 @@
 
 wil::unique_stg_medium GetStgMediumForGlobal(wil::unique_hglobal global)
 {
-	wil::unique_stg_medium storage;
+	wil::unique_stg_medium storage = {};
 	storage.tymed = TYMED_HGLOBAL;
 	storage.hGlobal = global.release();
+	storage.pUnkForRelease = nullptr;
+	return storage;
+}
+
+wil::unique_stg_medium GetStgMediumForGdiBitmap(wil::unique_hbitmap bitmap)
+{
+	wil::unique_stg_medium storage = {};
+	storage.tymed = TYMED_GDI;
+	storage.hBitmap = bitmap.release();
 	storage.pUnkForRelease = nullptr;
 	return storage;
 }

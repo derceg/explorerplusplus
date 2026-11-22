@@ -8,11 +8,11 @@
 #include "../Helper/GraphicsFactories.h"
 #include <gtest/gtest.h>
 
-TEST(ImageHelperTest, LoadBitmapFromPNG)
+TEST(ImageHelperTest, LoadBitmapFromPNGResource)
 {
 	wil::com_ptr_nothrow<IWICBitmapSource> bitmap;
 	ASSERT_HRESULT_SUCCEEDED(
-		ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), IDB_BASIC_PNG, bitmap));
+		ImageHelper::LoadBitmapFromPNGResource(GetModuleHandle(nullptr), IDB_BASIC_PNG, bitmap));
 
 	// This is a basic sanity check that the png has been loaded correctly.
 	UINT width;

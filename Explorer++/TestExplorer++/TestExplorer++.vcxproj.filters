@@ -99,9 +99,6 @@
     <ClCompile Include="TabTest.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="GdiplusHelperTest.cpp">
-      <Filter>Helper\Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="ControlsTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>

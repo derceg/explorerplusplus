@@ -50,8 +50,7 @@ TEST_F(ClipboardTest, ReadWriteHDropData)
 
 TEST_F(ClipboardTest, ReadWritePngData)
 {
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestGdiplusBitmap(100, 100, bitmap);
+	auto bitmap = BuildTestBitmap(80, 60);
 
 	auto res = m_clipboard.WritePng(bitmap.get());
 	ASSERT_TRUE(res);
@@ -59,21 +58,20 @@ TEST_F(ClipboardTest, ReadWritePngData)
 	auto retrievedBitmap = m_clipboard.ReadPng();
 	ASSERT_NE(retrievedBitmap, nullptr);
 
-	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
+	EXPECT_TRUE(AreBitmapsEquivalent(retrievedBitmap.get(), bitmap.get()));
 }
 
-TEST_F(ClipboardTest, ReadWriteDIBData)
+TEST_F(ClipboardTest, ReadWriteGdiBitmapData)
 {
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestGdiplusBitmap(100, 100, bitmap);
+	auto bitmap = BuildTestBitmap(75, 25);
 
-	auto res = m_clipboard.WriteDIB(bitmap.get());
+	auto res = m_clipboard.WriteGdiBitmap(bitmap.get());
 	ASSERT_TRUE(res);
 
-	auto retrievedBitmap = m_clipboard.ReadDIB();
+	auto retrievedBitmap = m_clipboard.ReadGdiBitmap();
 	ASSERT_NE(retrievedBitmap, nullptr);
 
-	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
+	EXPECT_TRUE(AreBitmapsEquivalent(retrievedBitmap.get(), bitmap.get()));
 }
 
 TEST_F(ClipboardTest, ReadWriteCustomData)

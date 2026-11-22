@@ -6,87 +6,27 @@
 #include "../Helper/DataExchangeHelper.h"
 #include "ImageTestHelper.h"
 #include "../Helper/DataObjectImpl.h"
+#include "../Helper/GraphicsFactories.h"
 #include <gtest/gtest.h>
 #include <Shlwapi.h>
 
 using namespace testing;
 
-class ReadImageDataFromGlobalTest : public Test
+TEST(DataExchangeHelperTest, ReadPngDataFromGlobalProducesNewBitmap)
 {
-protected:
-	enum class ImageType
-	{
-		Png,
-		DIB
-	};
+	auto bitmap = BuildTestBitmap(10, 10);
+	auto global = WritePngDataToGlobal(bitmap.get());
+	auto retrievedBitmap = ReadPngDataFromGlobal(global.get());
 
-	void PerformTest(ImageType imageType)
-	{
-		std::unique_ptr<Gdiplus::Bitmap> bitmap;
-		BuildTestGdiplusBitmap(100, 100, bitmap);
+	global.reset();
 
-		wil::unique_hglobal global;
+	auto *imagingFactory = GraphicsFactories::GetWICFactory();
 
-		switch (imageType)
-		{
-		case ImageType::Png:
-			global = WritePngDataToGlobal(bitmap.get());
-			break;
-
-		case ImageType::DIB:
-			global = WriteDIBDataToGlobal(bitmap.get());
-			break;
-
-		default:
-			DCHECK(false);
-			break;
-		}
-
-		ASSERT_NE(global, nullptr);
-
-		std::unique_ptr<Gdiplus::Bitmap> retrievedBitmap;
-
-		switch (imageType)
-		{
-		case ImageType::Png:
-			retrievedBitmap = ReadPngDataFromGlobal(global.get());
-			break;
-
-		case ImageType::DIB:
-			retrievedBitmap = ReadDIBDataFromGlobal(global.get());
-			break;
-
-		default:
-			DCHECK(false);
-			break;
-		}
-
-		ASSERT_NE(retrievedBitmap, nullptr);
-
-		// The Gdiplus::Bitmap constructors tend not to copy data that's passed in, which can create
-		// a silent dependency on any input data. The lines below test that freeing the HGLOBAL,
-		// then cloning the Gdiplus::Bitmap in a different pixel format (which requires accessing
-		// the original data) doesn't result in a UAF.
-		// Note that when a DIB image is being processed, asan doesn't currently detect any errors.
-		// That's seemingly because the msvcrt.dll!memcpy calls that occur within Clone() aren't
-		// being intercepted. That means that even if ReadDIBDataFromGlobal() is returning a bitmap
-		// that relies on the input HGLOBAL, no errors will currently be shown in that case.
-		global.reset();
-
-		Gdiplus::Rect rect(0, 0, retrievedBitmap->GetWidth(), retrievedBitmap->GetHeight());
-		Gdiplus::PixelFormat clonedPixelFormat = PixelFormat24bppRGB;
-		ASSERT_NE(retrievedBitmap->GetPixelFormat(), clonedPixelFormat);
-
-		std::unique_ptr<Gdiplus::Bitmap> clonedBitmap(
-			retrievedBitmap->Clone(rect, clonedPixelFormat));
-		ASSERT_NE(clonedBitmap, nullptr);
-	}
-};
-
-TEST_F(ReadImageDataFromGlobalTest, UseBitmapAfterGlobalFree)
-{
-	PerformTest(ImageType::Png);
-	PerformTest(ImageType::DIB);
+	// The bitmap produced by ReadPngDataFromGlobal() should stay valid, even if the backing global
+	// has been destroyed. Which means this call should succeed without triggering any errors.
+	wil::com_ptr_nothrow<IWICBitmap> retrievedBitmapCopy;
+	ASSERT_HRESULT_SUCCEEDED(imagingFactory->CreateBitmapFromSource(retrievedBitmap.get(),
+		WICBitmapCacheOnLoad, &retrievedBitmapCopy));
 }
 
 TEST(DataExchangeHelperTest, ReadWriteVirtualFiles)

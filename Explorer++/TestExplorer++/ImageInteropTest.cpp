@@ -31,7 +31,7 @@ TEST(ImageInteropTest, CreateWICBitmapFromHICON)
 
 TEST(ImageInteropTest, CreateHICONFromWICBitmap)
 {
-	auto bitmap = BuildTestWICBitmap(80, 60);
+	auto bitmap = BuildTestBitmap(80, 60);
 
 	wil::unique_hicon icon;
 	HRESULT hr = ImageInterop::CreateHICONFromWICBitmap(bitmap.get(), icon);
@@ -51,7 +51,7 @@ TEST(ImageInteropTest, CreateHICONFromWICBitmap)
 
 TEST(ImageInteropTest, CreateHBITMAPFromWICBitmap)
 {
-	auto bitmap = BuildTestWICBitmap(120, 60);
+	auto bitmap = BuildTestBitmap(120, 60);
 
 	wil::unique_hbitmap outputBitmap;
 	HRESULT hr = ImageInterop::CreateHBITMAPFromWICBitmap(bitmap.get(),
