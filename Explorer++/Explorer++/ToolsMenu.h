@@ -32,7 +32,7 @@ private:
 	void RebuildMenu();
 	void BuildMenu();
 
-	void SendCommandToBrowser(WORD id);
+	void ExecuteBrowserCommand(int command);
 
 	BrowserWindow *const m_browser;
 	const FeatureList *const m_featureList;

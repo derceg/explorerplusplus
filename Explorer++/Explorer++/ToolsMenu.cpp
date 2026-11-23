@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ToolsMenu.h"
+#include "BrowserCommandController.h"
 #include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "FeatureList.h"
@@ -45,7 +46,7 @@ void ToolsMenu::BuildMenu()
 				m_resourceLoader))
 			.SetHelpText(m_resourceLoader->LoadString(IDS_TOOLS_SEARCH_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_TOOLS_SEARCH))
-			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_TOOLS_SEARCH); }));
+			.SetSelectedCallback([this] { ExecuteBrowserCommand(IDM_TOOLS_SEARCH); }));
 
 	m_rootMenuView->AppendItem(
 		MenuItemParams(m_resourceLoader->LoadString(IDS_TOOLS_CUSTOMIZECOLORS))
@@ -53,7 +54,7 @@ void ToolsMenu::BuildMenu()
 				IconSize::Small, m_resourceLoader))
 			.SetHelpText(m_resourceLoader->LoadString(IDS_TOOLS_CUSTOMIZECOLORS_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_TOOLS_CUSTOMIZECOLORS))
-			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_TOOLS_CUSTOMIZECOLORS); }));
+			.SetSelectedCallback([this] { ExecuteBrowserCommand(IDM_TOOLS_CUSTOMIZECOLORS); }));
 
 	m_rootMenuView->AppendSeparator();
 
@@ -62,7 +63,7 @@ void ToolsMenu::BuildMenu()
 		m_rootMenuView->AppendItem(MenuItemParams(m_resourceLoader->LoadString(IDS_TOOLS_RUNSCRIPT))
 				.SetHelpText(m_resourceLoader->LoadString(IDS_TOOLS_RUNSCRIPT_HELP_TEXT))
 				.SetAcceleratorText(GetAcceleratorTextForId(IDM_TOOLS_RUNSCRIPT))
-				.SetSelectedCallback([this] { SendCommandToBrowser(IDM_TOOLS_RUNSCRIPT); }));
+				.SetSelectedCallback([this] { ExecuteBrowserCommand(IDM_TOOLS_RUNSCRIPT); }));
 
 		m_pluginsMenu = std::make_unique<Plugins::PluginItemsMenu>(m_rootMenuView,
 			m_acceleratorManager, m_pluginMenuItemsRegistry);
@@ -73,10 +74,10 @@ void ToolsMenu::BuildMenu()
 				m_resourceLoader))
 			.SetHelpText(m_resourceLoader->LoadString(IDS_TOOLS_OPTIONS_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_TOOLS_OPTIONS))
-			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_TOOLS_OPTIONS); }));
+			.SetSelectedCallback([this] { ExecuteBrowserCommand(IDM_TOOLS_OPTIONS); }));
 }
 
-void ToolsMenu::SendCommandToBrowser(WORD id)
+void ToolsMenu::ExecuteBrowserCommand(int command)
 {
-	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	m_browser->GetCommandController()->ExecuteCommand(command);
 }
