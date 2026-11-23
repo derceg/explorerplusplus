@@ -63,6 +63,7 @@ public:
 	void SplitFile() override;
 	bool CanMergeFiles() const override;
 	void MergeFiles() override;
+	void ShowLinkTarget() override;
 	void SelectAllItems() override;
 	void InvertSelection() override;
 	bool CanStartWildcardSelection(SelectionType selectionType) const override;

@@ -252,6 +252,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->StartWildcardSelection(SelectionType::Deselect);
 		break;
 
+	case IDM_EDIT_RESOLVELINK:
+		GetActiveShellBrowser()->ShowLinkTarget();
+		break;
+
 	case IDM_VIEW_STATUSBAR:
 		m_config->showStatusBar = !m_config->showStatusBar.get();
 		break;

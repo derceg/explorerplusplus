@@ -151,7 +151,6 @@ private:
 	/* Main menu handlers. */
 	void OnNewTab();
 	void OnCloneWindow();
-	void OnResolveLink();
 	void OnSelectColumns();
 	void OnDestroyFiles();
 

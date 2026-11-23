@@ -101,7 +101,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 void Explorerplusplus::OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem,
 	OpenFolderDisposition openFolderDisposition)
 {
-	unique_pidl_absolute target;
+	PidlAbsolute target;
 	HRESULT hr = MaybeResolveLinkTarget(m_hwnd, pidlItem, target);
 
 	if (FAILED(hr))
@@ -114,7 +114,7 @@ void Explorerplusplus::OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem,
 	bool openAsFolder = false;
 
 	SFGAOF targetAttributes = SFGAO_FOLDER | SFGAO_STREAM;
-	hr = GetItemAttributes(target.get(), &targetAttributes);
+	hr = GetItemAttributes(target.Raw(), &targetAttributes);
 
 	if (SUCCEEDED(hr))
 	{
@@ -131,7 +131,7 @@ void Explorerplusplus::OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem,
 		// This is a shortcut to a folder item or container file. In either case, it should be
 		// opened here, rather than being opened via the shell (since opening the shortcut via the
 		// shell will result in the item being opened in the default file manager).
-		OpenFolderItem(target.get(), openFolderDisposition);
+		OpenFolderItem(target.Raw(), openFolderDisposition);
 	}
 	else
 	{
@@ -585,56 +585,6 @@ void Explorerplusplus::OnDestroyFiles()
 	auto *destroyFilesDialog = DestroyFilesDialog::Create(m_resourceLoader, m_hwnd,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog->ShowModalDialog();
-}
-
-void Explorerplusplus::OnResolveLink()
-{
-	TCHAR szFullFileName[MAX_PATH];
-	TCHAR szPath[MAX_PATH];
-	HRESULT hr;
-	int iItem;
-
-	iItem = ListView_GetNextItem(m_hActiveListView, -1, LVNI_FOCUSED);
-
-	if (iItem != -1)
-	{
-		std::wstring shortcutFileName = m_pActiveShellBrowser->GetItemFullName(iItem);
-
-		hr = FileOperations::ResolveLink(m_hwnd, 0, shortcutFileName.c_str(), szFullFileName,
-			std::size(szFullFileName));
-
-		if (hr == S_OK)
-		{
-			/* Strip the filename, just leaving the path component. */
-			StringCchCopy(szPath, std::size(szPath), szFullFileName);
-			PathRemoveFileSpec(szPath);
-
-			Tab &newTab = GetActivePane()->GetTabBar()->CreateNewTab(szPath, { .selected = true });
-
-			if (newTab.GetShellBrowser()->GetDirectoryPath() == szPath)
-			{
-				wil::com_ptr_nothrow<IShellFolder> parent;
-				hr = SHBindToObject(nullptr, newTab.GetShellBrowser()->GetDirectory().Raw(),
-					nullptr, IID_PPV_ARGS(&parent));
-
-				if (hr == S_OK)
-				{
-					auto *filename = PathFindFileName(szFullFileName);
-					assert(filename != szFullFileName);
-
-					PidlAbsolute pidl;
-					hr = CreateSimplePidl(filename, pidl, parent.get());
-
-					if (SUCCEEDED(hr))
-					{
-						m_pActiveShellBrowser->SelectItems({ pidl.Raw() });
-					}
-				}
-			}
-
-			SetFocus(m_hActiveListView);
-		}
-	}
 }
 
 void Explorerplusplus::OnSelectColumns()

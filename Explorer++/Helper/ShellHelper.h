@@ -135,8 +135,8 @@ std::size_t hash_value(const IID &iid);
 // will be treated as folders, which will allow navigations to those locations.
 HRESULT ParseDisplayNameForNavigation(const std::wstring &itemPath, unique_pidl_absolute &pidlItem);
 
-HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl);
-HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl);
+HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, PidlAbsolute &targetPidl);
+HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, PidlAbsolute &targetPidl);
 
 // When the SHGFI_OVERLAYINDEX flag is used with SHGetFileInfo(), the overlay index will be returned
 // in the upper 8 bits of the SHFILEINFO::iIcon member. This function will split the iIcon value

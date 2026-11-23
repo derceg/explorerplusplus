@@ -42,7 +42,7 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 bool ShouldNormalizePath(const std::wstring &path);
 
 HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrievalType retrievalType,
-	unique_pidl_absolute &targetPidl);
+	PidlAbsolute &targetPidl);
 
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output)
 {
@@ -1172,12 +1172,12 @@ HRESULT ParseDisplayNameForNavigation(const std::wstring &itemPath, unique_pidl_
 		nullptr);
 }
 
-HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl)
+HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, PidlAbsolute &targetPidl)
 {
 	return MaybeGetLinkTarget(nullptr, pidl, LinkTargetRetrievalType::DontResolve, targetPidl);
 }
 
-HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl)
+HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, PidlAbsolute &targetPidl)
 {
 	return MaybeGetLinkTarget(hwnd, pidl, LinkTargetRetrievalType::Resolve, targetPidl);
 }
@@ -1188,7 +1188,7 @@ HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_ab
 // Depending on the LinkTargetRetrievalType, the target will be resolved by the shell, which may
 // result in a dialog being shown to the user (if the target doesn't currently exist).
 HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrievalType retrievalType,
-	unique_pidl_absolute &targetPidl)
+	PidlAbsolute &targetPidl)
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
 	RETURN_IF_FAILED(SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem)));
@@ -1222,7 +1222,7 @@ HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrieva
 		}
 	}
 
-	RETURN_IF_FAILED(shellLink->GetIDList(wil::out_param(targetPidl)));
+	RETURN_IF_FAILED(shellLink->GetIDList(PidlOutParam(targetPidl)));
 
 	return S_OK;
 }

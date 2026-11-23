@@ -31,6 +31,7 @@
 #include "ShellNavigationController.h"
 #include "SortModes.h"
 #include "SplitFileDialog.h"
+#include "TabBar.h"
 #include "ViewModeHelper.h"
 #include "ViewModes.h"
 #include "WildcardSelectDialog.h"
@@ -1438,6 +1439,37 @@ std::optional<std::vector<std::wstring>> ShellBrowserImpl::GetFilePathsForMerge(
 	}
 
 	return items;
+}
+
+void ShellBrowserImpl::ShowLinkTarget()
+{
+	int index = ListView_GetNextItem(m_listView, -1, LVNI_FOCUSED | LVNI_SELECTED);
+
+	if (index == -1)
+	{
+		return;
+	}
+
+	const auto &item = GetItemByIndex(index);
+
+	PidlAbsolute target;
+	HRESULT hr = MaybeResolveLinkTarget(m_listView, item.pidlComplete.Raw(), target);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	PidlAbsolute targetParent = target;
+
+	if (!targetParent.RemoveLastItem())
+	{
+		return;
+	}
+
+	auto navigateParams = NavigateParams::Normal(targetParent.Raw());
+	navigateParams.itemsToSelect = { target };
+	m_browser->GetActiveTabBar()->CreateNewTab(navigateParams, { .selected = true });
 }
 
 void ShellBrowserImpl::CopySelectedItemsToFolder(TransferAction action)

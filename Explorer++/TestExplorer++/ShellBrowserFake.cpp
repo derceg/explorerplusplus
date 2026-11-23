@@ -224,6 +224,10 @@ void ShellBrowserFake::MergeFiles()
 {
 }
 
+void ShellBrowserFake::ShowLinkTarget()
+{
+}
+
 void ShellBrowserFake::SelectAllItems()
 {
 }

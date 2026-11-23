@@ -80,6 +80,7 @@ public:
 	virtual void SplitFile() = 0;
 	virtual bool CanMergeFiles() const = 0;
 	virtual void MergeFiles() = 0;
+	virtual void ShowLinkTarget() = 0;
 
 	virtual void SelectAllItems() = 0;
 	virtual void InvertSelection() = 0;

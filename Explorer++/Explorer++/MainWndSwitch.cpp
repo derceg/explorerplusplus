@@ -154,11 +154,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 
 	case IDM_EDIT_WILDCARDSELECTION:
 	case IDM_EDIT_WILDCARDDESELECT:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_EDIT_RESOLVELINK:
-		OnResolveLink();
+		m_commandController.ExecuteCommand(id);
 		break;
 
 	case IDM_VIEW_DUAL_PANE:
