@@ -256,6 +256,10 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 		GetActiveShellBrowser()->ShowLinkTarget();
 		break;
 
+	case IDM_VIEW_DUAL_PANE:
+		m_config->dualPane = !m_config->dualPane;
+		break;
+
 	case IDM_VIEW_STATUSBAR:
 		m_config->showStatusBar = !m_config->showStatusBar.get();
 		break;
