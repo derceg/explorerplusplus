@@ -26,7 +26,7 @@ private:
 	void RebuildMenu();
 	void BuildMenu();
 
-	void SendCommandToBrowser(WORD id);
+	void ExecuteBrowserCommand(int command);
 
 	BookmarkTree *const m_bookmarkTree;
 	BrowserWindow *const m_browser;

@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarksMenu.h"
+#include "BrowserCommandController.h"
 #include "BrowserView.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
@@ -65,14 +66,14 @@ void BookmarksMainMenu::BuildMenu()
 			.SetHelpText(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_THIS_TAB_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_THIS_TAB))
 			.SetSelectedCallback(
-				[this] { SendCommandToBrowser(IDM_BOOKMARKS_BOOKMARK_THIS_TAB); }));
+				[this] { ExecuteBrowserCommand(IDM_BOOKMARKS_BOOKMARK_THIS_TAB); }));
 
 	m_rootMenuView->AppendItem(
 		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS))
 			.SetHelpText(m_resourceLoader->LoadString(IDS_BOOKMARKS_BOOKMARK_ALL_TABS_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS))
 			.SetSelectedCallback(
-				[this] { SendCommandToBrowser(IDM_BOOKMARKS_BOOKMARK_ALL_TABS); }));
+				[this] { ExecuteBrowserCommand(IDM_BOOKMARKS_BOOKMARK_ALL_TABS); }));
 
 	m_rootMenuView->AppendItem(
 		MenuItemParams(m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS))
@@ -80,7 +81,8 @@ void BookmarksMainMenu::BuildMenu()
 				m_resourceLoader))
 			.SetHelpText(m_resourceLoader->LoadString(IDS_BOOKMARKS_MANAGE_BOOKMARKS_HELP_TEXT))
 			.SetAcceleratorText(GetAcceleratorTextForId(IDM_BOOKMARKS_MANAGE_BOOKMARKS))
-			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_BOOKMARKS_MANAGE_BOOKMARKS); }));
+			.SetSelectedCallback(
+				[this] { ExecuteBrowserCommand(IDM_BOOKMARKS_MANAGE_BOOKMARKS); }));
 
 	auto *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
@@ -109,7 +111,7 @@ void BookmarksMainMenu::BuildMenu()
 	}
 }
 
-void BookmarksMainMenu::SendCommandToBrowser(WORD id)
+void BookmarksMainMenu::ExecuteBrowserCommand(int command)
 {
-	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	m_browser->GetCommandController()->ExecuteCommand(command);
 }
