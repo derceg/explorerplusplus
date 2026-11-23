@@ -69,13 +69,13 @@ void ShellBackgroundContextMenu::BuildMenu(IUnknown *site, Flags flags,
 		MenuItemParams(resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE))
 			.SetHelpText(resourceLoader->LoadString(IDS_EDIT_PASTE_HELP_TEXT))
 			.SetEnabledCallback([this] { return CanPaste(PasteType::Normal); })
-			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_EDIT_PASTE); }));
+			.SetSelectedCallback([this] { ExecuteBrowserCommand(IDM_EDIT_PASTE); }));
 
 	m_rootMenuView->AppendItem(
 		MenuItemParams(resourceLoader->LoadString(IDS_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT))
 			.SetHelpText(resourceLoader->LoadString(IDS_EDIT_PASTESHORTCUT_HELP_TEXT))
 			.SetEnabledCallback([this] { return CanPaste(PasteType::Shortcut); })
-			.SetSelectedCallback([this] { SendCommandToBrowser(IDM_EDIT_PASTESHORTCUT); }));
+			.SetSelectedCallback([this] { ExecuteBrowserCommand(IDM_EDIT_PASTESHORTCUT); }));
 
 	m_rootMenuView->AppendSeparator();
 
@@ -149,7 +149,7 @@ void ShellBackgroundContextMenu::OnCustomizeDirectory()
 		L"customize", L"");
 }
 
-void ShellBackgroundContextMenu::SendCommandToBrowser(WORD id)
+void ShellBackgroundContextMenu::ExecuteBrowserCommand(int command)
 {
-	SendMessage(m_browser->GetView()->GetHWND(), WM_COMMAND, MAKEWPARAM(id, 0), 0);
+	m_browser->GetCommandController()->ExecuteCommand(command);
 }

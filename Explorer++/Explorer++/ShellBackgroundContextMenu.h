@@ -36,7 +36,7 @@ private:
 	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu() const override;
 
 	void OnCustomizeDirectory();
-	void SendCommandToBrowser(WORD id);
+	void ExecuteBrowserCommand(int command);
 
 	BrowserWindow *const m_browser;
 	ClipboardStore *const m_clipboardStore;
