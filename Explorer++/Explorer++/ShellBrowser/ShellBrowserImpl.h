@@ -155,8 +155,6 @@ public:
 	uint64_t GetSelectionSize();
 	bool InVirtualFolder() const;
 	HRESULT CopyItemsToClipboard(const std::vector<PidlAbsolute> &items, ClipboardAction action);
-	void PasteHardLinks();
-	void PasteSymLinks();
 	void StartRenamingItems(const std::vector<PidlAbsolute> &items);
 
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
@@ -602,6 +600,8 @@ private:
 	void RestoreStateOfCutItems();
 	void Paste();
 	void PasteShortcut();
+	void PasteHardLinks();
+	void PasteSymLinks();
 	void SelectPastedItems(const ClipboardOperations::PastedItems &pastedItems);
 
 	// ShellDropTargetDelegate

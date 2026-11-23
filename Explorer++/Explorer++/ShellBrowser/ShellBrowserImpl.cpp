@@ -1129,13 +1129,15 @@ void ShellBrowserImpl::PasteShortcut()
 
 void ShellBrowserImpl::PasteHardLinks()
 {
-	auto pastedItems = ClipboardOperations::PasteHardLinks(m_clipboardStore, GetDirectoryPath());
+	auto pastedItems =
+		ClipboardOperations::PasteHardLinks(m_clipboardStore, m_directoryState.pidlDirectory.Raw());
 	SelectPastedItems(pastedItems);
 }
 
 void ShellBrowserImpl::PasteSymLinks()
 {
-	auto pastedItems = ClipboardOperations::PasteSymLinks(m_clipboardStore, GetDirectoryPath());
+	auto pastedItems =
+		ClipboardOperations::PasteSymLinks(m_clipboardStore, m_directoryState.pidlDirectory.Raw());
 	SelectPastedItems(pastedItems);
 }
 
@@ -1208,6 +1210,11 @@ bool ShellBrowserImpl::IsCommandEnabled(int command) const
 	case IDM_EDIT_PASTESHORTCUT:
 		return CanPasteInDirectory(m_clipboardStore, m_directoryState.pidlDirectory.Raw(),
 			PasteType::Shortcut);
+
+	case IDM_EDIT_PASTEHARDLINK:
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
+		return ClipboardOperations::CanPasteLinkInDirectory(m_clipboardStore,
+			m_directoryState.pidlDirectory.Raw());
 	}
 
 	return false;
@@ -1259,6 +1266,14 @@ void ShellBrowserImpl::ExecuteCommand(int command)
 
 	case IDM_EDIT_PASTESHORTCUT:
 		PasteShortcut();
+		break;
+
+	case IDM_EDIT_PASTEHARDLINK:
+		PasteHardLinks();
+		break;
+
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
+		PasteSymLinks();
 		break;
 
 	case IDM_EDIT_MOVETOFOLDER:

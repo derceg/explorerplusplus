@@ -513,6 +513,8 @@ bool BrowserCommandController::IsCommandContextSensitive(int command) const
 	case IDM_EDIT_COPY:
 	case IDM_EDIT_PASTE:
 	case IDM_EDIT_PASTESHORTCUT:
+	case IDM_EDIT_PASTEHARDLINK:
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
 	case IDM_EDIT_MOVETOFOLDER:
 	case IDM_EDIT_COPYTOFOLDER:
 		return true;

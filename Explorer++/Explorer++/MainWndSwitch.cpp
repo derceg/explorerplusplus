@@ -137,17 +137,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(UINT id, UINT n
 	case IDM_EDIT_COPY:
 	case IDM_EDIT_PASTE:
 	case IDM_EDIT_PASTESHORTCUT:
-		m_commandController.ExecuteCommand(id);
-		break;
-
 	case IDM_EDIT_PASTEHARDLINK:
-		GetActiveShellBrowserImpl()->PasteHardLinks();
-		break;
-
 	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
-		GetActiveShellBrowserImpl()->PasteSymLinks();
-		break;
-
 	case IDM_EDIT_MOVETOFOLDER:
 	case IDM_EDIT_COPYTOFOLDER:
 	case IDM_EDIT_SELECTALL:

@@ -46,7 +46,7 @@ std::optional<ExitCode> Process(const CommandLine::Settings *commandLineSettings
 
 	if (commandLineSettings->pasteSymLinksDestination)
 	{
-		auto pastedItems = ClipboardOperations::PasteSymLinks(clipboardStore,
+		auto pastedItems = ClipboardOperations::PasteSymLinksToPath(clipboardStore,
 			*commandLineSettings->pasteSymLinksDestination);
 
 		PasteSymLinksClient client;

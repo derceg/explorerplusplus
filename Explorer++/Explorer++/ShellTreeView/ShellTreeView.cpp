@@ -20,6 +20,7 @@
 #include "BrowserPane.h"
 #include "BrowserView.h"
 #include "BrowserWindow.h"
+#include "ClipboardOperations.h"
 #include "Config.h"
 #include "DialogHelper.h"
 #include "DirectoryOperationsHelper.h"
@@ -1393,6 +1394,11 @@ bool ShellTreeView::IsCommandEnabled(int command) const
 	case IDM_EDIT_PASTESHORTCUT:
 		return CanPasteInDirectory(m_clipboardStore, GetSelectedNodePidl().get(),
 			PasteType::Shortcut);
+
+	case IDM_EDIT_PASTEHARDLINK:
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
+		return ClipboardOperations::CanPasteLinkInDirectory(m_clipboardStore,
+			GetSelectedNodePidl().get());
 	}
 
 	return false;
@@ -1444,6 +1450,14 @@ void ShellTreeView::ExecuteCommand(int command)
 
 	case IDM_EDIT_PASTESHORTCUT:
 		PasteShortcut();
+		break;
+
+	case IDM_EDIT_PASTEHARDLINK:
+		PasteHardLinks();
+		break;
+
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
+		PasteSymLinks();
 		break;
 
 	case IDM_EDIT_MOVETOFOLDER:
@@ -1579,6 +1593,16 @@ void ShellTreeView::PasteShortcut()
 	auto *selectedNode = GetNodeFromTreeViewItem(TreeView_GetSelection(m_hTreeView));
 	ExecuteActionFromContextMenu(selectedNode->GetFullPidl().get(), {}, m_hTreeView, L"pastelink",
 		0, nullptr);
+}
+
+void ShellTreeView::PasteHardLinks()
+{
+	ClipboardOperations::PasteHardLinks(m_clipboardStore, GetSelectedNodePidl().get());
+}
+
+void ShellTreeView::PasteSymLinks()
+{
+	ClipboardOperations::PasteSymLinks(m_clipboardStore, GetSelectedNodePidl().get());
 }
 
 void ShellTreeView::OnClipboardUpdate()

@@ -691,6 +691,8 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 	case IDM_EDIT_COPY:
 	case IDM_EDIT_PASTE:
 	case IDM_EDIT_PASTESHORTCUT:
+	case IDM_EDIT_PASTEHARDLINK:
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
 	case IDM_EDIT_COPYTOFOLDER:
 	case IDM_EDIT_MOVETOFOLDER:
 	case IDM_EDIT_SELECTNONE:
@@ -718,15 +720,6 @@ MenuItemEnabledCallback MainMenu::MaybeGetEnabledCallback(WORD id) const
 
 			return shellBrowser->GetNumSelected() > 0
 				&& (shellBrowser->GetViewMode() == ViewMode::Details);
-		};
-
-	case IDM_EDIT_PASTEHARDLINK:
-	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
-		return [this]
-		{
-			const auto *shellBrowser = m_browser->GetActiveShellBrowser();
-			return ClipboardOperations::CanPasteLinkInDirectory(m_clipboardStore,
-				shellBrowser->GetDirectory().Raw());
 		};
 
 	case IDM_EDIT_RESOLVELINK:

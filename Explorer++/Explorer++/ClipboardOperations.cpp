@@ -64,28 +64,27 @@ ClipboardOperations::PastedItems PasteLinksOfType(ClipboardStore *clipboardStore
 
 	for (const auto &path : *paths)
 	{
-		std::filesystem::path sourceFilePath(path);
+		std::filesystem::path sourcePath(path);
 
-		std::filesystem::path destinationFilePath(destination);
-		destinationFilePath /= sourceFilePath.filename();
+		auto linkPath = destination / sourcePath.filename();
 
 		std::error_code error;
 
 		switch (linkType)
 		{
 		case LinkType::HardLink:
-			std::filesystem::create_hard_link(sourceFilePath, destinationFilePath, error);
+			std::filesystem::create_hard_link(sourcePath, linkPath, error);
 			break;
 
 		case LinkType::SymLink:
-			CreateSymLink(sourceFilePath, destinationFilePath, error);
+			CreateSymLink(sourcePath, linkPath, error);
 			break;
 
 		default:
 			CHECK(false);
 		}
 
-		pastedItems.emplace_back(destinationFilePath, error);
+		pastedItems.emplace_back(linkPath, error);
 	}
 
 	return pastedItems;
@@ -204,14 +203,30 @@ concurrencpp::null_result PasteCustomData(ClipboardStore *clipboardStore, PidlAb
 		DROPEFFECT_COPY);
 }
 
-PastedItems PasteHardLinks(ClipboardStore *clipboardStore, const std::wstring &destination)
+PastedItems PasteHardLinks(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE destination)
 {
-	return PasteLinksOfType(clipboardStore, destination, LinkType::HardLink);
+	wil::unique_cotaskmem_string destinationPath;
+	HRESULT hr = SHGetNameFromIDList(destination, SIGDN_FILESYSPATH, &destinationPath);
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	return PasteLinksOfType(clipboardStore, destinationPath.get(), LinkType::HardLink);
 }
 
-PastedItems PasteSymLinks(ClipboardStore *clipboardStore, const std::wstring &destination)
+PastedItems PasteSymLinks(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE destination)
 {
-	auto pastedItems = PasteLinksOfType(clipboardStore, destination, LinkType::SymLink);
+	wil::unique_cotaskmem_string destinationPath;
+	HRESULT hr = SHGetNameFromIDList(destination, SIGDN_FILESYSPATH, &destinationPath);
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	auto pastedItems = PasteLinksOfType(clipboardStore, destinationPath.get(), LinkType::SymLink);
 
 	auto itr = std::find_if(pastedItems.begin(), pastedItems.end(),
 		[](const auto &pastedItem)
@@ -233,7 +248,12 @@ PastedItems PasteSymLinks(ClipboardStore *clipboardStore, const std::wstring &de
 	// If at least one symlink operation failed due to insufficient privileges, it's assumed they
 	// all failed for that reason. In which case, the operation needs to be retried in an elevated
 	// process.
-	return PasteSymLinksViaElevatedProcess(destination);
+	return PasteSymLinksViaElevatedProcess(destinationPath.get());
+}
+
+PastedItems PasteSymLinksToPath(ClipboardStore *clipboardStore, const std::wstring &destination)
+{
+	return PasteLinksOfType(clipboardStore, destination, LinkType::SymLink);
 }
 
 }

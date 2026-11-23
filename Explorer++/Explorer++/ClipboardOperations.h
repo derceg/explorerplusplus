@@ -72,7 +72,12 @@ concurrencpp::null_result PasteCustomData(ClipboardStore *clipboardStore, PidlAb
 // 2. A paste that is really just a file operation that's performed internally.
 //
 // These functions allow for the second type of paste operation to be performed.
-PastedItems PasteHardLinks(ClipboardStore *clipboardStore, const std::wstring &destination);
-PastedItems PasteSymLinks(ClipboardStore *clipboardStore, const std::wstring &destination);
+PastedItems PasteHardLinks(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE destination);
+PastedItems PasteSymLinks(ClipboardStore *clipboardStore, PCIDLIST_ABSOLUTE destination);
+
+// This is intended to be used by an elevated process (to attempt symlink creation based on the
+// parsed command line arguments). Symlink creation will only be attempted once (rather than
+// launching an elevated process when creation fails due to missing privileges).
+PastedItems PasteSymLinksToPath(ClipboardStore *clipboardStore, const std::wstring &destination);
 
 }

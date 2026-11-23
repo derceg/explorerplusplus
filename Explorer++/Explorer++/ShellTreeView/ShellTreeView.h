@@ -146,6 +146,8 @@ private:
 	void OnClipboardUpdate();
 	void Paste();
 	void PasteShortcut();
+	void PasteHardLinks();
+	void PasteSymLinks();
 
 	void CopySelectedItemPath(PathType pathType) const;
 	void SetFileAttributesForSelectedItem();
