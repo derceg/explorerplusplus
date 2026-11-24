@@ -390,7 +390,7 @@ HRESULT GetBinaryDataFromIStream(IStream *stream, std::string &output)
 	STATSTG stat;
 	RETURN_IF_FAILED(stream->Stat(&stat, STATFLAG_NONAME));
 
-	LARGE_INTEGER offset = { 0 };
+	LARGE_INTEGER offset = {};
 	RETURN_IF_FAILED(stream->Seek(offset, STREAM_SEEK_SET, nullptr));
 
 	if (stat.cbSize.QuadPart > std::numeric_limits<ULONG>::max())
