@@ -88,7 +88,9 @@ void SessionRestorer::AddStartupModeTabs(WindowStorageData &targetWindow) const
 	case StartupMode::CustomFolders:
 		for (const auto &startupFolder : m_config->startupFolders)
 		{
-			targetWindow.tabs.push_back({ .directory = startupFolder });
+			targetWindow.tabs.push_back({ .directory = startupFolder,
+				.folderSettings = m_config->defaultFolderSettings,
+				.columns = m_config->globalFolderSettings.folderColumns });
 		}
 		break;
 
@@ -132,7 +134,9 @@ void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 			continue;
 		}
 
-		commandLineTabs.push_back({ .directory = *absolutePath });
+		commandLineTabs.push_back({ .directory = *absolutePath,
+			.folderSettings = m_config->defaultFolderSettings,
+			.columns = m_config->globalFolderSettings.folderColumns });
 	}
 
 	for (const auto &fileToSelect : m_commandLineSettings->filesToSelect)
@@ -155,7 +159,10 @@ void SessionRestorer::AddCommandLineTabs(WindowStorageData &targetWindow) const
 		auto parentPidl = parseResult.value();
 		parentPidl.RemoveLastItem();
 
-		commandLineTabs.push_back({ .pidl = parentPidl, .itemsToSelect = { parseResult.value() } });
+		commandLineTabs.push_back({ .pidl = parentPidl,
+			.folderSettings = m_config->defaultFolderSettings,
+			.columns = m_config->globalFolderSettings.folderColumns,
+			.itemsToSelect = { parseResult.value() } });
 	}
 
 	if (commandLineTabs.empty())
