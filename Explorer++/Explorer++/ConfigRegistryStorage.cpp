@@ -104,6 +104,8 @@ void LoadFromKey(HKEY settingsKey, Config &config)
 		config.showTaskbarThumbnails);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"SynchronizeTreeview",
 		config.synchronizeTreeview);
+	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"ScaleFolderTreeRowSpacingWithFont",
+		config.scaleFolderTreeRowSpacingWithFont);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"TVAutoExpandSelected",
 		config.treeViewAutoExpandSelected);
 	RegistrySettings::Read32BitValueFromRegistry(settingsKey, L"OverwriteExistingFilesConfirmation",
@@ -328,6 +330,8 @@ void SaveToKey(HKEY settingsKey, const Config &config)
 		config.showTaskbarThumbnails.get());
 	RegistrySettings::SaveDword(settingsKey, L"SynchronizeTreeview",
 		config.synchronizeTreeview.get());
+	RegistrySettings::SaveDword(settingsKey, L"ScaleFolderTreeRowSpacingWithFont",
+		config.scaleFolderTreeRowSpacingWithFont.get());
 	RegistrySettings::SaveDword(settingsKey, L"TVAutoExpandSelected",
 		config.treeViewAutoExpandSelected);
 

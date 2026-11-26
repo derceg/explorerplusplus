@@ -6,6 +6,8 @@
 #include "WindowOptionsPage.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "ResourceLoader.h"
+#include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
 
 WindowOptionsPage::WindowOptionsPage(HWND parent, const ResourceLoader *resourceLoader,
@@ -48,6 +50,8 @@ std::unique_ptr<ResizableDialogHelper> WindowOptionsPage::InitializeResizeDialog
 		SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTION_SYNCTREEVIEW), MovingType::None,
 		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTION_SCALEFOLDERTREEROWSPACING),
+		MovingType::None, SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTION_TREEVIEWSELECTIONEXPAND),
 		MovingType::None, SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTION_TREEVIEWDELAY), MovingType::None,
@@ -111,6 +115,16 @@ void WindowOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_OPTION_SYNCTREEVIEW, BST_CHECKED);
 	}
 
+	if (m_config->scaleFolderTreeRowSpacingWithFont.get())
+	{
+		CheckDlgButton(GetDialog(), IDC_OPTION_SCALEFOLDERTREEROWSPACING, BST_CHECKED);
+	}
+
+	AddTooltipForControl(m_tooltipWindow,
+		GetDlgItem(GetDialog(), IDC_OPTION_SCALEFOLDERTREEROWSPACING),
+		m_resourceLoader->LoadString(IDS_OPTIONS_SCALE_TREE_ROW_SPACING_TOOLTIP),
+		TooltipType::Control);
+
 	if (m_config->treeViewAutoExpandSelected)
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_TREEVIEWSELECTIONEXPAND, BST_CHECKED);
@@ -152,6 +166,7 @@ void WindowOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 	case IDC_OPTION_USERNAMEINTITLEBAR:
 	case IDC_OPTION_PRIVILEGELEVELINTITLEBAR:
 	case IDC_OPTION_SYNCTREEVIEW:
+	case IDC_OPTION_SCALEFOLDERTREEROWSPACING:
 	case IDC_OPTION_TREEVIEWSELECTIONEXPAND:
 	case IDC_OPTION_TREEVIEWDELAY:
 	case IDC_OPTION_EXTENDTABCONTROL:
@@ -191,6 +206,9 @@ void WindowOptionsPage::SaveSettings()
 
 	m_config->synchronizeTreeview =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_SYNCTREEVIEW) == BST_CHECKED);
+
+	m_config->scaleFolderTreeRowSpacingWithFont =
+		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_SCALEFOLDERTREEROWSPACING) == BST_CHECKED);
 
 	m_config->treeViewAutoExpandSelected =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_TREEVIEWSELECTIONEXPAND) == BST_CHECKED);

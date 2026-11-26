@@ -42,6 +42,7 @@
 #include "../Helper/ClipboardStore.h"
 #include "../Helper/ClipboardWatcher.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
@@ -109,6 +110,15 @@ ShellTreeView::ShellTreeView(HWND parent, BrowserWindow *browser, AppServices *a
 	m_connections.push_back(
 		m_config->showFolders.addObserver(std::bind(&ShellTreeView::UpdateSelection, this)));
 
+	m_connections.push_back(m_config->scaleFolderTreeRowSpacingWithFont.addObserver(
+		std::bind(&ShellTreeView::UpdateRowHeight, this)));
+
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ShellTreeView::UpdateRowHeight, this));
+
+	// The font set above may have been applied before this point was reached, so the row height
+	// is set explicitly here as well.
+	UpdateRowHeight();
+
 	m_connections.push_back(appServices->GetNavigationEvents()->AddCommittedObserver(
 		std::bind(&ShellTreeView::UpdateSelection, this),
 		NavigationEventScope::ForActiveShellBrowser(*m_browser)));
@@ -164,6 +174,12 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 {
 	switch (msg)
 	{
+	case WM_DPICHANGED_AFTERPARENT:
+		// The font may not have been updated in response to the DPI change (e.g. when the default
+		// font is in use), so the row height is re-applied here.
+		UpdateRowHeight();
+		break;
+
 	case WM_SETFOCUS:
 		m_commandTarget.TargetFocused();
 		break;
@@ -1489,6 +1505,11 @@ void ShellTreeView::CopySelectedItemToFolder(TransferAction action)
 	std::vector<PCIDLIST_ABSOLUTE> rawPidls = { pidl.get() };
 	Epp::FileOperations::CopyFilesToFolder(m_hTreeView, rawPidls, action,
 		m_appServices->GetResourceLoader());
+}
+
+void ShellTreeView::UpdateRowHeight()
+{
+	SetTreeViewRowHeight(m_hTreeView, m_config->scaleFolderTreeRowSpacingWithFont.get());
 }
 
 void ShellTreeView::UpdateSelection()

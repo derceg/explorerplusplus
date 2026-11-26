@@ -24,6 +24,11 @@ constexpr int DEFAULT_CHECKBOX_HEIGHT = 13;
 constexpr int DEFAULT_RADIO_BUTTON_WIDTH = 13;
 constexpr int DEFAULT_RADIO_BUTTON_HEIGHT = 13;
 
+// The factor that a tree view's automatic row height is scaled by when larger row spacing is
+// requested. The automatic row height already accounts for the font, icon size and DPI, so the
+// scaled height will adjust along with all three.
+constexpr float TREE_ROW_HEIGHT_SCALE_FACTOR = 1.3f;
+
 HWND CreateListView(HWND hParent, DWORD dwStyle)
 {
 	HWND hListView = CreateWindow(WC_LISTVIEW, L"", dwStyle, 0, 0, 0, 0, hParent, nullptr,
@@ -58,6 +63,23 @@ HWND CreateTreeView(HWND hParent, DWORD dwStyle)
 	}
 
 	return hTreeView;
+}
+
+void SetTreeViewRowHeight(HWND hTreeView, bool scaleRowHeightWithFontSize)
+{
+	if (!scaleRowHeightWithFontSize)
+	{
+		// Setting the item height to -1 resets it back to the automatic height (the default).
+		TreeView_SetItemHeight(hTreeView, -1);
+		return;
+	}
+
+	// The automatic height is retrieved by first resetting the item height, then reading the
+	// value back. The height is then scaled up from that base value.
+	TreeView_SetItemHeight(hTreeView, -1);
+	auto automaticHeight = TreeView_GetItemHeight(hTreeView);
+	TreeView_SetItemHeight(hTreeView,
+		static_cast<int>(automaticHeight * TREE_ROW_HEIGHT_SCALE_FACTOR));
 }
 
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle)

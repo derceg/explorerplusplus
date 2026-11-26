@@ -59,6 +59,7 @@ struct Config
 	ValueWrapper<bool> checkBoxSelection = false;
 	bool confirmCloseTabs = false;
 	ValueWrapper<bool> synchronizeTreeview = true;
+	ValueWrapper<bool> scaleFolderTreeRowSpacingWithFont = false;
 	ValueWrapper<bool> displayWindowVertical = false;
 	bool goUpOnDoubleClick = true;
 

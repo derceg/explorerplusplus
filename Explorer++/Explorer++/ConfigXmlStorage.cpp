@@ -218,6 +218,8 @@ void LoadFromNode(IXMLDOMNode *settingsNode, Config &config)
 		config.globalFolderSettings.sizeDisplayFormat);
 	GetEnumSetting(settingsNode, L"StartupMode", config.startupMode);
 	GetBoolSetting(settingsNode, L"SynchronizeTreeview", config.synchronizeTreeview);
+	GetBoolSetting(settingsNode, L"ScaleFolderTreeRowSpacingWithFont",
+		config.scaleFolderTreeRowSpacingWithFont);
 	GetBoolSetting(settingsNode, L"TVAutoExpandSelected", config.treeViewAutoExpandSelected);
 	GetBoolSetting(settingsNode, L"UseFullRowSelect", config.useFullRowSelect);
 	GetBoolSetting(settingsNode, L"TreeViewDelayEnabled", config.treeViewDelayEnabled);
@@ -450,6 +452,9 @@ void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *settingsNode, cons
 		XMLSettings::EncodeIntValue(static_cast<int>(config.startupMode)));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"SynchronizeTreeview", XMLSettings::EncodeBoolValue(config.synchronizeTreeview.get()));
+	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
+		L"ScaleFolderTreeRowSpacingWithFont",
+		XMLSettings::EncodeBoolValue(config.scaleFolderTreeRowSpacingWithFont.get()));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,
 		L"TVAutoExpandSelected", XMLSettings::EncodeBoolValue(config.treeViewAutoExpandSelected));
 	XMLSettings::WriteStandardSetting(xmlDocument, settingsNode, SETTING_NODE_NAME,

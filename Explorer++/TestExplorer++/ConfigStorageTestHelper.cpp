@@ -15,6 +15,7 @@ Config BuildReference()
 	config.language = MAKELANGID(LANG_FRENCH, SUBLANG_FRENCH);
 	config.defaultTabDirectory = L"C:\\";
 	config.alwaysOpenNewTab = true;
+	config.scaleFolderTreeRowSpacingWithFont = true;
 	config.infoTipType = InfoTipType::Custom;
 	config.displayWindowCentreColor = RGB(255, 0, 0);
 	config.displayWindowSurroundColor = RGB(0, 255, 0);
