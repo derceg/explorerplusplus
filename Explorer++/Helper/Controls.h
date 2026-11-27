@@ -14,6 +14,12 @@ enum class TooltipType
 
 HWND CreateListView(HWND hParent, DWORD dwStyle);
 HWND CreateTreeView(HWND hParent, DWORD dwStyle);
+
+// Sets the row height used by the tree view. When scaleRowHeightWithFontSize is set, the control's
+// automatic row height (which accounts for the font, icon size and DPI) is scaled up by a fixed
+// factor. Otherwise, the control is reset back to its automatic height.
+void SetTreeViewRowHeight(HWND hTreeView, bool scaleRowHeightWithFontSize);
+
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle);
 HWND CreateTabControl(HWND hParent, DWORD dwStyle);

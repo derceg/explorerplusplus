@@ -1,6 +1,13 @@
 Explorer++ Version History
 --------------------------
 
+Version 1.5.1
+-------------
+New features:
+- An opt-in option is now available to scale the spacing between
+  rows in the folders pane tree view with the font size. It can be
+  enabled via Tools > Options > Window.
+
 Version 1.5.0
 -------------
 New features:

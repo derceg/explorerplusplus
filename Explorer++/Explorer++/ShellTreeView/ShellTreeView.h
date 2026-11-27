@@ -135,6 +135,7 @@ private:
 	bool MaybeHandleShellMenuItem(const PidlAbsolute &directory,
 		const std::vector<PidlChild> &items, const std::wstring &verb);
 	void UpdateSelection();
+	void UpdateRowHeight();
 	void StartRenamingSelectedItem();
 	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
 	void ShowPropertiesForSelectedItem() const;
